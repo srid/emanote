@@ -188,7 +188,7 @@ instance Ema Model MarkdownRoute where
 
   -- All static assets (relative to input directory) go here.
   staticAssets _ =
-    ["manifest.json", "ema.svg", "ema-demo.mp4"]
+    ["favicon.jpeg"]
 
 -- ------------------------
 -- Main entry point
@@ -269,7 +269,7 @@ headHtml r doc = do
     favIcon = do
       H.unsafeByteString . encodeUtf8 $
         [text|
-        <link href="/ema.svg" rel="icon" />
+        <link href="/favicon.jpeg" rel="icon" />
         |]
 
 data ContainerType
@@ -297,7 +297,7 @@ bodyHtml model r doc = do
     let sidebarLogo =
           H.div ! A.class_ "mt-2 h-full flex pl-2 space-x-2 items-end" $ do
             H.a ! A.href (H.toValue $ Ema.routeUrl indexMarkdownRoute) $
-              H.img ! A.class_ "z-50 transition transform hover:scale-125 hover:opacity-80 h-20" ! A.src "/ema.svg"
+              H.img ! A.class_ "z-50 transition transform hover:scale-125 hover:opacity-80 h-20" ! A.src "/favicon.jpeg"
     containerLayout CHeader sidebarLogo $ do
       H.div ! A.class_ "flex justify-center items-center" $ do
         H.h1 ! A.class_ "text-6xl mt-2 mb-2 text-center pb-2" $ H.text $ lookupTitle doc r
