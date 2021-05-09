@@ -1,6 +1,4 @@
-# Ema Template
-
-This repository represents a **real-world example** of [Ema](https://ema.srid.ca/) — it is the source for ema.srid.ca website — and as such acts as a **template repository** to use for bootstrapping your next static site using Ema.
+# essepad
 
 ## Getting Started
 
