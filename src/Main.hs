@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -13,6 +14,7 @@ module Main where
 
 import Control.Exception (throw)
 import Control.Monad.Logger
+import Data.Aeson (ToJSON (toJSON))
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -26,12 +28,14 @@ import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
-import qualified Ema.Helper.Tailwind as Tailwind
 import NeatInterpolation (text)
 import System.FilePath (splitExtension, splitPath)
+import qualified Text.Blaze.Html.Renderer.Utf8 as RU
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
+import qualified Text.Ginger as G
+import qualified Text.Ginger.Html as G
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
@@ -108,17 +112,19 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
-    modelNav :: [Tree Slug]
+    modelNav :: [Tree Slug],
+    modelTemplate :: Either G.ParserError (G.Template G.SourcePos)
   }
-  deriving (Eq, Show)
+  deriving (Show)
 
 instance Default Model where
-  def = Model mempty mempty
+  def = Model mempty mempty (Left $ G.ParserError "Uninitialized" Nothing)
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
     -- its siblings.
-    order :: Word
+    order :: Word,
+    tags :: [Text]
   }
   deriving (Eq, Show)
 
@@ -126,9 +132,19 @@ instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
     Meta
       <$> m Y..: "order"
+      <*> m Y..: "tags"
 
 instance Default Meta where
-  def = Meta maxBound
+  def = Meta maxBound mempty
+
+data NoteContext = NoteContext
+  { html :: Text,
+    title :: Text,
+    -- TODO: These should be defined in templates, with ony data passed over
+    sidebarHtml :: Text,
+    breadcrumbsHtml :: Text
+  }
+  deriving (Generic, ToJSON)
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
@@ -153,6 +169,18 @@ modelInsert k v model =
               (unMarkdownRoute k)
               (modelNav model)
         }
+
+modelSetTemplate :: Either G.ParserError (G.Template G.SourcePos) -> Model -> Model
+modelSetTemplate v model =
+  model {modelTemplate = v}
+
+modelTemplateRender :: Model -> NoteContext -> Text
+modelTemplateRender model noteContext =
+  let ctxLookup var =
+        if var == "note" then G.toGVal (toJSON noteContext) else def
+      ctx = G.makeContextHtml ctxLookup
+      tmpl = either (error . show) id $ modelTemplate model
+   in G.htmlSource $ G.runGinger ctx tmpl
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
@@ -202,23 +230,24 @@ logD = logDebugNS "essepad"
 
 main :: IO ()
 main =
-  -- runEma handles the CLI and starts the dev server (or generate static site
-  -- if `gen` argument is passed).  It is designed to work well with ghcid
-  -- (which is what the bin/run script uses).
   Ema.runEma render $ \model -> do
-    -- This is the place where we can load and continue to modify our "model".
-    -- You will use `LVar.set` and `LVar.modify` to modify the model.
-    --
-    -- It is a run in a (long-running) thread of its own.
-    --
-    -- We use the FileSystem helper to directly "mount" our files on to the
-    -- LVar.
-    FileSystem.mountOnLVar "." ["**/*.md"] model $ \fp -> \case
-      FileSystem.Update -> do
-        mData <- readSource fp
-        pure $ maybe id (uncurry modelInsert) mData
-      FileSystem.Delete ->
-        pure $ maybe id modelDelete $ mkMarkdownRoute fp
+    let templateFile = ".essepad/template.html"
+    FileSystem.mountOnLVar "." ["**/*.md", templateFile] model $ \fp action -> do
+      case snd $ splitExtension fp of
+        ".md" -> case action of
+          FileSystem.Update -> do
+            mData <- readSource fp
+            pure $ maybe id (uncurry modelInsert) mData
+          FileSystem.Delete ->
+            pure $ maybe id modelDelete (mkMarkdownRoute fp)
+        _ -> do
+          if fp /= templateFile
+            then pure id
+            else case action of
+              FileSystem.Delete ->
+                pure $ modelSetTemplate $ Left $ G.ParserError "No template found" Nothing
+              FileSystem.Update ->
+                modelSetTemplate <$> G.parseGingerFile (fmap Just . readFile) fp
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
     readSource fp =
@@ -244,86 +273,37 @@ render emaAction model r = do
       throw $ BadRoute r
     Just doc -> do
       -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
-      Tailwind.layout emaAction (headHtml r doc) (bodyHtml model r doc)
+      -- Tailwind.layout emaAction (headHtml r doc) (bodyHtml model r doc)
+      let ctx =
+            NoteContext
+              { html = decodeUtf8 . RU.renderHtml $ renderMarkdownAfterVerify model doc,
+                title =
+                  if r == indexMarkdownRoute
+                    then "essepad Notebook"
+                    else lookupTitle doc r,
+                sidebarHtml =
+                  decodeUtf8 . RU.renderHtml $ renderSidebarNav model r,
+                breadcrumbsHtml =
+                  decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
+              }
+      encodeUtf8 $ modelTemplateRender model ctx
 
-headHtml :: MarkdownRoute -> Pandoc -> H.Html
-headHtml r doc = do
-  H.title $
-    H.text $
-      if r == indexMarkdownRoute
-        then "Ema – next-gen Haskell static site generator"
-        else lookupTitle doc r <> " – Ema"
-  H.meta ! A.name "description" ! A.content "Ema static site generator (Jamstack) in Haskell"
-  favIcon
-  -- Make this a PWA and w/ https://web.dev/themed-omnibox/
-  H.link ! A.rel "manifest" ! A.href "/manifest.json"
-  H.meta ! A.name "theme-color" ! A.content "#DB2777"
-  unless (r == indexMarkdownRoute) prismJs
-  where
-    prismJs = do
-      H.unsafeByteString . encodeUtf8 $
-        [text|
-        <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-        |]
-    favIcon = do
-      H.unsafeByteString . encodeUtf8 $
-        [text|
-        <link href="/favicon.jpeg" rel="icon" />
-        |]
-
-data ContainerType
-  = -- | The row representing title part of the site
-    CHeader
-  | -- | The row representing the main part of the site. Sidebar lives here, as well as <main>
-    CBody
-  deriving (Eq, Show)
-
-containerLayout :: ContainerType -> H.Html -> H.Html -> H.Html
-containerLayout ctype sidebar w = do
-  H.div ! A.class_ "px-2 grid grid-cols-12" $ do
-    let sidebarCls = case ctype of
-          CHeader -> ""
-          CBody -> "md:sticky md:top-0 md:h-screen overflow-x-auto"
-    H.div ! A.class_ ("hidden md:mr-4 md:block md:col-span-3 " <> sidebarCls) $ do
-      sidebar
-    H.div ! A.class_ "col-span-12 md:col-span-9" $ do
-      w
-
-bodyHtml :: Model -> MarkdownRoute -> Pandoc -> H.Html
-bodyHtml model r doc = do
-  H.div ! A.class_ "container mx-auto xl:max-w-screen-lg" $ do
-    -- Header row
-    let sidebarLogo =
-          H.div ! A.class_ "mt-2 h-full flex pl-2 space-x-2 items-end" $ do
-            H.a ! A.href (H.toValue $ Ema.routeUrl indexMarkdownRoute) $
-              H.img ! A.class_ "z-50 transition transform hover:scale-125 hover:opacity-80 h-20" ! A.src "/favicon.jpeg"
-    containerLayout CHeader sidebarLogo $ do
-      H.div ! A.class_ "flex justify-center items-center" $ do
-        H.h1 ! A.class_ "text-6xl mt-2 mb-2 text-center pb-2" $ H.text $ lookupTitle doc r
-    -- Main row
-    containerLayout CBody (H.div ! A.class_ "bg-pink-50 rounded pt-1 pb-2" $ renderSidebarNav model r) $ do
-      renderBreadcrumbs model r
-      renderPandoc $
-        doc
-          & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
-          & applyClassLibrary (\c -> fromMaybe c $ Map.lookup c emaMarkdownStyleLibrary)
-          & rewriteLinks
-            -- Rewrite .md links to @MarkdownRoute@
-            ( \url -> fromMaybe url $ do
-                guard $ not $ "://" `T.isInfixOf` url
-                target <- mkMarkdownRoute $ toString url
-                -- Check that .md links are not broken
-                if modelMember target model
-                  then pure $ Ema.routeUrl target
-                  else throw $ BadRoute target
-            )
-      H.footer ! A.class_ "flex justify-center items-center space-x-4 my-8 text-center text-gray-500" $ do
-        -- TODO: Move this to HTML template
-        H.a ! A.title "Edit this page" $ editIcon
-        H.div $ do
-          "Powered by "
-          H.a ! A.class_ "font-bold" ! A.href "https://github.com/srid/ema" $ "Ema"
+renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
+renderMarkdownAfterVerify model doc =
+  renderPandoc $
+    doc
+      & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
+      & applyClassLibrary (\c -> fromMaybe c $ Map.lookup c emaMarkdownStyleLibrary)
+      & rewriteLinks
+        -- Rewrite .md links to @MarkdownRoute@
+        ( \url -> fromMaybe url $ do
+            guard $ not $ "://" `T.isInfixOf` url
+            target <- mkMarkdownRoute $ toString url
+            -- Check that .md links are not broken
+            if modelMember target model
+              then pure $ Ema.routeUrl target
+              else throw $ BadRoute target
+        )
   where
     emaMarkdownStyleLibrary =
       Map.fromList
@@ -335,15 +315,6 @@ bodyHtml model r doc = do
           ("last", "mt-8 border-t-2 border-pink-500 pb-1 pl-1 bg-gray-50 rounded"),
           ("next", "py-2 text-xl italic font-bold")
         ]
-    editIcon =
-      H.unsafeByteString $
-        encodeUtf8
-          [text|
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-          </svg>
-          |]
 
 renderSidebarNav :: Model -> MarkdownRoute -> H.Html
 renderSidebarNav model currentRoute = do
@@ -404,8 +375,8 @@ lookupTitle doc r =
 rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
 rewriteLinks f =
   W.walk $ \case
-    B.Link attr is (url, title) ->
-      B.Link attr is (f url, title)
+    B.Link attr is (url, tit) ->
+      B.Link attr is (f url, tit)
     x -> x
 
 applyClassLibrary :: (Text -> Text) -> Pandoc -> Pandoc
@@ -451,9 +422,9 @@ rpBlock = \case
     -- Prism friendly classes
     let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
      in H.div ! A.class_ "py-0.5 text-sm" $ H.pre ! rpAttr (id', classes', attrs) $ H.code ! rpAttr ("", classes', []) $ H.text s
-  B.RawBlock (B.Format fmt) html ->
+  B.RawBlock (B.Format fmt) rawHtml ->
     if fmt == "html"
-      then H.unsafeByteString $ encodeUtf8 html
+      then H.unsafeByteString $ encodeUtf8 rawHtml
       else throw Unsupported
   B.BlockQuote bs ->
     H.blockquote $ mapM_ rpBlock bs
@@ -524,7 +495,7 @@ rpInline = \case
     H.pre $ H.toHtml s
   B.Math _ _ ->
     throw Unsupported
-  B.Link attr is (url, title) -> do
+  B.Link attr is (url, tit) -> do
     let (cls, target) =
           if "://" `T.isInfixOf` url
             then ("text-pink-600 hover:underline", targetBlank)
@@ -532,12 +503,12 @@ rpInline = \case
     H.a
       ! A.class_ cls
       ! A.href (H.textValue url)
-      ! A.title (H.textValue title)
+      ! A.title (H.textValue tit)
       ! target
       ! rpAttr attr
       $ mapM_ rpInline is
-  B.Image attr is (url, title) ->
-    H.img ! A.src (H.textValue url) ! A.title (H.textValue title) ! A.alt (H.textValue $ Markdown.plainify is) ! rpAttr attr
+  B.Image attr is (url, tit) ->
+    H.img ! A.src (H.textValue url) ! A.title (H.textValue tit) ! A.alt (H.textValue $ Markdown.plainify is) ! rpAttr attr
   B.Note _ ->
     throw Unsupported
   B.Span attr is ->
