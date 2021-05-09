@@ -195,10 +195,10 @@ instance Ema Model MarkdownRoute where
 -- ------------------------
 
 log :: MonadLogger m => Text -> m ()
-log = logInfoNS "ema-docs"
+log = logInfoNS "essepad"
 
 logD :: MonadLogger m => Text -> m ()
-logD = logDebugNS "ema-docs"
+logD = logDebugNS "essepad"
 
 main :: IO ()
 main =
@@ -319,7 +319,7 @@ bodyHtml model r doc = do
                   else throw $ BadRoute target
             )
       H.footer ! A.class_ "flex justify-center items-center space-x-4 my-8 text-center text-gray-500" $ do
-        let editUrl = fromString $ "https://github.com/srid/ema-docs/edit/master/content/" <> markdownRouteSourcePath r
+        let editUrl = fromString $ "https://github.com/srid/essepad/edit/master/content/" <> markdownRouteSourcePath r
         H.a ! A.href editUrl ! A.title "Edit this page on GitHub" $ editIcon
         H.div $ do
           "Powered by "

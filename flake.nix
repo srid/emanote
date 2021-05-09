@@ -1,5 +1,5 @@
 {
-  description = "Ema documentation source";
+  description = "Essepad";
   inputs = {
     ema.url = "github:srid/ema";
     # Use the nixpkgs used by the pinned ema.
@@ -19,7 +19,7 @@
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
             inherit returnShellEnv;
-            name = "ema-docs";
+            name = "essepad";
             root = ./.;
             withHoogle = false;
             overrides = self: super: with pkgs.haskell.lib; {

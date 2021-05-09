@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -xe
-export PORT=9001
+export PORT=9010
 
 # This will run ghcid, which uses `./.ghcid` to invoke your program main entry
 # point, with the specified args.
