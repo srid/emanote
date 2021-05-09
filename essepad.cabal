@@ -23,6 +23,7 @@ extra-source-files:
 executable essepad
   build-depends:
     , async
+    , aeson
     , base
     , blaze-html
     , blaze-markup
@@ -31,6 +32,7 @@ executable essepad
     , directory
     , ema                 >=0.2
     , filepath
+    , ginger
     , HsYAML
     , lvar
     , monad-logger
