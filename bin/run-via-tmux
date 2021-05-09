@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -xe
+PROJECT=$(basename `pwd`)
+tmux new-session -A -s $PROJECT bin/run

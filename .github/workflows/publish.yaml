@@ -1,0 +1,27 @@
+name: "Publish site"
+on:
+  # Run only when pushing to master branch
+  push:
+    branches:
+      - master
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v13
+        with:
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/lb41az54kzk6j12p81br4bczary7m145/install
+          install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Build and generate docs HTML 🔧
+        run: |
+          mkdir ./output
+          nix run . -- -C ./content gen $(pwd)/output
+      - name: Deploy to gh-pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: output
+          cname: ema.srid.ca

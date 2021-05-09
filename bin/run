@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -xe
+export PORT=9001
+
+# This will run ghcid, which uses `./.ghcid` to invoke your program main entry
+# point, with the specified args.
+#
+# If you change ./.ghcid, ghcid will automatically reload.
+exec nix develop -c ghcid

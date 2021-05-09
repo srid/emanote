@@ -1,0 +1,69 @@
+cabal-version:      2.4
+name:               ema-docs
+version:            0.1.0.0
+license:            AGPL-3.0-only
+copyright:          2021 Sridhar Ratnakumar
+maintainer:         srid@srid.ca
+author:             Sridhar Ratnakumar
+category:           Web
+
+-- A short (one-line) description of the package.
+-- synopsis:
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+
+extra-source-files:
+  LICENSE
+  README.md
+
+executable ema-docs
+  build-depends:
+    , async
+    , base
+    , blaze-html
+    , blaze-markup
+    , containers
+    , data-default
+    , directory
+    , ema                 >=0.2
+    , filepath
+    , HsYAML
+    , lvar
+    , monad-logger
+    , neat-interpolation
+    , pandoc-types
+    , profunctors
+    , relude
+    , shower
+    , tagged
+    , text
+    , time
+    , unliftio
+
+  mixins:
+    base hiding (Prelude),
+    relude (Relude as Prelude, Relude.Container.One),
+    relude
+
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+
+  default-extensions:
+    FlexibleContexts
+    FlexibleInstances
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    OverloadedStrings
+    ScopedTypeVariables
+    TupleSections
+    ViewPatterns
+
+  main-is:            Main.hs
+  hs-source-dirs:     src
+  default-language:   Haskell2010

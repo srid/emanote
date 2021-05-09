@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Dev Server",
+            "type": "shell",
+            // You may also use bin/run-via-tmux if you have tmux
+            // This is useful if you often see ghost ghcid left behind by VSCode reloads.
+            "command": "bin/run",
+            "args": [],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "runOptions": {
+                // "runOn": "folderOpen"
+            }
+        }
+    ]
+}

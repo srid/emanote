@@ -1,0 +1,1 @@
+--warnings -T ":main -C ./content"
