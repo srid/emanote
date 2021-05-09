@@ -138,7 +138,10 @@ instance Default Meta where
 
 data NoteContext = NoteContext
   { html :: Text,
-    title :: Text
+    title :: Text,
+    -- TODO: These should be defined in templates, with ony data passed over
+    sidebarHtml :: Text,
+    breadcrumbsHtml :: Text
   }
   deriving (Generic, ToJSON)
 
@@ -284,11 +287,15 @@ render emaAction model r = do
       -- Tailwind.layout emaAction (headHtml r doc) (bodyHtml model r doc)
       let ctx =
             NoteContext
-              { html = decodeUtf8 $ RU.renderHtml $ renderMarkdownAfterVerify model doc,
+              { html = decodeUtf8 . RU.renderHtml $ renderMarkdownAfterVerify model doc,
                 title =
                   if r == indexMarkdownRoute
                     then "essepad Notebook"
-                    else lookupTitle doc r
+                    else lookupTitle doc r,
+                sidebarHtml =
+                  decodeUtf8 . RU.renderHtml $ renderSidebarNav model r,
+                breadcrumbsHtml =
+                  decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
               }
       encodeUtf8 $ modelTemplateRender model ctx
 
