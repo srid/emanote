@@ -22,8 +22,8 @@ extra-source-files:
 
 executable essepad
   build-depends:
-    , async
     , aeson
+    , async
     , base
     , blaze-html
     , blaze-markup
