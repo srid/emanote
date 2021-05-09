@@ -319,8 +319,8 @@ bodyHtml model r doc = do
                   else throw $ BadRoute target
             )
       H.footer ! A.class_ "flex justify-center items-center space-x-4 my-8 text-center text-gray-500" $ do
-        let editUrl = fromString $ "https://github.com/srid/essepad/edit/master/content/" <> markdownRouteSourcePath r
-        H.a ! A.href editUrl ! A.title "Edit this page on GitHub" $ editIcon
+        -- TODO: Move this to HTML template
+        H.a ! A.title "Edit this page" $ editIcon
         H.div $ do
           "Powered by "
           H.a ! A.class_ "font-bold" ! A.href "https://github.com/srid/ema" $ "Ema"
@@ -482,7 +482,7 @@ rpBlock = \case
   B.Null ->
     pure ()
   where
-    listStyle = "list-inside ml-2 space-y-1 "
+    listStyle = "list-inside ml-4 space-y-1 "
     listItemStyle = ""
 
 headerElem :: Int -> H.Html -> H.Html

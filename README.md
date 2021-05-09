@@ -1,5 +1,7 @@
 # essepad
 
+WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
+
 ## Getting Started
 
 To develop with full IDE support in Visual Studio Code, follow these steps:
