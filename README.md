@@ -13,11 +13,11 @@ To develop with full IDE support in Visual Studio Code, follow these steps:
     - <kbd>Ctrl+Shift+P</kbd> to run command "Nix-Env: Select Environment" and select `shell.nix`. The extension will ask you to reload VSCode at the end.
 - Press <kbd>Ctrl+Shift+B</kbd> in VSCode, or run `bin/run` (`bin/run-via-tmux` if you have tmux installed) in terminal, to launch the Ema dev server, and navigate to http://localhost:9010/
 
-All but the final step need to be done only once. Check [the Ema tutorial](https://ema.srid.ca/start/tutorial) next.
+All but the final step need to be done only once.
 
 ### Testing on haskell-knowledge-base
 
-First, clone [haskell-knowlege-base](https://github.com/tfausak/haskell-knowledge-base) and symlink to Ema's default HTML templates,
+First, clone [haskell-knowledge-base](https://github.com/tfausak/haskell-knowledge-base) and symlink to Ema's default HTML templates,
 
 ```bash
 # Clone, and symlink to Ema's default HTML templates
@@ -31,10 +31,10 @@ ln -s ../emabook/docs/favicon.svg .  # Or use something else
 Then go back to Emabook, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
 
 ```
---warnings -T ":main -C /home/srid/code/haskell-knowledge-base"
+--warnings -T ":main -C ../haskell-knowledge-base"
 ```
 
-Finally, run `bin/run` to spin up the server at http://localhost:9010
+Finally, run `bin/run` to spin up the server, and go to http://localhost:9010/README
 
 To generate static files,
 
@@ -61,4 +61,5 @@ To triage,
 
 Before public release
 
+- [ ] Finalize in HTML templating: heist vs a more popular one?
 - [ ] Finalize on the project name: `emabook`, or something else?
