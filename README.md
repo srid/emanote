@@ -17,6 +17,8 @@ All but the final step need to be done only once. Check [the Ema tutorial](https
 
 ## Tasks
 
+Before making repo public,
+
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting

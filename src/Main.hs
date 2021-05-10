@@ -130,7 +130,7 @@ data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
     -- its siblings.
     order :: Word,
-    tags :: [Text]
+    tags :: Maybe [Text]
   }
   deriving (Eq, Show)
 
@@ -138,7 +138,7 @@ instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
     Meta
       <$> m Y..: "order"
-      <*> m Y..: "tags"
+      <*> m Y..:? "tags"
 
 instance Default Meta where
   def = Meta maxBound mempty
@@ -187,6 +187,8 @@ modelSetHeistTemplate v model =
   model {modelHeistTemplate = v}
 
 -- TODO: Eventually move these to Ema.Helper
+-- Consider first the full practical range of template patterns,
+-- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
 
 loadHeistTemplates :: MonadIO m => FilePath -> m (Either [String] (H.HeistState Identity))
 loadHeistTemplates templateDir = do
@@ -246,7 +248,7 @@ instance Ema Model MarkdownRoute where
 
   -- All static assets (relative to input directory) go here.
   staticAssets _ =
-    ["favicon.jpeg"]
+    ["favicon.jpeg", "favicon.svg", "static"]
 
 -- ------------------------
 -- Main entry point
@@ -307,7 +309,8 @@ render _emaAction model r = do
               { html = renderHtml $ renderMarkdownAfterVerify model doc,
                 title =
                   if r == indexMarkdownRoute
-                    then "emabook Notebook"
+                    then -- TODO: Configurable site title (via heist splice?)
+                      "emabook"
                     else lookupTitle doc r,
                 sidebarHtml =
                   renderHtml $ renderSidebarNav model r,
