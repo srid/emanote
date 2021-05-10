@@ -15,15 +15,41 @@ To develop with full IDE support in Visual Studio Code, follow these steps:
 
 All but the final step need to be done only once. Check [the Ema tutorial](https://ema.srid.ca/start/tutorial) next.
 
-## Tasks
+### Testing on haskell-knowledge-base
 
-Before making repo public,
+First, clone [haskell-knowlege-base](https://github.com/tfausak/haskell-knowledge-base) and symlink to Ema's default HTML templates,
+
+```bash
+# Clone, and symlink to Ema's default HTML templates
+cd ../
+git clone git@github.com:tfausak/haskell-knowledge-base.git
+cd haskell-knowledge-base/
+ln -s ../emabook/docs/.emabook .
+ln -s ../emabook/docs/favicon.svg .  # Or use something else
+```
+
+Then go back to Emabook, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
+
+```
+--warnings -T ":main -C /home/srid/code/haskell-knowledge-base"
+```
+
+Finally, run `bin/run` to spin up the server at http://localhost:9010
+
+To generate static files,
+
+```bash
+mkdir ./output
+nix run . -- -C ../haskell-knowledge-base gen $(pwd)/output
+nix-shell -p nodePackages.http-server --run 'http-server ./output/'
+```
+
+## Tasks
 
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
-- [ ] Make repo public
 
 To triage,
 
@@ -31,8 +57,7 @@ To triage,
 - [ ] Remove hardcoding of CSS classes in Pandoc's HTML
   - If using Tailwind, requires `@apply` somehow. Can be addressed using twind's preflight.
 - [ ] Redirect to README.md if there is no index.md
-- [ ] ... more in my notebook.
-
+- [ ] ... many more in my private notebook.
 
 Before public release
 

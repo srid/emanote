@@ -247,6 +247,7 @@ instance Ema Model MarkdownRoute where
     mdRoutes
 
   -- All static assets (relative to input directory) go here.
+  -- Not all of these may exist.
   staticAssets _ =
     ["favicon.jpeg", "favicon.svg", "static"]
 
