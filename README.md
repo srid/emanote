@@ -17,7 +17,21 @@ All but the final step need to be done only once. Check [the Ema tutorial](https
 
 ## Tasks
 
+- [ ] Default template: should be builtin, obviating `./.emabook`
+  - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
+  - Must include things like prismJS syntax highlighting
+- [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
+- [ ] Make repo public
+
+To triage,
+
 - [ ] Remove hardcoded Tailwind based HTML for sidebar & breadcrumbs
 - [ ] Remove hardcoding of CSS classes in Pandoc's HTML
   - If using Tailwind, requires `@apply` somehow. Can be addressed using twind's preflight.
-- [ ] ... more in notebook.
+- [ ] Redirect to README.md if there is no index.md
+- [ ] ... more in my notebook.
+
+
+Before public release
+
+- [ ] Finalize on the project name: `emabook`, or something else?
