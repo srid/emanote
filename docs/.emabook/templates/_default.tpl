@@ -45,7 +45,7 @@
             </div>
             <!-- Main body column -->
             <div class="col-span-12 md:col-span-9">
-                <note.breadcrumbsHtml />
+                <note-breadcrumbsHtml />
                 <note-html />
 
                 <footer class="flex justify-center items-center space-x-4 my-8 text-center text-gray-500">

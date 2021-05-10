@@ -25,7 +25,6 @@ executable emabook
     , async
     , base
     , blaze-html
-    , blaze-markup
     , bytestring
     , containers
     , data-default
