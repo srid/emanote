@@ -57,13 +57,23 @@ indexMarkdownRoute = MarkdownRoute $ "index" :| []
 -- | Convert foo/bar.md to a @MarkdownRoute@
 --
 -- If the file is not a Markdown file, return Nothing.
-mkMarkdownRoute :: FilePath -> Maybe MarkdownRoute
-mkMarkdownRoute = \case
+mkMarkdownRouteFromFilePath :: FilePath -> Maybe MarkdownRoute
+mkMarkdownRouteFromFilePath = \case
   (splitExtension -> (fp, ".md")) ->
     let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath fp
      in MarkdownRoute <$> nonEmpty slugs
   _ ->
     Nothing
+
+mkMarkdownRouteFromUrl :: Text -> Maybe MarkdownRoute
+mkMarkdownRouteFromUrl url =
+  if ".md" `T.isSuffixOf` url
+    then -- Regular Markdown link: [foo](foo.md); delegate.
+      mkMarkdownRouteFromFilePath $ toString url
+    else -- Expecting wikilink: [[foo]].
+
+      let resolvedPath = url <> ".md" -- TODO: Resolve to correct directory
+       in mkMarkdownRouteFromFilePath $ toString resolvedPath
 
 markdownRouteSourcePath :: MarkdownRoute -> FilePath
 markdownRouteSourcePath r =
@@ -232,7 +242,7 @@ main =
             mData <- readSource fp
             pure $ maybe id (uncurry modelInsert) mData
           FileSystem.Delete ->
-            pure $ maybe id modelDelete (mkMarkdownRoute fp)
+            pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
           if fp /= templateFile
             then pure id
@@ -245,12 +255,12 @@ main =
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
     readSource fp =
       runMaybeT $ do
-        r :: MarkdownRoute <- MaybeT $ pure $ mkMarkdownRoute fp
+        r :: MarkdownRoute <- MaybeT $ pure $ mkMarkdownRouteFromFilePath fp
         logD $ "Reading " <> toText fp
         s <- readFileText fp
         pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ parseMarkdown fp s)
     parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @Meta $ Markdown.wikiLinkSpec <> Markdown.fullMarkdownSpec
+      Markdown.parseMarkdownWithFrontMatter @Meta $ Markdown.wikilinksSpec <> Markdown.fullMarkdownSpec
 
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
@@ -293,7 +303,10 @@ renderMarkdownAfterVerify model doc =
         -- Rewrite .md links to @MarkdownRoute@
         ( \url -> fromMaybe url $ do
             guard $ not $ "://" `T.isInfixOf` url
-            target <- mkMarkdownRoute $ toString url
+            -- FIXME: Because wikilink parser returns "Foo.md", we must locate
+            -- it and link to correct place in hierarchy.
+            -- When doing this, bail out early on ambiguities.
+            target <- mkMarkdownRouteFromUrl url
             pure $ Ema.routeUrl target
             -- Check that .md links are not broken
             {- if modelMember target model
