@@ -13,6 +13,7 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
+import Data.Map.Syntax ((##))
 import Data.Profunctor (dimap)
 import qualified Data.Text as T
 import Data.Tree (Tree (Node))
@@ -185,17 +186,25 @@ modelSetHeistTemplate :: Either [String] (H.HeistState Identity) -> Model -> Mod
 modelSetHeistTemplate v model =
   model {modelHeistTemplate = v}
 
-modelRenderHeistTemplate :: ByteString -> Model -> LByteString
-modelRenderHeistTemplate name model =
+modelRenderHeistTemplate :: ByteString -> NoteContext -> Model -> LByteString
+modelRenderHeistTemplate name ctx model =
   case modelHeistTemplate model of
     Left (fmap toText -> errs) ->
       error $ unlines errs
     Right heist ->
-      case HI.renderTemplate heist name of
-        Identity (Just (builder, _mimeType)) ->
-          toLazyByteString builder
-        Identity Nothing ->
-          error "Unable to render"
+      let splices = do
+            "note-title" ## title ctx
+            "note-html" ## html ctx
+            "note-breadcrumbsHtml" ## breadcrumbsHtml ctx
+            "note-sidebarHtml" ## sidebarHtml ctx
+          heistWithCtx =
+            heist
+              & HI.bindStrings splices
+       in case HI.renderTemplate heistWithCtx name of
+            Identity (Just (builder, _mimeType)) ->
+              toLazyByteString builder
+            Identity Nothing ->
+              error "Unable to render"
 
 modelTemplateRender :: Model -> NoteContext -> Text
 modelTemplateRender model noteContext =
@@ -322,7 +331,7 @@ render emaAction model r = do
                   decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
               }
       -- encodeUtf8 $ modelTemplateRender model ctx
-      modelRenderHeistTemplate "_default" model
+      modelRenderHeistTemplate "_default" ctx model
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =

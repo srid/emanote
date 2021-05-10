@@ -34,10 +34,11 @@ executable emabook
     , ema                 >=0.2
     , filepath
     , ginger
-    , heist
+    , heist               >=1.1.0.1
     , HsYAML
     , lens
     , lvar
+    , map-syntax
     , monad-logger
     , neat-interpolation
     , pandoc-types
