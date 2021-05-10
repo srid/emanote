@@ -30,6 +30,7 @@ executable emabook
     , containers
     , data-default
     , directory
+    , mtl
     , ema                 >=0.2
     , filepath
     , heist               >=1.1.0.1
