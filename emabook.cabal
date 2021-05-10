@@ -22,7 +22,6 @@ extra-source-files:
 
 executable emabook
   build-depends:
-    , aeson
     , async
     , base
     , blaze-html
@@ -33,12 +32,10 @@ executable emabook
     , directory
     , ema                 >=0.2
     , filepath
-    , ginger
     , heist               >=1.1.0.1
     , HsYAML
     , lens
     , lvar
-    , map-syntax
     , monad-logger
     , neat-interpolation
     , pandoc-types

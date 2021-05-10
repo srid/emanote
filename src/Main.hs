@@ -9,12 +9,10 @@ module Main where
 import Control.Exception (throw)
 import Control.Lens.Operators ((.~))
 import Control.Monad.Logger
-import Data.Aeson (ToJSON (toJSON))
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
-import Data.Map.Syntax ((##))
 import Data.Profunctor (dimap)
 import qualified Data.Text as T
 import Data.Tree (Tree (Node))
@@ -29,13 +27,10 @@ import qualified Heist as H
 import qualified Heist.Interpreted as HI
 import NeatInterpolation (text)
 import System.FilePath (splitExtension, splitPath, (</>))
-import qualified Text.Blaze.Html.Renderer.Utf8 as RU
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Renderer.XmlHtml as RX
-import qualified Text.Ginger as G
-import qualified Text.Ginger.Html as G
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
@@ -124,12 +119,11 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
     modelNav :: [Tree Slug],
-    modelTemplate :: Either G.ParserError (G.Template G.SourcePos),
     modelHeistTemplate :: Either [String] (H.HeistState Identity)
   }
 
 instance Default Model where
-  def = Model mempty mempty (Left $ G.ParserError "Uninitialized" Nothing) (Left $ one $ "Heist state not yet loaded")
+  def = Model mempty mempty (Left $ one $ "Heist state not yet loaded")
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -179,10 +173,6 @@ modelInsert k v model =
               (unMarkdownRoute k)
               (modelNav model)
         }
-
-modelSetTemplate :: Either G.ParserError (G.Template G.SourcePos) -> Model -> Model
-modelSetTemplate v model =
-  model {modelTemplate = v}
 
 modelSetHeistTemplate :: Either [String] (H.HeistState Identity) -> Model -> Model
 modelSetHeistTemplate v model =
@@ -266,23 +256,16 @@ main =
           FileSystem.Delete ->
             pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
-          if fp == templateFile
-            then case action of
-              FileSystem.Delete ->
-                pure $ modelSetTemplate $ Left $ G.ParserError "No template found" Nothing
-              FileSystem.Update ->
-                modelSetTemplate <$> G.parseGingerFile (fmap Just . readFile) fp
-            else
-              if heistTemplateDir `isPrefixOf` fp
-                then do
-                  -- TODO: Use heist compiled templates
-                  let heistCfg :: H.HeistConfig Identity =
-                        H.emptyHeistConfig
-                          & H.hcNamespace .~ ""
-                          & H.hcTemplateLocations .~ [H.loadTemplates heistTemplateDir]
-                  eHeist <- liftIO $ H.initHeist heistCfg
-                  pure $ modelSetHeistTemplate eHeist
-                else pure id
+          if heistTemplateDir `isPrefixOf` fp
+            then do
+              -- TODO: Use heist compiled templates
+              let heistCfg :: H.HeistConfig Identity =
+                    H.emptyHeistConfig
+                      & H.hcNamespace .~ ""
+                      & H.hcTemplateLocations .~ [H.loadTemplates heistTemplateDir]
+              eHeist <- liftIO $ H.initHeist heistCfg
+              pure $ modelSetHeistTemplate eHeist
+            else pure id
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
     readSource fp =
