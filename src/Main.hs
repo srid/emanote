@@ -12,6 +12,7 @@ import Control.Monad.Except (runExcept)
 import Control.Monad.Logger
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
+import Data.List (isInfixOf)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Profunctor (dimap)
@@ -275,7 +276,7 @@ main =
           FileSystem.Delete ->
             pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
-          if heistTemplateDir `isPrefixOf` fp
+          if heistTemplateDir `isInfixOf` fp
             then modelSetHeistTemplate <$> loadHeistTemplates heistTemplateDir
             else pure id
   where
