@@ -49,6 +49,7 @@ executable emabook
     , text
     , time
     , unliftio
+    , xmlhtml
 
   mixins:
     base hiding (Prelude),

@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Main where
@@ -32,11 +33,13 @@ import qualified Text.Blaze.Html.Renderer.Utf8 as RU
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
+import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Ginger as G
 import qualified Text.Ginger.Html as G
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
+import qualified Text.XmlHtml as XmlHtml
 
 -- ------------------------
 -- Our site route
@@ -146,13 +149,12 @@ instance Default Meta where
   def = Meta maxBound mempty
 
 data NoteContext = NoteContext
-  { html :: Text,
+  { html :: [XmlHtml.Node],
     title :: Text,
     -- TODO: These should be defined in templates, with ony data passed over
-    sidebarHtml :: Text,
-    breadcrumbsHtml :: Text
+    sidebarHtml :: [XmlHtml.Node],
+    breadcrumbsHtml :: [XmlHtml.Node]
   }
-  deriving (Generic, ToJSON)
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
@@ -192,27 +194,17 @@ modelRenderHeistTemplate name ctx model =
     Left (fmap toText -> errs) ->
       error $ unlines errs
     Right heist ->
-      let splices = do
-            "note-title" ## title ctx
-            "note-html" ## html ctx
-            "note-breadcrumbsHtml" ## breadcrumbsHtml ctx
-            "note-sidebarHtml" ## sidebarHtml ctx
-          heistWithCtx =
+      let heistWithCtx =
             heist
-              & HI.bindStrings splices
+              & HI.bindString "note-title" (title ctx)
+              & HI.bindSplice "note-html" (pure $ html ctx)
+              & HI.bindSplice "note-sidebarHtml" (pure $ sidebarHtml ctx)
+              & HI.bindSplice "note-breadcrumbsHtml" (pure $ breadcrumbsHtml ctx)
        in case HI.renderTemplate heistWithCtx name of
             Identity (Just (builder, _mimeType)) ->
               toLazyByteString builder
             Identity Nothing ->
               error "Unable to render"
-
-modelTemplateRender :: Model -> NoteContext -> Text
-modelTemplateRender model noteContext =
-  let ctxLookup var =
-        if var == "note" then G.toGVal (toJSON noteContext) else def
-      ctx = G.makeContextHtml ctxLookup
-      tmpl = either (error . show) id $ modelTemplate model
-   in G.htmlSource $ G.runGinger ctx tmpl
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
@@ -320,18 +312,25 @@ render emaAction model r = do
       -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
       let ctx =
             NoteContext
-              { html = decodeUtf8 . RU.renderHtml $ renderMarkdownAfterVerify model doc,
+              { html = renderHtml $ renderMarkdownAfterVerify model doc,
                 title =
                   if r == indexMarkdownRoute
                     then "emabook Notebook"
                     else lookupTitle doc r,
                 sidebarHtml =
-                  decodeUtf8 . RU.renderHtml $ renderSidebarNav model r,
+                  renderHtml $ renderSidebarNav model r,
                 breadcrumbsHtml =
-                  decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
+                  renderHtml $ renderBreadcrumbs model r
               }
       -- encodeUtf8 $ modelTemplateRender model ctx
       modelRenderHeistTemplate "_default" ctx model
+  where
+    renderHtml h =
+      case RX.renderHtml h of
+        XmlHtml.HtmlDocument {..} ->
+          docContent
+        _ ->
+          error "not a HTML document"
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =
