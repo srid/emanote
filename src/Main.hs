@@ -226,15 +226,15 @@ instance Ema Model MarkdownRoute where
 -- ------------------------
 
 log :: MonadLogger m => Text -> m ()
-log = logInfoNS "essepad"
+log = logInfoNS "emabook"
 
 logD :: MonadLogger m => Text -> m ()
-logD = logDebugNS "essepad"
+logD = logDebugNS "emabook"
 
 main :: IO ()
 main =
   Ema.runEma render $ \model -> do
-    let templateFile = ".essepad/template.html"
+    let templateFile = ".emabook/template.html"
     FileSystem.mountOnLVar "." ["**/*.md", templateFile] model $ \fp action -> do
       case snd $ splitExtension fp of
         ".md" -> case action of
@@ -278,13 +278,12 @@ render emaAction model r = do
       throw $ BadRoute r
     Just doc -> do
       -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
-      -- Tailwind.layout emaAction (headHtml r doc) (bodyHtml model r doc)
       let ctx =
             NoteContext
               { html = decodeUtf8 . RU.renderHtml $ renderMarkdownAfterVerify model doc,
                 title =
                   if r == indexMarkdownRoute
-                    then "essepad Notebook"
+                    then "emabook Notebook"
                     else lookupTitle doc r,
                 sidebarHtml =
                   decodeUtf8 . RU.renderHtml $ renderSidebarNav model r,

@@ -1,4 +1,4 @@
-# essepad
+# emabook
 
 WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
