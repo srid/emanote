@@ -27,13 +27,16 @@ executable emabook
     , base
     , blaze-html
     , blaze-markup
+    , bytestring
     , containers
     , data-default
     , directory
     , ema                 >=0.2
     , filepath
     , ginger
+    , heist
     , HsYAML
+    , lens
     , lvar
     , monad-logger
     , neat-interpolation

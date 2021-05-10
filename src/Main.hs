@@ -6,8 +6,10 @@
 module Main where
 
 import Control.Exception (throw)
+import Control.Lens.Operators ((.~))
 import Control.Monad.Logger
 import Data.Aeson (ToJSON (toJSON))
+import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -21,8 +23,10 @@ import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Heist as H
+import qualified Heist.Interpreted as HI
 import NeatInterpolation (text)
-import System.FilePath (splitExtension, splitPath)
+import System.FilePath (splitExtension, splitPath, (</>))
 import qualified Text.Blaze.Html.Renderer.Utf8 as RU
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
@@ -116,12 +120,12 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
     modelNav :: [Tree Slug],
-    modelTemplate :: Either G.ParserError (G.Template G.SourcePos)
+    modelTemplate :: Either G.ParserError (G.Template G.SourcePos),
+    modelHeistTemplate :: Either [String] (H.HeistState Identity)
   }
-  deriving (Show)
 
 instance Default Model where
-  def = Model mempty mempty (Left $ G.ParserError "Uninitialized" Nothing)
+  def = Model mempty mempty (Left $ G.ParserError "Uninitialized" Nothing) (Left $ one $ "Heist state not yet loaded")
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -176,6 +180,22 @@ modelInsert k v model =
 modelSetTemplate :: Either G.ParserError (G.Template G.SourcePos) -> Model -> Model
 modelSetTemplate v model =
   model {modelTemplate = v}
+
+modelSetHeistTemplate :: Either [String] (H.HeistState Identity) -> Model -> Model
+modelSetHeistTemplate v model =
+  model {modelHeistTemplate = v}
+
+modelRenderHeistTemplate :: ByteString -> Model -> LByteString
+modelRenderHeistTemplate name model =
+  case modelHeistTemplate model of
+    Left (fmap toText -> errs) ->
+      error $ unlines errs
+    Right heist ->
+      case HI.renderTemplate heist name of
+        Identity (Just (builder, _mimeType)) ->
+          toLazyByteString builder
+        Identity Nothing ->
+          error "Unable to render"
 
 modelTemplateRender :: Model -> NoteContext -> Text
 modelTemplateRender model noteContext =
@@ -235,7 +255,8 @@ main :: IO ()
 main =
   Ema.runEma render $ \model -> do
     let templateFile = ".emabook/template.html"
-    FileSystem.mountOnLVar "." ["**/*.md", templateFile] model $ \fp action -> do
+        heistTemplateDir = ".emabook/templates"
+    FileSystem.mountOnLVar "." ["**/*.md", templateFile, heistTemplateDir </> "*.tpl"] model $ \fp action -> do
       case snd $ splitExtension fp of
         ".md" -> case action of
           FileSystem.Update -> do
@@ -244,13 +265,23 @@ main =
           FileSystem.Delete ->
             pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
-          if fp /= templateFile
-            then pure id
-            else case action of
+          if fp == templateFile
+            then case action of
               FileSystem.Delete ->
                 pure $ modelSetTemplate $ Left $ G.ParserError "No template found" Nothing
               FileSystem.Update ->
                 modelSetTemplate <$> G.parseGingerFile (fmap Just . readFile) fp
+            else
+              if heistTemplateDir `isPrefixOf` fp
+                then do
+                  -- TODO: Use heist compiled templates
+                  let heistCfg :: H.HeistConfig Identity =
+                        H.emptyHeistConfig
+                          & H.hcNamespace .~ ""
+                          & H.hcTemplateLocations .~ [H.loadTemplates heistTemplateDir]
+                  eHeist <- liftIO $ H.initHeist heistCfg
+                  pure $ modelSetHeistTemplate eHeist
+                else pure id
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
     readSource fp =
@@ -290,7 +321,8 @@ render emaAction model r = do
                 breadcrumbsHtml =
                   decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
               }
-      encodeUtf8 $ modelTemplateRender model ctx
+      -- encodeUtf8 $ modelTemplateRender model ctx
+      modelRenderHeistTemplate "_default" model
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =
