@@ -3,13 +3,6 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | This code generates the site at https://ema.srid.ca/ - and as such it might
--- be a bit too complex example to begin with, unless you intend to create a
--- Markdown-based site.
---
--- For a simpler example, check out one of the following:
---   https://github.com/srid/ema/blob/master/src/Ema/Example/Ex02_Clock.hs
---   https://github.com/srid/www.srid.ca/blob/master/src/Main.hs
 module Main where
 
 import Control.Exception (throw)
@@ -255,7 +248,9 @@ main =
         r :: MarkdownRoute <- MaybeT $ pure $ mkMarkdownRoute fp
         logD $ "Reading " <> toText fp
         s <- readFileText fp
-        pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ Markdown.parseMarkdownWithFrontMatter @Meta fp s)
+        pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ parseMarkdown fp s)
+    parseMarkdown =
+      Markdown.parseMarkdownWithFrontMatter @Meta $ Markdown.wikiLinkSpec <> Markdown.fullMarkdownSpec
 
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
@@ -299,10 +294,11 @@ renderMarkdownAfterVerify model doc =
         ( \url -> fromMaybe url $ do
             guard $ not $ "://" `T.isInfixOf` url
             target <- mkMarkdownRoute $ toString url
+            pure $ Ema.routeUrl target
             -- Check that .md links are not broken
-            if modelMember target model
+            {- if modelMember target model
               then pure $ Ema.routeUrl target
-              else throw $ BadRoute target
+              else throw $ BadRoute target -}
         )
   where
     emaMarkdownStyleLibrary =

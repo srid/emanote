@@ -7,15 +7,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1620574961,
-        "narHash": "sha256-uPisMXfny512zgZF5PSvbsJv2czJBGojCcNJSxC/9vg=",
+        "lastModified": 1620610007,
+        "narHash": "sha256-YNEX/gCzBGgRcmXYkuTbp7gZWc8e9rqYCp1jRrsjhRQ=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "5f10887eaf9c69f3d2c70fde76a50b3820235845",
+        "rev": "7eb3f7c29a127c10468658e698e476bb525227ad",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "wikilink",
         "repo": "ema",
         "type": "github"
       }
