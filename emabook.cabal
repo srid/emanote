@@ -22,18 +22,20 @@ extra-source-files:
 
 executable emabook
   build-depends:
-    , aeson
     , async
     , base
     , blaze-html
     , blaze-markup
+    , bytestring
     , containers
     , data-default
     , directory
+    , mtl
     , ema                 >=0.2
     , filepath
-    , ginger
+    , heist               >=1.1.0.1
     , HsYAML
+    , lens
     , lvar
     , monad-logger
     , neat-interpolation
@@ -45,6 +47,7 @@ executable emabook
     , text
     , time
     , unliftio
+    , xmlhtml
 
   mixins:
     base hiding (Prelude),
