@@ -260,7 +260,7 @@ main =
         s <- readFileText fp
         pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ parseMarkdown fp s)
     parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @Meta $ Markdown.wikilinksSpec <> Markdown.fullMarkdownSpec
+      Markdown.parseMarkdownWithFrontMatter @Meta $ Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
 
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
