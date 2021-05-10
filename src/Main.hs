@@ -1,13 +1,16 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Main where
 
 import Control.Exception (throw)
+import Control.Lens.Operators ((.~))
+import Control.Monad.Except (runExcept)
 import Control.Monad.Logger
-import Data.Aeson (ToJSON (toJSON))
+import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -21,17 +24,18 @@ import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Heist as H
+import qualified Heist.Interpreted as HI
 import NeatInterpolation (text)
-import System.FilePath (splitExtension, splitPath)
-import qualified Text.Blaze.Html.Renderer.Utf8 as RU
+import System.FilePath (splitExtension, splitPath, (</>))
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import qualified Text.Ginger as G
-import qualified Text.Ginger.Html as G
+import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
+import qualified Text.XmlHtml as XmlHtml
 
 -- ------------------------
 -- Our site route
@@ -116,12 +120,11 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
     modelNav :: [Tree Slug],
-    modelTemplate :: Either G.ParserError (G.Template G.SourcePos)
+    modelHeistTemplate :: Either [String] (H.HeistState Identity)
   }
-  deriving (Show)
 
 instance Default Model where
-  def = Model mempty mempty (Left $ G.ParserError "Uninitialized" Nothing)
+  def = Model mempty mempty (Left $ one "Heist state not yet loaded")
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -141,13 +144,12 @@ instance Default Meta where
   def = Meta maxBound mempty
 
 data NoteContext = NoteContext
-  { html :: Text,
+  { html :: [XmlHtml.Node],
     title :: Text,
     -- TODO: These should be defined in templates, with ony data passed over
-    sidebarHtml :: Text,
-    breadcrumbsHtml :: Text
+    sidebarHtml :: [XmlHtml.Node],
+    breadcrumbsHtml :: [XmlHtml.Node]
   }
-  deriving (Generic, ToJSON)
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
@@ -173,24 +175,49 @@ modelInsert k v model =
               (modelNav model)
         }
 
-modelSetTemplate :: Either G.ParserError (G.Template G.SourcePos) -> Model -> Model
-modelSetTemplate v model =
-  model {modelTemplate = v}
-
-modelTemplateRender :: Model -> NoteContext -> Text
-modelTemplateRender model noteContext =
-  let ctxLookup var =
-        if var == "note" then G.toGVal (toJSON noteContext) else def
-      ctx = G.makeContextHtml ctxLookup
-      tmpl = either (error . show) id $ modelTemplate model
-   in G.htmlSource $ G.runGinger ctx tmpl
-
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
     { modelDocs = Map.delete k (modelDocs model),
       modelNav = PathTree.treeDeletePath (unMarkdownRoute k) (modelNav model)
     }
+
+modelSetHeistTemplate :: Either [String] (H.HeistState Identity) -> Model -> Model
+modelSetHeistTemplate v model =
+  model {modelHeistTemplate = v}
+
+-- TODO: Eventually move these to Ema.Helper
+
+loadHeistTemplates :: MonadIO m => FilePath -> m (Either [String] (H.HeistState Identity))
+loadHeistTemplates templateDir = do
+  -- TODO: Use heist compiled templates
+  let heistCfg :: H.HeistConfig Identity =
+        H.emptyHeistConfig
+          & H.hcNamespace .~ ""
+          & H.hcTemplateLocations .~ [H.loadTemplates templateDir]
+  liftIO $ H.initHeist heistCfg
+
+bindNoteContext :: Monad n => NoteContext -> H.HeistState n -> H.HeistState n
+bindNoteContext ctx heist =
+  heist
+    & HI.bindString "note-title" (title ctx)
+    & HI.bindSplice "note-html" (pure $ html ctx)
+    & HI.bindSplice "note-sidebarHtml" (pure $ sidebarHtml ctx)
+    & HI.bindSplice "note-breadcrumbsHtml" (pure $ breadcrumbsHtml ctx)
+
+renderHeistTemplate :: ByteString -> (H.HeistState Identity -> H.HeistState Identity) -> Either [String] (H.HeistState Identity) -> LByteString
+renderHeistTemplate name bindF etmpl =
+  either error id . runExcept $ do
+    heist <-
+      hoistEither . first (unlines . fmap toText) $ etmpl
+    (builder, _mimeType) <-
+      tryJust "Unable to render" $
+        runIdentity $ HI.renderTemplate (bindF heist) name
+    pure $ toLazyByteString builder
+  where
+    -- A 'fromJust' that fails in the 'ExceptT' monad
+    tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
+    tryJust e m = hoistEither $ maybeToRight e m
 
 -- | Once we have a "model" and "route" (as defined above), we should define the
 -- @Ema@ typeclass to tell Ema how to decode/encode our routes, as well as the
@@ -235,7 +262,8 @@ main :: IO ()
 main =
   Ema.runEma render $ \model -> do
     let templateFile = ".emabook/template.html"
-    FileSystem.mountOnLVar "." ["**/*.md", templateFile] model $ \fp action -> do
+        heistTemplateDir = ".emabook/templates"
+    FileSystem.mountOnLVar "." ["**/*.md", templateFile, heistTemplateDir </> "*.tpl"] model $ \fp action -> do
       case snd $ splitExtension fp of
         ".md" -> case action of
           FileSystem.Update -> do
@@ -244,13 +272,9 @@ main =
           FileSystem.Delete ->
             pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
-          if fp /= templateFile
-            then pure id
-            else case action of
-              FileSystem.Delete ->
-                pure $ modelSetTemplate $ Left $ G.ParserError "No template found" Nothing
-              FileSystem.Update ->
-                modelSetTemplate <$> G.parseGingerFile (fmap Just . readFile) fp
+          if heistTemplateDir `isPrefixOf` fp
+            then modelSetHeistTemplate <$> loadHeistTemplates heistTemplateDir
+            else pure id
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
     readSource fp =
@@ -270,7 +294,7 @@ newtype BadMarkdown = BadMarkdown Text
 -- ------------------------
 
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
-render emaAction model r = do
+render _emaAction model r = do
   case modelLookup r model of
     Nothing ->
       -- In dev server mode, Ema will display the exceptions in the browser.
@@ -280,17 +304,24 @@ render emaAction model r = do
       -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
       let ctx =
             NoteContext
-              { html = decodeUtf8 . RU.renderHtml $ renderMarkdownAfterVerify model doc,
+              { html = renderHtml $ renderMarkdownAfterVerify model doc,
                 title =
                   if r == indexMarkdownRoute
                     then "emabook Notebook"
                     else lookupTitle doc r,
                 sidebarHtml =
-                  decodeUtf8 . RU.renderHtml $ renderSidebarNav model r,
+                  renderHtml $ renderSidebarNav model r,
                 breadcrumbsHtml =
-                  decodeUtf8 . RU.renderHtml $ renderBreadcrumbs model r
+                  renderHtml $ renderBreadcrumbs model r
               }
-      encodeUtf8 $ modelTemplateRender model ctx
+      renderHeistTemplate "_default" (bindNoteContext ctx) (modelHeistTemplate model)
+  where
+    renderHtml h =
+      case RX.renderHtml h of
+        XmlHtml.HtmlDocument {..} ->
+          docContent
+        _ ->
+          error "not a HTML document"
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =
