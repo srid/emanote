@@ -41,7 +41,7 @@
             <div class="hidden md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen overflow-x-auto">
                 <div class="bg-pink-50 rounded pt-1 pb-2">
                     <route-tree>
-                        <tree class="pl-2" />
+                        <sub-tree class="pl-2" />
                         <item-parent class="my-2" />
                         <item-terminal class="my-2 text-gray-600" />
                         <link-active class="hover:text-black text-pink-600 font-bold" />

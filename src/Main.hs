@@ -234,17 +234,16 @@ treeSplice tree here pathToRoute itemRender = do
         Map.mapMaybe id $
           Map.fromList $
             (id &&& getChildClass)
-              <$> [ "tree",
-                    "item-parent",
-                    "item-terminal",
-                    "link-active",
-                    "link-inactive"
-                  ]
+              <$> mconcat
+                [ fmap show [minBound @TreeSub .. maxBound],
+                  fmap show [minBound @TreeItemState .. maxBound],
+                  fmap show [minBound @TreeLinkState .. maxBound]
+                ]
   pure $ renderHtml $ go classes [] tree
   where
     go attrs parSlugs (xs :: [Tree a]) =
       -- TODO: Refactor this traverse a general Data.Tree
-      H.div ! classFrom attrs "tree" $ do
+      H.div ! classFrom attrs (show TreeSub) $ do
         forM_ xs $ \(Node slug children) -> do
           let itemState =
                 if null parSlugs || not (null children)
@@ -270,10 +269,16 @@ treeSplice tree here pathToRoute itemRender = do
         Just v ->
           A.class_ $ H.toValue v
 
+data TreeSub = TreeSub
+  deriving (Eq, Enum, Bounded)
+
+instance Show TreeSub where
+  show TreeSub = "sub-tree"
+
 data TreeItemState
   = TreeItem_RootOrParent
   | TreeItem_Terminal
-  deriving (Eq)
+  deriving (Eq, Enum, Bounded)
 
 instance Show TreeItemState where
   show = \case
@@ -283,7 +288,7 @@ instance Show TreeItemState where
 data TreeLinkState
   = TreeLink_Active
   | TreeLink_Inactive
-  deriving (Eq)
+  deriving (Eq, Enum, Bounded)
 
 instance Show TreeLinkState where
   show = \case
