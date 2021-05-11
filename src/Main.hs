@@ -36,6 +36,7 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
+import qualified Text.Show as Show
 import qualified Text.XmlHtml as XmlHtml
 
 -- ------------------------
@@ -148,8 +149,9 @@ data NoteContext = NoteContext
   { html :: [XmlHtml.Node],
     title :: Text,
     -- TODO: These should be defined in templates, with ony data passed over
-    sidebarHtml :: [XmlHtml.Node],
-    breadcrumbsHtml :: [XmlHtml.Node]
+    breadcrumbsHtml :: [XmlHtml.Node],
+    here :: MarkdownRoute,
+    model :: Model
   }
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
@@ -200,13 +202,93 @@ loadHeistTemplates templateDir = do
           & H.hcTemplateLocations .~ [H.loadTemplates templateDir]
   liftIO $ H.initHeist heistCfg
 
-bindNoteContext :: Monad n => NoteContext -> H.HeistState n -> H.HeistState n
+bindNoteContext :: forall n. Monad n => NoteContext -> H.HeistState n -> H.HeistState n
 bindNoteContext ctx heist =
   heist
     & HI.bindString "note-title" (title ctx)
     & HI.bindSplice "note-html" (pure $ html ctx)
-    & HI.bindSplice "note-sidebarHtml" (pure $ sidebarHtml ctx)
+    -- TODO: Should be in global context?
+    & HI.bindSplice
+      "route-tree"
+      ( let tree = PathTree.treeDeleteChild "index" $ modelNav $ model ctx
+         in treeSplice tree (here ctx) MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
+      )
+    -- TODO: Use splices here too
     & HI.bindSplice "note-breadcrumbsHtml" (pure $ breadcrumbsHtml ctx)
+
+-- | Heist splice to render a `Data.Tree` whilst allowing customization of
+-- individual styling in templates.
+treeSplice ::
+  forall a r n model.
+  (Monad n, Eq r, Ema model r) =>
+  [Tree a] ->
+  r ->
+  (NonEmpty a -> r) ->
+  (r -> H.Html) ->
+  HI.Splice n
+treeSplice tree here pathToRoute itemRender = do
+  node <- H.getParamNode
+  let getChildClass name =
+        XmlHtml.getAttribute "class" <=< XmlHtml.childElementTag name $ node
+      classes =
+        Map.mapMaybe id $
+          Map.fromList $
+            (id &&& getChildClass)
+              <$> [ "tree",
+                    "item-parent",
+                    "item-terminal",
+                    "link-active",
+                    "link-inactive"
+                  ]
+  pure $ renderHtml $ go classes [] tree
+  where
+    go attrs parSlugs (xs :: [Tree a]) =
+      -- TODO: Refactor this traverse a general Data.Tree
+      H.div ! classFrom attrs "tree" $ do
+        forM_ xs $ \(Node slug children) -> do
+          let itemState =
+                if null parSlugs || not (null children)
+                  then TreeItem_RootOrParent
+                  else TreeItem_Terminal
+              itemCls = classFrom attrs (show itemState)
+              itemRoute = pathToRoute $ NE.reverse $ slug :| parSlugs
+              linkState =
+                if here == itemRoute
+                  then TreeLink_Active
+                  else TreeLink_Inactive
+              linkCls = classFrom attrs (show linkState)
+          H.div ! itemCls $
+            H.a ! linkCls ! A.href (H.toValue $ Ema.routeUrl itemRoute) $
+              itemRender itemRoute
+          go attrs ([slug] <> parSlugs) children
+    classFrom attrs k =
+      classFromElse attrs k Nothing
+    classFromElse attrs k (mv :: Maybe Text) =
+      case Map.lookup k attrs of
+        Nothing ->
+          maybe mempty (A.class_ . H.toValue) mv
+        Just v ->
+          A.class_ $ H.toValue v
+
+data TreeItemState
+  = TreeItem_RootOrParent
+  | TreeItem_Terminal
+  deriving (Eq)
+
+instance Show TreeItemState where
+  show = \case
+    TreeItem_RootOrParent -> "item-parent"
+    TreeItem_Terminal -> "item-terminal"
+
+data TreeLinkState
+  = TreeLink_Active
+  | TreeLink_Inactive
+  deriving (Eq)
+
+instance Show TreeLinkState where
+  show = \case
+    TreeLink_Active -> "link-active"
+    TreeLink_Inactive -> "link-inactive"
 
 renderHeistTemplate :: ByteString -> (H.HeistState Identity -> H.HeistState Identity) -> Either [String] (H.HeistState Identity) -> LByteString
 renderHeistTemplate name bindF etmpl =
@@ -314,19 +396,20 @@ render _emaAction model r = do
                     then -- TODO: Configurable site title (via heist splice?)
                       "emabook"
                     else lookupTitle doc r,
-                sidebarHtml =
-                  renderHtml $ renderSidebarNav model r,
                 breadcrumbsHtml =
-                  renderHtml $ renderBreadcrumbs model r
+                  renderHtml $ renderBreadcrumbs model r,
+                here = r,
+                model = model
               }
       renderHeistTemplate "_default" (bindNoteContext ctx) (modelHeistTemplate model)
-  where
-    renderHtml h =
-      case RX.renderHtml h of
-        XmlHtml.HtmlDocument {..} ->
-          docContent
-        _ ->
-          error "not a HTML document"
+
+renderHtml :: H.Html -> [XmlHtml.Node]
+renderHtml h =
+  case RX.renderHtml h of
+    XmlHtml.HtmlDocument {..} ->
+      docContent
+    _ ->
+      error "not a HTML document"
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =
@@ -359,22 +442,6 @@ renderMarkdownAfterVerify model doc =
           ("last", "mt-8 border-t-2 border-pink-500 pb-1 pl-1 bg-gray-50 rounded"),
           ("next", "py-2 text-xl italic font-bold")
         ]
-
-renderSidebarNav :: Model -> MarkdownRoute -> H.Html
-renderSidebarNav model currentRoute = do
-  -- Drop toplevel index.md from sidebar tree (because we are linking to it manually)
-  let navTree = PathTree.treeDeleteChild "index" $ modelNav model
-  go [] navTree
-  where
-    go parSlugs xs =
-      H.div ! A.class_ "pl-2" $ do
-        forM_ xs $ \(Node slug children) -> do
-          let hereRoute = MarkdownRoute $ NE.reverse $ slug :| parSlugs
-          renderRoute (if null parSlugs || not (null children) then "" else "text-gray-600") hereRoute
-          go ([slug] <> parSlugs) children
-    renderRoute c r = do
-      let linkCls = if r == currentRoute then "text-pink-600 font-bold" else ""
-      H.div ! A.class_ ("my-2 " <> c) $ H.a ! A.class_ (" hover:text-black  " <> linkCls) ! A.href (H.toValue $ Ema.routeUrl r) $ H.toHtml $ lookupTitleForgiving model r
 
 renderBreadcrumbs :: Model -> MarkdownRoute -> H.Html
 renderBreadcrumbs model r = do

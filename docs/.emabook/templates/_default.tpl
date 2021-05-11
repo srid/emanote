@@ -40,12 +40,18 @@
             <!-- Sidebar column -->
             <div class="hidden md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen overflow-x-auto">
                 <div class="bg-pink-50 rounded pt-1 pb-2">
-                    <note-sidebarHtml />
+                    <route-tree>
+                        <tree class="pl-2" />
+                        <item-parent class="my-2" />
+                        <item-terminal class="my-2 text-gray-600" />
+                        <link-active class="hover:text-black text-pink-600 font-bold" />
+                        <link-inactive class="hover:text-black" />
+                    </route-tree>
                 </div>
             </div>
             <!-- Main body column -->
             <div class="col-span-12 md:col-span-9">
-                <note-breadcrumbsHtml />
+                <note-breadcrumbsHtml /> <!-- TODO: Use heist splice -->
                 <note-html />
 
                 <footer class="flex justify-center items-center space-x-4 my-8 text-center text-gray-500">

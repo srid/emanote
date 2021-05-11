@@ -62,4 +62,5 @@ To triage,
 Before public release
 
 - [ ] Finalize in HTML templating: heist vs a more popular one?
+  - If using Heist, document how to add custom splices when using this project as a Haskell library.
 - [ ] Finalize on the project name: `emabook`, or something else?

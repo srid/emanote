@@ -29,14 +29,15 @@ executable emabook
     , containers
     , data-default
     , directory
-    , mtl
     , ema                 >=0.2
     , filepath
     , heist               >=1.1.0.1
     , HsYAML
     , lens
     , lvar
+    , map-syntax
     , monad-logger
+    , mtl
     , neat-interpolation
     , pandoc-types
     , profunctors
