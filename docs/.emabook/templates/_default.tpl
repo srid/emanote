@@ -67,7 +67,6 @@
                       </svg>
                     </li>
                   </crumb>
-
                   <li class="inline-flex items-center text-gray-600">
                     <a>
                       <note-title />
@@ -100,8 +99,7 @@
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
-            Powered by
-            <a class="font-bold" href="https://github.com/srid/ema">Ema</a>
+            Powered by <a class="font-bold" href="https://github.com/srid/emabook">Emabook</a>
           </div>
         </footer>
       </div>
