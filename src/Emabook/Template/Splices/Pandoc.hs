@@ -16,11 +16,9 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as XmlHtml
 
--- | A splice that applies a non-empty list
-pandocSplice ::
-  Monad n =>
-  Pandoc ->
-  HI.Splice n
+-- | A splice to render a Pandoc AST allowing customization of the AST nodes in
+-- HTML.
+pandocSplice :: Monad n => Pandoc -> HI.Splice n
 pandocSplice doc = do
   node <- H.getParamNode
   pure $

@@ -83,7 +83,6 @@
                 </breadcrumbs>
 
                 <note-pandoc>
-                    <!-- TODO: These are yet to to be implemented -->
                     <PandocLink class="text-pink-600">
                         <Internal class="font-bold hover:bg-pink-50" />
                         <External class="hover:underline" target="_blank" rel="noopener" />
