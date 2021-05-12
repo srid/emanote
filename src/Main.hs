@@ -16,6 +16,7 @@ import Data.List (isInfixOf)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
+import qualified Data.Map.Syntax as MapSyntax
 import Data.Profunctor (dimap)
 import qualified Data.Text as T
 import Data.Tree (Tree (Node))
@@ -214,22 +215,21 @@ bindNoteContext ctx heist =
     & HI.bindSplice
       "breadcrumbs"
       ( let crumbs = init $ markdownRouteInits $ here ctx
-         in listSplice crumbs "crumb" $ \crumb -> do
-              "crumb-url" ## Ema.routeUrl crumb
-              "crumb-title" ## lookupTitleForgiving (model ctx) crumb
+         in listSplice crumbs "crumb" $ \crumb ->
+              MapSyntax.mapV HI.textSplice $ do
+                "crumb-url" ## Ema.routeUrl crumb
+                "crumb-title" ## lookupTitleForgiving (model ctx) crumb
       )
 
 -- | A splice that applies a non-empty list
-listSplice :: Monad n => [a] -> Text -> (a -> H.Splices Text) -> HI.Splice n
+listSplice :: Monad n => [a] -> Text -> (a -> H.Splices (HI.Splice n)) -> HI.Splice n
 listSplice xs childTag childSplice = do
-  case nonEmpty xs of
-    Nothing -> pure mempty
-    Just (toList -> crumbs) -> do
-      HI.runChildrenWith $ do
-        childTag
-          ## flip HI.mapSplices crumbs
-          $ \crumb ->
-            HI.runChildrenWithText $ childSplice crumb
+  if null xs
+    then pure mempty
+    else HI.runChildrenWith $ do
+      childTag
+        ## (HI.runChildrenWith . childSplice)
+          `foldMapM` xs
 
 -- | Heist splice to render a `Data.Tree` whilst allowing customization of
 -- individual styling in templates.
