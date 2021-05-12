@@ -4,6 +4,10 @@
     ema.url = "github:srid/ema";
     # Use the nixpkgs used by the pinned ema.
     nixpkgs.follows = "ema/nixpkgs";
+    tailwind = {
+      url = "github:srid/tailwind-nix";
+      flake = false;
+    };
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
@@ -15,7 +19,10 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
       let
         overlays = [ ];
-        pkgs = import nixpkgs { inherit system overlays; config.allowBroken = true; };
+        pkgs =
+          import nixpkgs { inherit system overlays; config.allowBroken = true; };
+        tailwindNix =
+          (import inputs.tailwind { inherit pkgs; }).shell.nodeDependencies;
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
             inherit returnShellEnv;
@@ -35,6 +42,8 @@
                 haskell-language-server
                 ormolu
                 pkgs.nixpkgs-fmt
+
+                tailwindNix
               ]);
           };
       in

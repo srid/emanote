@@ -106,7 +106,24 @@
         "nixpkgs": [
           "ema",
           "nixpkgs"
-        ]
+        ],
+        "tailwind": "tailwind"
+      }
+    },
+    "tailwind": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1620858460,
+        "narHash": "sha256-j3N9uemn96qzWUtqIEX81ivYF6zFxaqAhEDUztn1Tps=",
+        "owner": "srid",
+        "repo": "tailwind-nix",
+        "rev": "4ebb92f645b389abe93be9c892396c1a8bebe07a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "tailwind-nix",
+        "type": "github"
       }
     }
   },
