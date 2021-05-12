@@ -43,7 +43,7 @@ treeSplice tree here pathToRoute itemRender = do
                   fmap show [minBound @TreeItemState .. maxBound],
                   fmap show [minBound @TreeLinkState .. maxBound]
                 ]
-  pure $ renderHtml $ go classes [] tree
+  pure $ RX.renderHtmlNodes $ go classes [] tree
   where
     go attrs parSlugs (xs :: [Tree a]) =
       -- TODO: Refactor this traverse a general Data.Tree
@@ -98,11 +98,3 @@ instance Show TreeLinkState where
   show = \case
     TreeLink_Active -> "link-active"
     TreeLink_Inactive -> "link-inactive"
-
-renderHtml :: H.Html -> [XmlHtml.Node]
-renderHtml h =
-  case RX.renderHtml h of
-    XmlHtml.HtmlDocument {..} ->
-      docContent
-    _ ->
-      error "not a HTML document"

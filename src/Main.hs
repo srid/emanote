@@ -264,7 +264,7 @@ mkNoteContext model r =
       throw $ BadRoute r
     Just doc -> do
       NoteContext
-        { html = renderHtml $ renderMarkdownAfterVerify model doc,
+        { html = RX.renderHtmlNodes $ renderMarkdownAfterVerify model doc,
           title =
             if r == indexMarkdownRoute
               then -- TODO: Configurable site title (via heist splice?)
@@ -300,14 +300,6 @@ render _emaAction model r = do
   let ctx = mkNoteContext model r
       ctxSplices = noteContextSplices ctx
   T.renderHeistTemplate "_default" ctxSplices (modelHeistTemplate model)
-
-renderHtml :: H.Html -> [XmlHtml.Node]
-renderHtml h =
-  case RX.renderHtml h of
-    XmlHtml.HtmlDocument {..} ->
-      docContent
-    _ ->
-      error "not a HTML document"
 
 renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
 renderMarkdownAfterVerify model doc =
