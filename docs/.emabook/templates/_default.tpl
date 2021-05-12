@@ -51,7 +51,37 @@
             </div>
             <!-- Main body column -->
             <div class="col-span-12 md:col-span-9">
-                <note-breadcrumbsHtml /> <!-- TODO: Use heist splice -->
+                <breadcrumbs>
+                    <div class="w-full text-gray-600 mt-4 block md:hidden">
+                        <div class="flex justify-center">
+                            <div class="w-full bg-white py-2 rounded">
+                                <ul class="flex text-gray-500 text-sm lg:text-base">
+                                    <crumb>
+                                        <li class="inline-flex items-center">
+                                            <a class="px-1 font-bold bg-pink-500 text-gray-50 rounded"
+                                                href="${crumb-url}">
+                                                <crumb-title />
+                                            </a>
+                                            <svg fill="currentColor" viewBox="0 0 20 20"
+                                                class="h-5 w-auto text-gray-400">
+                                                <path fill-rule="evenodd"
+                                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                        </li>
+                                    </crumb>
+
+                                    <li class="inline-flex items-center text-gray-600">
+                                        <a>
+                                            <note-title />
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </breadcrumbs>
+
                 <note-html />
 
                 <footer class="flex justify-center items-center space-x-4 my-8 text-center text-gray-500">

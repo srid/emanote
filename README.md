@@ -46,6 +46,12 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 
 ## Tasks
 
+- Splice work
+  - [x] Make sidebar tree a splice
+  - [ ] Split into modules
+  - [x] Make breadcrumbs a splice
+    - Requires supporting arbitrary HTML in node children
+  - [ ] Make pandoc view a splice
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting
