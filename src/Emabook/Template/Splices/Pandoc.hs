@@ -17,7 +17,6 @@ import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as XmlHtml
 
 -- | A splice that applies a non-empty list
--- TODO: Use heist splice to override CSS classes
 pandocSplice ::
   Monad n =>
   Pandoc ->
@@ -30,35 +29,35 @@ pandocSplice doc = do
 
 blockLookupAttr :: XmlHtml.Node -> B.Block -> B.Attr
 blockLookupAttr node = \case
-  B.Para {} -> fromTag "Para"
-  B.BulletList {} -> fromTag "BulletList"
-  B.OrderedList {} -> fromTag "OrderedList"
+  B.Para {} -> childTagAttr node "Para"
+  B.BulletList {} -> childTagAttr node "BulletList"
+  B.OrderedList {} -> childTagAttr node "OrderedList"
+  B.CodeBlock {} -> childTagAttr node "CodeBlock"
   B.Header level _ _ ->
     fromMaybe B.nullAttr $ do
       header <- XmlHtml.childElementTag "Header" node
-      h <- XmlHtml.childElementTag ("h" <> show level) header
-      cls <- XmlHtml.getAttribute "class" h
-      pure $ addClass cls B.nullAttr
+      pure $ childTagAttr header ("h" <> show level)
   _ -> B.nullAttr
-  where
-    fromTag name =
-      B.nullAttr & maybe id addClass (getChildClass name)
-    getChildClass name =
-      XmlHtml.getAttribute "class" <=< XmlHtml.childElementTag name $ node
-    addClass c (id', cs, attrs) =
-      (id', c : cs, attrs)
 
 inlineLookupAttr :: XmlHtml.Node -> B.Inline -> B.Attr
 inlineLookupAttr node = \case
   B.Link _ _ (url, _) ->
     fromMaybe B.nullAttr $ do
       link <- XmlHtml.childElementTag "PandocLink" node
-      let cls = XmlHtml.getAttribute "class" link
-          innerTag = if "://" `T.isInfixOf` url then "Internal" else "External"
-          clsExtra = XmlHtml.getAttribute "class" =<< XmlHtml.childElementTag innerTag link
-          allClasses = catMaybes [cls, clsExtra]
-      pure ("", allClasses, mempty)
+      let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
+      pure $ attrFromNode link `addAttr` childTagAttr link innerTag
   _ -> B.nullAttr
+
+childTagAttr :: XmlHtml.Node -> Text -> B.Attr
+childTagAttr x name =
+  maybe B.nullAttr attrFromNode $ XmlHtml.childElementTag name x
+
+attrFromNode :: XmlHtml.Node -> B.Attr
+attrFromNode node =
+  let mClass = maybe mempty T.words $ XmlHtml.getAttribute "class" node
+      id' = fromMaybe "" $ XmlHtml.getAttribute "id" node
+      attrs = filter ((/= "class") . fst) $ XmlHtml.elementAttrs node
+   in (id', mClass, attrs)
 
 renderPandocWith :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> Pandoc -> H.Html
 renderPandocWith bAttr iAttr (Pandoc _meta blocks) =
@@ -74,9 +73,11 @@ rpBlock bAttr iAttr b = case b of
     forM_ iss $ \is ->
       mapM_ (rpInline iAttr) is >> "\n"
   B.CodeBlock (id', classes, attrs) s ->
-    -- Prism friendly classes
+    -- PrismJS friendly classes
     let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
-     in H.div ! A.class_ "py-0.5 text-sm" $ H.pre ! rpAttr (id', classes', attrs) $ H.code ! rpAttr ("", classes', []) $ H.text s
+     in H.div ! rpAttr (bAttr b) $
+          H.pre ! rpAttr (id', classes', attrs) $
+            H.code ! rpAttr ("", classes', []) $ H.text s
   B.RawBlock (B.Format fmt) rawHtml ->
     if fmt == "html"
       then H.unsafeByteString $ encodeUtf8 rawHtml
@@ -146,15 +147,9 @@ rpInline iAttr i = case i of
   B.Math _ _ ->
     throw Unsupported
   B.Link attr is (url, tit) -> do
-    -- TODO: remove
-    let target =
-          if "://" `T.isInfixOf` url
-            then targetBlank
-            else mempty
     H.a
       ! A.href (H.textValue url)
       ! A.title (H.textValue tit)
-      ! target
       ! rpAttr (addAttr attr $ iAttr i)
       $ mapM_ (rpInline iAttr) is
   B.Image attr is (url, tit) ->
@@ -171,16 +166,12 @@ rpInline iAttr i = case i of
       B.SingleQuote -> "‘" >> w <* "’"
       B.DoubleQuote -> "“" >> w <* "”"
 
-targetBlank :: H.Attribute
-targetBlank =
-  A.target "_blank" <> A.rel "noopener"
-
 rpAttr :: B.Attr -> H.Attribute
 rpAttr (id', classes, attrs) =
   let cls = T.intercalate " " classes
    in unlessNull id' (A.id (fromString . toString $ id'))
         <> unlessNull cls (A.class_ (fromString . toString $ cls))
-        <> mconcat (fmap (\(k, v) -> H.dataAttribute (fromString . toString $ k) (fromString . toString $ v)) attrs)
+        <> mconcat (fmap (\(k, v) -> H.customAttribute (fromString . toString $ k) (fromString . toString $ v)) attrs)
   where
     unlessNull x f =
       if T.null x then mempty else f

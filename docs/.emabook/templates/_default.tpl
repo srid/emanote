@@ -85,8 +85,8 @@
                 <note-pandoc>
                     <!-- TODO: These are yet to to be implemented -->
                     <PandocLink class="text-pink-600">
-                        <Internal class="hover:underline" />
-                        <External class="font-bold hover:bg-pink-50" target="_blank" rel="noopener" />
+                        <Internal class="font-bold hover:bg-pink-50" />
+                        <External class="hover:underline" target="_blank" rel="noopener" />
                     </PandocLink>
                     <Para class="my-2" />
                     <CodeBlock class="py-0.5 text-sm" />
