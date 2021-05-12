@@ -75,4 +75,5 @@ executable emabook
   other-modules:
     Emabook.Template
     Emabook.Template.Splices.List
+    Emabook.Template.Splices.Pandoc
     Emabook.Template.Splices.Tree
