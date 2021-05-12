@@ -72,3 +72,7 @@ executable emabook
   main-is:            Main.hs
   hs-source-dirs:     src
   default-language:   Haskell2010
+  other-modules:
+    Emabook.Template
+    Emabook.Template.Splices.List
+    Emabook.Template.Splices.Tree

@@ -7,10 +7,7 @@
 module Main where
 
 import Control.Exception (throw)
-import Control.Lens.Operators ((.~))
-import Control.Monad.Except (runExcept)
 import Control.Monad.Logger
-import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import Data.List (isInfixOf)
 import qualified Data.List.NonEmpty as NE
@@ -19,7 +16,7 @@ import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import Data.Profunctor (dimap)
 import qualified Data.Text as T
-import Data.Tree (Tree (Node))
+import Data.Tree (Tree)
 import qualified Data.YAML as Y
 import Ema (Ema (..), Slug)
 import qualified Ema
@@ -27,7 +24,10 @@ import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
-import qualified Heist as H
+import qualified Emabook.Template as T
+import qualified Emabook.Template.Splices.List as Splices
+import qualified Emabook.Template.Splices.Tree as Splices
+import Heist (Splices)
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension, splitPath, (</>))
 import Text.Blaze.Html5 ((!))
@@ -37,7 +37,6 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
-import qualified Text.Show as Show
 import qualified Text.XmlHtml as XmlHtml
 
 -- ------------------------
@@ -123,7 +122,7 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
     modelNav :: [Tree Slug],
-    modelHeistTemplate :: Either [String] (H.HeistState Identity)
+    modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
@@ -145,13 +144,6 @@ instance Y.FromYAML Meta where
 
 instance Default Meta where
   def = Meta maxBound mempty
-
-data NoteContext = NoteContext
-  { html :: [XmlHtml.Node],
-    title :: Text,
-    here :: MarkdownRoute,
-    model :: Model
-  }
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
@@ -184,145 +176,9 @@ modelDelete k model =
       modelNav = PathTree.treeDeletePath (unMarkdownRoute k) (modelNav model)
     }
 
-modelSetHeistTemplate :: Either [String] (H.HeistState Identity) -> Model -> Model
+modelSetHeistTemplate :: T.TemplateState -> Model -> Model
 modelSetHeistTemplate v model =
   model {modelHeistTemplate = v}
-
--- TODO: Eventually move these to Ema.Helper
--- Consider first the full practical range of template patterns,
--- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
-
-loadHeistTemplates :: MonadIO m => FilePath -> m (Either [String] (H.HeistState Identity))
-loadHeistTemplates templateDir = do
-  -- TODO: Use heist compiled templates
-  let heistCfg :: H.HeistConfig Identity =
-        H.emptyHeistConfig
-          & H.hcNamespace .~ ""
-          & H.hcTemplateLocations .~ [H.loadTemplates templateDir]
-  liftIO $ H.initHeist heistCfg
-
-bindNoteContext :: forall n. Monad n => NoteContext -> H.HeistState n -> H.HeistState n
-bindNoteContext ctx heist =
-  heist
-    & HI.bindString "note-title" (title ctx)
-    & HI.bindSplice "note-html" (pure $ html ctx)
-    -- TODO: Should be in global context?
-    & HI.bindSplice
-      "route-tree"
-      ( let tree = PathTree.treeDeleteChild "index" $ modelNav $ model ctx
-         in treeSplice tree (here ctx) MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
-      )
-    & HI.bindSplice
-      "breadcrumbs"
-      ( let crumbs = init $ markdownRouteInits $ here ctx
-         in listSplice crumbs "crumb" $ \crumb ->
-              MapSyntax.mapV HI.textSplice $ do
-                "crumb-url" ## Ema.routeUrl crumb
-                "crumb-title" ## lookupTitleForgiving (model ctx) crumb
-      )
-
--- | A splice that applies a non-empty list
-listSplice :: Monad n => [a] -> Text -> (a -> H.Splices (HI.Splice n)) -> HI.Splice n
-listSplice xs childTag childSplice = do
-  if null xs
-    then pure mempty
-    else HI.runChildrenWith $ do
-      childTag
-        ## (HI.runChildrenWith . childSplice)
-          `foldMapM` xs
-
--- | Heist splice to render a `Data.Tree` whilst allowing customization of
--- individual styling in templates.
-treeSplice ::
-  forall a r n model.
-  (Monad n, Eq r, Ema model r) =>
-  [Tree a] ->
-  r ->
-  (NonEmpty a -> r) ->
-  (r -> H.Html) ->
-  HI.Splice n
-treeSplice tree here pathToRoute itemRender = do
-  node <- H.getParamNode
-  let getChildClass name =
-        XmlHtml.getAttribute "class" <=< XmlHtml.childElementTag name $ node
-      classes =
-        Map.mapMaybe id $
-          Map.fromList $
-            (id &&& getChildClass)
-              <$> mconcat
-                [ fmap show [minBound @TreeSub .. maxBound],
-                  fmap show [minBound @TreeItemState .. maxBound],
-                  fmap show [minBound @TreeLinkState .. maxBound]
-                ]
-  pure $ renderHtml $ go classes [] tree
-  where
-    go attrs parSlugs (xs :: [Tree a]) =
-      -- TODO: Refactor this traverse a general Data.Tree
-      H.div ! classFrom attrs (show TreeSub) $ do
-        forM_ xs $ \(Node slug children) -> do
-          let itemState =
-                if null parSlugs || not (null children)
-                  then TreeItem_RootOrParent
-                  else TreeItem_Terminal
-              itemCls = classFrom attrs (show itemState)
-              itemRoute = pathToRoute $ NE.reverse $ slug :| parSlugs
-              linkState =
-                if here == itemRoute
-                  then TreeLink_Active
-                  else TreeLink_Inactive
-              linkCls = classFrom attrs (show linkState)
-          H.div ! itemCls $
-            H.a ! linkCls ! A.href (H.toValue $ Ema.routeUrl itemRoute) $
-              itemRender itemRoute
-          go attrs ([slug] <> parSlugs) children
-    classFrom attrs k =
-      classFromElse attrs k Nothing
-    classFromElse attrs k (mv :: Maybe Text) =
-      case Map.lookup k attrs of
-        Nothing ->
-          maybe mempty (A.class_ . H.toValue) mv
-        Just v ->
-          A.class_ $ H.toValue v
-
-data TreeSub = TreeSub
-  deriving (Eq, Enum, Bounded)
-
-instance Show TreeSub where
-  show TreeSub = "sub-tree"
-
-data TreeItemState
-  = TreeItem_RootOrParent
-  | TreeItem_Terminal
-  deriving (Eq, Enum, Bounded)
-
-instance Show TreeItemState where
-  show = \case
-    TreeItem_RootOrParent -> "item-parent"
-    TreeItem_Terminal -> "item-terminal"
-
-data TreeLinkState
-  = TreeLink_Active
-  | TreeLink_Inactive
-  deriving (Eq, Enum, Bounded)
-
-instance Show TreeLinkState where
-  show = \case
-    TreeLink_Active -> "link-active"
-    TreeLink_Inactive -> "link-inactive"
-
-renderHeistTemplate :: ByteString -> (H.HeistState Identity -> H.HeistState Identity) -> Either [String] (H.HeistState Identity) -> LByteString
-renderHeistTemplate name bindF etmpl =
-  either error id . runExcept $ do
-    heist <-
-      hoistEither . first (unlines . fmap toText) $ etmpl
-    (builder, _mimeType) <-
-      tryJust "Unable to render" $
-        runIdentity $ HI.renderTemplate (bindF heist) name
-    pure $ toLazyByteString builder
-  where
-    -- A 'fromJust' that fails in the 'ExceptT' monad
-    tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
-    tryJust e m = hoistEither $ maybeToRight e m
 
 -- | Once we have a "model" and "route" (as defined above), we should define the
 -- @Ema@ typeclass to tell Ema how to decode/encode our routes, as well as the
@@ -379,7 +235,7 @@ main =
             pure $ maybe id modelDelete (mkMarkdownRouteFromFilePath fp)
         _ -> do
           if heistTemplateDir `isInfixOf` fp
-            then modelSetHeistTemplate <$> loadHeistTemplates heistTemplateDir
+            then modelSetHeistTemplate <$> T.loadHeistTemplates heistTemplateDir
             else pure id
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Meta, Pandoc)))
@@ -395,31 +251,56 @@ main =
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
 
+data NoteContext = NoteContext
+  { html :: [XmlHtml.Node],
+    title :: Text,
+    here :: MarkdownRoute,
+    model :: Model
+  }
+
+mkNoteContext :: Model -> MarkdownRoute -> NoteContext
+mkNoteContext model r =
+  case modelLookup r model of
+    Nothing ->
+      throw $ BadRoute r
+    Just doc -> do
+      NoteContext
+        { html = renderHtml $ renderMarkdownAfterVerify model doc,
+          title =
+            if r == indexMarkdownRoute
+              then -- TODO: Configurable site title (via heist splice?)
+                "emabook"
+              else lookupTitle doc r,
+          here = r,
+          model = model
+        }
+
+noteContextSplices :: forall n. Monad n => NoteContext -> Heist.Splices (HI.Splice n)
+noteContextSplices ctx = do
+  "note-title" ## HI.textSplice (title ctx)
+  "note-html" ## pure (html ctx)
+  -- TODO: Should be in global context?
+  "route-tree"
+    ## ( let tree = PathTree.treeDeleteChild "index" $ modelNav $ model ctx
+          in Splices.treeSplice tree (here ctx) MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
+       )
+  "breadcrumbs"
+    ## ( let crumbs = init $ markdownRouteInits $ here ctx
+          in Splices.listSplice crumbs "crumb" $ \crumb ->
+               MapSyntax.mapV HI.textSplice $ do
+                 "crumb-url" ## Ema.routeUrl crumb
+                 "crumb-title" ## lookupTitleForgiving (model ctx) crumb
+       )
+
 -- ------------------------
 -- Our site HTML
 -- ------------------------
 
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _emaAction model r = do
-  case modelLookup r model of
-    Nothing ->
-      -- In dev server mode, Ema will display the exceptions in the browser.
-      -- In static generation mode, they will cause the generation to crash.
-      throw $ BadRoute r
-    Just doc -> do
-      -- You can return your own HTML string here, but we use the Tailwind+Blaze helper
-      let ctx =
-            NoteContext
-              { html = renderHtml $ renderMarkdownAfterVerify model doc,
-                title =
-                  if r == indexMarkdownRoute
-                    then -- TODO: Configurable site title (via heist splice?)
-                      "emabook"
-                    else lookupTitle doc r,
-                here = r,
-                model = model
-              }
-      renderHeistTemplate "_default" (bindNoteContext ctx) (modelHeistTemplate model)
+  let ctx = mkNoteContext model r
+      ctxSplices = noteContextSplices ctx
+  T.renderHeistTemplate "_default" ctxSplices (modelHeistTemplate model)
 
 renderHtml :: H.Html -> [XmlHtml.Node]
 renderHtml h =
