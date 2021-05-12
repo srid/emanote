@@ -100,19 +100,19 @@ mkNoteContext model r =
 
 noteContextSplices :: forall n. Monad n => NoteContext -> Heist.Splices (HI.Splice n)
 noteContextSplices ctx = do
-  "note-title" ## HI.textSplice (title ctx)
-  "note-pandoc" ## Splices.pandocSplice (verifyMarkdown (model ctx) (doc ctx))
+  "ema:note:title" ## HI.textSplice (title ctx)
+  "ema:note:pandoc" ## Splices.pandocSplice (verifyMarkdown (model ctx) (doc ctx))
   -- TODO: Should be in global context?
-  "route-tree"
+  "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav $ model ctx
           in Splices.treeSplice tree (here ctx) R.MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
        )
-  "breadcrumbs"
+  "ema:breadcrumbs"
     ## ( let crumbs = init $ R.markdownRouteInits $ here ctx
           in Splices.listSplice crumbs "crumb" $ \crumb ->
                MapSyntax.mapV HI.textSplice $ do
-                 "crumb-url" ## Ema.routeUrl crumb
-                 "crumb-title" ## lookupTitleForgiving (model ctx) crumb
+                 "crumb:url" ## Ema.routeUrl crumb
+                 "crumb:title" ## lookupTitleForgiving (model ctx) crumb
        )
 
 -- ------------------------
