@@ -4,5 +4,7 @@
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",
     "files.associations": {
         "*.tpl": "html"
-    }
+    },
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
 }
