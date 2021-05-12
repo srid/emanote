@@ -38,12 +38,12 @@
     <div class="grid grid-cols-12 px-2">
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
-        <div class="pt-1 pb-2 rounded bg-pink-50">
+        <div class="pt-1 pb-2 rounded bg-${theme}-50">
           <route-tree>
             <sub-tree class="pl-2" />
             <item-parent class="my-2" />
             <item-terminal class="my-2 text-gray-600" />
-            <link-active class="font-bold text-pink-600 hover:text-black" />
+            <link-active class="font-bold text-${theme}-600 hover:text-black" />
             <link-inactive class="hover:text-black" />
           </route-tree>
         </div>
@@ -57,7 +57,7 @@
                 <ul class="flex text-sm text-gray-500 lg:text-base">
                   <crumb>
                     <li class="inline-flex items-center">
-                      <a class="px-1 font-bold bg-pink-500 rounded text-gray-50" href="${crumb-url}">
+                      <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb-url}">
                         <crumb-title />
                       </a>
                       <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400">
@@ -80,8 +80,8 @@
         </breadcrumbs>
 
         <note-pandoc>
-          <PandocLink class="text-pink-600">
-            <Internal class="font-bold hover:bg-pink-50" />
+          <PandocLink class="text-${theme}-600">
+            <Internal class="font-bold hover:bg-${theme}-50" />
             <External class="hover:underline" target="_blank" rel="noopener" />
           </PandocLink>
           <Para class="my-2" />
