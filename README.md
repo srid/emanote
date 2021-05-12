@@ -51,7 +51,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [ ] Split into modules
   - [x] Make breadcrumbs a splice
     - Requires supporting arbitrary HTML in node children
-  - [ ] Make pandoc view a splice
+  - [x] Make pandoc view a splice
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting
@@ -59,9 +59,6 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 
 To triage,
 
-- [ ] Remove hardcoded Tailwind based HTML for sidebar & breadcrumbs
-- [ ] Remove hardcoding of CSS classes in Pandoc's HTML
-  - If using Tailwind, requires `@apply` somehow. Can be addressed using twind's preflight.
 - [ ] Redirect to README.md if there is no index.md
 - [ ] ... many more in my private notebook.
 
@@ -70,3 +67,9 @@ Before public release
 - [ ] Finalize in HTML templating: heist vs a more popular one?
   - If using Heist, document how to add custom splices when using this project as a Haskell library.
 - [ ] Finalize on the project name: `emabook`, or something else?
+
+Documentation
+
+- Heist docs for Ema
+  - Helper.Heist
+  - Helper.Heist.Tailwind - for `<Tailwind-Include />` in head that uses inline CSS in dev server, and include of generated CSS in prod.
