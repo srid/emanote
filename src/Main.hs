@@ -14,7 +14,6 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import Data.Profunctor (dimap)
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
@@ -296,14 +295,15 @@ noteContextSplices ctx = do
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _emaAction model r = do
   let ctx = mkNoteContext model r
-      ctxSplices = noteContextSplices ctx
-  T.renderHeistTemplate "_default" ctxSplices (modelHeistTemplate model)
+      splices = do
+        noteContextSplices ctx
+        "theme" ## HI.textSplice "yellow"
+  T.renderHeistTemplate "_default" splices (modelHeistTemplate model)
 
 verifyMarkdown :: Model -> Pandoc -> Pandoc
 verifyMarkdown model doc =
   doc
     & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
-    & applyClassLibrary (\c -> fromMaybe c $ Map.lookup c emaMarkdownStyleLibrary)
     & rewriteLinks
       -- Rewrite .md links to @MarkdownRoute@
       ( \url -> fromMaybe url $ do
@@ -318,17 +318,6 @@ verifyMarkdown model doc =
             then pure $ Ema.routeUrl target
             else throw $ BadRoute target -}
       )
-  where
-    emaMarkdownStyleLibrary =
-      Map.fromList
-        [ ("feature", "flex justify-center items-center text-center shadow-lg p-2 m-2 w-32 h-16 lg:w-auto rounded border-2 border-gray-400 bg-pink-100 text-base font-bold hover:bg-pink-200 hover:border-black"),
-          ("avatar", "float-right w-32 h-32"),
-          -- List item specifc styles
-          ("item-intro", "text-gray-500"),
-          -- Styling the last line in series posts
-          ("last", "mt-8 border-t-2 border-pink-500 pb-1 pl-1 bg-gray-50 rounded"),
-          ("next", "py-2 text-xl italic font-bold")
-        ]
 
 -- | This accepts if "${folder}.md" doesn't exist, and returns "folder" as the
 -- title.
@@ -353,24 +342,6 @@ rewriteLinks f =
     B.Link attr is (url, tit) ->
       B.Link attr is (f url, tit)
     x -> x
-
-applyClassLibrary :: (Text -> Text) -> Pandoc -> Pandoc
-applyClassLibrary f =
-  walkBlocks . walkInlines
-  where
-    walkBlocks = W.walk $ \case
-      B.Div attr bs ->
-        B.Div (g attr) bs
-      x -> x
-    walkInlines = W.walk $ \case
-      B.Span attr is ->
-        B.Span (g attr) is
-      x -> x
-    g (id', cls, attr) =
-      (id', withPackedClass f cls, attr)
-    withPackedClass :: (Text -> Text) -> [Text] -> [Text]
-    withPackedClass =
-      dimap (T.intercalate " ") (T.splitOn " ")
 
 -- ------------------------
 -- Pandoc AST helpers
