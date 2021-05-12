@@ -32,11 +32,9 @@ import Heist (Splices)
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension, splitPath, (</>))
 import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
-import qualified Text.XmlHtml as XmlHtml
 
 -- ------------------------
 -- Our site route
@@ -251,8 +249,8 @@ newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
 
 data NoteContext = NoteContext
-  { html :: [XmlHtml.Node],
-    title :: Text,
+  { title :: Text,
+    doc :: Pandoc,
     here :: MarkdownRoute,
     model :: Model
   }
@@ -264,7 +262,7 @@ mkNoteContext model r =
       throw $ BadRoute r
     Just doc -> do
       NoteContext
-        { html = RX.renderHtmlNodes $ renderMarkdownAfterVerify model doc,
+        { doc = doc,
           title =
             if r == indexMarkdownRoute
               then -- TODO: Configurable site title (via heist splice?)
@@ -277,7 +275,7 @@ mkNoteContext model r =
 noteContextSplices :: forall n. Monad n => NoteContext -> Heist.Splices (HI.Splice n)
 noteContextSplices ctx = do
   "note-title" ## HI.textSplice (title ctx)
-  "note-html" ## pure (html ctx)
+  "note-pandoc" ## Splices.pandocSplice (verifyMarkdown (model ctx) (doc ctx))
   -- TODO: Should be in global context?
   "route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ modelNav $ model ctx
@@ -301,26 +299,25 @@ render _emaAction model r = do
       ctxSplices = noteContextSplices ctx
   T.renderHeistTemplate "_default" ctxSplices (modelHeistTemplate model)
 
-renderMarkdownAfterVerify :: Model -> Pandoc -> H.Html
-renderMarkdownAfterVerify model doc =
-  Splices.renderPandoc $
-    doc
-      & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
-      & applyClassLibrary (\c -> fromMaybe c $ Map.lookup c emaMarkdownStyleLibrary)
-      & rewriteLinks
-        -- Rewrite .md links to @MarkdownRoute@
-        ( \url -> fromMaybe url $ do
-            guard $ not $ "://" `T.isInfixOf` url
-            -- FIXME: Because wikilink parser returns "Foo.md", we must locate
-            -- it and link to correct place in hierarchy.
-            -- When doing this, bail out early on ambiguities.
-            target <- mkMarkdownRouteFromUrl url
-            pure $ Ema.routeUrl target
-            -- Check that .md links are not broken
-            {- if modelMember target model
-              then pure $ Ema.routeUrl target
-              else throw $ BadRoute target -}
-        )
+verifyMarkdown :: Model -> Pandoc -> Pandoc
+verifyMarkdown model doc =
+  doc
+    & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
+    & applyClassLibrary (\c -> fromMaybe c $ Map.lookup c emaMarkdownStyleLibrary)
+    & rewriteLinks
+      -- Rewrite .md links to @MarkdownRoute@
+      ( \url -> fromMaybe url $ do
+          guard $ not $ "://" `T.isInfixOf` url
+          -- FIXME: Because wikilink parser returns "Foo.md", we must locate
+          -- it and link to correct place in hierarchy.
+          -- When doing this, bail out early on ambiguities.
+          target <- mkMarkdownRouteFromUrl url
+          pure $ Ema.routeUrl target
+          -- Check that .md links are not broken
+          {- if modelMember target model
+            then pure $ Ema.routeUrl target
+            else throw $ BadRoute target -}
+      )
   where
     emaMarkdownStyleLibrary =
       Map.fromList

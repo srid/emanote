@@ -82,7 +82,25 @@
                     </div>
                 </breadcrumbs>
 
-                <note-html />
+                <note-pandoc>
+                    <!-- TODO: These are yet to to be implemented -->
+                    <PandocLink class="text-pink-600">
+                        <Internal class="hover:underline" />
+                        <External class="font-bold hover:bg-pink-50" target="_blank" rel="noopener" />
+                    </PandocLink>
+                    <Para class="my-2" />
+                    <CodeBlock class="py-0.5 text-sm" />
+                    <OrderedList class="list-inside ml-4 space-y-1 list-decimal" />
+                    <BulletList class="list-inside ml-4 space-y-1 list-decimal" />
+                    <Header>
+                        <h1 class="text-6xl mt-2 mb-2 text-center pb-2" />
+                        <h2 class="text-5xl mt-4 mb-2 text-gray-700" />
+                        <h3 class="text-4xl mt-4 mb-2 text-gray-700" />
+                        <h4 class="text-3xl mt-4 mb-2 text-gray-700" />
+                        <h5 class="text-2xl mt-4 mb-2 text-gray-700" />
+                        <h6 class="text-xl  mt-4 mb-2 text-gray-700" />
+                    </Header>
+                </note-pandoc>
 
                 <footer class="flex justify-center items-center space-x-4 my-8 text-center text-gray-500">
                     <div>

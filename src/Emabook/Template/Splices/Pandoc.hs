@@ -1,18 +1,28 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template.Splices.Pandoc (renderPandoc) where
+module Emabook.Template.Splices.Pandoc (pandocSplice) where
 
 import Control.Exception (throw)
 import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
+import qualified Heist as H
+import qualified Heist.Interpreted as HI
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
+import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
+-- | A splice that applies a non-empty list
 -- TODO: Use heist splice to override CSS classes
+pandocSplice ::
+  Monad n =>
+  Pandoc ->
+  HI.Splice n
+pandocSplice doc =
+  pure $ RX.renderHtmlNodes $ renderPandoc doc
 
 renderPandoc :: Pandoc -> H.Html
 renderPandoc (Pandoc _meta blocks) =
