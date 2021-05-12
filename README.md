@@ -52,6 +52,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [x] Make breadcrumbs a splice
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
+- [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
-    <note-title /> – emabook
+    <ema:note:title /> – emabook
   </title>
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
   <link href="https://unpkg.com/tailwindcss@2.1.1/dist/tailwind.min.css" rel="stylesheet" type="text/css">
@@ -28,7 +28,7 @@
       <div class="col-span-12 md:col-span-9">
         <div class="flex items-center justify-center">
           <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
-            <note-title />
+            <ema:note:title />
           </h1>
         </div>
       </div>
@@ -39,26 +39,26 @@
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
         <div class="pt-1 pb-2 rounded bg-${theme}-50">
-          <route-tree>
+          <ema:route-tree>
             <sub-tree class="pl-2" />
             <item-parent class="my-2" />
             <item-terminal class="my-2 text-gray-600" />
             <link-active class="font-bold text-${theme}-600 hover:text-black" />
             <link-inactive class="hover:text-black" />
-          </route-tree>
+          </ema:route-tree>
         </div>
       </div>
       <!-- Main body column -->
       <div class="col-span-12 md:col-span-9">
-        <breadcrumbs>
+        <ema:breadcrumbs>
           <div class="block w-full mt-4 text-gray-600 md:hidden">
             <div class="flex justify-center">
               <div class="w-full py-2 bg-white rounded">
                 <ul class="flex text-sm text-gray-500 lg:text-base">
                   <crumb>
                     <li class="inline-flex items-center">
-                      <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb-url}">
-                        <crumb-title />
+                      <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb:url}">
+                        <crumb:title />
                       </a>
                       <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400">
                         <path fill-rule="evenodd"
@@ -69,16 +69,16 @@
                   </crumb>
                   <li class="inline-flex items-center text-gray-600">
                     <a>
-                      <note-title />
+                      <ema:note:title />
                     </a>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
-        </breadcrumbs>
+        </ema:breadcrumbs>
 
-        <note-pandoc>
+        <ema:note:pandoc>
           <PandocLink class="text-${theme}-600">
             <Internal class="font-bold hover:bg-${theme}-50" />
             <External class="hover:underline" target="_blank" rel="noopener" />
@@ -95,7 +95,7 @@
             <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
             <h6 class="mt-4 mb-2 text-xl text-gray-700" />
           </Header>
-        </note-pandoc>
+        </ema:note:pandoc>
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
