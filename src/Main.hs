@@ -15,6 +15,7 @@ import Data.Default (Default (..))
 import Data.List (isInfixOf)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
+import Data.Map.Syntax ((##))
 import Data.Profunctor (dimap)
 import qualified Data.Text as T
 import Data.Tree (Tree (Node))
@@ -27,7 +28,6 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
-import NeatInterpolation (text)
 import System.FilePath (splitExtension, splitPath, (</>))
 import Text.Blaze.Html5 ((!))
 import qualified Text.Blaze.Html5 as H
@@ -148,8 +148,6 @@ instance Default Meta where
 data NoteContext = NoteContext
   { html :: [XmlHtml.Node],
     title :: Text,
-    -- TODO: These should be defined in templates, with ony data passed over
-    breadcrumbsHtml :: [XmlHtml.Node],
     here :: MarkdownRoute,
     model :: Model
   }
@@ -213,8 +211,25 @@ bindNoteContext ctx heist =
       ( let tree = PathTree.treeDeleteChild "index" $ modelNav $ model ctx
          in treeSplice tree (here ctx) MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
       )
-    -- TODO: Use splices here too
-    & HI.bindSplice "note-breadcrumbsHtml" (pure $ breadcrumbsHtml ctx)
+    & HI.bindSplice
+      "breadcrumbs"
+      ( let crumbs = init $ markdownRouteInits $ here ctx
+         in listSplice crumbs "crumb" $ \crumb -> do
+              "crumb-url" ## Ema.routeUrl crumb
+              "crumb-title" ## lookupTitleForgiving (model ctx) crumb
+      )
+
+-- | A splice that applies a non-empty list
+listSplice :: Monad n => [a] -> Text -> (a -> H.Splices Text) -> HI.Splice n
+listSplice xs childTag childSplice = do
+  case nonEmpty xs of
+    Nothing -> pure mempty
+    Just (toList -> crumbs) -> do
+      HI.runChildrenWith $ do
+        childTag
+          ## flip HI.mapSplices crumbs
+          $ \crumb ->
+            HI.runChildrenWithText $ childSplice crumb
 
 -- | Heist splice to render a `Data.Tree` whilst allowing customization of
 -- individual styling in templates.
@@ -401,8 +416,6 @@ render _emaAction model r = do
                     then -- TODO: Configurable site title (via heist splice?)
                       "emabook"
                     else lookupTitle doc r,
-                breadcrumbsHtml =
-                  renderHtml $ renderBreadcrumbs model r,
                 here = r,
                 model = model
               }
@@ -447,29 +460,6 @@ renderMarkdownAfterVerify model doc =
           ("last", "mt-8 border-t-2 border-pink-500 pb-1 pl-1 bg-gray-50 rounded"),
           ("next", "py-2 text-xl italic font-bold")
         ]
-
-renderBreadcrumbs :: Model -> MarkdownRoute -> H.Html
-renderBreadcrumbs model r = do
-  whenNotNull (init $ markdownRouteInits r) $ \(toList -> crumbs) ->
-    H.div ! A.class_ "w-full text-gray-600 mt-4 block md:hidden" $ do
-      H.div ! A.class_ "flex justify-center" $ do
-        H.div ! A.class_ "w-full bg-white py-2 rounded" $ do
-          H.ul ! A.class_ "flex text-gray-500 text-sm lg:text-base" $ do
-            forM_ crumbs $ \crumb ->
-              H.li ! A.class_ "inline-flex items-center" $ do
-                H.a ! A.class_ "px-1 font-bold bg-pink-500 text-gray-50 rounded"
-                  ! A.href (fromString . toString $ Ema.routeUrl crumb)
-                  $ H.text $ lookupTitleForgiving model crumb
-                rightArrow
-            H.li ! A.class_ "inline-flex items-center text-gray-600" $ do
-              H.a $ H.text $ lookupTitleForgiving model r
-  where
-    rightArrow =
-      H.unsafeByteString $
-        encodeUtf8
-          [text|
-          <svg fill="currentColor" viewBox="0 0 20 20" class="h-5 w-auto text-gray-400"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          |]
 
 -- | This accepts if "${folder}.md" doesn't exist, and returns "folder" as the
 -- title.
