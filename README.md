@@ -69,6 +69,20 @@ To triage,
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
     - Pass these contents as template variable, so the user controls their display (eg: hide if a YAML frontmatter flag is set)
+- [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
+  ```
+  <Pandoc>
+    <Custom>
+      <Popout class="px-1 rounded bg-pink-50 font-serif" />
+      <!-- Hierarchical styling? -->
+      <Warning class="px-1 rounded bg-gray-50">
+        <Header>
+          <h2>class="font-bold text-xl"</h2>
+        </Header>
+      </Warning>
+    </Custom>
+  </Pandoc>
+  ```
 
 Before public release
 

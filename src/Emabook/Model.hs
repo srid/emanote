@@ -50,9 +50,9 @@ instance Y.FromYAML Meta where
 instance Default Meta where
   def = Meta Nothing Nothing
 
-modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
+modelLookup :: MarkdownRoute -> Model -> Maybe (Meta, Pandoc)
 modelLookup k =
-  fmap snd . Map.lookup k . modelDocs
+  Map.lookup k . modelDocs
 
 -- | Like `modelLookup` but looks up Markdown by the base filename (without extension) only.
 --
@@ -96,7 +96,7 @@ modelInsert k v model =
 -- Prefer Pandoc title if the Markdown file exists, otherwise return the file's basename.
 routeTitle :: MarkdownRoute -> Model -> Text
 routeTitle r =
-  maybe (R.markdownRouteFileBase r) (docTitle r) . modelLookup r
+  maybe (R.markdownRouteFileBase r) (docTitle r . snd) . modelLookup r
 
 -- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
 docTitle :: MarkdownRoute -> Pandoc -> Text
