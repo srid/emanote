@@ -53,20 +53,26 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
 - [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
+- [ ] Backlinks
+- [ ] UpTree?
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - Must include things like prismJS syntax highlighting
+- [ ] Redirect to README.md if there is no index.md
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
 
 To triage,
 
-- [ ] Redirect to README.md if there is no index.md
-- [ ] ... many more in my private notebook.
+- [ ] Sidebar: should be trimmed
+  - Calendar notes can be in thousands
+- [ ] Display directory contents
+  - For every `${folder}.md` route, display its contents *in addition to* the actual content.
+    - Pass these contents as template variable, so the user controls their display (eg: hide if a YAML frontmatter flag is set)
 
 Before public release
 
 - [ ] Finalize in HTML templating: heist vs a more popular one?
-  - If using Heist, document how to add custom splices when using this project as a Haskell library.
+  - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
 - [ ] Finalize on the project name: `emabook`, or something else?
 
 Documentation
@@ -74,3 +80,12 @@ Documentation
 - Heist docs for Ema
   - Helper.Heist
   - Helper.Heist.Tailwind - for `<Tailwind-Include />` in head that uses inline CSS in dev server, and include of generated CSS in prod.
+  - adding custom splices (when using as a library)
+
+Mega features,
+
+- Powerful and simpler query system (cf. Obsidian search)
+- Pandoc filters (`Pandoc -> IO Pandoc`)
+  - Including citations
+- mdBook like search (emabook should provide the index)
+- Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)
