@@ -114,6 +114,11 @@ render _ model r = do
     "ema:note:title"
       ## HI.textSplice
       $ M.routeTitle r model
+    "ema:note:tags"
+      ## Splices.listSplice (fromMaybe mempty $ M.tags . fst =<< mDoc) "tag"
+      $ \tag ->
+        MapSyntax.mapV HI.textSplice $ do
+          "tag:name" ## tag
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mDoc of
@@ -124,7 +129,7 @@ render _ model r = do
           -- In both cases, we take the lenient approach, and display an empty page (but with title).
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
-        Just doc ->
+        Just (_, doc) ->
           sanitizeMarkdown model doc
 
 sanitizeMarkdown :: Model -> Pandoc -> Pandoc

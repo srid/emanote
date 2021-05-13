@@ -45,6 +45,8 @@
             <item-terminal class="my-2 text-gray-600" />
             <link-active class="font-bold text-${theme}-600 hover:text-black" />
             <link-inactive class="hover:text-black" />
+            <!-- TODO: styling based on document meta, example: -->
+            <link-doc-meta name="tags" contains="pinned" class="bg-pink-100" />
           </ema:route-tree>
         </div>
       </div>
@@ -96,6 +98,16 @@
             <h6 class="mt-4 mb-2 text-xl text-gray-700" />
           </Header>
         </ema:note:pandoc>
+
+        <ema:note:tags>
+          <div class="flex space-x-2 items-center justify-center mt-8 font-mono text-sm">
+            <tag>
+              <a title="Tag" class="bg-gray-100 px-1 rounded">
+                <tag:name />
+              </a>
+            </tag>
+          </div>
+        </ema:note:tags>
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
