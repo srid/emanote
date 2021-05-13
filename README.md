@@ -46,9 +46,9 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 
 ## Tasks
 
+- [x] Wiki-links
 - Splice work
   - [x] Make sidebar tree a splice
-  - [ ] Split into modules
   - [x] Make breadcrumbs a splice
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
@@ -57,8 +57,9 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] UpTree?
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
-  - Must include things like prismJS syntax highlighting
+  - *Or*, require `emabook init` that copies over the default.
 - [ ] Redirect to README.md if there is no index.md
+- [ ] Report error on web / CLI on markdown parse failure (generally on any error)
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
 
 To triage,
