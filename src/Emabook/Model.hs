@@ -3,9 +3,11 @@
 
 module Emabook.Model where
 
-import Control.Monad.Writer.Strict (MonadWriter (tell), execWriter, runWriter)
+import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Default (Default (..))
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
@@ -27,12 +29,13 @@ import Text.Pandoc.Definition (Pandoc (..))
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
   { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
+    modelWikiLinks :: Map R.WikiLinkTarget (NonEmpty MarkdownRoute),
     modelNav :: [Tree Slug],
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model mempty mempty (Left $ one "Heist state not yet loaded")
+  def = Model mempty mempty mempty (Left $ one "Heist state not yet loaded")
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -70,6 +73,10 @@ modelLookupMeta :: MarkdownRoute -> Model -> Meta
 modelLookupMeta k =
   maybe def fst . Map.lookup k . modelDocs
 
+modelLookupWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
+modelLookupWikiLink wl =
+  maybe mempty toList . Map.lookup wl . modelWikiLinks
+
 modelMember :: MarkdownRoute -> Model -> Bool
 modelMember k =
   Map.member k . modelDocs
@@ -77,8 +84,12 @@ modelMember k =
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
 modelInsert k v model =
   let modelDocs' = Map.insert k v (modelDocs model)
+      wikiLinks =
+        Map.unionsWith (<>) $
+          Set.toList (R.allowedWikiLinkTargets k) <&> \wl -> Map.singleton wl (k :| [])
    in model
         { modelDocs = modelDocs',
+          modelWikiLinks = Map.unionWith (<>) (modelWikiLinks model) wikiLinks,
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
               (sortKey modelDocs' . R.MarkdownRoute)
@@ -108,6 +119,8 @@ modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
     { modelDocs = Map.delete k (modelDocs model),
+      modelWikiLinks = flip Map.mapMaybe (modelWikiLinks model) $ \rs -> do
+        nonEmpty $ NE.filter (/= k) rs,
       modelNav = PathTree.treeDeletePath (R.unMarkdownRoute k) (modelNav model)
     }
 
@@ -150,30 +163,32 @@ sanitizeMarkdown ::
   Pandoc ->
   m Pandoc
 sanitizeMarkdown model docRoute doc =
-  -- Eliminate H1, because we are handling it separately.
-  fmap rewriteMdLinks . rewriteWikiLinks $ PandocUtil.withoutH1 doc
+  doc
+    -- Eliminate H1, because we are handling it separately.
+    & PandocUtil.withoutH1
+    & fmap rewriteMdLinks . rewriteWikiLinks
   where
-    -- <&> rewriteMdLinks
-
-    -- Rewrite [[Foo]] -> path/to/where/it/exists/Foo.md
+    -- Resolve [[Bar/Foo]], etc.
     rewriteWikiLinks = do
+      let reportBrokenLink r s = tell $ one @[(MarkdownRoute, Text)] (r, s)
       PandocUtil.rewriteRelativeLinksM $ \url -> do
-        if "/" `T.isSuffixOf` url
-          then pure url
-          else do
-            -- Resolve [[Foo]] -> Foo.md's route if it exists in model anywhere in
-            -- hierarchy.
-            -- TODO: If "Foo" doesdn't exist, *and* is not refering to a staticAsset, then
-            -- We should track it as a "missing wiki-link", to be resolved (in
-            -- future) when the target gets created by the user.
-            case modelLookupFileName url model of
-              Nothing -> do
-                tell $ one (docRoute, url)
-                -- TODO: Set an attribute for broken links, so templates can style it accordingly
-                pure url
-              Just r ->
-                pure $ toText $ R.markdownRouteSourcePath r
-    -- Rewrite /foo/bar.md to `Ema.routeUrl` of the markdown route.
+        if any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
+          then -- This is a link to a static asset
+            pure url
+          else case R.mkWikiLinkTargetFromUrl url of
+            Nothing ->
+              -- Not a wiki link
+              pure url
+            Just wl ->
+              case nonEmpty (modelLookupWikiLink wl model) of
+                Nothing -> do
+                  reportBrokenLink docRoute url
+                  -- TODO: Set an attribute for broken links, so templates can style it accordingly
+                  pure "/EmaNotFound"
+                Just targets ->
+                  -- TODO: Deal with ambiguous targets here
+                  pure $ Ema.routeUrl $ head targets
+    -- Resolve Bar/Foo.md
     rewriteMdLinks =
       PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
         guard $ ".md" `T.isSuffixOf` url
