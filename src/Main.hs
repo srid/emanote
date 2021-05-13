@@ -8,7 +8,6 @@ module Main where
 import Control.Exception (throw)
 import Control.Monad.Logger
 import Data.Default (Default (..))
-import Data.List (isInfixOf)
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
@@ -26,7 +25,7 @@ import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
 import qualified Heist.Interpreted as HI
-import System.FilePath (splitExtension, (</>))
+import System.FilePath ((</>))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -42,23 +41,30 @@ log = logInfoNS "emabook"
 logD :: MonadLogger m => Text -> m ()
 logD = logDebugNS "emabook"
 
+data Source
+  = SourceMarkdown
+  | SourceTemplate FilePath
+  deriving (Eq, Show)
+
+sourcePattern :: Source -> FilePath
+sourcePattern = \case
+  SourceMarkdown -> "**/*.md"
+  SourceTemplate dir -> dir </> "*.tpl"
+
 main :: IO ()
 main =
   Ema.runEma render $ \model -> do
-    let templateFile = ".emabook/template.html"
-        heistTemplateDir = ".emabook/templates"
-    FileSystem.mountOnLVar "." ["**/*.md", templateFile, heistTemplateDir </> "*.tpl"] model $ \fp action -> do
-      case snd $ splitExtension fp of
-        ".md" -> case action of
+    let pats = [SourceMarkdown, SourceTemplate ".emabook/templates"] <&> id &&& sourcePattern
+    FileSystem.mountOnLVar "." pats model $ \(src, fp) action -> do
+      case src of
+        SourceMarkdown -> case action of
           FileSystem.Update -> do
             mData <- readSource fp
             pure $ maybe id (uncurry M.modelInsert) mData
           FileSystem.Delete ->
             pure $ maybe id M.modelDelete (R.mkMarkdownRouteFromFilePath fp)
-        _ -> do
-          if heistTemplateDir `isInfixOf` fp
-            then M.modelSetHeistTemplate <$> T.loadHeistTemplates heistTemplateDir
-            else pure id
+        SourceTemplate dir -> do
+          M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
   where
     readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
     readSource fp =
@@ -66,6 +72,7 @@ main =
         r :: MarkdownRoute <- MaybeT $ pure $ R.mkMarkdownRouteFromFilePath fp
         logD $ "Reading " <> toText fp
         s <- readFileText fp
+        -- TODO: Instead of throwing, report this error properly (on console and on HTML)
         pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ parseMarkdown fp s)
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @M.Meta $ Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
@@ -92,16 +99,21 @@ render _ model r = do
           ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
                 in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip routeTitle model
              )
-        "ema:breadcrumbs" ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb" $ \crumb ->
-          MapSyntax.mapV HI.textSplice $ do
-            "crumb:url" ## Ema.routeUrl crumb
-            "crumb:title" ## routeTitle crumb model
+        "ema:breadcrumbs"
+          ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
+          $ \crumb ->
+            MapSyntax.mapV HI.textSplice $ do
+              "crumb:url" ## Ema.routeUrl crumb
+              "crumb:title" ## routeTitle crumb model
         -- Note stuff
-        "ema:note:title" ## HI.textSplice $
-          if r == R.indexMarkdownRoute
+        "ema:note:title"
+          ## HI.textSplice
+          $ if r == R.indexMarkdownRoute
             then "emabook"
             else docTitle r doc
-        "ema:note:pandoc" ## Splices.pandocSplice (sanitizeMarkdown model doc)
+        "ema:note:pandoc"
+          ## Splices.pandocSplice
+          $ sanitizeMarkdown model doc
 
 -- | Return title associated with the given route.
 --
@@ -118,22 +130,23 @@ docTitle r =
 sanitizeMarkdown :: Model -> Pandoc -> Pandoc
 sanitizeMarkdown _model doc =
   doc
-    & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
-    & rewriteLinks
+    & withoutH1 -- Eliminate H1, because we are handling it separately.
+    & rewriteWikiLinks
+  where
+    rewriteWikiLinks =
       -- Rewrite .md links to @MarkdownRoute@
-      ( \url -> fromMaybe url $ do
-          guard $ not $ "://" `T.isInfixOf` url
-          -- FIXME: Because wikilink parser returns "Foo.md", we must locate
-          -- it and link to correct place in hierarchy.
-          -- When doing this, bail out early on ambiguities.
-          target <- R.mkMarkdownRouteFromUrl url
-          pure $ Ema.routeUrl target
-          -- Check that .md links are not broken
-          -- TODO: Not doing this, until determining how to handle non-existant wiki-links
-          {- if modelMember target model
-            then pure $ Ema.routeUrl target
-            else throw $ BadRoute target -}
-      )
+      rewriteLinks $ \url -> fromMaybe url $ do
+        guard $ not $ "://" `T.isInfixOf` url
+        -- FIXME: Because wikilink parser returns "Foo.md", we must locate
+        -- it and link to correct place in hierarchy.
+        -- When doing this, bail out early on ambiguities.
+        target <- R.mkMarkdownRouteFromUrl url
+        -- Check that .md links are not broken
+        -- TODO: Not doing this, until determining how to handle non-existant wiki-links
+        {- if modelMember target model
+          then pure $ Ema.routeUrl target
+          else throw $ BadRoute target -}
+        pure $ Ema.routeUrl target
 
 -- ------------------------
 -- Pandoc AST helpers

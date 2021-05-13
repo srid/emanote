@@ -18,6 +18,8 @@ import qualified Text.XmlHtml as XmlHtml
 
 -- | A splice to render a Pandoc AST allowing customization of the AST nodes in
 -- HTML.
+--
+-- TODO: Not all AST nodes unsupported. See `Unsupported` below.
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
 pandocSplice doc = do
   node <- H.getParamNode
