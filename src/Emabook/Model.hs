@@ -34,8 +34,8 @@ instance Default Model where
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
-    -- its siblings.
-    order :: Word,
+    -- its siblings. Default value: 0.
+    order :: Maybe Int,
     tags :: Maybe [Text]
   }
   deriving (Eq, Show)
@@ -43,11 +43,11 @@ data Meta = Meta
 instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
     Meta
-      <$> m Y..: "order"
+      <$> m Y..:? "order"
       <*> m Y..:? "tags"
 
 instance Default Meta where
-  def = Meta maxBound mempty
+  def = Meta Nothing Nothing
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
@@ -79,7 +79,7 @@ modelInsert k v model =
         { modelDocs = modelDocs',
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
-              (\k' -> order $ maybe def fst $ Map.lookup (R.MarkdownRoute k') modelDocs')
+              (\k' -> fromMaybe 0 . order $ maybe def fst $ Map.lookup (R.MarkdownRoute k') modelDocs')
               (R.unMarkdownRoute k)
               (modelNav model)
         }

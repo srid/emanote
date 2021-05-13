@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -41,6 +42,9 @@ log = logInfoNS "emabook"
 logD :: MonadLogger m => Text -> m ()
 logD = logDebugNS "emabook"
 
+logE :: MonadLogger m => Text -> m ()
+logE = logErrorNS "emabook"
+
 data Source
   = SourceMarkdown
   | SourceTemplate FilePath
@@ -55,27 +59,31 @@ main :: IO ()
 main =
   Ema.runEma render $ \model -> do
     let pats = [SourceMarkdown, SourceTemplate ".emabook/templates"] <&> id &&& sourcePattern
-    FileSystem.mountOnLVar "." pats model $ \(src, fp) action -> do
+    FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
         SourceMarkdown -> case action of
-          FileSystem.Update -> do
-            mData <- readSource fp
-            pure $ maybe id (uncurry M.modelInsert) mData
+          FileSystem.Update ->
+            readMarkdown fp
+              <&> maybe id (uncurry M.modelInsert)
           FileSystem.Delete ->
             pure $ maybe id M.modelDelete (R.mkMarkdownRouteFromFilePath fp)
-        SourceTemplate dir -> do
+        SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
   where
-    readSource :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
-    readSource fp =
+    readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
+    readMarkdown fp =
       runMaybeT $ do
         r :: MarkdownRoute <- MaybeT $ pure $ R.mkMarkdownRouteFromFilePath fp
         logD $ "Reading " <> toText fp
-        s <- readFileText fp
-        -- TODO: Instead of throwing, report this error properly (on console and on HTML)
-        pure (r, either (throw . BadMarkdown) (first $ fromMaybe def) $ parseMarkdown fp s)
+        !s <- readFileText fp
+        case parseMarkdown fp s of
+          Left (BadMarkdown -> err) -> do
+            throw err
+          Right (mMeta, doc) ->
+            pure (r, (fromMaybe def mMeta, doc))
     parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @M.Meta $ Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
+      Markdown.parseMarkdownWithFrontMatter @M.Meta $
+        Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
 
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
