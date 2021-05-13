@@ -11,6 +11,7 @@ import qualified Data.YAML as Y
 import Ema (Ema (..), Slug)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
@@ -79,10 +80,28 @@ modelInsert k v model =
         { modelDocs = modelDocs',
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
-              (\k' -> fromMaybe 0 . order $ maybe def fst $ Map.lookup (R.MarkdownRoute k') modelDocs')
+              (sortKey modelDocs' . R.MarkdownRoute)
               (R.unMarkdownRoute k)
               (modelNav model)
         }
+  where
+    -- Sort by `order` meta, falling back to title.
+    sortKey modelDocs' r = fromMaybe (0, R.markdownRouteFileBase r) $ do
+      (meta, doc) <- Map.lookup r modelDocs'
+      let docOrder = fromMaybe 0 $ order meta
+      pure (docOrder, docTitle r doc)
+
+-- | Return title associated with the given route.
+--
+-- Prefer Pandoc title if the Markdown file exists, otherwise return the file's basename.
+routeTitle :: MarkdownRoute -> Model -> Text
+routeTitle r =
+  maybe (R.markdownRouteFileBase r) (docTitle r) . modelLookup r
+
+-- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
+docTitle :: MarkdownRoute -> Pandoc -> Text
+docTitle r =
+  fromMaybe (R.markdownRouteFileBase r) . PandocUtil.getPandocTitle
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =

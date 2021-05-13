@@ -19,6 +19,7 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model (Model)
 import qualified Emabook.Model as M
+import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
@@ -102,20 +103,20 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip routeTitle model
+            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip M.routeTitle model
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl crumb
-          "crumb:title" ## routeTitle crumb model
+          "crumb:title" ## M.routeTitle crumb model
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice
       $ if r == R.indexMarkdownRoute
         then "emabook"
-        else routeTitle r model
+        else M.routeTitle r model
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mDoc of
@@ -129,26 +130,14 @@ render _ model r = do
         Just doc ->
           sanitizeMarkdown model doc
 
--- | Return title associated with the given route.
---
--- Prefer Pandoc title if the Markdown file exists, otherwise return the file's basename.
-routeTitle :: MarkdownRoute -> Model -> Text
-routeTitle r =
-  maybe (R.markdownRouteFileBase r) (docTitle r) . M.modelLookup r
-
--- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
-docTitle :: MarkdownRoute -> Pandoc -> Text
-docTitle r =
-  fromMaybe (R.markdownRouteFileBase r) . getPandocTitle
-
 sanitizeMarkdown :: Model -> Pandoc -> Pandoc
 sanitizeMarkdown model doc =
   doc
-    & withoutH1 -- Eliminate H1, because we are handling it separately.
+    & PandocUtil.withoutH1 -- Eliminate H1, because we are handling it separately.
     & rewriteWikiLinks
   where
     rewriteWikiLinks =
-      rewriteLinks $ \url -> fromMaybe url $ do
+      PandocUtil.rewriteLinks $ \url -> fromMaybe url $ do
         guard $ not $ "://" `T.isInfixOf` url -- Only handle relative URLs
         Ema.routeUrl
           <$> (mkMarkdownRouteFromUrl url <|> mkMarkdownRouteFromWikiLink url)
@@ -160,34 +149,3 @@ sanitizeMarkdown model doc =
     mkMarkdownRouteFromWikiLink s = do
       guard $ not $ "/" `T.isSuffixOf` s
       M.modelLookupFileName s model
-
--- ------------------------
--- Pandoc AST helpers
--- ------------------------
-
-getPandocTitle :: Pandoc -> Maybe Text
-getPandocTitle =
-  fmap Markdown.plainify . getPandocH1
-
-getPandocH1 :: Pandoc -> Maybe [B.Inline]
-getPandocH1 = listToMaybe . W.query go
-  where
-    go :: B.Block -> [[B.Inline]]
-    go = \case
-      B.Header 1 _ inlines ->
-        [inlines]
-      _ ->
-        []
-
-withoutH1 :: Pandoc -> Pandoc
-withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
-  Pandoc meta rest
-withoutH1 doc =
-  doc
-
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteLinks f =
-  W.walk $ \case
-    B.Link attr is (url, tit) ->
-      B.Link attr is (f url, tit)
-    x -> x
