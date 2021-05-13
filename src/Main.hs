@@ -31,7 +31,6 @@ import System.FilePath ((</>))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.Pandoc.Walk as W
 
 -- ------------------------
 -- Main entry point
@@ -114,9 +113,7 @@ render _ model r = do
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice
-      $ if r == R.indexMarkdownRoute
-        then "emabook"
-        else M.routeTitle r model
+      $ M.routeTitle r model
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mDoc of
