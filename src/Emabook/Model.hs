@@ -3,6 +3,7 @@
 
 module Emabook.Model where
 
+import Control.Monad.Writer.Strict (MonadWriter (tell), execWriter, runWriter)
 import Data.Default (Default (..))
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
@@ -140,3 +141,41 @@ instance Ema Model MarkdownRoute where
   -- Not all of these may exist.
   staticAssets _ =
     ["favicon.jpeg", "favicon.svg", "static"]
+
+-- | Accumulate broken links in Writer.
+sanitizeMarkdown ::
+  MonadWriter [(MarkdownRoute, Text)] m =>
+  Model ->
+  MarkdownRoute ->
+  Pandoc ->
+  m Pandoc
+sanitizeMarkdown model docRoute doc =
+  -- Eliminate H1, because we are handling it separately.
+  fmap rewriteMdLinks . rewriteWikiLinks $ PandocUtil.withoutH1 doc
+  where
+    -- <&> rewriteMdLinks
+
+    -- Rewrite [[Foo]] -> path/to/where/it/exists/Foo.md
+    rewriteWikiLinks = do
+      PandocUtil.rewriteRelativeLinksM $ \url -> do
+        if "/" `T.isSuffixOf` url
+          then pure url
+          else do
+            -- Resolve [[Foo]] -> Foo.md's route if it exists in model anywhere in
+            -- hierarchy.
+            -- TODO: If "Foo" doesdn't exist, *and* is not refering to a staticAsset, then
+            -- We should track it as a "missing wiki-link", to be resolved (in
+            -- future) when the target gets created by the user.
+            case modelLookupFileName url model of
+              Nothing -> do
+                tell $ one (docRoute, url)
+                -- TODO: Set an attribute for broken links, so templates can style it accordingly
+                pure url
+              Just r ->
+                pure $ toText $ R.markdownRouteSourcePath r
+    -- Rewrite /foo/bar.md to `Ema.routeUrl` of the markdown route.
+    rewriteMdLinks =
+      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
+        guard $ ".md" `T.isSuffixOf` url
+        r <- R.mkMarkdownRouteFromFilePath $ toString url
+        pure $ Ema.routeUrl r

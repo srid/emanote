@@ -8,10 +8,11 @@ module Main where
 
 import Control.Exception (throw)
 import Control.Monad.Logger
+import Control.Monad.Writer.Strict (runWriter)
 import Data.Default (Default (..))
+import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import qualified Data.Text as T
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
@@ -19,7 +20,6 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model (Model)
 import qualified Emabook.Model as M
-import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
@@ -130,29 +130,7 @@ render _ model r = do
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
         Just (_, doc) ->
-          sanitizeMarkdown model doc
-
-sanitizeMarkdown :: Model -> Pandoc -> Pandoc
-sanitizeMarkdown model doc =
-  doc
-    & PandocUtil.withoutH1 -- Eliminate H1, because we are handling it separately.
-    & rewriteWikiLinks
-    & rewriteMdLinks
-  where
-    -- Rewrite [[Foo]] -> path/to/where/it/exists/Foo.md
-    rewriteWikiLinks =
-      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
-        guard $ not $ "/" `T.isSuffixOf` url
-        -- Resolve [[Foo]] -> Foo.md's route if it exists in model anywhere in
-        -- hierarchy.
-        -- TODO: If "Foo" doesdn't exist, *and* is not refering to a staticAsset, then
-        -- We should track it as a "missing wiki-link", to be resolved (in
-        -- future) when the target gets created by the user.
-        r <- M.modelLookupFileName url model
-        pure $ toText $ R.markdownRouteSourcePath r
-    -- Rewrite /foo/bar.md to `Ema.routeUrl` of the markdown route.
-    rewriteMdLinks =
-      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
-        guard $ ".md" `T.isSuffixOf` url
-        r <- R.mkMarkdownRouteFromFilePath $ toString url
-        pure $ Ema.routeUrl r
+          let (doc', traceShowId . Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
+                runWriter $
+                  M.sanitizeMarkdown model r doc
+           in doc'

@@ -30,13 +30,19 @@ withoutH1 doc =
 
 rewriteRelativeLinks :: (Text -> Text) -> Pandoc -> Pandoc
 rewriteRelativeLinks f =
-  rewriteLinks $ \url -> fromMaybe url $ do
-    guard $ not $ "://" `T.isInfixOf` url -- Only handle relative URLs
-    pure $ f url
+  runIdentity . rewriteRelativeLinksM @Identity (Identity . f)
 
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
+rewriteRelativeLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
+rewriteRelativeLinksM f =
+  rewriteLinks $ \url -> do
+    if "://" `T.isInfixOf` url
+      then pure url
+      else f url
+
+rewriteLinks :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
 rewriteLinks f =
-  W.walk $ \case
-    B.Link attr is (url, tit) ->
-      B.Link attr is (f url, tit)
-    x -> x
+  W.walkM $ \case
+    B.Link attr is (url, tit) -> do
+      newUrl <- f url
+      pure $ B.Link attr is (newUrl, tit)
+    x -> pure x
