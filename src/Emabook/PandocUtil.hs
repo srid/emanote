@@ -2,6 +2,7 @@
 
 module Emabook.PandocUtil where
 
+import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -26,6 +27,12 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
   Pandoc meta rest
 withoutH1 doc =
   doc
+
+rewriteRelativeLinks :: (Text -> Text) -> Pandoc -> Pandoc
+rewriteRelativeLinks f =
+  rewriteLinks $ \url -> fromMaybe url $ do
+    guard $ not $ "://" `T.isInfixOf` url -- Only handle relative URLs
+    pure $ f url
 
 rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
 rewriteLinks f =
