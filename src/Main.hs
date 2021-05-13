@@ -86,34 +86,40 @@ newtype BadMarkdown = BadMarkdown Text
 
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
-  case M.modelLookup r model of
-    Nothing ->
-      throw $ R.BadRoute r
-    Just doc -> do
-      -- TODO: Look for "${r}" template, and then fallback to _default
-      flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
-        -- Common stuff
-        "theme" ## HI.textSplice "yellow"
-        -- Nav stuff
-        "ema:route-tree"
-          ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-                in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip routeTitle model
-             )
-        "ema:breadcrumbs"
-          ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
-          $ \crumb ->
-            MapSyntax.mapV HI.textSplice $ do
-              "crumb:url" ## Ema.routeUrl crumb
-              "crumb:title" ## routeTitle crumb model
-        -- Note stuff
-        "ema:note:title"
-          ## HI.textSplice
-          $ if r == R.indexMarkdownRoute
-            then "emabook"
-            else docTitle r doc
-        "ema:note:pandoc"
-          ## Splices.pandocSplice
-          $ sanitizeMarkdown model doc
+  let mDoc = M.modelLookup r model
+  -- TODO: Look for "${r}" template, and then fallback to _default
+  flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
+    -- Common stuff
+    "theme" ## HI.textSplice "yellow"
+    -- Nav stuff
+    "ema:route-tree"
+      ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
+            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip routeTitle model
+         )
+    "ema:breadcrumbs"
+      ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
+      $ \crumb ->
+        MapSyntax.mapV HI.textSplice $ do
+          "crumb:url" ## Ema.routeUrl crumb
+          "crumb:title" ## routeTitle crumb model
+    -- Note stuff
+    "ema:note:title"
+      ## HI.textSplice
+      $ if r == R.indexMarkdownRoute
+        then "emabook"
+        else routeTitle r model
+    "ema:note:pandoc"
+      ## Splices.pandocSplice
+      $ case mDoc of
+        Nothing ->
+          -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
+          -- 1. Refers to a folder route (and no ${folder}.md exists)
+          -- 2. A broken wiki-links
+          -- In both cases, we take the lenient approach, and display an empty page (but with title).
+          -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
+          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
+        Just doc ->
+          sanitizeMarkdown model doc
 
 -- | Return title associated with the given route.
 --
@@ -128,25 +134,24 @@ docTitle r =
   fromMaybe (R.markdownRouteFileBase r) . getPandocTitle
 
 sanitizeMarkdown :: Model -> Pandoc -> Pandoc
-sanitizeMarkdown _model doc =
+sanitizeMarkdown model doc =
   doc
     & withoutH1 -- Eliminate H1, because we are handling it separately.
     & rewriteWikiLinks
   where
     rewriteWikiLinks =
-      -- Rewrite .md links to @MarkdownRoute@
       rewriteLinks $ \url -> fromMaybe url $ do
-        guard $ not $ "://" `T.isInfixOf` url
-        -- FIXME: Because wikilink parser returns "Foo.md", we must locate
-        -- it and link to correct place in hierarchy.
-        -- When doing this, bail out early on ambiguities.
-        target <- R.mkMarkdownRouteFromUrl url
-        -- Check that .md links are not broken
-        -- TODO: Not doing this, until determining how to handle non-existant wiki-links
-        {- if modelMember target model
-          then pure $ Ema.routeUrl target
-          else throw $ BadRoute target -}
-        pure $ Ema.routeUrl target
+        guard $ not $ "://" `T.isInfixOf` url -- Only handle relative URLs
+        Ema.routeUrl
+          <$> (mkMarkdownRouteFromUrl url <|> mkMarkdownRouteFromWikiLink url)
+    mkMarkdownRouteFromUrl :: Text -> Maybe MarkdownRoute
+    mkMarkdownRouteFromUrl url = do
+      guard $ ".md" `T.isSuffixOf` url
+      R.mkMarkdownRouteFromFilePath $ toString url
+    mkMarkdownRouteFromWikiLink :: Text -> Maybe MarkdownRoute
+    mkMarkdownRouteFromWikiLink s = do
+      guard $ not $ "/" `T.isSuffixOf` s
+      M.modelLookupFileName s model
 
 -- ------------------------
 -- Pandoc AST helpers

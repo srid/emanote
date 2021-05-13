@@ -53,6 +53,17 @@ modelLookup :: MarkdownRoute -> Model -> Maybe Pandoc
 modelLookup k =
   fmap snd . Map.lookup k . modelDocs
 
+-- | Like `modelLookup` but looks up Markdown by the base filename (without extension) only.
+--
+-- Assumes that all Markdown file names, across folder hierarchy, are unique.
+modelLookupFileName :: Text -> Model -> Maybe MarkdownRoute
+modelLookupFileName name (modelDocs -> m) =
+  -- TODO: Instead of listToMaybe, handle ambiguous notes properly.
+  listToMaybe $
+    Map.keys $
+      flip Map.filterWithKey m $ \r _ ->
+        name == R.markdownRouteFileBase r
+
 modelLookupMeta :: MarkdownRoute -> Model -> Meta
 modelLookupMeta k =
   maybe def fst . Map.lookup k . modelDocs

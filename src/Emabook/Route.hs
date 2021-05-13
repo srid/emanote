@@ -42,16 +42,6 @@ mkMarkdownRouteFromFilePath = \case
   _ ->
     Nothing
 
-mkMarkdownRouteFromUrl :: Text -> Maybe MarkdownRoute
-mkMarkdownRouteFromUrl url =
-  if ".md" `T.isSuffixOf` url
-    then -- Regular Markdown link: [foo](foo.md); delegate.
-      mkMarkdownRouteFromFilePath $ toString url
-    else -- Expecting wikilink: [[foo]].
-
-      let resolvedPath = url <> ".md" -- TODO: Resolve to correct directory
-       in mkMarkdownRouteFromFilePath $ toString resolvedPath
-
 markdownRouteSourcePath :: MarkdownRoute -> FilePath
 markdownRouteSourcePath r =
   if r == indexMarkdownRoute
