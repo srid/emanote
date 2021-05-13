@@ -8,7 +8,7 @@
     <ema:note:title /> – emabook
   </title>
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
-  <link href="https://unpkg.com/tailwindcss@2.1.1/dist/tailwind.min.css" rel="stylesheet" type="text/css">
+  <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet" type="text/css">
   <link href="/favicon.svg" rel="icon" />
 </head>
 

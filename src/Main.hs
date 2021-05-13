@@ -25,7 +25,6 @@ import qualified Emabook.Template as T
 import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
-import Heist (Splices)
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension, (</>))
 import qualified Text.Blaze.Html5 as H
@@ -74,61 +73,50 @@ main =
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
 
-data NoteContext = NoteContext
-  { title :: Text,
-    doc :: Pandoc,
-    here :: MarkdownRoute,
-    model :: Model
-  }
+-- ------------------------
+-- Our site rendering
+-- ------------------------
 
-mkNoteContext :: Model -> MarkdownRoute -> NoteContext
-mkNoteContext model r =
+render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
+render _ model r = do
   case M.modelLookup r model of
     Nothing ->
       throw $ R.BadRoute r
     Just doc -> do
-      NoteContext
-        { doc = doc,
-          title =
-            if r == R.indexMarkdownRoute
-              then -- TODO: Configurable site title (via heist splice?)
-                "emabook"
-              else lookupTitle doc r,
-          here = r,
-          model = model
-        }
-
-noteContextSplices :: forall n. Monad n => NoteContext -> Heist.Splices (HI.Splice n)
-noteContextSplices ctx = do
-  "ema:note:title" ## HI.textSplice (title ctx)
-  "ema:note:pandoc" ## Splices.pandocSplice (verifyMarkdown (model ctx) (doc ctx))
-  -- TODO: Should be in global context?
-  "ema:route-tree"
-    ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav $ model ctx
-          in Splices.treeSplice tree (here ctx) R.MarkdownRoute $ H.toHtml . lookupTitleForgiving (model ctx)
-       )
-  "ema:breadcrumbs"
-    ## ( let crumbs = init $ R.markdownRouteInits $ here ctx
-          in Splices.listSplice crumbs "crumb" $ \crumb ->
-               MapSyntax.mapV HI.textSplice $ do
-                 "crumb:url" ## Ema.routeUrl crumb
-                 "crumb:title" ## lookupTitleForgiving (model ctx) crumb
-       )
-
--- ------------------------
--- Our site HTML
--- ------------------------
-
-render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
-render _emaAction model r = do
-  let ctx = mkNoteContext model r
-      splices = do
-        noteContextSplices ctx
+      -- TODO: Look for "${r}" template, and then fallback to _default
+      flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
+        -- Common stuff
         "theme" ## HI.textSplice "yellow"
-  T.renderHeistTemplate "_default" splices (M.modelHeistTemplate model)
+        -- Nav stuff
+        "ema:route-tree"
+          ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
+                in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip routeTitle model
+             )
+        "ema:breadcrumbs" ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb" $ \crumb ->
+          MapSyntax.mapV HI.textSplice $ do
+            "crumb:url" ## Ema.routeUrl crumb
+            "crumb:title" ## routeTitle crumb model
+        -- Note stuff
+        "ema:note:title" ## HI.textSplice $
+          if r == R.indexMarkdownRoute
+            then "emabook"
+            else docTitle r doc
+        "ema:note:pandoc" ## Splices.pandocSplice (sanitizeMarkdown model doc)
 
-verifyMarkdown :: Model -> Pandoc -> Pandoc
-verifyMarkdown model doc =
+-- | Return title associated with the given route.
+--
+-- Prefer Pandoc title if the Markdown file exists, otherwise return the file's basename.
+routeTitle :: MarkdownRoute -> Model -> Text
+routeTitle r =
+  maybe (R.markdownRouteFileBase r) (docTitle r) . M.modelLookup r
+
+-- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
+docTitle :: MarkdownRoute -> Pandoc -> Text
+docTitle r =
+  fromMaybe (R.markdownRouteFileBase r) . getPandocTitle
+
+sanitizeMarkdown :: Model -> Pandoc -> Pandoc
+sanitizeMarkdown _model doc =
   doc
     & withoutH1 -- Eliminate H1, because we are rendering it separately (see above)
     & rewriteLinks
@@ -141,38 +129,19 @@ verifyMarkdown model doc =
           target <- R.mkMarkdownRouteFromUrl url
           pure $ Ema.routeUrl target
           -- Check that .md links are not broken
+          -- TODO: Not doing this, until determining how to handle non-existant wiki-links
           {- if modelMember target model
             then pure $ Ema.routeUrl target
             else throw $ BadRoute target -}
       )
 
--- | This accepts if "${folder}.md" doesn't exist, and returns "folder" as the
--- title.
-lookupTitleForgiving :: Model -> MarkdownRoute -> Text
-lookupTitleForgiving model r =
-  fromMaybe (R.markdownRouteFileBase r) $ do
-    doc <- M.modelLookup r model
-    is <- getPandocH1 doc
-    pure $ Markdown.plainify is
-
-lookupTitle :: Pandoc -> MarkdownRoute -> Text
-lookupTitle doc r =
-  maybe (Ema.unSlug $ last $ R.unMarkdownRoute r) Markdown.plainify $ getPandocH1 doc
-
--- ------------------------
--- Pandoc transformer
--- ------------------------
-
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteLinks f =
-  W.walk $ \case
-    B.Link attr is (url, tit) ->
-      B.Link attr is (f url, tit)
-    x -> x
-
 -- ------------------------
 -- Pandoc AST helpers
 -- ------------------------
+
+getPandocTitle :: Pandoc -> Maybe Text
+getPandocTitle =
+  fmap Markdown.plainify . getPandocH1
 
 getPandocH1 :: Pandoc -> Maybe [B.Inline]
 getPandocH1 = listToMaybe . W.query go
@@ -189,3 +158,10 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
   Pandoc meta rest
 withoutH1 doc =
   doc
+
+rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
+rewriteLinks f =
+  W.walk $ \case
+    B.Link attr is (url, tit) ->
+      B.Link attr is (f url, tit)
+    x -> x
