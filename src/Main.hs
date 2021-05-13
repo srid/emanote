@@ -137,17 +137,22 @@ sanitizeMarkdown model doc =
   doc
     & PandocUtil.withoutH1 -- Eliminate H1, because we are handling it separately.
     & rewriteWikiLinks
+    & rewriteMdLinks
   where
+    -- Rewrite [[Foo]] -> path/to/where/it/exists/Foo.md
     rewriteWikiLinks =
-      PandocUtil.rewriteLinks $ \url -> fromMaybe url $ do
-        guard $ not $ "://" `T.isInfixOf` url -- Only handle relative URLs
-        Ema.routeUrl
-          <$> (mkMarkdownRouteFromUrl url <|> mkMarkdownRouteFromWikiLink url)
-    mkMarkdownRouteFromUrl :: Text -> Maybe MarkdownRoute
-    mkMarkdownRouteFromUrl url = do
-      guard $ ".md" `T.isSuffixOf` url
-      R.mkMarkdownRouteFromFilePath $ toString url
-    mkMarkdownRouteFromWikiLink :: Text -> Maybe MarkdownRoute
-    mkMarkdownRouteFromWikiLink s = do
-      guard $ not $ "/" `T.isSuffixOf` s
-      M.modelLookupFileName s model
+      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
+        guard $ not $ "/" `T.isSuffixOf` url
+        -- Resolve [[Foo]] -> Foo.md's route if it exists in model anywhere in
+        -- hierarchy.
+        -- TODO: If "Foo" doesdn't exist, *and* is not refering to a staticAsset, then
+        -- We should track it as a "missing wiki-link", to be resolved (in
+        -- future) when the target gets created by the user.
+        r <- M.modelLookupFileName url model
+        pure $ toText $ R.markdownRouteSourcePath r
+    -- Rewrite /foo/bar.md to `Ema.routeUrl` of the markdown route.
+    rewriteMdLinks =
+      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
+        guard $ ".md" `T.isSuffixOf` url
+        r <- R.mkMarkdownRouteFromFilePath $ toString url
+        pure $ Ema.routeUrl r
