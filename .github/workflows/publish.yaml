@@ -25,10 +25,10 @@ jobs:
       - name: Build and generate docs HTML 🔧
         run: |
           mkdir ./output
-          nix run . -- -C ./content gen $(pwd)/output
+          nix run . -- -C ./docs gen $(pwd)/output
       - name: Deploy to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: output
-          cname: ema.srid.ca
+          # cname: emabook.srid.ca
