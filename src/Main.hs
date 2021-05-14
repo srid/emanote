@@ -102,20 +102,20 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip M.routeTitle model
+            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip M.modelLookupTitle model
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl crumb
-          "crumb:title" ## M.routeTitle crumb model
+          "crumb:title" ## M.modelLookupTitle crumb model
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice
-      $ M.routeTitle r model
+      $ M.modelLookupTitle r model
     "ema:note:tags"
-      ## Splices.listSplice (fromMaybe mempty $ M.tags . M.noteMeta =<< mNote) "tag"
+      ## Splices.listSplice (maybe mempty (M.tags . M.noteMeta) mNote) "tag"
       $ \tag ->
         MapSyntax.mapV HI.textSplice $ do
           "tag:name" ## tag

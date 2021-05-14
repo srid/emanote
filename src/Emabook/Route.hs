@@ -81,7 +81,7 @@ markdownRouteInits (MarkdownRoute (slug :| rest')) =
 -- As wiki links may contain multiple path components, it can also represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLinkTarget = WikiLinkTarget {unWikiLinkText :: NonEmpty Slug}
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Data)
 
 mkWikiLinkTargetFromUrl :: Text -> Maybe WikiLinkTarget
 mkWikiLinkTargetFromUrl s = do
