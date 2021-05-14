@@ -52,16 +52,14 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [x] Make breadcrumbs a splice
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
-- [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [x] Backlinks
   - Using ixset
-- [ ] UpTree?
-  - ixset + path finding traversal
+- [ ] Report error on web / CLI on markdown parse failure (generally on any error)
+- [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - *Or*, require `emabook init` that copies over the default.
 - [ ] Redirect to README.md if there is no index.md
-- [ ] Report error on web / CLI on markdown parse failure (generally on any error)
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
 
 To triage,
@@ -71,6 +69,8 @@ To triage,
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
     - Pass these contents as template variable, so the user controls their display (eg: hide if a YAML frontmatter flag is set)
+- [ ] UpTree?
+  - ixset + path finding traversal
 - [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
   ```
   <Pandoc>
