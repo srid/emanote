@@ -193,28 +193,27 @@ sanitizeMarkdown model docRoute doc =
   doc
     -- Eliminate H1, because we are handling it separately.
     & PandocUtil.withoutH1
-    & fmap rewriteMdLinks . rewriteWikiLinks
+    & PandocUtil.rewriteLinksM resolveUrl
   where
-    -- Resolve [[Bar/Foo]], etc.
-    rewriteWikiLinks = do
-      PandocUtil.rewriteRelativeLinksM $ \url ->
-        fmap (fromMaybe url) . runMaybeT @m $ do
-          guard $ not $ isStaticAssetUrl url
-          Left wl <- hoistMaybe $ parseUrl url
-          case nonEmpty (modelLookupRouteByWikiLink wl model) of
-            Nothing -> do
-              tell $ one (docRoute, url)
-              -- TODO: Set an attribute for broken links, so templates can style it accordingly
-              -- TODO: Return url as is, so backlinks work?
-              pure "/EmaNotFound"
-            Just targets ->
-              -- TODO: Deal with ambiguous targets here
-              pure $ Ema.routeUrl $ head targets
-    -- Resolve Bar/Foo.md
-    rewriteMdLinks =
-      PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
-        Right r <- parseUrl url
-        pure $ Ema.routeUrl r
+    -- Convert .md or wiki links to their proper route url.
+    --
+    -- Requires resolution from the `model` state. Late resolution, in other words.
+    resolveUrl url =
+      fmap (fromMaybe url) . runMaybeT @m $ do
+        guard $ not $ isStaticAssetUrl url
+        hoistMaybe (parseUrl url) >>= \case
+          Right r -> do
+            pure $ Ema.routeUrl r
+          Left wl ->
+            case nonEmpty (modelLookupRouteByWikiLink wl model) of
+              Nothing -> do
+                tell $ one (docRoute, url)
+                -- TODO: Set an attribute for broken links, so templates can style it accordingly
+                -- TODO: Return url as is, so backlinks work?
+                pure "/EmaNotFound"
+              Just targets ->
+                -- TODO: Deal with ambiguous targets here
+                pure $ Ema.routeUrl $ head targets
     isStaticAssetUrl url =
       any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
 
