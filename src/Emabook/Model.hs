@@ -9,7 +9,7 @@ module Emabook.Model where
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Data (Data)
 import Data.Default (Default (..))
-import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@=))
+import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Text as T
 import Data.Tree (Tree)
@@ -22,6 +22,8 @@ import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.Pandoc.Definition as B
+import qualified Text.Pandoc.Walk as W
 
 -- | This is our Ema "model" -- the app state used to generate our site.
 --
@@ -40,21 +42,39 @@ data Note = Note
     noteMeta :: Meta,
     noteRoute :: MarkdownRoute
   }
-  deriving (Eq, Ord, Data)
+  deriving (Eq, Ord, Data, Show)
 
 -- | Set of WikiLinks that refer to a note.
 newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
-  deriving (Eq, Ord, Data)
+  deriving (Eq, Ord, Data, Show)
+
+-- | Outgoing links from a note; can be [[Foo]] or Foo/bar.md
+newtype OutgoingRef = OutgoingRef {unOutgoingRef :: Either R.WikiLinkTarget R.MarkdownRoute}
+  deriving (Eq, Ord, Data, Show)
 
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
 
+outgoingRefs :: Note -> [OutgoingRef]
+outgoingRefs =
+  fmap OutgoingRef . extractLinks . noteDoc
+  where
+    extractLinks :: Pandoc -> [Either R.WikiLinkTarget MarkdownRoute]
+    extractLinks =
+      W.query $ \case
+        B.Link _attr _is (url, _tit) -> maybe [] one $ do
+          guard $ not $ "://" `T.isInfixOf` url
+          wl <- R.mkWikiLinkTargetFromUrl url
+          pure $ Left wl
+        _ ->
+          []
+
 noteTitle :: Note -> Text
 noteTitle Note {..} =
   fromMaybe (R.markdownRouteFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
 
-type NoteIxs = '[MarkdownRoute, SelfRef]
+type NoteIxs = '[MarkdownRoute, SelfRef, OutgoingRef]
 
 type IxNote = IxSet NoteIxs Note
 
@@ -63,6 +83,7 @@ instance Indexable NoteIxs Note where
     ixList
       (ixGen (Proxy :: Proxy MarkdownRoute))
       (ixFun noteSelfRefs)
+      (ixFun outgoingRefs)
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -92,6 +113,10 @@ modelLookupMeta k =
 modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
   fmap noteRoute . Ix.toList $ modelNotes model @= SelfRef wl
+
+modelLookupBacklinks :: MarkdownRoute -> Model -> [Note]
+modelLookupBacklinks r model =
+  Ix.toList $ modelNotes model @+ (OutgoingRef . Left <$> toList (R.allowedWikiLinkTargets r))
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =

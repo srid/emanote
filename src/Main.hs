@@ -119,6 +119,12 @@ render _ model r = do
       $ \tag ->
         MapSyntax.mapV HI.textSplice $ do
           "tag:name" ## tag
+    "ema:note:backlinks"
+      ## Splices.listSplice (traceShowId $ M.modelLookupBacklinks r model) "backlink"
+      $ \note ->
+        MapSyntax.mapV HI.textSplice $ do
+          "backlink:note:title" ## M.noteTitle note
+          "backlink:note:url" ## Ema.routeUrl (M.noteRoute note)
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mNote of

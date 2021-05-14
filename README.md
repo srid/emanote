@@ -53,7 +53,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
 - [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
-- [ ] Backlinks
+- [x] Backlinks
   - Using ixset
 - [ ] UpTree?
   - ixset + path finding traversal

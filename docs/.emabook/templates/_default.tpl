@@ -99,6 +99,18 @@
           </Header>
         </ema:note:pandoc>
 
+        <ema:note:backlinks>
+          <header>Backlinks</header>
+          <div class="flex space-x-2">
+            <backlink>
+              <a class="font-bold" href="${backlink:note:url}">
+                <backlink:note:title />
+              </a>
+            </backlink>
+          </div>
+        </ema:note:backlinks>
+
+
         <ema:note:tags>
           <div class="flex space-x-2 items-center justify-center mt-8 font-mono text-sm">
             <tag>
