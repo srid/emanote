@@ -60,6 +60,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - *Or*, require `emabook init` that copies over the default.
 - [ ] Redirect to README.md if there is no index.md
+- [ ] `emabook gen --base-url=srid.github.io/foo` (or some other way)
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
 
 To triage,
