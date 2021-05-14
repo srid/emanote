@@ -1,11 +1,11 @@
-name: "Publish site"
+name: "Build & Publish site"
 on:
   # Run only when pushing to master branch
   push:
     branches:
       - master
 jobs:
-  docs:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,8 +18,14 @@ jobs:
       - uses: cachix/cachix-action@v10
         with:
           name: srid
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+          # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build and generate docs HTML 🔧
+      - name: Build 🔧
+        run: |
+          mkdir ./output
+          nix run -j 4 . -- --help
+      - name: Generate HTML 🔧
         run: |
           mkdir ./output
           nix run -j 4 . -- -C ./docs gen $(pwd)/output
