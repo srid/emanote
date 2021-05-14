@@ -64,10 +64,8 @@ outgoingRefs =
     extractLinks :: Pandoc -> [Either R.WikiLinkTarget MarkdownRoute]
     extractLinks =
       W.query $ \case
-        B.Link _attr _is (url, _tit) -> maybe [] one $ do
-          guard $ not $ "://" `T.isInfixOf` url
-          fmap Left (R.mkWikiLinkTargetFromUrl url)
-            <|> fmap Right (R.mkMarkdownRouteFromFilePath $ toString url)
+        B.Link _attr _is (url, _tit) ->
+          maybeToList $ parseUrl url
         _ ->
           []
 
@@ -200,13 +198,13 @@ sanitizeMarkdown model docRoute doc =
     rewriteWikiLinks = do
       PandocUtil.rewriteRelativeLinksM $ \url ->
         fmap (fromMaybe url) . runMaybeT @m $ do
-          -- Skip links to static assets
-          guard $ any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
+          guard $ not $ isStaticAssetUrl url
           Left wl <- hoistMaybe $ parseUrl url
           case nonEmpty (modelLookupRouteByWikiLink wl model) of
             Nothing -> do
               tell $ one (docRoute, url)
               -- TODO: Set an attribute for broken links, so templates can style it accordingly
+              -- TODO: Return url as is, so backlinks work?
               pure "/EmaNotFound"
             Just targets ->
               -- TODO: Deal with ambiguous targets here
@@ -216,6 +214,8 @@ sanitizeMarkdown model docRoute doc =
       PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
         Right r <- parseUrl url
         pure $ Ema.routeUrl r
+    isStaticAssetUrl url =
+      any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
 
 -- | Parse a URL string
 parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)

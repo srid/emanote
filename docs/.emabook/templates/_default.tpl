@@ -100,17 +100,18 @@
         </ema:note:pandoc>
 
         <ema:note:backlinks>
-          <header class="text-3xl mt-4 underline">Links to here</header>
-          <ul class="space-y-1">
-            <backlink>
-              <li><a class="" href="${backlink:note:url}">
-                  <backlink:note:title />
-                </a>
-              </li>
-            </backlink>
-          </ul>
+          <div class="bg-gray-100 rounded p-4 mt-8">
+            <header class="text-xl text-gray-500 font-semibold mb-4">Links to this page</header>
+            <ul class="space-y-1">
+              <backlink>
+                <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
+                    <backlink:note:title />
+                  </a>
+                </li>
+              </backlink>
+            </ul>
+          </div>
         </ema:note:backlinks>
-
 
         <ema:note:tags>
           <div class="flex space-x-2 items-center justify-center mt-8 font-mono text-sm">
