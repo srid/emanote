@@ -1,8 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emabook.Route where
 
+import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as Set
 import qualified Data.Text as T
@@ -19,7 +21,7 @@ import qualified Text.Show (Show (show))
 -- If you are using this repo as a template, you might want to use an ADT as
 -- route (eg: data Route = Index | About)
 newtype MarkdownRoute = MarkdownRoute {unMarkdownRoute :: NonEmpty Slug}
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Data)
 
 instance Show MarkdownRoute where
   show (MarkdownRoute slugs) =

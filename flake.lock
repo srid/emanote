@@ -7,11 +7,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1620929873,
-        "narHash": "sha256-txWJ5K82X2LSb+BBh8BWo/o3CTkYqWQyHcjDcQ14NyQ=",
+        "lastModified": 1620959685,
+        "narHash": "sha256-HLcIJv9Q4AeQrrSXEHYgqbWK8nG33QQ63lilrVtT6lI=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "560d0742413de14dd780af966ea528f657d0257b",
+        "rev": "735b182dc8df257f3c2c82be4dcf1b5f67645e54",
         "type": "github"
       },
       "original": {

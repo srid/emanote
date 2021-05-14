@@ -94,7 +94,7 @@ newtype BadMarkdown = BadMarkdown Text
 
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
-  let mDoc = M.modelLookup r model
+  let mNote = M.modelLookup r model
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
     -- Common stuff
@@ -115,13 +115,13 @@ render _ model r = do
       ## HI.textSplice
       $ M.routeTitle r model
     "ema:note:tags"
-      ## Splices.listSplice (fromMaybe mempty $ M.tags . fst =<< mDoc) "tag"
+      ## Splices.listSplice (fromMaybe mempty $ M.tags . M.noteMeta =<< mNote) "tag"
       $ \tag ->
         MapSyntax.mapV HI.textSplice $ do
           "tag:name" ## tag
     "ema:note:pandoc"
       ## Splices.pandocSplice
-      $ case mDoc of
+      $ case mNote of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
           -- 1. Refers to a folder route (and no ${folder}.md exists)
@@ -129,8 +129,8 @@ render _ model r = do
           -- In both cases, we take the lenient approach, and display an empty page (but with title).
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
-        Just (_, doc) ->
+        Just note ->
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
                 runWriter $
-                  M.sanitizeMarkdown model r doc
+                  M.sanitizeMarkdown model r $ M.noteDoc note
            in doc'
