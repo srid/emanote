@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -41,11 +42,19 @@ data Note = Note
   }
   deriving (Eq, Ord, Data)
 
--- | Wiki-links that refer to this note.
-noteWikiLinks :: Note -> [R.WikiLinkTarget]
-noteWikiLinks = toList . R.allowedWikiLinkTargets . noteRoute
+-- | Set of WikiLinks that refer to a note.
+newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
+  deriving (Eq, Ord, Data)
 
-type NoteIxs = '[MarkdownRoute, R.WikiLinkTarget]
+-- | Wiki-links that refer to this note.
+noteSelfRefs :: Note -> [SelfRef]
+noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
+
+noteTitle :: Note -> Text
+noteTitle Note {..} =
+  fromMaybe (R.markdownRouteFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
+
+type NoteIxs = '[MarkdownRoute, SelfRef]
 
 type IxNote = IxSet NoteIxs Note
 
@@ -53,24 +62,24 @@ instance Indexable NoteIxs Note where
   indices =
     ixList
       (ixGen (Proxy :: Proxy MarkdownRoute))
-      (ixFun noteWikiLinks)
+      (ixFun noteSelfRefs)
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
     -- its siblings. Default value: 0.
-    order :: Maybe Int,
-    tags :: Maybe [Text]
+    order :: Int,
+    tags :: [Text]
   }
   deriving (Eq, Show, Ord, Data)
 
 instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
     Meta
-      <$> m Y..:? "order"
-      <*> m Y..:? "tags"
+      <$> (fromMaybe def <$> m Y..:? "order")
+      <*> (fromMaybe mempty <$> m Y..:? "tags")
 
 instance Default Meta where
-  def = Meta Nothing Nothing
+  def = Meta def mempty
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
@@ -80,9 +89,13 @@ modelLookupMeta :: MarkdownRoute -> Model -> Meta
 modelLookupMeta k =
   maybe def noteMeta . modelLookup k
 
-modelLookupWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
-modelLookupWikiLink wl model =
-  fmap noteRoute . Ix.toList $ modelNotes model @= wl
+modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
+modelLookupRouteByWikiLink wl model =
+  fmap noteRoute . Ix.toList $ modelNotes model @= SelfRef wl
+
+modelLookupTitle :: MarkdownRoute -> Model -> Text
+modelLookupTitle r =
+  maybe (R.markdownRouteFileBase r) noteTitle . modelLookup r
 
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
 modelInsert k v model =
@@ -98,22 +111,12 @@ modelInsert k v model =
         }
   where
     -- Sort by `order` meta, falling back to title.
-    sortKey notes r = fromMaybe (0, R.markdownRouteFileBase r) $ do
+    sortKey notes r = fromMaybe (def, R.markdownRouteFileBase r) $ do
       note <- Ix.getOne $ Ix.getEQ r notes
-      let docOrder = fromMaybe 0 $ order $ noteMeta note
-      pure (docOrder, docTitle r $ noteDoc note)
-
--- | Return title associated with the given route.
---
--- Prefer Pandoc titallowedWikiLinkTargetsle if the Markdown file exists, otherwise return the file's basename.
-routeTitle :: MarkdownRoute -> Model -> Text
-routeTitle r =
-  maybe (R.markdownRouteFileBase r) (docTitle r . noteDoc) . modelLookup r
-
--- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
-docTitle :: MarkdownRoute -> Pandoc -> Text
-docTitle r =
-  fromMaybe (R.markdownRouteFileBase r) . PandocUtil.getPandocTitle
+      pure $
+        (,)
+          (order $ noteMeta note)
+          (noteTitle note)
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
@@ -178,7 +181,7 @@ sanitizeMarkdown model docRoute doc =
               -- Not a wiki link
               pure url
             Just wl ->
-              case nonEmpty (modelLookupWikiLink wl model) of
+              case nonEmpty (modelLookupRouteByWikiLink wl model) of
                 Nothing -> do
                   reportBrokenLink docRoute url
                   -- TODO: Set an attribute for broken links, so templates can style it accordingly

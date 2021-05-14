@@ -53,10 +53,10 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
     - Requires supporting arbitrary HTML in node children
   - [x] Make pandoc view a splice
 - [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
-- [ ] Use RDMBS (sqlite) for in-memory model (for indexing; ideally JSON-level)
-  - Or [ixset](https://stackoverflow.com/q/9234205/55246)
 - [ ] Backlinks
+  - Using ixset
 - [ ] UpTree?
+  - ixset + path finding traversal
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - *Or*, require `emabook init` that copies over the default.
