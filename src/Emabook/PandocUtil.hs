@@ -34,13 +34,13 @@ rewriteRelativeLinks f =
 
 rewriteRelativeLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
 rewriteRelativeLinksM f =
-  rewriteLinks $ \url -> do
+  rewriteLinksM $ \url -> do
     if "://" `T.isInfixOf` url
       then pure url
       else f url
 
-rewriteLinks :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
-rewriteLinks f =
+rewriteLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
+rewriteLinksM f =
   W.walkM $ \case
     B.Link attr is (url, tit) -> do
       newUrl <- f url
