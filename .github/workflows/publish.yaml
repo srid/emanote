@@ -18,9 +18,6 @@ jobs:
       - uses: cachix/cachix-action@v9
         with:
           name: srid
-          # If you chose signing key for write access
-          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
-          # If you chose API tokens for write access OR if you have a private cache
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build and generate docs HTML 🔧
         run: |
