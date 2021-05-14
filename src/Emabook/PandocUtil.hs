@@ -28,17 +28,6 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
 withoutH1 doc =
   doc
 
-rewriteRelativeLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteRelativeLinks f =
-  runIdentity . rewriteRelativeLinksM @Identity (Identity . f)
-
-rewriteRelativeLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
-rewriteRelativeLinksM f =
-  rewriteLinksM $ \url -> do
-    if "://" `T.isInfixOf` url
-      then pure url
-      else f url
-
 rewriteLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
 rewriteLinksM f =
   W.walkM $ \case
