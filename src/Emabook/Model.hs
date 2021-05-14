@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -7,8 +8,8 @@ module Emabook.Model where
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Data (Data)
 import Data.Default (Default (..))
-import Data.IxSet (Indexable (..), IxSet, ixFun, ixGen, ixSet, (@=))
-import qualified Data.IxSet as Ix
+import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@=))
+import qualified Data.IxSet.Typed as Ix
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
@@ -25,7 +26,7 @@ import Text.Pandoc.Definition (Pandoc (..))
 --
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
-  { modelNotes :: IxSet Note,
+  { modelNotes :: IxNote,
     modelNav :: [Tree Slug],
     modelHeistTemplate :: T.TemplateState
   }
@@ -44,12 +45,15 @@ data Note = Note
 noteWikiLinks :: Note -> [R.WikiLinkTarget]
 noteWikiLinks = toList . R.allowedWikiLinkTargets . noteRoute
 
-instance Indexable Note where
-  empty =
-    ixSet
-      [ ixGen (Ix.Proxy :: Ix.Proxy MarkdownRoute),
-        ixFun noteWikiLinks
-      ]
+type NoteIxs = '[MarkdownRoute, R.WikiLinkTarget]
+
+type IxNote = IxSet NoteIxs Note
+
+instance Indexable NoteIxs Note where
+  indices =
+    ixList
+      (ixGen (Proxy :: Proxy MarkdownRoute))
+      (ixFun noteWikiLinks)
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
