@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emabook.Model where
@@ -65,8 +66,8 @@ outgoingRefs =
       W.query $ \case
         B.Link _attr _is (url, _tit) -> maybe [] one $ do
           guard $ not $ "://" `T.isInfixOf` url
-          wl <- R.mkWikiLinkTargetFromUrl url
-          pure $ Left wl
+          fmap Left (R.mkWikiLinkTargetFromUrl url)
+            <|> fmap Right (R.mkMarkdownRouteFromFilePath $ toString url)
         _ ->
           []
 
@@ -183,7 +184,8 @@ instance Ema Model MarkdownRoute where
 
 -- | Accumulate broken links in Writer.
 sanitizeMarkdown ::
-  MonadWriter [(MarkdownRoute, Text)] m =>
+  forall m w.
+  (MonadWriter w m, w ~ [(MarkdownRoute, Text)]) =>
   Model ->
   MarkdownRoute ->
   Pandoc ->
@@ -196,27 +198,28 @@ sanitizeMarkdown model docRoute doc =
   where
     -- Resolve [[Bar/Foo]], etc.
     rewriteWikiLinks = do
-      let reportBrokenLink r s = tell $ one @[(MarkdownRoute, Text)] (r, s)
-      PandocUtil.rewriteRelativeLinksM $ \url -> do
-        if any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
-          then -- This is a link to a static asset
-            pure url
-          else case R.mkWikiLinkTargetFromUrl url of
-            Nothing ->
-              -- Not a wiki link
-              pure url
-            Just wl ->
-              case nonEmpty (modelLookupRouteByWikiLink wl model) of
-                Nothing -> do
-                  reportBrokenLink docRoute url
-                  -- TODO: Set an attribute for broken links, so templates can style it accordingly
-                  pure "/EmaNotFound"
-                Just targets ->
-                  -- TODO: Deal with ambiguous targets here
-                  pure $ Ema.routeUrl $ head targets
+      PandocUtil.rewriteRelativeLinksM $ \url ->
+        fmap (fromMaybe url) . runMaybeT @m $ do
+          -- Skip links to static assets
+          guard $ any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
+          Left wl <- hoistMaybe $ parseUrl url
+          case nonEmpty (modelLookupRouteByWikiLink wl model) of
+            Nothing -> do
+              tell $ one (docRoute, url)
+              -- TODO: Set an attribute for broken links, so templates can style it accordingly
+              pure "/EmaNotFound"
+            Just targets ->
+              -- TODO: Deal with ambiguous targets here
+              pure $ Ema.routeUrl $ head targets
     -- Resolve Bar/Foo.md
     rewriteMdLinks =
       PandocUtil.rewriteRelativeLinks $ \url -> fromMaybe url $ do
-        guard $ ".md" `T.isSuffixOf` url
-        r <- R.mkMarkdownRouteFromFilePath $ toString url
+        Right r <- parseUrl url
         pure $ Ema.routeUrl r
+
+-- | Parse a URL string
+parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
+parseUrl url = do
+  guard $ not $ "://" `T.isInfixOf` url
+  fmap Left (R.mkWikiLinkTargetFromUrl url)
+    <|> fmap Right (R.mkMarkdownRouteFromFilePath $ toString url)

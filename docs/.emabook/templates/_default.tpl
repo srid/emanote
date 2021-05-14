@@ -100,14 +100,15 @@
         </ema:note:pandoc>
 
         <ema:note:backlinks>
-          <header>Backlinks</header>
-          <div class="flex space-x-2">
+          <header class="text-3xl mt-4 underline">Links to here</header>
+          <ul class="space-y-1">
             <backlink>
-              <a class="font-bold" href="${backlink:note:url}">
-                <backlink:note:title />
-              </a>
+              <li><a class="" href="${backlink:note:url}">
+                  <backlink:note:title />
+                </a>
+              </li>
             </backlink>
-          </div>
+          </ul>
         </ema:note:backlinks>
 
 
