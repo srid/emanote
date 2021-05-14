@@ -33,6 +33,7 @@ executable emabook
     , filepath
     , heist               >=1.1.0.1
     , HsYAML
+    , ixset
     , lens
     , lvar
     , map-syntax

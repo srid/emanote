@@ -1,13 +1,14 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emabook.Model where
 
 import Control.Monad.Writer.Strict (MonadWriter (tell))
+import Data.Data (Data)
 import Data.Default (Default (..))
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
+import Data.IxSet (Indexable (..), IxSet, ixFun, ixGen, ixSet, (@=))
+import qualified Data.IxSet as Ix
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
@@ -20,22 +21,35 @@ import qualified Emabook.Route as R
 import qualified Emabook.Template as T
 import Text.Pandoc.Definition (Pandoc (..))
 
--- ------------------------
--- Our site model
--- ------------------------
-
 -- | This is our Ema "model" -- the app state used to generate our site.
 --
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
-  { modelDocs :: Map MarkdownRoute (Meta, Pandoc),
-    modelWikiLinks :: Map R.WikiLinkTarget (NonEmpty MarkdownRoute),
+  { modelNotes :: IxSet Note,
     modelNav :: [Tree Slug],
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model mempty mempty mempty (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty mempty (Left $ one "Heist state not yet loaded")
+
+data Note = Note
+  { noteDoc :: Pandoc,
+    noteMeta :: Meta,
+    noteRoute :: MarkdownRoute
+  }
+  deriving (Eq, Ord, Data)
+
+-- | Wiki-links that refer to this note.
+noteWikiLinks :: Note -> [R.WikiLinkTarget]
+noteWikiLinks = toList . R.allowedWikiLinkTargets . noteRoute
+
+instance Indexable Note where
+  empty =
+    ixSet
+      [ ixGen (Ix.Proxy :: Ix.Proxy MarkdownRoute),
+        ixFun noteWikiLinks
+      ]
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -43,7 +57,7 @@ data Meta = Meta
     order :: Maybe Int,
     tags :: Maybe [Text]
   }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Ord, Data)
 
 instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
@@ -54,61 +68,43 @@ instance Y.FromYAML Meta where
 instance Default Meta where
   def = Meta Nothing Nothing
 
-modelLookup :: MarkdownRoute -> Model -> Maybe (Meta, Pandoc)
+modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
-  Map.lookup k . modelDocs
-
--- | Like `modelLookup` but looks up Markdown by the base filename (without extension) only.
---
--- Assumes that all Markdown file names, across folder hierarchy, are unique.
-modelLookupFileName :: Text -> Model -> Maybe MarkdownRoute
-modelLookupFileName name (modelDocs -> m) =
-  -- TODO: Instead of listToMaybe, handle ambiguous notes properly.
-  listToMaybe $
-    Map.keys $
-      flip Map.filterWithKey m $ \r _ ->
-        name == R.markdownRouteFileBase r
+  Ix.getOne . Ix.getEQ k . modelNotes
 
 modelLookupMeta :: MarkdownRoute -> Model -> Meta
 modelLookupMeta k =
-  maybe def fst . Map.lookup k . modelDocs
+  maybe def noteMeta . modelLookup k
 
 modelLookupWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
-modelLookupWikiLink wl =
-  maybe mempty toList . Map.lookup wl . modelWikiLinks
-
-modelMember :: MarkdownRoute -> Model -> Bool
-modelMember k =
-  Map.member k . modelDocs
+modelLookupWikiLink wl model =
+  fmap noteRoute . Ix.toList $ modelNotes model @= wl
 
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
 modelInsert k v model =
-  let modelDocs' = Map.insert k v (modelDocs model)
-      wikiLinks =
-        Map.unionsWith (<>) $
-          Set.toList (R.allowedWikiLinkTargets k) <&> \wl -> Map.singleton wl (k :| [])
+  let modelNotes' = Ix.updateIx k note (modelNotes model)
+      note = Note (snd v) (fst v) k
    in model
-        { modelDocs = modelDocs',
-          modelWikiLinks = Map.unionWith (<>) (modelWikiLinks model) wikiLinks,
+        { modelNotes = modelNotes',
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
-              (sortKey modelDocs' . R.MarkdownRoute)
+              (sortKey modelNotes' . R.MarkdownRoute)
               (R.unMarkdownRoute k)
               (modelNav model)
         }
   where
     -- Sort by `order` meta, falling back to title.
-    sortKey modelDocs' r = fromMaybe (0, R.markdownRouteFileBase r) $ do
-      (meta, doc) <- Map.lookup r modelDocs'
-      let docOrder = fromMaybe 0 $ order meta
-      pure (docOrder, docTitle r doc)
+    sortKey notes r = fromMaybe (0, R.markdownRouteFileBase r) $ do
+      note <- Ix.getOne $ Ix.getEQ r notes
+      let docOrder = fromMaybe 0 $ order $ noteMeta note
+      pure (docOrder, docTitle r $ noteDoc note)
 
 -- | Return title associated with the given route.
 --
--- Prefer Pandoc title if the Markdown file exists, otherwise return the file's basename.
+-- Prefer Pandoc titallowedWikiLinkTargetsle if the Markdown file exists, otherwise return the file's basename.
 routeTitle :: MarkdownRoute -> Model -> Text
 routeTitle r =
-  maybe (R.markdownRouteFileBase r) (docTitle r . snd) . modelLookup r
+  maybe (R.markdownRouteFileBase r) (docTitle r . noteDoc) . modelLookup r
 
 -- | Return title of the given `Pandoc`. If there is no title, use the route to determine the title.
 docTitle :: MarkdownRoute -> Pandoc -> Text
@@ -118,9 +114,7 @@ docTitle r =
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
-    { modelDocs = Map.delete k (modelDocs model),
-      modelWikiLinks = flip Map.mapMaybe (modelWikiLinks model) $ \rs -> do
-        nonEmpty $ NE.filter (/= k) rs,
+    { modelNotes = Ix.deleteIx k (modelNotes model),
       modelNav = PathTree.treeDeletePath (R.unMarkdownRoute k) (modelNav model)
     }
 
@@ -147,7 +141,7 @@ instance Ema Model MarkdownRoute where
       pure $ R.MarkdownRoute slugs
 
   -- Which routes to generate when generating the static HTML for this site.
-  staticRoutes (Map.keys . modelDocs -> mdRoutes) =
+  staticRoutes (fmap noteRoute . Ix.toList . modelNotes -> mdRoutes) =
     mdRoutes
 
   -- All static assets (relative to input directory) go here.
