@@ -3,7 +3,7 @@ on:
   # Run only when pushing to master branch
   push:
     branches:
-      - masterXX
+      - master
 jobs:
   docs:
     runs-on: ubuntu-latest
@@ -15,6 +15,13 @@ jobs:
           install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
           extra_nix_config: |
             experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v9
+        with:
+          name: srid
+          # If you chose signing key for write access
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+          # If you chose API tokens for write access OR if you have a private cache
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build and generate docs HTML 🔧
         run: |
           mkdir ./output
