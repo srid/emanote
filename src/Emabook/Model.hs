@@ -63,11 +63,9 @@ outgoingRefs =
   where
     extractLinks :: Pandoc -> [Either R.WikiLinkTarget MarkdownRoute]
     extractLinks =
-      W.query $ \case
-        B.Link _attr _is (url, _tit) ->
-          maybeToList $ parseUrl url
-        _ ->
-          []
+      W.query $ \i -> maybeToList $ do
+        B.Link _ _ (url, _) <- pure i
+        parseUrl url
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
@@ -115,7 +113,10 @@ modelLookupRouteByWikiLink wl model =
 
 modelLookupBacklinks :: MarkdownRoute -> Model -> [Note]
 modelLookupBacklinks r model =
-  Ix.toList $ modelNotes model @+ (OutgoingRef . Left <$> toList (R.allowedWikiLinkTargets r))
+  let refsToSelf =
+        (OutgoingRef . Left <$> toList (R.allowedWikiLinkTargets r))
+          <> [OutgoingRef $ Right r]
+   in Ix.toList $ modelNotes model @+ refsToSelf
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
