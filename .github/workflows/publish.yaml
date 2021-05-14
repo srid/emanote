@@ -23,12 +23,11 @@ jobs:
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build 🔧
         run: |
-          mkdir ./output
-          nix run -j 4 . -- --help
+          nix -L run -j 4 . -- --help
       - name: Generate HTML 🔧
         run: |
           mkdir ./output
-          nix run -j 4 . -- -C ./docs gen $(pwd)/output
+          nix run . -- -C ./docs gen $(pwd)/output
       - name: Deploy to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
