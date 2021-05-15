@@ -8,6 +8,10 @@
       url = "github:srid/tailwind-nix";
       flake = false;
     };
+    pandoc-link-context = {
+      url = "github:srid/pandoc-link-context";
+      flake = false;
+    };
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
@@ -31,6 +35,7 @@
             withHoogle = false;
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
+              pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
               # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
             };
             modifier = drv:

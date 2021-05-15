@@ -117,11 +117,14 @@ render _ model r = do
           "tag:name" ## tag
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
-      $ \note ->
-        MapSyntax.mapV HI.textSplice $ do
-          -- TODO: reuse note splice
-          "backlink:note:title" ## M.noteTitle note
-          "backlink:note:url" ## Ema.routeUrl (M.noteRoute note)
+      $ \(source, ctx) -> do
+        let ctxDoc :: Pandoc = Pandoc mempty $ B.Div B.nullAttr <$> toList ctx
+        -- TODO: reuse note splice
+        "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl source)
+        "backlink:note:context"
+          ## Splices.pandocSplice
+          $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mNote of
@@ -131,8 +134,9 @@ render _ model r = do
           -- 2. A broken wiki-links
           -- In both cases, we take the lenient approach, and display an empty page (but with title).
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
-          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
+          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
         Just note ->
+          -- TODO: Need to handle broken links somehow.
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
                 runWriter $
                   M.sanitizeMarkdown model r $ M.noteDoc note
