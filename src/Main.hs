@@ -124,7 +124,7 @@ render _ model r = do
                getTreeLoc treeR
                  | treeR == R.unMarkdownRoute r = Splices.TreeLoc_Current
                  | toList treeR `NE.isPrefixOf` R.unMarkdownRoute r = Splices.TreeLoc_Ancestor
-                 | toList (R.unMarkdownRoute r) `isPrefixOf` toList treeR = Splices.TreeLoc_Descendant
+                 | NE.init treeR == toList (R.unMarkdownRoute r) = Splices.TreeLoc_Child
                  | otherwise = Splices.TreeLoc_Elsewhere
             in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ H.toHtml . flip M.modelLookupTitle model
          )
