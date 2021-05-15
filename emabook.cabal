@@ -23,6 +23,7 @@ extra-source-files:
 
 executable emabook
   build-depends:
+    , aeson
     , async
     , base
     , blaze-html
@@ -76,6 +77,7 @@ executable emabook
   hs-source-dirs:     src
   default-language:   Haskell2010
   other-modules:
+    Data.YAML.ToJSON
     Emabook.Model
     Emabook.PandocUtil
     Emabook.Route

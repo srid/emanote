@@ -8,6 +8,7 @@
 module Emabook.Model where
 
 import Control.Monad.Writer.Strict (MonadWriter (tell))
+import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.Default (Default (..))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
@@ -17,6 +18,7 @@ import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
+import Data.YAML.ToJSON ()
 import Ema (Ema (..), Slug)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
@@ -35,11 +37,18 @@ data Model = Model
   { modelNotes :: IxNote,
     modelRels :: IxRel,
     modelNav :: [Tree Slug],
+    modelSettings :: Aeson.Value,
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty mempty (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
+
+parseYaml :: Y.FromYAML a => FilePath -> Text -> Either Text a
+parseYaml n (encodeUtf8 -> v) = do
+  let mkError (loc, emsg) =
+        toText $ n <> ":" <> Y.prettyPosWithSource loc v " error" <> emsg
+  first mkError $ Y.decode1 v
 
 data Note = Note
   { noteDoc :: Pandoc,
@@ -151,6 +160,15 @@ modelLookupBacklinks r model =
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.markdownRouteFileBase r) noteTitle . modelLookup r
+
+modelUpdateSettings :: FilePath -> Text -> Model -> Model
+modelUpdateSettings settingsFile s model =
+  model
+    { modelSettings =
+        traceShowId $
+          either error Aeson.toJSON $
+            parseYaml @(Y.Node Y.Pos) settingsFile s
+    }
 
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
 modelInsert k v model =
