@@ -10,6 +10,7 @@ import Control.Exception (throw)
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict (runWriter)
 import Data.Default (Default (..))
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
@@ -98,7 +99,11 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice tree r R.MarkdownRoute $ H.toHtml . flip M.modelLookupTitle model
+               getTreeLoc treeR
+                 | treeR == R.unMarkdownRoute r = Splices.TreeLoc_Current
+                 | toList treeR `NE.isPrefixOf` R.unMarkdownRoute r = Splices.TreeLoc_Ancestor
+                 | otherwise = Splices.TreeLoc_Elsewhere
+            in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ H.toHtml . flip M.modelLookupTitle model
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"

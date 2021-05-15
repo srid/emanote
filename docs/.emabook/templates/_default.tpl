@@ -30,6 +30,7 @@
       </div>
       <!-- Title column -->
       <div class="col-span-12 md:col-span-9">
+
         <div class="flex items-center justify-center">
           <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
             <ema:note:title />
@@ -43,8 +44,12 @@
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
         <div class="pt-1 pb-2 rounded bg-${theme}-50">
+          <!-- TODO: A way to disable collapsing; ideally on per node basis.-->
           <ema:route-tree>
-            <sub-tree class="pl-2" />
+            <tree class="pl-2 " />
+            <tree:inactive class="hidden" />
+            <tree:active:ancestor class="bg-${theme}-100" />
+            <!-- Make this an inner splice, so as to render folder icon-->
             <item-parent class="my-2" />
             <item-terminal class="my-2 text-gray-600" />
             <link-active class="font-bold text-${theme}-600 hover:text-black" />
