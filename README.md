@@ -56,7 +56,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - Using ixset
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Report error on web / CLI on markdown parse failure (generally on any error)
-- [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
+- [x] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [ ] Default template: should be builtin, obviating `./.emabook`
   - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
   - *Or*, require `emabook init` that copies over the default.

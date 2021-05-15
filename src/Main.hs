@@ -28,6 +28,7 @@ import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
 import qualified Heist.Interpreted as HI
+import qualified Heist.Splices.Json as HJ
 import System.FilePath ((</>))
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Pandoc.Builder as B
@@ -49,17 +50,24 @@ logE = logErrorNS "emabook"
 data Source
   = SourceMarkdown
   | SourceTemplate FilePath
+  | SourceTemplateSettings FilePath
   deriving (Eq, Show)
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceMarkdown -> "**/*.md"
   SourceTemplate dir -> dir </> "*.tpl"
+  SourceTemplateSettings fp -> fp
 
 main :: IO ()
 main =
   Ema.runEma render $ \model -> do
-    let pats = [SourceMarkdown, SourceTemplate ".emabook/templates"] <&> id &&& sourcePattern
+    let pats =
+          (id &&& sourcePattern)
+            <$> [ SourceMarkdown,
+                  SourceTemplate ".emabook/templates",
+                  SourceTemplateSettings ".emabook/templates/settings.yml"
+                ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
         SourceMarkdown -> case action of
@@ -70,6 +78,8 @@ main =
             pure $ maybe id M.modelDelete (R.mkMarkdownRouteFromFilePath fp)
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
+        SourceTemplateSettings _ ->
+          M.modelUpdateSettings fp <$> readFileText fp
   where
     readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
     readMarkdown fp =
@@ -94,8 +104,9 @@ render _ model r = do
   let mNote = M.modelLookup r model
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
-    -- Common stuff
-    "theme" ## HI.textSplice "yellow"
+    -- Common stuff from settings.yml
+    -- Binding to <html> so they remain in scope throughout.
+    "html" ## HJ.bindJson (M.modelSettings model)
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model

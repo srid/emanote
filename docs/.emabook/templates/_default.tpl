@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
-    <ema:note:title /> – emabook
+    <ema:note:title /> –
+    <value:siteTitle />
   </title>
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet" type="text/css">
@@ -43,16 +44,16 @@
     <div class="grid grid-cols-12 px-2">
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
-        <div class="pt-1 pb-2 rounded bg-${theme}-50">
+        <div class="pt-1 pb-2 rounded bg-${value:theme}-50">
           <!-- TODO: A way to disable collapsing; ideally on per node basis.-->
           <ema:route-tree>
             <tree class="pl-2" />
             <tree:inactive class="hidden" />
-            <tree:active:ancestor class="bg-${theme}-100" />
+            <tree:active:ancestor class="bg-${value:theme}-100" />
             <!-- Make this an inner splice, so as to render folder icon-->
             <item:parent class="my-2" />
             <item:terminal class="my-2 text-gray-600" />
-            <link:active class="font-bold text-${theme}-600 hover:text-black" />
+            <link:active class="font-bold text-${value:theme}-600 hover:text-black" />
             <link:inactive class="hover:text-black" />
           </ema:route-tree>
         </div>
@@ -60,8 +61,8 @@
       <!-- Main body column -->
       <div class="col-span-12 md:col-span-9">
         <ema:note:pandoc>
-          <PandocLink class="text-${theme}-600">
-            <Internal class="font-bold hover:bg-${theme}-50" />
+          <PandocLink class="text-${value:theme}-600">
+            <Internal class="font-bold hover:bg-${value:theme}-50" />
             <External class="hover:underline" target="_blank" rel="noopener" />
           </PandocLink>
           <Para class="my-3" />
@@ -83,7 +84,7 @@
             <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
             <ul class="space-y-1">
               <backlink>
-                <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
+                <li><a class="text-${value:theme}-600 font-bold hover:bg-${value:theme}-50" href="${backlink:note:url}">
                     <backlink:note:title />
                   </a>
                   <div class="mb-4 text-sm text-gray-500">
@@ -121,7 +122,7 @@
                 <ul class="flex text-sm text-gray-500 lg:text-base">
                   <crumb>
                     <li class="inline-flex items-center">
-                      <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb:url}">
+                      <a class="px-1 font-bold bg-${value:theme}-500 rounded text-gray-50" href="${crumb:url}">
                         <crumb:title />
                       </a>
                       <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400">
