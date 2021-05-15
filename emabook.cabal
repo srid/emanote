@@ -29,9 +29,9 @@ executable emabook
     , containers
     , data-default
     , directory
-    , ema                 >=0.2
+    , ema                  >=0.2
     , filepath
-    , heist               >=1.1.0.1
+    , heist                >=1.1.0.1
     , HsYAML
     , ixset-typed
     , lens
@@ -40,6 +40,7 @@ executable emabook
     , monad-logger
     , mtl
     , neat-interpolation
+    , pandoc-link-context
     , pandoc-types
     , profunctors
     , relude

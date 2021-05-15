@@ -117,11 +117,14 @@ render _ model r = do
           "tag:name" ## tag
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
-      $ \note ->
-        MapSyntax.mapV HI.textSplice $ do
-          -- TODO: reuse note splice
-          "backlink:note:title" ## M.noteTitle note
-          "backlink:note:url" ## Ema.routeUrl (M.noteRoute note)
+      $ \(note, ctx) -> do
+        let ctxDoc :: Pandoc = Pandoc mempty $ B.Div B.nullAttr <$> toList ctx
+        -- TODO: reuse note splice
+        "backlink:note:title" ## HI.textSplice (M.noteTitle note)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl (M.noteRoute note))
+        "backlink:note:context"
+          ## Splices.pandocSplice
+          $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSplice
       $ case mNote of

@@ -99,6 +99,22 @@
         "type": "github"
       }
     },
+    "pandoc-link-context": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1614388258,
+        "narHash": "sha256-wf+uNyFH1hV5dEF6yjeFkxjKtSCpc7zRcmLUxGWn/Co=",
+        "owner": "srid",
+        "repo": "pandoc-link-context",
+        "rev": "7662ea7965c4ed940ca9245495d8f84488a4c675",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "pandoc-link-context",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "ema": "ema",
@@ -108,6 +124,7 @@
           "ema",
           "nixpkgs"
         ],
+        "pandoc-link-context": "pandoc-link-context",
         "tailwind": "tailwind"
       }
     },

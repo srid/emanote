@@ -107,6 +107,30 @@
                 <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
                     <backlink:note:title />
                   </a>
+                  <div class="text-gray-500 mb-4 text-sm">
+                    <!-- TODO: Avoid repeat the above pandoc styling u
+                         TODO: How to style the backlinks list item element? Or render each separately?
+                    -->
+                    <backlink:note:context>
+                      <PandocLink class="text-black-600">
+                        <Internal class="font-bold hover:bg-gray-50" />
+                        <External class="hover:underline" target="_blank" rel="noopener" />
+                      </PandocLink>
+                      <Para class="my-2" />
+                      <CodeBlock class="py-0.5 text-sm" />
+                      <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
+                      <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
+                      <Header>
+                        <h1 class="pb-2 mt-2 mb-2 text-6xl text-center" />
+                        <h2 class="mt-4 mb-2 text-5xl text-gray-700" />
+                        <h3 class="mt-4 mb-2 text-4xl text-gray-700" />
+                        <h4 class="mt-4 mb-2 text-3xl text-gray-700" />
+                        <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
+                        <h6 class="mt-4 mb-2 text-xl text-gray-700" />
+                      </Header>
+
+                    </backlink:note:context>
+                  </div>
                 </li>
               </backlink>
             </ul>
