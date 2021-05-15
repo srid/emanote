@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -9,6 +10,7 @@ module Main where
 import Control.Exception (throw)
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict (runWriter)
+import qualified Data.Aeson as Aeson
 import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -27,7 +29,9 @@ import qualified Emabook.Template as T
 import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
+import qualified Heist
 import qualified Heist.Interpreted as HI
+import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
 import System.FilePath ((</>))
 import qualified Text.Blaze.Html5 as H
@@ -99,20 +103,28 @@ main =
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
 
+data TemplateData = TemplateData
+  { settings :: Aeson.Value,
+    noteMay :: Maybe M.Note
+  }
+  deriving (Generic, Aeson.ToJSON)
+
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
+      tData = TemplateData (M.modelSettings model) mNote
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
-    -- Common stuff from settings.yml
+    "bind" ## HB.bindImpl
     -- Binding to <html> so they remain in scope throughout.
-    "html" ## HJ.bindJson (M.modelSettings model)
+    "html" ## HJ.bindJson tData
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
                getTreeLoc treeR
                  | treeR == R.unMarkdownRoute r = Splices.TreeLoc_Current
                  | toList treeR `NE.isPrefixOf` R.unMarkdownRoute r = Splices.TreeLoc_Ancestor
+                 | toList (R.unMarkdownRoute r) `isPrefixOf` toList treeR = Splices.TreeLoc_Descendant
                  | otherwise = Splices.TreeLoc_Elsewhere
             in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ H.toHtml . flip M.modelLookupTitle model
          )
