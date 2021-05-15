@@ -54,6 +54,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [x] Make pandoc view a splice
 - [x] Backlinks
   - Using ixset
+- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Report error on web / CLI on markdown parse failure (generally on any error)
 - [ ] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [ ] Default template: should be builtin, obviating `./.emabook`
