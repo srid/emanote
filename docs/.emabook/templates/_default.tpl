@@ -85,7 +85,7 @@
             <Internal class="font-bold hover:bg-${theme}-50" />
             <External class="hover:underline" target="_blank" rel="noopener" />
           </PandocLink>
-          <Para class="my-2" />
+          <Para class="my-3" />
           <CodeBlock class="py-0.5 text-sm" />
           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
           <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
@@ -100,14 +100,14 @@
         </ema:note:pandoc>
 
         <ema:note:backlinks>
-          <div class="bg-gray-100 rounded p-4 mt-8">
-            <header class="text-xl text-gray-500 font-semibold mb-2">Links to this page</header>
+          <div class="p-4 mt-8 bg-gray-100 rounded">
+            <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
             <ul class="space-y-1">
               <backlink>
                 <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
                     <backlink:note:title />
                   </a>
-                  <div class="text-gray-500 mb-4 text-sm">
+                  <div class="mb-4 text-sm text-gray-500">
                     <!-- TODO: How to style the backlinks list item element? Or render each separately?
                     -->
                     <backlink:note:context>
@@ -126,9 +126,9 @@
         </ema:note:backlinks>
 
         <ema:note:tags>
-          <div class="flex space-x-2 items-center justify-center mt-8 font-mono text-sm">
+          <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
             <tag>
-              <a title="Tag" class="bg-gray-100 px-1 rounded">
+              <a title="Tag" class="px-1 bg-gray-100 rounded">
                 <tag:name />
               </a>
             </tag>

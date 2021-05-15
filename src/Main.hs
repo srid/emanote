@@ -134,7 +134,7 @@ render _ model r = do
           -- 2. A broken wiki-links
           -- In both cases, we take the lenient approach, and display an empty page (but with title).
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
-          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
+          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
         Just note ->
           -- TODO: Need to handle broken links somehow.
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
