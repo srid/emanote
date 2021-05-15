@@ -92,7 +92,7 @@
           <Para class="my-3" />
           <CodeBlock class="py-0.5 text-sm" />
           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-          <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
+          <BulletList class="ml-4 space-y-1 list-disc list-inside" />
           <Header>
             <h1 class="pb-2 mt-2 mb-2 text-6xl text-center" />
             <h2 class="mt-4 mb-2 text-5xl text-gray-700" />
