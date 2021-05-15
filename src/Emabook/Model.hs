@@ -12,6 +12,8 @@ import Data.Data (Data)
 import Data.Default (Default (..))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Tree (Tree)
 import qualified Data.YAML as Y
@@ -24,19 +26,20 @@ import qualified Emabook.Route as R
 import qualified Emabook.Template as T
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.Walk as W
+import qualified Text.Pandoc.LinkContext as LC
 
 -- | This is our Ema "model" -- the app state used to generate our site.
 --
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
   { modelNotes :: IxNote,
+    modelRels :: IxRel,
     modelNav :: [Tree Slug],
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model Ix.empty mempty (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty mempty (Left $ one "Heist state not yet loaded")
 
 data Note = Note
   { noteDoc :: Pandoc,
@@ -49,38 +52,62 @@ data Note = Note
 newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
   deriving (Eq, Ord, Data, Show)
 
--- | Outgoing links from a note; can be [[Foo]] or Foo/bar.md
-newtype OutgoingRef = OutgoingRef {unOutgoingRef :: Either R.WikiLinkTarget R.MarkdownRoute}
-  deriving (Eq, Ord, Data, Show)
-
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
-
-outgoingRefs :: Note -> [OutgoingRef]
-outgoingRefs =
-  fmap OutgoingRef . extractLinks . noteDoc
-  where
-    extractLinks :: Pandoc -> [Either R.WikiLinkTarget MarkdownRoute]
-    extractLinks =
-      W.query $ \i -> maybeToList $ do
-        B.Link _ _ (url, _) <- pure i
-        parseUrl url
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
   fromMaybe (R.markdownRouteFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
 
-type NoteIxs = '[MarkdownRoute, SelfRef, OutgoingRef]
+type NoteIxs = '[MarkdownRoute, SelfRef]
 
 type IxNote = IxSet NoteIxs Note
 
 instance Indexable NoteIxs Note where
   indices =
     ixList
-      (ixGen (Proxy :: Proxy MarkdownRoute))
+      (ixGen $ Proxy @MarkdownRoute)
       (ixFun noteSelfRefs)
-      (ixFun outgoingRefs)
+
+-- | A relation from one note to another.
+data Rel = Rel
+  { relFrom :: MarkdownRoute,
+    relTo :: Either R.WikiLinkTarget R.MarkdownRoute,
+    -- | The relation context of 'from' note linking to 'to' note.
+    relCtx :: NonEmpty [B.Block]
+  }
+  deriving (Data, Show)
+
+instance Eq Rel where
+  a == b =
+    let f = relFrom &&& relTo
+     in f a == f b
+
+instance Ord Rel where
+  a <= b =
+    let f = relFrom &&& relTo
+     in f a <= f b
+
+type RelIxs = '[MarkdownRoute, Either R.WikiLinkTarget R.MarkdownRoute]
+
+type IxRel = IxSet RelIxs Rel
+
+instance Indexable RelIxs Rel where
+  indices =
+    ixList
+      (ixGen $ Proxy @MarkdownRoute)
+      (ixGen $ Proxy @(Either R.WikiLinkTarget R.MarkdownRoute))
+
+extractRels :: Note -> [Rel]
+extractRels note =
+  extractLinks . Map.map (fmap snd) . LC.queryLinksWithContext . noteDoc $ note
+  where
+    extractLinks :: Map Text (NonEmpty [B.Block]) -> [Rel]
+    extractLinks m =
+      flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
+        target <- parseUrl url
+        pure $ Rel (noteRoute note) target ctx
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -111,12 +138,15 @@ modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
   fmap noteRoute . Ix.toList $ modelNotes model @= SelfRef wl
 
-modelLookupBacklinks :: MarkdownRoute -> Model -> [Note]
+modelLookupBacklinks :: MarkdownRoute -> Model -> [(MarkdownRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
-        (OutgoingRef . Left <$> toList (R.allowedWikiLinkTargets r))
-          <> [OutgoingRef $ Right r]
-   in Ix.toList $ modelNotes model @+ refsToSelf
+        Set.fromList $
+          (Left <$> toList (R.allowedWikiLinkTargets r))
+            <> [Right r]
+      backlinks = Ix.toList $ modelRels model @+ toList refsToSelf
+   in backlinks <&> \rel ->
+        (relFrom rel, relCtx rel)
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
@@ -124,10 +154,17 @@ modelLookupTitle r =
 
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
 modelInsert k v model =
-  let modelNotes' = Ix.updateIx k note (modelNotes model)
-      note = Note (snd v) (fst v) k
+  let note = Note (snd v) (fst v) k
+      modelNotes' =
+        modelNotes model
+          & Ix.updateIx k note
+      modelRels' =
+        modelRels model
+          & Ix.deleteIx k
+          & Ix.insertList (extractRels note)
    in model
         { modelNotes = modelNotes',
+          modelRels = modelRels',
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
               (sortKey modelNotes' . R.MarkdownRoute)
@@ -147,6 +184,7 @@ modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
     { modelNotes = Ix.deleteIx k (modelNotes model),
+      modelRels = Ix.deleteIx k (modelRels model),
       modelNav = PathTree.treeDeletePath (R.unMarkdownRoute k) (modelNav model)
     }
 
