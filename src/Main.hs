@@ -88,10 +88,6 @@ main =
 newtype BadMarkdown = BadMarkdown Text
   deriving (Show, Exception)
 
--- ------------------------
--- Our site rendering
--- ------------------------
-
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
