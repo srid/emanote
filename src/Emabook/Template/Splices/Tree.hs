@@ -61,24 +61,18 @@ treeSplice tree pathToRoute getTreeLoc itemRender = do
   pure $ RX.renderHtmlNodes $ go getChildClass classes [] tree
   where
     go getChildCls attrs parSlugs (xs :: [Tree a]) = do
-      let subTreeCls =
-            A.class_ $
-              H.toValue $
-                T.intercalate " " $
-                  mapMaybe
-                    getChildCls
-                    $ [ show TreeSub,
-                        show TreeSub <> ":level:" <> show (length parSlugs)
-                      ]
-                      <> fromMaybe
-                        mempty
-                        ( do
-                            treeLoc <- getTreeLoc <$> nonEmpty parSlugs
-                            case treeLoc of
-                              TreeLoc_Current -> pure ["tree:active", "tree:active:current"]
-                              TreeLoc_Ancestor -> pure ["tree:active", "tree:active:ancestor"]
-                              TreeLoc_Elsewhere -> pure ["tree:inactive"]
-                        )
+      let childClsAttr tags =
+            A.class_ $ H.toValue $ T.intercalate " " $ mapMaybe getChildCls tags
+          subTreeCls =
+            childClsAttr $
+              [ show TreeSub,
+                show TreeSub <> ":level:" <> show (length parSlugs)
+              ]
+                <> case getTreeLoc <$> nonEmpty parSlugs of
+                  Just TreeLoc_Current -> ["tree:active", "tree:active:current"]
+                  Just TreeLoc_Ancestor -> ["tree:active", "tree:active:ancestor"]
+                  Just TreeLoc_Elsewhere -> ["tree:inactive"]
+                  Nothing -> []
       H.div ! subTreeCls $ do
         forM_ xs $ \(Node slug children) -> do
           let itemPath = NE.reverse $ slug :| parSlugs
@@ -117,8 +111,8 @@ data TreeItemState
 
 instance Show TreeItemState where
   show = \case
-    TreeItem_RootOrParent -> "item-parent"
-    TreeItem_Terminal -> "item-terminal"
+    TreeItem_RootOrParent -> "item:parent"
+    TreeItem_Terminal -> "item:terminal"
 
 data TreeLinkState
   = TreeLink_Active
@@ -127,5 +121,5 @@ data TreeLinkState
 
 instance Show TreeLinkState where
   show = \case
-    TreeLink_Active -> "link-active"
-    TreeLink_Inactive -> "link-inactive"
+    TreeLink_Active -> "link:active"
+    TreeLink_Inactive -> "link:inactive"
