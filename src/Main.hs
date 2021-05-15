@@ -117,11 +117,11 @@ render _ model r = do
           "tag:name" ## tag
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
-      $ \(note, ctx) -> do
+      $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ B.Div B.nullAttr <$> toList ctx
         -- TODO: reuse note splice
-        "backlink:note:title" ## HI.textSplice (M.noteTitle note)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl (M.noteRoute note))
+        "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl source)
         "backlink:note:context"
           ## Splices.pandocSplice
           $ ctxDoc
