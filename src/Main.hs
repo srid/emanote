@@ -136,6 +136,7 @@ render _ model r = do
           -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file for this route"
         Just note ->
+          -- TODO: Need to handle broken links somehow.
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
                 runWriter $
                   M.sanitizeMarkdown model r $ M.noteDoc note

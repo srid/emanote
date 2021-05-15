@@ -7,6 +7,7 @@ maintainer:         srid@srid.ca
 author:             Sridhar Ratnakumar
 category:           Web
 
+-- TODO: Before hackage release.
 -- A short (one-line) description of the package.
 -- synopsis:
 
@@ -40,7 +41,7 @@ executable emabook
     , monad-logger
     , mtl
     , neat-interpolation
-    , pandoc-link-context
+    , pandoc-link-context  >=1.0.2
     , pandoc-types
     , profunctors
     , relude
