@@ -29,8 +29,8 @@ import qualified Emabook.Template as T
 import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
-import qualified Heist
 import qualified Heist.Interpreted as HI
+import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
 import System.FilePath ((</>))
@@ -60,7 +60,7 @@ data Source
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceMarkdown -> "**/*.md"
-  SourceTemplate dir -> dir </> "*.tpl"
+  SourceTemplate dir -> dir </> "**/*.tpl"
   SourceTemplateSettings fp -> fp
 
 main :: IO ()
@@ -116,6 +116,7 @@ render _ model r = do
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
     "bind" ## HB.bindImpl
+    "apply" ## HA.applyImpl
     -- Binding to <html> so they remain in scope throughout.
     "html" ## HJ.bindJson tData
     -- Nav stuff

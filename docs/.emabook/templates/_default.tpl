@@ -51,65 +51,13 @@
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
         <div class="pt-1 pb-2 rounded bg-${value}-50">
-          <!-- TODO: A way to disable collapsing; ideally on per node basis.-->
-          <ema:route-tree>
-            <tree class="pl-2" />
-            <tree:inactive class="hidden" />
-            <tree:active class="bg-${theme}-100" />
-            <!-- Make this an inner splice, so as to render folder icon-->
-            <item:parent class="my-2" />
-            <item:terminal class="my-2 text-gray-600" />
-            <link:active class="font-bold text-${theme}-600 hover:text-black" />
-            <link:inactive class="hover:text-black" />
-          </ema:route-tree>
+          <apply template="components/sidebar-tree" />
         </div>
       </div>
       <!-- Main body column -->
       <div class="col-span-12 md:col-span-9">
-        <ema:note:pandoc>
-          <PandocLink class="text-${theme}-600">
-            <Internal class="font-bold hover:bg-${theme}-50" />
-            <External class="hover:underline" target="_blank" rel="noopener" />
-          </PandocLink>
-          <Para class="my-3" />
-          <CodeBlock class="py-0.5 text-sm" />
-          <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-          <BulletList class="ml-4 space-y-1 list-disc list-inside" />
-          <Header>
-            <h1 class="pb-2 mt-2 mb-2 text-6xl text-center" />
-            <h2 class="mt-4 mb-2 text-5xl text-gray-700" />
-            <h3 class="mt-4 mb-2 text-4xl text-gray-700" />
-            <h4 class="mt-4 mb-2 text-3xl text-gray-700" />
-            <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
-            <h6 class="mt-4 mb-2 text-xl text-gray-700" />
-          </Header>
-        </ema:note:pandoc>
-
-        <ema:note:backlinks>
-          <div class="p-4 mt-8 bg-gray-100 rounded">
-            <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
-            <ul class="space-y-1">
-              <backlink>
-                <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
-                    <backlink:note:title />
-                  </a>
-                  <div class="mb-4 text-sm text-gray-500">
-                    <!-- TODO: How to style the backlinks list item element? Or render each separately?
-                    -->
-                    <backlink:note:context>
-                      <PandocLink class="text-black-600">
-                        <Internal class="font-bold hover:bg-gray-50" />
-                        <External class="hover:underline" target="_blank" rel="noopener" />
-                      </PandocLink>
-                      <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-                      <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
-                    </backlink:note:context>
-                  </div>
-                </li>
-              </backlink>
-            </ul>
-          </div>
-        </ema:note:backlinks>
+        <apply template="components/markdown" />
+        <apply template="components/backlinks" />
 
         <ema:note:tags>
           <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
@@ -120,35 +68,8 @@
             </tag>
           </div>
         </ema:note:tags>
-        <ema:breadcrumbs>
-          <div class="w-full p-4 mt-4 text-gray-600 bg-gray-100">
-            <header class="mb-2 text-xl font-semibold text-gray-500">You are here</header>
-            <div class="flex justify-center">
-              <div class="w-full py-2 rounded">
-                <ul class="flex text-sm text-gray-500 lg:text-base">
-                  <crumb>
-                    <li class="inline-flex items-center">
-                      <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb:url}">
-                        <crumb:title />
-                      </a>
-                      <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400">
-                        <path fill-rule="evenodd"
-                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                          clip-rule="evenodd"></path>
-                      </svg>
-                    </li>
-                  </crumb>
-                  <li class="inline-flex items-center text-gray-600">
-                    <a>
-                      <ema:note:title />
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </ema:breadcrumbs>
 
+        <apply template="components/breadcrumbs" />
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
