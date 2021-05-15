@@ -108,7 +108,7 @@
                     <backlink:note:title />
                   </a>
                   <div class="text-gray-500 mb-4 text-sm">
-                    <!-- TODO: Avoid repeat the above pandoc styling u
+                    <!-- TODO: Avoid repeating the above pandoc styling.
                          TODO: How to style the backlinks list item element? Or render each separately?
                     -->
                     <backlink:note:context>

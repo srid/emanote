@@ -134,7 +134,9 @@ modelLookupBacklinks r model =
             <> [outRef $ Right r]
       backlinks = Ix.toList $ modelNotes model @+ toList refsToSelf
    in backlinks <&> \note ->
-        let ctx :: NonEmpty [B.Block] = maybe (one $ mempty) sconcat . nonEmpty $
+        -- FIXME: This may be inefficient. O(k) link traversal for each backlink note.
+        -- Perhaps context / links should be stored in separate IxSet?
+        let ctx :: NonEmpty [B.Block] = maybe (one mempty) sconcat . nonEmpty $
               flip mapMaybe (outgoingRefs note) $ \ref ->
                 if Set.member ref refsToSelf then Just (outRefContext ref) else Nothing
          in (note, ctx)
