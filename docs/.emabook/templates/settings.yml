@@ -1,4 +1,10 @@
 siteTitle: Emabook
-theme: yellow
+theme: blue
+# <with var="custom"> ...
 custom:
-  foo: test
+  # <value:rawHtml />
+  foo: red
+  # <with var="bar"> ...
+  bar: ["hello", "world"]
+  # <snippet:rawHtml />
+  rawHtml: "<b>Ema</b> is <u>cool</u>!"

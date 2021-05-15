@@ -15,5 +15,6 @@
     "plaintext": "html"
   },
   "editor.colorDecorators": true,
-  "tailwindCSS.colorDecorators": true
+  "tailwindCSS.colorDecorators": true,
+  "html.format.contentUnformatted": "bind"
 }

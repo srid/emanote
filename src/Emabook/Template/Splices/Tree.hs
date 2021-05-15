@@ -26,6 +26,7 @@ data TreeLoc
     TreeLoc_Current
   | -- | Location is an ancestor of current active route
     TreeLoc_Ancestor
+  | TreeLoc_Descendant
   | -- | Elsewhere in tree.
     TreeLoc_Elsewhere
   deriving (Eq, Show, Ord)
@@ -68,9 +69,10 @@ treeSplice tree pathToRoute getTreeLoc itemRender = do
               [ show TreeSub,
                 show TreeSub <> ":level:" <> show (length parSlugs)
               ]
-                <> case getTreeLoc <$> nonEmpty parSlugs of
+                <> case getTreeLoc <$> nonEmpty (reverse parSlugs) of
                   Just TreeLoc_Current -> ["tree:active", "tree:active:current"]
                   Just TreeLoc_Ancestor -> ["tree:active", "tree:active:ancestor"]
+                  Just TreeLoc_Descendant -> ["tree:active", "tree:active:descendant"]
                   Just TreeLoc_Elsewhere -> ["tree:inactive"]
                   Nothing -> []
       H.div ! subTreeCls $ do

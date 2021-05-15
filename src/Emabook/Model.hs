@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -55,7 +57,7 @@ data Note = Note
     noteMeta :: Meta,
     noteRoute :: MarkdownRoute
   }
-  deriving (Eq, Ord, Data, Show)
+  deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
 -- | Set of WikiLinks that refer to a note.
 newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
@@ -124,7 +126,7 @@ data Meta = Meta
     order :: Int,
     tags :: [Text]
   }
-  deriving (Eq, Show, Ord, Data)
+  deriving (Eq, Show, Ord, Data, Generic, Aeson.ToJSON)
 
 instance Y.FromYAML Meta where
   parseYAML = Y.withMap "FrontMatter" $ \m ->
