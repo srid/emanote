@@ -147,6 +147,8 @@ modelLookupMeta k =
 
 modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
+  -- TODO: Also lookup wiki links to *directories* without an associated zettel.
+  -- Eg: my [[Public Post Ideas]]
   fmap noteRoute . Ix.toList $ modelNotes model @= SelfRef wl
 
 modelLookupBacklinks :: MarkdownRoute -> Model -> [(MarkdownRoute, NonEmpty [B.Block])]

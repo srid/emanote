@@ -1,9 +1,4 @@
 <bind tag="iconSize">w-4 h-4</bind>
-<tree:active>
-  <bind tag="children-class">bg-${theme}-100</bind>
-  <else />
-  <bind tag="children-class">hidden</bind>
-</tree:active>
 <div class="pl-2">
   <!-- Node's rootLabel-->
   <apply template="sidebar-forest-node">
@@ -36,12 +31,12 @@
       </bind>
     </has-children>
   </apply>
-  <!-- Node's children forest
+  <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
-  <div class="${children-class}">
+  <tree:active>
     <children>
       <apply template="sidebar-forest" />
     </children>
-  </div>
+  </tree:active>
 </div>
