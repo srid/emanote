@@ -16,9 +16,14 @@
     <has-children>
       <bind tag="icon">
         <tree:active>
-          <svg class="${iconSize} inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clip-rule="evenodd" />
+            <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
+          </svg>
           <else />
-          <svg class="${iconSize} inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path> </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+          </svg>
         </tree:active>
       </bind>
       <else />
@@ -31,7 +36,9 @@
       </bind>
     </has-children>
   </apply>
-  <!-- Node's children forest-->
+  <!-- Node's children forest
+    TODO: Use <details> to toggle visibility?
+  -->
   <div class="${children-class}">
     <children>
       <apply template="sidebar-forest" />
