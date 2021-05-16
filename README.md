@@ -100,6 +100,8 @@ Documentation
   - Helper.Heist
   - Helper.Heist.Tailwind - for `<Tailwind-Include />` in head that uses inline CSS in dev server, and include of generated CSS in prod.
   - adding custom splices (when using as a library)
+- Fsnotify limitations
+  - If doing a directory move/rename, restart emabook.
 
 Mega features,
 
