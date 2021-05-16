@@ -130,7 +130,7 @@ render _ model r = do
             in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ H.toHtml . flip M.modelLookupTitle model
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.markdownRouteInits r) "crumb"
+      ## Splices.listSplice (init $ R.markdownRouteInits r) "each-crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl crumb

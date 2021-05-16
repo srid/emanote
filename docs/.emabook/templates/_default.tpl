@@ -50,7 +50,7 @@
     <div class="grid grid-cols-12 px-2">
       <!-- Sidebar column -->
       <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
-        <div class="pt-1 pb-2 rounded bg-${value}-50">
+        <div class="pt-1 pb-2 rounded bg-${theme}-50">
           <apply template="components/sidebar-tree" />
         </div>
       </div>
