@@ -1,11 +1,11 @@
 <!-- Variable bindings for this tree-->
+<bind tag="iconSize">w-4 h-4</bind>
 <node:active>
   <bind tag="link-class">font-bold text-${theme}-600 hover:text-black</bind>
   <else />
   <bind tag="link-class">hover:underline</bind>
 </node:active>
 <has-children>
-  <bind tag="iconSize">w-4 h-4</bind>
   <bind tag="icon">
     <tree:active>
       <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline" viewBox="0 0 20 20" fill="currentColor">
