@@ -16,5 +16,6 @@
   },
   "editor.colorDecorators": true,
   "tailwindCSS.colorDecorators": true,
-  "html.format.contentUnformatted": "bind"
+  "html.format.contentUnformatted": "bind",
+  "html.format.wrapLineLength": 100
 }

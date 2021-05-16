@@ -54,7 +54,7 @@ treeSplice tree pathToRoute getTreeLoc itemRender = do
             maybe mempty (A.class_ . H.toValue . T.intercalate " " . toList) $
               getChildCls tag states
           subTreeCls =
-            childClsAttr "tree" $
+            childClsAttr "forest" $
               [ "level:" <> show (length parSlugs)
               ]
                 <> case getTreeLoc <$> nonEmpty (reverse parSlugs) of
@@ -65,21 +65,21 @@ treeSplice tree pathToRoute getTreeLoc itemRender = do
                   Nothing -> []
       H.div ! subTreeCls $ do
         forM_ xs $ \(Node slug children) -> do
-          let itemPath = NE.reverse $ slug :| parSlugs
-              itemState =
+          let nodeState =
                 if null parSlugs || not (null children)
                   then TreeItem_RootOrParent
                   else TreeItem_Terminal
-              itemCls = childClsAttr "item" (one $ show itemState)
-              itemRoute = pathToRoute $ NE.reverse $ slug :| parSlugs
-              linkState =
-                case getTreeLoc itemPath of
-                  TreeLoc_Current -> TreeLink_Active
-                  _ -> TreeLink_Inactive
-              linkCls = childClsAttr "link" (one $ show linkState)
-          H.div ! itemCls $
-            H.a ! linkCls ! A.href (H.toValue $ Ema.routeUrl itemRoute) $
-              itemRender itemRoute
+              nodeCls = childClsAttr "node" (one $ show nodeState)
+          H.div ! nodeCls $ do
+            let itemPath = NE.reverse $ slug :| parSlugs
+                linkState =
+                  case getTreeLoc itemPath of
+                    TreeLoc_Current -> TreeLink_Active
+                    _ -> TreeLink_Inactive
+                linkCls = childClsAttr "link" (one $ show linkState)
+                nodeRoute = pathToRoute $ NE.reverse $ slug :| parSlugs
+            H.a ! linkCls ! A.href (H.toValue $ Ema.routeUrl nodeRoute) $
+              itemRender nodeRoute
           go getChildCls ([slug] <> parSlugs) children
 
 data TreeLoc
