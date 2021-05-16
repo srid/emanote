@@ -1,10 +1,12 @@
-siteTitle: Emabook
-theme: blue
-# <with var="custom"> ...
-custom:
-  # <value:rawHtml />
-  foo: red
-  # <with var="bar"> ...
-  bar: ["hello", "world"]
-  # <snippet:rawHtml />
-  rawHtml: "<b>Ema</b> is <u>cool</u>!"
+templateTheme: blue
+# Structured data stuff
+siteMeta:
+  siteName: Emabook
+  siteTitle: Emabook
+  description: "Emabook -- Markdown static site generator and live server. Supports Wiki-links, directories, HTML templates for complete theming."
+  # You can specify raw HTML too.
+  # Use as: <snippet:someHtml />
+  someHtml: "<b>Ema</b> is <u>cool</u>!"
+  # Or lists.
+  # use as: <with:someList> ...
+  someList: ["hello", "world"]
