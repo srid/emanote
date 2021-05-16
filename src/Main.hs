@@ -84,9 +84,9 @@ main =
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
         SourceTemplateSettings _ ->
-          M.modelUpdateSettings fp <$> readFileText fp
+          M.modelUpdateSettings <$> readFileBS fp
   where
-    readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
+    readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Aeson.Value, Pandoc)))
     readMarkdown fp =
       runMaybeT $ do
         r :: MarkdownRoute <- MaybeT $ pure $ R.mkMarkdownRouteFromFilePath fp
@@ -96,9 +96,9 @@ main =
           Left (BadMarkdown -> err) -> do
             throw err
           Right (mMeta, doc) ->
-            pure (r, (fromMaybe def mMeta, doc))
+            pure (r, (fromMaybe Aeson.Null mMeta, doc))
     parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @M.Meta $
+      Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
 
 newtype BadMarkdown = BadMarkdown Text
@@ -142,11 +142,8 @@ render _ model r = do
     "ema:note:title"
       ## HI.textSplice
       $ M.modelLookupTitle r model
-    "ema:note:tags"
-      ## Splices.listSplice (maybe mempty (M.tags . M.noteMeta) mNote) "tag"
-      $ \tag ->
-        MapSyntax.mapV HI.textSplice $ do
-          "tag:name" ## tag
+    "note-meta"
+      ## HJ.bindJson (traceShowId $ maybe Aeson.Null M.noteMeta mNote)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
