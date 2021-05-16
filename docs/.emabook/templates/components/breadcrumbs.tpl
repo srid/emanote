@@ -4,7 +4,7 @@
     <div class="flex justify-center">
       <div class="w-full py-2 rounded">
         <ul class="flex text-sm text-gray-500 lg:text-base">
-          <crumb>
+          <each-crumb>
             <li class="inline-flex items-center">
               <a class="px-1 font-bold bg-${theme}-500 rounded text-gray-50" href="${crumb:url}">
                 <crumb:title />
@@ -15,7 +15,7 @@
                   clip-rule="evenodd"></path>
               </svg>
             </li>
-          </crumb>
+          </each-crumb>
           <li class="inline-flex items-center text-gray-600">
             <a>
               <ema:note:title />
