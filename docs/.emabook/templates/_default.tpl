@@ -69,17 +69,17 @@
         <apply template="components/markdown" />
         <apply template="components/backlinks" />
 
-        <ema:note:tags>
-          <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
-            <tag>
-              <a title="Tag" class="px-1 bg-gray-100 rounded">
-                <tag:name />
-              </a>
-            </tag>
-          </div>
-        </ema:note:tags>
-
         <apply template="components/breadcrumbs" />
+
+        <note-meta>
+          <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
+            <with var="tags">
+              <a title="Tag" class="px-1 bg-gray-100 rounded">
+                <value />
+              </a>
+            </with>
+          </div>
+        </note-meta>
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>

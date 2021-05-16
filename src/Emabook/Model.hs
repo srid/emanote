@@ -10,6 +10,7 @@
 module Emabook.Model where
 
 import Control.Monad.Writer.Strict (MonadWriter (tell))
+import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.Default (Default (..))
@@ -19,8 +20,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Tree (Tree)
-import qualified Data.YAML as Y
-import Data.YAML.ToJSON ()
+import qualified Data.Yaml as Yaml
 import Ema (Ema (..), Slug)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
@@ -28,6 +28,7 @@ import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
+import Relude.Extra.Map
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
@@ -46,15 +47,13 @@ data Model = Model
 instance Default Model where
   def = Model Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
 
-parseYaml :: Y.FromYAML a => FilePath -> Text -> Either Text a
-parseYaml n (encodeUtf8 -> v) = do
-  let mkError (loc, emsg) =
-        toText $ n <> ":" <> Y.prettyPosWithSource loc v " error" <> emsg
-  first mkError $ Y.decode1 v
+parseYaml :: FromJSON a => ByteString -> Either Text a
+parseYaml v = do
+  first show $ Yaml.decodeEither' v
 
 data Note = Note
   { noteDoc :: Pandoc,
-    noteMeta :: Meta,
+    noteMeta :: Aeson.Value,
     noteRoute :: MarkdownRoute
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
@@ -128,12 +127,6 @@ data Meta = Meta
   }
   deriving (Eq, Show, Ord, Data, Generic, Aeson.ToJSON)
 
-instance Y.FromYAML Meta where
-  parseYAML = Y.withMap "FrontMatter" $ \m ->
-    Meta
-      <$> (fromMaybe def <$> m Y..:? "order")
-      <*> (fromMaybe mempty <$> m Y..:? "tags")
-
 instance Default Meta where
   def = Meta def mempty
 
@@ -141,9 +134,14 @@ modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
   Ix.getOne . Ix.getEQ k . modelNotes
 
-modelLookupMeta :: MarkdownRoute -> Model -> Meta
-modelLookupMeta k =
-  maybe def noteMeta . modelLookup k
+lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> Note -> a
+lookupNoteMeta x k note =
+  fromMaybe x $ do
+    Aeson.Object kw <- pure $ noteMeta note
+    val <- lookup k kw
+    case Aeson.fromJSON val of
+      Aeson.Error _ -> Nothing
+      Aeson.Success v -> pure v
 
 modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
@@ -165,15 +163,15 @@ modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.markdownRouteFileBase r) noteTitle . modelLookup r
 
-modelUpdateSettings :: FilePath -> Text -> Model -> Model
-modelUpdateSettings settingsFile s model =
+modelUpdateSettings :: ByteString -> Model -> Model
+modelUpdateSettings s model =
   model
     { modelSettings =
-        either error Aeson.toJSON $
-          parseYaml @(Y.Node Y.Pos) settingsFile s
+        either error id $
+          parseYaml s
     }
 
-modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
+modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsert k v model =
   let note = Note (snd v) (fst v) k
       modelNotes' =
@@ -198,7 +196,7 @@ modelInsert k v model =
       note <- Ix.getOne $ Ix.getEQ r notes
       pure $
         (,)
-          (order $ noteMeta note)
+          (lookupNoteMeta @Int 0 "order" note)
           (noteTitle note)
 
 modelDelete :: MarkdownRoute -> Model -> Model
