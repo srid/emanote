@@ -2,7 +2,6 @@
 
 module Emabook.PandocUtil where
 
-import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
