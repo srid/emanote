@@ -60,7 +60,7 @@
         class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
         <div class="pt-1 pb-2 rounded bg-${theme}-50">
           <ema:route-tree>
-            <apply template="components/sidebar-forest" />
+            <apply template="components/sidebar-tree" />
           </ema:route-tree>
         </div>
       </div>
