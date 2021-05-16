@@ -10,8 +10,8 @@
   <BlockQuote
     class="py-0.5 px-4 italic border-l-4 bg-gray-50 text-gray-600 border-gray-400 quote" />
   <Header>
-    <h1 class="pb-2 mt-2 mb-2 text-6xl text-center" />
-    <h2 class="mt-4 mb-2 text-5xl text-gray-700" />
+    <h1 class="pb-2 mt-4 mb-2 text-6xl text-center" />
+    <h2 class="mt-4 mb-4 text-5xl text-gray-700" />
     <h3 class="mt-4 mb-2 text-4xl text-gray-700" />
     <h4 class="mt-4 mb-2 text-3xl text-gray-700" />
     <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
