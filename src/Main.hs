@@ -70,7 +70,7 @@ main =
           (id &&& sourcePattern)
             <$> [ SourceMarkdown,
                   SourceTemplate ".emabook/templates",
-                  SourceTemplateSettings ".emabook/templates/settings.yml"
+                  SourceTemplateSettings ".emabook/templates/settings.yaml"
                 ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
