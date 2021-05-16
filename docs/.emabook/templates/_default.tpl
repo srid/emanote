@@ -6,8 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
     <ema:note:title /> –
-    <value var="settings.siteTitle" />
+    <value var="settings.siteMeta.siteTitle" />
   </title>
+  <with var="settings.siteMeta">
+    <meta property="og:description" content="${value:description}" />
+    <meta property="og:site_name" content="${value:siteName}" />
+  </with>
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet" type="text/css">
   <link href="/favicon.svg" rel="icon" />
@@ -20,9 +24,9 @@
 <body>
   <!-- 
     Just defining a convenient alias, to avoid <with>'ing
-    NOTE: There must not be any whitespace inside! 
+    NOTE: There must not be any whitespace inside this tag! 
   -->
-  <bind tag="theme"><value var="settings.theme" /></bind>
+  <bind tag="theme"><value var="settings.templateTheme" /></bind>
 
   <div class="container mx-auto xl:max-w-screen-lg">
     <!-- Header row-->
