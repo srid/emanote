@@ -127,7 +127,8 @@ render _ model r = do
                  | toList treeR `NE.isPrefixOf` R.unMarkdownRoute r = Splices.TreeLoc_Ancestor
                  | NE.init treeR == toList (R.unMarkdownRoute r) = Splices.TreeLoc_Child
                  | otherwise = Splices.TreeLoc_Elsewhere
-            in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ H.toHtml . flip M.modelLookupTitle model
+            in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ \nodeRoute -> do
+                 H.toHtml $ M.modelLookupTitle nodeRoute model
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.markdownRouteInits r) "each-crumb"
