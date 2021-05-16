@@ -30,11 +30,11 @@ import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
 import qualified Emabook.Template.Splices.Tree as Splices
 import qualified Heist.Interpreted as HI
+import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
 import System.FilePath ((</>))
-import qualified Text.Blaze.Html5 as H
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -122,13 +122,14 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-               getTreeLoc treeR
-                 | treeR == R.unMarkdownRoute r = Splices.TreeLoc_Current
-                 | toList treeR `NE.isPrefixOf` R.unMarkdownRoute r = Splices.TreeLoc_Ancestor
-                 | NE.init treeR == toList (R.unMarkdownRoute r) = Splices.TreeLoc_Child
-                 | otherwise = Splices.TreeLoc_Elsewhere
-            in Splices.treeSplice tree R.MarkdownRoute getTreeLoc $ \nodeRoute -> do
-                 H.toHtml $ M.modelLookupTitle nodeRoute model
+            in Splices.treeSplice [] tree $ \(R.MarkdownRoute -> nodeRoute) -> do
+                 "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
+                 "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
+                 let isActiveNode = nodeRoute == r
+                     isActiveTree =
+                       toList (R.unMarkdownRoute nodeRoute) `NE.isPrefixOf` R.unMarkdownRoute r
+                 "node:active" ## Heist.ifElseISplice isActiveNode
+                 "tree:active" ## Heist.ifElseISplice isActiveTree
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.markdownRouteInits r) "each-crumb"

@@ -167,9 +167,8 @@ modelUpdateSettings :: FilePath -> Text -> Model -> Model
 modelUpdateSettings settingsFile s model =
   model
     { modelSettings =
-        traceShowId $
-          either error Aeson.toJSON $
-            parseYaml @(Y.Node Y.Pos) settingsFile s
+        either error Aeson.toJSON $
+          parseYaml @(Y.Node Y.Pos) settingsFile s
     }
 
 modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model

@@ -13,10 +13,12 @@
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
-  <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet" type="text/css">
+  <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
+    type="text/css">
   <link href="/favicon.svg" rel="icon" />
   <!-- Syntax highlighting -->
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css"
+    rel="stylesheet" />
   <script
     src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </head>
@@ -35,7 +37,8 @@
       <div class="hidden md:mr-4 md:block md:col-span-3">
         <div class="flex items-end h-full pl-2 mt-2 space-x-2">
           <a href="/">
-            <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80" src="/favicon.svg" />
+            <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
+              src="/favicon.svg" />
           </a>
         </div>
       </div>
@@ -53,9 +56,12 @@
     <!-- Main row-->
     <div class="grid grid-cols-12 px-2">
       <!-- Sidebar column -->
-      <div class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
+      <div
+        class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
         <div class="pt-1 pb-2 rounded bg-${theme}-50">
-          <apply template="components/sidebar-tree" />
+          <ema:route-tree>
+            <apply template="components/sidebar-forest" />
+          </ema:route-tree>
         </div>
       </div>
       <!-- Main body column -->
