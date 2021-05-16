@@ -33,6 +33,7 @@ blockLookupAttr node = \case
   B.BulletList {} -> childTagAttr node "BulletList"
   B.OrderedList {} -> childTagAttr node "OrderedList"
   B.CodeBlock {} -> childTagAttr node "CodeBlock"
+  B.BlockQuote {} -> childTagAttr node "BlockQuote"
   B.Header level _ _ ->
     fromMaybe B.nullAttr $ do
       header <- XmlHtml.childElementTag "Header" node
@@ -83,7 +84,7 @@ rpBlock bAttr iAttr b = case b of
       then H.unsafeByteString $ encodeUtf8 rawHtml
       else throw Unsupported
   B.BlockQuote bs ->
-    H.blockquote $ mapM_ (rpBlock bAttr iAttr) bs
+    H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock bAttr iAttr) bs
   B.OrderedList _ bss ->
     H.ol ! rpAttr (bAttr b) $
       forM_ bss $ \bs ->

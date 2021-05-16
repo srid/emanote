@@ -7,6 +7,8 @@
   <CodeBlock class="py-0.5 text-sm" />
   <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
   <BulletList class="ml-4 space-y-1 list-disc list-inside" />
+  <BlockQuote
+    class="py-0.5 px-4 italic border-l-4 bg-gray-50 text-gray-600 border-gray-400 quote" />
   <Header>
     <h1 class="pb-2 mt-2 mb-2 text-6xl text-center" />
     <h2 class="mt-4 mb-2 text-5xl text-gray-700" />

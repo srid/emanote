@@ -70,6 +70,7 @@ main =
           (id &&& sourcePattern)
             <$> [ SourceMarkdown,
                   SourceTemplate ".emabook/templates",
+                  -- TODO: Move to `.emabook/data/*.{json,yaml,etc..}? But emabook is not data-processor, only renderer.
                   SourceTemplateSettings ".emabook/templates/settings.yaml"
                 ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
