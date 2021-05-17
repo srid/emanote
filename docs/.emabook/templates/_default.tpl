@@ -16,11 +16,7 @@
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
     type="text/css">
   <link href="/favicon.svg" rel="icon" />
-  <!-- Syntax highlighting -->
-  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css"
-    rel="stylesheet" />
-  <script
-    src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <snippet var="page.headHtml" />
 </head>
 
 <body>
