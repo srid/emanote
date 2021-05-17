@@ -30,6 +30,8 @@ import qualified Emabook.Model.Rel as Rel
 import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
+import qualified Emabook.Route.Ext as Ext
+import qualified Emabook.Route.WikiLinkTarget as WL
 import qualified Emabook.Template as T
 import qualified Emabook.Template.Splices.List as Splices
 import qualified Emabook.Template.Splices.Pandoc as Splices
@@ -89,17 +91,17 @@ main =
         SourceMarkdown -> case action of
           FileSystem.Update ->
             fmap (fromMaybe id) . runMaybeT $ do
-              r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Md fp
+              r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Md fp
               logD $ "Reading note " <> toText fp
               !s <- readFileText fp
               (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
               pure $ M.modelInsert r (fromMaybe Aeson.Null mMeta, doc)
           FileSystem.Delete ->
-            pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
+            pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @Ext.Md fp)
         SourceData -> case action of
           FileSystem.Update -> do
             fmap (fromMaybe id) . runMaybeT $ do
-              r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
+              r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
               logD $ "Reading data " <> toText fp
               !s <- readFileBS fp
               sdata <-
@@ -107,7 +109,7 @@ main =
                   Yaml.decodeEither' s
               pure $ M.modelInsertData r sdata
           FileSystem.Delete ->
-            pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
+            pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
         SourceTemplate dir ->
           (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
   where
@@ -192,7 +194,7 @@ resolveUrl model url =
         case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
           Nothing -> do
             -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            let fakeRouteUnder404 = R.Route @R.Md $ one "404" <> R.unWikiLinkText wl
+            let fakeRouteUnder404 = R.Route @Ext.Md $ one "404" <> WL.unWikiLinkText wl
             pure $ Ema.routeUrl fakeRouteUnder404
           Just targets ->
             -- TODO: Deal with ambiguous targets here

@@ -33,6 +33,8 @@ import qualified Emabook.Model.Rel as Rel
 import Emabook.Model.SData (IxSData, SData (SData), sdataValue)
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
+import qualified Emabook.Route.Ext as Ext
+import qualified Emabook.Route.WikiLinkTarget as WL
 import qualified Emabook.Template as T
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
@@ -69,7 +71,7 @@ lookupNoteMeta x k r model =
       Aeson.Error _ -> Nothing
       Aeson.Success b -> pure b
 
-modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
+modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
@@ -79,7 +81,7 @@ modelLookupBacklinks :: MarkdownRoute -> Model -> [(MarkdownRoute, NonEmpty [B.B
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
-          (Left <$> toList (R.allowedWikiLinkTargets r))
+          (Left <$> toList (WL.allowedWikiLinkTargets r))
             <> [Right r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
@@ -96,7 +98,7 @@ modelComputeMeta mr model =
   -- NOTE: This should never return Aeson.Null as long there is an index.yaml
   -- TODO: Capture and warn of this invariant in user-friendly way.
   fromMaybe Aeson.Null $ do
-    let defaultFiles = R.routeInits @R.Yaml (coerce mr)
+    let defaultFiles = R.routeInits @Ext.Yaml (coerce mr)
     defaults <- nonEmpty $
       flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
@@ -111,11 +113,11 @@ modelComputeMeta mr model =
   where
     mergeAeson = AesonMerge.lodashMerge
 
-modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
+modelInsertData :: R.Route Ext.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v =
   modelData %~ Ix.updateIx r (SData v r)
 
-modelDeleteData :: R.Route R.Yaml -> Model -> Model
+modelDeleteData :: R.Route Ext.Yaml -> Model -> Model
 modelDeleteData k =
   modelData %~ Ix.deleteIx k
 
