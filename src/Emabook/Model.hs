@@ -17,10 +17,8 @@ import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as Set
-import qualified Data.Text as T
 import Data.Tree (Tree)
-import Ema (Ema (..), Slug)
-import qualified Ema
+import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model.Note
   ( IxNote,
@@ -33,7 +31,6 @@ import Emabook.Model.Note
 import Emabook.Model.Rel (IxRel)
 import qualified Emabook.Model.Rel as Rel
 import Emabook.Model.SData (IxSData, SData (SData), sdataValue)
-import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
@@ -139,42 +136,3 @@ modelDelete k =
 staticRoutes :: Model -> [MarkdownRoute]
 staticRoutes (fmap (^. noteRoute) . Ix.toList . (^. modelNotes) -> mdRoutes) =
   mdRoutes
-
--- | Accumulate broken links in Writer.
-sanitizeMarkdown ::
-  (Ema Model R.MarkdownRoute) =>
-  Model ->
-  MarkdownRoute ->
-  Pandoc ->
-  Pandoc
-sanitizeMarkdown model r =
-  -- Eliminate H1, because we are handling it separately.
-  PandocUtil.withoutH1
-    >>> PandocUtil.rewriteLinks (resolveUrl model)
-
--- | Convert .md or wiki links to their proper route url.
---
--- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl ::
-  (Ema Model R.MarkdownRoute) =>
-  Model ->
-  Text ->
-  Text
-resolveUrl model url =
-  fromMaybe url $ do
-    guard $ not $ isStaticAssetUrl url
-    Rel.parseUrl url >>= \case
-      Right r -> do
-        pure $ Ema.routeUrl r
-      Left wl ->
-        case nonEmpty (modelLookupRouteByWikiLink wl model) of
-          Nothing -> do
-            -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            let fakeRouteUnder404 = R.Route @R.Md $ one "404" <> R.unWikiLinkText wl
-            pure $ Ema.routeUrl fakeRouteUnder404
-          Just targets ->
-            -- TODO: Deal with ambiguous targets here
-            pure $ Ema.routeUrl $ head targets
-  where
-    isStaticAssetUrl s =
-      any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) (staticAssets $ Proxy @MarkdownRoute)
