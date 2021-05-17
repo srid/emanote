@@ -24,7 +24,6 @@ First, clone [haskell-knowledge-base](https://github.com/tfausak/haskell-knowled
 cd ../
 git clone git@github.com:tfausak/haskell-knowledge-base.git
 cd haskell-knowledge-base/
-ln -s ../emabook/docs/.emabook .
 ln -s ../emabook/docs/favicon.svg .  # Or use something else
 ```
 
@@ -59,7 +58,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [ ] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
-  - [ ] Do the same for `index.yaml` (then test on haskell-kb)
+  - [x] Do the same for `index.yaml` (then test on haskell-kb)
   - [ ] Consider `emabook init` to create these files
 - [ ] Redirect to README.md if there is no index.md
 - [ ] `emabook gen --base-url=srid.github.io/foo` (or some other way)
