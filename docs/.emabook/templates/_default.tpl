@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
     <ema:note:title /> –
-    <value var="settings.siteMeta.siteTitle" />
+    <value var="siteMeta.siteTitle" />
   </title>
-  <with var="settings.siteMeta">
+  <with var="siteMeta">
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
@@ -28,7 +28,7 @@
     Just defining a convenient alias, to avoid <with>'ing
     NOTE: There must not be any whitespace inside this tag! 
   -->
-  <bind tag="theme"><value var="settings.templateTheme" /></bind>
+  <bind tag="theme"><value var="templateTheme" /></bind>
 
   <div class="container mx-auto xl:max-w-screen-lg">
     <!-- Header row-->

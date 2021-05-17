@@ -114,22 +114,16 @@ main =
 newtype BadInput = BadInput Text
   deriving (Show, Exception)
 
-data TemplateData = TemplateData
-  { settings :: Aeson.Value,
-    noteMay :: Maybe M.Note
-  }
-  deriving (Generic, Aeson.ToJSON)
-
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
-      tData = TemplateData (M.modelDefaultDataFor r model) mNote
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Binding to <html> so they remain in scope throughout.
-    "html" ## HJ.bindJson tData
+    "html"
+      ## HJ.bindJson (M.modelComputeMeta r model)
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
@@ -152,8 +146,6 @@ render _ model r = do
     "ema:note:title"
       ## HI.textSplice
       $ M.modelLookupTitle r model
-    "note-meta"
-      ## HJ.bindJson (M.modelComputeMeta r model)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
