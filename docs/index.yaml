@@ -3,7 +3,7 @@
 # You can override them on a per-note or per-directory basis by creating the
 # associated .yaml file.
 
-# Ordered is used by Emabook to determine the sidebar order of notes.
+# Order is used by Emabook to determine the sidebar order of notes.
 order: 0
 
 tags: []
