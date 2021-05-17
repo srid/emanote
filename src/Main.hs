@@ -11,7 +11,6 @@ import Control.Exception (throw)
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict (runWriter)
 import qualified Data.Aeson as Aeson
-import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
@@ -70,8 +69,7 @@ main =
           (id &&& sourcePattern)
             <$> [ SourceMarkdown,
                   SourceTemplate ".emabook/templates",
-                  -- TODO: Move to `.emabook/data/*.{json,yaml,etc..}? But emabook is not data-processor, only renderer.
-                  SourceTemplateSettings ".emabook/templates/settings.yaml"
+                  SourceTemplateSettings "index.yaml"
                 ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
