@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
     <ema:note:title /> –
-    <value var="settings.siteMeta.siteTitle" />
+    <value var="page.siteTitle" />
   </title>
-  <with var="settings.siteMeta">
+  <with var="page">
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
@@ -28,7 +28,7 @@
     Just defining a convenient alias, to avoid <with>'ing
     NOTE: There must not be any whitespace inside this tag! 
   -->
-  <bind tag="theme"><value var="settings.templateTheme" /></bind>
+  <bind tag="theme"><value var="templateTheme" /></bind>
 
   <div class="container mx-auto xl:max-w-screen-lg">
     <!-- Header row-->
@@ -69,17 +69,17 @@
         <apply template="components/markdown" />
         <apply template="components/backlinks" />
 
-        <ema:note:tags>
-          <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
-            <tag>
-              <a title="Tag" class="px-1 bg-gray-100 rounded">
-                <tag:name />
-              </a>
-            </tag>
-          </div>
-        </ema:note:tags>
-
         <apply template="components/breadcrumbs" />
+
+        <note-meta>
+          <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
+            <with var="tags">
+              <a title="Tag" class="px-1 bg-gray-100 rounded">
+                <value />
+              </a>
+            </with>
+          </div>
+        </note-meta>
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
