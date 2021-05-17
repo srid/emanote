@@ -13,15 +13,26 @@ import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 
 treeSplice ::
-  (Monad n, Ord sortKey) => [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> H.Splices (HI.Splice n)) -> HI.Splice n
-treeSplice pars sortKey trees childSplice = do
-  let treeSorted = flip sortOn trees $ \(rootLabel -> x) ->
-        sortKey $ maybe (one x) (<> one x) $ nonEmpty pars
-  flip foldMapM treeSorted $ \(Node lbl children) -> do
-    HI.runChildrenWith $ do
-      let herePath = maybe (one lbl) (<> one lbl) $ nonEmpty pars
-      childSplice herePath
-      "has-children" ## Heist.ifElseISplice (not . null $ children)
-      let childrenSorted = sortOn (sortKey . (herePath <>) . one . rootLabel) children
-      "children"
-        ## treeSplice (toList herePath) sortKey childrenSorted childSplice
+  forall a n sortKey.
+  (Monad n, Ord sortKey) =>
+  -- | How to sort children
+  (NonEmpty a -> sortKey) ->
+  -- | Input tree
+  [Tree a] ->
+  -- | How to render a (sub-)tree root
+  (NonEmpty a -> H.Splices (HI.Splice n)) ->
+  HI.Splice n
+treeSplice =
+  go []
+  where
+    go :: [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> H.Splices (HI.Splice n)) -> HI.Splice n
+    go pars sortKey trees childSplice = do
+      let extendPars x = maybe (one x) (<> one x) $ nonEmpty pars
+      flip foldMapM (sortOn (sortKey . extendPars . rootLabel) trees) $ \(Node lbl children) -> do
+        HI.runChildrenWith $ do
+          let herePath = extendPars lbl
+          childSplice herePath
+          "has-children" ## Heist.ifElseISplice (not . null $ children)
+          let childrenSorted = sortOn (sortKey . (herePath <>) . one . rootLabel) children
+          "children"
+            ## go (toList herePath) sortKey childrenSorted childSplice

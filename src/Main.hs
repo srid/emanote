@@ -76,38 +76,27 @@ main =
       case src of
         SourceMarkdown -> case action of
           FileSystem.Update ->
-            readMarkdown fp
-              <&> maybe id (uncurry M.modelInsert)
+            fmap (fromMaybe id) . runMaybeT $ do
+              r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Md fp
+              logD $ "Reading note " <> toText fp
+              !s <- readFileText fp
+              (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
+              pure $ M.modelInsert r (fromMaybe Aeson.Null mMeta, doc)
           FileSystem.Delete ->
             pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
         SourceData -> case action of
           FileSystem.Update -> do
-            fmap (fromMaybe id) $
-              runMaybeT $ do
-                r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
-                logD $ "Reading " <> toText fp
-                !s <- readFileBS fp
-                case M.parseYaml s of
-                  Left (BadInput -> err) -> do
-                    throw err
-                  Right sdata ->
-                    pure $ M.modelInsertData r sdata
+            fmap (fromMaybe id) . runMaybeT $ do
+              r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
+              logD $ "Reading data " <> toText fp
+              !s <- readFileBS fp
+              sdata <- either (throw . BadInput) pure $ M.parseYaml s
+              pure $ M.modelInsertData r sdata
           FileSystem.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
   where
-    readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Aeson.Value, Pandoc)))
-    readMarkdown fp =
-      runMaybeT $ do
-        r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Md fp
-        logD $ "Reading " <> toText fp
-        !s <- readFileText fp
-        case parseMarkdown fp s of
-          Left (BadInput -> err) -> do
-            throw err
-          Right (mMeta, doc) ->
-            pure (r, (fromMaybe Aeson.Null mMeta, doc))
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
@@ -130,7 +119,7 @@ render _ model r = do
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
                getOrder tr =
                  (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) M.noteTitle $ M.modelLookup tr model)
-            in Splices.treeSplice [] (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
+            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r

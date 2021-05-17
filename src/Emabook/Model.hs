@@ -187,6 +187,8 @@ modelLookupTitle r =
 -- specified in parent routes all the way upto index.yaml.
 modelComputeMeta :: MarkdownRoute -> Model -> Aeson.Value
 modelComputeMeta mr model =
+  -- NOTE: This should never return Aeson.Null as long there is an index.yaml
+  -- TODO: Capture and warn of this invariant in user-friendly way.
   fromMaybe Aeson.Null $ do
     let defaultFiles = R.routeInits @R.Yaml (coerce mr)
     defaults <- nonEmpty $
@@ -195,13 +197,11 @@ modelComputeMeta mr model =
         guard $ v /= Aeson.Null
         pure v
     let finalDefault = NE.last $ NE.scanl1 mergeAeson defaults
-    case noteMeta <$> modelLookup mr model of
-      Nothing -> pure finalDefault
-      Just frontmatter ->
-        pure $
-          if frontmatter == Aeson.Null
-            then finalDefault
-            else mergeAeson finalDefault frontmatter
+    pure $
+      fromMaybe finalDefault $ do
+        frontmatter <- noteMeta <$> modelLookup mr model
+        guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
+        pure $ mergeAeson finalDefault frontmatter
   where
     mergeAeson = AesonMerge.lodashMerge
 
@@ -235,15 +235,10 @@ modelInsert k v model =
           }
    in model'
         { modelNav =
-            PathTree.treeInsertPathMaintainingOrder
-              (sortKey model' . R.Route @R.Md)
+            PathTree.treeInsertPath
               (R.unRoute k)
               (modelNav model')
         }
-  where
-    sortKey m r = fromMaybe (R.routeFileBase r) $ do
-      note <- Ix.getOne $ Ix.getEQ r $ modelNotes m
-      pure $ noteTitle note
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
