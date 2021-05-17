@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template.Splices.List where
+module Heist.Extra.Splices.List where
 
 import Data.Map.Syntax ((##))
 import qualified Heist as H

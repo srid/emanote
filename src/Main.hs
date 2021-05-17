@@ -9,13 +9,14 @@
 module Main where
 
 import Control.Lens.Operators ((^.))
+import Control.Monad.Logger (MonadLogger)
+import Data.LVar (LVar)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
 import Ema (Ema)
 import qualified Ema
-import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model (Model)
@@ -29,10 +30,10 @@ import qualified Emabook.Route as R
 import qualified Emabook.Route.Ext as Ext
 import qualified Emabook.Route.WikiLinkTarget as WL
 import qualified Emabook.Source as Source
-import qualified Emabook.Template as T
-import qualified Emabook.Template.Splices.List as Splices
-import qualified Emabook.Template.Splices.Pandoc as Splices
-import qualified Emabook.Template.Splices.Tree as Splices
+import qualified Heist.Extra.Splices.List as Splices
+import qualified Heist.Extra.Splices.Pandoc as Splices
+import qualified Heist.Extra.Splices.Tree as Splices
+import qualified Heist.Extra.TemplateState as T
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
@@ -40,6 +41,7 @@ import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
+import UnliftIO (MonadUnliftIO)
 
 -- ------------------------
 -- Main entry point
@@ -54,21 +56,25 @@ instance Ema Model MarkdownRoute where
 
 main :: IO ()
 main =
-  Ema.runEma render $ \model -> do
-    FileSystem.mountOnLVar "." Source.filePatterns model $ \(src, fp) action ->
-      Source.transformAction src fp action
+  Ema.runEma (const render) run
 
-render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
-render _ model r = do
-  let mNote = M.modelLookup r model
+run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
+run model =
+  FileSystem.mountOnLVar "." Source.filePatterns model $ \(src, fp) action ->
+    Source.transformAction src fp action
+
+render :: Model -> MarkdownRoute -> LByteString
+render model r =
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (model ^. M.modelHeistTemplate) $ do
+    -- Heist helpers
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
-    -- Binding to <html> so they remain in scope throughout.
+    -- Bind route-associated metadata to <html> so that they remain in scope
+    -- throughout.
     "html"
       ## HJ.bindJson (Meta.getEffectiveRouteMeta r model)
-    -- Nav stuff
+    -- Sidebar navigation
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
@@ -104,7 +110,7 @@ render _ model r = do
           $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSplice
-      $ case mNote of
+      $ case M.modelLookup r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
           -- 1. Refers to a folder route (and no ${folder}.md exists)
