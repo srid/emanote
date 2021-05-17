@@ -27,6 +27,9 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
 withoutH1 doc =
   doc
 
+rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
+rewriteLinks f = runIdentity . rewriteLinksM (Identity . f)
+
 rewriteLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
 rewriteLinksM f =
   W.walkM $ \case

@@ -11,10 +11,8 @@ module Main where
 import Control.Exception (throw)
 import Control.Lens.Operators ((.~), (^.))
 import Control.Monad.Logger
-import Control.Monad.Writer.Strict (runWriter)
 import qualified Data.Aeson as Aeson
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Yaml as Yaml
@@ -173,7 +171,4 @@ render _ model r = do
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
         Just note ->
           -- TODO: Need to handle broken links somehow.
-          let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
-                runWriter $
-                  M.sanitizeMarkdown model r $ note ^. MN.noteDoc
-           in doc'
+          M.sanitizeMarkdown model r $ note ^. MN.noteDoc
