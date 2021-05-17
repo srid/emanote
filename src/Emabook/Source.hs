@@ -51,7 +51,7 @@ filePatterns =
   (id &&& sourcePattern)
     <$> [ SourceMarkdown,
           SourceData,
-          SourceTemplate ".emabook/templates"
+          SourceTemplate "templates"
         ]
 
 -- | Like `transformAction` but operates on multiple source types at a time
