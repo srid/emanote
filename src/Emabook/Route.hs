@@ -8,27 +8,12 @@ module Emabook.Route where
 import Data.Aeson (ToJSON)
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Set as Set
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
+import Emabook.Route.Ext (Ext (..), Md)
 import System.FilePath (splitExtension, splitPath)
 import qualified Text.Show (Show (show))
-
-data Md
-  deriving (Generic, Data, ToJSON)
-
-data Yaml
-  deriving (Generic, Data, ToJSON)
-
-class Ext a where
-  getExt :: Proxy a -> String
-
-instance Ext Md where
-  getExt Proxy = ".md"
-
-instance Ext Yaml where
-  getExt Proxy = ".yaml"
 
 -- | Represents the relative path to a source (.md) file under some directory.
 --
@@ -45,9 +30,6 @@ type MarkdownRoute = Route Md
 instance Ext ext => Show (Route ext) where
   show (Route slugs) =
     toString $ "R[" <> toText (getExt (Proxy @ext)) <> "]:" <> T.intercalate "/" (toList $ fmap Ema.unSlug slugs)
-
-newtype BadRoute ext = BadRoute (Route ext)
-  deriving (Show, Exception)
 
 -- | Represents the top-level index.md
 indexRoute :: Route ext
@@ -93,26 +75,6 @@ routeInits (Route (slug :| rest')) =
               one this
             Just ys ->
               this : go (unRoute this) ys
-
--- | Represents the "Foo" in [[Foo]]
---
--- As wiki links may contain multiple path components, it can also represent
--- [[Foo/Bar]], hence we use nonempty slug list.
-newtype WikiLinkTarget = WikiLinkTarget {unWikiLinkText :: NonEmpty Slug}
-  deriving (Eq, Show, Ord, Data)
-
-mkWikiLinkTargetFromUrl :: Text -> Maybe WikiLinkTarget
-mkWikiLinkTargetFromUrl s = do
-  guard $ not $ "://" `T.isInfixOf` s
-  slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
-  pure $ WikiLinkTarget slugs
-
--- | Return the various ways to link to this markdown route
---
--- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinkTargets :: Route Md -> Set WikiLinkTarget
-allowedWikiLinkTargets =
-  Set.fromList . mapMaybe (fmap WikiLinkTarget . nonEmpty) . toList . NE.tails . unRoute
 
 -- | Convert a route to URL slugs
 encodeRoute :: Route ext -> [Slug]

@@ -12,21 +12,22 @@ import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Emabook.Route as R
+import qualified Emabook.Route.Ext as Ext
 
 -- | `S` for "structured". Also to avoid conflict with builtin `Data`
 data SData = SData
   { _sdataValue :: Aeson.Value,
-    _sdataRoute :: R.Route R.Yaml
+    _sdataRoute :: R.Route Ext.Yaml
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
-type SDataIxs = '[R.Route R.Yaml]
+type SDataIxs = '[R.Route Ext.Yaml]
 
 type IxSData = IxSet SDataIxs SData
 
 instance Indexable SDataIxs SData where
   indices =
     ixList
-      (ixGen $ Proxy @(R.Route R.Yaml))
+      (ixGen $ Proxy @(R.Route Ext.Yaml))
 
 makeLenses ''SData

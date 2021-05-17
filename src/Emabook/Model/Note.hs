@@ -15,6 +15,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList)
 import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
+import qualified Emabook.Route.WikiLinkTarget as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
@@ -25,12 +26,12 @@ data Note = Note
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
 -- | Set of WikiLinks that refer to a note.
-newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
+newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLinkTarget}
   deriving (Eq, Ord, Data, Show)
 
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
-noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . _noteRoute
+noteSelfRefs = fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute
 
 type NoteIxs = '[MarkdownRoute, SelfRef]
 

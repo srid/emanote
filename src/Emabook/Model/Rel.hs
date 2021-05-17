@@ -17,13 +17,15 @@ import qualified Data.Text as T
 import Emabook.Model.Note (Note, noteDoc, noteRoute)
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
+import Emabook.Route.Ext (Md)
+import qualified Emabook.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
 -- | A relation from one note to another.
 data Rel = Rel
   { _relFrom :: MarkdownRoute,
-    _relTo :: Either R.WikiLinkTarget R.MarkdownRoute,
+    _relTo :: Either WL.WikiLinkTarget R.MarkdownRoute,
     -- | The relation context of 'from' note linking to 'to' note.
     _relCtx :: NonEmpty [B.Block]
   }
@@ -35,7 +37,7 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[MarkdownRoute, Either R.WikiLinkTarget R.MarkdownRoute]
+type RelIxs = '[MarkdownRoute, Either WL.WikiLinkTarget R.MarkdownRoute]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -43,7 +45,7 @@ instance Indexable RelIxs Rel where
   indices =
     ixList
       (ixGen $ Proxy @MarkdownRoute)
-      (ixGen $ Proxy @(Either R.WikiLinkTarget R.MarkdownRoute))
+      (ixGen $ Proxy @(Either WL.WikiLinkTarget R.MarkdownRoute))
 
 makeLenses ''Rel
 
@@ -58,8 +60,8 @@ extractRels note =
         pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
-parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
+parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget MarkdownRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Left (R.mkWikiLinkTargetFromUrl url)
-    <|> fmap Right (R.mkRouteFromFilePath @R.Md $ toString url)
+  fmap Left (WL.mkWikiLinkTargetFromUrl url)
+    <|> fmap Right (R.mkRouteFromFilePath @Md $ toString url)

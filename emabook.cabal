@@ -84,6 +84,8 @@ executable emabook
     Emabook.Model.SData
     Emabook.PandocUtil
     Emabook.Route
+    Emabook.Route.Ext
+    Emabook.Route.WikiLinkTarget
     Emabook.Template
     Emabook.Template.Splices.List
     Emabook.Template.Splices.Pandoc
