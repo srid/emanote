@@ -9,7 +9,6 @@ module Emabook.Model where
 
 import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
-import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Extra.Merge as AesonMerge
@@ -143,40 +142,36 @@ staticRoutes (fmap (^. noteRoute) . Ix.toList . (^. modelNotes) -> mdRoutes) =
 
 -- | Accumulate broken links in Writer.
 sanitizeMarkdown ::
-  forall m w.
-  (Ema Model R.MarkdownRoute, MonadWriter w m, w ~ [(MarkdownRoute, Text)]) =>
+  (Ema Model R.MarkdownRoute) =>
   Model ->
   MarkdownRoute ->
   Pandoc ->
-  m Pandoc
+  Pandoc
 sanitizeMarkdown model r =
   -- Eliminate H1, because we are handling it separately.
   PandocUtil.withoutH1
-    >>> PandocUtil.rewriteLinksM (resolveUrl model r)
+    >>> PandocUtil.rewriteLinks (resolveUrl model)
 
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
 resolveUrl ::
-  forall m w.
-  (Ema Model R.MarkdownRoute, MonadWriter w m, w ~ [(MarkdownRoute, Text)]) =>
+  (Ema Model R.MarkdownRoute) =>
   Model ->
-  MarkdownRoute ->
   Text ->
-  m Text
-resolveUrl model docRoute url =
-  fmap (fromMaybe url) . runMaybeT @m $ do
+  Text
+resolveUrl model url =
+  fromMaybe url $ do
     guard $ not $ isStaticAssetUrl url
-    hoistMaybe (Rel.parseUrl url) >>= \case
+    Rel.parseUrl url >>= \case
       Right r -> do
         pure $ Ema.routeUrl r
       Left wl ->
         case nonEmpty (modelLookupRouteByWikiLink wl model) of
           Nothing -> do
-            tell $ one (docRoute, url)
             -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            -- TODO: Return url as is, so backlinks work?
-            pure "/EmaNotFound"
+            let fakeRouteUnder404 = R.Route @R.Md $ one "404" <> R.unWikiLinkText wl
+            pure $ Ema.routeUrl fakeRouteUnder404
           Just targets ->
             -- TODO: Deal with ambiguous targets here
             pure $ Ema.routeUrl $ head targets
