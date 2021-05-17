@@ -1,0 +1,20 @@
+# These variables are made globally available in the HTML templates.
+# Make sure that they do not conflict with HTML tag names.
+# You can override them on a per-note or per-directory basis by creating the
+# associated .yaml file.
+
+# Order is used by Emabook to determine the sidebar order of notes.
+order: 0
+
+tags: []
+
+templateTheme: blue
+
+# Put page-specific metadata here. Override them in Markdown frontmatter or
+# per-folder YAML as necessary.
+page:
+  siteName: Emabook
+  siteTitle: Emabook
+  description: | 
+    Emabook -- Markdown static site generator and live server. Supports
+    Wiki-links, directories, HTML templates for complete theming.

@@ -10,17 +10,19 @@
 module Emabook.Model where
 
 import Control.Monad.Writer.Strict (MonadWriter (tell))
+import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Extra.Merge as AesonMerge
 import Data.Data (Data)
 import Data.Default (Default (..))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import Data.Tree (Tree)
-import qualified Data.YAML as Y
-import Data.YAML.ToJSON ()
+import qualified Data.Yaml as Yaml
 import Ema (Ema (..), Slug)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
@@ -28,6 +30,7 @@ import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
+import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
@@ -38,23 +41,37 @@ import qualified Text.Pandoc.LinkContext as LC
 data Model = Model
   { modelNotes :: IxNote,
     modelRels :: IxRel,
+    modelData :: IxSData,
     modelNav :: [Tree Slug],
-    modelSettings :: Aeson.Value,
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty Ix.empty mempty (Left $ one "Heist state not yet loaded")
 
-parseYaml :: Y.FromYAML a => FilePath -> Text -> Either Text a
-parseYaml n (encodeUtf8 -> v) = do
-  let mkError (loc, emsg) =
-        toText $ n <> ":" <> Y.prettyPosWithSource loc v " error" <> emsg
-  first mkError $ Y.decode1 v
+parseYaml :: FromJSON a => ByteString -> Either Text a
+parseYaml v = do
+  first show $ Yaml.decodeEither' v
+
+-- | `S` for "structured". Also to avoid conflict with builtin `Data`
+data SData = SData
+  { sdataValue :: Aeson.Value,
+    sdataRoute :: R.Route R.Yaml
+  }
+  deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
+
+type SDataIxs = '[R.Route R.Yaml]
+
+type IxSData = IxSet SDataIxs SData
+
+instance Indexable SDataIxs SData where
+  indices =
+    ixList
+      (ixGen $ Proxy @(R.Route R.Yaml))
 
 data Note = Note
   { noteDoc :: Pandoc,
-    noteMeta :: Meta,
+    noteMeta :: Aeson.Value,
     noteRoute :: MarkdownRoute
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
@@ -69,7 +86,7 @@ noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
-  fromMaybe (R.markdownRouteFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
+  fromMaybe (R.routeFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
 
 type NoteIxs = '[MarkdownRoute, SelfRef]
 
@@ -128,12 +145,6 @@ data Meta = Meta
   }
   deriving (Eq, Show, Ord, Data, Generic, Aeson.ToJSON)
 
-instance Y.FromYAML Meta where
-  parseYAML = Y.withMap "FrontMatter" $ \m ->
-    Meta
-      <$> (fromMaybe def <$> m Y..:? "order")
-      <*> (fromMaybe mempty <$> m Y..:? "tags")
-
 instance Default Meta where
   def = Meta def mempty
 
@@ -141,9 +152,16 @@ modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
   Ix.getOne . Ix.getEQ k . modelNotes
 
-modelLookupMeta :: MarkdownRoute -> Model -> Meta
-modelLookupMeta k =
-  maybe def noteMeta . modelLookup k
+lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> MarkdownRoute -> Model -> a
+lookupNoteMeta x k r model =
+  fromMaybe x $ do
+    Aeson.Object obj <- pure $ modelComputeMeta r model
+    resultToMaybe . Aeson.fromJSON =<< lookup k obj
+  where
+    resultToMaybe :: Aeson.Result b -> Maybe b
+    resultToMaybe = \case
+      Aeson.Error _ -> Nothing
+      Aeson.Success b -> pure b
 
 modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
@@ -163,17 +181,44 @@ modelLookupBacklinks r model =
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.markdownRouteFileBase r) noteTitle . modelLookup r
+  maybe (R.routeFileBase r) noteTitle . modelLookup r
 
-modelUpdateSettings :: FilePath -> Text -> Model -> Model
-modelUpdateSettings settingsFile s model =
+-- | Get the (final) metadata of a note, by merging it with the defaults
+-- specified in parent routes all the way upto index.yaml.
+modelComputeMeta :: MarkdownRoute -> Model -> Aeson.Value
+modelComputeMeta mr model =
+  -- NOTE: This should never return Aeson.Null as long there is an index.yaml
+  -- TODO: Capture and warn of this invariant in user-friendly way.
+  fromMaybe Aeson.Null $ do
+    let defaultFiles = R.routeInits @R.Yaml (coerce mr)
+    defaults <- nonEmpty $
+      flip mapMaybe (toList defaultFiles) $ \r -> do
+        v <- fmap sdataValue . Ix.getOne . Ix.getEQ r . modelData $ model
+        guard $ v /= Aeson.Null
+        pure v
+    let finalDefault = NE.last $ NE.scanl1 mergeAeson defaults
+    pure $
+      fromMaybe finalDefault $ do
+        frontmatter <- noteMeta <$> modelLookup mr model
+        guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
+        pure $ mergeAeson finalDefault frontmatter
+  where
+    mergeAeson = AesonMerge.lodashMerge
+
+modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
+modelInsertData r v model =
+  let modelData' =
+        modelData model
+          & Ix.updateIx r (SData v r)
+   in model {modelData = modelData'}
+
+modelDeleteData :: R.Route R.Yaml -> Model -> Model
+modelDeleteData k model =
   model
-    { modelSettings =
-        either error Aeson.toJSON $
-          parseYaml @(Y.Node Y.Pos) settingsFile s
+    { modelData = Ix.deleteIx k (modelData model)
     }
 
-modelInsert :: MarkdownRoute -> (Meta, Pandoc) -> Model -> Model
+modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsert k v model =
   let note = Note (snd v) (fst v) k
       modelNotes' =
@@ -183,30 +228,24 @@ modelInsert k v model =
         modelRels model
           & Ix.deleteIx k
           & Ix.insertList (extractRels note)
-   in model
-        { modelNotes = modelNotes',
-          modelRels = modelRels',
-          modelNav =
-            PathTree.treeInsertPathMaintainingOrder
-              (sortKey modelNotes' . R.MarkdownRoute)
-              (R.unMarkdownRoute k)
-              (modelNav model)
+      model' =
+        model
+          { modelNotes = modelNotes',
+            modelRels = modelRels'
+          }
+   in model'
+        { modelNav =
+            PathTree.treeInsertPath
+              (R.unRoute k)
+              (modelNav model')
         }
-  where
-    -- Sort by `order` meta, falling back to title.
-    sortKey notes r = fromMaybe (def, R.markdownRouteFileBase r) $ do
-      note <- Ix.getOne $ Ix.getEQ r notes
-      pure $
-        (,)
-          (order $ noteMeta note)
-          (noteTitle note)
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
   model
     { modelNotes = Ix.deleteIx k (modelNotes model),
       modelRels = Ix.deleteIx k (modelRels model),
-      modelNav = PathTree.treeDeletePath (R.unMarkdownRoute k) (modelNav model)
+      modelNav = PathTree.treeDeletePath (R.unRoute k) (modelNav model)
     }
 
 modelSetHeistTemplate :: T.TemplateState -> Model -> Model
@@ -216,8 +255,8 @@ modelSetHeistTemplate v model =
 instance Ema Model MarkdownRoute where
   -- Convert a route to URL slugs
   encodeRoute = \case
-    R.MarkdownRoute ("index" :| []) -> mempty
-    R.MarkdownRoute paths -> toList paths
+    R.Route ("index" :| []) -> mempty
+    R.Route paths -> toList paths
 
   -- Parse our route from URL slugs
   --
@@ -225,11 +264,11 @@ instance Ema Model MarkdownRoute where
   -- parsed as representing the route to /foo/bar.md.
   decodeRoute = \case
     (nonEmpty -> Nothing) ->
-      pure $ R.MarkdownRoute $ one "index"
+      pure $ R.Route $ one "index"
     (nonEmpty -> Just slugs) -> do
       -- Heuristic to let requests to static files (eg: favicon.ico) to pass through
       guard $ not (any (T.isInfixOf "." . Ema.unSlug) slugs)
-      pure $ R.MarkdownRoute slugs
+      pure $ R.Route slugs
 
   -- Which routes to generate when generating the static HTML for this site.
   staticRoutes (fmap noteRoute . Ix.toList . modelNotes -> mdRoutes) =
@@ -281,4 +320,4 @@ parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap Left (R.mkWikiLinkTargetFromUrl url)
-    <|> fmap Right (R.mkMarkdownRouteFromFilePath $ toString url)
+    <|> fmap Right (R.mkRouteFromFilePath @R.Md $ toString url)

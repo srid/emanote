@@ -11,11 +11,11 @@ import Control.Exception (throw)
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict (runWriter)
 import qualified Data.Aeson as Aeson
-import Data.Default (Default (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import qualified Data.Tree as Tree
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
@@ -53,15 +53,15 @@ logE = logErrorNS "emabook"
 
 data Source
   = SourceMarkdown
+  | SourceData
   | SourceTemplate FilePath
-  | SourceTemplateSettings FilePath
   deriving (Eq, Show)
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceMarkdown -> "**/*.md"
+  SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
-  SourceTemplateSettings fp -> fp
 
 main :: IO ()
 main =
@@ -69,71 +69,67 @@ main =
     let pats =
           (id &&& sourcePattern)
             <$> [ SourceMarkdown,
-                  SourceTemplate ".emabook/templates",
-                  -- TODO: Move to `.emabook/data/*.{json,yaml,etc..}? But emabook is not data-processor, only renderer.
-                  SourceTemplateSettings ".emabook/templates/settings.yaml"
+                  SourceData,
+                  SourceTemplate ".emabook/templates"
                 ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
         SourceMarkdown -> case action of
           FileSystem.Update ->
-            readMarkdown fp
-              <&> maybe id (uncurry M.modelInsert)
+            fmap (fromMaybe id) . runMaybeT $ do
+              r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Md fp
+              logD $ "Reading note " <> toText fp
+              !s <- readFileText fp
+              (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
+              pure $ M.modelInsert r (fromMaybe Aeson.Null mMeta, doc)
           FileSystem.Delete ->
-            pure $ maybe id M.modelDelete (R.mkMarkdownRouteFromFilePath fp)
+            pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
+        SourceData -> case action of
+          FileSystem.Update -> do
+            fmap (fromMaybe id) . runMaybeT $ do
+              r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
+              logD $ "Reading data " <> toText fp
+              !s <- readFileBS fp
+              sdata <- either (throw . BadInput) pure $ M.parseYaml s
+              pure $ M.modelInsertData r sdata
+          FileSystem.Delete ->
+            pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
-        SourceTemplateSettings _ ->
-          M.modelUpdateSettings fp <$> readFileText fp
   where
-    readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (M.Meta, Pandoc)))
-    readMarkdown fp =
-      runMaybeT $ do
-        r :: MarkdownRoute <- MaybeT $ pure $ R.mkMarkdownRouteFromFilePath fp
-        logD $ "Reading " <> toText fp
-        !s <- readFileText fp
-        case parseMarkdown fp s of
-          Left (BadMarkdown -> err) -> do
-            throw err
-          Right (mMeta, doc) ->
-            pure (r, (fromMaybe def mMeta, doc))
     parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @M.Meta $
+      Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
 
-newtype BadMarkdown = BadMarkdown Text
+newtype BadInput = BadInput Text
   deriving (Show, Exception)
-
-data TemplateData = TemplateData
-  { settings :: Aeson.Value,
-    noteMay :: Maybe M.Note
-  }
-  deriving (Generic, Aeson.ToJSON)
 
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
-      tData = TemplateData (M.modelSettings model) mNote
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Binding to <html> so they remain in scope throughout.
-    "html" ## HJ.bindJson tData
+    "html"
+      ## HJ.bindJson (M.modelComputeMeta r model)
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice [] tree $ \(R.MarkdownRoute -> nodeRoute) -> do
+               getOrder tr =
+                 (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) M.noteTitle $ M.modelLookup tr model)
+            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
-                       toList (R.unMarkdownRoute nodeRoute) `NE.isPrefixOf` R.unMarkdownRoute r
+                       toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
                  "node:active" ## Heist.ifElseISplice isActiveNode
                  "tree:active" ## Heist.ifElseISplice isActiveTree
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.markdownRouteInits r) "each-crumb"
+      ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl crumb
@@ -142,11 +138,6 @@ render _ model r = do
     "ema:note:title"
       ## HI.textSplice
       $ M.modelLookupTitle r model
-    "ema:note:tags"
-      ## Splices.listSplice (maybe mempty (M.tags . M.noteMeta) mNote) "tag"
-      $ \tag ->
-        MapSyntax.mapV HI.textSplice $ do
-          "tag:name" ## tag
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
