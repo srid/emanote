@@ -81,7 +81,6 @@ main =
             pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
         SourceData -> case action of
           FileSystem.Update -> do
-            -- M.modelUpdateSettings <$> readFileBS fp
             fmap (fromMaybe id) $
               runMaybeT $ do
                 r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
@@ -91,9 +90,9 @@ main =
                   Left (BadInput -> err) -> do
                     throw err
                   Right sdata ->
-                    pure $ M.modelInsertSData r sdata
+                    pure $ M.modelInsertData r sdata
           FileSystem.Delete ->
-            undefined
+            pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
   where
@@ -124,7 +123,7 @@ data TemplateData = TemplateData
 render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
-      tData = TemplateData (M.modelSettings model) mNote
+      tData = TemplateData (M.modelDefaultDataFor r model) mNote
   -- TODO: Look for "${r}" template, and then fallback to _default
   flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
     "bind" ## HB.bindImpl
@@ -144,7 +143,7 @@ render _ model r = do
                  "tree:active" ## Heist.ifElseISplice isActiveTree
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.markdownRouteInits r) "each-crumb"
+      ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl crumb
