@@ -79,6 +79,7 @@ executable emabook
   default-language:   Haskell2010
   other-modules:
     Emabook.Model
+    Emabook.Model.Meta
     Emabook.Model.Note
     Emabook.Model.Rel
     Emabook.Model.SData

@@ -14,7 +14,8 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Emabook.Route as R
 import qualified Emabook.Route.Ext as Ext
 
--- | `S` for "structured". Also to avoid conflict with builtin `Data`
+-- | `S` for "structured". Refers to a per-route data file represented by Aeson
+-- value.  Example: /foo/bar.yaml file
 data SData = SData
   { _sdataValue :: Aeson.Value,
     _sdataRoute :: R.Route Ext.Yaml

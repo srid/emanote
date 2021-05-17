@@ -25,6 +25,7 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model (Model)
 import qualified Emabook.Model as M
+import qualified Emabook.Model.Meta as Meta
 import qualified Emabook.Model.Note as MN
 import qualified Emabook.Model.Rel as Rel
 import qualified Emabook.PandocUtil as PandocUtil
@@ -129,12 +130,12 @@ render _ model r = do
     "apply" ## HA.applyImpl
     -- Binding to <html> so they remain in scope throughout.
     "html"
-      ## HJ.bindJson (M.modelComputeMeta r model)
+      ## HJ.bindJson (Meta.getEffectiveRouteMeta r model)
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
-                 (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
+                 (Meta.lookupMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
             in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
