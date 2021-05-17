@@ -15,6 +15,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import qualified Data.Tree as Tree
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
@@ -127,7 +128,9 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice [] tree $ \(R.Route -> nodeRoute) -> do
+               getOrder tr =
+                 M.lookupNoteMeta @Int 0 "order" tr model
+            in Splices.treeSplice [] (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r

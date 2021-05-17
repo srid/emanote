@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
     <ema:note:title /> –
-    <value var="siteMeta.siteTitle" />
+    <value var="page.siteTitle" />
   </title>
-  <with var="siteMeta">
+  <with var="page">
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
