@@ -152,10 +152,10 @@ modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
   Ix.getOne . Ix.getEQ k . modelNotes
 
-lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> Note -> a
-lookupNoteMeta x k note =
+lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> MarkdownRoute -> Model -> a
+lookupNoteMeta x k r model =
   fromMaybe x $ do
-    Aeson.Object obj <- pure $ noteMeta note
+    Aeson.Object obj <- pure $ modelComputeMeta r model
     resultToMaybe . Aeson.fromJSON =<< lookup k obj
   where
     resultToMaybe :: Aeson.Result b -> Maybe b
@@ -183,16 +183,27 @@ modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeFileBase r) noteTitle . modelLookup r
 
+-- | Get the (final) metadata of a note, by merging it with the defaults
+-- specified in parent routes all the way upto index.yaml.
 modelComputeMeta :: MarkdownRoute -> Model -> Aeson.Value
 modelComputeMeta mr model =
   fromMaybe Aeson.Null $ do
-    let dr :: R.Route R.Yaml = coerce mr
-        trail = R.routeInits dr
-    overrides <- nonEmpty $ flip mapMaybe (toList trail) $ \r -> Ix.getOne . Ix.getEQ r . modelData $ model
-    let defaultMeta = NE.last $ NE.scanl1 AesonMerge.lodashMerge $ sdataValue <$> overrides
+    let defaultFiles = R.routeInits @R.Yaml (coerce mr)
+    defaults <- nonEmpty $
+      flip mapMaybe (toList defaultFiles) $ \r -> do
+        v <- fmap sdataValue . Ix.getOne . Ix.getEQ r . modelData $ model
+        guard $ v /= Aeson.Null
+        pure v
+    let finalDefault = NE.last $ NE.scanl1 mergeAeson defaults
     case noteMeta <$> modelLookup mr model of
-      Nothing -> pure defaultMeta
-      Just noteVal -> pure $ AesonMerge.lodashMerge noteVal defaultMeta
+      Nothing -> pure finalDefault
+      Just frontmatter ->
+        pure $
+          if frontmatter == Aeson.Null
+            then finalDefault
+            else mergeAeson finalDefault frontmatter
+  where
+    mergeAeson = AesonMerge.lodashMerge
 
 modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v model =
@@ -217,23 +228,22 @@ modelInsert k v model =
         modelRels model
           & Ix.deleteIx k
           & Ix.insertList (extractRels note)
-   in model
-        { modelNotes = modelNotes',
-          modelRels = modelRels',
-          modelNav =
+      model' =
+        model
+          { modelNotes = modelNotes',
+            modelRels = modelRels'
+          }
+   in model'
+        { modelNav =
             PathTree.treeInsertPathMaintainingOrder
-              (sortKey modelNotes' . R.Route @R.Md)
+              (sortKey model' . R.Route @R.Md)
               (R.unRoute k)
-              (modelNav model)
+              (modelNav model')
         }
   where
-    -- Sort by `order` meta, falling back to title.
-    sortKey notes r = fromMaybe (def, R.routeFileBase r) $ do
-      note <- Ix.getOne $ Ix.getEQ r notes
-      pure $
-        (,)
-          (lookupNoteMeta @Int 0 "order" note)
-          (noteTitle note)
+    sortKey m r = fromMaybe (R.routeFileBase r) $ do
+      note <- Ix.getOne $ Ix.getEQ r $ modelNotes m
+      pure $ noteTitle note
 
 modelDelete :: MarkdownRoute -> Model -> Model
 modelDelete k model =
