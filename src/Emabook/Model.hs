@@ -28,7 +28,7 @@ import qualified Emabook.PandocUtil as PandocUtil
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
-import Relude.Extra.Map
+import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
@@ -137,11 +137,13 @@ modelLookup k =
 lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> Note -> a
 lookupNoteMeta x k note =
   fromMaybe x $ do
-    Aeson.Object kw <- pure $ noteMeta note
-    val <- lookup k kw
-    case Aeson.fromJSON val of
+    Aeson.Object obj <- pure $ noteMeta note
+    resultToMaybe . Aeson.fromJSON =<< lookup k obj
+  where
+    resultToMaybe :: Aeson.Result b -> Maybe b
+    resultToMaybe = \case
       Aeson.Error _ -> Nothing
-      Aeson.Success v -> pure v
+      Aeson.Success b -> pure b
 
 modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =

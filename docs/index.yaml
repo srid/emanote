@@ -1,4 +1,9 @@
+# Defaults for Markdown frontmatter
+tags: []
+order: 0
+
 templateTheme: blue
+
 # Structured data stuff
 siteMeta:
   siteName: Emabook
