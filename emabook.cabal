@@ -24,6 +24,7 @@ extra-source-files:
 executable emabook
   build-depends:
     , aeson
+    , aeson-extra
     , async
     , base
     , blaze-html

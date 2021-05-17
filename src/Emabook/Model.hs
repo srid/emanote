@@ -12,6 +12,7 @@ module Emabook.Model where
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Extra.Merge as AesonMerge
 import Data.Data (Data)
 import Data.Default (Default (..))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
@@ -52,7 +53,7 @@ parseYaml :: FromJSON a => ByteString -> Either Text a
 parseYaml v = do
   first show $ Yaml.decodeEither' v
 
--- | `S` for structured.
+-- | `S` for "structured". Also to avoid conflict with builtin `Data`
 data SData = SData
   { sdataValue :: Aeson.Value,
     sdataRoute :: R.Route R.Yaml
@@ -188,8 +189,19 @@ modelDefaultDataFor mr model =
     let dr :: R.Route R.Yaml = coerce mr
         inits = R.routeInits dr
     overrides <- nonEmpty $ flip mapMaybe (toList inits) $ \r -> Ix.getOne . Ix.getEQ r . modelData $ model
-    -- TODO: apply overrides
-    pure $ sdataValue $ NE.last overrides
+    let final = NE.last $ NE.scanl1 AesonMerge.lodashMerge $ sdataValue <$> overrides
+    pure $ traceShowId final
+
+modelComputeMeta :: MarkdownRoute -> Model -> Aeson.Value
+modelComputeMeta mr model =
+  fromMaybe Aeson.Null $ do
+    let dr :: R.Route R.Yaml = coerce mr
+        trail = R.routeInits dr
+    overrides <- nonEmpty $ flip mapMaybe (toList trail) $ \r -> Ix.getOne . Ix.getEQ r . modelData $ model
+    let defaultMeta = NE.last $ NE.scanl1 AesonMerge.lodashMerge $ sdataValue <$> overrides
+    case noteMeta <$> modelLookup mr model of
+      Nothing -> pure defaultMeta
+      Just noteVal -> pure $ AesonMerge.lodashMerge noteVal defaultMeta
 
 modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v model =

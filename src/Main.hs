@@ -153,7 +153,7 @@ render _ model r = do
       ## HI.textSplice
       $ M.modelLookupTitle r model
     "note-meta"
-      ## HJ.bindJson (maybe Aeson.Null M.noteMeta mNote)
+      ## HJ.bindJson (M.modelComputeMeta r model)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
