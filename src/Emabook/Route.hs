@@ -28,7 +28,7 @@ instance Ext Md where
   getExt Proxy = ".md"
 
 instance Ext Yaml where
-  getExt Proxy = ".yaml'"
+  getExt Proxy = ".yaml"
 
 -- | Represents the relative path to a source (.md) file under some directory.
 --
@@ -63,22 +63,22 @@ mkRouteFromFilePath fp = do
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
    in Route <$> nonEmpty slugs
 
-markdownRouteSourcePath :: forall ext. Ext ext => Route ext -> FilePath
-markdownRouteSourcePath r =
+routeSourcePath :: forall ext. Ext ext => Route ext -> FilePath
+routeSourcePath r =
   if r == indexRoute
     then "index" <> getExt (Proxy @ext)
     else toString (T.intercalate "/" $ fmap Ema.unSlug $ toList $ unRoute r) <> ".md"
 
 -- | Filename of the markdown file without extension
-markdownRouteFileBase :: Route ext -> Text
-markdownRouteFileBase =
+routeFileBase :: Route ext -> Text
+routeFileBase =
   Ema.unSlug . head . NE.reverse . unRoute
 
 -- | For use in breadcrumbs
-markdownRouteInits :: Route ext -> NonEmpty (Route ext)
-markdownRouteInits (Route ("index" :| [])) =
+routeInits :: Route ext -> NonEmpty (Route ext)
+routeInits (Route ("index" :| [])) =
   one indexRoute
-markdownRouteInits (Route (slug :| rest')) =
+routeInits (Route (slug :| rest')) =
   indexRoute :| case nonEmpty rest' of
     Nothing ->
       one $ Route (one slug)

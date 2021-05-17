@@ -16,6 +16,7 @@ import Data.Data (Data)
 import Data.Default (Default (..))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList, (@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
@@ -41,12 +42,11 @@ data Model = Model
     modelRels :: IxRel,
     modelData :: IxSData,
     modelNav :: [Tree Slug],
-    modelSettings :: Aeson.Value,
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty Ix.empty mempty (Left $ one "Heist state not yet loaded")
 
 parseYaml :: FromJSON a => ByteString -> Either Text a
 parseYaml v = do
@@ -85,7 +85,7 @@ noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
-  fromMaybe (R.markdownRouteFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
+  fromMaybe (R.routeFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
 
 type NoteIxs = '[MarkdownRoute, SelfRef]
 
@@ -180,22 +180,29 @@ modelLookupBacklinks r model =
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.markdownRouteFileBase r) noteTitle . modelLookup r
+  maybe (R.routeFileBase r) noteTitle . modelLookup r
 
-modelUpdateSettings :: ByteString -> Model -> Model
-modelUpdateSettings s model =
-  model
-    { modelSettings =
-        either error id $
-          parseYaml s
-    }
+modelDefaultDataFor :: MarkdownRoute -> Model -> Aeson.Value
+modelDefaultDataFor mr model =
+  fromMaybe Aeson.Null $ do
+    let dr :: R.Route R.Yaml = coerce mr
+        inits = R.routeInits dr
+    overrides <- nonEmpty $ flip mapMaybe (toList inits) $ \r -> Ix.getOne . Ix.getEQ r . modelData $ model
+    -- TODO: apply overrides
+    pure $ sdataValue $ NE.last overrides
 
-modelInsertSData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
-modelInsertSData r v model =
+modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
+modelInsertData r v model =
   let modelData' =
         modelData model
           & Ix.updateIx r (SData v r)
    in model {modelData = modelData'}
+
+modelDeleteData :: R.Route R.Yaml -> Model -> Model
+modelDeleteData k model =
+  model
+    { modelData = Ix.deleteIx k (modelData model)
+    }
 
 modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsert k v model =
@@ -218,7 +225,7 @@ modelInsert k v model =
         }
   where
     -- Sort by `order` meta, falling back to title.
-    sortKey notes r = fromMaybe (def, R.markdownRouteFileBase r) $ do
+    sortKey notes r = fromMaybe (def, R.routeFileBase r) $ do
       note <- Ix.getOne $ Ix.getEQ r notes
       pure $
         (,)
