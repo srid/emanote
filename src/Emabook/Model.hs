@@ -188,8 +188,8 @@ modelInsert k v model =
           modelRels = modelRels',
           modelNav =
             PathTree.treeInsertPathMaintainingOrder
-              (sortKey modelNotes' . R.MarkdownRoute)
-              (R.unMarkdownRoute k)
+              (sortKey modelNotes' . R.Route @R.Md)
+              (R.unRoute k)
               (modelNav model)
         }
   where
@@ -206,7 +206,7 @@ modelDelete k model =
   model
     { modelNotes = Ix.deleteIx k (modelNotes model),
       modelRels = Ix.deleteIx k (modelRels model),
-      modelNav = PathTree.treeDeletePath (R.unMarkdownRoute k) (modelNav model)
+      modelNav = PathTree.treeDeletePath (R.unRoute k) (modelNav model)
     }
 
 modelSetHeistTemplate :: T.TemplateState -> Model -> Model
@@ -216,8 +216,8 @@ modelSetHeistTemplate v model =
 instance Ema Model MarkdownRoute where
   -- Convert a route to URL slugs
   encodeRoute = \case
-    R.MarkdownRoute ("index" :| []) -> mempty
-    R.MarkdownRoute paths -> toList paths
+    R.Route ("index" :| []) -> mempty
+    R.Route paths -> toList paths
 
   -- Parse our route from URL slugs
   --
@@ -225,11 +225,11 @@ instance Ema Model MarkdownRoute where
   -- parsed as representing the route to /foo/bar.md.
   decodeRoute = \case
     (nonEmpty -> Nothing) ->
-      pure $ R.MarkdownRoute $ one "index"
+      pure $ R.Route $ one "index"
     (nonEmpty -> Just slugs) -> do
       -- Heuristic to let requests to static files (eg: favicon.ico) to pass through
       guard $ not (any (T.isInfixOf "." . Ema.unSlug) slugs)
-      pure $ R.MarkdownRoute slugs
+      pure $ R.Route slugs
 
   -- Which routes to generate when generating the static HTML for this site.
   staticRoutes (fmap noteRoute . Ix.toList . modelNotes -> mdRoutes) =
@@ -281,4 +281,4 @@ parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap Left (R.mkWikiLinkTargetFromUrl url)
-    <|> fmap Right (R.mkMarkdownRouteFromFilePath $ toString url)
+    <|> fmap Right (R.mkRouteFromFilePath @R.Md $ toString url)

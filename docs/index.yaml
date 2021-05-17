@@ -1,6 +1,6 @@
 # Defaults for Markdown frontmatter
-tags: []
 order: 0
+tags: []
 
 templateTheme: blue
 
