@@ -8,7 +8,10 @@ order: 0
 
 tags: []
 
-templateTheme: blue
+template:
+  # Use file "${template.name}.tpl" to render HTML
+  name: _default
+  theme: blue
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.

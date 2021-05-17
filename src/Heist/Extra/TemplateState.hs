@@ -32,7 +32,7 @@ loadHeistTemplates templateDir = do
   liftIO $ TemplateState <$> H.initHeist heistCfg
 
 renderHeistTemplate ::
-  ByteString ->
+  Text ->
   H.Splices (HI.Splice Identity) ->
   TemplateState ->
   LByteString
@@ -41,10 +41,10 @@ renderHeistTemplate name splices st =
     heist <-
       hoistEither . first (unlines . fmap toText) $ unTemplateState st
     (builder, _mimeType) <-
-      tryJust "Unable to render" $
-        runIdentity $ HI.renderTemplate (HI.bindSplices splices heist) name
+      tryJust ("Unable to render template '" <> name <> "'") $
+        runIdentity $ HI.renderTemplate (HI.bindSplices splices heist) (encodeUtf8 name)
     pure $ toLazyByteString builder
   where
     -- A 'fromJust' that fails in the 'ExceptT' monad
     tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
-    tryJust e m = hoistEither $ maybeToRight e m
+    tryJust e = hoistEither . maybeToRight e
