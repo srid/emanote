@@ -80,8 +80,18 @@ main =
           FileSystem.Delete ->
             pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
         SourceData -> case action of
-          FileSystem.Update ->
-            M.modelUpdateSettings <$> readFileBS fp
+          FileSystem.Update -> do
+            -- M.modelUpdateSettings <$> readFileBS fp
+            fmap (fromMaybe id) $
+              runMaybeT $ do
+                r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
+                logD $ "Reading " <> toText fp
+                !s <- readFileBS fp
+                case M.parseYaml s of
+                  Left (BadInput -> err) -> do
+                    throw err
+                  Right sdata ->
+                    pure $ M.modelInsertSData r sdata
           FileSystem.Delete ->
             undefined
         SourceTemplate dir ->
@@ -94,7 +104,7 @@ main =
         logD $ "Reading " <> toText fp
         !s <- readFileText fp
         case parseMarkdown fp s of
-          Left (BadMarkdown -> err) -> do
+          Left (BadInput -> err) -> do
             throw err
           Right (mMeta, doc) ->
             pure (r, (fromMaybe Aeson.Null mMeta, doc))
@@ -102,7 +112,7 @@ main =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
 
-newtype BadMarkdown = BadMarkdown Text
+newtype BadInput = BadInput Text
   deriving (Show, Exception)
 
 data TemplateData = TemplateData
