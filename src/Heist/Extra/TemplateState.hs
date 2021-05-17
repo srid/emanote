@@ -1,21 +1,26 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Heist.Extra.TemplateState where
+-- TODO: Eventually move `Heist.Extra` to Ema.Helper
+-- Consider first the full practical range of template patterns,
+-- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
+module Heist.Extra.TemplateState
+  ( TemplateState,
+    loadHeistTemplates,
+    renderHeistTemplate,
+  )
+where
 
 import Control.Lens.Operators ((.~))
 import Control.Monad.Except (runExcept)
 import Data.ByteString.Builder (toLazyByteString)
+import Data.Default (Default (..))
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
 
-type TemplateState = Either [String] (H.HeistState Identity)
+newtype TemplateState = TemplateState {unTemplateState :: Either [String] (H.HeistState Identity)}
 
-defaultTemplateState :: TemplateState
-defaultTemplateState = Left $ one "Heist state not yet loaded"
-
--- TODO: Eventually move these to Ema.Helper
--- Consider first the full practical range of template patterns,
--- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
+instance Default TemplateState where
+  def = TemplateState $ Left $ one "Heist templates yet to be loaded"
 
 loadHeistTemplates :: MonadIO m => FilePath -> m TemplateState
 loadHeistTemplates templateDir = do
@@ -24,17 +29,17 @@ loadHeistTemplates templateDir = do
         H.emptyHeistConfig
           & H.hcNamespace .~ ""
           & H.hcTemplateLocations .~ [H.loadTemplates templateDir]
-  liftIO $ H.initHeist heistCfg
+  liftIO $ TemplateState <$> H.initHeist heistCfg
 
 renderHeistTemplate ::
   ByteString ->
   H.Splices (HI.Splice Identity) ->
   TemplateState ->
   LByteString
-renderHeistTemplate name splices etmpl =
+renderHeistTemplate name splices st =
   either error id . runExcept $ do
     heist <-
-      hoistEither . first (unlines . fmap toText) $ etmpl
+      hoistEither . first (unlines . fmap toText) $ unTemplateState st
     (builder, _mimeType) <-
       tryJust "Unable to render" $
         runIdentity $ HI.renderTemplate (HI.bindSplices splices heist) name
