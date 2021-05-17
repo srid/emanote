@@ -32,6 +32,7 @@ loadHeistTemplates templateDir = do
   liftIO $ TemplateState <$> H.initHeist heistCfg
 
 renderHeistTemplate ::
+  HasCallStack =>
   Text ->
   H.Splices (HI.Splice Identity) ->
   TemplateState ->

@@ -57,9 +57,10 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Report error on web / CLI on markdown parse failure (generally on any error)
 - [x] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
-- [ ] Default template: should be builtin, obviating `./.emabook`
-  - Include them in the Nix install, and reference when running against a notebook without `./.emabook` directory
-  - *Or*, require `emabook init` that copies over the default.
+- [ ] Use default templates and metadata if none exist
+  - [x] Load templates from cabal data-files by default
+  - [ ] Do the same for `index.yaml` (then test on haskell-kb)
+  - [ ] Consider `emabook init` to create these files
 - [ ] Redirect to README.md if there is no index.md
 - [ ] `emabook gen --base-url=srid.github.io/foo` (or some other way)
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
@@ -77,11 +78,11 @@ To triage,
   ```
   <Pandoc>
     <Custom>
-      <Popout class="px-1 rounded bg-pink-50 font-serif" />
+      <Popout class="px-1 font-serif rounded bg-pink-50" />
       <!-- Hierarchical styling? -->
       <Warning class="px-1 rounded bg-gray-50">
         <Header>
-          <h2>class="font-bold text-xl"</h2>
+          <h2>class="text-xl font-bold"</h2>
         </Header>
       </Warning>
     </Custom>
