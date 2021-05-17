@@ -15,7 +15,9 @@
   <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
     type="text/css">
-  <link href="/favicon.svg" rel="icon" />
+  <with var="template">
+    <link href="/${value:faviconFile}" rel="icon" />
+  </with>
   <snippet var="page.headHtml" />
 </head>
 
@@ -33,8 +35,10 @@
       <div class="hidden md:mr-4 md:block md:col-span-3">
         <div class="flex items-end h-full pl-2 mt-2 space-x-2">
           <a href="/">
-            <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
-              src="/favicon.svg" />
+            <with var="template">
+              <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
+                src="/${value:faviconFile}" />
+            </with>
           </a>
         </div>
       </div>

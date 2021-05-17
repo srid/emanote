@@ -13,6 +13,7 @@ template:
   # Use file "${template.name}.tpl" to render HTML
   name: _default
   theme: blue
+  faviconFile: favicon.svg
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
