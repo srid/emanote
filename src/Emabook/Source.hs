@@ -38,7 +38,7 @@ data Source
     SourceData
   | -- | Heist template file
     SourceTemplate FilePath
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
@@ -54,38 +54,60 @@ filePatterns =
           SourceTemplate ".emabook/templates"
         ]
 
+-- | Like `transformAction` but operates on multiple source types at a time
+transformActions :: (MonadIO m, MonadLogger m) => [(Source, [FilePath])] -> FileSystem.FileAction -> m (Model -> Model)
+transformActions sources action =
+  chainM sources $ \(src, fps) ->
+    transformAction src fps action
+
 -- | Transform a filesystem action (on a source) to model update
-transformAction :: (MonadIO m, MonadLogger m) => Source -> FilePath -> FileSystem.FileAction -> m (Model -> Model)
-transformAction src fp action =
+transformAction :: (MonadIO m, MonadLogger m) => Source -> [FilePath] -> FileSystem.FileAction -> m (Model -> Model)
+transformAction src fps action =
   case src of
     SourceMarkdown -> case action of
       FileSystem.Update ->
-        fmap (fromMaybe id) . runMaybeT $ do
-          r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Md fp
-          logD $ "Reading note " <> toText fp
-          !s <- readFileText fp
-          (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
-          pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
+        chainM fps $ \fp ->
+          fmap (fromMaybe id) . runMaybeT $ do
+            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Md fp
+            logD $ "Reading note " <> toText fp
+            !s <- readFileText fp
+            (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
+            pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
       FileSystem.Delete ->
-        pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @Ext.Md fp)
+        chainM fps $ \fp ->
+          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @Ext.Md fp)
     SourceData -> case action of
       FileSystem.Update -> do
-        fmap (fromMaybe id) . runMaybeT $ do
-          r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
-          logD $ "Reading data " <> toText fp
-          !s <- readFileBS fp
-          sdata <-
-            either (throw . BadInput . show) pure $
-              Yaml.decodeEither' s
-          pure $ M.modelInsertData r sdata
+        chainM fps $ \fp ->
+          fmap (fromMaybe id) . runMaybeT $ do
+            r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
+            logD $ "Reading data " <> toText fp
+            !s <- readFileBS fp
+            sdata <-
+              either (throw . BadInput . show) pure $
+                Yaml.decodeEither' s
+            pure $ M.modelInsertData r sdata
       FileSystem.Delete ->
-        pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
-    SourceTemplate dir ->
+        chainM fps $ \fp ->
+          pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
+    SourceTemplate dir -> do
+      log "Reloading templates"
       (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
+
+-- | Apply the list of actions in the given order to an initial argument.
+--
+-- chain [f1, f2, ...] x = ... (f2 (f1 x))
+chain :: [a -> a] -> a -> a
+chain = flip (foldl' $ flip ($))
+
+-- | Monadic version of `chain`
+chainM :: Monad m => [b] -> (b -> m (a -> a)) -> m (a -> a)
+chainM xs =
+  fmap chain . forM xs
 
 newtype BadInput = BadInput Text
   deriving (Show, Exception)

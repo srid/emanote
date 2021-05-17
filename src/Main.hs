@@ -1,8 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -34,5 +29,5 @@ main =
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
 run model =
-  FileSystem.mountOnLVar "." Source.filePatterns model $ \(src, fp) action ->
-    Source.transformAction src fp action
+  FileSystem.mountOnLVar "." Source.filePatterns model $ \sources action -> do
+    Source.transformActions sources action
