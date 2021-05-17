@@ -88,7 +88,7 @@ executable emabook
     Emabook.Route.Ext
     Emabook.Route.WikiLinkTarget
     Emabook.Source
-    Emabook.Template
-    Emabook.Template.Splices.List
-    Emabook.Template.Splices.Pandoc
-    Emabook.Template.Splices.Tree
+    Heist.Extra.Splices.List
+    Heist.Extra.Splices.Pandoc
+    Heist.Extra.Splices.Tree
+    Heist.Extra.TemplateState

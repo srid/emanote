@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template.Splices.Pandoc (pandocSplice) where
+module Heist.Extra.Splices.Pandoc (pandocSplice) where
 
 import Control.Exception (throw)
 import qualified Data.Text as T

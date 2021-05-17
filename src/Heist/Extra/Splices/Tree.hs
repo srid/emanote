@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template.Splices.Tree (treeSplice) where
+module Heist.Extra.Splices.Tree (treeSplice) where
 
 import Data.Map.Syntax ((##))
 import Data.Tree (Tree (..))

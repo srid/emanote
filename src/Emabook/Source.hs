@@ -18,7 +18,7 @@ import qualified Emabook.Model as M
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Route.Ext as Ext
-import qualified Emabook.Template as T
+import qualified Heist.Extra.TemplateState as T
 import System.FilePath ((</>))
 
 log :: MonadLogger m => Text -> m ()

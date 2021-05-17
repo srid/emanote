@@ -31,7 +31,7 @@ import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Route.Ext as Ext
 import qualified Emabook.Route.WikiLinkTarget as WL
-import qualified Emabook.Template as T
+import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 
@@ -43,7 +43,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelData :: IxSData,
     _modelNav :: [Tree Slug],
-    _modelHeistTemplate :: T.TemplateState
+    _modelHeistTemplate :: TemplateState
   }
 
 makeLenses ''Model

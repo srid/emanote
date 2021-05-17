@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template where
+module Heist.Extra.TemplateState where
 
 import Control.Lens.Operators ((.~))
 import Control.Monad.Except (runExcept)
