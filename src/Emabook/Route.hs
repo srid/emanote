@@ -113,3 +113,22 @@ mkWikiLinkTargetFromUrl s = do
 allowedWikiLinkTargets :: Route Md -> Set WikiLinkTarget
 allowedWikiLinkTargets =
   Set.fromList . mapMaybe (fmap WikiLinkTarget . nonEmpty) . toList . NE.tails . unRoute
+
+-- | Convert a route to URL slugs
+encodeRoute :: Route ext -> [Slug]
+encodeRoute = \case
+  Route ("index" :| []) -> mempty
+  Route paths -> toList paths
+
+-- | Parse our route from URL slugs
+--
+-- For eg., /foo/bar maps to slugs ["foo", "bar"], which in our app gets
+-- parsed as representing the route to /foo/bar.md.
+decodeRoute :: [Slug] -> Maybe (Route ext)
+decodeRoute = \case
+  (nonEmpty -> Nothing) ->
+    pure $ Route $ one "index"
+  (nonEmpty -> Just slugs) -> do
+    -- Heuristic to let requests to static files (eg: favicon.ico) to pass through
+    guard $ not (any (T.isInfixOf "." . Ema.unSlug) slugs)
+    pure $ Route slugs

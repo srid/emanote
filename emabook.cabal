@@ -79,6 +79,9 @@ executable emabook
   default-language:   Haskell2010
   other-modules:
     Emabook.Model
+    Emabook.Model.Note
+    Emabook.Model.Rel
+    Emabook.Model.SData
     Emabook.PandocUtil
     Emabook.Route
     Emabook.Template
