@@ -24,7 +24,7 @@
     Just defining a convenient alias, to avoid <with>'ing
     NOTE: There must not be any whitespace inside this tag! 
   -->
-  <bind tag="theme"><value var="templateTheme" /></bind>
+  <bind tag="theme"><value var="template.theme" /></bind>
 
   <div class="container mx-auto xl:max-w-screen-lg">
     <!-- Header row-->

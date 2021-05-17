@@ -11,7 +11,6 @@ import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Extra.Merge as AesonMerge
-import Data.Default (Default (..))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
 import Emabook.Model (Model, modelData, modelLookup)
@@ -25,11 +24,18 @@ import qualified Emabook.Route.Ext as Ext
 import Relude.Extra.Map (StaticMap (lookup))
 
 -- | Look up a specific key in the meta for a given route.
-lookupMeta :: (Default a, FromJSON a) => a -> Text -> MarkdownRoute -> Model -> a
-lookupMeta x k r model =
+lookupMeta :: FromJSON a => a -> Text -> MarkdownRoute -> Model -> a
+lookupMeta x k r =
+  lookupMetaFrom x (one k) . getEffectiveRouteMeta r
+
+lookupMetaFrom :: forall a. FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
+lookupMetaFrom x (k :| ks) meta =
   fromMaybe x $ do
-    Aeson.Object obj <- pure $ getEffectiveRouteMeta r model
-    resultToMaybe . Aeson.fromJSON =<< lookup k obj
+    Aeson.Object obj <- pure meta
+    val <- lookup k obj
+    case nonEmpty ks of
+      Nothing -> resultToMaybe $ Aeson.fromJSON val
+      Just ks' -> pure $ lookupMetaFrom x ks' val
   where
     resultToMaybe :: Aeson.Result b -> Maybe b
     resultToMaybe = \case

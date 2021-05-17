@@ -33,16 +33,17 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema Model MarkdownRoute => Model -> MarkdownRoute -> LByteString
-render model r =
-  -- TODO: Look for "${r}" template, and then fallback to _default
-  flip (T.renderHeistTemplate "_default") (model ^. M.modelHeistTemplate) $ do
+render model r = do
+  let meta = Meta.getEffectiveRouteMeta r model
+      templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
+  flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Bind route-associated metadata to <html> so that they remain in scope
     -- throughout.
     "html"
-      ## HJ.bindJson (Meta.getEffectiveRouteMeta r model)
+      ## HJ.bindJson meta
     -- Sidebar navigation
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
