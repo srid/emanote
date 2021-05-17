@@ -39,17 +39,34 @@ import qualified Text.Pandoc.LinkContext as LC
 data Model = Model
   { modelNotes :: IxNote,
     modelRels :: IxRel,
+    modelData :: IxSData,
     modelNav :: [Tree Slug],
     modelSettings :: Aeson.Value,
     modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty Ix.empty mempty Aeson.Null (Left $ one "Heist state not yet loaded")
 
 parseYaml :: FromJSON a => ByteString -> Either Text a
 parseYaml v = do
   first show $ Yaml.decodeEither' v
+
+-- | `S` for structured.
+data SData = SData
+  { sdataValue :: Aeson.Value,
+    sdataRoute :: R.Route R.Yaml
+  }
+  deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
+
+type SDataIxs = '[R.Route R.Yaml]
+
+type IxSData = IxSet SDataIxs SData
+
+instance Indexable SDataIxs SData where
+  indices =
+    ixList
+      (ixGen $ Proxy @(R.Route R.Yaml))
 
 data Note = Note
   { noteDoc :: Pandoc,
@@ -172,6 +189,13 @@ modelUpdateSettings s model =
         either error id $
           parseYaml s
     }
+
+modelInsertSData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
+modelInsertSData r v model =
+  let modelData' =
+        modelData model
+          & Ix.updateIx r (SData v r)
+   in model {modelData = modelData'}
 
 modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsert k v model =
