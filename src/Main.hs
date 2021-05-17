@@ -52,15 +52,15 @@ logE = logErrorNS "emabook"
 
 data Source
   = SourceMarkdown
+  | SourceData
   | SourceTemplate FilePath
-  | SourceTemplateSettings FilePath
   deriving (Eq, Show)
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceMarkdown -> "**/*.md"
+  SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
-  SourceTemplateSettings fp -> fp
 
 main :: IO ()
 main =
@@ -68,8 +68,8 @@ main =
     let pats =
           (id &&& sourcePattern)
             <$> [ SourceMarkdown,
-                  SourceTemplate ".emabook/templates",
-                  SourceTemplateSettings "index.yaml"
+                  SourceData,
+                  SourceTemplate ".emabook/templates"
                 ]
     FileSystem.mountOnLVar "." pats model $ \(src, fp) action ->
       case src of
@@ -78,16 +78,19 @@ main =
             readMarkdown fp
               <&> maybe id (uncurry M.modelInsert)
           FileSystem.Delete ->
-            pure $ maybe id M.modelDelete (R.mkMarkdownRouteFromFilePath fp)
+            pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @R.Md fp)
+        SourceData -> case action of
+          FileSystem.Update ->
+            M.modelUpdateSettings <$> readFileBS fp
+          FileSystem.Delete ->
+            undefined
         SourceTemplate dir ->
           M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
-        SourceTemplateSettings _ ->
-          M.modelUpdateSettings <$> readFileBS fp
   where
     readMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> m (Maybe (MarkdownRoute, (Aeson.Value, Pandoc)))
     readMarkdown fp =
       runMaybeT $ do
-        r :: MarkdownRoute <- MaybeT $ pure $ R.mkMarkdownRouteFromFilePath fp
+        r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Md fp
         logD $ "Reading " <> toText fp
         !s <- readFileText fp
         case parseMarkdown fp s of
@@ -121,12 +124,12 @@ render _ model r = do
     -- Nav stuff
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
-            in Splices.treeSplice [] tree $ \(R.MarkdownRoute -> nodeRoute) -> do
+            in Splices.treeSplice [] tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
-                       toList (R.unMarkdownRoute nodeRoute) `NE.isPrefixOf` R.unMarkdownRoute r
+                       toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
                  "node:active" ## Heist.ifElseISplice isActiveNode
                  "tree:active" ## Heist.ifElseISplice isActiveTree
          )
@@ -141,7 +144,7 @@ render _ model r = do
       ## HI.textSplice
       $ M.modelLookupTitle r model
     "note-meta"
-      ## HJ.bindJson (traceShowId $ maybe Aeson.Null M.noteMeta mNote)
+      ## HJ.bindJson (maybe Aeson.Null M.noteMeta mNote)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
