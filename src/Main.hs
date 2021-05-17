@@ -4,6 +4,7 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Main where
 
@@ -16,6 +17,8 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import qualified Data.Yaml as Yaml
+import Ema (Ema)
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
@@ -23,6 +26,7 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Ema.Helper.PathTree as PathTree
 import Emabook.Model (Model)
 import qualified Emabook.Model as M
+import qualified Emabook.Model.Note as MN
 import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Template as T
@@ -63,6 +67,13 @@ sourcePattern = \case
   SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
 
+instance Ema Model MarkdownRoute where
+  encodeRoute = R.encodeRoute
+  decodeRoute = R.decodeRoute
+  staticRoutes = M.staticRoutes
+  staticAssets _ =
+    ["favicon.jpeg", "favicon.svg", "static"]
+
 main :: IO ()
 main =
   Ema.runEma render $ \model -> do
@@ -90,7 +101,9 @@ main =
               r :: R.Route R.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @R.Yaml fp
               logD $ "Reading data " <> toText fp
               !s <- readFileBS fp
-              sdata <- either (throw . BadInput) pure $ M.parseYaml s
+              sdata <-
+                either (throw . BadInput . show) pure $
+                  Yaml.decodeEither' s
               pure $ M.modelInsertData r sdata
           FileSystem.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
@@ -118,7 +131,7 @@ render _ model r = do
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
-                 (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) M.noteTitle $ M.modelLookup tr model)
+                 (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
             in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
@@ -162,5 +175,5 @@ render _ model r = do
           -- TODO: Need to handle broken links somehow.
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
                 runWriter $
-                  M.sanitizeMarkdown model r $ note ^. M.noteDoc
+                  M.sanitizeMarkdown model r $ note ^. MN.noteDoc
            in doc'
