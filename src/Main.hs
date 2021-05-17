@@ -129,7 +129,7 @@ render _ model r = do
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
                getOrder tr =
-                 M.lookupNoteMeta @Int 0 "order" tr model
+                 (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) M.noteTitle $ M.modelLookup tr model)
             in Splices.treeSplice [] (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
