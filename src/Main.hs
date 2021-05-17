@@ -3,7 +3,9 @@
 
 module Main where
 
+import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
+import Data.Default (Default (def))
 import Data.LVar (LVar)
 import Ema (Ema)
 import qualified Ema
@@ -28,6 +30,10 @@ main =
   Ema.runEma (const Template.render) run
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
-run model =
-  FileSystem.mountOnLVar "." Source.filePatterns model $ \sources action -> do
+run model = do
+  defaultTmpl <- Source.defaultTemplateState
+  let model0 = def & M.modelHeistTemplate .~ defaultTmpl
+  -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
+  -- Otherwise configure ghcid to reload when this directory is changed.
+  FileSystem.mountOnLVar "." Source.filePatterns model model0 $ \sources action -> do
     Source.transformActions sources action

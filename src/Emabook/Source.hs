@@ -19,6 +19,8 @@ import Emabook.Route (MarkdownRoute)
 import qualified Emabook.Route as R
 import qualified Emabook.Route.Ext as Ext
 import qualified Heist.Extra.TemplateState as T
+import qualified Paths_emabook
+import System.Directory (doesDirectoryExist)
 import System.FilePath ((</>))
 
 log :: MonadLogger m => Text -> m ()
@@ -53,6 +55,13 @@ filePatterns =
           SourceData,
           SourceTemplate "templates"
         ]
+
+defaultTemplateState :: (MonadIO m, MonadLogger m) => m T.TemplateState
+defaultTemplateState = do
+  defaultFiles <- liftIO Paths_emabook.getDataDir
+  let tmplDir = defaultFiles </> "templates"
+  log $ "Loading default templates from " <> toText tmplDir
+  T.loadHeistTemplates tmplDir
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => [(Source, [FilePath])] -> FileSystem.FileAction -> m (Model -> Model)
@@ -91,8 +100,12 @@ transformAction src fps action =
         chainM fps $ \fp ->
           pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
     SourceTemplate dir -> do
-      log "Reloading templates"
-      (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
+      liftIO (doesDirectoryExist dir) >>= \case
+        True -> do
+          log "Reloading user templates"
+          (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
+        False -> do
+          (M.modelHeistTemplate .~) <$> defaultTemplateState
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
