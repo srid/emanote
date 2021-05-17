@@ -32,7 +32,11 @@ main =
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
 run model = do
   defaultTmpl <- Source.defaultTemplateState
-  let model0 = def & M.modelHeistTemplate .~ defaultTmpl
+  defaultData <- Source.defaultData
+  let model0 =
+        def
+          & M.modelHeistTemplate .~ defaultTmpl
+          & M.modelDataDefault .~ defaultData
   -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
   -- Otherwise configure ghcid to reload when this directory is changed.
   FileSystem.mountOnLVar "." Source.filePatterns model model0 $ \sources action -> do

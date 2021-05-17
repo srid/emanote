@@ -63,6 +63,13 @@ defaultTemplateState = do
   log $ "Loading default templates from " <> toText tmplDir
   T.loadHeistTemplates tmplDir
 
+defaultData :: (MonadIO m, MonadLogger m) => m Aeson.Value
+defaultData = do
+  defaultFiles <- liftIO Paths_emabook.getDataDir
+  let indexYaml = defaultFiles </> "index.yaml"
+  log $ "Loading index.yaml from " <> toText indexYaml
+  parseSData =<< readFileBS indexYaml
+
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => [(Source, [FilePath])] -> FileSystem.FileAction -> m (Model -> Model)
 transformActions sources action =
@@ -92,9 +99,7 @@ transformAction src fps action =
             r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
             logD $ "Reading data " <> toText fp
             !s <- readFileBS fp
-            sdata <-
-              either (throw . BadInput . show) pure $
-                Yaml.decodeEither' s
+            sdata <- parseSData s
             pure $ M.modelInsertData r sdata
       FileSystem.Delete ->
         chainM fps $ \fp ->
@@ -105,11 +110,17 @@ transformAction src fps action =
           log "Reloading user templates"
           (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
         False -> do
+          -- Revert to default templates (the user has deleted theirs)
           (M.modelHeistTemplate .~) <$> defaultTemplateState
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
+
+parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
+parseSData s =
+  either (throw . BadInput . show) pure $
+    Yaml.decodeEither' s
 
 -- | Apply the list of actions in the given order to an initial argument.
 --
