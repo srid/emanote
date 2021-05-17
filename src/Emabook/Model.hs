@@ -3,12 +3,15 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emabook.Model where
 
+import Control.Lens.Operators as Lens ((%~), (.~), (^.))
+import Control.Lens.TH (makeLenses)
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
@@ -39,11 +42,11 @@ import qualified Text.Pandoc.LinkContext as LC
 --
 -- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
-  { modelNotes :: IxNote,
-    modelRels :: IxRel,
-    modelData :: IxSData,
-    modelNav :: [Tree Slug],
-    modelHeistTemplate :: T.TemplateState
+  { _modelNotes :: IxNote,
+    _modelRels :: IxRel,
+    _modelData :: IxSData,
+    _modelNav :: [Tree Slug],
+    _modelHeistTemplate :: T.TemplateState
   }
 
 instance Default Model where
@@ -55,8 +58,8 @@ parseYaml v = do
 
 -- | `S` for "structured". Also to avoid conflict with builtin `Data`
 data SData = SData
-  { sdataValue :: Aeson.Value,
-    sdataRoute :: R.Route R.Yaml
+  { _sdataValue :: Aeson.Value,
+    _sdataRoute :: R.Route R.Yaml
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
@@ -70,9 +73,9 @@ instance Indexable SDataIxs SData where
       (ixGen $ Proxy @(R.Route R.Yaml))
 
 data Note = Note
-  { noteDoc :: Pandoc,
-    noteMeta :: Aeson.Value,
-    noteRoute :: MarkdownRoute
+  { _noteDoc :: Pandoc,
+    _noteMeta :: Aeson.Value,
+    _noteRoute :: MarkdownRoute
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
@@ -82,11 +85,7 @@ newtype SelfRef = SelfRef {unSelfRef :: R.WikiLinkTarget}
 
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
-noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . noteRoute
-
-noteTitle :: Note -> Text
-noteTitle Note {..} =
-  fromMaybe (R.routeFileBase noteRoute) $ PandocUtil.getPandocTitle noteDoc
+noteSelfRefs = fmap SelfRef . toList . R.allowedWikiLinkTargets . _noteRoute
 
 type NoteIxs = '[MarkdownRoute, SelfRef]
 
@@ -100,22 +99,18 @@ instance Indexable NoteIxs Note where
 
 -- | A relation from one note to another.
 data Rel = Rel
-  { relFrom :: MarkdownRoute,
-    relTo :: Either R.WikiLinkTarget R.MarkdownRoute,
+  { _relFrom :: MarkdownRoute,
+    _relTo :: Either R.WikiLinkTarget R.MarkdownRoute,
     -- | The relation context of 'from' note linking to 'to' note.
-    relCtx :: NonEmpty [B.Block]
+    _relCtx :: NonEmpty [B.Block]
   }
   deriving (Data, Show)
 
 instance Eq Rel where
-  a == b =
-    let f = relFrom &&& relTo
-     in f a == f b
+  (==) = (==) `on` (_relFrom &&& _relTo)
 
 instance Ord Rel where
-  a <= b =
-    let f = relFrom &&& relTo
-     in f a <= f b
+  (<=) = (<=) `on` (_relFrom &&& _relTo)
 
 type RelIxs = '[MarkdownRoute, Either R.WikiLinkTarget R.MarkdownRoute]
 
@@ -127,15 +122,12 @@ instance Indexable RelIxs Rel where
       (ixGen $ Proxy @MarkdownRoute)
       (ixGen $ Proxy @(Either R.WikiLinkTarget R.MarkdownRoute))
 
-extractRels :: Note -> [Rel]
-extractRels note =
-  extractLinks . Map.map (fmap snd) . LC.queryLinksWithContext . noteDoc $ note
-  where
-    extractLinks :: Map Text (NonEmpty [B.Block]) -> [Rel]
-    extractLinks m =
-      flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
-        target <- parseUrl url
-        pure $ Rel (noteRoute note) target ctx
+-- | Parse a URL string
+parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
+parseUrl url = do
+  guard $ not $ "://" `T.isInfixOf` url
+  fmap Left (R.mkWikiLinkTargetFromUrl url)
+    <|> fmap Right (R.mkRouteFromFilePath @R.Md $ toString url)
 
 data Meta = Meta
   { -- | Indicates the order of the Markdown file in sidebar tree, relative to
@@ -148,9 +140,29 @@ data Meta = Meta
 instance Default Meta where
   def = Meta def mempty
 
+makeLenses ''SData
+makeLenses ''Note
+makeLenses ''Rel
+makeLenses ''Model
+
+extractRels :: Note -> [Rel]
+extractRels note =
+  extractLinks . Map.map (fmap snd) . LC.queryLinksWithContext $ note ^. noteDoc
+  where
+    extractLinks :: Map Text (NonEmpty [B.Block]) -> [Rel]
+    extractLinks m =
+      flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
+        target <- parseUrl url
+        pure $ Rel (note ^. noteRoute) target ctx
+
+noteTitle :: Note -> Text
+noteTitle note =
+  fromMaybe (R.routeFileBase $ note ^. noteRoute) $
+    PandocUtil.getPandocTitle $ note ^. noteDoc
+
 modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
-  Ix.getOne . Ix.getEQ k . modelNotes
+  Ix.getOne . Ix.getEQ k . _modelNotes
 
 lookupNoteMeta :: (Default a, FromJSON a) => a -> Text -> MarkdownRoute -> Model -> a
 lookupNoteMeta x k r model =
@@ -167,7 +179,7 @@ modelLookupRouteByWikiLink :: R.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
-  fmap noteRoute . Ix.toList $ modelNotes model @= SelfRef wl
+  fmap _noteRoute . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
 modelLookupBacklinks :: MarkdownRoute -> Model -> [(MarkdownRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
@@ -175,9 +187,9 @@ modelLookupBacklinks r model =
         Set.fromList $
           (Left <$> toList (R.allowedWikiLinkTargets r))
             <> [Right r]
-      backlinks = Ix.toList $ modelRels model @+ toList refsToSelf
+      backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
-        (relFrom rel, relCtx rel)
+        (rel ^. relFrom, rel ^. relCtx)
 
 modelLookupTitle :: MarkdownRoute -> Model -> Text
 modelLookupTitle r =
@@ -193,64 +205,39 @@ modelComputeMeta mr model =
     let defaultFiles = R.routeInits @R.Yaml (coerce mr)
     defaults <- nonEmpty $
       flip mapMaybe (toList defaultFiles) $ \r -> do
-        v <- fmap sdataValue . Ix.getOne . Ix.getEQ r . modelData $ model
+        v <- fmap _sdataValue . Ix.getOne . Ix.getEQ r $ model ^. modelData
         guard $ v /= Aeson.Null
         pure v
     let finalDefault = NE.last $ NE.scanl1 mergeAeson defaults
     pure $
       fromMaybe finalDefault $ do
-        frontmatter <- noteMeta <$> modelLookup mr model
+        frontmatter <- _noteMeta <$> modelLookup mr model
         guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
         pure $ mergeAeson finalDefault frontmatter
   where
     mergeAeson = AesonMerge.lodashMerge
 
 modelInsertData :: R.Route R.Yaml -> Aeson.Value -> Model -> Model
-modelInsertData r v model =
-  let modelData' =
-        modelData model
-          & Ix.updateIx r (SData v r)
-   in model {modelData = modelData'}
+modelInsertData r v =
+  modelData %~ Ix.updateIx r (SData v r)
 
 modelDeleteData :: R.Route R.Yaml -> Model -> Model
-modelDeleteData k model =
-  model
-    { modelData = Ix.deleteIx k (modelData model)
-    }
+modelDeleteData k =
+  modelData %~ Ix.deleteIx k
 
 modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
-modelInsert k v model =
-  let note = Note (snd v) (fst v) k
-      modelNotes' =
-        modelNotes model
-          & Ix.updateIx k note
-      modelRels' =
-        modelRels model
-          & Ix.deleteIx k
-          & Ix.insertList (extractRels note)
-      model' =
-        model
-          { modelNotes = modelNotes',
-            modelRels = modelRels'
-          }
-   in model'
-        { modelNav =
-            PathTree.treeInsertPath
-              (R.unRoute k)
-              (modelNav model')
-        }
+modelInsert k v =
+  modelNotes %~ Ix.updateIx k note
+    >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (extractRels note))
+    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
+  where
+    note = Note (snd v) (fst v) k
 
 modelDelete :: MarkdownRoute -> Model -> Model
-modelDelete k model =
-  model
-    { modelNotes = Ix.deleteIx k (modelNotes model),
-      modelRels = Ix.deleteIx k (modelRels model),
-      modelNav = PathTree.treeDeletePath (R.unRoute k) (modelNav model)
-    }
-
-modelSetHeistTemplate :: T.TemplateState -> Model -> Model
-modelSetHeistTemplate v model =
-  model {modelHeistTemplate = v}
+modelDelete k =
+  modelNotes %~ Ix.deleteIx k
+    >>> modelRels %~ Ix.deleteIx k
+    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
 
 instance Ema Model MarkdownRoute where
   -- Convert a route to URL slugs
@@ -271,7 +258,7 @@ instance Ema Model MarkdownRoute where
       pure $ R.Route slugs
 
   -- Which routes to generate when generating the static HTML for this site.
-  staticRoutes (fmap noteRoute . Ix.toList . modelNotes -> mdRoutes) =
+  staticRoutes (fmap _noteRoute . Ix.toList . _modelNotes -> mdRoutes) =
     mdRoutes
 
   -- All static assets (relative to input directory) go here.
@@ -314,10 +301,3 @@ sanitizeMarkdown model docRoute doc =
                 pure $ Ema.routeUrl $ head targets
     isStaticAssetUrl url =
       any (\asset -> ("/" <> toText asset) `T.isPrefixOf` url) (staticAssets $ Proxy @MarkdownRoute)
-
--- | Parse a URL string
-parseUrl :: Text -> Maybe (Either R.WikiLinkTarget MarkdownRoute)
-parseUrl url = do
-  guard $ not $ "://" `T.isInfixOf` url
-  fmap Left (R.mkWikiLinkTargetFromUrl url)
-    <|> fmap Right (R.mkRouteFromFilePath @R.Md $ toString url)

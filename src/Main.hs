@@ -8,6 +8,7 @@
 module Main where
 
 import Control.Exception (throw)
+import Control.Lens.Operators ((.~), (^.))
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict (runWriter)
 import qualified Data.Aeson as Aeson
@@ -15,7 +16,6 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import qualified Data.Tree as Tree
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.FileSystem as FileSystem
@@ -95,7 +95,7 @@ main =
           FileSystem.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @R.Yaml fp)
         SourceTemplate dir ->
-          M.modelSetHeistTemplate <$> T.loadHeistTemplates dir
+          (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
@@ -108,7 +108,7 @@ render :: Ema.CLI.Action -> Model -> MarkdownRoute -> LByteString
 render _ model r = do
   let mNote = M.modelLookup r model
   -- TODO: Look for "${r}" template, and then fallback to _default
-  flip (T.renderHeistTemplate "_default") (M.modelHeistTemplate model) $ do
+  flip (T.renderHeistTemplate "_default") (model ^. M.modelHeistTemplate) $ do
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Binding to <html> so they remain in scope throughout.
@@ -116,7 +116,7 @@ render _ model r = do
       ## HJ.bindJson (M.modelComputeMeta r model)
     -- Nav stuff
     "ema:route-tree"
-      ## ( let tree = PathTree.treeDeleteChild "index" $ M.modelNav model
+      ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
                  (M.lookupNoteMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) M.noteTitle $ M.modelLookup tr model)
             in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
@@ -162,5 +162,5 @@ render _ model r = do
           -- TODO: Need to handle broken links somehow.
           let (doc', Map.fromListWith (<>) . fmap (second $ one @(NonEmpty Text)) -> brokenLinks) =
                 runWriter $
-                  M.sanitizeMarkdown model r $ M.noteDoc note
+                  M.sanitizeMarkdown model r $ note ^. M.noteDoc
            in doc'
