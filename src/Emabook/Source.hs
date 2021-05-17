@@ -65,9 +65,9 @@ transformAction src fp action =
           logD $ "Reading note " <> toText fp
           !s <- readFileText fp
           (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
-          pure $ M.modelInsert r (fromMaybe Aeson.Null mMeta, doc)
+          pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
       FileSystem.Delete ->
-        pure $ maybe id M.modelDelete (R.mkRouteFromFilePath @Ext.Md fp)
+        pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @Ext.Md fp)
     SourceData -> case action of
       FileSystem.Update -> do
         fmap (fromMaybe id) . runMaybeT $ do

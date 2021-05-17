@@ -35,9 +35,6 @@ import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 
--- | This is our Ema "model" -- the app state used to generate our site.
---
--- It contains the list of all markdown files, parsed as Pandoc AST.
 data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
@@ -49,11 +46,37 @@ data Model = Model
 makeLenses ''Model
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty Ix.empty mempty (Left $ one "Heist state not yet loaded")
+  def = Model Ix.empty Ix.empty Ix.empty mempty def
+
+modelInsertMarkdown :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
+modelInsertMarkdown k v =
+  modelNotes %~ Ix.updateIx k note
+    >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (Rel.extractRels note))
+    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
+  where
+    note = Note (snd v) (fst v) k
+
+modelDeleteMarkdown :: MarkdownRoute -> Model -> Model
+modelDeleteMarkdown k =
+  modelNotes %~ Ix.deleteIx k
+    >>> modelRels %~ Ix.deleteIx k
+    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
+
+modelInsertData :: R.Route Ext.Yaml -> Aeson.Value -> Model -> Model
+modelInsertData r v =
+  modelData %~ Ix.updateIx r (SData v r)
+
+modelDeleteData :: R.Route Ext.Yaml -> Model -> Model
+modelDeleteData k =
+  modelData %~ Ix.deleteIx k
 
 modelLookup :: MarkdownRoute -> Model -> Maybe Note
 modelLookup k =
   Ix.getOne . Ix.getEQ k . _modelNotes
+
+modelLookupTitle :: MarkdownRoute -> Model -> Text
+modelLookupTitle r =
+  maybe (R.routeFileBase r) noteTitle . modelLookup r
 
 modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [MarkdownRoute]
 modelLookupRouteByWikiLink wl model =
@@ -70,32 +93,6 @@ modelLookupBacklinks r model =
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
-
-modelLookupTitle :: MarkdownRoute -> Model -> Text
-modelLookupTitle r =
-  maybe (R.routeFileBase r) noteTitle . modelLookup r
-
-modelInsertData :: R.Route Ext.Yaml -> Aeson.Value -> Model -> Model
-modelInsertData r v =
-  modelData %~ Ix.updateIx r (SData v r)
-
-modelDeleteData :: R.Route Ext.Yaml -> Model -> Model
-modelDeleteData k =
-  modelData %~ Ix.deleteIx k
-
-modelInsert :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
-modelInsert k v =
-  modelNotes %~ Ix.updateIx k note
-    >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (Rel.extractRels note))
-    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
-  where
-    note = Note (snd v) (fst v) k
-
-modelDelete :: MarkdownRoute -> Model -> Model
-modelDelete k =
-  modelNotes %~ Ix.deleteIx k
-    >>> modelRels %~ Ix.deleteIx k
-    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
 
 staticRoutes :: Model -> [MarkdownRoute]
 staticRoutes (fmap (^. noteRoute) . Ix.toList . (^. modelNotes) -> mdRoutes) =
