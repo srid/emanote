@@ -7,6 +7,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    env:
+      DOCKERTAG: latest
     steps:
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v13
@@ -34,3 +36,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: output
           cname: emanote.srid.ca
+      - name: Publish Docker image to Docker Hub
+        if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
+        run: |
+          docker load -i $(nix-build docker.nix --argstr tag "${{ env.DOCKERTAG }}")
+          # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
+          echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
+          set -x
+          docker push "sridca/emanote:${{ env.DOCKERTAG }}"
+          # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
