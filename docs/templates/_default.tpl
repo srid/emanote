@@ -16,7 +16,7 @@
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
     type="text/css">
   <with var="template">
-    <link href="/${value:faviconFile}" rel="icon" />
+    <link href="${value:faviconUrl}" rel="icon" />
   </with>
   <snippet var="page.headHtml" />
 </head>
@@ -37,7 +37,7 @@
           <a href="/">
             <with var="template">
               <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
-                src="/${value:faviconFile}" />
+                src="${value:faviconUrl}" />
             </with>
           </a>
         </div>
