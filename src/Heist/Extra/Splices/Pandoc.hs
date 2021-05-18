@@ -42,6 +42,8 @@ blockLookupAttr node = \case
 
 inlineLookupAttr :: XmlHtml.Node -> B.Inline -> B.Attr
 inlineLookupAttr node = \case
+  B.Note _ ->
+    childTagAttr node "Note"
   B.Link _ _ (url, _) ->
     fromMaybe B.nullAttr $ do
       link <- XmlHtml.childElementTag "PandocLink" node
@@ -67,12 +69,12 @@ renderPandocWith bAttr iAttr (Pandoc _meta blocks) =
 rpBlock :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> B.Block -> H.Html
 rpBlock bAttr iAttr b = case b of
   B.Plain is ->
-    mapM_ (rpInline iAttr) is
+    mapM_ (rpInline bAttr iAttr) is
   B.Para is ->
-    H.p ! rpAttr (bAttr b) $ mapM_ (rpInline iAttr) is
+    H.p ! rpAttr (bAttr b) $ mapM_ (rpInline bAttr iAttr) is
   B.LineBlock iss ->
     forM_ iss $ \is ->
-      mapM_ (rpInline iAttr) is >> "\n"
+      mapM_ (rpInline bAttr iAttr) is >> "\n"
   B.CodeBlock (id', classes, attrs) s ->
     -- PrismJS friendly classes
     let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
@@ -82,7 +84,7 @@ rpBlock bAttr iAttr b = case b of
   B.RawBlock (B.Format fmt) rawHtml ->
     if fmt == "html"
       then H.unsafeByteString $ encodeUtf8 rawHtml
-      else throw Unsupported
+      else H.pre ! A.class_ (show fmt) $ H.text rawHtml
   B.BlockQuote bs ->
     H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock bAttr iAttr) bs
   B.OrderedList _ bss ->
@@ -96,15 +98,27 @@ rpBlock bAttr iAttr b = case b of
   B.DefinitionList defs ->
     H.dl $
       forM_ defs $ \(term, descList) -> do
-        mapM_ (rpInline iAttr) term
+        mapM_ (rpInline bAttr iAttr) term
         forM_ descList $ \desc ->
           H.dd $ mapM_ (rpBlock bAttr iAttr) desc
   B.Header level attr is ->
-    headerElem level ! rpAttr (addAttr attr $ bAttr b) $ mapM_ (rpInline iAttr) is
+    headerElem level ! rpAttr (addAttr attr $ bAttr b) $ mapM_ (rpInline bAttr iAttr) is
   B.HorizontalRule ->
     H.hr
-  B.Table {} ->
-    throw Unsupported
+  B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot ->
+    -- TODO: Apply captions, colSpec, etc.
+    H.table ! rpAttr attr $ do
+      H.thead $ do
+        forM_ hrows $ \(B.Row _ cells) ->
+          H.tr $
+            forM_ cells $ \(B.Cell _ _ _ _ blks) ->
+              H.th $ rpBlock bAttr iAttr `mapM_` blks
+      H.tbody $ do
+        forM_ tbodys $ \(B.TableBody _ _ _ rows) ->
+          forM_ rows $ \(B.Row _ cells) ->
+            H.tr $
+              forM_ cells $ \(B.Cell _ _ _ _ blks) ->
+                H.td $ rpBlock bAttr iAttr `mapM_` blks
   B.Div attr bs ->
     H.div ! rpAttr attr $ mapM_ (rpBlock bAttr iAttr) bs
   B.Null ->
@@ -120,24 +134,23 @@ headerElem = \case
   6 -> H.h6
   _ -> error "Invalid pandoc header level"
 
-rpInline :: (B.Inline -> B.Attr) -> B.Inline -> H.Html
-rpInline iAttr i = case i of
+rpInline :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> B.Inline -> H.Html
+rpInline bAttr iAttr i = case i of
   B.Str s -> H.toHtml s
   B.Emph is ->
-    H.em $ mapM_ (rpInline iAttr) is
+    H.em $ mapM_ (rpInline bAttr iAttr) is
   B.Strong is ->
-    H.strong $ mapM_ (rpInline iAttr) is
+    H.strong $ mapM_ (rpInline bAttr iAttr) is
   B.Underline is ->
-    H.u $ mapM_ (rpInline iAttr) is
+    H.u $ mapM_ (rpInline bAttr iAttr) is
   B.Strikeout is ->
-    -- FIXME: Should use <s>, but blaze doesn't have it.
-    H.del $ mapM_ (rpInline iAttr) is
+    H.del $ mapM_ (rpInline bAttr iAttr) is
   B.Superscript is ->
-    H.sup $ mapM_ (rpInline iAttr) is
+    H.sup $ mapM_ (rpInline bAttr iAttr) is
   B.Subscript is ->
-    H.sub $ mapM_ (rpInline iAttr) is
+    H.sub $ mapM_ (rpInline bAttr iAttr) is
   B.Quoted qt is ->
-    flip inQuotes qt $ mapM_ (rpInline iAttr) is
+    flip inQuotes qt $ mapM_ (rpInline bAttr iAttr) is
   B.Code attr s ->
     H.code ! rpAttr attr $ H.toHtml s
   B.Space -> " "
@@ -145,20 +158,29 @@ rpInline iAttr i = case i of
   B.LineBreak -> H.br
   B.RawInline _fmt s ->
     H.pre $ H.toHtml s
-  B.Math _ _ ->
-    throw Unsupported
+  B.Math mathType s ->
+    case mathType of
+      B.InlineMath ->
+        H.span ! A.class_ "math inline" $ H.text $ "\\(" <> s <> "\\)"
+      B.DisplayMath ->
+        H.span ! A.class_ "math display" $ do
+          "$$"
+          H.text s
+          "$$"
   B.Link attr is (url, tit) -> do
     H.a
       ! A.href (H.textValue url)
       ! A.title (H.textValue tit)
       ! rpAttr (addAttr attr $ iAttr i)
-      $ mapM_ (rpInline iAttr) is
+      $ mapM_ (rpInline bAttr iAttr) is
   B.Image attr is (url, tit) ->
     H.img ! A.src (H.textValue url) ! A.title (H.textValue tit) ! A.alt (H.textValue $ Markdown.plainify is) ! rpAttr attr
-  B.Note _ ->
-    throw Unsupported
+  B.Note bs -> do
+    -- TODO: Style this properly to be Tufte like. Maybe integrate https://edwardtufte.github.io/tufte-css/
+    H.sup ! A.style "margin-left: 3px;" $ "note"
+    H.div ! rpAttr (iAttr i) $ mapM_ (rpBlock bAttr iAttr) bs
   B.Span attr is ->
-    H.span ! rpAttr attr $ mapM_ (rpInline iAttr) is
+    H.span ! rpAttr attr $ mapM_ (rpInline bAttr iAttr) is
   x ->
     H.pre $ H.toHtml $ show @Text x
   where
@@ -184,6 +206,3 @@ addAttr (id1, cls1, attr1) (id2, cls2, attr2) =
     pickNonNull x "" = x
     pickNonNull "" x = x
     pickNonNull _ _ = ""
-
-data Unsupported = Unsupported
-  deriving (Show, Exception)
