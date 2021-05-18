@@ -12,7 +12,7 @@
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
-  <!-- TODO: Re-use Tailwind/windicss from emabook/ema? -->
+  <!-- TODO: Re-use Tailwind/windicss from emanote/ema? -->
   <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
     type="text/css">
   <with var="template">
@@ -83,7 +83,7 @@
 
         <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
           <div>
-            Powered by <a class="font-bold" href="https://github.com/srid/emabook">Emabook</a>
+            Powered by <a class="font-bold" href="https://github.com/srid/emanote">Emanote</a>
           </div>
         </footer>
       </div>

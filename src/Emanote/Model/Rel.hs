@@ -6,7 +6,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Emabook.Model.Rel where
+module Emanote.Model.Rel where
 
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
@@ -14,11 +14,11 @@ import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
-import Emabook.Model.Note (Note, noteDoc, noteRoute)
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import Emabook.Route.Ext (Md)
-import qualified Emabook.Route.WikiLinkTarget as WL
+import Emanote.Model.Note (Note, noteDoc, noteRoute)
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import Emanote.Route.Ext (Md)
+import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 

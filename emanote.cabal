@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               emabook
+name:               emanote
 version:            0.1.0.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
@@ -28,7 +28,7 @@ data-files:
   templates/components/*.tpl
   favicon.svg
 
-executable emabook
+executable emanote
   build-depends:
     , aeson
     , aeson-extra
@@ -85,20 +85,20 @@ executable emabook
   hs-source-dirs:     src
   default-language:   Haskell2010
   autogen-modules:
-    Paths_emabook
+    Paths_emanote
   other-modules:
-    Paths_emabook
-    Emabook.Model
-    Emabook.Model.Meta
-    Emabook.Model.Note
-    Emabook.Model.Rel
-    Emabook.Model.SData
-    Emabook.PandocUtil
-    Emabook.Route
-    Emabook.Route.Ext
-    Emabook.Route.WikiLinkTarget
-    Emabook.Source
-    Emabook.Template
+    Paths_emanote
+    Emanote.Model
+    Emanote.Model.Meta
+    Emanote.Model.Note
+    Emanote.Model.Rel
+    Emanote.Model.SData
+    Emanote.PandocUtil
+    Emanote.Route
+    Emanote.Route.Ext
+    Emanote.Route.WikiLinkTarget
+    Emanote.Source
+    Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
     Heist.Extra.Splices.Tree

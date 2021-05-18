@@ -3,7 +3,7 @@
 # You can override them on a per-note or per-directory basis by creating the
 # associated .yaml file.
 
-# Order is used by Emabook to determine the sidebar order of notes.
+# Order is used by Emanote to determine the sidebar order of notes.
 order: 0
 
 tags: []
@@ -13,7 +13,7 @@ template:
   # Use file "${template.name}.tpl" to render HTML
   name: _default
   theme: blue
-  faviconUrl: https://raw.githubusercontent.com/srid/emabook/master/docs/favicon.svg
+  faviconUrl: https://raw.githubusercontent.com/srid/emanote/master/docs/favicon.svg
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
@@ -22,10 +22,10 @@ template:
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
 page:
-  siteName: Emabook
-  siteTitle: Emabook
+  siteName: Emanote
+  siteTitle: Emanote
   description: | 
-    Emabook -- Markdown static site generator and live server. Supports
+    Emanote -- Markdown static site generator and live server. Supports
     Wiki-links, directories, HTML templates for complete theming.
   headHtml: |
     <!-- Syntax highlighting -->

@@ -1,4 +1,4 @@
-# emabook
+# emanote
 
 WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
@@ -8,11 +8,11 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 
 ```bash
 # Run live server
-PORT=8080 nix run github:srid/emabook -- -C /path/to/notebook
+PORT=8080 nix run github:srid/emanote -- -C /path/to/notebook
 
 # Generate static files
 mkdir /tmp/output
-nix run github:srid/emabook -C /path/to/notebook gen /tmp/output
+nix run github:srid/emanote -C /path/to/notebook gen /tmp/output
 ```
 
 ## Hacking
@@ -39,7 +39,7 @@ git clone git@github.com:tfausak/haskell-knowledge-base.git
 cd haskell-knowledge-base/
 ```
 
-Then go back to Emabook, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
+Then go back to Emanote, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
 
 ```
 --warnings -T ":main -C ../haskell-knowledge-base"
@@ -66,7 +66,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Backlinks
   - Using ixset
 - [x] Report error on web / CLI on markdown parse failure (generally on any error)
-- [x] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
+- [x] .emanote/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
 - [x] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
@@ -74,19 +74,19 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Finish Pandoc AST rendering (address Unsupported)
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
-- [ ] `emabook init` to allow editing default templates/yaml
-- [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
-- [ ] Milestone: `./emabook -C ~/code/haskell-knowledge-base` should just work.
+- [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
+  - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
   - [ ] Add docker image, and then use it from haskell KB's CI.
 
 Before beta release,
 
-- [ ] Finalize on the project name: `emabook`, or something else?
+- [ ] Finalize on the project name: `emanote`, or something else?
 
 To triage,
 
+- [ ] `emanote init` to allow editing default templates/yaml
 - [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [ ] GitHub pages without CNAME: `emabook gen --base-url=srid.github.io/foo` (or some other way)
+- [ ] GitHub pages without CNAME: `emanote gen --base-url=srid.github.io/foo` (or some other way)
 - [ ] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
@@ -120,7 +120,7 @@ Documentation
   - Helper.Heist.Tailwind - for `<Tailwind-Include />` in head that uses inline CSS in dev server, and include of generated CSS in prod.
   - adding custom splices (when using as a library)
 - Fsnotify limitations
-  - If doing a directory move/rename, restart emabook.
+  - If doing a directory move/rename, restart emanote.
 
 Mega features,
 
@@ -128,5 +128,5 @@ Mega features,
   - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
 - Pandoc filters (`Pandoc -> IO Pandoc`)
   - Including citations
-- mdBook like search (emabook should provide the index)
+- mdBook like search (emanote should provide the index)
 - Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)

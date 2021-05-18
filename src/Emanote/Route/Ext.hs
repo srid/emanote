@@ -3,7 +3,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Route.Ext where
+module Emanote.Route.Ext where
 
 import Data.Aeson (ToJSON)
 import Data.Data (Data)

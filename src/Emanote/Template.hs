@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Template where
+module Emanote.Template where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
@@ -10,16 +10,16 @@ import qualified Data.Text as T
 import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
-import Emabook.Model (Model)
-import qualified Emabook.Model as M
-import qualified Emabook.Model.Meta as Meta
-import qualified Emabook.Model.Note as MN
-import qualified Emabook.Model.Rel as Rel
-import qualified Emabook.PandocUtil as PandocUtil
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.Ext as Ext
-import qualified Emabook.Route.WikiLinkTarget as WL
+import Emanote.Model (Model)
+import qualified Emanote.Model as M
+import qualified Emanote.Model.Meta as Meta
+import qualified Emanote.Model.Note as MN
+import qualified Emanote.Model.Rel as Rel
+import qualified Emanote.PandocUtil as PandocUtil
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Route.Ext as Ext
+import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices

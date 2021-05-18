@@ -5,14 +5,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Model.SData where
+module Emanote.Model.SData where
 
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.Ext as Ext
+import qualified Emanote.Route as R
+import qualified Emanote.Route.Ext as Ext
 
 -- | `S` for "structured". Refers to a per-route data file represented by Aeson
 -- value.  Example: /foo/bar.yaml file

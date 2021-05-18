@@ -3,7 +3,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Route where
+module Emanote.Route where
 
 import Data.Aeson (ToJSON)
 import Data.Data (Data)
@@ -11,7 +11,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emabook.Route.Ext (Ext (..), Md)
+import Emanote.Route.Ext (Ext (..), Md)
 import System.FilePath (splitExtension, splitPath)
 import qualified Text.Show (Show (show))
 

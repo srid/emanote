@@ -3,7 +3,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Route.WikiLinkTarget where
+module Emanote.Route.WikiLinkTarget where
 
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
@@ -11,8 +11,8 @@ import qualified Data.Set as Set
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emabook.Route (Route (unRoute))
-import Emabook.Route.Ext (Md)
+import Emanote.Route (Route (unRoute))
+import Emanote.Route.Ext (Md)
 
 -- | Represents the "Foo" in [[Foo]]
 --

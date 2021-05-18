@@ -5,17 +5,17 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Model.Note where
+module Emanote.Model.Note where
 
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList)
-import qualified Emabook.PandocUtil as PandocUtil
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.WikiLinkTarget as WL
+import qualified Emanote.PandocUtil as PandocUtil
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Route.WikiLinkTarget as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note

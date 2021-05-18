@@ -10,12 +10,12 @@ import Data.LVar (LVar)
 import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.FileSystem as FileSystem
-import Emabook.Model (Model)
-import qualified Emabook.Model as M
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Source as Source
-import qualified Emabook.Template as Template
+import Emanote.Model (Model)
+import qualified Emanote.Model as M
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Source as Source
+import qualified Emanote.Template as Template
 import UnliftIO (MonadUnliftIO)
 
 instance Ema Model MarkdownRoute where
