@@ -2,7 +2,22 @@
 
 WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
-## Getting Started
+
+## Installing and using
+
+```
+# Install
+nix-env -if https://github.com/srid/emabook/archive/refs/heads/master.tar.gz
+
+# Run live server
+PORT=8080 emabook -C /path/to/notebook
+
+# Generate static files
+mkdir /tmp/output
+emabook -C /path/to/notebook gen /tmp/output
+```
+
+## Hacking
 
 To develop with full IDE support in Visual Studio Code, follow these steps:
 
@@ -24,7 +39,6 @@ First, clone [haskell-knowledge-base](https://github.com/tfausak/haskell-knowled
 cd ../
 git clone git@github.com:tfausak/haskell-knowledge-base.git
 cd haskell-knowledge-base/
-ln -s ../emabook/docs/favicon.svg .  # Or use something else
 ```
 
 Then go back to Emabook, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
@@ -33,7 +47,7 @@ Then go back to Emabook, and edit its `.ghcid` file to refer to the haskell-know
 --warnings -T ":main -C ../haskell-knowledge-base"
 ```
 
-Finally, run `bin/run` to spin up the server, and go to http://localhost:9010/README
+Finally, run `bin/run` to spin up the server, and go to http://localhost:9010/
 
 To generate static files,
 
@@ -53,24 +67,27 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [x] Make pandoc view a splice
 - [x] Backlinks
   - Using ixset
-- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
-- [ ] Report error on web / CLI on markdown parse failure (generally on any error)
+- [x] Report error on web / CLI on markdown parse failure (generally on any error)
 - [x] .emabook/templates/settings.yml - to pass global vars (`theme`, `site-title`) as-is
-- [ ] Use default templates and metadata if none exist
+- [x] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
-  - [ ] Consider `emabook init` to create these files
-- [ ] Redirect to README.md if there is no index.md
-- [ ] `emabook gen --base-url=srid.github.io/foo` (or some other way)
+- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
+- [ ] `emabook init` to allow editing default templates/yaml
+- [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
+- [ ] GitHub pages without CNAME: `emabook gen --base-url=srid.github.io/foo` (or some other way)
 - [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
+
+Before beta release,
+
+- [ ] Finalize on the project name: `emabook`, or something else?
 
 To triage,
 
-- [ ] Sidebar: should be trimmed
-  - Calendar notes can be in thousands
+- [ ] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
-    - Pass these contents as template variable, so the user controls their display (eg: hide if a YAML frontmatter flag is set)
+    - Control via YAML metadata.
 - [ ] UpTree?
   - ixset + path finding traversal
 - [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
@@ -90,9 +107,8 @@ To triage,
 
 Before public release
 
-- [ ] Finalize in HTML templating: heist vs a more popular one?
+- [x] Finalize in HTML templating: heist vs a more popular one?
   - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
-- [ ] Finalize on the project name: `emabook`, or something else?
 
 Documentation
 
