@@ -71,13 +71,13 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
 - [x] Use default static files (favicon.svg) for those that do not exist
-- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Finish Pandoc AST rendering (address Unsupported)
-- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
+- [x] Add docker image
 - [ ] Milestone: Make ema.srid.ca an emanote site
+- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
+- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
   - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
-  - [x] Add docker image
   - [ ] Use docker image from haskell KB's CI.
 
 Before beta release,
