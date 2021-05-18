@@ -2,6 +2,7 @@
 
 WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
+Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation from plain-text notes -- with live preview that updates in real-time.
 
 ## Installing and using
 
@@ -69,6 +70,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
+- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
 - [ ] Use default static files (favicon.svg) for those that do not exist
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Finish Pandoc AST rendering (address Unsupported)
@@ -121,6 +123,7 @@ Documentation
 Mega features,
 
 - Powerful and simpler query system (cf. Obsidian search)
+  - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
 - Pandoc filters (`Pandoc -> IO Pandoc`)
   - Including citations
 - mdBook like search (emabook should provide the index)
