@@ -20,18 +20,18 @@ treeSplice ::
   -- | Input tree
   [Tree a] ->
   -- | How to render a (sub-)tree root
-  (NonEmpty a -> H.Splices (HI.Splice n)) ->
+  (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice n)) ->
   HI.Splice n
 treeSplice =
   go []
   where
-    go :: [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> H.Splices (HI.Splice n)) -> HI.Splice n
+    go :: [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice n)) -> HI.Splice n
     go pars sortKey trees childSplice = do
       let extendPars x = maybe (one x) (<> one x) $ nonEmpty pars
       flip foldMapM (sortOn (sortKey . extendPars . rootLabel) trees) $ \(Node lbl children) -> do
         HI.runChildrenWith $ do
           let herePath = extendPars lbl
-          childSplice herePath
+          childSplice herePath children
           "has-children" ## Heist.ifElseISplice (not . null $ children)
           let childrenSorted = sortOn (sortKey . (herePath <>) . one . rootLabel) children
           "children"
