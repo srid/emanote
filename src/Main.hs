@@ -16,6 +16,7 @@ import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
 import qualified Emanote.Source as Source
 import qualified Emanote.Template as Template
+import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
 instance Ema Model MarkdownRoute where
@@ -27,7 +28,8 @@ instance Ema Model MarkdownRoute where
 
 main :: IO ()
 main =
-  Ema.runEma (const Template.render) run
+  withUtf8 $
+    Ema.runEma (const Template.render) run
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
 run model = do

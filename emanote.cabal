@@ -58,6 +58,7 @@ executable emanote
     , text
     , time
     , unliftio
+    , with-utf8
     , xmlhtml
     , yaml
 
