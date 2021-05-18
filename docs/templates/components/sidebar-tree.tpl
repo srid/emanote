@@ -31,11 +31,20 @@
 <!-- Rendering of this tree -->
 <div class="pl-2">
   <!-- Node's rootLabel-->
-  <div class="my-2">
+  <div class="flex items-center my-2 space-x-2 justify-left">
     <icon />
     <a class="${link-class}" href="${node:url}">
       <node:text />
     </a>
+    <tree:open>
+      <else />
+      <node:terminal>
+        <else />
+        <span class="text-gray-300" title="${tree:childrenCount} children inside">
+          <tree:childrenCount />
+        </span>
+      </node:terminal>
+    </tree:open>
   </div>
 
   <!-- Node's children forest, displayed only on active trees

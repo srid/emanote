@@ -51,7 +51,7 @@ render model r = do
                  (Meta.lookupMeta @Int 0 (one "order") tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
                getCollapsed tr =
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
+            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r
@@ -61,6 +61,8 @@ render model r = do
                        isActiveTree -- Active tree is always open
                          || not (getCollapsed nodeRoute)
                  "node:active" ## Heist.ifElseISplice isActiveNode
+                 "node:terminal" ## Heist.ifElseISplice (null children)
+                 "tree:childrenCount" ## HI.textSplice (show $ length children)
                  "tree:open" ## Heist.ifElseISplice openTree
          )
     "ema:breadcrumbs"
