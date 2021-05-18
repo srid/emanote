@@ -5,16 +5,13 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 ## Installing and using
 
-```
-# Install
-nix-env -if https://github.com/srid/emabook/archive/refs/heads/master.tar.gz
-
+```bash
 # Run live server
-PORT=8080 emabook -C /path/to/notebook
+PORT=8080 nix run github:srid/emabook -- -C /path/to/notebook
 
 # Generate static files
 mkdir /tmp/output
-emabook -C /path/to/notebook gen /tmp/output
+nix run github:srid/emabook -C /path/to/notebook gen /tmp/output
 ```
 
 ## Hacking
@@ -72,7 +69,9 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
+- [ ] Use default static files (favicon.svg) for those that do not exist
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
+- [ ] Finish Pandoc AST rendering (address Unsupported)
 - [ ] `emabook init` to allow editing default templates/yaml
 - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
 - [ ] GitHub pages without CNAME: `emabook gen --base-url=srid.github.io/foo` (or some other way)
