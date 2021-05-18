@@ -70,14 +70,14 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Use default templates and metadata if none exist
   - [x] Load templates from cabal data-files by default
   - [x] Do the same for `index.yaml` (then test on haskell-kb)
-- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [ ] Use default static files (favicon.svg) for those that do not exist
+- [x] Use default static files (favicon.svg) for those that do not exist
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
-- [ ] Finish Pandoc AST rendering (address Unsupported)
+- [x] Finish Pandoc AST rendering (address Unsupported)
+- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] `emabook init` to allow editing default templates/yaml
 - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
-- [ ] GitHub pages without CNAME: `emabook gen --base-url=srid.github.io/foo` (or some other way)
-- [ ] Milestone: `./emabook ~/code/haskell-knowledge-base` should just work.
+- [ ] Milestone: `./emabook -C ~/code/haskell-knowledge-base` should just work.
+  - [ ] Add docker image, and then use it from haskell KB's CI.
 
 Before beta release,
 
@@ -85,6 +85,8 @@ Before beta release,
 
 To triage,
 
+- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
+- [ ] GitHub pages without CNAME: `emabook gen --base-url=srid.github.io/foo` (or some other way)
 - [ ] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
