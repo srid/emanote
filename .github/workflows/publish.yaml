@@ -26,18 +26,8 @@ jobs:
       - name: Build 🔧
         run: |
           nix -L run -j 4 . -- --help
-      - name: Generate HTML 🔧
-        run: |
-          mkdir ./output
-          nix run . -- -C ./docs gen $(pwd)/output
-      - name: Deploy to gh-pages 🚀
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: output
-          cname: emanote.srid.ca
       - name: Publish Docker image to Docker Hub
-        if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
+        # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
           docker load -i $(nix-build docker.nix --argstr tag "${{ env.DOCKERTAG }}")
           # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
@@ -45,3 +35,14 @@ jobs:
           set -x
           docker push "sridca/emanote:${{ env.DOCKERTAG }}"
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
+      - name: Generate website HTML 🔧
+        run: |
+          mkdir ./output
+          nix run . -- -C ./docs gen $(pwd)/output
+      - name: Deploy to website to gh-pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: output
+          cname: emanote.srid.ca
+ 
