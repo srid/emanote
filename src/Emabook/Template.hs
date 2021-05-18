@@ -48,15 +48,20 @@ render model r = do
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
-                 (Meta.lookupMeta @Int 0 "order" tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
+                 (Meta.lookupMeta @Int 0 (one "order") tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
+               getCollapsed tr =
+                 Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
             in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
                        toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
+                     openTree =
+                       isActiveTree -- Active tree is always open
+                         || not (getCollapsed nodeRoute)
                  "node:active" ## Heist.ifElseISplice isActiveNode
-                 "tree:active" ## Heist.ifElseISplice isActiveTree
+                 "tree:open" ## Heist.ifElseISplice openTree
          )
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
