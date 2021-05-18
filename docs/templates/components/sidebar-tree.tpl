@@ -7,16 +7,16 @@
 </node:active>
 <has-children>
   <bind tag="icon">
-    <tree:active>
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline" viewBox="0 0 20 20" fill="currentColor">
+    <tree:open>
+      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-700" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clip-rule="evenodd" />
         <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
       </svg>
       <else />
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline" viewBox="0 0 20 20" fill="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500" viewBox="0 0 20 20" fill="currentColor">
         <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
       </svg>
-    </tree:active>
+    </tree:open>
   </bind>
   <else />
   <bind tag="icon">
@@ -41,9 +41,9 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
-  <tree:active>
+  <tree:open>
     <children>
       <apply template="sidebar-tree" />
     </children>
-  </tree:active>
+  </tree:open>
 </div>

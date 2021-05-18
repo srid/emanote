@@ -24,9 +24,9 @@ import qualified Emabook.Route.Ext as Ext
 import Relude.Extra.Map (StaticMap (lookup))
 
 -- | Look up a specific key in the meta for a given route.
-lookupMeta :: FromJSON a => a -> Text -> MarkdownRoute -> Model -> a
+lookupMeta :: FromJSON a => a -> NonEmpty Text -> MarkdownRoute -> Model -> a
 lookupMeta x k r =
-  lookupMetaFrom x (one k) . getEffectiveRouteMeta r
+  lookupMetaFrom x k . getEffectiveRouteMeta r
 
 lookupMetaFrom :: forall a. FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
 lookupMetaFrom x (k :| ks) meta =
