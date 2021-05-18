@@ -74,6 +74,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Finish Pandoc AST rendering (address Unsupported)
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
+- [ ] Milestone: Make ema.srid.ca an emanote site
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
   - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
   - [x] Add docker image

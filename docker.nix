@@ -19,7 +19,7 @@ let
         }
       )
       { };
-  emanote = import ./.;
+  emanote = (import ./.).defaultPackage.x86_64-linux;
 in
 { name ? "sridca/emanote"
 , tag ? "dev"
@@ -37,5 +37,6 @@ in
     Volumes = {
       "/data" = { };
     };
+    Cmd = [ "${emanote}/bin/emanote" ];
   };
 }
