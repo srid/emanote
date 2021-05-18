@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.Source where
+module Emanote.Source where
 
 import Control.Exception (throw)
 import Control.Lens.Operators ((.~))
@@ -13,24 +13,24 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
-import Emabook.Model (Model)
-import qualified Emabook.Model as M
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.Ext as Ext
+import Emanote.Model (Model)
+import qualified Emanote.Model as M
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Route.Ext as Ext
 import qualified Heist.Extra.TemplateState as T
-import qualified Paths_emabook
+import qualified Paths_emanote
 import System.Directory (doesDirectoryExist)
 import System.FilePath ((</>))
 
 log :: MonadLogger m => Text -> m ()
-log = logInfoNS "emabook"
+log = logInfoNS "emanote"
 
 logD :: MonadLogger m => Text -> m ()
-logD = logDebugNS "emabook"
+logD = logDebugNS "emanote"
 
 logE :: MonadLogger m => Text -> m ()
-logE = logErrorNS "emabook"
+logE = logErrorNS "emanote"
 
 -- | Represents the different kinds of file the application will handle.
 data Source
@@ -58,14 +58,14 @@ filePatterns =
 
 defaultTemplateState :: (MonadIO m, MonadLogger m) => m T.TemplateState
 defaultTemplateState = do
-  defaultFiles <- liftIO Paths_emabook.getDataDir
+  defaultFiles <- liftIO Paths_emanote.getDataDir
   let tmplDir = defaultFiles </> "templates"
   log $ "Loading default templates from " <> toText tmplDir
   T.loadHeistTemplates tmplDir
 
 defaultData :: (MonadIO m, MonadLogger m) => m Aeson.Value
 defaultData = do
-  defaultFiles <- liftIO Paths_emabook.getDataDir
+  defaultFiles <- liftIO Paths_emanote.getDataDir
   let indexYaml = defaultFiles </> "index.yaml"
   log $ "Loading index.yaml from " <> toText indexYaml
   parseSData =<< readFileBS indexYaml

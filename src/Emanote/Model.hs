@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Emabook.Model where
+module Emanote.Model where
 
 import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
@@ -17,20 +17,20 @@ import qualified Data.Set as Set
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
-import Emabook.Model.Note
+import Emanote.Model.Note
   ( IxNote,
     Note (Note),
     SelfRef (SelfRef),
     noteRoute,
     noteTitle,
   )
-import Emabook.Model.Rel (IxRel)
-import qualified Emabook.Model.Rel as Rel
-import Emabook.Model.SData (IxSData, SData (SData))
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.Ext as Ext
-import qualified Emabook.Route.WikiLinkTarget as WL
+import Emanote.Model.Rel (IxRel)
+import qualified Emanote.Model.Rel as Rel
+import Emanote.Model.SData (IxSData, SData (SData))
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Route.Ext as Ext
+import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B

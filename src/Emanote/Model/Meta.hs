@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Emabook.Model.Meta where
+module Emanote.Model.Meta where
 
 import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
@@ -13,14 +13,14 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Extra.Merge as AesonMerge
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
-import Emabook.Model (Model, modelData, modelDataDefault, modelLookup)
-import Emabook.Model.Note
+import Emanote.Model (Model, modelData, modelDataDefault, modelLookup)
+import Emanote.Model.Note
   ( noteMeta,
   )
-import Emabook.Model.SData (sdataValue)
-import Emabook.Route (MarkdownRoute)
-import qualified Emabook.Route as R
-import qualified Emabook.Route.Ext as Ext
+import Emanote.Model.SData (sdataValue)
+import Emanote.Route (MarkdownRoute)
+import qualified Emanote.Route as R
+import qualified Emanote.Route.Ext as Ext
 import Relude.Extra.Map (StaticMap (lookup))
 
 -- | Look up a specific key in the meta for a given route.

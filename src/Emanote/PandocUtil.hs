@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emabook.PandocUtil where
+module Emanote.PandocUtil where
 
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Text.Pandoc.Builder as B
