@@ -76,7 +76,8 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
   - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
-  - [ ] Add docker image, and then use it from haskell KB's CI.
+  - [x] Add docker image
+  - [ ] Use docker image from haskell KB's CI.
 
 Before beta release,
 
