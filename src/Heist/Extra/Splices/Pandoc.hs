@@ -80,10 +80,20 @@ rpBlock bAttr iAttr b = case b of
      in H.div ! rpAttr (bAttr b) $
           H.pre ! rpAttr (id', classes', attrs) $
             H.code ! rpAttr ("", classes', []) $ H.text s
-  B.RawBlock (B.Format fmt) rawHtml -> do
-    if fmt == "html"
-      then H.unsafeByteString $ encodeUtf8 rawHtml
-      else H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.text rawHtml
+  B.RawBlock (B.Format fmt) s -> do
+    case fmt of
+      "html" ->
+        H.unsafeByteString $ encodeUtf8 s
+      "video" ->
+        -- HACK format. TODO: replace with ![[foo.mp4]]
+        H.video ! A.autoplay "" ! A.loop "" ! H.customAttribute "muted" "" $ do
+          H.source ! A.src (H.toValue $ T.strip s)
+          H.p $ do
+            "Your browser doesn't support HTML5 video. Here is a "
+            H.a ! A.href (H.toValue $ T.strip s) $ "link to the video"
+            " instead."
+      _ ->
+        H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.text s
   B.BlockQuote bs ->
     H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock bAttr iAttr) bs
   B.OrderedList _ bss ->

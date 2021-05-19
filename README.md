@@ -76,9 +76,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [ ] Milestone: Make ema.srid.ca an emanote site
   - Bugs and blockers
     - [x] /start.md - the .md breaks links
-    - [ ] raw HTML doesn't work (eg: <video> element)
-      - Blame https://github.com/snapframework/xmlhtml ?
-        - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
+    - [x] workaround raw html bug (see below) using video raw format
     - [ ] "Next" styling; just copy paste?
       - Nah, add `<PandocDiv:className class="foo" />`
     - [ ] Tailwind cdn! ignore now?
@@ -91,7 +89,13 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - [ ] Use docker image from haskell KB's CI.
 
 To triage,
-
+- [ ] BUG: raw HTML doesn't work (eg: <video> element)
+  - Blame https://github.com/snapframework/xmlhtml ?
+    - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
+  - For now, support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+    - Yes. Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
+      - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
+    - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
 - [ ] `emanote init` to allow editing default templates/yaml
 - [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
 - [ ] GitHub pages without CNAME: `emanote gen --base-url=srid.github.io/foo` (or some other way)
