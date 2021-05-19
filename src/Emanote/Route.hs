@@ -86,11 +86,10 @@ encodeRoute = \case
 --
 -- For eg., /foo/bar maps to slugs ["foo", "bar"], which in our app gets
 -- parsed as representing the route to /foo/bar.md.
-decodeRoute :: [Slug] -> Maybe (Route ext)
-decodeRoute = \case
+decodeRouteExcept :: [[Slug]] -> [Slug] -> Maybe (Route ext)
+decodeRouteExcept exceptions = \case
   (nonEmpty -> Nothing) ->
     pure $ Route $ one "index"
   (nonEmpty -> Just slugs) -> do
-    -- Heuristic to let requests to static files (eg: favicon.ico) to pass through
-    guard $ not (any (T.isInfixOf "." . Ema.unSlug) slugs)
+    guard $ not $ any (`isPrefixOf` toList slugs) exceptions
     pure $ Route slugs

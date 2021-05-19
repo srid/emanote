@@ -19,12 +19,14 @@ import qualified Emanote.Template as Template
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
+topLevelStaticPaths :: [FilePath]
+topLevelStaticPaths = ["favicon.jpeg", "favicon.svg", "static"]
+
 instance Ema Model MarkdownRoute where
   encodeRoute = R.encodeRoute
-  decodeRoute = R.decodeRoute
+  decodeRoute = R.decodeRouteExcept $ one . fromString <$> topLevelStaticPaths
   staticRoutes = M.staticRoutes
-  staticAssets _ =
-    ["favicon.jpeg", "favicon.svg", "static"]
+  staticAssets _ = topLevelStaticPaths
 
 main :: IO ()
 main =

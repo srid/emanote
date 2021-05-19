@@ -3,7 +3,6 @@
 
 module Heist.Extra.Splices.Pandoc (pandocSplice) where
 
-import Control.Exception (throw)
 import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Heist as H
