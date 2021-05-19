@@ -74,15 +74,19 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Finish Pandoc AST rendering (address Unsupported)
 - [x] Add docker image
 - [ ] Milestone: Make ema.srid.ca an emanote site
-- [ ] BUG: /Haskell.org (with dot in it) crashes ema dev server
+  - Bugs and blockers
+    - [x] /start.md - the .md breaks links
+    - [ ] raw HTML doesn't work (eg: <video> element)
+    - [ ] "Next" styling; just copy paste?
+      - Nah, add `<PandocDiv:className class="foo" />`
+    - [ ] Tailwind cdn! ignore now?
+  - ema-docs: replace with ema-template
+  - docs: adjust tutorial for new ema-template 
+- [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
   - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
   - [ ] Use docker image from haskell KB's CI.
-
-Before beta release,
-
-- [ ] Finalize on the project name: `emanote`, or something else?
 
 To triage,
 
@@ -93,7 +97,7 @@ To triage,
 - [ ] Display directory contents
   - For every `${folder}.md` route, display its contents *in addition to* the actual content.
     - Control via YAML metadata.
-- [ ] UpTree?
+- [ ] UpTree.md?
   - ixset + path finding traversal
 - [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
   ```
