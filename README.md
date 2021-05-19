@@ -81,8 +81,9 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
       - Nah, add `<PandocDivClass:className class="foo" />` & `PandocSpanClass`
     - [ ] Tailwind cdn! ignore now?
     - [ ] editUrl?
-  - ema-docs: replace with ema-template
-  - docs: adjust tutorial for new ema-template 
+  - [ ] Pandoc cleanpus: eg <p>'s margin
+  - [ ] docs: adjust tutorial for new ema-template 
+  - [ ] ema-docs: replace with ema-template
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.

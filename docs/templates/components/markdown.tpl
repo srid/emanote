@@ -3,6 +3,7 @@
     <Internal class="font-bold hover:bg-${theme}-50" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
+  <Para class="my-3" />
   <!-- FIXME: See the TODO in Pandoc.hs -->
   <Note class="inline-block float-right clear-right w-2/5 text-left bg-red-100" />
   <CodeBlock class="py-0.5 text-sm" />
