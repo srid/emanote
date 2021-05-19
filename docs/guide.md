@@ -8,7 +8,7 @@ TODO
 
 Remember to document these
 
-- PandocDivClass, ...
+- pandoc -> rewriteClass
 
 Known limitations
 

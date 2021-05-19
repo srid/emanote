@@ -77,8 +77,7 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - Bugs and blockers
     - [x] /start.md - the .md breaks links
     - [x] workaround raw html bug (see below) using video raw format
-    - [ ] "Next" styling; just copy paste?
-      - Nah, add `<PandocDivClass:className class="foo" />` & `PandocSpanClass`
+    - [x] "Next" styling, via class map in .yaml
     - [ ] Tailwind cdn! ignore now?
     - [ ] editUrl?
   - [ ] Pandoc cleanpus: eg <p>'s margin

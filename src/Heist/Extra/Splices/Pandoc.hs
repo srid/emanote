@@ -1,8 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Heist.Extra.Splices.Pandoc (pandocSplice) where
+module Heist.Extra.Splices.Pandoc (pandocSplice, pandocSpliceWithCustomClass) where
 
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Heist as H
@@ -15,16 +17,32 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as XmlHtml
 
+pandocSplice :: Monad n => Pandoc -> HI.Splice n
+pandocSplice = pandocSpliceWithCustomClass mempty
+
 -- | A splice to render a Pandoc AST allowing customization of the AST nodes in
 -- HTML.
---
--- TODO: Not all AST nodes unsupported. See `Unsupported` below.
-pandocSplice :: Monad n => Pandoc -> HI.Splice n
-pandocSplice doc = do
+pandocSpliceWithCustomClass ::
+  Monad n =>
+  -- | How to replace classes in Div and Span nodes.
+  Map Text Text ->
+  Pandoc ->
+  HI.Splice n
+pandocSpliceWithCustomClass classMap doc = do
   node <- H.getParamNode
-  pure $
-    RX.renderHtmlNodes $
-      renderPandocWith (blockLookupAttr node) (inlineLookupAttr node) doc
+  let ctx = RenderCtx (blockLookupAttr node) (inlineLookupAttr node) classMap
+  pure $ RX.renderHtmlNodes $ renderPandocWith ctx doc
+
+data RenderCtx = RenderCtx
+  { bAttr :: B.Block -> B.Attr,
+    iAttr :: B.Inline -> B.Attr,
+    classMap :: Map Text Text
+  }
+
+rewriteClass :: RenderCtx -> B.Attr -> B.Attr
+rewriteClass RenderCtx {..} (id', cls, attr) =
+  let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
+   in (id', cls', attr)
 
 blockLookupAttr :: XmlHtml.Node -> B.Block -> B.Attr
 blockLookupAttr node = \case
@@ -61,19 +79,19 @@ attrFromNode node =
       attrs = filter ((/= "class") . fst) $ XmlHtml.elementAttrs node
    in (id', mClass, attrs)
 
-renderPandocWith :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> Pandoc -> H.Html
-renderPandocWith bAttr iAttr (Pandoc _meta blocks) =
-  mapM_ (rpBlock bAttr iAttr) blocks
+renderPandocWith :: RenderCtx -> Pandoc -> H.Html
+renderPandocWith ctx (Pandoc _meta blocks) =
+  mapM_ (rpBlock ctx) blocks
 
-rpBlock :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> B.Block -> H.Html
-rpBlock bAttr iAttr b = case b of
+rpBlock :: RenderCtx -> B.Block -> H.Html
+rpBlock ctx@RenderCtx {..} b = case b of
   B.Plain is ->
-    mapM_ (rpInline bAttr iAttr) is
+    mapM_ (rpInline ctx) is
   B.Para is ->
-    H.p ! rpAttr (bAttr b) $ mapM_ (rpInline bAttr iAttr) is
+    H.p ! rpAttr (bAttr b) $ mapM_ (rpInline ctx) is
   B.LineBlock iss ->
     forM_ iss $ \is ->
-      mapM_ (rpInline bAttr iAttr) is >> "\n"
+      mapM_ (rpInline ctx) is >> "\n"
   B.CodeBlock (id', classes, attrs) s ->
     -- PrismJS friendly classes
     let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
@@ -95,23 +113,23 @@ rpBlock bAttr iAttr b = case b of
       _ ->
         H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.text s
   B.BlockQuote bs ->
-    H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock bAttr iAttr) bs
+    H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock ctx) bs
   B.OrderedList _ bss ->
     H.ol ! rpAttr (bAttr b) $
       forM_ bss $ \bs ->
-        H.li $ mapM_ (rpBlock bAttr iAttr) bs
+        H.li $ mapM_ (rpBlock ctx) bs
   B.BulletList bss ->
     H.ul ! rpAttr (bAttr b) $
       forM_ bss $ \bs ->
-        H.li $ mapM_ (rpBlock bAttr iAttr) bs
+        H.li $ mapM_ (rpBlock ctx) bs
   B.DefinitionList defs ->
     H.dl $
       forM_ defs $ \(term, descList) -> do
-        mapM_ (rpInline bAttr iAttr) term
+        mapM_ (rpInline ctx) term
         forM_ descList $ \desc ->
-          H.dd $ mapM_ (rpBlock bAttr iAttr) desc
+          H.dd $ mapM_ (rpBlock ctx) desc
   B.Header level attr is ->
-    headerElem level ! rpAttr (addAttr attr $ bAttr b) $ mapM_ (rpInline bAttr iAttr) is
+    headerElem level ! rpAttr (addAttr attr $ bAttr b) $ mapM_ (rpInline ctx) is
   B.HorizontalRule ->
     H.hr
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot ->
@@ -121,15 +139,15 @@ rpBlock bAttr iAttr b = case b of
         forM_ hrows $ \(B.Row _ cells) ->
           H.tr $
             forM_ cells $ \(B.Cell _ _ _ _ blks) ->
-              H.th $ rpBlock bAttr iAttr `mapM_` blks
+              H.th $ rpBlock ctx `mapM_` blks
       H.tbody $ do
         forM_ tbodys $ \(B.TableBody _ _ _ rows) ->
           forM_ rows $ \(B.Row _ cells) ->
             H.tr $
               forM_ cells $ \(B.Cell _ _ _ _ blks) ->
-                H.td $ rpBlock bAttr iAttr `mapM_` blks
+                H.td $ rpBlock ctx `mapM_` blks
   B.Div attr bs ->
-    H.div ! rpAttr attr $ mapM_ (rpBlock bAttr iAttr) bs
+    H.div ! rpAttr (rewriteClass ctx attr) $ mapM_ (rpBlock ctx) bs
   B.Null ->
     pure ()
 
@@ -143,23 +161,23 @@ headerElem = \case
   6 -> H.h6
   _ -> error "Invalid pandoc header level"
 
-rpInline :: (B.Block -> B.Attr) -> (B.Inline -> B.Attr) -> B.Inline -> H.Html
-rpInline bAttr iAttr i = case i of
+rpInline :: RenderCtx -> B.Inline -> H.Html
+rpInline ctx@RenderCtx {..} i = case i of
   B.Str s -> H.toHtml s
   B.Emph is ->
-    H.em $ mapM_ (rpInline bAttr iAttr) is
+    H.em $ mapM_ (rpInline ctx) is
   B.Strong is ->
-    H.strong $ mapM_ (rpInline bAttr iAttr) is
+    H.strong $ mapM_ (rpInline ctx) is
   B.Underline is ->
-    H.u $ mapM_ (rpInline bAttr iAttr) is
+    H.u $ mapM_ (rpInline ctx) is
   B.Strikeout is ->
-    H.del $ mapM_ (rpInline bAttr iAttr) is
+    H.del $ mapM_ (rpInline ctx) is
   B.Superscript is ->
-    H.sup $ mapM_ (rpInline bAttr iAttr) is
+    H.sup $ mapM_ (rpInline ctx) is
   B.Subscript is ->
-    H.sub $ mapM_ (rpInline bAttr iAttr) is
+    H.sub $ mapM_ (rpInline ctx) is
   B.Quoted qt is ->
-    flip inQuotes qt $ mapM_ (rpInline bAttr iAttr) is
+    flip inQuotes qt $ mapM_ (rpInline ctx) is
   B.Code attr s ->
     H.code ! rpAttr attr $ H.toHtml s
   B.Space -> " "
@@ -183,15 +201,15 @@ rpInline bAttr iAttr i = case i of
       ! A.href (H.textValue url)
       ! A.title (H.textValue tit)
       ! rpAttr (addAttr attr $ iAttr i)
-      $ mapM_ (rpInline bAttr iAttr) is
+      $ mapM_ (rpInline ctx) is
   B.Image attr is (url, tit) ->
     H.img ! A.src (H.textValue url) ! A.title (H.textValue tit) ! A.alt (H.textValue $ Markdown.plainify is) ! rpAttr attr
   B.Note bs -> do
     -- TODO: Style this properly to be Tufte like. Maybe integrate https://edwardtufte.github.io/tufte-css/
     H.sup ! A.style "margin-left: 3px;" $ "note"
-    H.div ! rpAttr (iAttr i) $ mapM_ (rpBlock bAttr iAttr) bs
+    H.div ! rpAttr (iAttr i) $ mapM_ (rpBlock ctx) bs
   B.Span attr is ->
-    H.span ! rpAttr attr $ mapM_ (rpInline bAttr iAttr) is
+    H.span ! rpAttr (rewriteClass ctx attr) $ mapM_ (rpInline ctx) is
   x ->
     H.pre $ H.toHtml $ show @Text x
   where

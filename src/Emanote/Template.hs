@@ -36,6 +36,7 @@ render :: Ema Model MarkdownRoute => Model -> MarkdownRoute -> LByteString
 render model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
+      rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
   flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers
     "bind" ## HB.bindImpl
@@ -86,7 +87,7 @@ render model r = do
           ## Splices.pandocSplice
           $ ctxDoc
     "ema:note:pandoc"
-      ## Splices.pandocSplice
+      ## Splices.pandocSpliceWithCustomClass rewriteClass
       $ case M.modelLookup r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
