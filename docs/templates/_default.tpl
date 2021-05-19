@@ -9,9 +9,7 @@
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
-  <!-- TODO: Re-use Tailwind/windicss from emanote/ema? -->
-  <link href="https://unpkg.com/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet"
-    type="text/css">
+  <tailwindCssShim />
   <with var="template">
     <link href="${value:iconUrl}" rel="icon" />
   </with>

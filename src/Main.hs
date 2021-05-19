@@ -10,6 +10,7 @@ import Data.LVar (LVar)
 import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.FileSystem as FileSystem
+import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import Emanote.Route (MarkdownRoute)
@@ -31,7 +32,10 @@ instance Ema Model MarkdownRoute where
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma (const Template.render) run
+    Ema.runEma (\a -> Template.render $ cssShim a) run
+  where
+    cssShim =
+      Tailwind.twindShim
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
 run model = do
