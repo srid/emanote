@@ -37,6 +37,8 @@ render model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
       rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
+      siteTitle = Meta.lookupMetaFrom @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+      pageTitle = M.modelLookupTitle r model
   flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers
     "bind" ## HB.bindImpl
@@ -74,8 +76,9 @@ render model r = do
           "crumb:title" ## M.modelLookupTitle crumb model
     -- Note stuff
     "ema:note:title"
-      ## HI.textSplice
-      $ M.modelLookupTitle r model
+      ## HI.textSplice pageTitle
+    "ema:note:titleFull"
+      ## HI.textSplice (if pageTitle == siteTitle then pageTitle else pageTitle <> " – " <> siteTitle)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
       $ \(source, ctx) -> do
