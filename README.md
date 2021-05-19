@@ -78,8 +78,9 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
     - [x] /start.md - the .md breaks links
     - [x] workaround raw html bug (see below) using video raw format
     - [ ] "Next" styling; just copy paste?
-      - Nah, add `<PandocDiv:className class="foo" />`
+      - Nah, add `<PandocDivClass:className class="foo" />` & `PandocSpanClass`
     - [ ] Tailwind cdn! ignore now?
+    - [ ] editUrl?
   - ema-docs: replace with ema-template
   - docs: adjust tutorial for new ema-template 
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server

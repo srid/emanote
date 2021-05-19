@@ -13,7 +13,7 @@ template:
   # Use file "${template.name}.tpl" to render HTML
   name: _default
   theme: blue
-  faviconUrl: https://raw.githubusercontent.com/srid/emanote/master/docs/favicon.svg
+  iconUrl: https://raw.githubusercontent.com/srid/emanote/master/docs/favicon.svg
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
