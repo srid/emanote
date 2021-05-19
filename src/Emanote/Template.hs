@@ -29,11 +29,13 @@ import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
+import qualified Text.Blaze.Html5 as H
+import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: Ema Model MarkdownRoute => Model -> MarkdownRoute -> LByteString
-render model r = do
+render :: Ema Model MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
+render tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
       rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
@@ -43,6 +45,8 @@ render model r = do
     -- Heist helpers
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
+    -- Add tailwind css shim
+    "tailwindCssShim" ## pure (RX.renderHtmlNodes tailwindShim)
     -- Bind route-associated metadata to <html> so that they remain in scope
     -- throughout.
     "html"

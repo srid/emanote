@@ -75,14 +75,14 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Use default static files (favicon.svg) for those that do not exist
 - [x] Finish Pandoc AST rendering (address Unsupported)
 - [x] Add docker image
-- [ ] Milestone: Make ema.srid.ca an emanote site
+- [x] Milestone: Make ema.srid.ca an emanote site
   - Bugs and blockers
     - [x] /start.md - the .md breaks links
     - [x] workaround raw html bug (see below) using video raw format
     - [x] "Next" styling, via class map in .yaml
   - [x] docs: adjust tutorial for new ema-template 
   - [x] ema-docs: replace with ema-template
-- [ ] Tailwind CDN: replace with windi workflow for faster page load, or use Twind shim
+- [x] Tailwind CDN: replace with windi workflow for faster page load, or use Twind shim
 - [x] Avoid "Ema - Ema" kind of title. Pass ifIndexRoute splice?
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
