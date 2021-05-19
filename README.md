@@ -77,6 +77,8 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
   - Bugs and blockers
     - [x] /start.md - the .md breaks links
     - [ ] raw HTML doesn't work (eg: <video> element)
+      - Blame https://github.com/snapframework/xmlhtml ?
+        - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
     - [ ] "Next" styling; just copy paste?
       - Nah, add `<PandocDiv:className class="foo" />`
     - [ ] Tailwind cdn! ignore now?
@@ -116,6 +118,9 @@ To triage,
 
 Before public release
 
+- [ ] **Tests**!
+  - URL parsing (.md and wiki-links) and route encoding/decoding
+  - Metadata overriding
 - [x] Finalize in HTML templating: heist vs a more popular one?
   - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
 
