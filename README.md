@@ -2,7 +2,9 @@
 
 WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
-Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation from plain-text notes -- with live preview that updates in real-time.
+Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
+
+Real-world example: [ema.srid.ca](https://ema.srid.ca) (generated from [these sources](https://github.com/srid/emanote/tree/master/docs)).
 
 ## Installing and using
 
@@ -78,11 +80,10 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
     - [x] /start.md - the .md breaks links
     - [x] workaround raw html bug (see below) using video raw format
     - [x] "Next" styling, via class map in .yaml
-    - [ ] Tailwind cdn! ignore now?
-    - [ ] editUrl?
-  - [ ] Pandoc cleanpus: eg <p>'s margin
-  - [ ] docs: adjust tutorial for new ema-template 
-  - [ ] ema-docs: replace with ema-template
+  - [x] docs: adjust tutorial for new ema-template 
+  - [x] ema-docs: replace with ema-template
+- [ ] Tailwind CDN: replace with windi workflow for faster page load, or use Twind shim
+- [x] Avoid "Ema - Ema" kind of title. Pass ifIndexRoute splice?
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
