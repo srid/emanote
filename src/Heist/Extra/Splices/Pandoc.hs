@@ -80,10 +80,10 @@ rpBlock bAttr iAttr b = case b of
      in H.div ! rpAttr (bAttr b) $
           H.pre ! rpAttr (id', classes', attrs) $
             H.code ! rpAttr ("", classes', []) $ H.text s
-  B.RawBlock (B.Format fmt) rawHtml ->
+  B.RawBlock (B.Format fmt) rawHtml -> do
     if fmt == "html"
       then H.unsafeByteString $ encodeUtf8 rawHtml
-      else H.pre ! A.class_ (show fmt) $ H.text rawHtml
+      else H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.text rawHtml
   B.BlockQuote bs ->
     H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock bAttr iAttr) bs
   B.OrderedList _ bss ->
@@ -155,8 +155,10 @@ rpInline bAttr iAttr i = case i of
   B.Space -> " "
   B.SoftBreak -> " "
   B.LineBreak -> H.br
-  B.RawInline _fmt s ->
-    H.pre $ H.toHtml s
+  B.RawInline (B.Format fmt) s ->
+    if fmt == "html"
+      then H.unsafeByteString $ encodeUtf8 s
+      else H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.toHtml s
   B.Math mathType s ->
     case mathType of
       B.InlineMath ->
