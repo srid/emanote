@@ -4,9 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <with var="template">
-    <base href="${value:baseUrl}" />
-  </with>
+  <base href="${value:template.baseUrl}" />
   <title><ema:note:titleFull /></title>
   <with var="page">
     <meta property="og:description" content="${value:description}" />
@@ -32,7 +30,7 @@
       <!-- Logo column -->
       <div class="hidden md:mr-4 md:block md:col-span-3">
         <div class="flex items-end h-full pl-2 mt-2 space-x-2">
-          <a href="/">
+          <a href="">
             <with var="template">
               <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
                 src="${value:iconUrl}" />
