@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <base href="${value:template.baseUrl}" />
+  <with var="template">
+    <base href="${value:baseUrl}" />
+  </with>
   <title><ema:note:titleFull /></title>
   <with var="page">
     <meta property="og:description" content="${value:description}" />
