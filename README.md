@@ -59,6 +59,8 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 
 ## Tasks
 
+Initial MVP,
+
 - [x] Wiki-links
 - Splice work
   - [x] Make sidebar tree a splice
@@ -85,28 +87,29 @@ nix-shell -p nodePackages.http-server --run 'http-server ./output/'
 - [x] Tailwind CDN: replace with windi workflow for faster page load, or use Twind shim
 - [x] Avoid "Ema - Ema" kind of title. Pass ifIndexRoute splice?
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
-- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
-- [ ] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
-  - [ ] Redirect to README.md if there is no index.md (Obsidian publish behaviour)
-  - [ ] Use docker image from haskell KB's CI.
+- [x] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
+
+Before tests (tasks impacting the larger architectural context in code base),
+- [ ] UpTree.md?
+  - ixset + path finding traversal
+- [ ] Embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+  - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
+    - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
+  - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
+- [ ] Queries and results embed
+- [ ] Finally, **tests**!
+  - URL parsing (.md and wiki-links) and route encoding/decoding
+  - Metadata overriding
 
 To triage,
+- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] BUG: raw HTML doesn't work (eg: <video> element)
   - Blame https://github.com/snapframework/xmlhtml ?
     - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
-  - For now, support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
-    - Yes. Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
-      - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
-    - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
 - [ ] `emanote init` to allow editing default templates/yaml
 - [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [ ] GitHub pages without CNAME: `emanote gen --base-url=srid.github.io/foo` (or some other way)
-- [ ] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
-- [ ] Display directory contents
-  - For every `${folder}.md` route, display its contents *in addition to* the actual content.
-    - Control via YAML metadata.
-- [ ] UpTree.md?
-  - ixset + path finding traversal
+- [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
+- [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
   ```
   <Pandoc>
@@ -124,26 +127,5 @@ To triage,
 
 Before public release
 
-- [ ] **Tests**!
-  - URL parsing (.md and wiki-links) and route encoding/decoding
-  - Metadata overriding
 - [x] Finalize in HTML templating: heist vs a more popular one?
   - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
-
-Documentation
-
-- Heist docs for Ema
-  - Helper.Heist
-  - Helper.Heist.Tailwind - for `<Tailwind-Include />` in head that uses inline CSS in dev server, and include of generated CSS in prod.
-  - adding custom splices (when using as a library)
-- Fsnotify limitations
-  - If doing a directory move/rename, restart emanote.
-
-Mega features,
-
-- Powerful and simpler query system (cf. Obsidian search)
-  - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
-- Pandoc filters (`Pandoc -> IO Pandoc`)
-  - Including citations
-- mdBook like search (emanote should provide the index)
-- Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)
