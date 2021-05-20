@@ -38,6 +38,59 @@ All but the final step need to be done only once.
 
 ## Tasks
 
+### Current
+
+Before tests (tasks impacting the larger architectural context in code base),
+- [ ] Interlude(architecture): a layer between ema and emanote
+  - source -> target file transformation with routing
+  - examples
+    - source: .md, .org, static files, ..
+    - output: .rss/.xml
+- [ ] neuron UpTree?
+  - ixset + path finding traversal
+  - rendering design: where to place? esp. in relation to sidebar?
+- [ ] Embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+  - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
+    - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
+  - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
+- [ ] Queries and results embed
+- [ ] Finally, **tests**!
+  - URL parsing (.md and wiki-links) and route encoding/decoding
+  - Metadata overriding
+
+To triage,
+- [ ] `emanote gen` should generate $dir.html even if $dir.md doesn't exist.
+- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
+- [ ] BUG: raw HTML doesn't work (eg: <video> element)
+  - Blame https://github.com/snapframework/xmlhtml ?
+    - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
+- [ ] `emanote init` to allow editing default templates/yaml
+- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
+- [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
+- [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
+- [ ] `neuron query` equivalent?
+- [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
+  ```
+  <Pandoc>
+    <Custom>
+      <Popout class="px-1 font-serif rounded bg-pink-50" />
+      <!-- Hierarchical styling? -->
+      <Warning class="px-1 rounded bg-gray-50">
+        <Header>
+          <h2>class="text-xl font-bold"</h2>
+        </Header>
+      </Warning>
+    </Custom>
+  </Pandoc>
+  ```
+
+Before public release
+
+- [x] Finalize in HTML templating: heist vs a more popular one?
+  - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
+
+### Archived Tasks
+
 Initial MVP,
 
 - [x] Wiki-links
@@ -68,44 +121,3 @@ Initial MVP,
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
 
-Before tests (tasks impacting the larger architectural context in code base),
-- [ ] UpTree.md?
-  - ixset + path finding traversal
-- [ ] Embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
-  - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
-    - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
-  - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
-- [ ] Queries and results embed
-- [ ] Finally, **tests**!
-  - URL parsing (.md and wiki-links) and route encoding/decoding
-  - Metadata overriding
-
-To triage,
-- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
-- [ ] BUG: raw HTML doesn't work (eg: <video> element)
-  - Blame https://github.com/snapframework/xmlhtml ?
-    - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
-- [ ] `emanote init` to allow editing default templates/yaml
-- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
-- [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
-- [ ] `neuron query` equivalent?
-- [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
-  ```
-  <Pandoc>
-    <Custom>
-      <Popout class="px-1 font-serif rounded bg-pink-50" />
-      <!-- Hierarchical styling? -->
-      <Warning class="px-1 rounded bg-gray-50">
-        <Header>
-          <h2>class="text-xl font-bold"</h2>
-        </Header>
-      </Warning>
-    </Custom>
-  </Pandoc>
-  ```
-
-Before public release
-
-- [x] Finalize in HTML templating: heist vs a more popular one?
-  - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
