@@ -1,5 +1,5 @@
 # Emanote
 
-Welcome to [Emanote](https://github.com/srid/emanote) docs.
+Welcome to [Emanote](https://github.com/srid/emanote).
 
-There is nothing in here (or in [[start]]), because Emanote is heavily a work-in-progress. 
+As Emanote is still a **work in progress** we do not have documentation yet.

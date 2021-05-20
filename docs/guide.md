@@ -4,7 +4,7 @@ order: 2
 
 # Guide
 
-TODO
+TODO Just a skeleton for now.
 
 Remember to document these
 
