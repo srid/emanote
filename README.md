@@ -4,18 +4,24 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-Real-world example: [ema.srid.ca](https://ema.srid.ca) (generated from [these sources](https://github.com/srid/emanote/tree/master/docs)).
-
 ## Installing and using
 
 ```bash
+# Install
+nix-env -if ./default.nix
+
 # Run live server
-PORT=8080 nix run github:srid/emanote -- -C /path/to/notebook
+PORT=8001 emanote -C /path/to/notebook
 
 # Generate static files
 mkdir /tmp/output
-nix run github:srid/emanote -C /path/to/notebook gen /tmp/output
+emanote -C /path/to/notebook gen /tmp/output
 ```
+
+### Examples
+
+* [ema.srid.ca](https://ema.srid.ca) (generated from [these sources](https://github.com/srid/emanote/tree/master/docs)).
+* [Haskell KB](https://taylor.fausak.me/haskell-knowledge-base/) (generated from [these sources](https://github.com/tfausak/haskell-knowledge-base))
 
 ## Hacking
 
@@ -29,33 +35,6 @@ To develop with full IDE support in Visual Studio Code, follow these steps:
 - Press <kbd>Ctrl+Shift+B</kbd> in VSCode, or run `bin/run` (`bin/run-via-tmux` if you have tmux installed) in terminal, to launch the Ema dev server, and navigate to http://localhost:9010/
 
 All but the final step need to be done only once.
-
-### Testing on haskell-knowledge-base
-
-First, clone [haskell-knowledge-base](https://github.com/tfausak/haskell-knowledge-base) and symlink to Ema's default HTML templates,
-
-```bash
-# Clone, and symlink to Ema's default HTML templates
-cd ../
-git clone git@github.com:tfausak/haskell-knowledge-base.git
-cd haskell-knowledge-base/
-```
-
-Then go back to Emanote, and edit its `.ghcid` file to refer to the haskell-knowledge-base directory instead. It should contain something like this:
-
-```
---warnings -T ":main -C ../haskell-knowledge-base"
-```
-
-Finally, run `bin/run` to spin up the server, and go to http://localhost:9010/
-
-To generate static files,
-
-```bash
-mkdir ./output
-nix run . -- -C ../haskell-knowledge-base gen $(pwd)/output
-nix-shell -p nodePackages.http-server --run 'http-server ./output/'
-```
 
 ## Tasks
 
@@ -110,6 +89,7 @@ To triage,
 - [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
 - [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
 - [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
+- [ ] `neuron query` equivalent?
 - [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
   ```
   <Pandoc>
