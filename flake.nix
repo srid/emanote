@@ -1,7 +1,7 @@
 {
   description = "emanote";
   inputs = {
-    ema.url = "github:srid/ema/master";
+    ema.url = "github:srid/ema/polymorphic-routes";
     # Use the nixpkgs used by the pinned ema.
     nixpkgs.follows = "ema/nixpkgs";
     tailwind = {

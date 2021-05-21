@@ -7,7 +7,7 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
-import Ema (Ema)
+import Ema (FileRoute (..))
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model (Model)
@@ -34,7 +34,7 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: Ema Model MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
+render :: FileRoute MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
 render tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
@@ -112,7 +112,7 @@ render tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Ema Model MarkdownRoute => Model -> Text -> Text
+resolveUrl :: FileRoute MarkdownRoute => Model -> Text -> Text
 resolveUrl model url =
   fromMaybe url $ do
     guard $ not $ isStaticAssetUrl url
@@ -130,4 +130,9 @@ resolveUrl model url =
             pure $ Ema.routeUrl $ head targets
   where
     isStaticAssetUrl s =
-      any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) (Ema.staticAssets $ Proxy @MarkdownRoute)
+      -- any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) (Ema.staticAssets $ Proxy @MarkdownRoute)
+      -- FIXME: refactor and deal with static files correctly. put 'em all in model for safety.
+      any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) topLevelStaticPaths
+
+topLevelStaticPaths :: [FilePath]
+topLevelStaticPaths = ["favicon.jpeg", "favicon.svg", "static"]
