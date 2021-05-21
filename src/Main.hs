@@ -7,7 +7,6 @@ import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
 import Data.LVar (LVar)
-import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Tailwind as Tailwind
@@ -20,19 +19,14 @@ import qualified Emanote.Template as Template
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
-topLevelStaticPaths :: [FilePath]
-topLevelStaticPaths = ["favicon.jpeg", "favicon.svg", "static"]
-
-instance Ema Model MarkdownRoute where
-  encodeRoute = R.encodeRoute
-  decodeRoute = R.decodeRouteExcept $ one . fromString <$> topLevelStaticPaths
-  staticRoutes = M.staticRoutes
-  staticAssets _ = topLevelStaticPaths
+instance Ema.FileRoute MarkdownRoute where
+  encodeRoute = Ema.htmlSlugs . R.encodeRoute
+  decodeRoute = R.decodeRouteExcept $ one . fromString <$> Template.topLevelStaticPaths
 
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma (\a -> Template.render $ cssShim a) run
+    Ema.runEma Template.topLevelStaticPaths M.staticRoutes (Template.render . cssShim) run
   where
     cssShim =
       Tailwind.twindShim
