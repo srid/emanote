@@ -21,8 +21,8 @@ import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
 instance Ema.FileRoute MarkdownRoute where
-  encodeRoute = Ema.htmlSlugs . R.encodeRoute
-  decodeRoute = R.decodeRoute
+  encodeFileRoute = R.encodeFileRoute
+  decodeFileRoute = R.decodeFileRoute
 
 main :: IO ()
 main =
