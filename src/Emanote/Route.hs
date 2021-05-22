@@ -87,9 +87,9 @@ encodeFileRoute (Route slugs) =
 -- | Parse our route from html file path
 decodeFileRoute :: FilePath -> Maybe (Route Md)
 decodeFileRoute fp = do
-  base <- T.stripSuffix ".html" (toText fp)
-  case nonEmpty (T.splitOn "/" base) of
-    Nothing ->
-      pure $ Route $ one "index"
-    Just parts ->
+  if null fp
+    then pure $ Route $ one "index"
+    else do
+      let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
+      parts <- nonEmpty $ T.splitOn "/" base
       pure $ Route $ fmap Ema.decodeSlug parts
