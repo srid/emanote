@@ -7,7 +7,7 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
-import Ema (FileRoute (..))
+import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model (Model)
@@ -34,7 +34,7 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: FileRoute MarkdownRoute => H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
+render :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
 render tailwindShim model = \case
   Left staticPath ->
     -- TODO: Should consult model?
@@ -42,7 +42,7 @@ render tailwindShim model = \case
   Right r ->
     Ema.AssetGenerated Ema.Html $ renderHtml tailwindShim model r
 
-renderHtml :: FileRoute MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
+renderHtml :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> MarkdownRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
@@ -68,7 +68,7 @@ renderHtml tailwindShim model r = do
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
             in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-                 "node:url" ## HI.textSplice $ Ema.routeUrl nodeRoute
+                 "node:url" ## HI.textSplice $ Ema.routeUrl $ Right @FilePath nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
                        toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
@@ -84,7 +84,7 @@ renderHtml tailwindShim model r = do
       ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
       $ \crumb ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## Ema.routeUrl crumb
+          "crumb:url" ## Ema.routeUrl (Right @FilePath crumb)
           "crumb:title" ## M.modelLookupTitle crumb model
     -- Note stuff
     "ema:note:title"
@@ -97,7 +97,7 @@ renderHtml tailwindShim model r = do
         let ctxDoc :: Pandoc = Pandoc mempty $ B.Div B.nullAttr <$> toList ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ Right @FilePath source)
         "backlink:note:context"
           ## Splices.pandocSplice
           $ ctxDoc
@@ -120,22 +120,22 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: FileRoute MarkdownRoute => Model -> Text -> Text
+resolveUrl :: Ema Model (Either FilePath MarkdownRoute) => Model -> Text -> Text
 resolveUrl model url =
   fromMaybe url $ do
     guard $ not $ isStaticAssetUrl url
     Rel.parseUrl url >>= \case
       Right r -> do
-        pure $ Ema.routeUrl r
+        pure $ Ema.routeUrl $ Right @FilePath r
       Left wl ->
         case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
           Nothing -> do
             -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            let fakeRouteUnder404 = R.Route @Ext.Md $ one "404" <> WL.unWikiLinkText wl
+            let fakeRouteUnder404 = Right @FilePath $ R.Route @Ext.Md $ one "404" <> WL.unWikiLinkText wl
             pure $ Ema.routeUrl fakeRouteUnder404
           Just targets ->
             -- TODO: Deal with ambiguous targets here
-            pure $ Ema.routeUrl $ head targets
+            pure $ Ema.routeUrl $ Right @FilePath $ head targets
   where
     isStaticAssetUrl s =
       any (\asset -> toText asset `T.isPrefixOf` s) $ model ^. M.modelStaticFiles
