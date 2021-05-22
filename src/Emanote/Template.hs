@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.Template where
+module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
@@ -34,8 +34,16 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: FileRoute MarkdownRoute => H.Html -> Model -> Either FilePath MarkdownRoute -> Either FilePath LByteString
-render tailwindShim model = fmap $ \r -> do
+render :: FileRoute MarkdownRoute => H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
+render tailwindShim model = \case
+  Left staticPath ->
+    -- TODO: Should consult model?
+    Ema.AssetStatic staticPath
+  Right r ->
+    Ema.AssetGenerated Ema.Html $ renderHtml tailwindShim model r
+
+renderHtml :: FileRoute MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
+renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
       rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta

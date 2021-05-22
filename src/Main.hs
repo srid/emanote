@@ -3,7 +3,6 @@
 
 module Main where
 
-import Control.Lens.Combinators (view)
 import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
