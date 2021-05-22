@@ -77,16 +77,17 @@ routeInits (Route (slug :| rest')) =
               this : go (unRoute this) ys
 
 -- | Convert a route to html filepath
-encodeFileRoute :: Route Md -> FilePath
-encodeFileRoute (Route slugs) =
+encodeRoute :: Route Md -> FilePath
+encodeRoute (Route slugs) =
   (<> ".html") $ case nonEmpty (Ema.unSlug <$> toList slugs) of
     Nothing -> "index.html"
     Just parts ->
       toString $ T.intercalate "/" (toList parts)
 
 -- | Parse our route from html file path
-decodeFileRoute :: FilePath -> Maybe (Route Md)
-decodeFileRoute fp = do
+-- See FIXME: in Ema.Route's Either instance for FileRoute.
+decodeRoute :: FilePath -> Maybe (Route Md)
+decodeRoute fp = do
   if null fp
     then pure $ Route $ one "index"
     else do

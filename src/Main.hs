@@ -7,6 +7,7 @@ import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
 import Data.LVar (LVar)
+import Ema (Ema (..))
 import qualified Ema
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Tailwind as Tailwind
@@ -19,14 +20,18 @@ import qualified Emanote.Template as Template
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
-instance Ema.FileRoute MarkdownRoute where
-  encodeFileRoute = R.encodeFileRoute
-  decodeFileRoute = R.decodeFileRoute
+instance Ema Model (Either FilePath MarkdownRoute) where
+  encodeRoute =
+    either id R.encodeRoute
+  decodeRoute model fp =
+    fmap Left (M.modelLookupStaticFile fp model)
+      <|> fmap Right (R.decodeRoute fp)
+  allRoutes = M.allRoutes
 
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma M.staticRoutes (Template.render . cssShim) run
+    Ema.runEma (Template.render . cssShim) run
   where
     cssShim =
       Tailwind.twindShim

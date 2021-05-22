@@ -96,8 +96,13 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-staticRoutes :: Model -> [Either FilePath MarkdownRoute]
-staticRoutes model =
+modelLookupStaticFile :: FilePath -> Model -> Maybe FilePath
+modelLookupStaticFile fp model = do
+  guard $ Set.member fp $ model ^. modelStaticFiles
+  pure fp
+
+allRoutes :: Model -> [Either FilePath MarkdownRoute]
+allRoutes model =
   let mdRoutes = (fmap (^. noteRoute) . Ix.toList . (^. modelNotes)) model
       staticFiles = Set.toList $ model ^. modelStaticFiles
    in fmap Right mdRoutes <> fmap Left staticFiles
