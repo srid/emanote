@@ -7,9 +7,10 @@
 module Emanote.Source where
 
 import Control.Exception (throw)
-import Control.Lens.Operators ((.~))
+import Control.Lens.Operators ((%~), (.~))
 import Control.Monad.Logger
 import qualified Data.Aeson as Aeson
+import qualified Data.Set as Set
 import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
@@ -22,6 +23,7 @@ import qualified Heist.Extra.TemplateState as T
 import qualified Paths_emanote
 import System.Directory (doesDirectoryExist)
 import System.FilePath ((</>))
+import System.FilePattern (FilePattern)
 
 log :: MonadLogger m => Text -> m ()
 log = logInfoNS "emanote"
@@ -40,6 +42,8 @@ data Source
     SourceData
   | -- | Heist template file
     SourceTemplate FilePath
+  | -- | The rest are considered static files to copy as-is
+    SourceStatic
   deriving (Eq, Ord, Show)
 
 sourcePattern :: Source -> FilePath
@@ -47,14 +51,21 @@ sourcePattern = \case
   SourceMarkdown -> "**/*.md"
   SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
+  SourceStatic -> "**"
 
-filePatterns :: [(Source, FilePath)]
+filePatterns :: [(Source, FilePattern)]
 filePatterns =
   (id &&& sourcePattern)
     <$> [ SourceMarkdown,
           SourceData,
-          SourceTemplate "templates"
+          SourceTemplate "templates",
+          SourceStatic
         ]
+
+ignorePatterns :: [FilePattern]
+ignorePatterns =
+  [ ".*/**"
+  ]
 
 defaultTemplateState :: (MonadIO m, MonadLogger m) => m T.TemplateState
 defaultTemplateState = do
@@ -112,6 +123,9 @@ transformAction src fps action =
         False -> do
           -- Revert to default templates (the user has deleted theirs)
           (M.modelHeistTemplate .~) <$> defaultTemplateState
+    SourceStatic -> do
+      print fps
+      pure $ M.modelStaticFiles %~ Set.union (Set.fromList fps)
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $

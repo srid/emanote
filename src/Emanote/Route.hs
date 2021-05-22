@@ -83,13 +83,9 @@ encodeRoute = \case
   Route paths -> toList paths
 
 -- | Parse our route from URL slugs
---
--- For eg., /foo/bar maps to slugs ["foo", "bar"], which in our app gets
--- parsed as representing the route to /foo/bar.md.
-decodeRouteExcept :: [[Slug]] -> [Slug] -> Maybe (Route ext)
-decodeRouteExcept exceptions = \case
+decodeRoute :: [Slug] -> Maybe (Route ext)
+decodeRoute = \case
   (nonEmpty -> Nothing) ->
     pure $ Route $ one "index"
-  (nonEmpty -> Just slugs) -> do
-    guard $ not $ any (`isPrefixOf` toList slugs) exceptions
+  (nonEmpty -> Just slugs) ->
     pure $ Route slugs

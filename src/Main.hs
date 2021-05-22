@@ -3,6 +3,7 @@
 
 module Main where
 
+import Control.Lens.Combinators (view)
 import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
@@ -21,12 +22,12 @@ import UnliftIO (MonadUnliftIO)
 
 instance Ema.FileRoute MarkdownRoute where
   encodeRoute = Ema.htmlSlugs . R.encodeRoute
-  decodeRoute = R.decodeRouteExcept $ one . fromString <$> Template.topLevelStaticPaths
+  decodeRoute = R.decodeRoute
 
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma Template.topLevelStaticPaths M.staticRoutes (Template.render . cssShim) run
+    Ema.runEma (toList . view M.modelStaticFiles) M.staticRoutes (Template.render . cssShim) run
   where
     cssShim =
       Tailwind.twindShim
@@ -41,5 +42,5 @@ run model = do
           & M.modelDataDefault .~ defaultData
   -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
   -- Otherwise configure ghcid to reload when this directory is changed.
-  FileSystem.mountOnLVar "." Source.filePatterns model model0 $ \sources action -> do
+  FileSystem.mountOnLVar "." Source.filePatterns Source.ignorePatterns model model0 $ \sources action -> do
     Source.transformActions sources action

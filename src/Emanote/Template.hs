@@ -130,9 +130,4 @@ resolveUrl model url =
             pure $ Ema.routeUrl $ head targets
   where
     isStaticAssetUrl s =
-      -- any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) (Ema.staticAssets $ Proxy @MarkdownRoute)
-      -- FIXME: refactor and deal with static files correctly. put 'em all in model for safety.
-      any (\asset -> ("/" <> toText asset) `T.isPrefixOf` s) topLevelStaticPaths
-
-topLevelStaticPaths :: [FilePath]
-topLevelStaticPaths = ["favicon.jpeg", "favicon.svg", "static"]
+      any (\asset -> toText asset `T.isPrefixOf` s) $ model ^. M.modelStaticFiles
