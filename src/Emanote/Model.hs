@@ -40,6 +40,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelData :: IxSData,
     _modelDataDefault :: Aeson.Value,
+    _modelStaticFiles :: Set FilePath,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -47,7 +48,7 @@ data Model = Model
 makeLenses ''Model
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty Ix.empty Aeson.Null mempty def
+  def = Model Ix.empty Ix.empty Ix.empty Aeson.Null mempty mempty def
 
 modelInsertMarkdown :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsertMarkdown k v =
@@ -95,6 +96,13 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-staticRoutes :: Model -> [MarkdownRoute]
-staticRoutes (fmap (^. noteRoute) . Ix.toList . (^. modelNotes) -> mdRoutes) =
-  mdRoutes
+modelLookupStaticFile :: FilePath -> Model -> Maybe FilePath
+modelLookupStaticFile fp model = do
+  guard $ Set.member fp $ model ^. modelStaticFiles
+  pure fp
+
+allRoutes :: Model -> [Either FilePath MarkdownRoute]
+allRoutes model =
+  let mdRoutes = (fmap (^. noteRoute) . Ix.toList . (^. modelNotes)) model
+      staticFiles = Set.toList $ model ^. modelStaticFiles
+   in fmap Right mdRoutes <> fmap Left staticFiles

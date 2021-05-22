@@ -7,7 +7,7 @@ import Control.Lens.Operators ((.~))
 import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
 import Data.LVar (LVar)
-import Ema (Ema)
+import Ema (Ema (..))
 import qualified Ema
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Tailwind as Tailwind
@@ -20,19 +20,18 @@ import qualified Emanote.Template as Template
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
-topLevelStaticPaths :: [FilePath]
-topLevelStaticPaths = ["favicon.jpeg", "favicon.svg", "static"]
-
-instance Ema Model MarkdownRoute where
-  encodeRoute = R.encodeRoute
-  decodeRoute = R.decodeRouteExcept $ one . fromString <$> topLevelStaticPaths
-  staticRoutes = M.staticRoutes
-  staticAssets _ = topLevelStaticPaths
+instance Ema Model (Either FilePath MarkdownRoute) where
+  encodeRoute =
+    either id R.encodeRoute
+  decodeRoute model fp =
+    fmap Left (M.modelLookupStaticFile fp model)
+      <|> fmap Right (R.decodeRoute fp)
+  allRoutes = M.allRoutes
 
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma (\a -> Template.render $ cssShim a) run
+    Ema.runEma (Template.render . cssShim) run
   where
     cssShim =
       Tailwind.twindShim
@@ -47,5 +46,5 @@ run model = do
           & M.modelDataDefault .~ defaultData
   -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
   -- Otherwise configure ghcid to reload when this directory is changed.
-  FileSystem.mountOnLVar "." Source.filePatterns model model0 $ \sources action -> do
+  FileSystem.mountOnLVar "." Source.filePatterns Source.ignorePatterns model model0 $ \sources action -> do
     Source.transformActions sources action

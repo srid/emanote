@@ -76,20 +76,21 @@ routeInits (Route (slug :| rest')) =
             Just ys ->
               this : go (unRoute this) ys
 
--- | Convert a route to URL slugs
-encodeRoute :: Route ext -> [Slug]
-encodeRoute = \case
-  Route ("index" :| []) -> mempty
-  Route paths -> toList paths
+-- | Convert a route to html filepath
+encodeRoute :: Route Md -> FilePath
+encodeRoute (Route slugs) =
+  (<> ".html") $ case nonEmpty (Ema.unSlug <$> toList slugs) of
+    Nothing -> "index.html"
+    Just parts ->
+      toString $ T.intercalate "/" (toList parts)
 
--- | Parse our route from URL slugs
---
--- For eg., /foo/bar maps to slugs ["foo", "bar"], which in our app gets
--- parsed as representing the route to /foo/bar.md.
-decodeRouteExcept :: [[Slug]] -> [Slug] -> Maybe (Route ext)
-decodeRouteExcept exceptions = \case
-  (nonEmpty -> Nothing) ->
-    pure $ Route $ one "index"
-  (nonEmpty -> Just slugs) -> do
-    guard $ not $ any (`isPrefixOf` toList slugs) exceptions
-    pure $ Route slugs
+-- | Parse our route from html file path
+-- See FIXME: in Ema.Route's Either instance for FileRoute.
+decodeRoute :: FilePath -> Maybe (Route Md)
+decodeRoute fp = do
+  if null fp
+    then pure $ Route $ one "index"
+    else do
+      let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
+      parts <- nonEmpty $ T.splitOn "/" base
+      pure $ Route $ fmap Ema.decodeSlug parts
