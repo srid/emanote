@@ -124,8 +124,11 @@ transformAction src fps action =
           -- Revert to default templates (the user has deleted theirs)
           (M.modelHeistTemplate .~) <$> defaultTemplateState
     SourceStatic -> do
+      let setAction = case action of
+            FileSystem.Update -> Set.union
+            FileSystem.Delete -> flip Set.difference
       print fps
-      pure $ M.modelStaticFiles %~ Set.union (Set.fromList fps)
+      pure $ M.modelStaticFiles %~ setAction (Set.fromList fps)
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
