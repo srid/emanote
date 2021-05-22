@@ -7,16 +7,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1621701624,
-        "narHash": "sha256-mVclBM/sW2wPCqf3x3Gyjw9uMxd93Twi0Obwmo8jzeM=",
+        "lastModified": 1621703964,
+        "narHash": "sha256-UR1c0YtvpjtZqk/IeBGdu5DCbatchBHzUVJg9LnVKX0=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "0570f3ac99a63659eed6f12c95f34bf4118e341f",
+        "rev": "141ed1022a5da27b44735bda3fb583ca595bc77a",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "polymorphic-routes",
+        "ref": "master",
         "repo": "ema",
         "type": "github"
       }
