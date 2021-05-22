@@ -76,16 +76,20 @@ routeInits (Route (slug :| rest')) =
             Just ys ->
               this : go (unRoute this) ys
 
--- | Convert a route to URL slugs
-encodeRoute :: Route ext -> [Slug]
-encodeRoute = \case
-  Route ("index" :| []) -> mempty
-  Route paths -> toList paths
+-- | Convert a route to html filepath
+encodeFileRoute :: Route Md -> FilePath
+encodeFileRoute (Route slugs) =
+  (<> ".html") $ case nonEmpty (Ema.unSlug <$> toList slugs) of
+    Nothing -> "index.html"
+    Just parts ->
+      toString $ T.intercalate "/" (toList parts)
 
--- | Parse our route from URL slugs
-decodeRoute :: [Slug] -> Maybe (Route ext)
-decodeRoute = \case
-  (nonEmpty -> Nothing) ->
-    pure $ Route $ one "index"
-  (nonEmpty -> Just slugs) ->
-    pure $ Route slugs
+-- | Parse our route from html file path
+decodeFileRoute :: FilePath -> Maybe (Route Md)
+decodeFileRoute fp = do
+  base <- T.stripSuffix ".html" (toText fp)
+  case nonEmpty (T.splitOn "/" base) of
+    Nothing ->
+      pure $ Route $ one "index"
+    Just parts ->
+      pure $ Route $ fmap Ema.decodeSlug parts
