@@ -41,6 +41,7 @@ executable emanote
     , directory
     , ema                  >=0.2
     , filepath
+    , filepattern
     , heist                >=1.1.0.1
     , ixset-typed
     , lens
