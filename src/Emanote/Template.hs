@@ -34,8 +34,8 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: FileRoute MarkdownRoute => H.Html -> Model -> MarkdownRoute -> LByteString
-render tailwindShim model r = do
+render :: FileRoute MarkdownRoute => H.Html -> Model -> Either FilePath MarkdownRoute -> Either FilePath LByteString
+render tailwindShim model = fmap $ \r -> do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
       rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta

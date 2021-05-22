@@ -27,7 +27,7 @@ instance Ema.FileRoute MarkdownRoute where
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma (toList . view M.modelStaticFiles) M.staticRoutes (Template.render . cssShim) run
+    Ema.runEma M.staticRoutes (Template.render . cssShim) run
   where
     cssShim =
       Tailwind.twindShim
