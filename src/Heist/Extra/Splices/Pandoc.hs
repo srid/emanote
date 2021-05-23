@@ -59,6 +59,7 @@ blockLookupAttr node = \case
 
 inlineLookupAttr :: XmlHtml.Node -> B.Inline -> B.Attr
 inlineLookupAttr node = \case
+  B.Code {} -> childTagAttr node "Code"
   B.Note _ ->
     childTagAttr node "Note"
   B.Link _ _ (url, _) ->
@@ -179,7 +180,7 @@ rpInline ctx@RenderCtx {..} i = case i of
   B.Quoted qt is ->
     flip inQuotes qt $ mapM_ (rpInline ctx) is
   B.Code attr s ->
-    H.code ! rpAttr attr $ H.toHtml s
+    H.code ! rpAttr (addAttr attr $ iAttr i) $ H.toHtml s
   B.Space -> " "
   B.SoftBreak -> " "
   B.LineBreak -> H.br

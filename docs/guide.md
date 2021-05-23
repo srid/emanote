@@ -16,6 +16,7 @@ Remember to document these
 
 Mega features,
 
+- [data cascade](https://www.11ty.dev/docs/data-cascade/)
 - Powerful and simpler query system (cf. Obsidian search)
   - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
 - Pandoc filters (`Pandoc -> IO Pandoc`)
