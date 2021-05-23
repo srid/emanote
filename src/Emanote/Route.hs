@@ -26,7 +26,7 @@ import qualified Text.Show (Show (show))
 newtype Route (ext :: FileType) = Route {unRoute :: NonEmpty Slug}
   deriving (Eq, Ord, Data, Generic, ToJSON)
 
-type MarkdownRoute = Route 'Md
+type MarkdownRoute = Route ('LMLType 'Md)
 
 instance HasExt ext => Show (Route ext) where
   show (Route slugs) =
@@ -82,7 +82,7 @@ routeInits (Route (slug :| rest')) =
               this : go (unRoute this) ys
 
 -- | Convert a route to html filepath
-encodeRoute :: Route 'Md -> FilePath
+encodeRoute :: Route ('LMLType 'Md) -> FilePath
 encodeRoute (Route slugs) =
   (<> ".html") $ case nonEmpty (Ema.unSlug <$> toList slugs) of
     Nothing -> "index.html"
@@ -91,7 +91,7 @@ encodeRoute (Route slugs) =
 
 -- | Parse our route from html file path
 -- See FIXME: in Ema.Route's Either instance for FileRoute.
-decodeRoute :: FilePath -> Maybe (Route 'Md)
+decodeRoute :: FilePath -> Maybe (Route ('LMLType 'Md))
 decodeRoute fp = do
   if null fp
     then pure $ Route $ one "index"

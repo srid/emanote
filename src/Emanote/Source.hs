@@ -35,21 +35,10 @@ logD = logDebugNS "emanote"
 logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
 
--- | A lightweight markup language
---
--- https://en.wikipedia.org/wiki/Lightweight_markup_language
-data LML
-  = LMLMarkdown
-  deriving (Eq, Ord, Show)
-
-lmlPattern :: LML -> FilePath
-lmlPattern = \case
-  LMLMarkdown -> "**/*.md"
-
 -- | Represents the different kinds of file the application will handle.
 data Source
   = -- | Markdown file
-    SourceLML LML
+    SourceLML Ext.LML
   | -- | YAML data file
     SourceData
   | -- | Heist template file
@@ -60,7 +49,7 @@ data Source
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
-  SourceLML lml -> lmlPattern lml
+  SourceLML Ext.Md -> "**/*" <> Ext.getExt @('Ext.LMLType 'Ext.Md)
   SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
   SourceStatic -> "**"
@@ -68,7 +57,7 @@ sourcePattern = \case
 filePatterns :: [(Source, FilePattern)]
 filePatterns =
   (id &&& sourcePattern)
-    <$> [ SourceLML LMLMarkdown,
+    <$> [ SourceLML Ext.Md,
           SourceData,
           SourceTemplate "templates",
           SourceStatic
@@ -103,18 +92,19 @@ transformActions sources action =
 transformAction :: (MonadIO m, MonadLogger m) => Source -> [FilePath] -> FileSystem.FileAction -> m (Model -> Model)
 transformAction src fps action =
   case src of
-    SourceLML LMLMarkdown -> case action of
+    SourceLML Ext.Md -> case action of
       FileSystem.Update ->
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Md fp
+            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
+            -- TODO: Log in batches, to avoid slowing things down when using large notebooks
             logD $ "Reading note " <> toText fp
             !s <- readFileText fp
             (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
             pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
       FileSystem.Delete ->
         chainM fps $ \fp ->
-          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @'Ext.Md fp)
+          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp)
     SourceData -> case action of
       FileSystem.Update -> do
         chainM fps $ \fp ->
@@ -139,7 +129,6 @@ transformAction src fps action =
       let setAction = case action of
             FileSystem.Update -> Set.union
             FileSystem.Delete -> flip Set.difference
-      print fps
       pure $ M.modelStaticFiles %~ setAction (Set.fromList fps)
   where
     parseMarkdown =
