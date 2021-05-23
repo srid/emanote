@@ -17,7 +17,7 @@ import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (Md)
+import Emanote.Route.Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
@@ -63,5 +63,5 @@ extractRels note =
 parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget MarkdownRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Right (R.mkRouteFromFilePath @Md $ toString url)
+  fmap Right (R.mkRouteFromFilePath @'Md $ toString url)
     <|> fmap Left (WL.mkWikiLinkTargetFromUrl url)

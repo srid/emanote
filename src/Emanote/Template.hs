@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Template (render) where
@@ -129,7 +130,7 @@ resolveUrl model url =
         case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
           Nothing -> do
             -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            let fakeRouteUnder404 = Right @FilePath $ R.Route @Ext.Md $ one "404" <> WL.unWikiLinkText wl
+            let fakeRouteUnder404 = Right @FilePath $ R.Route @'Ext.Md $ one "404" <> WL.unWikiLinkText wl
             pure $ Ema.routeUrl fakeRouteUnder404
           Just targets ->
             -- TODO: Deal with ambiguous targets here
