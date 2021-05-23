@@ -63,5 +63,5 @@ extractRels note =
 parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget MarkdownRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Right (R.mkRouteFromFilePath @'Md $ toString url)
+  fmap Right (R.mkRouteFromFilePath @('LMLType 'Md) $ toString url)
     <|> fmap Left (WL.mkWikiLinkTargetFromUrl url)
