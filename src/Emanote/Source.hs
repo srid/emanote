@@ -34,10 +34,21 @@ logD = logDebugNS "emanote"
 logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
 
+-- | A lightweight markup language
+--
+-- https://en.wikipedia.org/wiki/Lightweight_markup_language
+data LML
+  = LMLMarkdown
+  deriving (Eq, Ord, Show)
+
+lmlPattern :: LML -> FilePath
+lmlPattern = \case
+  LMLMarkdown -> "**/*.md"
+
 -- | Represents the different kinds of file the application will handle.
 data Source
   = -- | Markdown file
-    SourceMarkdown
+    SourceLML LML
   | -- | YAML data file
     SourceData
   | -- | Heist template file
@@ -48,7 +59,7 @@ data Source
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
-  SourceMarkdown -> "**/*.md"
+  SourceLML lml -> lmlPattern lml
   SourceData -> "**/*.yaml"
   SourceTemplate dir -> dir </> "**/*.tpl"
   SourceStatic -> "**"
@@ -56,7 +67,7 @@ sourcePattern = \case
 filePatterns :: [(Source, FilePattern)]
 filePatterns =
   (id &&& sourcePattern)
-    <$> [ SourceMarkdown,
+    <$> [ SourceLML LMLMarkdown,
           SourceData,
           SourceTemplate "templates",
           SourceStatic
@@ -91,7 +102,7 @@ transformActions sources action =
 transformAction :: (MonadIO m, MonadLogger m) => Source -> [FilePath] -> FileSystem.FileAction -> m (Model -> Model)
 transformAction src fps action =
   case src of
-    SourceMarkdown -> case action of
+    SourceLML LMLMarkdown -> case action of
       FileSystem.Update ->
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do

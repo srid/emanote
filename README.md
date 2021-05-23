@@ -58,6 +58,8 @@ Before tests (tasks impacting the larger architectural context in code base),
     - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [ ] Queries and results embed
+- [ ] Generation of pages with no associated Markdown
+  - eg: Pagination ala https://web.dev/authors/ | https://web.dev/how-we-build-webdev-and-use-web-components/#collections
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
