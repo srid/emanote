@@ -7,9 +7,9 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
-import Ema (Ema)
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
+import Emanote.Class ()
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
@@ -34,13 +34,13 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
+render :: H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
 render x m =
   either
     Ema.AssetStatic
     (Ema.AssetGenerated Ema.Html . renderHtml x m)
 
-renderHtml :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> MarkdownRoute -> LByteString
+renderHtml :: H.Html -> Model -> MarkdownRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
@@ -118,7 +118,7 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Ema Model (Either FilePath MarkdownRoute) => Model -> Text -> Text
+resolveUrl :: Model -> Text -> Text
 resolveUrl model url =
   fromMaybe url $ do
     guard $ not $ isStaticAssetUrl url
