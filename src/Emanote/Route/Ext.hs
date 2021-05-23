@@ -10,7 +10,7 @@ module Emanote.Route.Ext where
 import Data.Aeson (ToJSON)
 import Data.Data (Data)
 
-data FileType = LMLType LML | Yaml
+data FileType = LMLType LML | Yaml | Html
   deriving (Generic, Eq, Show, Ord, Data, ToJSON)
 
 -- | A lightweight markup language
@@ -27,3 +27,6 @@ instance HasExt ('LMLType 'Md) where
 
 instance HasExt 'Yaml where
   getExt = ".yaml"
+
+instance HasExt 'Html where
+  getExt = ".html"
