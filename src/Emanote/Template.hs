@@ -35,12 +35,10 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> Either FilePath MarkdownRoute -> Ema.Asset LByteString
-render tailwindShim model = \case
-  Left staticPath ->
-    -- TODO: Should consult model?
-    Ema.AssetStatic staticPath
-  Right r ->
-    Ema.AssetGenerated Ema.Html $ renderHtml tailwindShim model r
+render x m =
+  either
+    Ema.AssetStatic
+    (Ema.AssetGenerated Ema.Html . renderHtml x m)
 
 renderHtml :: Ema Model (Either FilePath MarkdownRoute) => H.Html -> Model -> MarkdownRoute -> LByteString
 renderHtml tailwindShim model r = do

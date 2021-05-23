@@ -4,6 +4,8 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
+**Project Status**: Alpha status, but usable for generating documentation sites (see examples below). HTML templates are yet to be finalized. More features are being worked on (see tasks below).
+
 ## Installing and using
 
 ```bash
@@ -41,24 +43,32 @@ All but the final step need to be done only once.
 ### Current
 
 Before tests (tasks impacting the larger architectural context in code base),
+
 - [x] Interlude(architecture): a layer between ema and emanote
   - source -> target file transformation with routing
   - examples
     - source: .md, .org, static files, ..
     - output: .rss/.xml
-- [ ] Embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
-  - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
-    - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
-  - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
+- [ ] WikiLink: allow linking to non-HTML files.
+  - Refactor `Route` to accomodate them all, and ditch `Either FilePath`
+- Embedding / Filtering / Transforming / etc
+  - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+    - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
+      - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
+    - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
+    - Also consider non-Obsidian formats, `![[program.hs:2-13]]
+  - [ ] Queries and results embed
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
-- [ ] Queries and results embed
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
 
 To triage,
+
+- [ ] apply prismJS on live server refresh?
+  - Hack on `<script class="ema-rerun">`?
 - [ ] `emanote gen` should generate $dir.html even if $dir.md doesn't exist.
 - [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
 - [ ] BUG: raw HTML doesn't work (eg: <video> element)

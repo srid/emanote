@@ -7,6 +7,7 @@
   <!-- FIXME: See the TODO in Pandoc.hs -->
   <Note class="inline-block float-right clear-right w-2/5 text-left bg-red-100" />
   <CodeBlock class="py-0.5 text-sm" />
+  <Code class="py-0.5 bg-gray-100 text-sm" />
   <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
   <BulletList class="ml-4 space-y-1 list-disc list-inside" />
   <BlockQuote

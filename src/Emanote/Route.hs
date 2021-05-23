@@ -29,7 +29,11 @@ type MarkdownRoute = Route Md
 
 instance Ext ext => Show (Route ext) where
   show (Route slugs) =
-    toString $ "R[" <> toText (getExt (Proxy @ext)) <> "]:" <> T.intercalate "/" (toList $ fmap Ema.unSlug slugs)
+    toString $
+      "R["
+        <> toText (getExt (Proxy @ext))
+        <> "]:"
+        <> T.intercalate "/" (toList $ fmap Ema.unSlug slugs)
 
 -- | Represents the top-level index.md
 indexRoute :: Route ext
