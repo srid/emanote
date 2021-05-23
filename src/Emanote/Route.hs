@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -11,7 +12,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route.Ext (Ext (..), Md)
+import Emanote.Route.Ext
 import System.FilePath (splitExtension, splitPath)
 import qualified Text.Show (Show (show))
 
@@ -22,16 +23,16 @@ import qualified Text.Show (Show (show))
 --
 -- If you are using this repo as a template, you might want to use an ADT as
 -- route (eg: data Route = Index | About)
-newtype Route ext = Route {unRoute :: NonEmpty Slug}
+newtype Route (ext :: FileType) = Route {unRoute :: NonEmpty Slug}
   deriving (Eq, Ord, Data, Generic, ToJSON)
 
-type MarkdownRoute = Route Md
+type MarkdownRoute = Route 'Md
 
-instance Ext ext => Show (Route ext) where
+instance HasExt ext => Show (Route ext) where
   show (Route slugs) =
     toString $
       "R["
-        <> toText (getExt (Proxy @ext))
+        <> toText (getExt @ext)
         <> "]:"
         <> T.intercalate "/" (toList $ fmap Ema.unSlug slugs)
 
@@ -42,17 +43,17 @@ indexRoute = Route $ "index" :| []
 -- | Convert foo/bar.md to a @Route@
 --
 -- If the file is not a Markdown file, return Nothing.
-mkRouteFromFilePath :: forall ext. Ext ext => FilePath -> Maybe (Route ext)
+mkRouteFromFilePath :: forall ext. HasExt ext => FilePath -> Maybe (Route ext)
 mkRouteFromFilePath fp = do
   let (base, ext) = splitExtension fp
-  guard $ ext == getExt (Proxy @ext)
+  guard $ ext == getExt @ext
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
    in Route <$> nonEmpty slugs
 
-routeSourcePath :: forall ext. Ext ext => Route ext -> FilePath
+routeSourcePath :: forall ext. HasExt ext => Route ext -> FilePath
 routeSourcePath r =
   if r == indexRoute
-    then "index" <> getExt (Proxy @ext)
+    then "index" <> getExt @ext
     else toString (T.intercalate "/" $ fmap Ema.unSlug $ toList $ unRoute r) <> ".md"
 
 -- | Filename of the markdown file without extension
@@ -81,7 +82,7 @@ routeInits (Route (slug :| rest')) =
               this : go (unRoute this) ys
 
 -- | Convert a route to html filepath
-encodeRoute :: Route Md -> FilePath
+encodeRoute :: Route 'Md -> FilePath
 encodeRoute (Route slugs) =
   (<> ".html") $ case nonEmpty (Ema.unSlug <$> toList slugs) of
     Nothing -> "index.html"
@@ -90,7 +91,7 @@ encodeRoute (Route slugs) =
 
 -- | Parse our route from html file path
 -- See FIXME: in Ema.Route's Either instance for FileRoute.
-decodeRoute :: FilePath -> Maybe (Route Md)
+decodeRoute :: FilePath -> Maybe (Route 'Md)
 decodeRoute fp = do
   if null fp
     then pure $ Route $ one "index"

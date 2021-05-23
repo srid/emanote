@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
@@ -12,7 +13,7 @@ import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
 import Emanote.Route (Route (unRoute))
-import Emanote.Route.Ext (Md)
+import Emanote.Route.Ext
 
 -- | Represents the "Foo" in [[Foo]]
 --
@@ -30,6 +31,6 @@ mkWikiLinkTargetFromUrl s = do
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinkTargets :: Route Md -> Set WikiLinkTarget
+allowedWikiLinkTargets :: Route 'Md -> Set WikiLinkTarget
 allowedWikiLinkTargets =
   Set.fromList . mapMaybe (fmap WikiLinkTarget . nonEmpty) . toList . NE.tails . unRoute

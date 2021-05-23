@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -106,26 +107,26 @@ transformAction src fps action =
       FileSystem.Update ->
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Md fp
+            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Md fp
             logD $ "Reading note " <> toText fp
             !s <- readFileText fp
             (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
             pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
       FileSystem.Delete ->
         chainM fps $ \fp ->
-          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @Ext.Md fp)
+          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @'Ext.Md fp)
     SourceData -> case action of
       FileSystem.Update -> do
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
+            r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
             logD $ "Reading data " <> toText fp
             !s <- readFileBS fp
             sdata <- parseSData s
             pure $ M.modelInsertData r sdata
       FileSystem.Delete ->
         chainM fps $ \fp ->
-          pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
+          pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
     SourceTemplate dir -> do
       liftIO (doesDirectoryExist dir) >>= \case
         True -> do
