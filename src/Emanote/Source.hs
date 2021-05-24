@@ -50,9 +50,9 @@ data Source
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceLML Ext.Md ->
-    Ext.addExt @('Ext.LMLType 'Ext.Md) $ "**/*"
+    Ext.withExt @('Ext.LMLType 'Ext.Md) $ "**/*"
   SourceData ->
-    Ext.addExt @'Ext.Yaml $ "**/*"
+    Ext.withExt @'Ext.Yaml $ "**/*"
   SourceTemplate dir -> dir </> "**/*.tpl"
   SourceStatic -> "**"
 

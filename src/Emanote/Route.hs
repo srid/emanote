@@ -13,7 +13,7 @@ import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
 import Emanote.Route.Ext
-import System.FilePath (splitExtension, splitPath)
+import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 
 -- | Represents the relative path to a source (.md) file under some directory.
@@ -45,13 +45,13 @@ indexRoute = Route $ "index" :| []
 -- If the file is not a Markdown file, return Nothing.
 mkRouteFromFilePath :: forall ext. HasExt ext => FilePath -> Maybe (Route ext)
 mkRouteFromFilePath fp = do
-  base <- removeExt @ext fp
+  base <- withoutKnownExt @ext fp
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   Route <$> nonEmpty slugs
 
 routeSourcePath :: forall ext. HasExt ext => Route ext -> FilePath
 routeSourcePath r =
-  addExt @ext $ toString (T.intercalate "/" $ fmap Ema.unSlug $ toList $ unRoute r)
+  withExt @ext $ toString (T.intercalate "/" $ fmap Ema.unSlug $ toList $ unRoute r)
 
 -- | Filename of the markdown file without extension
 routeFileBase :: Route ext -> Text
@@ -81,7 +81,7 @@ routeInits (Route (slug :| rest')) =
 -- | Convert a route to html filepath
 encodeRoute :: forall ft. HasExt ft => Route ft -> FilePath
 encodeRoute (Route slugs) =
-  addExt @ft $ case nonEmpty (Ema.unSlug <$> toList slugs) of
+  withExt @ft $ case nonEmpty (Ema.unSlug <$> toList slugs) of
     Nothing -> "index"
     Just parts ->
       toString $ T.intercalate "/" (toList parts)
