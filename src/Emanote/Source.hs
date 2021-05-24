@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -16,8 +17,8 @@ import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
-import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
+import Emanote.Route.Ext
 import qualified Emanote.Route.Ext as Ext
 import qualified Heist.Extra.TemplateState as T
 import qualified Paths_emanote
@@ -34,21 +35,10 @@ logD = logDebugNS "emanote"
 logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
 
--- | A lightweight markup language
---
--- https://en.wikipedia.org/wiki/Lightweight_markup_language
-data LML
-  = LMLMarkdown
-  deriving (Eq, Ord, Show)
-
-lmlPattern :: LML -> FilePath
-lmlPattern = \case
-  LMLMarkdown -> "**/*.md"
-
 -- | Represents the different kinds of file the application will handle.
 data Source
   = -- | Markdown file
-    SourceLML LML
+    SourceLML Ext.LML
   | -- | YAML data file
     SourceData
   | -- | Heist template file
@@ -59,15 +49,17 @@ data Source
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
-  SourceLML lml -> lmlPattern lml
-  SourceData -> "**/*.yaml"
+  SourceLML Ext.Md ->
+    Ext.withExt @('Ext.LMLType 'Ext.Md) $ "**/*"
+  SourceData ->
+    Ext.withExt @'Ext.Yaml $ "**/*"
   SourceTemplate dir -> dir </> "**/*.tpl"
   SourceStatic -> "**"
 
 filePatterns :: [(Source, FilePattern)]
 filePatterns =
   (id &&& sourcePattern)
-    <$> [ SourceLML LMLMarkdown,
+    <$> [ SourceLML Ext.Md,
           SourceData,
           SourceTemplate "templates",
           SourceStatic
@@ -102,30 +94,31 @@ transformActions sources action =
 transformAction :: (MonadIO m, MonadLogger m) => Source -> [FilePath] -> FileSystem.FileAction -> m (Model -> Model)
 transformAction src fps action =
   case src of
-    SourceLML LMLMarkdown -> case action of
+    SourceLML Ext.Md -> case action of
       FileSystem.Update ->
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Md fp
+            r :: R.Route ('LMLType 'Md) <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
+            -- TODO: Log in batches, to avoid slowing things down when using large notebooks
             logD $ "Reading note " <> toText fp
             !s <- readFileText fp
             (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fp s
             pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
       FileSystem.Delete ->
         chainM fps $ \fp ->
-          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @Ext.Md fp)
+          pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp)
     SourceData -> case action of
       FileSystem.Update -> do
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: R.Route Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @Ext.Yaml fp
+            r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
             logD $ "Reading data " <> toText fp
             !s <- readFileBS fp
             sdata <- parseSData s
             pure $ M.modelInsertData r sdata
       FileSystem.Delete ->
         chainM fps $ \fp ->
-          pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @Ext.Yaml fp)
+          pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
     SourceTemplate dir -> do
       liftIO (doesDirectoryExist dir) >>= \case
         True -> do
@@ -138,8 +131,7 @@ transformAction src fps action =
       let setAction = case action of
             FileSystem.Update -> Set.union
             FileSystem.Delete -> flip Set.difference
-      print fps
-      pure $ M.modelStaticFiles %~ setAction (Set.fromList fps)
+      pure $ M.modelStaticFiles %~ setAction (Set.fromList $ mapMaybe R.mkRouteFromFilePath fps)
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $

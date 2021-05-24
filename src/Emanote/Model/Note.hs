@@ -13,15 +13,16 @@ import qualified Data.Aeson as Aeson
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList)
 import qualified Emanote.PandocUtil as PandocUtil
-import Emanote.Route (MarkdownRoute)
+import Emanote.Route (Route)
 import qualified Emanote.Route as R
+import Emanote.Route.Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteRoute :: MarkdownRoute
+    _noteRoute :: Route ('LMLType 'Md)
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
@@ -31,16 +32,17 @@ newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLinkTarget}
 
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
-noteSelfRefs = fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute
+noteSelfRefs =
+  fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute
 
-type NoteIxs = '[MarkdownRoute, SelfRef]
+type NoteIxs = '[Route ('LMLType 'Md), SelfRef]
 
 type IxNote = IxSet NoteIxs Note
 
 instance Indexable NoteIxs Note where
   indices =
     ixList
-      (ixGen $ Proxy @MarkdownRoute)
+      (ixGen $ Proxy @(Route ('LMLType 'Md)))
       (ixFun noteSelfRefs)
 
 makeLenses ''Note

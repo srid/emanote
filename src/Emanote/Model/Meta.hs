@@ -18,13 +18,13 @@ import Emanote.Model.Note
   ( noteMeta,
   )
 import Emanote.Model.SData (sdataValue)
-import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
+import Emanote.Route.Ext
 import qualified Emanote.Route.Ext as Ext
 import Relude.Extra.Map (StaticMap (lookup))
 
 -- | Look up a specific key in the meta for a given route.
-lookupMeta :: FromJSON a => a -> NonEmpty Text -> MarkdownRoute -> Model -> a
+lookupMeta :: FromJSON a => a -> NonEmpty Text -> R.Route ('LMLType 'Md) -> Model -> a
 lookupMeta x k r =
   lookupMetaFrom x k . getEffectiveRouteMeta r
 
@@ -44,11 +44,11 @@ lookupMetaFrom x (k :| ks) meta =
 
 -- | Get the (final) metadata of a note at the given route, by merging it with
 -- the defaults specified in parent routes all the way upto index.yaml.
-getEffectiveRouteMeta :: MarkdownRoute -> Model -> Aeson.Value
+getEffectiveRouteMeta :: R.Route ('LMLType 'Md) -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model = do
   let appDefault = model ^. modelDataDefault
   fromMaybe appDefault $ do
-    let defaultFiles = R.routeInits @Ext.Yaml (coerce mr)
+    let defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
     let defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
           v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
           guard $ v /= Aeson.Null
