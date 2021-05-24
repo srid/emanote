@@ -17,8 +17,8 @@ import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
-import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
+import Emanote.Route.Ext
 import qualified Emanote.Route.Ext as Ext
 import qualified Heist.Extra.TemplateState as T
 import qualified Paths_emanote
@@ -98,7 +98,7 @@ transformAction src fps action =
       FileSystem.Update ->
         chainM fps $ \fp ->
           fmap (fromMaybe id) . runMaybeT $ do
-            r :: MarkdownRoute <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
+            r :: R.Route ('LMLType 'Md) <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
             -- TODO: Log in batches, to avoid slowing things down when using large notebooks
             logD $ "Reading note " <> toText fp
             !s <- readFileText fp

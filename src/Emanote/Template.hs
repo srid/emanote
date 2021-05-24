@@ -17,7 +17,7 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Rel as Rel
 import qualified Emanote.PandocUtil as PandocUtil
-import Emanote.Route (MarkdownRoute, Route)
+import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
@@ -46,7 +46,7 @@ render x m = \case
     mdRouteForHtmlRoute :: Route 'Html -> Route ('LMLType 'Md)
     mdRouteForHtmlRoute = coerce
 
-renderHtml :: H.Html -> Model -> MarkdownRoute -> LByteString
+renderHtml :: H.Html -> Model -> Route ('LMLType 'Md) -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
