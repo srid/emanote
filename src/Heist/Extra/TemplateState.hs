@@ -1,11 +1,14 @@
-{-# LANGUAGE TypeApplications #-}
-
 -- TODO: Eventually move `Heist.Extra` to Ema.Helper
 -- Consider first the full practical range of template patterns,
 -- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
+
 module Heist.Extra.TemplateState
   ( TemplateState,
+    newTemplateState,
     loadHeistTemplates,
+    addTemplateFile,
     renderHeistTemplate,
   )
 where
@@ -17,7 +20,9 @@ import Data.Default (Default (..))
 import qualified Data.Text as T
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
+import System.FilePath (splitExtension)
 import Text.Show (Show (..))
+import qualified Text.XmlHtml as XmlHtml
 
 newtype TemplateState = TemplateState {unTemplateState :: Either [String] (H.HeistState Identity)}
 
@@ -31,6 +36,30 @@ instance Show TemplateState where
     TemplateState (Right st) ->
       let names :: [Text] = sort $ H.templateNames st <&> T.intercalate "/" . reverse . fmap (decodeUtf8 @Text)
        in "Heist templates: " <> toString (T.intercalate ", " names)
+
+newTemplateState :: MonadIO m => m TemplateState
+newTemplateState = do
+  -- TODO: Use heist compiled templates
+  let heistCfg :: H.HeistConfig Identity =
+        H.emptyHeistConfig
+          & H.hcNamespace .~ ""
+  -- & H.hcTemplateLocations .~ [pure $ Left $ one "Uninitialized"]
+  liftIO $ TemplateState <$> H.initHeist heistCfg
+
+addTemplateFile :: HasCallStack => FilePath -> ByteString -> TemplateState -> TemplateState
+addTemplateFile fp s (TemplateState eSt) =
+  TemplateState $ do
+    st <- eSt
+    first one (XmlHtml.parseHTML fp s) >>= \case
+      XmlHtml.XmlDocument {} ->
+        Left $ one "Xml unsupported"
+      XmlHtml.HtmlDocument {..} -> do
+        Right $ HI.addTemplate tmplName docContent (Just fp) st
+  where
+    tmplName = fromMaybe (error "Not a .tpl file") $ do
+      let (base, ext) = splitExtension fp
+      guard $ ext == ".tpl"
+      pure $ encodeUtf8 base
 
 loadHeistTemplates :: MonadIO m => FilePath -> m TemplateState
 loadHeistTemplates templateDir = do
@@ -53,7 +82,7 @@ renderHeistTemplate name splices st =
     heist <-
       hoistEither . first (unlines . fmap toText) $ unTemplateState st
     (builder, _mimeType) <-
-      tryJust ("Unable to render template '" <> name <> "'") $
+      tryJust ("Unable to render template '" <> name <> "' -- " <> Prelude.show st) $
         runIdentity $ HI.renderTemplate (HI.bindSplices splices heist) (encodeUtf8 name)
     pure $ toLazyByteString builder
   where
