@@ -60,4 +60,6 @@ getEffectiveRouteMeta mr model = do
         guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
         pure $ mergeAeson finalDefault frontmatter
   where
-    mergeAeson = AesonMerge.lodashMerge
+
+mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
+mergeAeson = AesonMerge.lodashMerge

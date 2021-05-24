@@ -49,7 +49,7 @@ render x m = \case
 renderHtml :: H.Html -> Model -> Route ('LMLType 'Md) -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
-      templateName = Meta.lookupMetaFrom @Text "_default" ("template" :| ["name"]) meta
+      templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
       rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       siteTitle = Meta.lookupMetaFrom @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
