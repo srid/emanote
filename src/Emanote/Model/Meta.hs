@@ -19,7 +19,7 @@ import Emanote.Model.Note
   )
 import Emanote.Model.SData (sdataValue)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext
+import Emanote.Route.Ext (FileType (LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
 import Relude.Extra.Map (StaticMap (lookup))
 

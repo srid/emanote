@@ -38,9 +38,7 @@ instance HasExt ext => Show (Route ext) where
 indexRoute :: Route ext
 indexRoute = Route $ "index" :| []
 
--- | Convert foo/bar.md to a @Route@
---
--- If the file is not a Markdown file, return Nothing.
+-- | Convert foo/bar.<ext> to a @Route@
 mkRouteFromFilePath :: forall ext. HasExt ext => FilePath -> Maybe (Route ext)
 mkRouteFromFilePath fp = do
   base <- withoutKnownExt @ext fp

@@ -50,11 +50,16 @@ data Source
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
   SourceLML Ext.Md ->
-    Ext.withExt @('Ext.LMLType 'Ext.Md) $ "**/*"
+    Ext.withExt @('Ext.LMLType 'Ext.Md) $
+      "**/*"
   SourceData ->
-    Ext.withExt @'Ext.Yaml $ "**/*"
-  SourceTemplate dir -> dir </> "**/*.tpl"
-  SourceStatic -> "**"
+    Ext.withExt @'Ext.Yaml $
+      "**/*"
+  SourceTemplate dir ->
+    Ext.withExt @'Ext.HeistTpl $
+      dir </> "**/*"
+  SourceStatic ->
+    "**"
 
 filePatterns :: [(Source, FilePattern)]
 filePatterns =
@@ -67,7 +72,8 @@ filePatterns =
 
 ignorePatterns :: [FilePattern]
 ignorePatterns =
-  [ ".*/**"
+  [ -- Ignore all top-level dotfile directories (eg: .git, .vscode)
+    ".*/**"
   ]
 
 defaultTemplateState :: (MonadIO m, MonadLogger m) => m T.TemplateState
@@ -120,10 +126,13 @@ transformAction src fps action =
         chainM fps $ \fp ->
           pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
     SourceTemplate dir -> do
+      print fps
       liftIO (doesDirectoryExist dir) >>= \case
         True -> do
           log "Reloading user templates"
-          (M.modelHeistTemplate .~) <$> T.loadHeistTemplates dir
+          tplState <- T.loadHeistTemplates dir
+          log $ show tplState
+          pure $ M.modelHeistTemplate .~ tplState
         False -> do
           -- Revert to default templates (the user has deleted theirs)
           (M.modelHeistTemplate .~) <$> defaultTemplateState

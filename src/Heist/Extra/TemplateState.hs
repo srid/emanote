@@ -14,21 +14,32 @@ import Control.Lens.Operators ((.~))
 import Control.Monad.Except (runExcept)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
+import qualified Data.Text as T
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
+import Text.Show (Show (..))
 
 newtype TemplateState = TemplateState {unTemplateState :: Either [String] (H.HeistState Identity)}
 
 instance Default TemplateState where
   def = TemplateState $ Left $ one "Heist templates yet to be loaded"
 
+instance Show TemplateState where
+  show = \case
+    TemplateState (Left errs) ->
+      "Heist errors: \n" <> toString (unlines (toText <$> errs))
+    TemplateState (Right st) ->
+      let names :: [Text] = sort $ H.templateNames st <&> T.intercalate "/" . reverse . fmap (decodeUtf8 @Text)
+       in "Heist templates: " <> toString (T.intercalate ", " names)
+
 loadHeistTemplates :: MonadIO m => FilePath -> m TemplateState
 loadHeistTemplates templateDir = do
   -- TODO: Use heist compiled templates
-  let heistCfg :: H.HeistConfig Identity =
+  let eRepo = H.loadTemplates templateDir
+      heistCfg :: H.HeistConfig Identity =
         H.emptyHeistConfig
           & H.hcNamespace .~ ""
-          & H.hcTemplateLocations .~ [H.loadTemplates templateDir]
+          & H.hcTemplateLocations .~ [eRepo]
   liftIO $ TemplateState <$> H.initHeist heistCfg
 
 renderHeistTemplate ::
