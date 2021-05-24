@@ -26,8 +26,6 @@ import qualified Text.Show (Show (show))
 newtype Route (ext :: FileType) = Route {unRoute :: NonEmpty Slug}
   deriving (Eq, Ord, Data, Generic, ToJSON)
 
-type MarkdownRoute = Route ('LMLType 'Md)
-
 instance HasExt ext => Show (Route ext) where
   show (Route slugs) =
     toString $

@@ -15,17 +15,18 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import Emanote.Route (MarkdownRoute)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
+type TargetRoute = Either WL.WikiLinkTarget (R.Route ('LMLType 'Md))
+
 -- | A relation from one note to another.
 data Rel = Rel
-  { _relFrom :: MarkdownRoute,
-    _relTo :: Either WL.WikiLinkTarget R.MarkdownRoute,
+  { _relFrom :: R.Route ('LMLType 'Md),
+    _relTo :: TargetRoute,
     -- | The relation context of 'from' note linking to 'to' note.
     _relCtx :: NonEmpty [B.Block]
   }
@@ -37,15 +38,15 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[MarkdownRoute, Either WL.WikiLinkTarget R.MarkdownRoute]
+type RelIxs = '[R.Route ('LMLType 'Md), TargetRoute]
 
 type IxRel = IxSet RelIxs Rel
 
 instance Indexable RelIxs Rel where
   indices =
     ixList
-      (ixGen $ Proxy @MarkdownRoute)
-      (ixGen $ Proxy @(Either WL.WikiLinkTarget R.MarkdownRoute))
+      (ixGen $ Proxy @(R.Route ('LMLType 'Md)))
+      (ixGen $ Proxy @TargetRoute)
 
 makeLenses ''Rel
 
@@ -60,7 +61,7 @@ extractRels note =
         pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
-parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget MarkdownRoute)
+parseUrl :: Text -> Maybe TargetRoute
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap Right (R.mkRouteFromFilePath @('LMLType 'Md) $ toString url)

@@ -27,9 +27,9 @@ import Emanote.Model.Note
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
-import Emanote.Route (MarkdownRoute, Route)
+import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (OtherExt))
+import Emanote.Route.Ext (FileType (LMLType, OtherExt), LML (Md))
 import qualified Emanote.Route.Ext as Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
@@ -51,7 +51,7 @@ makeLenses ''Model
 instance Default Model where
   def = Model Ix.empty Ix.empty Ix.empty Aeson.Null mempty mempty def
 
-modelInsertMarkdown :: MarkdownRoute -> (Aeson.Value, Pandoc) -> Model -> Model
+modelInsertMarkdown :: Route ('LMLType 'Md) -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsertMarkdown k v =
   modelNotes %~ Ix.updateIx k note
     >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (Rel.extractRels note))
@@ -59,7 +59,7 @@ modelInsertMarkdown k v =
   where
     note = Note (snd v) (fst v) k
 
-modelDeleteMarkdown :: MarkdownRoute -> Model -> Model
+modelDeleteMarkdown :: Route ('LMLType 'Md) -> Model -> Model
 modelDeleteMarkdown k =
   modelNotes %~ Ix.deleteIx k
     >>> modelRels %~ Ix.deleteIx k
@@ -73,21 +73,21 @@ modelDeleteData :: R.Route 'Ext.Yaml -> Model -> Model
 modelDeleteData k =
   modelData %~ Ix.deleteIx k
 
-modelLookup :: MarkdownRoute -> Model -> Maybe Note
+modelLookup :: Route ('LMLType 'Md) -> Model -> Maybe Note
 modelLookup k =
   Ix.getOne . Ix.getEQ k . _modelNotes
 
-modelLookupTitle :: MarkdownRoute -> Model -> Text
+modelLookupTitle :: Route ('LMLType 'Md) -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeFileBase r) noteTitle . modelLookup r
 
-modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [MarkdownRoute]
+modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [Route ('LMLType 'Md)]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
   fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
-modelLookupBacklinks :: MarkdownRoute -> Model -> [(MarkdownRoute, NonEmpty [B.Block])]
+modelLookupBacklinks :: Route ('LMLType 'Md) -> Model -> [(Route ('LMLType 'Md), NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
