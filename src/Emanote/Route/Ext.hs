@@ -14,6 +14,7 @@ import qualified System.FilePath as FP
 data FileType
   = LMLType LML
   | Yaml
+  | HeistTpl
   | Html
   | -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
     -- "catch all" type to capture files using an arbitrary.
@@ -51,6 +52,11 @@ instance HasExt 'Html where
   fileType = Html
   withExt = flip FP.addExtension ".html"
   withoutKnownExt = fpWithoutExt ".html"
+
+instance HasExt 'HeistTpl where
+  fileType = HeistTpl
+  withExt = flip FP.addExtension ".tpl"
+  withoutKnownExt = fpWithoutExt ".tpl"
 
 -- | The AnyExt instance ignores explicitly dealing with extensions, expecting
 -- the user to explicitly encode the extension in their value tpye.
