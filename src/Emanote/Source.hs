@@ -12,7 +12,6 @@ import Control.Lens.Operators ((%~))
 import Control.Monad.Logger
 import qualified Data.Aeson as Aeson
 import qualified Data.Set as Set
-import qualified Data.Text as Text
 import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
@@ -78,27 +77,23 @@ ignorePatterns =
     ".*/**"
   ]
 
-defaultTemplateState :: (MonadIO m, MonadLogger m) => m T.TemplateState
-defaultTemplateState = do
-  st <- T.newTemplateState
+emanoteDefaultTemplates :: (MonadIO m, MonadLogger m) => m T.TemplateState
+emanoteDefaultTemplates = do
   defaultFiles <- liftIO Paths_emanote.getDataDir
-  let tmplDir = defaultFiles </> "templates"
-  log $ "Loading default templates from " <> toText tmplDir
+  log $ "Loading default templates from " <> toText defaultFiles
   liftIO $
     withCurrentDirectory defaultFiles $ do
       files <- FP.getDirectoryFiles "." ["**/*.tpl"]
-      filesWithContent <- forM files $ \fp -> (fp,) <$> readFileBS fp
-      pure $ addTemplateFiles filesWithContent st
+      populateTemplates <- chainM files $ \fp -> do
+        s <- readFileBS fp
+        pure $ T.addTemplateFile fp s
+      populateTemplates <$> T.newTemplateState
 
-addTemplateFiles :: [(FilePath, ByteString)] -> T.TemplateState -> T.TemplateState
-addTemplateFiles tpls ts = do
-  foldl' (\st (fp, s) -> T.addTemplateFile fp s st) ts tpls
-
-defaultData :: (MonadIO m, MonadLogger m) => m Aeson.Value
-defaultData = do
+emanoteDefaultIndexData :: (MonadIO m, MonadLogger m) => m Aeson.Value
+emanoteDefaultIndexData = do
   defaultFiles <- liftIO Paths_emanote.getDataDir
   let indexYaml = defaultFiles </> "index.yaml"
-  log $ "Loading index.yaml from " <> toText indexYaml
+  log $ "Loading default index.yaml from " <> toText indexYaml
   parseSData =<< readFileBS indexYaml
 
 -- | Like `transformAction` but operates on multiple source types at a time
@@ -137,12 +132,13 @@ transformAction src fps action =
         chainM fps $ \fp ->
           pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
     SourceTemplate -> do
-      -- TODO: Juse use chainM?
       print fps
-      tpls <- forM fps $ \fp -> (fp,) <$> readFileBS fp
       -- TODO: Handle *removing* of templates! ... however, don't remove *default* ones.
-      log $ "Reading " <> show (length tpls) <> " template: " <> Text.intercalate ", " (toText . fst <$> tpls)
-      pure $ M.modelHeistTemplate %~ addTemplateFiles tpls
+      fmap (M.modelHeistTemplate %~) $
+        chainM fps $ \fp -> do
+          logD $ "Reading template: " <> toText fp
+          s <- readFileBS fp
+          pure $ T.addTemplateFile fp s
     SourceStatic -> do
       let setAction = case action of
             FileSystem.Update -> Set.union

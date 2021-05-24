@@ -27,14 +27,19 @@ main =
       Tailwind.twindShim
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
-run model = do
-  defaultTmpl <- Source.defaultTemplateState
-  defaultData <- Source.defaultData
+run modelLvar = do
+  -- TODO: Monitor the default files; only if running in ghcid.
+  -- Otherwise configure ghcid to reload when this directory is changed.
+  defaultTmpl <- Source.emanoteDefaultTemplates
+  defaultData <- Source.emanoteDefaultIndexData
   let model0 =
         def
           & M.modelHeistTemplate .~ defaultTmpl
           & M.modelDataDefault .~ defaultData
-  -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
-  -- Otherwise configure ghcid to reload when this directory is changed.
-  FileSystem.mountOnLVar "." Source.filePatterns Source.ignorePatterns model model0 $ \sources action -> do
-    Source.transformActions sources action
+  FileSystem.mountOnLVar
+    "."
+    Source.filePatterns
+    Source.ignorePatterns
+    modelLvar
+    model0
+    Source.transformActions

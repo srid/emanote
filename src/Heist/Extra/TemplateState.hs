@@ -39,11 +39,9 @@ instance Show TemplateState where
 
 newTemplateState :: MonadIO m => m TemplateState
 newTemplateState = do
-  -- TODO: Use heist compiled templates
   let heistCfg :: H.HeistConfig Identity =
         H.emptyHeistConfig
           & H.hcNamespace .~ ""
-  -- & H.hcTemplateLocations .~ [pure $ Left $ one "Uninitialized"]
   liftIO $ TemplateState <$> H.initHeist heistCfg
 
 addTemplateFile :: HasCallStack => FilePath -> ByteString -> TemplateState -> TemplateState
