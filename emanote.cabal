@@ -42,6 +42,7 @@ executable emanote
     , ema                  >=0.2
     , filepath
     , filepattern
+    , fsnotify
     , heist                >=1.1.0.1
     , ixset-typed
     , lens
@@ -89,6 +90,7 @@ executable emanote
   autogen-modules:    Paths_emanote
   other-modules:
     Emanote.Class
+    Emanote.Logging
     Emanote.Model
     Emanote.Model.Meta
     Emanote.Model.Note
@@ -99,9 +101,8 @@ executable emanote
     Emanote.Route.Ext
     Emanote.Route.WikiLinkTarget
     Emanote.Source
-    Emanote.Source.Default
+    Emanote.Source.Mount
     Emanote.Source.Util
-    Emanote.Logging
     Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
