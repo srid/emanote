@@ -29,7 +29,7 @@ import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (LMLType, OtherExt), LML (Md))
+import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
@@ -41,7 +41,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelData :: IxSData,
     _modelDataDefault :: Aeson.Value,
-    _modelStaticFiles :: Set (Route 'OtherExt),
+    _modelStaticFiles :: Set (Route 'AnyExt),
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -97,7 +97,7 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'OtherExt)
+modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt)
 modelLookupStaticFile fp model = do
   r <- R.mkRouteFromFilePath fp
   guard $ Set.member r $ model ^. modelStaticFiles

@@ -15,9 +15,9 @@ data FileType
   = LMLType LML
   | Yaml
   | Html
-  | -- | `OtherExt` has no *known* (at compile time) extension. It is used as a
-    -- "catch all" type to capture files using *all other* (unknown) extensions.
-    OtherExt
+  | -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
+    -- "catch all" type to capture files using an arbitrary.
+    AnyExt
   deriving (Generic, Eq, Show, Ord, Data, ToJSON)
 
 -- | A lightweight markup language
@@ -26,6 +26,8 @@ data FileType
 data LML = Md
   deriving (Generic, Eq, Show, Ord, Data, ToJSON)
 
+-- | The `HasExt` class's responsibility is to allow dealing with basepath sans
+-- extension (and vice-versa).
 class HasExt (ext :: FileType) where
   fileType :: FileType
 
@@ -50,10 +52,10 @@ instance HasExt 'Html where
   withExt = flip FP.addExtension ".html"
   withoutKnownExt = fpWithoutExt ".html"
 
--- | The OtherExt instance ignores explicit dealing with extensions, expecting
--- the user to explicitly encode the extenion in their value tpye.
-instance HasExt 'OtherExt where
-  fileType = OtherExt
+-- | The AnyExt instance ignores explicitly dealing with extensions, expecting
+-- the user to explicitly encode the extension in their value tpye.
+instance HasExt 'AnyExt where
+  fileType = AnyExt
   withExt = id
   withoutKnownExt = pure
 
