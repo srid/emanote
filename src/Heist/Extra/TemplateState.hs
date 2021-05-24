@@ -50,6 +50,7 @@ addTemplateFile fp s (TemplateState eSt) =
     st <- eSt
     first one (XmlHtml.parseHTML fp s) >>= \case
       XmlHtml.XmlDocument {} ->
+        -- TODO: Need this for RSS feed generation.
         Left $ one "Xml unsupported"
       XmlHtml.HtmlDocument {..} -> do
         Right $ HI.addTemplate tmplName docContent (Just fp) st

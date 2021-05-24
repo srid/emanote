@@ -99,6 +99,9 @@ executable emanote
     Emanote.Route.Ext
     Emanote.Route.WikiLinkTarget
     Emanote.Source
+    Emanote.Source.Default
+    Emanote.Source.Util
+    Emanote.Logging
     Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
