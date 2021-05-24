@@ -12,22 +12,24 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (Html, LMLType))
+import Emanote.Route.Ext (FileType (Html, LMLType, OtherExt))
 
+-- | TODO: Use `OpenUnion` here?
 data EmanoteRoute
   = ERNoteHtml (Route 'Html)
-  | EROtherFile FilePath
+  | EROtherFile (Route 'OtherExt)
   deriving (Eq, Show, Ord)
 
 instance Ema Model EmanoteRoute where
   encodeRoute = \case
     ERNoteHtml r ->
       R.encodeRoute r
-    EROtherFile fp ->
-      fp
+    EROtherFile r ->
+      R.encodeRoute r
+
   decodeRoute model fp =
     fmap EROtherFile (M.modelLookupStaticFile fp model)
-      <|> fmap ERNoteHtml (R.decodeRoute fp)
+      <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
   allRoutes model =
     let htmlRoutes =
           model ^. M.modelNotes

@@ -49,8 +49,10 @@ data Source
 
 sourcePattern :: Source -> FilePath
 sourcePattern = \case
-  SourceLML Ext.Md -> "**/*" <> Ext.getExt @('Ext.LMLType 'Ext.Md)
-  SourceData -> "**/*.yaml"
+  SourceLML Ext.Md ->
+    Ext.addExt @('Ext.LMLType 'Ext.Md) $ "**/*"
+  SourceData ->
+    Ext.addExt @'Ext.Yaml $ "**/*"
   SourceTemplate dir -> dir </> "**/*.tpl"
   SourceStatic -> "**"
 
@@ -129,7 +131,7 @@ transformAction src fps action =
       let setAction = case action of
             FileSystem.Update -> Set.union
             FileSystem.Delete -> flip Set.difference
-      pure $ M.modelStaticFiles %~ setAction (Set.fromList fps)
+      pure $ M.modelStaticFiles %~ setAction (Set.fromList $ mapMaybe R.mkRouteFromFilePath fps)
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $

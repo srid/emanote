@@ -27,8 +27,9 @@ import Emanote.Model.Note
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
-import Emanote.Route (MarkdownRoute)
+import Emanote.Route (MarkdownRoute, Route)
 import qualified Emanote.Route as R
+import Emanote.Route.Ext (FileType (OtherExt))
 import qualified Emanote.Route.Ext as Ext
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
@@ -40,7 +41,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelData :: IxSData,
     _modelDataDefault :: Aeson.Value,
-    _modelStaticFiles :: Set FilePath,
+    _modelStaticFiles :: Set (Route 'OtherExt),
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -64,11 +65,11 @@ modelDeleteMarkdown k =
     >>> modelRels %~ Ix.deleteIx k
     >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
 
-modelInsertData :: R.Route Ext.Yaml -> Aeson.Value -> Model -> Model
+modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v =
   modelData %~ Ix.updateIx r (SData v r)
 
-modelDeleteData :: R.Route Ext.Yaml -> Model -> Model
+modelDeleteData :: R.Route 'Ext.Yaml -> Model -> Model
 modelDeleteData k =
   modelData %~ Ix.deleteIx k
 
@@ -96,13 +97,8 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe FilePath
+modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'OtherExt)
 modelLookupStaticFile fp model = do
-  guard $ Set.member fp $ model ^. modelStaticFiles
-  pure fp
-
-allRoutes :: Model -> [Either FilePath MarkdownRoute]
-allRoutes model =
-  let mdRoutes = (fmap (^. noteRoute) . Ix.toList . (^. modelNotes)) model
-      staticFiles = Set.toList $ model ^. modelStaticFiles
-   in fmap Right mdRoutes <> fmap Left staticFiles
+  r <- R.mkRouteFromFilePath fp
+  guard $ Set.member r $ model ^. modelStaticFiles
+  pure r
