@@ -9,32 +9,24 @@ module Emanote.Source where
 
 import Control.Exception (throw)
 import Control.Lens.Operators ((%~))
-import Control.Monad.Logger
+import Control.Monad.Logger (MonadLogger)
 import qualified Data.Aeson as Aeson
 import qualified Data.Set as Set
-import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Markdown as Markdown
+import Emanote.Logging
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Source.Util
+  ( BadInput (BadInput),
+    chainM,
+    parseSData,
+  )
 import qualified Heist.Extra.TemplateState as T
-import qualified Paths_emanote
-import System.Directory (withCurrentDirectory)
-import System.FilePath ((</>))
 import System.FilePattern (FilePattern)
-import qualified System.FilePattern.Directory as FP
-
-log :: MonadLogger m => Text -> m ()
-log = logInfoNS "emanote"
-
-logD :: MonadLogger m => Text -> m ()
-logD = logDebugNS "emanote"
-
-logE :: MonadLogger m => Text -> m ()
-logE = logErrorNS "emanote"
 
 -- | Represents the different kinds of file the application will handle.
 data Source
@@ -76,25 +68,6 @@ ignorePatterns =
   [ -- Ignore all top-level dotfile directories (eg: .git, .vscode)
     ".*/**"
   ]
-
-emanoteDefaultTemplates :: (MonadIO m, MonadLogger m) => m T.TemplateState
-emanoteDefaultTemplates = do
-  defaultFiles <- liftIO Paths_emanote.getDataDir
-  log $ "Loading default templates from " <> toText defaultFiles
-  liftIO $
-    withCurrentDirectory defaultFiles $ do
-      files <- FP.getDirectoryFiles "." ["**/*.tpl"]
-      populateTemplates <- chainM files $ \fp -> do
-        s <- readFileBS fp
-        pure $ T.addTemplateFile fp s
-      populateTemplates <$> T.newTemplateState
-
-emanoteDefaultIndexData :: (MonadIO m, MonadLogger m) => m Aeson.Value
-emanoteDefaultIndexData = do
-  defaultFiles <- liftIO Paths_emanote.getDataDir
-  let indexYaml = defaultFiles </> "index.yaml"
-  log $ "Loading default index.yaml from " <> toText indexYaml
-  parseSData =<< readFileBS indexYaml
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => [(Source, [FilePath])] -> FileSystem.FileAction -> m (Model -> Model)
@@ -148,22 +121,3 @@ transformAction src fps action =
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
-
-parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
-parseSData s =
-  either (throw . BadInput . show) pure $
-    Yaml.decodeEither' s
-
--- | Apply the list of actions in the given order to an initial argument.
---
--- chain [f1, f2, ...] x = ... (f2 (f1 x))
-chain :: [a -> a] -> a -> a
-chain = flip (foldl' $ flip ($))
-
--- | Monadic version of `chain`
-chainM :: Monad m => [b] -> (b -> m (a -> a)) -> m (a -> a)
-chainM xs =
-  fmap chain . forM xs
-
-newtype BadInput = BadInput Text
-  deriving (Show, Exception)

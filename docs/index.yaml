@@ -10,7 +10,7 @@ tags: []
 
 # TODO: How to design this when generating RSS feeds?
 template:
-  # Use file "${template.name}.tpl" to render HTML
+  # Use file "./${template.name}.tpl" to render HTML
   name: templates/_default
   theme: blue
   baseUrl: /
