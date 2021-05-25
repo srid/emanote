@@ -30,7 +30,9 @@ import System.FSNotify
 import System.FilePath (isRelative, makeRelative)
 import System.FilePattern (FilePattern, (?==))
 import System.FilePattern.Directory (getDirectoryFilesIgnore)
-import UnliftIO (MonadUnliftIO, toIO, withRunInIO)
+import UnliftIO (MonadUnliftIO, newTBQueueIO, newTChanIO, toIO, withRunInIO, writeTBQueue)
+import UnliftIO.Concurrent (forkIO)
+import UnliftIO.STM (TBQueue, TChan, readTBQueue)
 
 data UnionPolicy a m
   = UnionPolicyOverlay
@@ -165,13 +167,11 @@ unionMount sources pats ignore handleAction = do
               put =<< lift . changeInsert src tag fp (Update ()) =<< get
     lift $ handleAction changes0 (Update ())
     -- Run fsnotify on sources
-    ofs <- get
-    -- FIXME: Synchronize so that this is run serially (for state)
-    -- FIXME: State result is discarded!!!!!
-    lift . onChange (toList sources) $ \src fp act -> void . flip runStateT ofs $ do
+    q <- lift $ onChange (toList sources)
+    forever $ do
+      (src, fp, act) <- atomically $ readTBQueue q
       let shouldIgnore = any (?== fp) ignore
       whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
-        -- Update our overlay state with this change.
         changes <- fmap snd . flip runStateT Map.empty $ do
           put =<< lift . changeInsert src tag fp (Update ()) =<< get
         lift $ handleAction changes act
@@ -241,7 +241,9 @@ mountOnLVar' mFallbackFolder (stag, folder) pats ignore var var0 toAction' = do
     fs <- filesMatchingWithTag folder pats ignore
     fsF <- toAction (second (fmap withBase) <$> fs) $ Update ()
     pure $ fsF . fbFilesF $ var0
-  onChange (((),) <$> [folder]) $ \() fp change -> do
+  changes <- onChange (((),) <$> [folder])
+  forever $ do
+    ((), fp, change) <- atomically $ readTBQueue changes
     -- TODO: Should refactor the ignore part to be integral to pats, and be part
     -- of `getTag`
     let shouldIgnore = any (?== fp) ignore
@@ -325,25 +327,29 @@ onChange ::
   [(x, FilePath)] ->
   -- | The filepath is relative to the folder being monitored, unless if its
   -- ancestor is a symlink.
-  (x -> FilePath -> FileAction () -> m ()) ->
-  m ()
-onChange roots f = do
-  withManagerM $ \mgr -> do
-    stops <- forM roots $ \(x, rootRel) -> do
-      -- NOTE: It is important to use canonical path, because this will allow us to
-      -- transform fsnotify event's (absolute) path into one that is relative to
-      -- @parent'@ (as passed by user), which is what @f@ will expect.
-      root <- liftIO $ canonicalizePath rootRel
-      log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
-      watchTreeM mgr root (const True) $ \event -> do
-        log LevelDebug $ show event
-        let rel = makeRelative root
-        case event of
-          Added (rel -> fp) _ _ -> f x fp $ Update ()
-          Modified (rel -> fp) _ _ -> f x fp $ Update ()
-          Removed (rel -> fp) _ _ -> f x fp Delete
-          Unknown (rel -> fp) _ _ -> f x fp Delete
-    liftIO $ threadDelay maxBound `finally` forM_ stops id
+  m (TBQueue (x, FilePath, FileAction ()))
+onChange roots = do
+  changes :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
+  -- TODO: Use race_?
+  void . forkIO $
+    withManagerM $ \mgr -> do
+      stops <- forM roots $ \(x, rootRel) -> do
+        -- NOTE: It is important to use canonical path, because this will allow us to
+        -- transform fsnotify event's (absolute) path into one that is relative to
+        -- @parent'@ (as passed by user), which is what @f@ will expect.
+        root <- liftIO $ canonicalizePath rootRel
+        log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
+        watchTreeM mgr root (const True) $ \event -> do
+          log LevelDebug $ show event
+          let rel = makeRelative root
+              f a fp act = atomically $ writeTBQueue changes (a, fp, act)
+          case event of
+            Added (rel -> fp) _ _ -> f x fp $ Update ()
+            Modified (rel -> fp) _ _ -> f x fp $ Update ()
+            Removed (rel -> fp) _ _ -> f x fp Delete
+            Unknown (rel -> fp) _ _ -> f x fp Delete
+      liftIO $ threadDelay maxBound `finally` forM_ stops id
+  pure changes
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>
