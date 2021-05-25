@@ -1,4 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -30,34 +31,11 @@ import System.FSNotify
 import System.FilePath (isRelative, makeRelative)
 import System.FilePattern (FilePattern, (?==))
 import System.FilePattern.Directory (getDirectoryFilesIgnore)
-import UnliftIO (MonadUnliftIO, newTBQueueIO, newTChanIO, toIO, withRunInIO, writeTBQueue)
+import UnliftIO (MonadUnliftIO, newTBQueueIO, toIO, withRunInIO, writeTBQueue)
 import UnliftIO.Concurrent (forkIO)
-import UnliftIO.STM (TBQueue, TChan, readTBQueue)
+import UnliftIO.STM (TBQueue, readTBQueue)
 
-data UnionPolicy a m
-  = UnionPolicyOverlay
-  | UnionPolicyMergeWith (a -> a -> m a)
-
-class HasUnionPolicy tag a m where
-  getUnionPolicy :: tag -> UnionPolicy a m
-
--- | Union a non-empty list of elements into a single element, using the union
--- policy defined for the tag associated with the list.
-union :: forall tag m a. Monad m => HasUnionPolicy tag a m => tag -> NonEmpty a -> m a
-union =
-  applyUnionPolicy . getUnionPolicy
-  where
-    applyUnionPolicy :: Monad m => UnionPolicy a m -> NonEmpty a -> m a
-    applyUnionPolicy = \case
-      UnionPolicyOverlay ->
-        -- First element overlays the next (and rest)
-        pure . head
-      UnionPolicyMergeWith f ->
-        foldM1 f
-      where
-        foldM1 :: (Monad m) => (a -> a -> m a) -> NonEmpty a -> m a
-        foldM1 f (x :| xs) = foldM f x xs
-
+-- | Like `unionMount` but updates a `LVar` as well handles exceptions by logging them.
 unionMountOnLVar ::
   forall source tag model m.
   ( MonadIO m,
@@ -76,71 +54,10 @@ unionMountOnLVar ::
 unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
   LVar.set modelLVar model0
   unionMount sources pats ignore $ \fs act -> do
-    doAct <- handleAction fs act
+    doAct <-
+      interceptExceptions id $
+        handleAction fs act
     LVar.modify modelLVar doAct
-
--- TODO: Abstract in module with StateT / MonadState
-newtype OverlayFs source = OverlayFs
-  { unOverlayFs :: Map FilePath (Set source)
-  }
-
--- TODO: Replace this with a function taking `NonEmpty source`
-emptyOverlayFs :: Ord source => OverlayFs source
-emptyOverlayFs = OverlayFs mempty
-
-overlayFsModify :: FilePath -> (Set src -> Set src) -> OverlayFs src -> OverlayFs src
-overlayFsModify k f (OverlayFs m) =
-  OverlayFs $
-    Map.insert k (f $ fromMaybe Set.empty $ Map.lookup k m) m
-
-overlayFsAdd :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
-overlayFsAdd fp src =
-  overlayFsModify fp $ Set.insert src
-
-overlayFsRemove :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
-overlayFsRemove fp src =
-  overlayFsModify fp $ Set.delete src
-
-overlayFsLookup :: FilePath -> OverlayFs source -> Maybe (NonEmpty (source, FilePath))
-overlayFsLookup fp (OverlayFs m) = do
-  sources <- nonEmpty . toList =<< Map.lookup fp m
-  pure $ sources <&> \src -> (src, fp)
-
-overlayFsHasFile :: Ord src => src -> FilePath -> OverlayFs src -> Bool
-overlayFsHasFile src fp =
-  -- maybe False (Set.member fp) . Map.lookup src . unOverlayFs
-  undefined
-
--- Files matched by each tag pattern, each represented by their corresponding
--- file (absolute path) in the individual sources. It is up to the user to union
--- them (for now).
---
--- If a path is represented by Nothing, it means it just got removed from the
--- last source, and the app must remove it from its internal state.
-type Change source tag = Map tag (Map FilePath (FileAction (NonEmpty (source, FilePath))))
-
-changeInsert ::
-  (Ord source, Ord tag, MonadState (OverlayFs source) m) =>
-  source ->
-  tag ->
-  FilePath ->
-  FileAction () ->
-  Change source tag ->
-  m (Change source tag)
-changeInsert src tag fp act ch = do
-  fmap snd . flip runStateT ch $ do
-    -- First, register this change in the overlayFs
-    lift $
-      modify $
-        (if act == Delete then overlayFsRemove else overlayFsAdd)
-          fp
-          src
-    overlays <- fmap (maybe Delete Update) $ lift $ gets $ overlayFsLookup fp
-    gets (Map.lookup tag) >>= \case
-      Nothing ->
-        modify $ Map.insert tag $ Map.singleton fp overlays
-      Just files ->
-        modify $ Map.insert tag $ Map.insert fp overlays files
 
 unionMount ::
   forall source tag m.
@@ -176,103 +93,20 @@ unionMount sources pats ignore handleAction = do
           put =<< lift . changeInsert src tag fp (Update ()) =<< get
         lift $ handleAction changes act
 
--- | Mount the given directory on to the given LVar such that any filesystem
--- events (represented by `FileAction`) are made to be reflected in the LVar
--- model using the given model update function.
-mountOnLVar' ::
-  forall model m b s.
-  ( MonadIO m,
-    MonadUnliftIO m,
-    MonadLogger m,
-    Show b,
-    Ord b
-  ) =>
-  -- | The base directory of files to use as "fallback" if the corresponding path is missing (or gets removed) in the mounted directory.
-  --
-  -- NOTE: Auto reload is not supported on this directory (yet)
-  Maybe (s, FilePath) ->
-  -- | The directory to mount.
-  (s, FilePath) ->
-  -- | Only include these files (exclude everything else)
-  [(b, FilePattern)] ->
-  -- | Ignore these patterns
-  [FilePattern] ->
-  -- | The `LVar` onto which to mount.
-  --
-  -- NOTE: It must not be set already. Otherwise, the value will be overriden
-  -- with the initial value argument (next).
-  LVar model ->
-  -- | Initial value of model, onto which to apply updates.
-  model ->
-  -- | How to update the model given a file action.
-  --
-  -- `b` is the tag associated with the `FilePattern` that selected this
-  -- `FilePath`. `FileAction` is the operation performed on this path. This
-  -- should return a function (in monadic context) that will update the model,
-  -- to reflect the given `FileAction`.
-  --
-  -- The `FilePath` is relative to mounted directory, unless the fallback path
-  -- is returned (or a symlink is found), which would be absolute.
-  --
-  -- If the action throws an exception, it will be logged and ignored.
-  ([(b, [(s, (Maybe s, FilePath))])] -> FileAction () -> m (model -> model)) ->
-  m ()
-mountOnLVar' mFallbackFolder (stag, folder) pats ignore var var0 toAction' = do
-  log LevelInfo $ "Mounting path " <> toText folder <> " (filter: " <> show pats <> ") onto LVar"
-  let toAction x = interceptExceptions id . toAction' x
-  -- NOTE: We read the fallback files only once. Auto reload is not supported, yet.
-  (fbFiles, fallbacks, stagBase) <-
-    case mFallbackFolder of
-      Nothing ->
-        pure (mempty, mempty, stag)
-      Just (stagBase, fallbackFolder) -> do
-        canonical <- liftIO $ canonicalizePath fallbackFolder
-        log LevelInfo $ "Mount base: " <> toText canonical
-        fbFiles <- maybe (pure mempty) (\(_, path) -> filesMatchingWithTag path pats ignore) mFallbackFolder
-        let fallbacks :: Map FilePath (FilePath, b) =
-              Map.fromList $
-                flip concatMap fbFiles $ \(t, fs) ->
-                  fs <&> \fp ->
-                    (fp, (fp, t))
-        pure (fbFiles, fallbacks, stagBase)
-  let withBase f = (stag, (const (Just stagBase) =<< Map.lookup f fallbacks, f))
-  LVar.set var =<< do
-    fbFilesF <- toAction (second (fmap ((stagBase,) . (Nothing,))) <$> fbFiles) $ Update ()
-    fs <- filesMatchingWithTag folder pats ignore
-    fsF <- toAction (second (fmap withBase) <$> fs) $ Update ()
-    pure $ fsF . fbFilesF $ var0
-  changes <- onChange (((),) <$> [folder])
-  forever $ do
-    ((), fp, change) <- atomically $ readTBQueue changes
-    -- TODO: Should refactor the ignore part to be integral to pats, and be part
-    -- of `getTag`
-    let shouldIgnore = any (?== fp) ignore
-    whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
-      -- TODO: We should probably debounce and group frequently-firing events
-      -- here, but do so such that `change` is the same for the events in the
-      -- group.
-      let restoreFallback = do
-            guard $ change == Delete
-            (fallbackFp, fallbackTag) <- Map.lookup fp fallbacks
-            unless (fallbackTag == tag) $ error "Fallback tag is non-equivalent (impossible)"
-            pure (stagBase, (Nothing, fallbackFp))
-      let groupOfOne = one (tag, one $ fromMaybe (withBase fp) restoreFallback)
-      action <- toAction groupOfOne change
-      LVar.modify var action
-  where
-    -- Log and ignore exceptions
-    --
-    -- TODO: Make user defineeable?
-    interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
-    interceptExceptions default_ f = do
-      f' <- toIO f
-      liftIO (try f') >>= \case
-        Left (ex :: SomeException) -> do
-          log LevelError $ "User exception: " <> show ex
-          pure default_
-        Right v ->
-          pure v
+-- Log and ignore exceptions
+--
+-- TODO: Make user defineeable?
+interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
+interceptExceptions default_ f = do
+  f' <- toIO f
+  liftIO (try f') >>= \case
+    Left (ex :: SomeException) -> do
+      log LevelError $ "User exception: " <> show ex
+      pure default_
+    Right v ->
+      pure v
 
+-- | Like `unionMountOnLVar` but without the unioning
 mountOnLVar ::
   (MonadUnliftIO m, MonadLogger m, Ord a) =>
   FilePath ->
@@ -373,3 +207,85 @@ watchTreeM wm fp pr f =
 
 log :: MonadLogger m => LogLevel -> Text -> m ()
 log = logWithoutLoc "Emanote.Source.Mount"
+
+-- TODO: Abstract in module with StateT / MonadState
+newtype OverlayFs source = OverlayFs
+  { unOverlayFs :: Map FilePath (Set source)
+  }
+
+-- TODO: Replace this with a function taking `NonEmpty source`
+emptyOverlayFs :: Ord source => OverlayFs source
+emptyOverlayFs = OverlayFs mempty
+
+overlayFsModify :: FilePath -> (Set src -> Set src) -> OverlayFs src -> OverlayFs src
+overlayFsModify k f (OverlayFs m) =
+  OverlayFs $
+    Map.insert k (f $ fromMaybe Set.empty $ Map.lookup k m) m
+
+overlayFsAdd :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
+overlayFsAdd fp src =
+  overlayFsModify fp $ Set.insert src
+
+overlayFsRemove :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
+overlayFsRemove fp src =
+  overlayFsModify fp $ Set.delete src
+
+overlayFsLookup :: FilePath -> OverlayFs source -> Maybe (NonEmpty (source, FilePath))
+overlayFsLookup fp (OverlayFs m) = do
+  sources <- nonEmpty . toList =<< Map.lookup fp m
+  pure $ sources <&> (,fp)
+
+-- Files matched by each tag pattern, each represented by their corresponding
+-- file (absolute path) in the individual sources. It is up to the user to union
+-- them (for now).
+--
+-- If a path is represented by Nothing, it means it just got removed from the
+-- last source, and the app must remove it from its internal state.
+type Change source tag = Map tag (Map FilePath (FileAction (NonEmpty (source, FilePath))))
+
+changeInsert ::
+  (Ord source, Ord tag, MonadState (OverlayFs source) m) =>
+  source ->
+  tag ->
+  FilePath ->
+  FileAction () ->
+  Change source tag ->
+  m (Change source tag)
+changeInsert src tag fp act ch = do
+  fmap snd . flip runStateT ch $ do
+    -- First, register this change in the overlayFs
+    lift $
+      modify $
+        (if act == Delete then overlayFsRemove else overlayFsAdd)
+          fp
+          src
+    overlays <- fmap (maybe Delete Update) $ lift $ gets $ overlayFsLookup fp
+    gets (Map.lookup tag) >>= \case
+      Nothing ->
+        modify $ Map.insert tag $ Map.singleton fp overlays
+      Just files ->
+        modify $ Map.insert tag $ Map.insert fp overlays files
+
+data UnionPolicy a m
+  = UnionPolicyOverlay
+  | UnionPolicyMergeWith (a -> a -> m a)
+
+class HasUnionPolicy tag a m where
+  getUnionPolicy :: tag -> UnionPolicy a m
+
+-- | Union a non-empty list of elements into a single element, using the union
+-- policy defined for the tag associated with the list.
+union :: forall tag m a. Monad m => HasUnionPolicy tag a m => tag -> NonEmpty a -> m a
+union =
+  applyUnionPolicy . getUnionPolicy
+  where
+    applyUnionPolicy :: Monad m => UnionPolicy a m -> NonEmpty a -> m a
+    applyUnionPolicy = \case
+      UnionPolicyOverlay ->
+        -- First element overlays the next (and rest)
+        pure . head
+      UnionPolicyMergeWith f ->
+        foldM1 f
+      where
+        foldM1 :: (Monad m) => (a -> a -> m a) -> NonEmpty a -> m a
+        foldM1 f (x :| xs) = foldM f x xs
