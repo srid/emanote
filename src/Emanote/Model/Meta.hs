@@ -28,6 +28,7 @@ lookupMeta :: FromJSON a => a -> NonEmpty Text -> R.Route ('LMLType 'Md) -> Mode
 lookupMeta x k r =
   lookupMetaFrom x k . getEffectiveRouteMeta r
 
+-- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupMetaFrom :: forall a. FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
 lookupMetaFrom x (k :| ks) meta =
   fromMaybe x $ do
@@ -59,7 +60,6 @@ getEffectiveRouteMeta mr model = do
         frontmatter <- (^. noteMeta) <$> modelLookup mr model
         guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
         pure $ mergeAeson finalDefault frontmatter
-  where
 
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson = AesonMerge.lodashMerge
