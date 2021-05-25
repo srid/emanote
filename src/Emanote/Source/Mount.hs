@@ -328,12 +328,12 @@ onChange ::
   (x -> FilePath -> FileAction () -> m ()) ->
   m ()
 onChange roots f = do
-  stops <- forM roots $ \(x, rootRel) -> do
-    -- NOTE: It is important to use canonical path, because this will allow us to
-    -- transform fsnotify event's (absolute) path into one that is relative to
-    -- @parent'@ (as passed by user), which is what @f@ will expect.
-    root <- liftIO $ canonicalizePath rootRel
-    withManagerM $ \mgr -> do
+  withManagerM $ \mgr -> do
+    stops <- forM roots $ \(x, rootRel) -> do
+      -- NOTE: It is important to use canonical path, because this will allow us to
+      -- transform fsnotify event's (absolute) path into one that is relative to
+      -- @parent'@ (as passed by user), which is what @f@ will expect.
+      root <- liftIO $ canonicalizePath rootRel
       log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
       watchTreeM mgr root (const True) $ \event -> do
         log LevelDebug $ show event
@@ -343,7 +343,7 @@ onChange roots f = do
           Modified (rel -> fp) _ _ -> f x fp $ Update ()
           Removed (rel -> fp) _ _ -> f x fp Delete
           Unknown (rel -> fp) _ _ -> f x fp Delete
-  liftIO $ threadDelay maxBound `finally` forM_ stops id
+    liftIO $ threadDelay maxBound `finally` forM_ stops id
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>
