@@ -44,7 +44,7 @@ unionMountOnLVar ::
     Ord source,
     Ord tag
   ) =>
-  NonEmpty (source, FilePath) ->
+  Set (source, FilePath) ->
   [(tag, FilePattern)] ->
   [FilePattern] ->
   LVar model ->
@@ -67,7 +67,7 @@ unionMount ::
     Ord source,
     Ord tag
   ) =>
-  NonEmpty (source, FilePath) ->
+  Set (source, FilePath) ->
   [(tag, FilePattern)] ->
   [FilePattern] ->
   (Change source tag -> FileAction () -> m ()) ->

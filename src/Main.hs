@@ -38,7 +38,12 @@ run modelLvar = do
         def
           & M.modelHeistTemplate .~ emptyTmpl
   Mount.unionMountOnLVar
-    ((Source.LocUser, ".") :| one (Source.LocEmanoteDefault defaultFiles, defaultFiles))
+    -- Note that the order here doesn't matter. Overlay order is determined by the `Ord` instance.
+    ( fromList
+        [ (Source.LocUser, "."),
+          (Source.LocEmanoteDefault defaultFiles, defaultFiles)
+        ]
+    )
     Source.filePatterns
     Source.ignorePatterns
     modelLvar

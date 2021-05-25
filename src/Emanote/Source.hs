@@ -31,12 +31,13 @@ import qualified Heist.Extra.TemplateState as T
 import System.FilePath ((</>))
 import System.FilePattern (FilePattern)
 
+-- | The order here matters. Top = higher precedence.
 data Loc
-  = -- | The location of the emanote's default files directory containing
+  = -- | This always refers to current working directory
+    LocUser
+  | -- | The location of the emanote's default files directory containing
     -- templates, data, etc.
     LocEmanoteDefault FilePath
-  | -- | This always refers to current working directory
-    LocUser
   deriving (Eq, Ord, Show)
 
 locResolve :: (Loc, FilePath) -> FilePath
