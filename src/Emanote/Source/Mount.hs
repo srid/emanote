@@ -52,12 +52,13 @@ unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
     doAct <-
       interceptExceptions id $
         handleAction changes
-    atomically (readTMVar initialized) >>= \case
+    atomically (takeTMVar initialized) >>= \case
       False -> do
         LVar.set modelLVar (doAct model0)
         atomically $ putTMVar initialized True
-      True ->
+      True -> do
         LVar.modify modelLVar doAct
+        atomically $ putTMVar initialized True
 
 unionMount ::
   forall source tag m.
