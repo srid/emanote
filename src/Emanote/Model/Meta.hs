@@ -13,7 +13,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Extra.Merge as AesonMerge
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
-import Emanote.Model (Model, modelData, modelDataDefault, modelLookup)
+import Emanote.Model (Model, modelData, modelLookup)
 import Emanote.Model.Note
   ( noteMeta,
   )
@@ -46,20 +46,20 @@ lookupMetaFrom x (k :| ks) meta =
 -- | Get the (final) metadata of a note at the given route, by merging it with
 -- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.Route ('LMLType 'Md) -> Model -> Aeson.Value
-getEffectiveRouteMeta mr model = do
-  -- TODO: modelDataDefault is never set; remove it.
-  let appDefault = model ^. modelDataDefault
-      defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
+getEffectiveRouteMeta mr model =
+  let defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
         guard $ v /= Aeson.Null
         pure v
-      finalDefault = mergeAesons $ appDefault :| defaults
-  fromMaybe finalDefault $ do
-    frontmatter <- (^. noteMeta) <$> modelLookup mr model
-    guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
-    pure $ mergeAeson finalDefault frontmatter
+      frontmatter = do
+        x <- (^. noteMeta) <$> modelLookup mr model
+        guard $ x /= Aeson.Null
+        pure x
+      metas = defaults <> maybe mempty one frontmatter
+   in maybe Aeson.Null mergeAesons $ nonEmpty metas
 
+-- | Later values override former.
 mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
 mergeAesons =
   NE.last . NE.scanl1 mergeAeson

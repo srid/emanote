@@ -41,7 +41,6 @@ data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelData :: IxSData,
-    _modelDataDefault :: Aeson.Value,
     _modelStaticFiles :: Set (Route 'AnyExt),
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
@@ -50,7 +49,7 @@ data Model = Model
 makeLenses ''Model
 
 instance Default Model where
-  def = Model Ix.empty Ix.empty Ix.empty Aeson.Null mempty mempty def
+  def = Model Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelInsertMarkdown :: Route ('LMLType 'Md) -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsertMarkdown k v =
