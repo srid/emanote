@@ -21,7 +21,7 @@ extra-source-files:
   LICENSE
   README.md
 
-data-dir:           docs
+data-dir:           default
 data-files:
   favicon.svg
   index.yaml
