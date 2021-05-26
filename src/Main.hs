@@ -8,13 +8,14 @@ import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
 import Data.LVar (LVar)
 import qualified Ema
-import qualified Ema.Helper.FileSystem as FileSystem
 import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class ()
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Source as Source
+import qualified Emanote.Source.Mount as Mount
 import qualified Emanote.Template as Template
+import qualified Heist.Extra.TemplateState as T
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)
 
@@ -27,14 +28,14 @@ main =
       Tailwind.twindShim
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
-run model = do
-  defaultTmpl <- Source.defaultTemplateState
-  defaultData <- Source.defaultData
-  let model0 =
-        def
-          & M.modelHeistTemplate .~ defaultTmpl
-          & M.modelDataDefault .~ defaultData
-  -- TODO: Monitor defaultTmpl directory; only if running in ghcid.
-  -- Otherwise configure ghcid to reload when this directory is changed.
-  FileSystem.mountOnLVar "." Source.filePatterns Source.ignorePatterns model model0 $ \sources action -> do
-    Source.transformActions sources action
+run modelLvar = do
+  fsLayers <- liftIO Source.locLayers
+  emptyTmpl <- T.newTemplateState
+  let initialModel = def & M.modelHeistTemplate .~ emptyTmpl
+  Mount.unionMountOnLVar
+    fsLayers
+    Source.filePatterns
+    Source.ignorePatterns
+    modelLvar
+    initialModel
+    Source.transformActions
