@@ -17,7 +17,6 @@ import qualified Emanote.Source.Mount as Mount
 import qualified Emanote.Template as Template
 import qualified Heist.Extra.TemplateState as T
 import Main.Utf8 (withUtf8)
-import qualified Paths_emanote
 import UnliftIO (MonadUnliftIO)
 
 main :: IO ()
@@ -30,21 +29,13 @@ main =
 
 run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
 run modelLvar = do
-  -- TODO: Monitor the default files; only if running in ghcid.
-  -- Otherwise configure ghcid to reload when this directory is changed.
-  defaultFiles <- liftIO Paths_emanote.getDataDir
+  fsLayers <- liftIO Source.locLayers
   emptyTmpl <- T.newTemplateState
-  let model0 =
-        def
-          & M.modelHeistTemplate .~ emptyTmpl
+  let initialModel = def & M.modelHeistTemplate .~ emptyTmpl
   Mount.unionMountOnLVar
-    ( fromList
-        [ (Source.LocUser, "."),
-          (Source.LocEmanoteDefault defaultFiles, defaultFiles)
-        ]
-    )
+    fsLayers
     Source.filePatterns
     Source.ignorePatterns
     modelLvar
-    model0
+    initialModel
     Source.transformActions
