@@ -44,6 +44,10 @@ To develop with full IDE support in Visual Studio Code, follow these steps:
 
 All but the final step need to be done only once.
 
+## Discussion
+
+To discuss the emanote project, [join Matrix](https://app.element.io/#/room/#neuron:matrix.org).
+
 ## Tasks
 
 ### Current
