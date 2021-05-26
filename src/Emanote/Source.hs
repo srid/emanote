@@ -11,6 +11,7 @@ import Control.Exception (throw)
 import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
 import qualified Data.Aeson as Aeson
+import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Ema.Helper.Markdown as Markdown
@@ -122,21 +123,13 @@ transformAction src fps = do
           Mount.Update overlays ->
             fmap (fromMaybe id) . runMaybeT $ do
               print overlays
-              let fpAbs = locResolve $ head overlays
-              -- TODO: We want to merge index.yaml from two locations. Not favour the user one!
               r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
-              logD $ "Reading data: " <> toText fpAbs
-              !s <- readFileBS fpAbs
-              sdata <- parseSData s
-              {- final <- case fst (snd x) of
-                Just (LocEmanoteDefault defaultDir) -> do
-                  let baseYaml = defaultDir </> snd (snd x)
-                  logD $ "Reading default data: " <> toText baseYaml
-                  !baseS <- readFileBS baseYaml
-                  baseData <- parseSData baseS
-                  pure $ Meta.mergeAeson baseData sdata
-                _ -> pure sdata -}
-              pure $ M.modelInsertData r sdata
+              fmap (M.modelInsertData r . Meta.mergeAesons . NEL.reverse) $
+                forM overlays $ \overlay -> do
+                  let fpAbs = locResolve overlay
+                  logD $ "Reading data: " <> toText fpAbs
+                  !s <- readFileBS fpAbs
+                  parseSData s
           Mount.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
     SourceTemplate ->
@@ -148,7 +141,6 @@ transformAction src fps = do
             fmap (M.modelHeistTemplate %~) $ do
               logD $ "Reading template: " <> toText fpAbs
               s <- readFileBS fpAbs
-              -- TODO: Set template name!
               pure $ T.addTemplateFile fpAbs fp s
           Mount.Delete -> do
             -- TODO: Handle *removing* of templates! ... however, don't remove *default* ones.

@@ -47,19 +47,22 @@ lookupMetaFrom x (k :| ks) meta =
 -- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.Route ('LMLType 'Md) -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model = do
+  -- TODO: modelDataDefault is never set; remove it.
   let appDefault = model ^. modelDataDefault
-  fromMaybe appDefault $ do
-    let defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
-    let defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
-          v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
-          guard $ v /= Aeson.Null
-          pure v
-    let finalDefault = NE.last $ NE.scanl1 mergeAeson $ appDefault :| defaults
-    pure $
-      fromMaybe finalDefault $ do
-        frontmatter <- (^. noteMeta) <$> modelLookup mr model
-        guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
-        pure $ mergeAeson finalDefault frontmatter
+      defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
+      defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
+        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
+        guard $ v /= Aeson.Null
+        pure v
+      finalDefault = mergeAesons $ appDefault :| defaults
+  fromMaybe finalDefault $ do
+    frontmatter <- (^. noteMeta) <$> modelLookup mr model
+    guard $ frontmatter /= Aeson.Null -- To not trip up AesonMerge
+    pure $ mergeAeson finalDefault frontmatter
+
+mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
+mergeAesons =
+  NE.last . NE.scanl1 mergeAeson
 
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson = AesonMerge.lodashMerge
