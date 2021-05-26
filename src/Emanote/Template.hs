@@ -5,6 +5,7 @@ module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
+import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
@@ -38,8 +39,8 @@ import Text.Pandoc.Definition (Pandoc (..))
 
 render :: H.Html -> Model -> EmanoteRoute -> Ema.Asset LByteString
 render x m = \case
-  EROtherFile r ->
-    Ema.AssetStatic $ R.routeSourcePath r
+  EROtherFile (_r, fpAbs) ->
+    Ema.AssetStatic fpAbs
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
     Ema.AssetGenerated Ema.Html $ renderHtml x m r
   where
@@ -142,7 +143,7 @@ resolveUrl model url =
             pure $ noteUrl $ head targets
   where
     isStaticAssetUrl s =
-      any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ model ^. M.modelStaticFiles
+      any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles
 
 noteUrl :: Route ('LMLType x) -> Text
 noteUrl =

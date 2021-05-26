@@ -19,7 +19,6 @@ import Control.Monad.Logger (MonadLogger)
 import qualified Data.Aeson as Aeson
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
 import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.Markdown as Markdown
 import Emanote.Logging (logD)
@@ -89,12 +88,15 @@ transformAction src fps = do
           Mount.Delete -> do
             pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
       Ext.AnyExt -> do
-        case action of
-          Mount.Update overlays -> do
-            let fpAbs = locResolve $ head overlays
-            pure $ M.modelStaticFiles %~ Set.union (maybe mempty Set.singleton $ R.mkRouteFromFilePath fpAbs)
-          Mount.Delete ->
-            pure $ M.modelStaticFiles %~ maybe id Set.delete (R.mkRouteFromFilePath fp)
+        pure $
+          fromMaybe id $ do
+            r <- R.mkRouteFromFilePath fp
+            case action of
+              Mount.Update overlays -> do
+                let fpAbs = locResolve $ head overlays
+                pure $ M.modelStaticFiles %~ Map.insert r fpAbs
+              Mount.Delete -> do
+                pure $ M.modelStaticFiles %~ Map.delete r
       Ext.Html -> do
         -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
         pure id
