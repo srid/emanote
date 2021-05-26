@@ -10,8 +10,8 @@ tags: []
 
 # TODO: How to design this when generating RSS feeds?
 template:
-  # Use file "${template.name}.tpl" to render HTML
-  name: _default
+  # Use file "./${template.name}.tpl" to render HTML
+  name: templates/_default
   theme: blue
   baseUrl: /
   iconUrl: https://raw.githubusercontent.com/srid/emanote/master/docs/favicon.svg

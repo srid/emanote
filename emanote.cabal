@@ -21,7 +21,7 @@ extra-source-files:
   LICENSE
   README.md
 
-data-dir:           docs
+data-dir:           default
 data-files:
   favicon.svg
   index.yaml
@@ -39,10 +39,11 @@ executable emanote
     , containers
     , data-default
     , directory
-    , ema                  >=0.2
+    , ema                   >=0.2
     , filepath
     , filepattern
-    , heist                >=1.1.0.1
+    , fsnotify
+    , heist                 >=1.1.0.1
     , ixset-typed
     , lens
     , lvar
@@ -50,7 +51,7 @@ executable emanote
     , monad-logger
     , mtl
     , neat-interpolation
-    , pandoc-link-context  >=1.0.2
+    , pandoc-link-context   >=1.0.2
     , pandoc-types
     , profunctors
     , relude
@@ -59,6 +60,7 @@ executable emanote
     , text
     , time
     , unliftio
+    , unordered-containers
     , with-utf8
     , xmlhtml
     , yaml
@@ -89,6 +91,7 @@ executable emanote
   autogen-modules:    Paths_emanote
   other-modules:
     Emanote.Class
+    Emanote.Logging
     Emanote.Model
     Emanote.Model.Meta
     Emanote.Model.Note
@@ -99,6 +102,10 @@ executable emanote
     Emanote.Route.Ext
     Emanote.Route.WikiLinkTarget
     Emanote.Source
+    Emanote.Source.Loc
+    Emanote.Source.Mount
+    Emanote.Source.Pattern
+    Emanote.Source.Util
     Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
