@@ -90,7 +90,6 @@ ignorePatterns =
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Source -> m (Model -> Model)
 transformActions ch = do
-  print ch
   chainM (Map.toList ch) $ uncurry transformAction
 
 -- | Transform a filesystem action (on a source) to model update
@@ -100,13 +99,12 @@ transformAction ::
   Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
-  case src of
-    SourceLML Ext.Md ->
-      chainM (Map.toList fps) $ \(fp, action) ->
+  chainM (Map.toList fps) $ \(fp, action) ->
+    case src of
+      SourceLML Ext.Md ->
         case action of
           Mount.Update overlays ->
             fmap (fromMaybe id) . runMaybeT $ do
-              print overlays
               let fpAbs = locResolve $ head overlays
               r :: R.Route ('LMLType 'Md) <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
               -- TODO: Log in batches, to avoid slowing things down when using large notebooks
@@ -116,12 +114,10 @@ transformAction src fps = do
               pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
           Mount.Delete ->
             pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp)
-    SourceData ->
-      chainM (Map.toList fps) $ \(fp, action) ->
+      SourceData ->
         case action of
           Mount.Update overlays ->
             fmap (fromMaybe id) . runMaybeT $ do
-              print overlays
               r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
               fmap (M.modelInsertData r . Meta.mergeAesons . NEL.reverse) $
                 forM overlays $ \overlay -> do
@@ -131,11 +127,9 @@ transformAction src fps = do
                   parseSData s
           Mount.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
-    SourceTemplate ->
-      chainM (Map.toList fps) $ \(fp, action) ->
+      SourceTemplate ->
         case action of
           Mount.Update overlays -> do
-            print overlays
             let fpAbs = locResolve $ head overlays
             fmap (M.modelHeistTemplate %~) $ do
               logD $ "Reading template: " <> toText fpAbs
@@ -145,11 +139,9 @@ transformAction src fps = do
             -- TODO: Handle *removing* of templates! ... however, don't remove *default* ones.
             -- Removing a default template, should restore it.
             pure id
-    SourceStatic -> do
-      chainM (Map.toList fps) $ \(fp, action) -> do
+      SourceStatic -> do
         case action of
           Mount.Update overlays -> do
-            print overlays
             let fpAbs = locResolve $ head overlays
             pure $ M.modelStaticFiles %~ Set.union (maybe mempty Set.singleton $ R.mkRouteFromFilePath fpAbs)
           Mount.Delete ->

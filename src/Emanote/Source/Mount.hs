@@ -6,7 +6,6 @@ module Emanote.Source.Mount where
 
 import Control.Concurrent (threadDelay)
 import Control.Exception (finally, try)
-import Control.Monad (foldM)
 import Control.Monad.Logger
   ( LogLevel (LevelDebug, LevelError, LevelInfo),
     MonadLogger,
@@ -248,27 +247,3 @@ changeInsert src tag fp act ch = do
         modify $ Map.insert tag $ Map.singleton fp overlays
       Just files ->
         modify $ Map.insert tag $ Map.insert fp overlays files
-
-data UnionPolicy a m
-  = UnionPolicyOverlay
-  | UnionPolicyMergeWith (a -> a -> m a)
-
-class HasUnionPolicy tag a m where
-  getUnionPolicy :: tag -> UnionPolicy a m
-
--- | Union a non-empty list of elements into a single element, using the union
--- policy defined for the tag associated with the list.
-union :: forall tag m a. Monad m => HasUnionPolicy tag a m => tag -> NonEmpty a -> m a
-union =
-  applyUnionPolicy . getUnionPolicy
-  where
-    applyUnionPolicy :: Monad m => UnionPolicy a m -> NonEmpty a -> m a
-    applyUnionPolicy = \case
-      UnionPolicyOverlay ->
-        -- First element overlays the next (and rest)
-        pure . head
-      UnionPolicyMergeWith f ->
-        foldM1 f
-      where
-        foldM1 :: (Monad m) => (a -> a -> m a) -> NonEmpty a -> m a
-        foldM1 f (x :| xs) = foldM f x xs
