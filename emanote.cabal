@@ -39,11 +39,11 @@ executable emanote
     , containers
     , data-default
     , directory
-    , ema                  >=0.2
+    , ema                   >=0.2
     , filepath
     , filepattern
     , fsnotify
-    , heist                >=1.1.0.1
+    , heist                 >=1.1.0.1
     , ixset-typed
     , lens
     , lvar
@@ -51,7 +51,7 @@ executable emanote
     , monad-logger
     , mtl
     , neat-interpolation
-    , pandoc-link-context  >=1.0.2
+    , pandoc-link-context   >=1.0.2
     , pandoc-types
     , profunctors
     , relude
@@ -60,6 +60,7 @@ executable emanote
     , text
     , time
     , unliftio
+    , unordered-containers
     , with-utf8
     , xmlhtml
     , yaml
@@ -101,10 +102,10 @@ executable emanote
     Emanote.Route.Ext
     Emanote.Route.WikiLinkTarget
     Emanote.Source
-    Emanote.Source.Mount
-    Emanote.Source.Util
-    Emanote.Source.Pattern
     Emanote.Source.Loc
+    Emanote.Source.Mount
+    Emanote.Source.Pattern
+    Emanote.Source.Util
     Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
