@@ -77,7 +77,7 @@ To triage,
   - Blame https://github.com/snapframework/xmlhtml ?
     - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
 - [ ] `emanote init` to allow editing default templates/yaml
-- [ ] Add fsnotify watcher for default template files (etc), but only in ghcid mode
+- [x] Add fsnotify watcher for default template files (etc), but only in ghcid mode
 - [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
 - [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] `neuron query` equivalent?
