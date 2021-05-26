@@ -88,11 +88,10 @@ ignorePatterns =
   ]
 
 -- | Like `transformAction` but operates on multiple source types at a time
-transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Source -> Mount.FileAction () -> m (Model -> Model)
-transformActions ch action = do
+transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Source -> m (Model -> Model)
+transformActions ch = do
   print ch
-  chainM (Map.toList ch) $ \(src, fps) ->
-    transformAction src fps
+  chainM (Map.toList ch) $ uncurry transformAction
 
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::

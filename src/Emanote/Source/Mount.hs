@@ -45,14 +45,14 @@ unionMountOnLVar ::
   [FilePattern] ->
   LVar model ->
   model ->
-  (Change source tag -> FileAction () -> m (model -> model)) ->
+  (Change source tag -> m (model -> model)) ->
   m ()
 unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
   LVar.set modelLVar model0
-  unionMount sources pats ignore $ \fs act -> do
+  unionMount sources pats ignore $ \changes -> do
     doAct <-
       interceptExceptions id $
-        handleAction fs act
+        handleAction changes
     LVar.modify modelLVar doAct
 
 unionMount ::
@@ -66,7 +66,7 @@ unionMount ::
   Set (source, FilePath) ->
   [(tag, FilePattern)] ->
   [FilePattern] ->
-  (Change source tag -> FileAction () -> m ()) ->
+  (Change source tag -> m ()) ->
   m ()
 unionMount sources pats ignore handleAction = do
   void . flip runStateT (emptyOverlayFs @source) $ do
@@ -78,7 +78,7 @@ unionMount sources pats ignore handleAction = do
           forM_ taggedFiles $ \(tag, fs) -> do
             forM_ fs $ \fp -> do
               put =<< lift . changeInsert src tag fp (Update ()) =<< get
-    lift $ handleAction changes0 (Update ())
+    lift $ handleAction changes0
     -- Run fsnotify on sources
     ofs <- get
     q :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
@@ -90,8 +90,8 @@ unionMount sources pats ignore handleAction = do
             let shouldIgnore = any (?== fp) ignore
             whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
               changes <- fmap snd . flip runStateT Map.empty $ do
-                put =<< lift . changeInsert src tag fp (Update ()) =<< get
-              lift $ handleAction changes act
+                put =<< lift . changeInsert src tag fp act =<< get
+              lift $ handleAction changes
 
 -- Log and ignore exceptions
 --
@@ -105,20 +105,6 @@ interceptExceptions default_ f = do
       pure default_
     Right v ->
       pure v
-
--- | Like `unionMountOnLVar` but without the unioning
-mountOnLVar ::
-  (MonadUnliftIO m, MonadLogger m, Ord a) =>
-  FilePath ->
-  [(a, FilePattern)] ->
-  [FilePattern] ->
-  LVar model ->
-  model ->
-  ([(a, [FilePath])] -> FileAction () -> m (model -> model)) ->
-  m ()
-mountOnLVar folder pats ignore modelLVar model0 f = do
-  unionMountOnLVar (one ((), folder)) pats ignore modelLVar model0 $ \ch act ->
-    f (second Map.keys <$> Map.toList ch) act
 
 filesMatching :: (MonadIO m, MonadLogger m) => FilePath -> [FilePattern] -> [FilePattern] -> m [FilePath]
 filesMatching parent' pats ignore = do
