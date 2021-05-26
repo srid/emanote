@@ -44,8 +44,8 @@ newTemplateState = do
           & H.hcNamespace .~ ""
   liftIO $ TemplateState <$> H.initHeist heistCfg
 
-addTemplateFile :: HasCallStack => FilePath -> ByteString -> TemplateState -> TemplateState
-addTemplateFile fp s (TemplateState eSt) =
+addTemplateFile :: HasCallStack => FilePath -> FilePath -> ByteString -> TemplateState -> TemplateState
+addTemplateFile fp fpRel s (TemplateState eSt) =
   TemplateState $ do
     st <- eSt
     first one (XmlHtml.parseHTML fp s) >>= \case
@@ -56,7 +56,7 @@ addTemplateFile fp s (TemplateState eSt) =
         Right $ HI.addTemplate tmplName docContent (Just fp) st
   where
     tmplName = fromMaybe (error "Not a .tpl file") $ do
-      let (base, ext) = splitExtension fp
+      let (base, ext) = splitExtension fpRel
       guard $ ext == ".tpl"
       pure $ encodeUtf8 base
 
