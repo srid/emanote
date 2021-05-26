@@ -98,8 +98,7 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt)
+modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt, FilePath)
 modelLookupStaticFile fp model = do
   r <- R.mkRouteFromFilePath fp
-  guard $ Map.member r $ model ^. modelStaticFiles
-  pure r
+  (r,) <$> Map.lookup r (model ^. modelStaticFiles)

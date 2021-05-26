@@ -14,10 +14,13 @@ import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType))
 
--- | TODO: Use `OpenUnion` here?
 data EmanoteRoute
   = ERNoteHtml (Route 'Html)
-  | EROtherFile (Route 'AnyExt, FilePath)
+  | EROtherFile
+      ( Route 'AnyExt,
+        -- Absolute path to the static file referenced by this route
+        FilePath
+      )
   deriving (Eq, Show, Ord)
 
 instance Ema Model EmanoteRoute where
@@ -28,12 +31,7 @@ instance Ema Model EmanoteRoute where
       R.encodeRoute r
 
   decodeRoute model fp =
-    fmap
-      EROtherFile
-      ( do
-          r <- M.modelLookupStaticFile fp model
-          pure (r, fp)
-      )
+    fmap EROtherFile (M.modelLookupStaticFile fp model)
       <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
 
   allRoutes model =
