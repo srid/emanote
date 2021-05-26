@@ -88,15 +88,15 @@ transformAction src fps = do
           Mount.Delete -> do
             pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
       Ext.AnyExt -> do
-        pure $
-          fromMaybe id $ do
-            r <- R.mkRouteFromFilePath fp
-            case action of
-              Mount.Update overlays -> do
-                let fpAbs = locResolve $ head overlays
-                pure $ M.modelStaticFiles %~ Map.insert r fpAbs
-              Mount.Delete -> do
-                pure $ M.modelStaticFiles %~ Map.delete r
+        fmap (fromMaybe id) . runMaybeT $ do
+          r <- MaybeT $ pure $ R.mkRouteFromFilePath fp
+          case action of
+            Mount.Update overlays -> do
+              let fpAbs = locResolve $ head overlays
+              logD $ "Adding file: " <> toText fpAbs <> " " <> show r
+              pure $ M.modelStaticFiles %~ Map.insert r fpAbs
+            Mount.Delete -> do
+              pure $ M.modelStaticFiles %~ Map.delete r
       Ext.Html -> do
         -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
         pure id
