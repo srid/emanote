@@ -47,12 +47,17 @@ unionMountOnLVar ::
   (Change source tag -> m (model -> model)) ->
   m ()
 unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
-  LVar.set modelLVar model0
+  initialized <- newTMVarIO False
   unionMount sources pats ignore $ \changes -> do
     doAct <-
       interceptExceptions id $
         handleAction changes
-    LVar.modify modelLVar doAct
+    atomically (readTMVar initialized) >>= \case
+      False -> do
+        LVar.set modelLVar (doAct model0)
+        atomically $ putTMVar initialized True
+      True ->
+        LVar.modify modelLVar doAct
 
 unionMount ::
   forall source tag m.
