@@ -60,7 +60,8 @@ Before tests (tasks impacting the larger architectural context in code base),
     - source: .md, .org, static files, ..
     - output: .rss/.xml
 - [ ] WikiLink: allow linking to non-HTML files.
-  - Refactor `Route` to accomodate them all, and ditch `Either FilePath`
+  - [x] Refactor `Route` to accomodate them all, and ditch `Either FilePath`
+  - [ ] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
 - Embedding / Filtering / Transforming / etc
   - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
     - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
@@ -79,6 +80,8 @@ Before tests (tasks impacting the larger architectural context in code base),
 
 To triage,
 
+- [ ] fsnotify: reliably handle directory renames/ moves
+  - If nothing, restart mount on such events.
 - [ ] apply prismJS on live server refresh?
   - Hack on `<script class="ema-rerun">`?
 - [ ] `emanote gen` should generate $dir.html even if $dir.md doesn't exist.
