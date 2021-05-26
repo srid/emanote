@@ -47,18 +47,37 @@ unionMountOnLVar ::
   (Change source tag -> m (model -> model)) ->
   m ()
 unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
+  -- This TMVar is used to ensure the LVar semantics that `set` is called once
+  -- /after/ the initial file listing is read, and `modify` is called for each
+  -- subsequent inotify events.
   initialized <- newTMVarIO False
   unionMount sources pats ignore $ \changes -> do
-    doAct <-
+    updateModel <-
       interceptExceptions id $
         handleAction changes
     atomically (takeTMVar initialized) >>= \case
       False -> do
-        LVar.set modelLVar (doAct model0)
-        atomically $ putTMVar initialized True
+        LVar.set modelLVar (updateModel model0)
       True -> do
-        LVar.modify modelLVar doAct
-        atomically $ putTMVar initialized True
+        LVar.modify modelLVar updateModel
+    atomically $ putTMVar initialized True
+
+-- Log and ignore exceptions
+--
+-- TODO: Make user defineeable?
+interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
+interceptExceptions default_ f = do
+  f' <- toIO f
+  liftIO (try f') >>= \case
+    Left (ex :: SomeException) -> do
+      log LevelError $ "User exception: " <> show ex
+      pure default_
+    Right v ->
+      pure v
+
+-------------------------------------
+-- Candidate for moving to a library
+-------------------------------------
 
 unionMount ::
   forall source tag m.
@@ -97,19 +116,6 @@ unionMount sources pats ignore handleAction = do
               changes <- fmap snd . flip runStateT Map.empty $ do
                 put =<< lift . changeInsert src tag fp act =<< get
               lift $ handleAction changes
-
--- Log and ignore exceptions
---
--- TODO: Make user defineeable?
-interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
-interceptExceptions default_ f = do
-  f' <- toIO f
-  liftIO (try f') >>= \case
-    Left (ex :: SomeException) -> do
-      log LevelError $ "User exception: " <> show ex
-      pure default_
-    Right v ->
-      pure v
 
 filesMatching :: (MonadIO m, MonadLogger m) => FilePath -> [FilePattern] -> [FilePattern] -> m [FilePath]
 filesMatching parent' pats ignore = do

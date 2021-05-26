@@ -129,18 +129,20 @@ resolveUrl :: Model -> Text -> Text
 resolveUrl model url =
   fromMaybe url $ do
     guard $ not $ isStaticAssetUrl url
-    Rel.parseUrl url >>= \case
-      Right r -> do
-        pure $ noteUrl r
-      Left wl ->
-        case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
-          Nothing -> do
-            -- TODO: Set an attribute for broken links, so templates can style it accordingly
-            let fakeRouteUnder404 = R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
-            pure $ noteUrl fakeRouteUnder404
-          Just targets ->
-            -- TODO: Deal with ambiguous targets here
-            pure $ noteUrl $ head targets
+    r <-
+      Rel.parseUrl url >>= \case
+        Right r -> do
+          pure r
+        Left wl ->
+          case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
+            Nothing -> do
+              -- TODO: Set an attribute for broken links, so templates can style it accordingly
+              let fakeRouteUnder404 = R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
+              pure fakeRouteUnder404
+            Just targets ->
+              -- TODO: Deal with ambiguous targets here
+              pure $ head targets
+    pure $ noteUrl r
   where
     isStaticAssetUrl s =
       any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles

@@ -86,6 +86,8 @@ modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [Route ('LMLType 'Md
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
+  --
+  -- Could store `modelNoteDirs` and look that up.
   fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
 modelLookupBacklinks :: Route ('LMLType 'Md) -> Model -> [(Route ('LMLType 'Md), NonEmpty [B.Block])]
