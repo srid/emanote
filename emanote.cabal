@@ -103,6 +103,8 @@ executable emanote
     Emanote.Source
     Emanote.Source.Mount
     Emanote.Source.Util
+    Emanote.Source.Pattern
+    Emanote.Source.Loc
     Emanote.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc

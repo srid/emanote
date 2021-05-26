@@ -2,14 +2,6 @@
 
 module Emanote.Source.Util where
 
-import Control.Exception (throw)
-import qualified Data.Yaml as Yaml
-
-parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
-parseSData s =
-  either (throw . BadInput . show) pure $
-    Yaml.decodeEither' s
-
 -- | Monadic version of `chain`
 chainM :: Monad m => [b] -> (b -> m (a -> a)) -> m (a -> a)
 chainM xs =

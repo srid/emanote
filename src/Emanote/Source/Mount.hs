@@ -83,8 +83,8 @@ unionMount sources pats ignore handleAction = do
     q :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
     lift $
       race_ (onChange q (toList sources)) $
-        forever $
-          void . flip runStateT ofs $ do
+        void . flip runStateT ofs $
+          forever $ do
             (src, fp, act) <- atomically $ readTBQueue q
             let shouldIgnore = any (?== fp) ignore
             whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
