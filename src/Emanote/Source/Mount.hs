@@ -1,7 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 
 -- | This is a fork of Ema.Helper.FileSystem (forked for ghcid-convenience), to
 -- be *soon* made a separate Haskell library.
@@ -31,8 +28,7 @@ import System.FSNotify
 import System.FilePath (isRelative, makeRelative)
 import System.FilePattern (FilePattern, (?==))
 import System.FilePattern.Directory (getDirectoryFilesIgnore)
-import UnliftIO (MonadUnliftIO, newTBQueueIO, toIO, withRunInIO, writeTBQueue)
-import UnliftIO.Concurrent (forkIO)
+import UnliftIO (MonadUnliftIO, newTBQueueIO, race_, toIO, withRunInIO, writeTBQueue)
 import UnliftIO.STM (TBQueue, readTBQueue)
 
 -- | Like `unionMount` but updates a `LVar` as well handles exceptions by logging them.
@@ -84,14 +80,18 @@ unionMount sources pats ignore handleAction = do
               put =<< lift . changeInsert src tag fp (Update ()) =<< get
     lift $ handleAction changes0 (Update ())
     -- Run fsnotify on sources
-    q <- lift $ onChange (toList sources)
-    forever $ do
-      (src, fp, act) <- atomically $ readTBQueue q
-      let shouldIgnore = any (?== fp) ignore
-      whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
-        changes <- fmap snd . flip runStateT Map.empty $ do
-          put =<< lift . changeInsert src tag fp (Update ()) =<< get
-        lift $ handleAction changes act
+    ofs <- get
+    q :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
+    lift $
+      race_ (onChange q (toList sources)) $
+        forever $
+          void . flip runStateT ofs $ do
+            (src, fp, act) <- atomically $ readTBQueue q
+            let shouldIgnore = any (?== fp) ignore
+            whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
+              changes <- fmap snd . flip runStateT Map.empty $ do
+                put =<< lift . changeInsert src tag fp (Update ()) =<< get
+              lift $ handleAction changes act
 
 -- Log and ignore exceptions
 --
@@ -158,32 +158,29 @@ data FileAction a = Update a | Delete
 onChange ::
   forall x m.
   (MonadIO m, MonadLogger m, MonadUnliftIO m) =>
+  TBQueue (x, FilePath, FileAction ()) ->
   [(x, FilePath)] ->
   -- | The filepath is relative to the folder being monitored, unless if its
   -- ancestor is a symlink.
-  m (TBQueue (x, FilePath, FileAction ()))
-onChange roots = do
-  changes :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
-  -- TODO: Use race_?
-  void . forkIO $
-    withManagerM $ \mgr -> do
-      stops <- forM roots $ \(x, rootRel) -> do
-        -- NOTE: It is important to use canonical path, because this will allow us to
-        -- transform fsnotify event's (absolute) path into one that is relative to
-        -- @parent'@ (as passed by user), which is what @f@ will expect.
-        root <- liftIO $ canonicalizePath rootRel
-        log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
-        watchTreeM mgr root (const True) $ \event -> do
-          log LevelDebug $ show event
-          let rel = makeRelative root
-              f a fp act = atomically $ writeTBQueue changes (a, fp, act)
-          case event of
-            Added (rel -> fp) _ _ -> f x fp $ Update ()
-            Modified (rel -> fp) _ _ -> f x fp $ Update ()
-            Removed (rel -> fp) _ _ -> f x fp Delete
-            Unknown (rel -> fp) _ _ -> f x fp Delete
-      liftIO $ threadDelay maxBound `finally` forM_ stops id
-  pure changes
+  m ()
+onChange q roots = do
+  withManagerM $ \mgr -> do
+    stops <- forM roots $ \(x, rootRel) -> do
+      -- NOTE: It is important to use canonical path, because this will allow us to
+      -- transform fsnotify event's (absolute) path into one that is relative to
+      -- @parent'@ (as passed by user), which is what @f@ will expect.
+      root <- liftIO $ canonicalizePath rootRel
+      log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
+      watchTreeM mgr root (const True) $ \event -> do
+        log LevelDebug $ show event
+        let rel = makeRelative root
+            f a fp act = atomically $ writeTBQueue q (a, fp, act)
+        case event of
+          Added (rel -> fp) _ _ -> f x fp $ Update ()
+          Modified (rel -> fp) _ _ -> f x fp $ Update ()
+          Removed (rel -> fp) _ _ -> f x fp Delete
+          Unknown (rel -> fp) _ _ -> f x fp Delete
+    liftIO $ threadDelay maxBound `finally` forM_ stops id
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>
