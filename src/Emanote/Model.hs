@@ -36,6 +36,7 @@ import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 
+-- TODO: Use https://hackage.haskell.org/package/data-lens-ixset-0.1.4/docs/Data-Lens-IxSet.html
 data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,

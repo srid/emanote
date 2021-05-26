@@ -37,9 +37,12 @@ run modelLvar = do
   let model0 =
         def
           & M.modelHeistTemplate .~ emptyTmpl
-  Mount.mountOnLVar
-    (Just (Source.LocEmanoteDefault defaultFiles, defaultFiles))
-    (Source.LocUser, ".")
+  Mount.unionMountOnLVar
+    ( fromList
+        [ (Source.LocUser, "."),
+          (Source.LocEmanoteDefault defaultFiles, defaultFiles)
+        ]
+    )
     Source.filePatterns
     Source.ignorePatterns
     modelLvar

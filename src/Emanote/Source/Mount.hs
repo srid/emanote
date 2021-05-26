@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 -- | This is a fork of Ema.Helper.FileSystem (forked for ghcid-convenience), to
 -- be *soon* made a separate Haskell library.
 module Emanote.Source.Mount where
@@ -12,6 +14,7 @@ import Control.Monad.Logger
 import Data.LVar (LVar)
 import qualified Data.LVar as LVar
 import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import System.Directory (canonicalizePath)
 import System.FSNotify
   ( ActionPredicate,
@@ -24,102 +27,83 @@ import System.FSNotify
 import System.FilePath (isRelative, makeRelative)
 import System.FilePattern (FilePattern, (?==))
 import System.FilePattern.Directory (getDirectoryFilesIgnore)
-import UnliftIO (MonadUnliftIO, toIO, withRunInIO)
+import UnliftIO (MonadUnliftIO, newTBQueueIO, race_, toIO, withRunInIO, writeTBQueue)
+import UnliftIO.STM (TBQueue, readTBQueue)
 
--- | Mount the given directory on to the given LVar such that any filesystem
--- events (represented by `FileAction`) are made to be reflected in the LVar
--- model using the given model update function.
-mountOnLVar ::
-  forall model m b s.
+-- | Like `unionMount` but updates a `LVar` as well handles exceptions by logging them.
+unionMountOnLVar ::
+  forall source tag model m.
   ( MonadIO m,
     MonadUnliftIO m,
     MonadLogger m,
-    Show b,
-    Ord b
+    Ord source,
+    Ord tag
   ) =>
-  -- | The base directory of files to use as "fallback" if the corresponding path is missing (or gets removed) in the mounted directory.
-  --
-  -- NOTE: Auto reload is not supported on this directory (yet)
-  Maybe (s, FilePath) ->
-  -- | The directory to mount.
-  (s, FilePath) ->
-  -- | Only include these files (exclude everything else)
-  [(b, FilePattern)] ->
-  -- | Ignore these patterns
+  Set (source, FilePath) ->
+  [(tag, FilePattern)] ->
   [FilePattern] ->
-  -- | The `LVar` onto which to mount.
-  --
-  -- NOTE: It must not be set already. Otherwise, the value will be overriden
-  -- with the initial value argument (next).
   LVar model ->
-  -- | Initial value of model, onto which to apply updates.
   model ->
-  -- | How to update the model given a file action.
-  --
-  -- `b` is the tag associated with the `FilePattern` that selected this
-  -- `FilePath`. `FileAction` is the operation performed on this path. This
-  -- should return a function (in monadic context) that will update the model,
-  -- to reflect the given `FileAction`.
-  --
-  -- The `FilePath` is relative to mounted directory, unless the fallback path
-  -- is returned (or a symlink is found), which would be absolute.
-  --
-  -- If the action throws an exception, it will be logged and ignored.
-  ([(b, [(s, (Maybe s, FilePath))])] -> FileAction -> m (model -> model)) ->
+  (Change source tag -> m (model -> model)) ->
   m ()
-mountOnLVar mFallbackFolder (stag, folder) pats ignore var var0 toAction' = do
-  log LevelInfo $ "Mounting path " <> toText folder <> " (filter: " <> show pats <> ") onto LVar"
-  let toAction x = interceptExceptions id . toAction' x
-  -- NOTE: We read the fallback files only once. Auto reload is not supported, yet.
-  (fbFiles, fallbacks, stagBase) <-
-    case mFallbackFolder of
-      Nothing ->
-        pure (mempty, mempty, stag)
-      Just (stagBase, fallbackFolder) -> do
-        canonical <- liftIO $ canonicalizePath fallbackFolder
-        log LevelInfo $ "Mount base: " <> toText canonical
-        fbFiles <- maybe (pure mempty) (\(_, path) -> filesMatchingWithTag path pats ignore) mFallbackFolder
-        let fallbacks :: Map FilePath (FilePath, b) =
-              Map.fromList $
-                flip concatMap fbFiles $ \(t, fs) ->
-                  fs <&> \fp ->
-                    (fp, (fp, t))
-        pure (fbFiles, fallbacks, stagBase)
-  let withBase f = (stag, (const (Just stagBase) =<< Map.lookup f fallbacks, f))
-  LVar.set var =<< do
-    fbFilesF <- toAction (second (fmap ((stagBase,) . (Nothing,))) <$> fbFiles) Update
-    fs <- filesMatchingWithTag folder pats ignore
-    fsF <- toAction (second (fmap withBase) <$> fs) Update
-    pure $ fsF . fbFilesF $ var0
-  onChange folder $ \fp change -> do
-    -- TODO: Should refactor the ignore part to be integral to pats, and be part
-    -- of `getTag`
-    let shouldIgnore = any (?== fp) ignore
-    whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
-      -- TODO: We should probably debounce and group frequently-firing events
-      -- here, but do so such that `change` is the same for the events in the
-      -- group.
-      let restoreFallback = do
-            guard $ change == Delete
-            (fallbackFp, fallbackTag) <- Map.lookup fp fallbacks
-            unless (fallbackTag == tag) $ error "Fallback tag is non-equivalent (impossible)"
-            pure (stagBase, (Nothing, fallbackFp))
-      let groupOfOne = one (tag, one $ fromMaybe (withBase fp) restoreFallback)
-      action <- toAction groupOfOne change
-      LVar.modify var action
-  where
-    -- Log and ignore exceptions
-    --
-    -- TODO: Make user defineeable?
-    interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
-    interceptExceptions default_ f = do
-      f' <- toIO f
-      liftIO (try f') >>= \case
-        Left (ex :: SomeException) -> do
-          log LevelError $ "User exception: " <> show ex
-          pure default_
-        Right v ->
-          pure v
+unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
+  LVar.set modelLVar model0
+  unionMount sources pats ignore $ \changes -> do
+    doAct <-
+      interceptExceptions id $
+        handleAction changes
+    LVar.modify modelLVar doAct
+
+unionMount ::
+  forall source tag m.
+  ( MonadIO m,
+    MonadUnliftIO m,
+    MonadLogger m,
+    Ord source,
+    Ord tag
+  ) =>
+  Set (source, FilePath) ->
+  [(tag, FilePattern)] ->
+  [FilePattern] ->
+  (Change source tag -> m ()) ->
+  m ()
+unionMount sources pats ignore handleAction = do
+  void . flip runStateT (emptyOverlayFs @source) $ do
+    -- Initial traversal of sources
+    changes0 :: Change source tag <-
+      fmap snd . flip runStateT Map.empty $ do
+        forM_ sources $ \(src, folder) -> do
+          taggedFiles <- filesMatchingWithTag folder pats ignore
+          forM_ taggedFiles $ \(tag, fs) -> do
+            forM_ fs $ \fp -> do
+              put =<< lift . changeInsert src tag fp (Update ()) =<< get
+    lift $ handleAction changes0
+    -- Run fsnotify on sources
+    ofs <- get
+    q :: TBQueue (x, FilePath, FileAction ()) <- liftIO $ newTBQueueIO 1
+    lift $
+      race_ (onChange q (toList sources)) $
+        forever $
+          void . flip runStateT ofs $ do
+            (src, fp, act) <- atomically $ readTBQueue q
+            let shouldIgnore = any (?== fp) ignore
+            whenJust (guard (not shouldIgnore) >> getTag pats fp) $ \tag -> do
+              changes <- fmap snd . flip runStateT Map.empty $ do
+                put =<< lift . changeInsert src tag fp act =<< get
+              lift $ handleAction changes
+
+-- Log and ignore exceptions
+--
+-- TODO: Make user defineeable?
+interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
+interceptExceptions default_ f = do
+  f' <- toIO f
+  liftIO (try f') >>= \case
+    Left (ex :: SomeException) -> do
+      log LevelError $ "User exception: " <> show ex
+      pure default_
+    Right v ->
+      pure v
 
 filesMatching :: (MonadIO m, MonadLogger m) => FilePath -> [FilePattern] -> [FilePattern] -> m [FilePath]
 filesMatching parent' pats ignore = do
@@ -153,33 +137,35 @@ getTag pats fp =
         -- the trade offs with using symlinks.
           pull $ second ("**/" <>) <$> pats
 
-data FileAction = Update | Delete
+data FileAction a = Update a | Delete
   deriving (Eq, Show)
 
 onChange ::
-  forall m.
+  forall x m.
   (MonadIO m, MonadLogger m, MonadUnliftIO m) =>
-  FilePath ->
+  TBQueue (x, FilePath, FileAction ()) ->
+  [(x, FilePath)] ->
   -- | The filepath is relative to the folder being monitored, unless if its
   -- ancestor is a symlink.
-  (FilePath -> FileAction -> m ()) ->
   m ()
-onChange parent' f = do
-  -- NOTE: It is important to use canonical path, because this will allow us to
-  -- transform fsnotify event's (absolute) path into one that is relative to
-  -- @parent'@ (as passed by user), which is what @f@ will expect.
-  parent <- liftIO $ canonicalizePath parent'
+onChange q roots = do
   withManagerM $ \mgr -> do
-    log LevelInfo $ toText $ "Monitoring " <> parent <> " for changes"
-    stop <- watchTreeM mgr parent (const True) $ \event -> do
-      log LevelDebug $ show event
-      let rel = makeRelative parent
-      case event of
-        Added (rel -> fp) _ _ -> f fp Update
-        Modified (rel -> fp) _ _ -> f fp Update
-        Removed (rel -> fp) _ _ -> f fp Delete
-        Unknown (rel -> fp) _ _ -> f fp Delete
-    liftIO $ threadDelay maxBound `finally` stop
+    stops <- forM roots $ \(x, rootRel) -> do
+      -- NOTE: It is important to use canonical path, because this will allow us to
+      -- transform fsnotify event's (absolute) path into one that is relative to
+      -- @parent'@ (as passed by user), which is what @f@ will expect.
+      root <- liftIO $ canonicalizePath rootRel
+      log LevelInfo $ toText $ "Monitoring " <> root <> " for changes"
+      watchTreeM mgr root (const True) $ \event -> do
+        log LevelDebug $ show event
+        let rel = makeRelative root
+            f a fp act = atomically $ writeTBQueue q (a, fp, act)
+        case event of
+          Added (rel -> fp) _ _ -> f x fp $ Update ()
+          Modified (rel -> fp) _ _ -> f x fp $ Update ()
+          Removed (rel -> fp) _ _ -> f x fp Delete
+          Unknown (rel -> fp) _ _ -> f x fp Delete
+    liftIO $ threadDelay maxBound `finally` forM_ stops id
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>
@@ -203,3 +189,61 @@ watchTreeM wm fp pr f =
 
 log :: MonadLogger m => LogLevel -> Text -> m ()
 log = logWithoutLoc "Emanote.Source.Mount"
+
+-- TODO: Abstract in module with StateT / MonadState
+newtype OverlayFs source = OverlayFs
+  { unOverlayFs :: Map FilePath (Set source)
+  }
+
+-- TODO: Replace this with a function taking `NonEmpty source`
+emptyOverlayFs :: Ord source => OverlayFs source
+emptyOverlayFs = OverlayFs mempty
+
+overlayFsModify :: FilePath -> (Set src -> Set src) -> OverlayFs src -> OverlayFs src
+overlayFsModify k f (OverlayFs m) =
+  OverlayFs $
+    Map.insert k (f $ fromMaybe Set.empty $ Map.lookup k m) m
+
+overlayFsAdd :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
+overlayFsAdd fp src =
+  overlayFsModify fp $ Set.insert src
+
+overlayFsRemove :: Ord src => FilePath -> src -> OverlayFs src -> OverlayFs src
+overlayFsRemove fp src =
+  overlayFsModify fp $ Set.delete src
+
+overlayFsLookup :: FilePath -> OverlayFs source -> Maybe (NonEmpty (source, FilePath))
+overlayFsLookup fp (OverlayFs m) = do
+  sources <- nonEmpty . toList =<< Map.lookup fp m
+  pure $ sources <&> (,fp)
+
+-- Files matched by each tag pattern, each represented by their corresponding
+-- file (absolute path) in the individual sources. It is up to the user to union
+-- them (for now).
+--
+-- If a path is represented by Nothing, it means it just got removed from the
+-- last source, and the app must remove it from its internal state.
+type Change source tag = Map tag (Map FilePath (FileAction (NonEmpty (source, FilePath))))
+
+changeInsert ::
+  (Ord source, Ord tag, MonadState (OverlayFs source) m) =>
+  source ->
+  tag ->
+  FilePath ->
+  FileAction () ->
+  Change source tag ->
+  m (Change source tag)
+changeInsert src tag fp act ch = do
+  fmap snd . flip runStateT ch $ do
+    -- First, register this change in the overlayFs
+    lift $
+      modify $
+        (if act == Delete then overlayFsRemove else overlayFsAdd)
+          fp
+          src
+    overlays <- fmap (maybe Delete Update) $ lift $ gets $ overlayFsLookup fp
+    gets (Map.lookup tag) >>= \case
+      Nothing ->
+        modify $ Map.insert tag $ Map.singleton fp overlays
+      Just files ->
+        modify $ Map.insert tag $ Map.insert fp overlays files
