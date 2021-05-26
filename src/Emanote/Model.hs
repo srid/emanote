@@ -13,6 +13,7 @@ import qualified Data.Aeson as Aeson
 import Data.Default (Default (..))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -41,7 +42,7 @@ data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelData :: IxSData,
-    _modelStaticFiles :: Set (Route 'AnyExt),
+    _modelStaticFiles :: Map (Route 'AnyExt) FilePath,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -100,5 +101,5 @@ modelLookupBacklinks r model =
 modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt)
 modelLookupStaticFile fp model = do
   r <- R.mkRouteFromFilePath fp
-  guard $ Set.member r $ model ^. modelStaticFiles
+  guard $ Map.member r $ model ^. modelStaticFiles
   pure r

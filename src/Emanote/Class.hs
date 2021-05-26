@@ -5,7 +5,7 @@ module Emanote.Class where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.Set as Set
+import qualified Data.Map.Strict as Map
 import Ema (Ema (..))
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
@@ -17,18 +17,23 @@ import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType))
 -- | TODO: Use `OpenUnion` here?
 data EmanoteRoute
   = ERNoteHtml (Route 'Html)
-  | EROtherFile (Route 'AnyExt)
+  | EROtherFile (Route 'AnyExt, FilePath)
   deriving (Eq, Show, Ord)
 
 instance Ema Model EmanoteRoute where
   encodeRoute = \case
     ERNoteHtml r ->
       R.encodeRoute r
-    EROtherFile r ->
+    EROtherFile (r, _fpAbs) ->
       R.encodeRoute r
 
   decodeRoute model fp =
-    fmap EROtherFile (M.modelLookupStaticFile fp model)
+    fmap
+      EROtherFile
+      ( do
+          r <- M.modelLookupStaticFile fp model
+          pure (r, fp)
+      )
       <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
 
   allRoutes model =
@@ -37,7 +42,7 @@ instance Ema Model EmanoteRoute where
             & Ix.toList
             <&> htmlRouteForLmlRoute . (^. N.noteRoute)
         staticFiles =
-          Set.toList $ model ^. M.modelStaticFiles
+          Map.toList $ model ^. M.modelStaticFiles
      in fmap ERNoteHtml htmlRoutes
           <> fmap EROtherFile staticFiles
 

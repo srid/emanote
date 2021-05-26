@@ -8,6 +8,7 @@ import Control.Monad.Logger (MonadLogger)
 import Data.Default (Default (def))
 import Data.LVar (LVar)
 import qualified Ema
+import qualified Ema.CLI as CLI
 import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class ()
 import Emanote.Model (Model)
@@ -27,8 +28,9 @@ main =
     cssShim =
       Tailwind.twindShim
 
-run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> m ()
-run modelLvar = do
+run :: (MonadUnliftIO m, MonadLogger m) => CLI.Action -> LVar Model -> m ()
+run _act modelLvar = do
+  -- TODO: When CLI.Action is Generate, exit immediately instead of monitoring mounts.
   fsLayers <- liftIO Source.locLayers
   emptyTmpl <- T.newTemplateState
   let initialModel = def & M.modelHeistTemplate .~ emptyTmpl
