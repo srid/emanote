@@ -87,9 +87,7 @@ transformAction src fps = do
               s <- readFileBS fpAbs
               pure $ T.addTemplateFile fpAbs fp s
           Mount.Delete -> do
-            -- TODO: Handle *removing* of templates! ... however, don't remove *default* ones.
-            -- Removing a default template, should restore it.
-            pure id
+            pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
       Ext.AnyExt -> do
         case action of
           Mount.Update overlays -> do

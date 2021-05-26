@@ -7,8 +7,8 @@
 module Heist.Extra.TemplateState
   ( TemplateState,
     newTemplateState,
-    loadHeistTemplates,
     addTemplateFile,
+    removeTemplateFile,
     renderHeistTemplate,
   )
 where
@@ -16,9 +16,12 @@ where
 import Control.Lens.Operators ((.~))
 import Control.Monad.Except (runExcept)
 import Data.ByteString.Builder (toLazyByteString)
+import qualified Data.ByteString.Char8 as BC
 import Data.Default (Default (..))
+import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import qualified Heist as H
+import qualified Heist.Internal.Types as HT
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension)
 import Text.Show (Show (..))
@@ -53,22 +56,20 @@ addTemplateFile fp fpRel s (TemplateState eSt) =
         -- TODO: Need this for RSS feed generation.
         Left $ one "Xml unsupported"
       XmlHtml.HtmlDocument {..} -> do
-        Right $ HI.addTemplate tmplName docContent (Just fp) st
-  where
-    tmplName = fromMaybe (error "Not a .tpl file") $ do
-      let (base, ext) = splitExtension fpRel
-      guard $ ext == ".tpl"
-      pure $ encodeUtf8 base
+        Right $ HI.addTemplate (tmplName fpRel) docContent (Just fp) st
 
-loadHeistTemplates :: MonadIO m => FilePath -> m TemplateState
-loadHeistTemplates templateDir = do
-  -- TODO: Use heist compiled templates
-  let eRepo = H.loadTemplates templateDir
-      heistCfg :: H.HeistConfig Identity =
-        H.emptyHeistConfig
-          & H.hcNamespace .~ ""
-          & H.hcTemplateLocations .~ [eRepo]
-  liftIO $ TemplateState <$> H.initHeist heistCfg
+tmplName :: String -> ByteString
+tmplName fp = fromMaybe (error "Not a .tpl file") $ do
+  let (base, ext) = splitExtension fp
+  guard $ ext == ".tpl"
+  pure $ encodeUtf8 base
+
+removeTemplateFile :: HasCallStack => FilePath -> TemplateState -> TemplateState
+removeTemplateFile fp (TemplateState eSt) =
+  TemplateState $ do
+    st <- eSt
+    let tpath = splitPathWith '/' (tmplName fp)
+    Right $ st {HT._templateMap = HM.delete tpath (HT._templateMap st)}
 
 renderHeistTemplate ::
   HasCallStack =>
@@ -88,3 +89,15 @@ renderHeistTemplate name splices st =
     -- A 'fromJust' that fails in the 'ExceptT' monad
     tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
     tryJust e = hoistEither . maybeToRight e
+
+-- Uhh, a fork of heist function not exposed.
+
+-- | Converts a path into an array of the elements in reverse order.  If the
+-- path is absolute, we need to remove the leading slash so the split doesn't
+-- leave @\"\"@ as the last element of the TPath.
+--
+-- FIXME @\"..\"@ currently doesn't work in paths, the solution is non-trivial
+splitPathWith :: Char -> ByteString -> H.TPath
+splitPathWith s p = if BC.null p then [] else (reverse $ BC.split s path)
+  where
+    path = if BC.head p == s then BC.tail p else p
