@@ -99,7 +99,7 @@ modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to static files. Anything generated really.
   fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
-modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, NonEmpty [B.Block])]
+modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
