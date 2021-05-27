@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask Questions
+    url: https://github.com/srid/emanote/discussions/categories/q-a
+    about: Post questions in Discussions tab
+  - name: Request a feature
+    url: https://github.com/srid/emanote/discussions/categories/ideas
+    about: Enhancement requests should be posted in Discussions tab
