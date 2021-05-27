@@ -103,15 +103,16 @@ modelLookupRouteByWikiLink wl model =
       staticRoutes =
         maybeToList $
           liftSomeRoute . fst
+            -- TODO: For "foo/bar/qux.py" we should support [[qux.py]], etc.
             <$> modelLookupStaticFile (WL.wikiLinkFilePath wl) model
    in staticRoutes <> noteRoutes
 
-modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, [B.Block])]
+modelLookupBacklinks :: SomeRoute -> Model -> [(SomeLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
           (Left <$> toList (WL.allowedWikiLinks r))
-            <> [Right $ liftSomeRoute . someLMLRouteCase $ r]
+            <> [Right r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)

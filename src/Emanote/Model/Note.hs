@@ -31,7 +31,7 @@ newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLink}
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs =
-  fmap SelfRef . toList . WL.allowedWikiLinks . _noteRoute
+  fmap SelfRef . toList . WL.allowedWikiLinks . liftSomeRoute . someLMLRouteCase . _noteRoute
 
 type NoteIxs = '[SomeLMLRoute, SelfRef]
 
