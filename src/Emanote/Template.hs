@@ -135,33 +135,33 @@ renderHtml tailwindShim model r = do
 -- Requires resolution from the `model` state. Late resolution, in other words.
 resolveUrl :: Model -> [(Text, Text)] -> Text -> Text
 resolveUrl model linkAttrs url =
-  fromMaybe url $ do
-    -- TODO: Can't get rid of this completely yet, see the TODO: near parseUrl
-    guard $ not $ isStaticAssetUrl url
+  fromMaybe url $
     fmap Ema.routeUrl . resolveRelTarget model
       <=< Rel.parseRelTarget linkAttrs
       $ url
-  where
-    isStaticAssetUrl s =
-      any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles
 
 resolveRelTarget :: Model -> Rel.RelTarget -> Maybe EmanoteRoute
 resolveRelTarget model = \case
-  Right r -> do
-    case someRouteCase r of
-      Left mdR ->
-        pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
-      Right sR ->
-        EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
+  Right r ->
+    resolveSomeRoute r
   Left wl ->
     case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
       Nothing -> do
-        -- TODO: Set an attribute for broken links, so templates can style it accordingly
-        let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLink wl
-        pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
+        resolveBrokenWikiLink wl
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        pure $ ERNoteHtml $ htmlRouteForLmlRoute $head targets
+        resolveSomeRoute $ head targets
+  where
+    resolveSomeRoute r =
+      case someRouteCase r of
+        Left mdR ->
+          pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
+        Right sR ->
+          EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
+    resolveBrokenWikiLink wl = do
+      -- TODO: Set an attribute for broken links, so templates can style it accordingly
+      let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLink wl
+      pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
 
 noteUrl :: SomeLMLRoute -> Text
 noteUrl =

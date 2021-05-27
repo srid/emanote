@@ -66,16 +66,7 @@ extractRels note =
 parseRelTarget :: [(Text, Text)] -> Text -> Maybe RelTarget
 parseRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
-  -- NOTE: wiki link parsing must come **last**, as it catches every relative
-  -- URL.
-  -- TODO: Use mkAnyExtRouteFromFilePath to catch static file paths, but only if they exist
-  -- BUT this can only be done when parsing wiki-link only in wiki-links (not regular links)
-  -- So make link-context return entire pandoc link node, and parse wiki-link identifiers.
-  -- DO the same for PandocUtil.rewriteLinks
-  -- THEN during resolution:
-  -- Make wiki link parser look for all sources including static sources (and dirs).
-  -- See the TODO in modelLookupRouteByWikiLink
-  fmap
-    (Right . openUnionLift . someLMLRouteCase)
-    (mkLmlRouteFromFilePath . toString $ url)
-    <|> fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+  fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+    <|> fmap
+      (Right . openUnionLift . someLMLRouteCase)
+      (mkLmlRouteFromFilePath . toString $ url)

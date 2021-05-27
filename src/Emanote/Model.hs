@@ -34,6 +34,7 @@ import Emanote.Route.Ext (FileType (AnyExt))
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute
   ( SomeLMLRoute,
+    SomeRoute,
     liftSomeRoute,
     someLMLRouteCase,
   )
@@ -90,14 +91,20 @@ modelLookupTitle :: SomeLMLRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeFileBase $ someLMLRouteCase r) noteTitle . modelLookupNote r
 
-modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [SomeLMLRoute]
+modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [SomeRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
   --
   -- Could store `modelNoteDirs` and look that up.
-  -- TODO: Also lookup wiki links to static files. Anything generated really.
-  fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
+  let noteRoutes =
+        fmap (liftSomeRoute . someLMLRouteCase . (^. noteRoute)) . Ix.toList $
+          (model ^. modelNotes) @= SelfRef wl
+      staticRoutes =
+        maybeToList $
+          liftSomeRoute . fst
+            <$> modelLookupStaticFile (WL.wikiLinkFilePath wl) model
+   in staticRoutes <> noteRoutes
 
 modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
