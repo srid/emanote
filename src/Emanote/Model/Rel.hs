@@ -29,7 +29,7 @@ data Rel = Rel
     -- The target of the relation (can be a note or anything)
     _relTo :: RelTarget,
     -- | The relation context in LML
-    _relCtx :: NonEmpty [B.Block]
+    _relCtx :: [B.Block]
   }
   deriving (Show)
 
@@ -53,13 +53,14 @@ makeLenses ''Rel
 
 extractRels :: Note -> [Rel]
 extractRels note =
-  extractLinks . Map.map (fmap snd) . LC.queryLinksWithContext $ note ^. noteDoc
+  extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
-    extractLinks :: Map Text (NonEmpty [B.Block]) -> [Rel]
+    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> [Rel]
     extractLinks m =
-      flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
-        target <- parseRelTarget url
-        pure $ Rel (note ^. noteRoute) target ctx
+      flip concatMap (Map.toList m) $ \(url, instances) -> do
+        flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
+          target <- parseRelTarget url
+          pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
 parseRelTarget :: Text -> Maybe RelTarget
