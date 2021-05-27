@@ -102,7 +102,7 @@ executable emanote
     Emanote.Route
     Emanote.Route.Ext
     Emanote.Route.SomeRoute
-    Emanote.Route.WikiLinkTarget
+    Emanote.Route.WikiLink
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
