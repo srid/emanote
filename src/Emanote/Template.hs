@@ -5,10 +5,8 @@ module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import qualified Data.Text as T
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Class (EmanoteRoute (..), htmlRouteForLmlRoute)
@@ -102,7 +100,7 @@ renderHtml tailwindShim model r = do
     "ema:note:titleFull"
       ## HI.textSplice (if pageTitle == siteTitle then pageTitle else pageTitle <> " – " <> siteTitle)
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks (liftSomeRoute . someLMLRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice

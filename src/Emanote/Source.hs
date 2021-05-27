@@ -28,6 +28,7 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Route as R
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute (liftSomeLMLRoute)
+import qualified Emanote.Route.WikiLink as WL
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -104,7 +105,7 @@ transformAction src fps = do
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
-        Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
+        WL.wikilinkSpec <> Markdown.fullMarkdownSpec
     parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
     parseSData s =
       either (throw . BadInput . show) pure $

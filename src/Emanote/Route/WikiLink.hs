@@ -18,7 +18,7 @@ import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
 import Emanote.Route (Route (unRoute))
-import Emanote.Route.SomeRoute (SomeLMLRoute, someLMLRouteCase)
+import Emanote.Route.SomeRoute (SomeRoute, someLMLRouteCase, someRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
@@ -51,14 +51,17 @@ mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinks :: SomeLMLRoute -> Set WikiLink
+allowedWikiLinks :: SomeRoute -> Set WikiLink
 allowedWikiLinks =
   Set.fromList
     . mapMaybe (fmap WikiLink . nonEmpty)
     . toList
     . NE.tails
-    . unRoute
-    . someLMLRouteCase
+    . wlParts
+  where
+    wlParts =
+      either (unRoute . someLMLRouteCase) unRoute
+        . someRouteCase
 
 -------------------------
 -- Parser
