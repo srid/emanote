@@ -27,11 +27,11 @@ data Note = Note
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
--- | Set of WikiLinks that refer to a note.
+-- | Any potential WikiLink that refer to a note.
 newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLinkTarget}
   deriving (Eq, Ord, Show)
 
--- | Wiki-links that refer to this note.
+-- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs =
   fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute

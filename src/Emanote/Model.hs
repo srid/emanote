@@ -96,6 +96,7 @@ modelLookupRouteByWikiLink wl model =
   -- Eg: my [[Public Post Ideas]]
   --
   -- Could store `modelNoteDirs` and look that up.
+  -- TODO: Also lookup wiki links to static files. Anything generated really.
   fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
 modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, NonEmpty [B.Block])]
