@@ -110,7 +110,7 @@ renderHtml tailwindShim model r = do
         "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ ERNoteHtml $ htmlRouteForLmlRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
-          $ ctxDoc
+          $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass rewriteClass
       $ case M.modelLookupNote r model of
@@ -124,8 +124,11 @@ renderHtml tailwindShim model r = do
         Just note ->
           note ^. MN.noteDoc
             & ( PandocUtil.withoutH1 -- Because, handling note title separately
-                  >>> PandocUtil.rewriteLinks (resolveUrl model)
+                  >>> resolvePandoc
               )
+  where
+    resolvePandoc =
+      PandocUtil.rewriteLinks (resolveUrl model)
 
 -- | Convert .md or wiki links to their proper route url.
 --

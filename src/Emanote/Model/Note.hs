@@ -17,9 +17,6 @@ import Emanote.Route.SomeRoute
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
--- TODO: This type should be polymorphic over `LMLType` once we get to
--- supporting formats other than Markdown. Checkout out `SomeRoute`, but we need
--- that constrained to LML routes only.
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
