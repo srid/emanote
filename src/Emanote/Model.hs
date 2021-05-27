@@ -37,7 +37,7 @@ import Emanote.Route.SomeRoute
     liftSomeRoute,
     someLMLRouteCase,
   )
-import qualified Emanote.Route.WikiLinkTarget as WL
+import qualified Emanote.Route.WikiLink as WL
 import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
@@ -90,7 +90,7 @@ modelLookupTitle :: SomeLMLRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeFileBase $ someLMLRouteCase r) noteTitle . modelLookupNote r
 
-modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [SomeLMLRoute]
+modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [SomeLMLRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
@@ -103,7 +103,7 @@ modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
-          (Left <$> toList (WL.allowedWikiLinkTargets r))
+          (Left <$> toList (WL.allowedWikiLinks r))
             <> [Right $ liftSomeRoute . someLMLRouteCase $ r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->

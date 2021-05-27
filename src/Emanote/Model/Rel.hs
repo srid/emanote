@@ -16,11 +16,11 @@ import qualified Data.Text as T
 import Data.WorldPeace.Union (openUnionLift)
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, mkLmlRouteFromFilePath, someLMLRouteCase)
-import qualified Emanote.Route.WikiLinkTarget as WL
+import qualified Emanote.Route.WikiLink as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
-type RelTarget = Either WL.WikiLinkTarget SomeRoute
+type RelTarget = Either WL.WikiLink SomeRoute
 
 -- | A relation from a note to another note or static file.
 data Rel = Rel
@@ -78,4 +78,4 @@ parseRelTarget url = do
   fmap
     (Right . openUnionLift . someLMLRouteCase)
     (mkLmlRouteFromFilePath . toString $ url)
-    <|> fmap Left (WL.mkWikiLinkTargetFromUrl url)
+    <|> fmap Left (WL.mkWikiLinkFromUrl url)

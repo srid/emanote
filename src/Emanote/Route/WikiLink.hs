@@ -4,7 +4,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.Route.WikiLinkTarget where
+module Emanote.Route.WikiLink where
 
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
@@ -19,22 +19,22 @@ import Emanote.Route.SomeRoute
 --
 -- As wiki links may contain multiple path components, it can also represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
-newtype WikiLinkTarget = WikiLinkTarget {unWikiLinkText :: NonEmpty Slug}
+newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Show, Ord, Data)
 
-mkWikiLinkTargetFromUrl :: Text -> Maybe WikiLinkTarget
-mkWikiLinkTargetFromUrl s = do
+mkWikiLinkFromUrl :: Text -> Maybe WikiLink
+mkWikiLinkFromUrl s = do
   guard $ not $ "://" `T.isInfixOf` s
   slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
-  pure $ WikiLinkTarget slugs
+  pure $ WikiLink slugs
 
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinkTargets :: SomeLMLRoute -> Set WikiLinkTarget
-allowedWikiLinkTargets =
+allowedWikiLinks :: SomeLMLRoute -> Set WikiLink
+allowedWikiLinks =
   Set.fromList
-    . mapMaybe (fmap WikiLinkTarget . nonEmpty)
+    . mapMaybe (fmap WikiLink . nonEmpty)
     . toList
     . NE.tails
     . unRoute

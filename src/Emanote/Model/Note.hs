@@ -14,7 +14,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Emanote.PandocUtil as PandocUtil
 import qualified Emanote.Route as R
 import Emanote.Route.SomeRoute
-import qualified Emanote.Route.WikiLinkTarget as WL
+import qualified Emanote.Route.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
@@ -25,13 +25,13 @@ data Note = Note
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
 -- | Any potential WikiLink that refer to a note.
-newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLinkTarget}
+newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLink}
   deriving (Eq, Ord, Show)
 
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs =
-  fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute
+  fmap SelfRef . toList . WL.allowedWikiLinks . _noteRoute
 
 type NoteIxs = '[SomeLMLRoute, SelfRef]
 

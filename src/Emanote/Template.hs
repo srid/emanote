@@ -23,7 +23,7 @@ import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute
-import qualified Emanote.Route.WikiLinkTarget as WL
+import qualified Emanote.Route.WikiLink as WL
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
@@ -155,7 +155,7 @@ resolveRelTarget model = \case
     case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
       Nothing -> do
         -- TODO: Set an attribute for broken links, so templates can style it accordingly
-        let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
+        let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLink wl
         pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
       Just targets ->
         -- TODO: Deal with ambiguous targets here
