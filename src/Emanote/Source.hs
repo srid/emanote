@@ -26,8 +26,8 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.SomeRoute (liftSomeLMLRoute)
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -49,21 +49,22 @@ transformAction ::
   Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
-  chainM (Map.toList fps) $ \(fp, action) ->
+  chainM (Map.toList fps) $ \(fp, action) -> do
+    let mkMdRoute = fmap liftSomeLMLRoute . R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md)
     case src of
       Ext.LMLType Ext.Md ->
         case action of
           Mount.Update overlays ->
             fmap (fromMaybe id) . runMaybeT $ do
               let fpAbs = locResolve $ head overlays
-              r :: R.Route ('LMLType 'Md) <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
+              r <- MaybeT $ pure $ mkMdRoute fp
               -- TODO: Log in batches, to avoid slowing things down when using large notebooks
               logD $ "Reading note: " <> toText fpAbs
               !s <- readFileText fpAbs
               (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fpAbs s
-              pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
+              pure $ M.modelInsertNote r (fromMaybe Aeson.Null mMeta, doc)
           Mount.Delete ->
-            pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp)
+            pure $ maybe id M.modelDeleteNote (mkMdRoute fp)
       Ext.Yaml ->
         case action of
           Mount.Update overlays ->

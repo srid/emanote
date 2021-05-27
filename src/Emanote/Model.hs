@@ -30,9 +30,13 @@ import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
+import Emanote.Route.Ext (FileType (AnyExt))
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute
+  ( SomeLMLRoute,
+    liftSomeRoute,
+    someLMLRouteCase,
+  )
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
@@ -53,22 +57,22 @@ makeLenses ''Model
 instance Default Model where
   def = Model Ix.empty Ix.empty Ix.empty mempty mempty def
 
-modelInsertMarkdown :: Route ('LMLType 'Md) -> (Aeson.Value, Pandoc) -> Model -> Model
-modelInsertMarkdown k v =
+modelInsertNote :: SomeLMLRoute -> (Aeson.Value, Pandoc) -> Model -> Model
+modelInsertNote k v =
   modelNotes %~ Ix.updateIx k note
     >>> modelRels
-      %~ ( Ix.deleteIx (liftSomeRoute k)
+      %~ ( Ix.deleteIx k
              >>> Ix.insertList (Rel.extractRels note)
          )
-    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
+    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . someLMLRouteCase $ k)
   where
     note = Note (snd v) (fst v) k
 
-modelDeleteMarkdown :: Route ('LMLType 'Md) -> Model -> Model
-modelDeleteMarkdown k =
+modelDeleteNote :: SomeLMLRoute -> Model -> Model
+modelDeleteNote k =
   modelNotes %~ Ix.deleteIx k
-    >>> modelRels %~ Ix.deleteIx (liftSomeRoute k)
-    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
+    >>> modelRels %~ Ix.deleteIx k
+    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . someLMLRouteCase $ k)
 
 modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v =
@@ -78,15 +82,15 @@ modelDeleteData :: R.Route 'Ext.Yaml -> Model -> Model
 modelDeleteData k =
   modelData %~ Ix.deleteIx k
 
-modelLookup :: Route ('LMLType 'Md) -> Model -> Maybe Note
-modelLookup k =
+modelLookupNote :: SomeLMLRoute -> Model -> Maybe Note
+modelLookupNote k =
   Ix.getOne . Ix.getEQ k . _modelNotes
 
-modelLookupTitle :: Route ('LMLType 'Md) -> Model -> Text
+modelLookupTitle :: SomeLMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeFileBase r) noteTitle . modelLookup r
+  maybe (R.routeFileBase $ someLMLRouteCase r) noteTitle . modelLookupNote r
 
-modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [Route ('LMLType 'Md)]
+modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [SomeLMLRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
@@ -94,16 +98,15 @@ modelLookupRouteByWikiLink wl model =
   -- Could store `modelNoteDirs` and look that up.
   fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
 
-modelLookupBacklinks :: Route ('LMLType 'Md) -> Model -> [(Route ('LMLType 'Md), NonEmpty [B.Block])]
+modelLookupBacklinks :: SomeLMLRoute -> Model -> [(SomeLMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
           (Left <$> toList (WL.allowedWikiLinkTargets r))
-            <> [Right $ liftSomeRoute r]
+            <> [Right $ liftSomeRoute . someLMLRouteCase $ r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
-   in flip mapMaybe backlinks $ \rel -> do
-        rFrom <- someRouteMatch $ rel ^. Rel.relFrom
-        pure (rFrom, rel ^. Rel.relCtx)
+   in backlinks <&> \rel ->
+        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
 modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt, FilePath)
 modelLookupStaticFile fp model = do

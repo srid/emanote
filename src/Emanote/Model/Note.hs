@@ -12,16 +12,18 @@ import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Emanote.PandocUtil as PandocUtil
-import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext
+import Emanote.Route.SomeRoute
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
+-- TODO: This type should be polymorphic over `LMLType` once we get to
+-- supporting formats other than Markdown. Checkout out `SomeRoute`, but we need
+-- that constrained to LML routes only.
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteRoute :: Route ('LMLType 'Md)
+    _noteRoute :: SomeLMLRoute
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
@@ -34,14 +36,13 @@ noteSelfRefs :: Note -> [SelfRef]
 noteSelfRefs =
   fmap SelfRef . toList . WL.allowedWikiLinkTargets . _noteRoute
 
-type NoteIxs = '[Route ('LMLType 'Md), SelfRef]
+type NoteIxs = '[SomeLMLRoute, SelfRef]
 
 type IxNote = IxSet NoteIxs Note
 
 instance Indexable NoteIxs Note where
   indices =
     ixList
-      -- (ixGen $ Proxy @(Route ('LMLType 'Md)))
       (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
 
@@ -49,5 +50,5 @@ makeLenses ''Note
 
 noteTitle :: Note -> Text
 noteTitle note =
-  fromMaybe (R.routeFileBase $ note ^. noteRoute) $
+  fromMaybe (R.routeFileBase . someLMLRouteCase $ note ^. noteRoute) $
     PandocUtil.getPandocTitle $ note ^. noteDoc

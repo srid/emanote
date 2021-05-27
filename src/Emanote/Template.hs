@@ -45,10 +45,10 @@ render x m = \case
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
     Ema.AssetGenerated Ema.Html $ renderHtml x m r
   where
-    mdRouteForHtmlRoute :: Route 'Html -> Route ('LMLType 'Md)
-    mdRouteForHtmlRoute = coerce
+    mdRouteForHtmlRoute :: Route 'Html -> SomeLMLRoute
+    mdRouteForHtmlRoute = liftSomeLMLRoute . coerce @(Route 'Html) @(Route ('LMLType 'Md))
 
-renderHtml :: H.Html -> Model -> Route ('LMLType 'Md) -> LByteString
+renderHtml :: H.Html -> Model -> SomeLMLRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
@@ -69,15 +69,19 @@ renderHtml tailwindShim model r = do
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
-                 (Meta.lookupMeta @Int 0 (one "order") tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
+                 ( Meta.lookupMeta @Int 0 (one "order") tr model,
+                   maybe (R.routeFileBase . someLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+                 )
                getCollapsed tr =
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) children -> do
+               mkLmlRoute = liftSomeLMLRoute . R.Route @('LMLType 'Md)
+               lmlRouteSlugs = R.unRoute . someLMLRouteCase
+            in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ noteUrl nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
-                       toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
+                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
                      openTree =
                        isActiveTree -- Active tree is always open
                          || not (getCollapsed nodeRoute)
@@ -87,11 +91,11 @@ renderHtml tailwindShim model r = do
                  "tree:open" ## Heist.ifElseISplice openTree
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
-      $ \crumb ->
+      ## Splices.listSplice (init $ R.routeInits . someLMLRouteCase $ r) "each-crumb"
+      $ \(liftSomeLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## noteUrl crumb
-          "crumb:title" ## M.modelLookupTitle crumb model
+          "crumb:url" ## noteUrl crumbR
+          "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice pageTitle
@@ -109,7 +113,7 @@ renderHtml tailwindShim model r = do
           $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass rewriteClass
-      $ case M.modelLookup r model of
+      $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
           -- 1. Refers to a folder route (and no ${folder}.md exists)
@@ -142,7 +146,7 @@ resolveUrl model url =
           case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
             Nothing -> do
               -- TODO: Set an attribute for broken links, so templates can style it accordingly
-              let fakeRouteUnder404 = R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
+              let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
               pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
             Just targets ->
               -- TODO: Deal with ambiguous targets here
@@ -152,6 +156,6 @@ resolveUrl model url =
     isStaticAssetUrl s =
       any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles
 
-noteUrl :: Route ('LMLType x) -> Text
+noteUrl :: SomeLMLRoute -> Text
 noteUrl =
   Ema.routeUrl . ERNoteHtml . htmlRouteForLmlRoute

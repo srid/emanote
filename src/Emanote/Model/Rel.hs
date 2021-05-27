@@ -15,15 +15,15 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext
-import Emanote.Route.SomeRoute (SomeRoute, liftSomeRoute)
+import Emanote.Route.Ext (FileType (LMLType), LML (Md))
+import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, liftSomeRoute)
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
 -- | A relation from one note to another.
 data Rel = Rel
-  { _relFrom :: SomeRoute,
+  { _relFrom :: SomeLMLRoute,
     _relTo :: Either WL.WikiLinkTarget SomeRoute,
     -- | The relation context of 'from' note linking to 'to' note.
     _relCtx :: NonEmpty [B.Block]
@@ -36,7 +36,7 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[SomeRoute, Either WL.WikiLinkTarget SomeRoute]
+type RelIxs = '[SomeLMLRoute, Either WL.WikiLinkTarget SomeRoute]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -56,7 +56,7 @@ extractRels note =
     extractLinks m =
       flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
         target <- parseUrl url
-        pure $ Rel (liftSomeRoute $ note ^. noteRoute) target ctx
+        pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
 parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget SomeRoute)

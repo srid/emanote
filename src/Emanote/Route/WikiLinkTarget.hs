@@ -13,6 +13,7 @@ import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
 import Emanote.Route (Route (unRoute))
+import Emanote.Route.SomeRoute
 
 -- | Represents the "Foo" in [[Foo]]
 --
@@ -30,6 +31,11 @@ mkWikiLinkTargetFromUrl s = do
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinkTargets :: Route fileType -> Set WikiLinkTarget
+allowedWikiLinkTargets :: SomeLMLRoute -> Set WikiLinkTarget
 allowedWikiLinkTargets =
-  Set.fromList . mapMaybe (fmap WikiLinkTarget . nonEmpty) . toList . NE.tails . unRoute
+  Set.fromList
+    . mapMaybe (fmap WikiLinkTarget . nonEmpty)
+    . toList
+    . NE.tails
+    . unRoute
+    . someLMLRouteCase
