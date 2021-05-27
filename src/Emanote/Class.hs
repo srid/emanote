@@ -12,7 +12,8 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType))
+import Emanote.Route.Ext (FileType (AnyExt, Html))
+import Emanote.Route.SomeRoute (SomeLMLRoute, someLMLRouteCase)
 
 data EmanoteRoute
   = ERNoteHtml (Route 'Html)
@@ -44,5 +45,5 @@ instance Ema Model EmanoteRoute where
      in fmap ERNoteHtml htmlRoutes
           <> fmap EROtherFile staticFiles
 
-htmlRouteForLmlRoute :: Route ('LMLType x) -> Route 'Html
-htmlRouteForLmlRoute = coerce
+htmlRouteForLmlRoute :: SomeLMLRoute -> Route 'Html
+htmlRouteForLmlRoute = coerce . someLMLRouteCase

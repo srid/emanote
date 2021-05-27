@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Emanote.Route.SomeRoute where
 
@@ -14,12 +15,26 @@ import Data.WorldPeace.Union
 import Emanote.Route (Route)
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 
-type Routes =
-  '[ Route ('LMLType 'Md),
-     Route 'AnyExt
+type LMLRoutes =
+  '[ Route ('LMLType 'Md)
    ]
 
+type Routes =
+  Route 'AnyExt
+    ': LMLRoutes
+
+-- | Route to anything
 type SomeRoute = OpenUnion Routes
+
+-- | Route to a note file
+type SomeLMLRoute = OpenUnion LMLRoutes
+
+liftSomeLMLRoute ::
+  IsMember (Route ext) LMLRoutes =>
+  Route (ext :: FileType) ->
+  SomeLMLRoute
+liftSomeLMLRoute =
+  openUnionLift
 
 liftSomeRoute ::
   IsMember (Route ext) Routes =>
@@ -27,6 +42,13 @@ liftSomeRoute ::
   SomeRoute
 liftSomeRoute =
   openUnionLift
+
+someLMLRouteCase ::
+  SomeLMLRoute ->
+  Route ('LMLType 'Md)
+someLMLRouteCase =
+  absurdUnion
+    `openUnionHandle` id
 
 someRouteMatch ::
   IsMember (Route ext) Routes =>
@@ -37,8 +59,10 @@ someRouteMatch =
 
 someRouteCase ::
   SomeRoute ->
-  Either (Route ('LMLType 'Md)) (Route 'AnyExt)
+  Either SomeLMLRoute (Route 'AnyExt)
 someRouteCase =
-  absurdUnion
-    `openUnionHandle` Left
-    `openUnionHandle` Right
+  first (liftSomeLMLRoute @('LMLType 'Md))
+    . ( absurdUnion
+          `openUnionHandle` Left
+          `openUnionHandle` Right
+      )
