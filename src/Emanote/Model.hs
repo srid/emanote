@@ -25,7 +25,7 @@ import Emanote.Model.Note
   )
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
-import Emanote.Model.SData (IxSData, SData (SData), sdataRoute)
+import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.SelfRef (SelfRef (SelfRef))
 import Emanote.Model.StaticFile
 import Emanote.Route (Route)

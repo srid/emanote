@@ -10,14 +10,13 @@ module Emanote.Model.Meta where
 import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
-import qualified Data.Aeson.Extra.Merge as AesonMerge
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.List.NonEmpty as NE
 import Emanote.Model (Model, modelLookupNote, modelSData)
 import Emanote.Model.Note
   ( noteMeta,
   )
 import Emanote.Model.SData (sdataValue)
+import qualified Emanote.Model.SData as SData
 import qualified Emanote.Route as R
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute
@@ -57,12 +56,4 @@ getEffectiveRouteMeta mr model =
         guard $ x /= Aeson.Null
         pure x
       metas = defaults <> maybe mempty one frontmatter
-   in maybe Aeson.Null mergeAesons $ nonEmpty metas
-
--- | Later values override former.
-mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
-mergeAesons =
-  NE.last . NE.scanl1 mergeAeson
-
-mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
-mergeAeson = AesonMerge.lodashMerge
+   in maybe Aeson.Null SData.mergeAesons $ nonEmpty metas

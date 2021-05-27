@@ -21,6 +21,7 @@ import qualified Emanote.Route.Ext as Ext
 -- value.  Example: /foo/bar.yaml file
 data SData = SData
   { _sdataValue :: Aeson.Value,
+    -- | Location of this data file
     _sdataRoute :: R.Route 'Ext.Yaml
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
