@@ -59,12 +59,12 @@ extractRels note =
     extractLinks m =
       flip concatMap (Map.toList m) $ \(url, instances) -> do
         flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-          target <- parseRelTarget url
+          target <- parseRelTarget attrs url
           pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
-parseRelTarget :: Text -> Maybe RelTarget
-parseRelTarget url = do
+parseRelTarget :: [(Text, Text)] -> Text -> Maybe RelTarget
+parseRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
   -- NOTE: wiki link parsing must come **last**, as it catches every relative
   -- URL.
@@ -78,4 +78,4 @@ parseRelTarget url = do
   fmap
     (Right . openUnionLift . someLMLRouteCase)
     (mkLmlRouteFromFilePath . toString $ url)
-    <|> fmap Left (WL.mkWikiLinkFromUrl url)
+    <|> fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
