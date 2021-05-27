@@ -32,6 +32,7 @@ import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.SomeRoute
 import qualified Emanote.Route.WikiLinkTarget as WL
 import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
@@ -55,7 +56,10 @@ instance Default Model where
 modelInsertMarkdown :: Route ('LMLType 'Md) -> (Aeson.Value, Pandoc) -> Model -> Model
 modelInsertMarkdown k v =
   modelNotes %~ Ix.updateIx k note
-    >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (Rel.extractRels note))
+    >>> modelRels
+      %~ ( Ix.deleteIx (liftSomeRoute k)
+             >>> Ix.insertList (Rel.extractRels note)
+         )
     >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
   where
     note = Note (snd v) (fst v) k
@@ -63,7 +67,7 @@ modelInsertMarkdown k v =
 modelDeleteMarkdown :: Route ('LMLType 'Md) -> Model -> Model
 modelDeleteMarkdown k =
   modelNotes %~ Ix.deleteIx k
-    >>> modelRels %~ Ix.deleteIx k
+    >>> modelRels %~ Ix.deleteIx (liftSomeRoute k)
     >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
 
 modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
@@ -95,10 +99,11 @@ modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
           (Left <$> toList (WL.allowedWikiLinkTargets r))
-            <> [Right r]
+            <> [Right $ liftSomeRoute r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
-   in backlinks <&> \rel ->
-        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+   in flip mapMaybe backlinks $ \rel -> do
+        rFrom <- someRouteMatch $ rel ^. Rel.relFrom
+        pure (rFrom, rel ^. Rel.relCtx)
 
 modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt, FilePath)
 modelLookupStaticFile fp model = do

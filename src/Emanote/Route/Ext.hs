@@ -19,13 +19,13 @@ data FileType
   | -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
     -- "catch all" type to capture files using an arbitrary.
     AnyExt
-  deriving (Generic, Eq, Show, Ord, Data, ToJSON)
+  deriving (Generic, Eq, Show, Ord, Typeable, Data, ToJSON)
 
 -- | A lightweight markup language
 --
 -- https://en.wikipedia.org/wiki/Lightweight_markup_language
 data LML = Md
-  deriving (Generic, Eq, Show, Ord, Data, ToJSON)
+  deriving (Generic, Eq, Show, Ord, Typeable, Data, ToJSON)
 
 -- | The `HasExt` class's responsibility is to allow dealing with basepath sans
 -- extension (and vice-versa).

@@ -22,6 +22,7 @@ import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.SomeRoute
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -132,17 +133,21 @@ resolveUrl model url =
     r <-
       Rel.parseUrl url >>= \case
         Right r -> do
-          pure r
+          case someRouteCase r of
+            Left mdR ->
+              pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
+            Right sR ->
+              EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
         Left wl ->
           case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
             Nothing -> do
               -- TODO: Set an attribute for broken links, so templates can style it accordingly
               let fakeRouteUnder404 = R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
-              pure fakeRouteUnder404
+              pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
             Just targets ->
               -- TODO: Deal with ambiguous targets here
-              pure $ head targets
-    pure $ noteUrl r
+              pure $ ERNoteHtml $ htmlRouteForLmlRoute $head targets
+    pure $ Ema.routeUrl r
   where
     isStaticAssetUrl s =
       any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles

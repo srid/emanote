@@ -10,27 +10,25 @@ module Emanote.Model.Rel where
 
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
-import Data.Data (Data)
-import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
+import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext
+import Emanote.Route.SomeRoute (SomeRoute, liftSomeRoute)
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
-type TargetRoute = Either WL.WikiLinkTarget (R.Route ('LMLType 'Md))
-
 -- | A relation from one note to another.
 data Rel = Rel
-  { _relFrom :: R.Route ('LMLType 'Md),
-    _relTo :: TargetRoute,
+  { _relFrom :: SomeRoute,
+    _relTo :: Either WL.WikiLinkTarget SomeRoute,
     -- | The relation context of 'from' note linking to 'to' note.
     _relCtx :: NonEmpty [B.Block]
   }
-  deriving (Data, Show)
+  deriving (Show)
 
 instance Eq Rel where
   (==) = (==) `on` (_relFrom &&& _relTo)
@@ -38,15 +36,15 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[R.Route ('LMLType 'Md), TargetRoute]
+type RelIxs = '[SomeRoute, Either WL.WikiLinkTarget SomeRoute]
 
 type IxRel = IxSet RelIxs Rel
 
 instance Indexable RelIxs Rel where
   indices =
     ixList
-      (ixGen $ Proxy @(R.Route ('LMLType 'Md)))
-      (ixGen $ Proxy @TargetRoute)
+      (ixFun $ one . _relFrom)
+      (ixFun $ one . _relTo)
 
 makeLenses ''Rel
 
@@ -58,11 +56,11 @@ extractRels note =
     extractLinks m =
       flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
         target <- parseUrl url
-        pure $ Rel (note ^. noteRoute) target ctx
+        pure $ Rel (liftSomeRoute $ note ^. noteRoute) target ctx
 
 -- | Parse a URL string
-parseUrl :: Text -> Maybe TargetRoute
+parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget SomeRoute)
 parseUrl url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Right (R.mkRouteFromFilePath @('LMLType 'Md) $ toString url)
+  fmap (Right . liftSomeRoute) (R.mkRouteFromFilePath @('LMLType 'Md) $ toString url)
     <|> fmap Left (WL.mkWikiLinkTargetFromUrl url)
