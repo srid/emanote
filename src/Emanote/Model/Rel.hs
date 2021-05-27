@@ -13,19 +13,22 @@ import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
+import Data.WorldPeace.Union (openUnionLift)
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (LMLType), LML (Md))
-import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, liftSomeRoute)
+import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, mkLmlRouteFromFilePath, someLMLRouteCase)
 import qualified Emanote.Route.WikiLinkTarget as WL
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
--- | A relation from one note to another.
+type RelTarget = Either WL.WikiLinkTarget SomeRoute
+
+-- | A relation from a note to another note or static file.
 data Rel = Rel
-  { _relFrom :: SomeLMLRoute,
-    _relTo :: Either WL.WikiLinkTarget SomeRoute,
-    -- | The relation context of 'from' note linking to 'to' note.
+  { -- The note containing this relation
+    _relFrom :: SomeLMLRoute,
+    -- The target of the relation (can be a note or anything)
+    _relTo :: RelTarget,
+    -- | The relation context in LML
     _relCtx :: NonEmpty [B.Block]
   }
   deriving (Show)
@@ -36,7 +39,7 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[SomeLMLRoute, Either WL.WikiLinkTarget SomeRoute]
+type RelIxs = '[SomeLMLRoute, RelTarget]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -55,12 +58,23 @@ extractRels note =
     extractLinks :: Map Text (NonEmpty [B.Block]) -> [Rel]
     extractLinks m =
       flip mapMaybe (Map.toList m) $ \(url, ctx) -> do
-        target <- parseUrl url
+        target <- parseRelTarget url
         pure $ Rel (note ^. noteRoute) target ctx
 
 -- | Parse a URL string
-parseUrl :: Text -> Maybe (Either WL.WikiLinkTarget SomeRoute)
-parseUrl url = do
+parseRelTarget :: Text -> Maybe RelTarget
+parseRelTarget url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap (Right . liftSomeRoute) (R.mkRouteFromFilePath @('LMLType 'Md) $ toString url)
+  -- NOTE: wiki link parsing must come **last**, as it catches every relative
+  -- URL.
+  -- TODO: Use mkAnyExtRouteFromFilePath to catch static file paths, but only if they exist
+  -- BUT this can only be done when parsing wiki-link only in wiki-links (not regular links)
+  -- So make link-context return entire pandoc link node, and parse wiki-link identifiers.
+  -- DO the same for PandocUtil.rewriteLinks
+  -- THEN during resolution:
+  -- Make wiki link parser look for all sources including static sources (and dirs).
+  -- See the TODO in modelLookupRouteByWikiLink
+  fmap
+    (Right . openUnionLift . someLMLRouteCase)
+    (mkLmlRouteFromFilePath . toString $ url)
     <|> fmap Left (WL.mkWikiLinkTargetFromUrl url)

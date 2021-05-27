@@ -133,28 +133,30 @@ renderHtml tailwindShim model r = do
 resolveUrl :: Model -> Text -> Text
 resolveUrl model url =
   fromMaybe url $ do
+    -- TODO: Can't get rid of this completely yet, see the TODO: near parseUrl
     guard $ not $ isStaticAssetUrl url
-    r <-
-      Rel.parseUrl url >>= \case
-        Right r -> do
-          case someRouteCase r of
-            Left mdR ->
-              pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
-            Right sR ->
-              EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
-        Left wl ->
-          case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
-            Nothing -> do
-              -- TODO: Set an attribute for broken links, so templates can style it accordingly
-              let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
-              pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
-            Just targets ->
-              -- TODO: Deal with ambiguous targets here
-              pure $ ERNoteHtml $ htmlRouteForLmlRoute $head targets
-    pure $ Ema.routeUrl r
+    fmap Ema.routeUrl . resolveRelTarget model <=< Rel.parseRelTarget $ url
   where
     isStaticAssetUrl s =
       any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles
+
+resolveRelTarget :: Model -> Rel.RelTarget -> Maybe EmanoteRoute
+resolveRelTarget model = \case
+  Right r -> do
+    case someRouteCase r of
+      Left mdR ->
+        pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
+      Right sR ->
+        EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
+  Left wl ->
+    case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
+      Nothing -> do
+        -- TODO: Set an attribute for broken links, so templates can style it accordingly
+        let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
+        pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
+      Just targets ->
+        -- TODO: Deal with ambiguous targets here
+        pure $ ERNoteHtml $ htmlRouteForLmlRoute $head targets
 
 noteUrl :: SomeLMLRoute -> Text
 noteUrl =

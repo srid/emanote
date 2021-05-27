@@ -13,12 +13,14 @@ import Data.WorldPeace.Union
     openUnionMatch,
   )
 import Emanote.Route (Route)
+import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 
 type LMLRoutes =
   '[ Route ('LMLType 'Md)
    ]
 
+-- NOTE: We are not including .yaml and .tpl routes, as they are unused (yet).
 type Routes =
   Route 'AnyExt
     ': LMLRoutes
@@ -26,7 +28,7 @@ type Routes =
 -- | Route to anything
 type SomeRoute = OpenUnion Routes
 
--- | Route to a note file
+-- | Route to a note file in LML (lightweight markup language) format
 type SomeLMLRoute = OpenUnion LMLRoutes
 
 liftSomeLMLRoute ::
@@ -66,3 +68,12 @@ someRouteCase =
           `openUnionHandle` Left
           `openUnionHandle` Right
       )
+
+mkLmlRouteFromFilePath :: FilePath -> Maybe SomeLMLRoute
+mkLmlRouteFromFilePath fp =
+  fmap liftSomeLMLRoute (R.mkRouteFromFilePath @('LMLType 'Md) fp)
+
+mkAnyExtRouteFromFilePath :: HasCallStack => FilePath -> SomeRoute
+mkAnyExtRouteFromFilePath fp =
+  fromMaybe (error "BUG: AnyExt fallback failed; impossible") $ do
+    fmap liftSomeRoute (R.mkRouteFromFilePath @'AnyExt fp)

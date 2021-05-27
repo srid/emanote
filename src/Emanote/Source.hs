@@ -59,7 +59,7 @@ transformAction src fps = do
               let fpAbs = locResolve $ head overlays
               r <- MaybeT $ pure $ mkMdRoute fp
               -- TODO: Log in batches, to avoid slowing things down when using large notebooks
-              logD $ "Reading note: " <> toText fpAbs
+              -- logD $ "Reading note: " <> toText fpAbs
               !s <- readFileText fpAbs
               (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fpAbs s
               pure $ M.modelInsertNote r (fromMaybe Aeson.Null mMeta, doc)
