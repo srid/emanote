@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.Route.WikiLink where
+module Emanote.WikiLink where
 
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP

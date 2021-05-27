@@ -20,9 +20,7 @@ import qualified Emanote.PandocUtil as PandocUtil
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
-import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute
-import qualified Emanote.Route.WikiLink as WL
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
@@ -69,7 +67,7 @@ renderHtml tailwindShim model r = do
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
                  ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                   maybe (R.routeFileBase . someLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+                   maybe (R.routeBaseName . someLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
                  )
                getCollapsed tr =
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model

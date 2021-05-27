@@ -109,13 +109,13 @@ executable emanote
     Emanote.Route
     Emanote.Route.Ext
     Emanote.Route.SomeRoute
-    Emanote.Route.WikiLink
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
     Emanote.Source.Pattern
     Emanote.Source.Util
     Emanote.Template
+    Emanote.WikiLink
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
     Heist.Extra.Splices.Tree

@@ -13,7 +13,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Extra.Merge as AesonMerge
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
-import Emanote.Model (Model, modelData, modelLookupNote)
+import Emanote.Model (Model, modelLookupNote, modelSData)
 import Emanote.Model.Note
   ( noteMeta,
   )
@@ -49,7 +49,7 @@ getEffectiveRouteMeta :: SomeLMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
   let defaultFiles = R.routeInits @'Ext.Yaml (coerce $ someLMLRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
-        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
+        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
         guard $ v /= Aeson.Null
         pure v
       frontmatter = do
