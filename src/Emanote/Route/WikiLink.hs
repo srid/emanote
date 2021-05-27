@@ -31,6 +31,11 @@ import Text.Read (Read (readsPrec))
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Show, Ord, Typeable, Data)
 
+-- | The contents of treated as a filepath
+wikiLinkFilePath :: WikiLink -> FilePath
+wikiLinkFilePath (WikiLink slugs) =
+  toString $ T.intercalate "/" (toList $ Ema.unSlug <$> slugs)
+
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
   wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup "title" $ attrs
