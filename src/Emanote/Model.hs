@@ -13,7 +13,6 @@ import qualified Data.Aeson as Aeson
 import Data.Default (Default (..))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -28,6 +27,7 @@ import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
 import Emanote.Model.SelfRef (SelfRef (SelfRef))
+import Emanote.Model.StaticFile
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt))
@@ -50,8 +50,7 @@ data Model = Model
     -- TODO: Rename to `modelSData` and move parser function to SData.hs after
     -- newtyping Aeson.Value (and move the merge function in there as well)
     _modelData :: IxSData,
-    -- TODO: Promote to `IxStaticFile` and re-use `SelfRef` to allow sub-wikilinks
-    _modelStaticFiles :: Map (Route 'AnyExt) FilePath,
+    _modelStaticFiles :: IxStaticFile,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -77,6 +76,16 @@ modelDeleteNote k =
   modelNotes %~ Ix.deleteIx k
     >>> modelRels %~ Ix.deleteIx k
     >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . someLMLRouteCase $ k)
+
+modelInsertStaticFile :: R.Route 'AnyExt -> FilePath -> Model -> Model
+modelInsertStaticFile r fp =
+  modelStaticFiles %~ Ix.updateIx r staticFile
+  where
+    staticFile = StaticFile r fp
+
+modelDeleteStaticFile :: R.Route 'AnyExt -> Model -> Model
+modelDeleteStaticFile r =
+  modelStaticFiles %~ Ix.deleteIx r
 
 modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
 modelInsertData r v =
@@ -104,10 +113,8 @@ modelLookupRouteByWikiLink wl model =
         fmap (liftSomeRoute . someLMLRouteCase . (^. noteRoute)) . Ix.toList $
           (model ^. modelNotes) @= SelfRef wl
       staticRoutes =
-        maybeToList $
-          liftSomeRoute . fst
-            -- TODO: For "foo/bar/qux.py" we should support [[qux.py]], etc.
-            <$> modelLookupStaticFile (WL.wikiLinkFilePath wl) model
+        fmap (liftSomeRoute . (^. staticFileRoute)) . Ix.toList $
+          (model ^. modelStaticFiles) @= SelfRef wl
    in staticRoutes <> noteRoutes
 
 modelLookupBacklinks :: SomeRoute -> Model -> [(SomeLMLRoute, [B.Block])]
@@ -120,7 +127,10 @@ modelLookupBacklinks r model =
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt, FilePath)
+modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
 modelLookupStaticFile fp model = do
-  r <- R.mkRouteFromFilePath fp
-  (r,) <$> Map.lookup r (model ^. modelStaticFiles)
+  flip modelLookupStaticFileByRoute model =<< R.mkRouteFromFilePath @'AnyExt fp
+
+modelLookupStaticFileByRoute :: Route 'AnyExt -> Model -> Maybe StaticFile
+modelLookupStaticFileByRoute r model = do
+  Ix.getOne . Ix.getEQ r . _modelStaticFiles $ model

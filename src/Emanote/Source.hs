@@ -96,9 +96,9 @@ transformAction src fps = do
             Mount.Update overlays -> do
               let fpAbs = locResolve $ head overlays
               logD $ "Adding file: " <> toText fpAbs <> " " <> show r
-              pure $ M.modelStaticFiles %~ Map.insert r fpAbs
+              pure $ M.modelInsertStaticFile r fpAbs
             Mount.Delete -> do
-              pure $ M.modelStaticFiles %~ Map.delete r
+              pure $ M.modelDeleteStaticFile r
       Ext.Html -> do
         -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
         pure id

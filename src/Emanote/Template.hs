@@ -9,7 +9,8 @@ import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
-import Emanote.Class (EmanoteRoute (..), htmlRouteForLmlRoute)
+import Emanote.Class (EmanoteRoute (..))
+import qualified Emanote.Class as C
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
@@ -76,7 +77,7 @@ renderHtml tailwindShim model r = do
                lmlRouteSlugs = R.unRoute . someLMLRouteCase
             in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-                 "node:url" ## HI.textSplice $ noteUrl nodeRoute
+                 "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
                        toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
@@ -92,7 +93,7 @@ renderHtml tailwindShim model r = do
       ## Splices.listSplice (init $ R.routeInits . someLMLRouteCase $ r) "each-crumb"
       $ \(liftSomeLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## noteUrl crumbR
+          "crumb:url" ## Ema.routeUrl $ C.lmlHtmlRoute crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
@@ -105,7 +106,7 @@ renderHtml tailwindShim model r = do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ ERNoteHtml $ htmlRouteForLmlRoute source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
@@ -153,14 +154,11 @@ resolveRelTarget model = \case
     resolveSomeRoute r =
       case someRouteCase r of
         Left mdR ->
-          pure $ ERNoteHtml $ htmlRouteForLmlRoute mdR
+          -- NOTE: Because don't support slugs yet.
+          pure $ C.lmlHtmlRoute mdR
         Right sR ->
-          EROtherFile <$> M.modelLookupStaticFile (R.routeSourcePath sR) model
+          C.staticFileRoute <$> M.modelLookupStaticFileByRoute sR model
     resolveBrokenWikiLink wl = do
       -- TODO: Set an attribute for broken links, so templates can style it accordingly
       let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLink wl
-      pure $ ERNoteHtml $ htmlRouteForLmlRoute fakeRouteUnder404
-
-noteUrl :: SomeLMLRoute -> Text
-noteUrl =
-  Ema.routeUrl . ERNoteHtml . htmlRouteForLmlRoute
+      pure $ C.lmlHtmlRoute fakeRouteUnder404
