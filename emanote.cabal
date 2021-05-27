@@ -62,6 +62,7 @@ executable emanote
     , unliftio
     , unordered-containers
     , with-utf8
+    , world-peace
     , xmlhtml
     , yaml
 
@@ -100,6 +101,7 @@ executable emanote
     Emanote.PandocUtil
     Emanote.Route
     Emanote.Route.Ext
+    Emanote.Route.SomeRoute
     Emanote.Route.WikiLinkTarget
     Emanote.Source
     Emanote.Source.Loc

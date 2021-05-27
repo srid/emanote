@@ -13,6 +13,7 @@ import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class ()
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
+import Emanote.Route.SomeRoute
 import qualified Emanote.Source as Source
 import qualified Emanote.Source.Mount as Mount
 import qualified Emanote.Template as Template

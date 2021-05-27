@@ -10,8 +10,7 @@ module Emanote.Model.Note where
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
-import Data.Data (Data)
-import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixGen, ixList)
+import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Emanote.PandocUtil as PandocUtil
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
@@ -24,11 +23,11 @@ data Note = Note
     _noteMeta :: Aeson.Value,
     _noteRoute :: Route ('LMLType 'Md)
   }
-  deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
+  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
 -- | Set of WikiLinks that refer to a note.
 newtype SelfRef = SelfRef {unSelfRef :: WL.WikiLinkTarget}
-  deriving (Eq, Ord, Data, Show)
+  deriving (Eq, Ord, Show)
 
 -- | Wiki-links that refer to this note.
 noteSelfRefs :: Note -> [SelfRef]
@@ -42,7 +41,8 @@ type IxNote = IxSet NoteIxs Note
 instance Indexable NoteIxs Note where
   indices =
     ixList
-      (ixGen $ Proxy @(Route ('LMLType 'Md)))
+      -- (ixGen $ Proxy @(Route ('LMLType 'Md)))
+      (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
 
 makeLenses ''Note

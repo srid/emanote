@@ -24,7 +24,7 @@ import qualified Text.Show (Show (show))
 -- If you are using this repo as a template, you might want to use an ADT as
 -- route (eg: data Route = Index | About)
 newtype Route (ext :: FileType) = Route {unRoute :: NonEmpty Slug}
-  deriving (Eq, Ord, Data, Generic, ToJSON)
+  deriving (Eq, Ord, Typeable, Data, Generic, ToJSON)
 
 instance HasExt ext => Show (Route ext) where
   show (Route slugs) =
