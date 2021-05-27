@@ -133,12 +133,14 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Model -> Text -> Text
-resolveUrl model url =
+resolveUrl :: Model -> [(Text, Text)] -> Text -> Text
+resolveUrl model linkAttrs url =
   fromMaybe url $ do
     -- TODO: Can't get rid of this completely yet, see the TODO: near parseUrl
     guard $ not $ isStaticAssetUrl url
-    fmap Ema.routeUrl . resolveRelTarget model <=< Rel.parseRelTarget $ url
+    fmap Ema.routeUrl . resolveRelTarget model
+      <=< Rel.parseRelTarget linkAttrs
+      $ url
   where
     isStaticAssetUrl s =
       any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles

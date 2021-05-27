@@ -36,6 +36,8 @@ executable emanote
     , base
     , blaze-html
     , bytestring
+    , commonmark
+    , commonmark-pandoc
     , containers
     , data-default
     , directory
@@ -48,11 +50,13 @@ executable emanote
     , lens
     , lvar
     , map-syntax
+    , megaparsec
     , monad-logger
     , mtl
     , neat-interpolation
     , pandoc-link-context   >=1.0.2
     , pandoc-types
+    , parsec
     , profunctors
     , relude
     , shower

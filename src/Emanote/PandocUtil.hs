@@ -27,13 +27,13 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
 withoutH1 doc =
   doc
 
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteLinks f = runIdentity . rewriteLinksM (Identity . f)
+rewriteLinks :: ([(Text, Text)] -> Text -> Text) -> Pandoc -> Pandoc
+rewriteLinks f = runIdentity . rewriteLinksM (\x -> Identity . f x)
 
-rewriteLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
+rewriteLinksM :: Monad m => ([(Text, Text)] -> Text -> m Text) -> Pandoc -> m Pandoc
 rewriteLinksM f =
   W.walkM $ \case
-    B.Link attr is (url, tit) -> do
-      newUrl <- f url
+    B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
+      newUrl <- f (otherAttrs <> one ("title", tit)) url
       pure $ B.Link attr is (newUrl, tit)
     x -> pure x
