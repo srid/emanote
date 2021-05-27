@@ -21,13 +21,13 @@ import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model.Note
   ( IxNote,
     Note (Note),
-    SelfRef (SelfRef),
     noteRoute,
     noteTitle,
   )
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData (SData))
+import Emanote.Model.SelfRef (SelfRef (SelfRef))
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt))
@@ -47,7 +47,10 @@ import qualified Text.Pandoc.Definition as B
 data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
+    -- TODO: Rename to `modelSData` and move parser function to SData.hs after
+    -- newtyping Aeson.Value (and move the merge function in there as well)
     _modelData :: IxSData,
+    -- TODO: Promote to `IxStaticFile` and re-use `SelfRef` to allow sub-wikilinks
     _modelStaticFiles :: Map (Route 'AnyExt) FilePath,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
