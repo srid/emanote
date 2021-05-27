@@ -51,7 +51,8 @@ executable emanote
     , monad-logger
     , mtl
     , neat-interpolation
-    , pandoc-link-context   >=1.0.2
+    , optparse-applicative
+    , pandoc-link-context  >=1.0.2
     , pandoc-types
     , profunctors
     , relude
@@ -91,6 +92,7 @@ executable emanote
   autogen-modules:    Paths_emanote
   other-modules:
     Emanote.Class
+    Emanote.Cli
     Emanote.Logging
     Emanote.Model
     Emanote.Model.Meta
