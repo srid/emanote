@@ -19,12 +19,10 @@ import Control.Monad.Logger (MonadLogger)
 import qualified Data.Aeson as Aeson
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
-import qualified Data.Yaml as Yaml
 import qualified Ema.Helper.Markdown as Markdown
 import Emanote.Logging (logD)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
-import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.SData as SD
 import qualified Emanote.Route as R
 import qualified Emanote.Route.Ext as Ext
@@ -38,11 +36,13 @@ import Emanote.Source.Util
   )
 import qualified Emanote.WikiLink as WL
 import qualified Heist.Extra.TemplateState as T
+import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Ext.FileType -> m (Model -> Model)
 transformActions ch = do
-  chainM (Map.toList ch) $ uncurry transformAction
+  chainM (Map.toList ch) (uncurry transformAction)
+    <* hFlush stdout
 
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::
@@ -61,7 +61,7 @@ transformAction src fps = do
               let fpAbs = locResolve $ head overlays
               r <- MaybeT $ pure $ mkMdRoute fp
               -- TODO: Log in batches, to avoid slowing things down when using large notebooks
-              -- logD $ "Reading note: " <> toText fpAbs
+              logD $ "Reading note: " <> toText fpAbs
               !s <- readFileText fpAbs
               (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fpAbs s
               pure $ M.modelInsertNote r (fromMaybe Aeson.Null mMeta, doc)
