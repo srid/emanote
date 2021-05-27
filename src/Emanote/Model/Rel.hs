@@ -17,6 +17,7 @@ import Data.WorldPeace.Union (openUnionLift)
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, mkLmlRouteFromFilePath, someLMLRouteCase)
 import qualified Emanote.Route.WikiLink as WL
+import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
@@ -69,4 +70,4 @@ parseRelTarget attrs url = do
   fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
       (Right . openUnionLift . someLMLRouteCase)
-      (mkLmlRouteFromFilePath . toString $ url)
+      (mkLmlRouteFromFilePath $ UE.decode (toString url))

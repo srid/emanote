@@ -65,6 +65,7 @@ executable emanote
     , time
     , unliftio
     , unordered-containers
+    , uri-encode
     , with-utf8
     , world-peace
     , xmlhtml
