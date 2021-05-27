@@ -132,24 +132,24 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Model -> [(Text, Text)] -> Text -> Text
+resolveUrl :: Model -> [(Text, Text)] -> Text -> Either Text Text
 resolveUrl model linkAttrs url =
-  fromMaybe url $
-    fmap Ema.routeUrl . resolveRelTarget model
+  fromMaybe (Right url) $
+    fmap (fmap Ema.routeUrl) . resolveRelTarget model
       <=< Rel.parseRelTarget linkAttrs
       $ url
 
-resolveRelTarget :: Model -> Rel.RelTarget -> Maybe EmanoteRoute
+resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
 resolveRelTarget model = \case
   Right r ->
-    resolveSomeRoute r
+    Right <$> resolveSomeRoute r
   Left wl ->
     case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
       Nothing -> do
-        resolveBrokenWikiLink wl
+        pure $ Left "Unresolved link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        resolveSomeRoute $ head targets
+        fmap Right $ resolveSomeRoute $ head targets
   where
     resolveSomeRoute r =
       case someRouteCase r of
@@ -158,7 +158,3 @@ resolveRelTarget model = \case
           pure $ C.lmlHtmlRoute mdR
         Right sR ->
           C.staticFileRoute <$> M.modelLookupStaticFileByRoute sR model
-    resolveBrokenWikiLink wl = do
-      -- TODO: Set an attribute for broken links, so templates can style it accordingly
-      let fakeRouteUnder404 = liftSomeLMLRoute $ R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLink wl
-      pure $ C.lmlHtmlRoute fakeRouteUnder404

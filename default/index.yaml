@@ -27,8 +27,9 @@ pandoc:
   # This feature is useful when managing a "library" of CSS styling to use on
   # Markdown text, especially when using Tailwind.
   rewriteClass:
-    # This is just an example
-    example-highlight: bg-yellow-200 p-1
+    # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
+    emanote:broken-link: line-through italic
+    # You can also add your own class -> style mappings.
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
