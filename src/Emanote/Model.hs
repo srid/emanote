@@ -25,7 +25,7 @@ import Emanote.Model.Note
   )
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
-import Emanote.Model.SData (IxSData, SData (SData))
+import Emanote.Model.SData (IxSData, SData (SData), sdataRoute)
 import Emanote.Model.SelfRef (SelfRef (SelfRef))
 import Emanote.Model.StaticFile
 import Emanote.Route (Route)
@@ -38,7 +38,7 @@ import Emanote.Route.SomeRoute
     liftSomeRoute,
     someLMLRouteCase,
   )
-import qualified Emanote.Route.WikiLink as WL
+import qualified Emanote.WikiLink as WL
 import Heist.Extra.TemplateState (TemplateState)
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
@@ -49,7 +49,7 @@ data Model = Model
     _modelRels :: IxRel,
     -- TODO: Rename to `modelSData` and move parser function to SData.hs after
     -- newtyping Aeson.Value (and move the merge function in there as well)
-    _modelData :: IxSData,
+    _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
@@ -87,13 +87,13 @@ modelDeleteStaticFile :: R.Route 'AnyExt -> Model -> Model
 modelDeleteStaticFile r =
   modelStaticFiles %~ Ix.deleteIx r
 
-modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
-modelInsertData r v =
-  modelData %~ Ix.updateIx r (SData v r)
+modelInsertData :: SData -> Model -> Model
+modelInsertData v =
+  modelSData %~ Ix.updateIx (v ^. sdataRoute) v
 
 modelDeleteData :: R.Route 'Ext.Yaml -> Model -> Model
 modelDeleteData k =
-  modelData %~ Ix.deleteIx k
+  modelSData %~ Ix.deleteIx k
 
 modelLookupNote :: SomeLMLRoute -> Model -> Maybe Note
 modelLookupNote k =
@@ -101,7 +101,7 @@ modelLookupNote k =
 
 modelLookupTitle :: SomeLMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeFileBase $ someLMLRouteCase r) noteTitle . modelLookupNote r
+  maybe (R.routeBaseName $ someLMLRouteCase r) noteTitle . modelLookupNote r
 
 modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [SomeRoute]
 modelLookupRouteByWikiLink wl model =

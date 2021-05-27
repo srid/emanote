@@ -25,10 +25,10 @@ import Emanote.Logging (logD)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
+import qualified Emanote.Model.SData as SD
 import qualified Emanote.Route as R
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.SomeRoute (liftSomeLMLRoute)
-import qualified Emanote.Route.WikiLink as WL
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -36,6 +36,7 @@ import Emanote.Source.Util
   ( BadInput (BadInput),
     chainM,
   )
+import qualified Emanote.WikiLink as WL
 import qualified Heist.Extra.TemplateState as T
 
 -- | Like `transformAction` but operates on multiple source types at a time
@@ -71,12 +72,14 @@ transformAction src fps = do
           Mount.Update overlays ->
             fmap (fromMaybe id) . runMaybeT $ do
               r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
-              fmap (M.modelInsertData r . Meta.mergeAesons . NEL.reverse) $
-                forM overlays $ \overlay -> do
-                  let fpAbs = locResolve overlay
-                  logD $ "Reading data: " <> toText fpAbs
-                  !s <- readFileBS fpAbs
-                  parseSData s
+              yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
+                let fpAbs = locResolve overlay
+                logD $ "Reading data: " <> toText fpAbs
+                readFileBS fpAbs
+              sData <-
+                either (throw . BadInput) pure $
+                  SD.parseSDataCascading r yamlContents
+              pure $ M.modelInsertData sData
           Mount.Delete ->
             pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
       Ext.HeistTpl ->
@@ -106,7 +109,3 @@ transformAction src fps = do
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         WL.wikilinkSpec <> Markdown.fullMarkdownSpec
-    parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
-    parseSData s =
-      either (throw . BadInput . show) pure $
-        Yaml.decodeEither' s

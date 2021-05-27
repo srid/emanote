@@ -45,5 +45,5 @@ makeLenses ''Note
 
 noteTitle :: Note -> Text
 noteTitle note =
-  fromMaybe (R.routeFileBase . someLMLRouteCase $ note ^. noteRoute) $
+  fromMaybe (R.routeBaseName . someLMLRouteCase $ note ^. noteRoute) $
     PandocUtil.getPandocTitle $ note ^. noteDoc
