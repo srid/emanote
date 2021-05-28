@@ -64,7 +64,7 @@
       </div>
       <!-- Main body column -->
       <div class="col-span-12 md:col-span-9">
-        <apply template="components/markdown" />
+        <apply template="components/pandoc" />
         <apply template="components/backlinks" />
 
         <apply template="components/breadcrumbs" />
