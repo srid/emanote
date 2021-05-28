@@ -10,10 +10,10 @@ module Emanote.Model.StaticFile where
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import Emanote.Model.SelfRef (SelfRef, routeSelfRefs)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt))
-import Emanote.Route.SomeRoute (liftSomeRoute)
+import Emanote.Route.Linkable (liftLinkableRoute)
+import qualified Emanote.WikiLink as WL
 
 data StaticFile = StaticFile
   { _staticFileRoute :: R.Route 'AnyExt,
@@ -21,7 +21,7 @@ data StaticFile = StaticFile
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
-type StaticFileIxs = '[R.Route 'AnyExt, SelfRef]
+type StaticFileIxs = '[R.Route 'AnyExt, WL.WikiLink]
 
 type IxStaticFile = IxSet StaticFileIxs StaticFile
 
@@ -31,10 +31,10 @@ instance Indexable StaticFileIxs StaticFile where
       (ixFun $ one . _staticFileRoute)
       (ixFun staticFileSelfRefs)
 
-staticFileSelfRefs :: StaticFile -> [SelfRef]
+staticFileSelfRefs :: StaticFile -> [WL.WikiLink]
 staticFileSelfRefs =
-  routeSelfRefs
-    . liftSomeRoute
+  WL.allowedWikiLinks
+    . liftLinkableRoute
     . _staticFileRoute
 
 makeLenses ''StaticFile
