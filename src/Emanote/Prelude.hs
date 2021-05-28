@@ -62,15 +62,15 @@ withoutH1 doc =
 
 -- TODO: Should we consolidate this with PandocSplice behaviour, in an uniform way?
 rewriteLinks ::
-  ([(Text, Text)] -> Text -> Either Text Text) ->
+  ([(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)) ->
   Pandoc ->
   Pandoc
 rewriteLinks f =
   W.walk $ \case
     x@(B.Link attr@(_id, _class, otherAttrs) is (url, tit)) -> do
-      case f (otherAttrs <> one ("title", tit)) url of
+      case f (otherAttrs <> one ("title", tit)) (is, url) of
         Left err ->
           B.Span ("", one "emanote:broken-link", one ("title", err)) (one x)
-        Right newUrl ->
-          B.Link attr is (newUrl, tit)
+        Right (newIs, newUrl) ->
+          B.Link attr newIs (newUrl, tit)
     x -> x
