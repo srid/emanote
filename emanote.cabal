@@ -36,6 +36,8 @@ executable emanote
     , base
     , blaze-html
     , bytestring
+    , commonmark
+    , commonmark-pandoc
     , containers
     , data-default
     , directory
@@ -48,11 +50,13 @@ executable emanote
     , lens
     , lvar
     , map-syntax
+    , megaparsec
     , monad-logger
     , mtl
     , neat-interpolation
     , pandoc-link-context   >=1.0.2
     , pandoc-types
+    , parsec
     , profunctors
     , relude
     , shower
@@ -61,7 +65,9 @@ executable emanote
     , time
     , unliftio
     , unordered-containers
+    , uri-encode
     , with-utf8
+    , world-peace
     , xmlhtml
     , yaml
 
@@ -97,16 +103,18 @@ executable emanote
     Emanote.Model.Note
     Emanote.Model.Rel
     Emanote.Model.SData
+    Emanote.Model.StaticFile
     Emanote.PandocUtil
     Emanote.Route
     Emanote.Route.Ext
-    Emanote.Route.WikiLinkTarget
+    Emanote.Route.Linkable
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
     Emanote.Source.Pattern
     Emanote.Source.Util
     Emanote.Template
+    Emanote.WikiLink
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
     Heist.Extra.Splices.Tree

@@ -5,13 +5,12 @@ module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import qualified Data.Text as T
 import qualified Ema
 import qualified Ema.Helper.PathTree as PathTree
-import Emanote.Class (EmanoteRoute (..), htmlRouteForLmlRoute)
+import Emanote.Class (EmanoteRoute (..))
+import qualified Emanote.Class as C
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
@@ -21,8 +20,7 @@ import qualified Emanote.PandocUtil as PandocUtil
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
-import qualified Emanote.Route.Ext as Ext
-import qualified Emanote.Route.WikiLinkTarget as WL
+import Emanote.Route.Linkable
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
@@ -44,10 +42,10 @@ render x m = \case
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
     Ema.AssetGenerated Ema.Html $ renderHtml x m r
   where
-    mdRouteForHtmlRoute :: Route 'Html -> Route ('LMLType 'Md)
-    mdRouteForHtmlRoute = coerce
+    mdRouteForHtmlRoute :: Route 'Html -> LinkableLMLRoute
+    mdRouteForHtmlRoute = liftLinkableLMLRoute . coerce @(Route 'Html) @(Route ('LMLType 'Md))
 
-renderHtml :: H.Html -> Model -> Route ('LMLType 'Md) -> LByteString
+renderHtml :: H.Html -> Model -> LinkableLMLRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
@@ -68,15 +66,19 @@ renderHtml tailwindShim model r = do
     "ema:route-tree"
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
-                 (Meta.lookupMeta @Int 0 (one "order") tr model, maybe (R.routeFileBase tr) MN.noteTitle $ M.modelLookup tr model)
+                 ( Meta.lookupMeta @Int 0 (one "order") tr model,
+                   maybe (R.routeBaseName . someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+                 )
                getCollapsed tr =
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-            in Splices.treeSplice (getOrder . R.Route) tree $ \(R.Route -> nodeRoute) children -> do
+               mkLmlRoute = liftLinkableLMLRoute . R.Route @('LMLType 'Md)
+               lmlRouteSlugs = R.unRoute . someLinkableLMLRouteCase
+            in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-                 "node:url" ## HI.textSplice $ noteUrl nodeRoute
+                 "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
                  let isActiveNode = nodeRoute == r
                      isActiveTree =
-                       toList (R.unRoute nodeRoute) `NE.isPrefixOf` R.unRoute r
+                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
                      openTree =
                        isActiveTree -- Active tree is always open
                          || not (getCollapsed nodeRoute)
@@ -86,29 +88,29 @@ renderHtml tailwindShim model r = do
                  "tree:open" ## Heist.ifElseISplice openTree
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits r) "each-crumb"
-      $ \crumb ->
+      ## Splices.listSplice (init $ R.routeInits . someLinkableLMLRouteCase $ r) "each-crumb"
+      $ \(liftLinkableLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## noteUrl crumb
-          "crumb:title" ## M.modelLookupTitle crumb model
+          "crumb:url" ## Ema.routeUrl $ C.lmlHtmlRoute crumbR
+          "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice pageTitle
     "ema:note:titleFull"
       ## HI.textSplice (if pageTitle == siteTitle then pageTitle else pageTitle <> " – " <> siteTitle)
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks r model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks (liftLinkableRoute . someLinkableLMLRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
-        let ctxDoc :: Pandoc = Pandoc mempty $ B.Div B.nullAttr <$> toList ctx
+        let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ ERNoteHtml $ htmlRouteForLmlRoute source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
-          $ ctxDoc
+          $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass rewriteClass
-      $ case M.modelLookup r model of
+      $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
           -- 1. Refers to a folder route (and no ${folder}.md exists)
@@ -119,34 +121,38 @@ renderHtml tailwindShim model r = do
         Just note ->
           note ^. MN.noteDoc
             & ( PandocUtil.withoutH1 -- Because, handling note title separately
-                  >>> PandocUtil.rewriteLinks (resolveUrl model)
+                  >>> resolvePandoc
               )
+  where
+    resolvePandoc =
+      PandocUtil.rewriteLinks (resolveUrl model)
 
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Model -> Text -> Text
-resolveUrl model url =
-  fromMaybe url $ do
-    guard $ not $ isStaticAssetUrl url
-    r <-
-      Rel.parseUrl url >>= \case
-        Right r -> do
-          pure r
-        Left wl ->
-          case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
-            Nothing -> do
-              -- TODO: Set an attribute for broken links, so templates can style it accordingly
-              let fakeRouteUnder404 = R.Route @('Ext.LMLType 'Ext.Md) $ one "404" <> WL.unWikiLinkText wl
-              pure fakeRouteUnder404
-            Just targets ->
-              -- TODO: Deal with ambiguous targets here
-              pure $ head targets
-    pure $ noteUrl r
-  where
-    isStaticAssetUrl s =
-      any (\asset -> toText (R.routeSourcePath asset) `T.isPrefixOf` s) $ Map.keys $ model ^. M.modelStaticFiles
+resolveUrl :: Model -> [(Text, Text)] -> Text -> Either Text Text
+resolveUrl model linkAttrs url =
+  fromMaybe (Right url) $
+    fmap (fmap Ema.routeUrl) . resolveRelTarget model
+      <=< Rel.parseRelTarget linkAttrs
+      $ url
 
-noteUrl :: Route ('LMLType x) -> Text
-noteUrl =
-  Ema.routeUrl . ERNoteHtml . htmlRouteForLmlRoute
+resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
+resolveRelTarget model = \case
+  Right r ->
+    Right <$> resolveLinkableRoute r
+  Left wl ->
+    case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
+      Nothing -> do
+        pure $ Left "Unresolved link"
+      Just targets ->
+        -- TODO: Deal with ambiguous targets here
+        fmap Right $ resolveLinkableRoute $ head targets
+  where
+    resolveLinkableRoute r =
+      case linkableRouteCase r of
+        Left mdR ->
+          -- NOTE: Because don't support slugs yet.
+          pure $ C.lmlHtmlRoute mdR
+        Right sR ->
+          C.staticFileRoute <$> M.modelLookupStaticFileByRoute sR model

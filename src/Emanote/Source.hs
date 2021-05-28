@@ -16,18 +16,16 @@ where
 import Control.Exception (throw)
 import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
-import qualified Data.Aeson as Aeson
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
-import qualified Data.Yaml as Yaml
-import qualified Ema.Helper.Markdown as Markdown
 import Emanote.Logging (logD)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
-import qualified Emanote.Model.Meta as Meta
+import qualified Emanote.Model.Note as N
+import qualified Emanote.Model.SData as SD
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.Linkable (liftLinkableLMLRoute)
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -36,11 +34,13 @@ import Emanote.Source.Util
     chainM,
   )
 import qualified Heist.Extra.TemplateState as T
+import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Ext.FileType -> m (Model -> Model)
 transformActions ch = do
-  chainM (Map.toList ch) $ uncurry transformAction
+  chainM (Map.toList ch) (uncurry transformAction)
+    <* hFlush stdout
 
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::
@@ -49,62 +49,55 @@ transformAction ::
   Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
-  chainM (Map.toList fps) $ \(fp, action) ->
-    case src of
-      Ext.LMLType Ext.Md ->
-        case action of
-          Mount.Update overlays ->
-            fmap (fromMaybe id) . runMaybeT $ do
-              let fpAbs = locResolve $ head overlays
-              r :: R.Route ('LMLType 'Md) <- MaybeT $ pure $ R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp
-              -- TODO: Log in batches, to avoid slowing things down when using large notebooks
-              logD $ "Reading note: " <> toText fpAbs
-              !s <- readFileText fpAbs
-              (mMeta, doc) <- either (throw . BadInput) pure $ parseMarkdown fpAbs s
-              pure $ M.modelInsertMarkdown r (fromMaybe Aeson.Null mMeta, doc)
-          Mount.Delete ->
-            pure $ maybe id M.modelDeleteMarkdown (R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) fp)
-      Ext.Yaml ->
-        case action of
-          Mount.Update overlays ->
-            fmap (fromMaybe id) . runMaybeT $ do
-              r :: R.Route 'Ext.Yaml <- MaybeT $ pure $ R.mkRouteFromFilePath @'Ext.Yaml fp
-              fmap (M.modelInsertData r . Meta.mergeAesons . NEL.reverse) $
-                forM overlays $ \overlay -> do
-                  let fpAbs = locResolve overlay
-                  logD $ "Reading data: " <> toText fpAbs
-                  !s <- readFileBS fpAbs
-                  parseSData s
-          Mount.Delete ->
-            pure $ maybe id M.modelDeleteData (R.mkRouteFromFilePath @'Ext.Yaml fp)
-      Ext.HeistTpl ->
-        case action of
+  chainM (Map.toList fps) $ \(fp, action) -> case src of
+    Ext.LMLType Ext.Md ->
+      case fmap liftLinkableLMLRoute . R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) $ fp of
+        Nothing ->
+          pure id
+        Just r -> case action of
           Mount.Update overlays -> do
             let fpAbs = locResolve $ head overlays
-            fmap (M.modelHeistTemplate %~) $ do
-              logD $ "Reading template: " <> toText fpAbs
-              s <- readFileBS fpAbs
-              pure $ T.addTemplateFile fpAbs fp s
+            logD $ "Reading note: " <> toText fpAbs
+            fmap M.modelInsertNote $ either (throw . BadInput) pure =<< N.parseNote r fpAbs
+          Mount.Delete ->
+            pure $ M.modelDeleteNote r
+    Ext.Yaml ->
+      case R.mkRouteFromFilePath fp of
+        Nothing ->
+          pure id
+        Just r -> case action of
+          Mount.Update overlays -> do
+            yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
+              let fpAbs = locResolve overlay
+              logD $ "Reading data: " <> toText fpAbs
+              readFileBS fpAbs
+            sData <-
+              either (throw . BadInput) pure $
+                SD.parseSDataCascading r yamlContents
+            pure $ M.modelInsertData sData
+          Mount.Delete ->
+            pure $ M.modelDeleteData r
+    Ext.HeistTpl ->
+      case action of
+        Mount.Update overlays -> do
+          let fpAbs = locResolve $ head overlays
+          fmap (M.modelHeistTemplate %~) $ do
+            logD $ "Reading template: " <> toText fpAbs
+            s <- readFileBS fpAbs
+            pure $ T.addTemplateFile fpAbs fp s
+        Mount.Delete -> do
+          pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
+    Ext.AnyExt -> do
+      case R.mkRouteFromFilePath fp of
+        Nothing ->
+          pure id
+        Just r -> case action of
+          Mount.Update overlays -> do
+            let fpAbs = locResolve $ head overlays
+            logD $ "Adding file: " <> toText fpAbs <> " " <> show r
+            pure $ M.modelInsertStaticFile r fpAbs
           Mount.Delete -> do
-            pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
-      Ext.AnyExt -> do
-        fmap (fromMaybe id) . runMaybeT $ do
-          r <- MaybeT $ pure $ R.mkRouteFromFilePath fp
-          case action of
-            Mount.Update overlays -> do
-              let fpAbs = locResolve $ head overlays
-              logD $ "Adding file: " <> toText fpAbs <> " " <> show r
-              pure $ M.modelStaticFiles %~ Map.insert r fpAbs
-            Mount.Delete -> do
-              pure $ M.modelStaticFiles %~ Map.delete r
-      Ext.Html -> do
-        -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
-        pure id
-  where
-    parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
-        Markdown.wikilinkSpec <> Markdown.fullMarkdownSpec
-    parseSData :: (Applicative f, Yaml.FromJSON a) => ByteString -> f a
-    parseSData s =
-      either (throw . BadInput . show) pure $
-        Yaml.decodeEither' s
+            pure $ M.modelDeleteStaticFile r
+    Ext.Html -> do
+      -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
+      pure id

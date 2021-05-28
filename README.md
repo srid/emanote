@@ -59,9 +59,9 @@ Before tests (tasks impacting the larger architectural context in code base),
   - examples
     - source: .md, .org, static files, ..
     - output: .rss/.xml
-- [ ] WikiLink: allow linking to non-HTML files.
+- [x] WikiLink: allow linking to non-HTML files.
   - [x] Refactor `Route` to accomodate them all, and ditch `Either FilePath`
-  - [ ] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
+  - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
 - Embedding / Filtering / Transforming / etc
   - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
     - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)

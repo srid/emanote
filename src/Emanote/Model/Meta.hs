@@ -10,21 +10,18 @@ module Emanote.Model.Meta where
 import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
-import qualified Data.Aeson.Extra.Merge as AesonMerge
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.List.NonEmpty as NE
-import Emanote.Model (Model, modelData, modelLookup)
-import Emanote.Model.Note
-  ( noteMeta,
-  )
+import Emanote.Model (Model, modelLookupNote, modelSData)
+import Emanote.Model.Note (noteMeta)
 import Emanote.Model.SData (sdataValue)
+import qualified Emanote.Model.SData as SData
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (LMLType), LML (Md))
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.Linkable
 import Relude.Extra.Map (StaticMap (lookup))
 
 -- | Look up a specific key in the meta for a given route.
-lookupMeta :: FromJSON a => a -> NonEmpty Text -> R.Route ('LMLType 'Md) -> Model -> a
+lookupMeta :: FromJSON a => a -> NonEmpty Text -> LinkableLMLRoute -> Model -> a
 lookupMeta x k r =
   lookupMetaFrom x k . getEffectiveRouteMeta r
 
@@ -45,24 +42,16 @@ lookupMetaFrom x (k :| ks) meta =
 
 -- | Get the (final) metadata of a note at the given route, by merging it with
 -- the defaults specified in parent routes all the way upto index.yaml.
-getEffectiveRouteMeta :: R.Route ('LMLType 'Md) -> Model -> Aeson.Value
+getEffectiveRouteMeta :: LinkableLMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
-  let defaultFiles = R.routeInits @'Ext.Yaml (coerce mr)
+  let defaultFiles = R.routeInits @'Ext.Yaml (coerce $ someLinkableLMLRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
-        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelData
+        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
         guard $ v /= Aeson.Null
         pure v
       frontmatter = do
-        x <- (^. noteMeta) <$> modelLookup mr model
+        x <- (^. noteMeta) <$> modelLookupNote mr model
         guard $ x /= Aeson.Null
         pure x
       metas = defaults <> maybe mempty one frontmatter
-   in maybe Aeson.Null mergeAesons $ nonEmpty metas
-
--- | Later values override former.
-mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
-mergeAesons =
-  NE.last . NE.scanl1 mergeAeson
-
-mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
-mergeAeson = AesonMerge.lodashMerge
+   in maybe Aeson.Null SData.mergeAesons $ nonEmpty metas

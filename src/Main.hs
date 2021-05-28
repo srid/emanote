@@ -1,5 +1,4 @@
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Main where
 
@@ -18,15 +17,13 @@ import qualified Emanote.Source.Mount as Mount
 import qualified Emanote.Template as Template
 import qualified Heist.Extra.TemplateState as T
 import Main.Utf8 (withUtf8)
-import UnliftIO (MonadUnliftIO)
+import UnliftIO (BufferMode (BlockBuffering), MonadUnliftIO, hSetBuffering)
 
 main :: IO ()
-main =
+main = do
+  liftIO $ hSetBuffering stdout (BlockBuffering Nothing)
   withUtf8 $
-    Ema.runEma (Template.render . cssShim) run
-  where
-    cssShim =
-      Tailwind.twindShim
+    Ema.runEma (Template.render . Tailwind.twindShim) run
 
 run :: (MonadUnliftIO m, MonadLogger m) => CLI.Action -> LVar Model -> m ()
 run _act modelLvar = do

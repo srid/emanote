@@ -9,40 +9,47 @@ module Emanote.Model where
 
 import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
 import Data.Default (Default (..))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model.Note
   ( IxNote,
-    Note (Note),
-    SelfRef (SelfRef),
+    Note,
     noteRoute,
     noteTitle,
   )
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
-import Emanote.Model.SData (IxSData, SData (SData))
+import Emanote.Model.SData (IxSData, SData, sdataRoute)
+import Emanote.Model.StaticFile
+  ( IxStaticFile,
+    StaticFile (StaticFile),
+    staticFileRoute,
+  )
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
+import Emanote.Route.Ext (FileType (AnyExt))
 import qualified Emanote.Route.Ext as Ext
-import qualified Emanote.Route.WikiLinkTarget as WL
+import Emanote.Route.Linkable
+  ( LinkableLMLRoute,
+    LinkableRoute,
+    liftLinkableRoute,
+    someLinkableLMLRouteCase,
+  )
+import qualified Emanote.WikiLink as WL
 import Heist.Extra.TemplateState (TemplateState)
-import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 
 -- TODO: Use https://hackage.haskell.org/package/data-lens-ixset-0.1.4/docs/Data-Lens-IxSet.html
 data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
-    _modelData :: IxSData,
-    _modelStaticFiles :: Map (Route 'AnyExt) FilePath,
+    _modelSData :: IxSData,
+    _modelStaticFiles :: IxStaticFile,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -52,55 +59,77 @@ makeLenses ''Model
 instance Default Model where
   def = Model Ix.empty Ix.empty Ix.empty mempty mempty def
 
-modelInsertMarkdown :: Route ('LMLType 'Md) -> (Aeson.Value, Pandoc) -> Model -> Model
-modelInsertMarkdown k v =
-  modelNotes %~ Ix.updateIx k note
-    >>> modelRels %~ (Ix.deleteIx k >>> Ix.insertList (Rel.extractRels note))
-    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute k)
+modelInsertNote :: Note -> Model -> Model
+modelInsertNote note =
+  modelNotes %~ Ix.updateIx r note
+    >>> modelRels
+      %~ ( Ix.deleteIx r
+             >>> Ix.insertList (Rel.extractRels note)
+         )
+    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . someLinkableLMLRouteCase $ r)
   where
-    note = Note (snd v) (fst v) k
+    r = note ^. noteRoute
 
-modelDeleteMarkdown :: Route ('LMLType 'Md) -> Model -> Model
-modelDeleteMarkdown k =
+modelDeleteNote :: LinkableLMLRoute -> Model -> Model
+modelDeleteNote k =
   modelNotes %~ Ix.deleteIx k
     >>> modelRels %~ Ix.deleteIx k
-    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute k)
+    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . someLinkableLMLRouteCase $ k)
 
-modelInsertData :: R.Route 'Ext.Yaml -> Aeson.Value -> Model -> Model
-modelInsertData r v =
-  modelData %~ Ix.updateIx r (SData v r)
+modelInsertStaticFile :: R.Route 'AnyExt -> FilePath -> Model -> Model
+modelInsertStaticFile r fp =
+  modelStaticFiles %~ Ix.updateIx r staticFile
+  where
+    staticFile = StaticFile r fp
+
+modelDeleteStaticFile :: R.Route 'AnyExt -> Model -> Model
+modelDeleteStaticFile r =
+  modelStaticFiles %~ Ix.deleteIx r
+
+modelInsertData :: SData -> Model -> Model
+modelInsertData v =
+  modelSData %~ Ix.updateIx (v ^. sdataRoute) v
 
 modelDeleteData :: R.Route 'Ext.Yaml -> Model -> Model
 modelDeleteData k =
-  modelData %~ Ix.deleteIx k
+  modelSData %~ Ix.deleteIx k
 
-modelLookup :: Route ('LMLType 'Md) -> Model -> Maybe Note
-modelLookup k =
+modelLookupNote :: LinkableLMLRoute -> Model -> Maybe Note
+modelLookupNote k =
   Ix.getOne . Ix.getEQ k . _modelNotes
 
-modelLookupTitle :: Route ('LMLType 'Md) -> Model -> Text
+modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeFileBase r) noteTitle . modelLookup r
+  maybe (R.routeBaseName $ someLinkableLMLRouteCase r) noteTitle . modelLookupNote r
 
-modelLookupRouteByWikiLink :: WL.WikiLinkTarget -> Model -> [Route ('LMLType 'Md)]
+modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
 modelLookupRouteByWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
   --
   -- Could store `modelNoteDirs` and look that up.
-  fmap (^. noteRoute) . Ix.toList $ (model ^. modelNotes) @= SelfRef wl
+  let noteRoutes =
+        fmap (liftLinkableRoute . someLinkableLMLRouteCase . (^. noteRoute)) . Ix.toList $
+          (model ^. modelNotes) @= wl
+      staticRoutes =
+        fmap (liftLinkableRoute . (^. staticFileRoute)) . Ix.toList $
+          (model ^. modelStaticFiles) @= wl
+   in staticRoutes <> noteRoutes
 
-modelLookupBacklinks :: Route ('LMLType 'Md) -> Model -> [(Route ('LMLType 'Md), NonEmpty [B.Block])]
+modelLookupBacklinks :: LinkableRoute -> Model -> [(LinkableLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let refsToSelf =
         Set.fromList $
-          (Left <$> toList (WL.allowedWikiLinkTargets r))
+          (Left <$> toList (WL.allowedWikiLinks r))
             <> [Right r]
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe (Route 'AnyExt, FilePath)
+modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
 modelLookupStaticFile fp model = do
-  r <- R.mkRouteFromFilePath fp
-  (r,) <$> Map.lookup r (model ^. modelStaticFiles)
+  flip modelLookupStaticFileByRoute model =<< R.mkRouteFromFilePath @'AnyExt fp
+
+modelLookupStaticFileByRoute :: Route 'AnyExt -> Model -> Maybe StaticFile
+modelLookupStaticFileByRoute r model = do
+  Ix.getOne . Ix.getEQ r . _modelStaticFiles $ model
