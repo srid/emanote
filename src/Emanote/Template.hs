@@ -143,7 +143,7 @@ resolveUrl model linkAttrs x@(inner, url) =
               ERNoteHtml htmlR -> do
                 let nr = R.liftLinkableLMLRoute $ coerce @(R 'Html) @(R ('R.LMLType 'R.Md)) htmlR
                 one . B.Str . MN.noteTitle <$> M.modelLookupNote nr model
-              EROtherFile (otherR, _fp) -> do
+              EROtherFile _ -> do
                 -- Just append a file: prefix.
                 pure $ B.Str "File: " : inner
       pure (fromMaybe inner mNewInner, Ema.routeUrl r)
