@@ -13,7 +13,6 @@ import qualified Commonmark.TokParsers as CT
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
