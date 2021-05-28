@@ -27,13 +27,18 @@ withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
 withoutH1 doc =
   doc
 
-rewriteLinks :: (Text -> Text) -> Pandoc -> Pandoc
-rewriteLinks f = runIdentity . rewriteLinksM (Identity . f)
+rewriteLinks :: ([(Text, Text)] -> Text -> Either Text Text) -> Pandoc -> Pandoc
+rewriteLinks f = runIdentity . rewriteLinksM (\x -> Identity . f x)
 
-rewriteLinksM :: Monad m => (Text -> m Text) -> Pandoc -> m Pandoc
+-- | If `f` returns Nothing, it is treated is broken link, and put inside a
+-- <span> for later handling.
+rewriteLinksM :: Monad m => ([(Text, Text)] -> Text -> m (Either Text Text)) -> Pandoc -> m Pandoc
 rewriteLinksM f =
   W.walkM $ \case
-    B.Link attr is (url, tit) -> do
-      newUrl <- f url
-      pure $ B.Link attr is (newUrl, tit)
+    x@(B.Link attr@(_id, _class, otherAttrs) is (url, tit)) -> do
+      f (otherAttrs <> one ("title", tit)) url >>= \case
+        Left err ->
+          pure $ B.Span ("", one "emanote:broken-link", one ("title", err)) (one x)
+        Right newUrl ->
+          pure $ B.Link attr is (newUrl, tit)
     x -> pure x
