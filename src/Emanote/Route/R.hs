@@ -64,7 +64,7 @@ routeInits = \case
     indexRoute :: R ext
     indexRoute = R $ "index" :| []
 
--- | Convert a route to html filepath
+-- | Convert a route to filepath
 encodeRoute :: forall ft. HasExt ft => R ft -> FilePath
 encodeRoute (R slugs) =
   let parts = Ema.unSlug <$> slugs

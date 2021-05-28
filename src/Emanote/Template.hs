@@ -8,6 +8,7 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Ema
+import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Class (EmanoteRoute (..))
 import qualified Emanote.Class as C
@@ -128,12 +129,24 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Model -> [(Text, Text)] -> Text -> Either Text Text
-resolveUrl model linkAttrs url =
-  fromMaybe (Right url) $
-    fmap (fmap Ema.routeUrl) . resolveRelTarget model
-      <=< Rel.parseRelTarget linkAttrs
-      $ url
+resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
+resolveUrl model linkAttrs x@(inner, url) =
+  fromMaybe (Right x) $ do
+    res <- resolveRelTarget model <=< Rel.parseRelTarget linkAttrs $ url
+    pure $ do
+      r <- res
+      let mNewInner = do
+            -- Automatic link text replacement is done only if the user has not set
+            -- a custom link text.
+            guard $ plainify inner == url
+            case r of
+              ERNoteHtml htmlR -> do
+                let nr = R.liftLinkableLMLRoute $ coerce @(R 'Html) @(R ('R.LMLType 'R.Md)) htmlR
+                one . B.Str . MN.noteTitle <$> M.modelLookupNote nr model
+              EROtherFile (otherR, _fp) -> do
+                -- Just append a file: prefix.
+                pure $ B.Str "File: " : inner
+      pure (fromMaybe inner mNewInner, Ema.routeUrl r)
 
 resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
 resolveRelTarget model = \case
