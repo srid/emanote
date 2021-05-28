@@ -17,11 +17,10 @@ import qualified Emanote.Source.Mount as Mount
 import qualified Emanote.Template as Template
 import qualified Heist.Extra.TemplateState as T
 import Main.Utf8 (withUtf8)
-import UnliftIO (BufferMode (BlockBuffering), MonadUnliftIO, hSetBuffering)
+import UnliftIO (MonadUnliftIO)
 
 main :: IO ()
 main = do
-  liftIO $ hSetBuffering stdout (BlockBuffering Nothing)
   withUtf8 $
     Ema.runEma (Template.render . Tailwind.twindShim) run
 
