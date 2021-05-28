@@ -103,12 +103,11 @@ executable emanote
     Emanote.Model.Note
     Emanote.Model.Rel
     Emanote.Model.SData
-    Emanote.Model.SelfRef
     Emanote.Model.StaticFile
     Emanote.PandocUtil
     Emanote.Route
     Emanote.Route.Ext
-    Emanote.Route.SomeRoute
+    Emanote.Route.Linkable
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount

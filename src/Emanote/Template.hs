@@ -20,7 +20,7 @@ import qualified Emanote.PandocUtil as PandocUtil
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
-import Emanote.Route.SomeRoute
+import Emanote.Route.Linkable
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
@@ -42,10 +42,10 @@ render x m = \case
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
     Ema.AssetGenerated Ema.Html $ renderHtml x m r
   where
-    mdRouteForHtmlRoute :: Route 'Html -> SomeLMLRoute
-    mdRouteForHtmlRoute = liftSomeLMLRoute . coerce @(Route 'Html) @(Route ('LMLType 'Md))
+    mdRouteForHtmlRoute :: Route 'Html -> LinkableLMLRoute
+    mdRouteForHtmlRoute = liftLinkableLMLRoute . coerce @(Route 'Html) @(Route ('LMLType 'Md))
 
-renderHtml :: H.Html -> Model -> SomeLMLRoute -> LByteString
+renderHtml :: H.Html -> Model -> LinkableLMLRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
@@ -67,12 +67,12 @@ renderHtml tailwindShim model r = do
       ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
                getOrder tr =
                  ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                   maybe (R.routeBaseName . someLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+                   maybe (R.routeBaseName . someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
                  )
                getCollapsed tr =
                  Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-               mkLmlRoute = liftSomeLMLRoute . R.Route @('LMLType 'Md)
-               lmlRouteSlugs = R.unRoute . someLMLRouteCase
+               mkLmlRoute = liftLinkableLMLRoute . R.Route @('LMLType 'Md)
+               lmlRouteSlugs = R.unRoute . someLinkableLMLRouteCase
             in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                  "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                  "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
@@ -88,8 +88,8 @@ renderHtml tailwindShim model r = do
                  "tree:open" ## Heist.ifElseISplice openTree
          )
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits . someLMLRouteCase $ r) "each-crumb"
-      $ \(liftSomeLMLRoute -> crumbR) ->
+      ## Splices.listSplice (init $ R.routeInits . someLinkableLMLRouteCase $ r) "each-crumb"
+      $ \(liftLinkableLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl $ C.lmlHtmlRoute crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
@@ -99,7 +99,7 @@ renderHtml tailwindShim model r = do
     "ema:note:titleFull"
       ## HI.textSplice (if pageTitle == siteTitle then pageTitle else pageTitle <> " – " <> siteTitle)
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks (liftSomeRoute . someLMLRouteCase $ r) model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks (liftLinkableRoute . someLinkableLMLRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
@@ -140,17 +140,17 @@ resolveUrl model linkAttrs url =
 resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
 resolveRelTarget model = \case
   Right r ->
-    Right <$> resolveSomeRoute r
+    Right <$> resolveLinkableRoute r
   Left wl ->
     case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
       Nothing -> do
         pure $ Left "Unresolved link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        fmap Right $ resolveSomeRoute $ head targets
+        fmap Right $ resolveLinkableRoute $ head targets
   where
-    resolveSomeRoute r =
-      case someRouteCase r of
+    resolveLinkableRoute r =
+      case linkableRouteCase r of
         Left mdR ->
           -- NOTE: Because don't support slugs yet.
           pure $ C.lmlHtmlRoute mdR

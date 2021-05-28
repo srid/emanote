@@ -1,5 +1,4 @@
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Main where
 
@@ -22,12 +21,9 @@ import UnliftIO (BufferMode (BlockBuffering), MonadUnliftIO, hSetBuffering)
 
 main :: IO ()
 main = do
-  liftIO $ print =<< hSetBuffering stdout (BlockBuffering Nothing)
+  liftIO $ hSetBuffering stdout (BlockBuffering Nothing)
   withUtf8 $
-    Ema.runEma (Template.render . cssShim) run
-  where
-    cssShim =
-      Tailwind.twindShim
+    Ema.runEma (Template.render . Tailwind.twindShim) run
 
 run :: (MonadUnliftIO m, MonadLogger m) => CLI.Action -> LVar Model -> m ()
 run _act modelLvar = do

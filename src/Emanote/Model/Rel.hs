@@ -13,20 +13,19 @@ import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
-import Data.WorldPeace.Union (openUnionLift)
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import Emanote.Route.SomeRoute (SomeLMLRoute, SomeRoute, mkLmlRouteFromFilePath, someLMLRouteCase)
+import Emanote.Route.Linkable (LinkableLMLRoute, LinkableRoute, liftLinkableRoute, mkLinkableLMLRouteFromFilePath, someLinkableLMLRouteCase)
 import qualified Emanote.WikiLink as WL
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
-type RelTarget = Either WL.WikiLink SomeRoute
+type RelTarget = Either WL.WikiLink LinkableRoute
 
 -- | A relation from a note to another note or static file.
 data Rel = Rel
   { -- The note containing this relation
-    _relFrom :: SomeLMLRoute,
+    _relFrom :: LinkableLMLRoute,
     -- The target of the relation (can be a note or anything)
     _relTo :: RelTarget,
     -- | The relation context in LML
@@ -40,7 +39,7 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[SomeLMLRoute, RelTarget]
+type RelIxs = '[LinkableLMLRoute, RelTarget]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -69,5 +68,5 @@ parseRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
-      (Right . openUnionLift . someLMLRouteCase)
-      (mkLmlRouteFromFilePath $ UE.decode (toString url))
+      (Right . liftLinkableRoute . someLinkableLMLRouteCase)
+      (mkLinkableLMLRouteFromFilePath $ UE.decode (toString url))
