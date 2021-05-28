@@ -16,7 +16,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Rel as Rel
-import qualified Emanote.PandocUtil as PandocUtil
+import qualified Emanote.Prelude as EP
 import Emanote.Route (Route)
 import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (Html, LMLType), LML (Md))
@@ -120,12 +120,12 @@ renderHtml tailwindShim model r = do
           Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
         Just note ->
           note ^. MN.noteDoc
-            & ( PandocUtil.withoutH1 -- Because, handling note title separately
+            & ( EP.withoutH1 -- Because, handling note title separately
                   >>> resolvePandoc
               )
   where
     resolvePandoc =
-      PandocUtil.rewriteLinks (resolveUrl model)
+      EP.rewriteLinks (resolveUrl model)
 
 -- | Convert .md or wiki links to their proper route url.
 --

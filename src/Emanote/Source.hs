@@ -18,21 +18,21 @@ import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
-import Emanote.Logging (logD)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.SData as SD
+import Emanote.Prelude
+  ( BadInput (BadInput),
+    chainM,
+    logD,
+  )
 import qualified Emanote.Route as R
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.Linkable (liftLinkableLMLRoute)
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
-import Emanote.Source.Util
-  ( BadInput (BadInput),
-    chainM,
-  )
 import qualified Heist.Extra.TemplateState as T
 import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.IO (hFlush)
@@ -41,12 +41,12 @@ import UnliftIO.IO (hFlush)
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Ext.FileType -> m (Model -> Model)
 transformActions ch = do
   withBlockBuffering $
-    chainM (Map.toList ch) (uncurry transformAction)
+    uncurry transformAction `chainM` Map.toList ch
   where
     -- Temporarily use block buffering before calling an IO action that is
     -- known ahead to log rapidly, so as to not hamper serial processing speed.
     withBlockBuffering f =
-      liftIO (hSetBuffering stdout (BlockBuffering Nothing))
+      hSetBuffering stdout (BlockBuffering Nothing)
         *> f
         <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
 
@@ -57,7 +57,7 @@ transformAction ::
   Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
-  chainM (Map.toList fps) $ \(fp, action) -> case src of
+  flip chainM (Map.toList fps) $ \(fp, action) -> case src of
     Ext.LMLType Ext.Md ->
       case fmap liftLinkableLMLRoute . R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) $ fp of
         Nothing ->
