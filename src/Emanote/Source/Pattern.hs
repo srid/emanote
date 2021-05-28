@@ -3,33 +3,33 @@
 
 module Emanote.Source.Pattern where
 
-import qualified Emanote.Route.Ext as Ext
+import qualified Emanote.Route as R
 import System.FilePattern (FilePattern)
 
-filePattern :: Ext.FileType -> FilePath
+filePattern :: R.FileType -> FilePath
 filePattern = \case
-  Ext.LMLType Ext.Md ->
-    Ext.withExt @('Ext.LMLType 'Ext.Md) $
+  R.LMLType R.Md ->
+    R.withExt @('R.LMLType 'R.Md) $
       "**/*"
-  Ext.Yaml ->
-    Ext.withExt @'Ext.Yaml $
+  R.Yaml ->
+    R.withExt @'R.Yaml $
       "**/*"
-  Ext.Html ->
-    Ext.withExt @'Ext.Html $
+  R.Html ->
+    R.withExt @'R.Html $
       "**/*"
-  Ext.HeistTpl ->
-    Ext.withExt @'Ext.HeistTpl $
+  R.HeistTpl ->
+    R.withExt @'R.HeistTpl $
       "**/*"
-  Ext.AnyExt ->
+  R.AnyExt ->
     "**"
 
-filePatterns :: [(Ext.FileType, FilePattern)]
+filePatterns :: [(R.FileType, FilePattern)]
 filePatterns =
   (id &&& filePattern)
-    <$> [ Ext.LMLType Ext.Md,
-          Ext.Yaml,
-          Ext.HeistTpl,
-          Ext.AnyExt
+    <$> [ R.LMLType R.Md,
+          R.Yaml,
+          R.HeistTpl,
+          R.AnyExt
         ]
 
 ignorePatterns :: [FilePattern]

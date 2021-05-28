@@ -14,7 +14,8 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import Emanote.Route.Linkable (LinkableLMLRoute, LinkableRoute, liftLinkableRoute, mkLinkableLMLRouteFromFilePath, someLinkableLMLRouteCase)
+import Emanote.Route (LinkableLMLRoute, LinkableRoute)
+import qualified Emanote.Route as R
 import qualified Emanote.WikiLink as WL
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
@@ -68,5 +69,5 @@ parseRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
-      (Right . liftLinkableRoute . someLinkableLMLRouteCase)
-      (mkLinkableLMLRouteFromFilePath $ UE.decode (toString url))
+      (Right . R.liftLinkableRoute . R.someLinkableLMLRouteCase)
+      (R.mkLinkableLMLRouteFromFilePath $ UE.decode (toString url))

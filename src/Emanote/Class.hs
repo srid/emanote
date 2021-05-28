@@ -10,15 +10,13 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
-import Emanote.Route (Route)
+import Emanote.Route (FileType (AnyExt, Html), LinkableLMLRoute, R)
 import qualified Emanote.Route as R
-import Emanote.Route.Ext (FileType (AnyExt, Html))
-import Emanote.Route.Linkable (LinkableLMLRoute, someLinkableLMLRouteCase)
 
 data EmanoteRoute
-  = ERNoteHtml (Route 'Html)
+  = ERNoteHtml (R 'Html)
   | EROtherFile
-      ( Route 'AnyExt,
+      ( R 'AnyExt,
         -- Absolute path to the static file referenced by this route
         FilePath
       )
@@ -50,8 +48,8 @@ lmlHtmlRoute :: LinkableLMLRoute -> EmanoteRoute
 lmlHtmlRoute =
   ERNoteHtml . htmlRouteForLmlRoute
   where
-    htmlRouteForLmlRoute :: LinkableLMLRoute -> Route 'Html
-    htmlRouteForLmlRoute = coerce . someLinkableLMLRouteCase
+    htmlRouteForLmlRoute :: LinkableLMLRoute -> R 'Html
+    htmlRouteForLmlRoute = coerce . R.someLinkableLMLRouteCase
 
 staticFileRoute :: SF.StaticFile -> EmanoteRoute
 staticFileRoute =

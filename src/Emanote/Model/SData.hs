@@ -15,29 +15,28 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Yaml as Yaml
 import qualified Emanote.Route as R
-import qualified Emanote.Route.Ext as Ext
 
 -- | `S` for "structured". Refers to a per-route data file represented by Aeson
 -- value.  Example: /foo/bar.yaml file
 data SData = SData
   { _sdataValue :: Aeson.Value,
     -- | Location of this data file
-    _sdataRoute :: R.Route 'Ext.Yaml
+    _sdataRoute :: R.R 'R.Yaml
   }
   deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
 
-type SDataIxs = '[R.Route 'Ext.Yaml]
+type SDataIxs = '[R.R 'R.Yaml]
 
 type IxSData = IxSet SDataIxs SData
 
 instance Indexable SDataIxs SData where
   indices =
     ixList
-      (ixGen $ Proxy @(R.Route 'Ext.Yaml))
+      (ixGen $ Proxy @(R.R 'R.Yaml))
 
 makeLenses ''SData
 
-parseSDataCascading :: R.Route 'Ext.Yaml -> NonEmpty ByteString -> Either Text SData
+parseSDataCascading :: R.R 'R.Yaml -> NonEmpty ByteString -> Either Text SData
 parseSDataCascading r bs = do
   vals <- traverse (first (show @Text) . Yaml.decodeEither') bs
   let val = mergeAesons vals

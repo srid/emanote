@@ -16,8 +16,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route (Route (unRoute))
-import Emanote.Route.Linkable (LinkableRoute, linkableRouteCase, someLinkableLMLRouteCase)
+import Emanote.Route (LinkableRoute, R (unRoute), linkableRouteCase, someLinkableLMLRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
