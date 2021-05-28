@@ -34,13 +34,21 @@ import Emanote.Source.Util
     chainM,
   )
 import qualified Heist.Extra.TemplateState as T
+import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Ext.FileType -> m (Model -> Model)
 transformActions ch = do
-  chainM (Map.toList ch) (uncurry transformAction)
-    <* hFlush stdout
+  withBlockBuffering $
+    chainM (Map.toList ch) (uncurry transformAction)
+  where
+    -- Temporarily use block buffering before calling an IO action that is
+    -- known ahead to log rapidly, so as to not hamper serial processing speed.
+    withBlockBuffering f =
+      liftIO (hSetBuffering stdout (BlockBuffering Nothing))
+        *> f
+        <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
 
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::
