@@ -49,14 +49,10 @@ getPandocTitle =
   fmap Markdown.plainify . getPandocH1
 
 getPandocH1 :: Pandoc -> Maybe [B.Inline]
-getPandocH1 = listToMaybe . W.query go
-  where
-    go :: B.Block -> [[B.Inline]]
-    go = \case
-      B.Header 1 _ inlines ->
-        [inlines]
-      _ ->
-        []
+getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =
+  Just inlines
+getPandocH1 _ =
+  Nothing
 
 withoutH1 :: Pandoc -> Pandoc
 withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
