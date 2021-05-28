@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
+-- | Linkable route types
 module Emanote.Route.Linkable
   ( -- Some route in a generated site
     LinkableRoute,
@@ -22,48 +23,48 @@ import Data.WorldPeace.Union
     openUnionHandle,
     openUnionLift,
   )
-import Emanote.Route (Route)
-import qualified Emanote.Route as R
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
+import Emanote.Route.R (R)
+import qualified Emanote.Route.R as R
 
 type LMLRoutes =
-  '[ Route ('LMLType 'Md)
+  '[ R ('LMLType 'Md)
    ]
 
 type Routes =
-  Route 'AnyExt
+  R 'AnyExt
     ': LMLRoutes
 
--- | A Route that can be linked to from anywhere.
+-- | A R that can be linked to from anywhere.
 type LinkableRoute = OpenUnion Routes
 
--- | Route to a note file in LML (lightweight markup language) format
+-- | R to a note file in LML (lightweight markup language) format
 type LinkableLMLRoute = OpenUnion LMLRoutes
 
 liftLinkableLMLRoute ::
-  IsMember (Route ext) LMLRoutes =>
-  Route (ext :: FileType) ->
+  IsMember (R ext) LMLRoutes =>
+  R (ext :: FileType) ->
   LinkableLMLRoute
 liftLinkableLMLRoute =
   openUnionLift
 
 liftLinkableRoute ::
-  IsMember (Route ext) Routes =>
-  Route (ext :: FileType) ->
+  IsMember (R ext) Routes =>
+  R (ext :: FileType) ->
   LinkableRoute
 liftLinkableRoute =
   openUnionLift
 
 someLinkableLMLRouteCase ::
   LinkableLMLRoute ->
-  Route ('LMLType 'Md)
+  R ('LMLType 'Md)
 someLinkableLMLRouteCase =
   absurdUnion
     `openUnionHandle` id
 
 linkableRouteCase ::
   LinkableRoute ->
-  Either LinkableLMLRoute (Route 'AnyExt)
+  Either LinkableLMLRoute (R 'AnyExt)
 linkableRouteCase =
   first (liftLinkableLMLRoute @('LMLType 'Md))
     . ( absurdUnion

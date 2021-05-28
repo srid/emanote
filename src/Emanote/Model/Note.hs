@@ -15,14 +15,13 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Emanote.Prelude as EP
 import qualified Emanote.Route as R
-import Emanote.Route.Linkable
 import qualified Emanote.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteRoute :: LinkableLMLRoute
+    _noteRoute :: R.LinkableLMLRoute
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
@@ -30,10 +29,10 @@ data Note = Note
 noteSelfRefs :: Note -> [WL.WikiLink]
 noteSelfRefs =
   WL.allowedWikiLinks
-    . (liftLinkableRoute . someLinkableLMLRouteCase)
+    . (R.liftLinkableRoute . R.someLinkableLMLRouteCase)
     . _noteRoute
 
-type NoteIxs = '[LinkableLMLRoute, WL.WikiLink]
+type NoteIxs = '[R.LinkableLMLRoute, WL.WikiLink]
 
 type IxNote = IxSet NoteIxs Note
 
@@ -47,10 +46,10 @@ makeLenses ''Note
 
 noteTitle :: Note -> Text
 noteTitle note =
-  fromMaybe (R.routeBaseName . someLinkableLMLRouteCase $ note ^. noteRoute) $
+  fromMaybe (R.routeBaseName . R.someLinkableLMLRouteCase $ note ^. noteRoute) $
     EP.getPandocTitle $ note ^. noteDoc
 
-parseNote :: MonadIO m => LinkableLMLRoute -> FilePath -> m (Either Text Note)
+parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
   !s <- readFileText fp
   pure $ do

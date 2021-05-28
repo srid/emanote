@@ -27,9 +27,8 @@ import Emanote.Prelude
     chainM,
     logD,
   )
+import Emanote.Route (liftLinkableLMLRoute)
 import qualified Emanote.Route as R
-import qualified Emanote.Route.Ext as Ext
-import Emanote.Route.Linkable (liftLinkableLMLRoute)
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -38,7 +37,7 @@ import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
-transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc Ext.FileType -> m (Model -> Model)
+transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc R.FileType -> m (Model -> Model)
 transformActions ch = do
   withBlockBuffering $
     uncurry transformAction `chainM` Map.toList ch
@@ -53,13 +52,13 @@ transformActions ch = do
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::
   (MonadIO m, MonadLogger m) =>
-  Ext.FileType ->
+  R.FileType ->
   Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
   flip chainM (Map.toList fps) $ \(fp, action) -> case src of
-    Ext.LMLType Ext.Md ->
-      case fmap liftLinkableLMLRoute . R.mkRouteFromFilePath @('Ext.LMLType 'Ext.Md) $ fp of
+    R.LMLType R.Md ->
+      case fmap liftLinkableLMLRoute . R.mkRouteFromFilePath @('R.LMLType 'R.Md) $ fp of
         Nothing ->
           pure id
         Just r -> case action of
@@ -69,7 +68,7 @@ transformAction src fps = do
             fmap M.modelInsertNote $ either (throw . BadInput) pure =<< N.parseNote r fpAbs
           Mount.Delete ->
             pure $ M.modelDeleteNote r
-    Ext.Yaml ->
+    R.Yaml ->
       case R.mkRouteFromFilePath fp of
         Nothing ->
           pure id
@@ -85,7 +84,7 @@ transformAction src fps = do
             pure $ M.modelInsertData sData
           Mount.Delete ->
             pure $ M.modelDeleteData r
-    Ext.HeistTpl ->
+    R.HeistTpl ->
       case action of
         Mount.Update overlays -> do
           let fpAbs = locResolve $ head overlays
@@ -95,7 +94,7 @@ transformAction src fps = do
             pure $ T.addTemplateFile fpAbs fp s
         Mount.Delete -> do
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
-    Ext.AnyExt -> do
+    R.AnyExt -> do
       case R.mkRouteFromFilePath fp of
         Nothing ->
           pure id
@@ -106,6 +105,6 @@ transformAction src fps = do
             pure $ M.modelInsertStaticFile r fpAbs
           Mount.Delete -> do
             pure $ M.modelDeleteStaticFile r
-    Ext.Html -> do
+    R.Html -> do
       -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
       pure id

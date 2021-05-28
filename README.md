@@ -60,7 +60,7 @@ Before tests (tasks impacting the larger architectural context in code base),
     - source: .md, .org, static files, ..
     - output: .rss/.xml
 - [x] WikiLink: allow linking to non-HTML files.
-  - [x] Refactor `Route` to accomodate them all, and ditch `Either FilePath`
+  - [x] Refactor `R` to accomodate them all, and ditch `Either FilePath`
   - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
 - Embedding / Filtering / Transforming / etc
   - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files

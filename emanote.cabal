@@ -104,9 +104,9 @@ executable emanote
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Prelude
-    Emanote.Route
     Emanote.Route.Ext
     Emanote.Route.Linkable
+    Emanote.Route.R
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
