@@ -13,7 +13,7 @@ import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Ema.Helper.Markdown as Markdown
-import qualified Emanote.PandocUtil as PandocUtil
+import qualified Emanote.Prelude as EP
 import qualified Emanote.Route as R
 import Emanote.Route.Linkable
 import qualified Emanote.WikiLink as WL
@@ -48,7 +48,7 @@ makeLenses ''Note
 noteTitle :: Note -> Text
 noteTitle note =
   fromMaybe (R.routeBaseName . someLinkableLMLRouteCase $ note ^. noteRoute) $
-    PandocUtil.getPandocTitle $ note ^. noteDoc
+    EP.getPandocTitle $ note ^. noteDoc
 
 parseNote :: MonadIO m => LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do

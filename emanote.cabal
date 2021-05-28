@@ -97,14 +97,13 @@ executable emanote
   autogen-modules:    Paths_emanote
   other-modules:
     Emanote.Class
-    Emanote.Logging
     Emanote.Model
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Rel
     Emanote.Model.SData
     Emanote.Model.StaticFile
-    Emanote.PandocUtil
+    Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext
     Emanote.Route.Linkable
@@ -112,7 +111,6 @@ executable emanote
     Emanote.Source.Loc
     Emanote.Source.Mount
     Emanote.Source.Pattern
-    Emanote.Source.Util
     Emanote.Template
     Emanote.WikiLink
     Heist.Extra.Splices.List
