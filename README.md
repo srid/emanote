@@ -73,14 +73,14 @@ Before tests (tasks impacting the larger architectural context in code base),
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
 - [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
-- [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
-  - Display children inline?
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
 
 To triage,
 
+- [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
+  - Display children inline?
 - [ ] fsnotify: reliably handle directory renames/ moves
   - Straightforward to do using unionMount's OverlayFs?
   - If nothing, restart mount on such events.
