@@ -17,6 +17,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Model.Query as Q
 import qualified Emanote.Model.Rel as Rel
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (Html, LMLType), LML (Md), R)
@@ -110,7 +111,7 @@ renderHtml tailwindShim model r = do
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
-      ## Splices.pandocSpliceWithCustomClass rewriteClass querySplice
+      ## Splices.pandocSpliceWithCustomClass rewriteClass (querySplice model)
       $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
@@ -131,16 +132,18 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-querySplice :: Monad n => B.Block -> Maybe (HI.Splice n)
-querySplice blk = do
+querySplice :: Monad n => Model -> B.Block -> Maybe (HI.Splice n)
+querySplice model blk = do
   B.CodeBlock
     (_id', T.strip . T.unwords -> "query", _attrs)
     (T.strip -> q) <-
     pure blk
+  tag <- T.stripPrefix "tag:#" q
+  let res = Q.queryByTag model tag
   Just $
     pure $
       one . X.Element "pre" [("class", "border-2 p-2 border-gray-400")] $
-        one . X.TextNode $ "This is a query: " <> q
+        one . X.TextNode $ "Notes tagged " <> tag <> ": " <> show (MN.noteTitle <$> res)
 
 resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl model linkAttrs x@(inner, url) =
