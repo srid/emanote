@@ -2,7 +2,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Heist.Extra.Splices.Pandoc (pandocSplice, pandocSpliceWithCustomClass) where
+module Heist.Extra.Splices.Pandoc
+  ( RenderCtx (..),
+    pandocSplice,
+    pandocSpliceWithCustomClass,
+  )
+where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
@@ -14,7 +19,7 @@ import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as X
 
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
-pandocSplice = pandocSpliceWithCustomClass mempty (const Nothing)
+pandocSplice = pandocSpliceWithCustomClass mempty (const . const $ Nothing)
 
 -- | A splice to render a Pandoc AST allowing customization of the AST nodes in
 -- HTML.
@@ -23,16 +28,17 @@ pandocSpliceWithCustomClass ::
   -- | How to replace classes in Div and Span nodes.
   Map Text Text ->
   -- | Custom handling of AST nodes
-  (B.Block -> Maybe (HI.Splice n)) ->
+  (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
   Pandoc ->
   HI.Splice n
 pandocSpliceWithCustomClass classMap bS doc = do
   node <- H.getParamNode
-  let ctx = RenderCtx (blockLookupAttr node) (inlineLookupAttr node) classMap bS
+  let ctx = RenderCtx node (blockLookupAttr node) (inlineLookupAttr node) classMap (bS ctx)
   renderPandocWith ctx doc
 
 data RenderCtx n = RenderCtx
-  { bAttr :: B.Block -> B.Attr,
+  { rootNode :: X.Node,
+    bAttr :: B.Block -> B.Attr,
     iAttr :: B.Inline -> B.Attr,
     classMap :: Map Text Text,
     blockSplice :: B.Block -> Maybe (HI.Splice n)

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Template (render) where
@@ -22,7 +23,9 @@ import qualified Emanote.Model.Rel as Rel
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (Html, LMLType), LML (Md), R)
 import qualified Emanote.Route as R
+import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
+import Heist.Extra.Splices.Pandoc (RenderCtx (..))
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
@@ -132,17 +135,29 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
-querySplice :: Monad n => Model -> B.Block -> Maybe (HI.Splice n)
-querySplice model blk = do
+querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
+querySplice model RenderCtx {..} blk = do
   B.CodeBlock
     (_id', T.strip . T.unwords -> "query", _attrs)
     (Q.parseQuery -> Just q) <-
     pure blk
   let res = Q.runQuery model q
-  Just $
-    pure $
-      one . X.Element "pre" [("class", "border-2 p-2 border-gray-400")] $
-        one . X.TextNode $ "Query " <> show q <> " results: " <> show (MN.noteTitle <$> res)
+  -- FIXME: eject the `<query>` wrapper from html?
+  queryNode <- X.childElementTag "Query" rootNode
+  Just $ do
+    let topSplices = do
+          "result"
+            ## (HI.runChildrenWith . noteSplice) `foldMapM` res
+    H.localHS (HI.bindSplices topSplices) $
+      HI.runNode queryNode
+
+-- TODO: Reuse this elsewhere
+noteSplice :: Monad n => MN.Note -> H.Splices (HI.Splice n)
+noteSplice note = do
+  "note:title" ## HI.textSplice (MN.noteTitle note)
+  "note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
+
+-- "note:meta" ## HJ.bindJson (note ^. MN.noteMeta)
 
 resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl model linkAttrs x@(inner, url) =
