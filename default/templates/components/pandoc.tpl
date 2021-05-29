@@ -21,4 +21,16 @@
     <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl text-gray-700" />
   </Header>
+  <Query>
+    <h2>Query Results</h2>
+    <result>
+      <li class="pl-2 border-l-2 border-gray-600">
+        Result:
+        <a class="text-green-700" href="${note:url}">
+          <note:title />
+        </a>
+      </li>
+    </result>
+  </Query>
+
 </ema:note:pandoc>
