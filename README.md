@@ -66,12 +66,13 @@ Before tests (tasks impacting the larger architectural context in code base),
   - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
     - Consider designing this in the larger context of Pandoc splice with customizable rendering 
       - Including wiki-links (thus supplanting rewriteLinks)
+      - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [ ] Queries and results embed
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
-- [ ] Custom route slugs
+- [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
 - [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
   - Display children inline?
 - [ ] Finally, **tests**!
@@ -81,6 +82,7 @@ Before tests (tasks impacting the larger architectural context in code base),
 To triage,
 
 - [ ] fsnotify: reliably handle directory renames/ moves
+  - Straightforward to do using unionMount's OverlayFs?
   - If nothing, restart mount on such events.
 - [ ] apply prismJS on live server refresh?
   - Hack on `<script class="ema-rerun">`?
