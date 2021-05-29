@@ -136,14 +136,13 @@ querySplice :: Monad n => Model -> B.Block -> Maybe (HI.Splice n)
 querySplice model blk = do
   B.CodeBlock
     (_id', T.strip . T.unwords -> "query", _attrs)
-    (T.strip -> q) <-
+    (Q.parseQuery -> Just q) <-
     pure blk
-  tag <- T.stripPrefix "tag:#" q
-  let res = Q.queryByTag model tag
+  let res = Q.runQuery model q
   Just $
     pure $
       one . X.Element "pre" [("class", "border-2 p-2 border-gray-400")] $
-        one . X.TextNode $ "Notes tagged " <> tag <> ": " <> show (MN.noteTitle <$> res)
+        one . X.TextNode $ "Query " <> show q <> " results: " <> show (MN.noteTitle <$> res)
 
 resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl model linkAttrs x@(inner, url) =
