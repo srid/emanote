@@ -7,6 +7,7 @@ import Control.Lens.Operators ((^.))
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import qualified Data.Text as T
 import qualified Ema
 import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
@@ -23,7 +24,7 @@ import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
-import qualified Heist.Extra.TemplateState as T
+import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
@@ -33,6 +34,7 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.XmlHtml as X
 
 render :: H.Html -> Model -> EmanoteRoute -> Ema.Asset LByteString
 render x m = \case
@@ -51,7 +53,7 @@ renderHtml tailwindShim model r = do
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
-  flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
+  flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
@@ -108,7 +110,7 @@ renderHtml tailwindShim model r = do
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
-      ## Splices.pandocSpliceWithCustomClass rewriteClass
+      ## Splices.pandocSpliceWithCustomClass rewriteClass querySplice
       $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
@@ -129,6 +131,17 @@ renderHtml tailwindShim model r = do
 -- | Convert .md or wiki links to their proper route url.
 --
 -- Requires resolution from the `model` state. Late resolution, in other words.
+querySplice :: Monad n => B.Block -> Maybe (HI.Splice n)
+querySplice blk = do
+  B.CodeBlock
+    (_id', T.strip . T.unwords -> "query", _attrs)
+    (T.strip -> q) <-
+    pure blk
+  Just $
+    pure $
+      one . X.Element "pre" [("class", "border-2 p-2 border-gray-400")] $
+        one . X.TextNode $ "This is a query: " <> q
+
 resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
