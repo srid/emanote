@@ -103,6 +103,7 @@ executable emanote
     Emanote.Model.Rel
     Emanote.Model.SData
     Emanote.Model.StaticFile
+    Emanote.Model.Type
     Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext
@@ -111,6 +112,7 @@ executable emanote
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
+    Emanote.Source.Patch
     Emanote.Source.Pattern
     Emanote.Template
     Emanote.WikiLink
