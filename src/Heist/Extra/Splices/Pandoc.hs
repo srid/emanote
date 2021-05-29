@@ -9,13 +9,9 @@ import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
-import Text.Blaze.Html5 ((!))
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
-import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.XmlHtml as XmlHtml
+import qualified Text.XmlHtml as X
 
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
 pandocSplice = pandocSpliceWithCustomClass mempty
@@ -31,7 +27,7 @@ pandocSpliceWithCustomClass ::
 pandocSpliceWithCustomClass classMap doc = do
   node <- H.getParamNode
   let ctx = RenderCtx (blockLookupAttr node) (inlineLookupAttr node) classMap
-  pure $ RX.renderHtmlNodes $ renderPandocWith ctx doc
+  renderPandocWith ctx doc
 
 data RenderCtx = RenderCtx
   { bAttr :: B.Block -> B.Attr,
@@ -44,7 +40,7 @@ rewriteClass RenderCtx {..} (id', cls, attr) =
   let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
    in (id', cls', attr)
 
-blockLookupAttr :: XmlHtml.Node -> B.Block -> B.Attr
+blockLookupAttr :: X.Node -> B.Block -> B.Attr
 blockLookupAttr node = \case
   B.Para {} -> childTagAttr node "Para"
   B.BulletList {} -> childTagAttr node "BulletList"
@@ -53,178 +49,198 @@ blockLookupAttr node = \case
   B.BlockQuote {} -> childTagAttr node "BlockQuote"
   B.Header level _ _ ->
     fromMaybe B.nullAttr $ do
-      header <- XmlHtml.childElementTag "Header" node
+      header <- X.childElementTag "Header" node
       pure $ childTagAttr header ("h" <> show level)
   _ -> B.nullAttr
 
-inlineLookupAttr :: XmlHtml.Node -> B.Inline -> B.Attr
+inlineLookupAttr :: X.Node -> B.Inline -> B.Attr
 inlineLookupAttr node = \case
   B.Code {} -> childTagAttr node "Code"
   B.Note _ ->
     childTagAttr node "Note"
   B.Link _ _ (url, _) ->
     fromMaybe B.nullAttr $ do
-      link <- XmlHtml.childElementTag "PandocLink" node
+      link <- X.childElementTag "PandocLink" node
       let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
       pure $ attrFromNode link `addAttr` childTagAttr link innerTag
   _ -> B.nullAttr
 
-childTagAttr :: XmlHtml.Node -> Text -> B.Attr
+childTagAttr :: X.Node -> Text -> B.Attr
 childTagAttr x name =
-  maybe B.nullAttr attrFromNode $ XmlHtml.childElementTag name x
+  maybe B.nullAttr attrFromNode $ X.childElementTag name x
 
-attrFromNode :: XmlHtml.Node -> B.Attr
+attrFromNode :: X.Node -> B.Attr
 attrFromNode node =
-  let mClass = maybe mempty T.words $ XmlHtml.getAttribute "class" node
-      id' = fromMaybe "" $ XmlHtml.getAttribute "id" node
-      attrs = filter ((/= "class") . fst) $ XmlHtml.elementAttrs node
+  let mClass = maybe mempty T.words $ X.getAttribute "class" node
+      id' = fromMaybe "" $ X.getAttribute "id" node
+      attrs = filter ((/= "class") . fst) $ X.elementAttrs node
    in (id', mClass, attrs)
 
-renderPandocWith :: RenderCtx -> Pandoc -> H.Html
+renderPandocWith :: Monad n => RenderCtx -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =
-  mapM_ (rpBlock ctx) blocks
+  foldMapM (rpBlock ctx) blocks
 
-rpBlock :: RenderCtx -> B.Block -> H.Html
+rpBlock :: Monad n => RenderCtx -> B.Block -> HI.Splice n
 rpBlock ctx@RenderCtx {..} b = case b of
   B.Plain is ->
-    mapM_ (rpInline ctx) is
+    foldMapM (rpInline ctx) is
   B.Para is ->
-    H.p ! rpAttr (bAttr b) $ mapM_ (rpInline ctx) is
+    one . X.Element "p" (rpAttr $ bAttr b) <$> foldMapM (rpInline ctx) is
   B.LineBlock iss ->
-    forM_ iss $ \is ->
-      mapM_ (rpInline ctx) is >> "\n"
-  B.CodeBlock (id', classes, attrs) s ->
+    flip foldMapM iss $ \is ->
+      foldMapM (rpInline ctx) is >> pure [X.TextNode "\n"]
+  B.CodeBlock (id', classes, attrs) s -> do
     -- PrismJS friendly classes
     let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
-     in H.div ! rpAttr (bAttr b) $
-          H.pre ! rpAttr (id', classes', attrs) $
-            H.code ! rpAttr ("", classes', []) $ H.text s
+    pure $
+      one . X.Element "div" (rpAttr $ bAttr b) $
+        one . X.Element "pre" (rpAttr (id', classes', attrs)) $
+          one . X.Element "code" (rpAttr ("", classes', [])) $
+            one $ X.TextNode s
   B.RawBlock (B.Format fmt) s -> do
-    case fmt of
+    pure $ case fmt of
       "html" ->
-        H.unsafeByteString $ encodeUtf8 s
+        rawNode "div" s
       "video" ->
         -- HACK format. TODO: replace with ![[foo.mp4]]
-        H.video ! A.autoplay "" ! A.loop "" ! H.customAttribute "muted" "" $ do
-          H.source ! A.src (H.toValue $ T.strip s)
-          H.p $ do
-            "Your browser doesn't support HTML5 video. Here is a "
-            H.a ! A.href (H.toValue $ T.strip s) $ "link to the video"
-            " instead."
+        one . X.Element "video" [("autoplay", ""), ("loop", ""), ("muted", "")] $
+          one . X.Element "source" [("src", T.strip s)] $
+            one . X.Element "p" mempty $
+              [ X.TextNode "Your browser doesn't support HTML5 video. Here is a ",
+                X.Element "a" [("href", T.strip s)] $
+                  one . X.TextNode $ "link to the video",
+                X.TextNode " instead."
+              ]
       _ ->
-        H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.text s
+        one . X.Element "pre" [("class", "pandoc-raw-" <> show fmt)] $ one . X.TextNode $ s
   B.BlockQuote bs ->
-    H.blockquote ! rpAttr (bAttr b) $ mapM_ (rpBlock ctx) bs
+    one . X.Element "blockquote" (rpAttr $bAttr b) <$> foldMapM (rpBlock ctx) bs
   B.OrderedList _ bss ->
-    H.ol ! rpAttr (bAttr b) $
-      forM_ bss $ \bs ->
-        H.li $ mapM_ (rpBlock ctx) bs
+    fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
+      flip foldMapM bss $
+        fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.BulletList bss ->
-    H.ul ! rpAttr (bAttr b) $
-      forM_ bss $ \bs ->
-        H.li $ mapM_ (rpBlock ctx) bs
+    fmap (one . X.Element "ul" (rpAttr $ bAttr b)) $
+      flip foldMapM bss $
+        fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.DefinitionList defs ->
-    H.dl $
-      forM_ defs $ \(term, descList) -> do
-        mapM_ (rpInline ctx) term
-        forM_ descList $ \desc ->
-          H.dd $ mapM_ (rpBlock ctx) desc
+    fmap (one . X.Element "dl" mempty) $
+      flip foldMapM defs $ \(term, descList) -> do
+        a <- foldMapM (rpInline ctx) term
+        as <-
+          flip foldMapM descList $
+            fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
+        pure $ a <> as
   B.Header level attr is ->
-    headerElem level ! rpAttr (addAttr attr $ bAttr b) $ mapM_ (rpInline ctx) is
+    one . X.Element (headerTag level) (rpAttr $ addAttr attr $ bAttr b)
+      <$> foldMapM (rpInline ctx) is
   B.HorizontalRule ->
-    H.hr
-  B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot ->
+    pure $ one $ X.Element "hr" mempty mempty
+  B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
     -- TODO: Apply captions, colSpec, etc.
-    H.table ! rpAttr attr $ do
-      H.thead $ do
-        forM_ hrows $ \(B.Row _ cells) ->
-          H.tr $
-            forM_ cells $ \(B.Cell _ _ _ _ blks) ->
-              H.th $ rpBlock ctx `mapM_` blks
-      H.tbody $ do
-        forM_ tbodys $ \(B.TableBody _ _ _ rows) ->
-          forM_ rows $ \(B.Row _ cells) ->
-            H.tr $
-              forM_ cells $ \(B.Cell _ _ _ _ blks) ->
-                H.td $ rpBlock ctx `mapM_` blks
+    fmap (one . X.Element "table" (rpAttr attr)) $ do
+      thead <- fmap (one . X.Element "thead" mempty) $
+        flip foldMapM hrows $ \(B.Row _ cells) ->
+          fmap (one . X.Element "tr" mempty) $
+            flip foldMapM cells $ \(B.Cell _ _ _ _ blks) ->
+              one . X.Element "th" mempty <$> foldMapM (rpBlock ctx) blks
+      tbody <- fmap (one . X.Element "tbody" mempty) $
+        flip foldMapM tbodys $ \(B.TableBody _ _ _ rows) ->
+          flip foldMapM rows $ \(B.Row _ cells) ->
+            fmap (one . X.Element "tr" mempty) $
+              flip foldMapM cells $ \(B.Cell _ _ _ _ blks) ->
+                one . X.Element "td" mempty <$> foldMapM (rpBlock ctx) blks
+      pure $ thead <> tbody
   B.Div attr bs ->
-    H.div ! rpAttr (rewriteClass ctx attr) $ mapM_ (rpBlock ctx) bs
+    one . X.Element "div" (rpAttr $ rewriteClass ctx attr)
+      <$> foldMapM (rpBlock ctx) bs
   B.Null ->
-    pure ()
+    pure []
 
-headerElem :: Int -> H.Html -> H.Html
-headerElem = \case
-  1 -> H.h1
-  2 -> H.h2
-  3 -> H.h3
-  4 -> H.h4
-  5 -> H.h5
-  6 -> H.h6
-  _ -> error "Invalid pandoc header level"
+headerTag :: HasCallStack => Int -> Text
+headerTag n =
+  if n >= 1 && n <= 6
+    then "h" <> show n
+    else error "Invalid pandoc header level"
 
-rpInline :: RenderCtx -> B.Inline -> H.Html
+rpInline :: Monad n => RenderCtx -> B.Inline -> HI.Splice n
 rpInline ctx@RenderCtx {..} i = case i of
-  B.Str s -> H.toHtml s
+  B.Str s ->
+    pure $ one . X.TextNode $ s
   B.Emph is ->
-    H.em $ mapM_ (rpInline ctx) is
+    one . X.Element "em" mempty <$> foldMapM (rpInline ctx) is
   B.Strong is ->
-    H.strong $ mapM_ (rpInline ctx) is
+    one . X.Element "strong" mempty <$> foldMapM (rpInline ctx) is
   B.Underline is ->
-    H.u $ mapM_ (rpInline ctx) is
+    one . X.Element "u" mempty <$> foldMapM (rpInline ctx) is
   B.Strikeout is ->
-    H.del $ mapM_ (rpInline ctx) is
+    one . X.Element "s" mempty <$> foldMapM (rpInline ctx) is
   B.Superscript is ->
-    H.sup $ mapM_ (rpInline ctx) is
+    one . X.Element "sup" mempty <$> foldMapM (rpInline ctx) is
   B.Subscript is ->
-    H.sub $ mapM_ (rpInline ctx) is
+    one . X.Element "sub" mempty <$> foldMapM (rpInline ctx) is
   B.Quoted qt is ->
-    flip inQuotes qt $ mapM_ (rpInline ctx) is
+    flip inQuotes qt $ foldMapM (rpInline ctx) is
   B.Code attr s ->
-    H.code ! rpAttr (addAttr attr $ iAttr i) $ H.toHtml s
-  B.Space -> " "
-  B.SoftBreak -> " "
-  B.LineBreak -> H.br
+    pure $
+      one . X.Element "code" (rpAttr $ addAttr attr $ iAttr i) $
+        one . X.TextNode $ s
+  B.Space -> pure $ one . X.TextNode $ " "
+  B.SoftBreak -> pure $ one . X.TextNode $ " "
+  B.LineBreak ->
+    pure $ one $ X.Element "br" mempty mempty
   B.RawInline (B.Format fmt) s ->
     if fmt == "html"
-      then H.unsafeByteString $ encodeUtf8 s
-      else H.pre ! A.class_ ("pandoc-raw-" <> show fmt) $ H.toHtml s
+      then pure $ rawNode "span" s
+      else
+        pure $
+          one . X.Element "pre" [("class", "pandoc-raw-" <> show fmt)] $
+            one . X.TextNode $ s
   B.Math mathType s ->
     case mathType of
       B.InlineMath ->
-        H.span ! A.class_ "math inline" $ H.text $ "\\(" <> s <> "\\)"
+        pure $
+          one . X.Element "span" [("class", "math inline")] $
+            one . X.TextNode $ "\\(" <> s <> "\\)"
       B.DisplayMath ->
-        H.span ! A.class_ "math display" $ do
-          "$$"
-          H.text s
-          "$$"
+        pure $
+          one . X.Element "span" [("class", "math display")] $
+            one . X.TextNode $ "$$" <> s <> "$$"
   B.Link attr is (url, tit) -> do
-    H.a
-      ! A.href (H.textValue url)
-      ! A.title (H.textValue tit)
-      ! rpAttr (addAttr attr $ iAttr i)
-      $ mapM_ (rpInline ctx) is
-  B.Image attr is (url, tit) ->
-    H.img ! A.src (H.textValue url) ! A.title (H.textValue tit) ! A.alt (H.textValue $ Markdown.plainify is) ! rpAttr attr
+    let attrs = [("href", url), ("title", tit)] <> rpAttr (addAttr attr $ iAttr i)
+    one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
+  B.Image attr is (url, tit) -> do
+    let attrs = [("src", url), ("title", tit), ("alt", Markdown.plainify is)] <> rpAttr attr
+    pure $ one . X.Element "img" attrs $ mempty
   B.Note bs -> do
     -- TODO: Style this properly to be Tufte like. Maybe integrate https://edwardtufte.github.io/tufte-css/
-    H.sup ! A.style "margin-left: 3px;" $ "note"
-    H.div ! rpAttr (iAttr i) $ mapM_ (rpBlock ctx) bs
+    noteBody <- foldMapM (rpBlock ctx) bs
+    pure
+      [ X.Element "sup" [("style", "margin-left: 3px;")] $ one . X.TextNode $ "node",
+        X.Element "div" (rpAttr $ iAttr i) noteBody
+      ]
   B.Span attr is ->
-    H.span ! rpAttr (rewriteClass ctx attr) $ mapM_ (rpInline ctx) is
+    one . X.Element "span" (rpAttr $ rewriteClass ctx attr) <$> foldMapM (rpInline ctx) is
   x ->
-    H.pre $ H.toHtml $ show @Text x
+    -- TODO: Implement these
+    pure $ one . X.Element "pre" mempty $ one . X.TextNode $ show x
   where
-    inQuotes :: H.Html -> B.QuoteType -> H.Html
+    inQuotes :: Monad n => HI.Splice n -> B.QuoteType -> HI.Splice n
     inQuotes w = \case
-      B.SingleQuote -> "‘" >> w <* "’"
-      B.DoubleQuote -> "“" >> w <* "”"
+      B.SingleQuote ->
+        w <&> \nodes ->
+          [X.TextNode "‘"] <> nodes <> [X.TextNode "’"]
+      B.DoubleQuote ->
+        w <&> \nodes ->
+          [X.TextNode "“"] <> nodes <> [X.TextNode "”"]
 
-rpAttr :: B.Attr -> H.Attribute
+-- | Convert Pandoc attributes to XmlHtml attributes
+rpAttr :: B.Attr -> [(Text, Text)]
 rpAttr (id', classes, attrs) =
   let cls = T.intercalate " " classes
-   in unlessNull id' (A.id (fromString . toString $ id'))
-        <> unlessNull cls (A.class_ (fromString . toString $ cls))
-        <> mconcat (fmap (\(k, v) -> H.customAttribute (fromString . toString $ k) (fromString . toString $ v)) attrs)
+   in unlessNull id' [("id", id')]
+        <> unlessNull cls [("class", cls)]
+        <> mconcat (fmap (\(k, v) -> [(k, v)]) attrs)
   where
     unlessNull x f =
       if T.null x then mempty else f
@@ -236,3 +252,8 @@ addAttr (id1, cls1, attr1) (id2, cls2, attr2) =
     pickNonNull x "" = x
     pickNonNull "" x = x
     pickNonNull _ _ = ""
+
+rawNode :: Text -> Text -> [X.Node]
+rawNode wrapperTag s =
+  one . X.Element wrapperTag (one ("xmlhtmlRaw", "")) $
+    one . X.TextNode $ s
