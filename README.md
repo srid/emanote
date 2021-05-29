@@ -64,16 +64,16 @@ Before tests (tasks impacting the larger architectural context in code base),
   - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
 - Embedding / Filtering / Transforming / etc
   - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
-    - Have `rewriteLinks` pass "title" to WikiLink parser, and have it return `WikiLink Video` (as distinct from `WikiLink Md`)
-      - For embed flag, make that `WikiLink Embed Video` (vs `WikiLink (Conn Folge) Md`)
-    - That, or do it from `<PandocLink>` style, in `rpBlock` by decoding "title" attr.
+    - Consider designing this in the larger context of Pandoc splice with customizable rendering 
+      - Including wiki-links (thus supplanting rewriteLinks)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [ ] Queries and results embed
-- [ ] Generation of pages with no associated Markdown
-  - eg: Pagination ala https://web.dev/authors/ | https://web.dev/how-we-build-webdev-and-use-web-components/#collections
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
+- [ ] Custom route slugs
+- [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
+  - Display children inline?
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
@@ -84,35 +84,17 @@ To triage,
   - If nothing, restart mount on such events.
 - [ ] apply prismJS on live server refresh?
   - Hack on `<script class="ema-rerun">`?
-- [ ] `emanote gen` should generate $dir.html even if $dir.md doesn't exist.
-- [ ] Proper footnote styling: take Tufte style (sidebar refs) into consideration
-- [ ] BUG: raw HTML doesn't work (eg: <video> element)
-  - Blame https://github.com/snapframework/xmlhtml ?
-    - Culprit, possibly: https://github.com/snapframework/xmlhtml/blob/54463f1691c7b31cc3c4c336a6fe328b1f0ebb95/src/Text/Blaze/Renderer/XmlHtml.hs#L27
-- [ ] `emanote init` to allow editing default templates/yaml
 - [x] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [ ] Allow overriding baseUrl in CLI: `emanote gen --baseUrl=srid.github.io/foo`
 - [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] `neuron query` equivalent?
-- [ ] Heist Pandoc splice: allow custom "class library" with hierarchy:
-  ```
-  <Pandoc>
-    <Custom>
-      <Popout class="px-1 font-serif rounded bg-pink-50" />
-      <!-- Hierarchical styling? -->
-      <Warning class="px-1 rounded bg-gray-50">
-        <Header>
-          <h2>class="text-xl font-bold"</h2>
-        </Header>
-      </Warning>
-    </Custom>
-  </Pandoc>
-  ```
+- [ ] Generation of pages with no associated Markdown
+  - eg: Pagination ala https://web.dev/authors/ | https://web.dev/how-we-build-webdev-and-use-web-components/#collections
 
 Before public release
 
 - [x] Finalize in HTML templating: heist vs a more popular one?
   - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
+- [ ] Finalize Heist variables/structures and template locations
 
 ### Archived Tasks
 
