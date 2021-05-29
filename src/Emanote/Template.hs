@@ -47,9 +47,9 @@ render x m = \case
 renderHtml :: H.Html -> Model -> R.LinkableLMLRoute -> LByteString
 renderHtml tailwindShim model r = do
   let meta = Meta.getEffectiveRouteMeta r model
-      templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
-      rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
-      siteTitle = Meta.lookupMetaFrom @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+      templateName = MN.lookupAeson @Text "templates/_default" ("template" :| ["name"]) meta
+      rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
+      siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers

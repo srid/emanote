@@ -69,6 +69,8 @@ Before tests (tasks impacting the larger architectural context in code base),
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [ ] Queries and results embed
+    - Index tags in IxNote
+    - First query: by tag
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
