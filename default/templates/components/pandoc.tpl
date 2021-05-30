@@ -22,15 +22,20 @@
     <h6 class="mt-4 mb-2 text-xl text-gray-700" />
   </Header>
   <Query>
-    <h2>Query Results</h2>
-    <result>
-      <li class="pl-2 border-l-2 border-gray-600">
-        Result:
-        <a class="text-green-700" href="${note:url}">
-          <note:title />
-        </a>
-      </li>
-    </result>
+    <div class="p-2 bg-${theme}-100 border-2 border-${theme}-600">
+      <header class="font-bold mb-1">Query Results:</header>
+      <result>
+        <li class="list-none mb-1">
+          <a class="text-green-700" href="${note:url}">
+            <note:title />
+          </a>
+          -
+          <note:metadata>
+            <value var="date" />
+          </note:metadata>
+        </li>
+      </result>
+    </div>
   </Query>
 
 </ema:note:pandoc>

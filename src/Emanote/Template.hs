@@ -63,9 +63,7 @@ renderHtml tailwindShim model r = do
     "apply" ## HA.applyImpl
     -- Add tailwind css shim
     "tailwindCssShim" ## pure (RX.renderHtmlNodes tailwindShim)
-    -- Bind route-associated metadata to <html> so that they remain in scope
-    -- throughout.
-    "html"
+    "ema:metadata"
       ## HJ.bindJson meta
     -- Sidebar navigation
     "ema:route-tree"
@@ -156,8 +154,7 @@ noteSplice :: Monad n => MN.Note -> H.Splices (HI.Splice n)
 noteSplice note = do
   "note:title" ## HI.textSplice (MN.noteTitle note)
   "note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
-
--- "note:meta" ## HJ.bindJson (note ^. MN.noteMeta)
+  "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
 
 resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl model linkAttrs x@(inner, url) =
