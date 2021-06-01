@@ -21,21 +21,25 @@
     <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl text-gray-700" />
   </Header>
-  <Query>
-    <div class="p-2 bg-${theme}-100 border-2 border-${theme}-600">
-      <header class="font-bold mb-1">Query Results:</header>
+  <QueryResults>
+    <div class="p-2 bg-${theme}-100 border-2 ">
+      <header class="text-gray-800 font-bold mb-2">
+        <query />
+      </header>
       <result>
         <li class="list-none mb-1">
-          <a class="text-green-700" href="${note:url}">
+          <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${note:url}">
             <note:title />
           </a>
+          <!--  FIXME: Gotta implement fallback for missing keys, in Heist
           -
           <note:metadata>
             <value var="date" />
           </note:metadata>
+          -->
         </li>
       </result>
     </div>
-  </Query>
+  </QueryResults>
 
 </ema:note:pandoc>

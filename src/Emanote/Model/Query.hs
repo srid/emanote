@@ -8,10 +8,16 @@ import Emanote.Model.Note
 import Emanote.Model.Type
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as M
+import qualified Text.Show as Show
 
 data Query
   = QueryByTag Text
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show.Show Query where
+  show = \case
+    QueryByTag tag ->
+      toString $ "Notes tagged #" <> tag
 
 parseQuery :: Text -> Maybe Query
 parseQuery = do

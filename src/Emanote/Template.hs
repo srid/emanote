@@ -141,9 +141,10 @@ querySplice model RenderCtx {..} blk = do
     pure blk
   let res = Q.runQuery model q
   -- FIXME: eject the `<query>` wrapper from html?
-  queryNode <- X.childElementTag "Query" rootNode
+  queryNode <- X.childElementTag "QueryResults" rootNode
   Just $ do
     let topSplices = do
+          "query" ## HI.textSplice (show q)
           "result"
             ## (HI.runChildrenWith . noteSplice) `foldMapM` res
     H.localHS (HI.bindSplices topSplices) $
