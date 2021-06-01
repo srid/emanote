@@ -19,7 +19,11 @@ import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as X
 
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
-pandocSplice = pandocSpliceWithCustomClass mempty (const . const $ Nothing)
+pandocSplice =
+  pandocSpliceWithCustomClass
+    mempty
+    (const . const $ Nothing)
+    (const . const $ Nothing)
 
 -- | A splice to render a Pandoc AST allowing customization of the AST nodes in
 -- HTML.
@@ -27,13 +31,22 @@ pandocSpliceWithCustomClass ::
   Monad n =>
   -- | How to replace classes in Div and Span nodes.
   Map Text Text ->
-  -- | Custom handling of AST nodes
+  -- | Custom handling of AST block nodes
   (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
+  -- | Custom handling of AST inline nodes
+  (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
   Pandoc ->
   HI.Splice n
-pandocSpliceWithCustomClass classMap bS doc = do
+pandocSpliceWithCustomClass classMap bS iS doc = do
   node <- H.getParamNode
-  let ctx = RenderCtx node (blockLookupAttr node) (inlineLookupAttr node) classMap (bS ctx)
+  let ctx =
+        RenderCtx
+          node
+          (blockLookupAttr node)
+          (inlineLookupAttr node)
+          classMap
+          (bS ctx)
+          (iS ctx)
   renderPandocWith ctx doc
 
 data RenderCtx n = RenderCtx
@@ -41,7 +54,8 @@ data RenderCtx n = RenderCtx
     bAttr :: B.Block -> B.Attr,
     iAttr :: B.Inline -> B.Attr,
     classMap :: Map Text Text,
-    blockSplice :: B.Block -> Maybe (HI.Splice n)
+    blockSplice :: B.Block -> Maybe (HI.Splice n),
+    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
   }
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
@@ -181,7 +195,15 @@ headerTag n =
     else error "Invalid pandoc header level"
 
 rpInline :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
-rpInline ctx@RenderCtx {..} i = case i of
+rpInline ctx@RenderCtx {..} i = do
+  case inlineSplice i of
+    Nothing ->
+      rpInline' ctx i
+    Just userSplice ->
+      userSplice
+
+rpInline' :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
+rpInline' ctx@RenderCtx {..} i = case i of
   B.Str s ->
     pure $ one . X.TextNode $ s
   B.Emph is ->

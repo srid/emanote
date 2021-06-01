@@ -112,7 +112,10 @@ renderHtml tailwindShim model r = do
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
-      ## Splices.pandocSpliceWithCustomClass rewriteClass (querySplice model)
+      ## Splices.pandocSpliceWithCustomClass
+        rewriteClass
+        (querySplice model)
+        (const . const $ Nothing)
       $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
