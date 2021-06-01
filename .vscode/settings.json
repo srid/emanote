@@ -16,6 +16,7 @@
   },
   "editor.colorDecorators": true,
   "tailwindCSS.colorDecorators": true,
-  "html.format.contentUnformatted": "pre,code,textarea,bind,title",
-  "html.format.wrapLineLength": 100
+  "html.format.contentUnformatted": "pre,code,textarea",
+  "html.format.wrapLineLength": 100,
+  "html.format.unformattedContentDelimiter": "<!-- DoNotFormat -->"
 }
