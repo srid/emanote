@@ -4,18 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <with var="template">
-    <base href="${value:baseUrl}" />
-  </with>
   <title><ema:note:titleFull /></title>
   <with var="page">
     <meta property="og:description" content="${value:description}" />
     <meta property="og:site_name" content="${value:siteName}" />
   </with>
   <tailwindCssShim />
-  <with var="template">
-    <link href="${value:iconUrl}" rel="icon" />
-  </with>
+  <ema:metadata>
+    <with var="template">
+      <base href="${value:baseUrl}" />
+      <link href="${value:iconUrl}" rel="icon" />
+    </with>
+  </ema:metadata>
   <snippet var="page.headHtml" />
 </head>
 
@@ -24,7 +24,7 @@
     Just defining a convenient alias, to avoid <with>'ing
     NOTE: There must not be any whitespace inside this tag! 
   -->
-  <bind tag="theme"><value var="template.theme" /></bind>
+  <bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
 
   <div class="container mx-auto xl:max-w-screen-lg">
     <!-- Header row-->
@@ -33,10 +33,12 @@
       <div class="hidden md:mr-4 md:block md:col-span-3">
         <div class="flex items-end h-full pl-2 mt-2 space-x-2">
           <a href="">
-            <with var="template">
-              <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
-                src="${value:iconUrl}" />
-            </with>
+            <ema:metadata>
+              <with var="template">
+                <img class="z-50 h-20 transition transform hover:scale-125 hover:opacity-80"
+                  src="${value:iconUrl}" />
+              </with>
+            </ema:metadata>
           </a>
         </div>
       </div>

@@ -16,11 +16,13 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Emanote.Prelude as EP
 import qualified Emanote.Route as R
 import qualified Emanote.WikiLink as WL
+import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
+    _noteTags :: [Text],
     _noteRoute :: R.LinkableLMLRoute
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
@@ -32,7 +34,7 @@ noteSelfRefs =
     . (R.liftLinkableRoute . R.someLinkableLMLRouteCase)
     . _noteRoute
 
-type NoteIxs = '[R.LinkableLMLRoute, WL.WikiLink]
+type NoteIxs = '[R.LinkableLMLRoute, WL.WikiLink, Text]
 
 type IxNote = IxSet NoteIxs Note
 
@@ -41,6 +43,7 @@ instance Indexable NoteIxs Note where
     ixList
       (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
+      (ixFun _noteTags)
 
 makeLenses ''Note
 
@@ -54,8 +57,25 @@ parseNote r fp = do
   !s <- readFileText fp
   pure $ do
     (mMeta, doc) <- parseMarkdown fp s
-    pure $ Note doc (fromMaybe Aeson.Null mMeta) r
+    let meta = fromMaybe Aeson.Null mMeta
+        tags = lookupAeson [] (one "tags") meta
+    pure $ Note doc meta tags r
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
         WL.wikilinkSpec <> Markdown.fullMarkdownSpec
+
+-- TODO: Use https://hackage.haskell.org/package/lens-aeson
+lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
+lookupAeson x (k :| ks) meta =
+  fromMaybe x $ do
+    Aeson.Object obj <- pure meta
+    val <- lookup k obj
+    case nonEmpty ks of
+      Nothing -> resultToMaybe $ Aeson.fromJSON val
+      Just ks' -> pure $ lookupAeson x ks' val
+  where
+    resultToMaybe :: Aeson.Result b -> Maybe b
+    resultToMaybe = \case
+      Aeson.Error _ -> Nothing
+      Aeson.Success b -> pure b

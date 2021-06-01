@@ -8,7 +8,6 @@ import Data.Default (Default (def))
 import Data.LVar (LVar)
 import qualified Ema
 import qualified Ema.CLI as CLI
-import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class ()
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
@@ -22,7 +21,7 @@ import UnliftIO (MonadUnliftIO)
 main :: IO ()
 main = do
   withUtf8 $
-    Ema.runEma (Template.render . Tailwind.twindShim) run
+    Ema.runEma Template.render run
 
 run :: (MonadUnliftIO m, MonadLogger m) => CLI.Action -> LVar Model -> m ()
 run _act modelLvar = do
