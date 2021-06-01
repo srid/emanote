@@ -9,9 +9,12 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Data.Text as T
+import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import qualified Ema
+import qualified Ema.CLI
 import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class (EmanoteRoute (..))
 import qualified Emanote.Class as C
 import Emanote.Model (Model)
@@ -20,6 +23,7 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
 import qualified Emanote.Model.Rel as Rel
+import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (Html, LMLType), LML (Md), R)
 import qualified Emanote.Route as R
@@ -34,24 +38,23 @@ import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
-import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as X
 
-render :: H.Html -> Model -> EmanoteRoute -> Ema.Asset LByteString
-render x m = \case
+render :: Ema.CLI.Action -> Model -> EmanoteRoute -> Ema.Asset LByteString
+render emaAction m = \case
   EROtherFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
-    Ema.AssetGenerated Ema.Html $ renderHtml x m r
+    Ema.AssetGenerated Ema.Html $ renderHtml emaAction m r
   where
     mdRouteForHtmlRoute :: R 'Html -> R.LinkableLMLRoute
     mdRouteForHtmlRoute = R.liftLinkableLMLRoute . coerce @(R 'Html) @(R ('LMLType 'Md))
 
-renderHtml :: H.Html -> Model -> R.LinkableLMLRoute -> LByteString
-renderHtml tailwindShim model r = do
+renderHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
+renderHtml emaAction model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = MN.lookupAeson @Text "templates/_default" ("template" :| ["name"]) meta
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
@@ -62,7 +65,8 @@ renderHtml tailwindShim model r = do
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Add tailwind css shim
-    "tailwindCssShim" ## pure (RX.renderHtmlNodes tailwindShim)
+    "tailwindCssShim"
+      ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
     "ema:metadata"
       ## HJ.bindJson meta
     -- Sidebar navigation
@@ -131,7 +135,7 @@ renderHtml tailwindShim model r = do
               )
   where
     resolvePandoc =
-      EP.rewriteLinks (resolveUrl model)
+      EP.rewriteLinks (resolveUrl emaAction model)
 
 -- | Convert .md or wiki links to their proper route url.
 --
@@ -160,12 +164,12 @@ noteSplice note = do
   "note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
   "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
 
-resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
-resolveUrl model linkAttrs x@(inner, url) =
+resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
+resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
     res <- resolveRelTarget model <=< Rel.parseRelTarget linkAttrs $ url
     pure $ do
-      r <- res
+      (r, mTime) <- res
       let mNewInner = do
             -- Automatic link text replacement is done only if the user has not set
             -- a custom link text.
@@ -177,9 +181,17 @@ resolveUrl model linkAttrs x@(inner, url) =
               EROtherFile _ -> do
                 -- Just append a file: prefix.
                 pure $ B.Str "File: " : inner
-      pure (fromMaybe inner mNewInner, Ema.routeUrl r)
+          queryString =
+            fromMaybe "" $ do
+              -- In live server mode, append last modification time if any, such
+              -- that the browser is forced to refresh the inline image on hot
+              -- reload (Ema's DOM patch).
+              guard $ emaAction == Ema.CLI.Run
+              t <- mTime
+              pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
+      pure (fromMaybe inner mNewInner, Ema.routeUrl r <> queryString)
 
-resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
+resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text (EmanoteRoute, Maybe UTCTime))
 resolveRelTarget model = \case
   Right r ->
     Right <$> resolveLinkableRoute r
@@ -189,12 +201,13 @@ resolveRelTarget model = \case
         pure $ Left "Unresolved link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        fmap Right $ resolveLinkableRoute $ head targets
+        Right <$> resolveLinkableRoute (head targets)
   where
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
         Left mdR ->
           -- NOTE: Because don't support slugs yet.
-          pure $ C.lmlHtmlRoute mdR
-        Right sR ->
-          C.staticFileRoute <$> M.modelLookupStaticFileByRoute sR model
+          pure (C.lmlHtmlRoute mdR, Nothing)
+        Right sR -> do
+          staticFile <- M.modelLookupStaticFileByRoute sR model
+          pure (C.staticFileRoute staticFile, Just $ staticFile ^. SF.staticFileTime)
