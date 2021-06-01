@@ -83,7 +83,7 @@ Milestone (notes.srid.ca),
 - Blog post friendly
   - Queries
     - [x] Query by tag (in code block)
-    - [ ] Date in queries (requires Heist withJson changes)
+    - [x] Date in queries (requires Heist withJson changes)
     - [ ] RSS feeds
 
 To triage,

@@ -11,7 +11,7 @@ tags: []
 # TODO: How to design this when generating RSS feeds?
 template:
   # Use file "./${template.name}.tpl" to render HTML
-  name: templates/_default
+  name: templates/layouts/book
   theme: blue
   baseUrl: /
   iconUrl: /favicon.svg
