@@ -73,4 +73,10 @@ rewriteLinks f =
           B.Span ("", one "emanote:broken-link", one ("title", err)) (one x)
         Right (newIs, newUrl) ->
           B.Link attr newIs (newUrl, tit)
+    x@(B.Image attr@(_id, _class, otherAttrs) is (url, tit)) -> do
+      case f (otherAttrs <> one ("title", tit)) (is, url) of
+        Left err ->
+          B.Span ("", one "emanote:broken-image", one ("title", err)) (one x)
+        Right (newIs, newUrl) ->
+          B.Image attr newIs (newUrl, tit)
     x -> x
