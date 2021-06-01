@@ -10,12 +10,15 @@ module Emanote.Model.StaticFile where
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
+import Data.Time (UTCTime)
 import qualified Emanote.Route as R
 import qualified Emanote.WikiLink as WL
 
 data StaticFile = StaticFile
   { _staticFileRoute :: R.R 'R.AnyExt,
-    _staticFilePath :: FilePath
+    _staticFilePath :: FilePath,
+    -- | Indicates that this file was updated no latter than the given time.
+    _staticFileTime :: UTCTime
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
