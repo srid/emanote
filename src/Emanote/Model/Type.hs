@@ -13,6 +13,7 @@ import Data.Default (Default (..))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Set as Set
+import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
@@ -68,11 +69,11 @@ modelDeleteNote k =
     >>> modelRels %~ Ix.deleteIx k
     >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . R.someLinkableLMLRouteCase $ k)
 
-modelInsertStaticFile :: R.R 'AnyExt -> FilePath -> Model -> Model
-modelInsertStaticFile r fp =
+modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
+modelInsertStaticFile t r fp =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
-    staticFile = StaticFile r fp
+    staticFile = StaticFile r fp t
 
 modelDeleteStaticFile :: R.R 'AnyExt -> Model -> Model
 modelDeleteStaticFile r =
