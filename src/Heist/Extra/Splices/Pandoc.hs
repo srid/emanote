@@ -2,7 +2,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Heist.Extra.Splices.Pandoc (pandocSplice, pandocSpliceWithCustomClass) where
+module Heist.Extra.Splices.Pandoc
+  ( RenderCtx (..),
+    pandocSplice,
+    pandocSpliceWithCustomClass,
+  )
+where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
@@ -14,7 +19,11 @@ import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as X
 
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
-pandocSplice = pandocSpliceWithCustomClass mempty
+pandocSplice =
+  pandocSpliceWithCustomClass
+    mempty
+    (const . const $ Nothing)
+    (const . const $ Nothing)
 
 -- | A splice to render a Pandoc AST allowing customization of the AST nodes in
 -- HTML.
@@ -22,20 +31,34 @@ pandocSpliceWithCustomClass ::
   Monad n =>
   -- | How to replace classes in Div and Span nodes.
   Map Text Text ->
+  -- | Custom handling of AST block nodes
+  (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
+  -- | Custom handling of AST inline nodes
+  (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
   Pandoc ->
   HI.Splice n
-pandocSpliceWithCustomClass classMap doc = do
+pandocSpliceWithCustomClass classMap bS iS doc = do
   node <- H.getParamNode
-  let ctx = RenderCtx (blockLookupAttr node) (inlineLookupAttr node) classMap
+  let ctx =
+        RenderCtx
+          node
+          (blockLookupAttr node)
+          (inlineLookupAttr node)
+          classMap
+          (bS ctx)
+          (iS ctx)
   renderPandocWith ctx doc
 
-data RenderCtx = RenderCtx
-  { bAttr :: B.Block -> B.Attr,
+data RenderCtx n = RenderCtx
+  { rootNode :: X.Node,
+    bAttr :: B.Block -> B.Attr,
     iAttr :: B.Inline -> B.Attr,
-    classMap :: Map Text Text
+    classMap :: Map Text Text,
+    blockSplice :: B.Block -> Maybe (HI.Splice n),
+    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
   }
 
-rewriteClass :: RenderCtx -> B.Attr -> B.Attr
+rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', cls, attr) =
   let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
    in (id', cls', attr)
@@ -76,12 +99,20 @@ attrFromNode node =
       attrs = filter ((/= "class") . fst) $ X.elementAttrs node
    in (id', mClass, attrs)
 
-renderPandocWith :: Monad n => RenderCtx -> Pandoc -> HI.Splice n
+renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =
   foldMapM (rpBlock ctx) blocks
 
-rpBlock :: Monad n => RenderCtx -> B.Block -> HI.Splice n
-rpBlock ctx@RenderCtx {..} b = case b of
+rpBlock :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
+rpBlock ctx@RenderCtx {..} b = do
+  case blockSplice b of
+    Nothing ->
+      rpBlock' ctx b
+    Just userSplice ->
+      userSplice
+
+rpBlock' :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
+rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
     foldMapM (rpInline ctx) is
   B.Para is ->
@@ -163,8 +194,16 @@ headerTag n =
     then "h" <> show n
     else error "Invalid pandoc header level"
 
-rpInline :: Monad n => RenderCtx -> B.Inline -> HI.Splice n
-rpInline ctx@RenderCtx {..} i = case i of
+rpInline :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
+rpInline ctx@RenderCtx {..} i = do
+  case inlineSplice i of
+    Nothing ->
+      rpInline' ctx i
+    Just userSplice ->
+      userSplice
+
+rpInline' :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
+rpInline' ctx@RenderCtx {..} i = case i of
   B.Str s ->
     pure $ one . X.TextNode $ s
   B.Emph is ->

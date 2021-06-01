@@ -15,7 +15,7 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 ## Installing and using
 
 ```bash
-# Install
+# Install (`cachix use srid` for cached binaries)
 nix-env -if ./default.nix
 
 # Run live server
@@ -68,14 +68,23 @@ Before tests (tasks impacting the larger architectural context in code base),
       - Including wiki-links (thus supplanting rewriteLinks)
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
-  - [ ] Queries and results embed
+  - Queries and results embed (see below)
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
-- [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
+
+Milestone (notes.srid.ca),
+
+- Footnotes
+- [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
+- Blog post friendly
+  - Queries
+    - [x] Query by tag (in code block)
+    - [ ] Date in queries (requires Heist withJson changes)
+    - [ ] RSS feeds
 
 To triage,
 

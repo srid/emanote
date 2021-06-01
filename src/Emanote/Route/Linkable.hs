@@ -8,7 +8,7 @@ module Emanote.Route.Linkable
     LinkableRoute,
     liftLinkableRoute,
     linkableRouteCase,
-    mkLinkableLMLRouteFromFilePath,
+    mkLinkableRouteFromFilePath,
     -- Only LML routes
     LinkableLMLRoute,
     liftLinkableLMLRoute,
@@ -72,6 +72,7 @@ linkableRouteCase =
           `openUnionHandle` Right
       )
 
-mkLinkableLMLRouteFromFilePath :: FilePath -> Maybe LinkableLMLRoute
-mkLinkableLMLRouteFromFilePath fp =
-  fmap liftLinkableLMLRoute (R.mkRouteFromFilePath @('LMLType 'Md) fp)
+mkLinkableRouteFromFilePath :: FilePath -> Maybe LinkableRoute
+mkLinkableRouteFromFilePath fp =
+  fmap liftLinkableRoute (R.mkRouteFromFilePath @('LMLType 'Md) fp)
+    <|> fmap liftLinkableRoute (R.mkRouteFromFilePath @'AnyExt fp)

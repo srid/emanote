@@ -100,6 +100,7 @@ executable emanote
     Emanote.Model
     Emanote.Model.Meta
     Emanote.Model.Note
+    Emanote.Model.Query
     Emanote.Model.Rel
     Emanote.Model.SData
     Emanote.Model.StaticFile

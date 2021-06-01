@@ -69,5 +69,5 @@ parseRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
-      (Right . R.liftLinkableRoute . R.someLinkableLMLRouteCase)
-      (R.mkLinkableLMLRouteFromFilePath $ UE.decode (toString url))
+      Right
+      (R.mkLinkableRouteFromFilePath $ UE.decode (toString url))

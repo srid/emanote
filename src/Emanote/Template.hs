@@ -1,65 +1,74 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import qualified Data.Text as T
+import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import qualified Ema
+import qualified Ema.CLI
 import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Class (EmanoteRoute (..))
 import qualified Emanote.Class as C
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Model.Query as Q
 import qualified Emanote.Model.Rel as Rel
+import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (Html, LMLType), LML (Md), R)
 import qualified Emanote.Route as R
+import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
+import Heist.Extra.Splices.Pandoc (RenderCtx (..))
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
-import qualified Heist.Extra.TemplateState as T
+import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
-import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.XmlHtml as X
 
-render :: H.Html -> Model -> EmanoteRoute -> Ema.Asset LByteString
-render x m = \case
+render :: Ema.CLI.Action -> Model -> EmanoteRoute -> Ema.Asset LByteString
+render emaAction m = \case
   EROtherFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
-    Ema.AssetGenerated Ema.Html $ renderHtml x m r
+    Ema.AssetGenerated Ema.Html $ renderHtml emaAction m r
   where
     mdRouteForHtmlRoute :: R 'Html -> R.LinkableLMLRoute
     mdRouteForHtmlRoute = R.liftLinkableLMLRoute . coerce @(R 'Html) @(R ('LMLType 'Md))
 
-renderHtml :: H.Html -> Model -> R.LinkableLMLRoute -> LByteString
-renderHtml tailwindShim model r = do
+renderHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
+renderHtml emaAction model r = do
   let meta = Meta.getEffectiveRouteMeta r model
-      templateName = Meta.lookupMetaFrom @Text "templates/_default" ("template" :| ["name"]) meta
-      rewriteClass = Meta.lookupMetaFrom @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
-      siteTitle = Meta.lookupMetaFrom @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+      templateName = MN.lookupAeson @Text "templates/_default" ("template" :| ["name"]) meta
+      rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
+      siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
-  flip (T.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
+  flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     -- Heist helpers
     "bind" ## HB.bindImpl
     "apply" ## HA.applyImpl
     -- Add tailwind css shim
-    "tailwindCssShim" ## pure (RX.renderHtmlNodes tailwindShim)
-    -- Bind route-associated metadata to <html> so that they remain in scope
-    -- throughout.
-    "html"
+    "tailwindCssShim"
+      ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+    "ema:metadata"
       ## HJ.bindJson meta
     -- Sidebar navigation
     "ema:route-tree"
@@ -108,7 +117,10 @@ renderHtml tailwindShim model r = do
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
-      ## Splices.pandocSpliceWithCustomClass rewriteClass
+      ## Splices.pandocSpliceWithCustomClass
+        rewriteClass
+        (querySplice model)
+        (const . const $ Nothing)
       $ case M.modelLookupNote r model of
         Nothing ->
           -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
@@ -124,17 +136,45 @@ renderHtml tailwindShim model r = do
               )
   where
     resolvePandoc =
-      EP.rewriteLinks (resolveUrl model)
+      EP.rewriteLinks (resolveUrl emaAction model)
 
--- | Convert .md or wiki links to their proper route url.
---
--- Requires resolution from the `model` state. Late resolution, in other words.
-resolveUrl :: Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
-resolveUrl model linkAttrs x@(inner, url) =
+querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
+querySplice model RenderCtx {..} blk = do
+  B.CodeBlock
+    (_id', classes, _attrs)
+    (Q.parseQuery -> Just q) <-
+    pure blk
+  guard $ List.elem "query" classes
+  let mOtherCls = nonEmpty $ List.delete "query" classes
+  queryTags <- nonEmpty $ X.childElementsTag "CodeBlock:Query" rootNode
+  -- TODO: This tag still remains in the HTML.
+  let queryNode =
+        fromMaybe (head queryTags) $ do
+          otherCls <- T.intercalate "/" . toList <$> mOtherCls
+          fmap head . nonEmpty $
+            NE.filter ((\x -> x == Just otherCls) . X.getAttribute "class") queryTags
+  let res = Q.runQuery model q
+  Just $ do
+    let topSplices = do
+          "query" ## HI.textSplice (show q)
+          "result"
+            ## (HI.runChildrenWith . noteSplice) `foldMapM` res
+    H.localHS (HI.bindSplices topSplices) $
+      HI.runNode queryNode
+
+-- TODO: Reuse this elsewhere
+noteSplice :: Monad n => MN.Note -> H.Splices (HI.Splice n)
+noteSplice note = do
+  "note:title" ## HI.textSplice (MN.noteTitle note)
+  "note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
+  "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
+
+resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
+resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
     res <- resolveRelTarget model <=< Rel.parseRelTarget linkAttrs $ url
     pure $ do
-      r <- res
+      (r, mTime) <- res
       let mNewInner = do
             -- Automatic link text replacement is done only if the user has not set
             -- a custom link text.
@@ -146,9 +186,17 @@ resolveUrl model linkAttrs x@(inner, url) =
               EROtherFile _ -> do
                 -- Just append a file: prefix.
                 pure $ B.Str "File: " : inner
-      pure (fromMaybe inner mNewInner, Ema.routeUrl r)
+          queryString =
+            fromMaybe "" $ do
+              -- In live server mode, append last modification time if any, such
+              -- that the browser is forced to refresh the inline image on hot
+              -- reload (Ema's DOM patch).
+              guard $ emaAction == Ema.CLI.Run
+              t <- mTime
+              pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
+      pure (fromMaybe inner mNewInner, Ema.routeUrl r <> queryString)
 
-resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text EmanoteRoute)
+resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text (EmanoteRoute, Maybe UTCTime))
 resolveRelTarget model = \case
   Right r ->
     Right <$> resolveLinkableRoute r
@@ -158,12 +206,13 @@ resolveRelTarget model = \case
         pure $ Left "Unresolved link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        fmap Right $ resolveLinkableRoute $ head targets
+        Right <$> resolveLinkableRoute (head targets)
   where
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
         Left mdR ->
           -- NOTE: Because don't support slugs yet.
-          pure $ C.lmlHtmlRoute mdR
-        Right sR ->
-          C.staticFileRoute <$> M.modelLookupStaticFileByRoute sR model
+          pure (C.lmlHtmlRoute mdR, Nothing)
+        Right sR -> do
+          staticFile <- M.modelLookupStaticFileByRoute sR model
+          pure (C.staticFileRoute staticFile, Just $ staticFile ^. SF.staticFileTime)
