@@ -19,6 +19,7 @@ import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
+import Data.Time (getCurrentTime)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
@@ -103,7 +104,8 @@ transformAction src fps = do
           Mount.Update overlays -> do
             let fpAbs = locResolve $ head overlays
             logD $ "Adding file: " <> toText fpAbs <> " " <> show r
-            pure $ M.modelInsertStaticFile r fpAbs
+            t <- liftIO getCurrentTime
+            pure $ M.modelInsertStaticFile t r fpAbs
           Mount.Delete -> do
             pure $ M.modelDeleteStaticFile r
     R.Html -> do
