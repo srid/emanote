@@ -5,6 +5,7 @@
 module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
@@ -137,18 +138,22 @@ renderHtml emaAction model r = do
     resolvePandoc =
       EP.rewriteLinks (resolveUrl emaAction model)
 
--- | Convert .md or wiki links to their proper route url.
---
--- Requires resolution from the `model` state. Late resolution, in other words.
 querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
 querySplice model RenderCtx {..} blk = do
   B.CodeBlock
-    (_id', T.strip . T.unwords -> "query", _attrs)
+    (_id', classes, _attrs)
     (Q.parseQuery -> Just q) <-
     pure blk
+  guard $ List.elem "query" classes
+  let mOtherCls = nonEmpty $ List.delete "query" classes
+  queryTags <- nonEmpty $ X.childElementsTag "CodeBlock:Query" rootNode
+  -- TODO: This tag still remains in the HTML.
+  let queryNode =
+        fromMaybe (head queryTags) $ do
+          otherCls <- T.intercalate "/" . toList <$> mOtherCls
+          fmap head . nonEmpty $
+            NE.filter ((\x -> x == Just otherCls) . X.getAttribute "class") queryTags
   let res = Q.runQuery model q
-  -- FIXME: eject the `<query>` wrapper from html?
-  queryNode <- X.childElementTag "QueryResults" rootNode
   Just $ do
     let topSplices = do
           "query" ## HI.textSplice (show q)

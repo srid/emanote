@@ -21,25 +21,51 @@
     <h5 class="mt-4 mb-2 text-2xl text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl text-gray-700" />
   </Header>
-  <QueryResults>
-    <div class="p-2 bg-${theme}-100 border-2 ">
+  <CodeBlock:Query>
+    <div class="p-2 border-2 rounded shadow hover:shadow-lg hover:border-gray-400">
       <header class="text-gray-800 font-bold mb-2">
         <query />
       </header>
       <result>
-        <li class="list-none mb-1">
-          <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${note:url}">
-            <note:title />
-          </a>
-          <!--  FIXME: Gotta implement fallback for missing keys, in Heist
-          -
-          <note:metadata>
-            <value var="date" />
-          </note:metadata>
-          -->
-        </li>
+        <!-- This should be a grid -->
+        <div class="flex flex-row items-end space-y-2">
+          <div class="flex items-center pr-2">
+            <note:metadata>
+              <value var="date" />
+            </note:metadata>
+          </div>
+          <div class="flex items-center">
+            <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${note:url}">
+              <note:title />
+            </a>
+          </div>
+        </div>
       </result>
     </div>
-  </QueryResults>
+  </CodeBlock:Query>
+
+  <CodeBlock:Query class="timeline">
+    <div class="p-2 border-2 rounded shadow hover:shadow-lg hover:border-gray-400">
+      <header class="text-gray-800 font-bold mb-2">
+        <query />
+      </header>
+      <result>
+        <!-- This should be a grid -->
+        <div class="flex flex-row items-end space-y-2">
+          <div class="flex items-center pr-2">
+            <note:metadata>
+              <value var="date" />
+            </note:metadata>
+          </div>
+          <div class="flex items-center">
+            <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${note:url}">
+              <note:title />
+            </a>
+          </div>
+        </div>
+      </result>
+    </div>
+  </CodeBlock:Query>
+
 
 </ema:note:pandoc>

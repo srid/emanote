@@ -68,9 +68,7 @@ Before tests (tasks impacting the larger architectural context in code base),
       - Including wiki-links (thus supplanting rewriteLinks)
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
-  - [ ] Queries and results embed
-    - Index tags in IxNote
-    - First query: by tag
+  - Queries and results embed (see below)
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
@@ -80,13 +78,13 @@ Before tests (tasks impacting the larger architectural context in code base),
 
 Milestone (notes.srid.ca),
 
-- Deploy www.srid.ca as-is first?
-- footnotes
+- Footnotes
 - [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
 - Blog post friendly
-  - Queries (see above)
-  - [ ] Date in queries (requires Heist withJson changes)
-  - [ ] RSS feeds
+  - Queries
+    - [x] Query by tag (in code block)
+    - [ ] Date in queries (requires Heist withJson changes)
+    - [ ] RSS feeds
 
 To triage,
 
