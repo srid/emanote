@@ -25,8 +25,9 @@ data-dir:           default
 data-files:
   favicon.svg
   index.yaml
-  templates/_default.tpl
+  templates/*.tpl
   templates/components/*.tpl
+  templates/layouts/*.tpl
 
 executable emanote
   build-depends:
