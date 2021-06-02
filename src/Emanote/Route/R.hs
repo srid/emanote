@@ -61,8 +61,9 @@ routeInits = \case
               one this
             Just ys ->
               this : go (unRoute this) ys
-    indexRoute :: R ext
-    indexRoute = R $ "index" :| []
+
+indexRoute :: R ext
+indexRoute = R $ "index" :| []
 
 -- | Convert a route to filepath
 encodeRoute :: forall ft. HasExt ft => R ft -> FilePath

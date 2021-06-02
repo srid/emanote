@@ -5,6 +5,7 @@
 module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import qualified Data.Aeson.Types as Aeson
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
@@ -49,52 +50,73 @@ render emaAction m = \case
   EROtherFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
   ERNoteHtml (mdRouteForHtmlRoute -> r) ->
-    Ema.AssetGenerated Ema.Html $ renderHtml emaAction m r
+    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m r
+  ERIndex ->
+    Ema.AssetGenerated Ema.Html $ renderIndex emaAction m
   where
     mdRouteForHtmlRoute :: R 'Html -> R.LinkableLMLRoute
     mdRouteForHtmlRoute = R.liftLinkableLMLRoute . coerce @(R 'Html) @(R ('LMLType 'Md))
 
-renderHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
-renderHtml emaAction model r = do
+renderIndex :: Ema.CLI.Action -> Model -> LByteString
+renderIndex emaAction model = do
+  let meta = Meta.getIndexYamlMeta model
+  flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
+    commonSplices emaAction meta
+    -- TODO: Style tree differently in index
+    routeTreeSplice Nothing model
+
+commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> H.Splices (HI.Splice n)
+commonSplices emaAction meta = do
+  -- Heist helpers
+  "bind" ## HB.bindImpl
+  "apply" ## HA.applyImpl
+  -- Add tailwind css shim
+  "tailwindCssShim"
+    ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+  -- TODO: Add site title
+  "ema:metadata"
+    ## HJ.bindJson meta
+
+-- | If there is no 'current route', all sub-trees are marked as active/open.
+routeTreeSplice :: Monad n => Maybe R.LinkableLMLRoute -> Model -> H.Splices (HI.Splice n)
+routeTreeSplice mr model = do
+  "ema:route-tree"
+    ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
+             getOrder tr =
+               ( Meta.lookupMeta @Int 0 (one "order") tr model,
+                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+               )
+             getCollapsed tr =
+               Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+             mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
+             lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
+          in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+               "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
+               "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
+               let isActiveNode = Just nodeRoute == mr
+                   isActiveTree =
+                     flip (maybe True) mr $ \r ->
+                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
+                   openTree =
+                     isActiveTree -- Active tree is always open
+                       || not (getCollapsed nodeRoute)
+               "node:active" ## Heist.ifElseISplice isActiveNode
+               "node:terminal" ## Heist.ifElseISplice (null children)
+               "tree:childrenCount" ## HI.textSplice (show $ length children)
+               "tree:open" ## Heist.ifElseISplice openTree
+       )
+
+renderLmlHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
+renderLmlHtml emaAction model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = MN.lookupAeson @Text "templates/_default" ("template" :| ["name"]) meta
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
-    -- Heist helpers
-    "bind" ## HB.bindImpl
-    "apply" ## HA.applyImpl
-    -- Add tailwind css shim
-    "tailwindCssShim"
-      ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
-    "ema:metadata"
-      ## HJ.bindJson meta
+    commonSplices emaAction meta
     -- Sidebar navigation
-    "ema:route-tree"
-      ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
-               getOrder tr =
-                 ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                   maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
-                 )
-               getCollapsed tr =
-                 Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-               mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
-               lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
-            in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-                 "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-                 "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
-                 let isActiveNode = nodeRoute == r
-                     isActiveTree =
-                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
-                     openTree =
-                       isActiveTree -- Active tree is always open
-                         || not (getCollapsed nodeRoute)
-                 "node:active" ## Heist.ifElseISplice isActiveNode
-                 "node:terminal" ## Heist.ifElseISplice (null children)
-                 "tree:childrenCount" ## HI.textSplice (show $ length children)
-                 "tree:open" ## Heist.ifElseISplice openTree
-         )
+    routeTreeSplice (Just r) model
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits . R.someLinkableLMLRouteCase $ r) "each-crumb"
       $ \(R.liftLinkableLMLRoute -> crumbR) ->
@@ -186,6 +208,8 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
               EROtherFile _ -> do
                 -- Just append a file: prefix.
                 pure $ B.Str "File: " : inner
+              ERIndex ->
+                Nothing
           queryString =
             fromMaybe "" $ do
               -- In live server mode, append last modification time if any, such

@@ -14,7 +14,8 @@ import Emanote.Route (FileType (AnyExt, Html), LinkableLMLRoute, R)
 import qualified Emanote.Route as R
 
 data EmanoteRoute
-  = ERNoteHtml (R 'Html)
+  = ERIndex
+  | ERNoteHtml (R 'Html)
   | EROtherFile
       ( R 'AnyExt,
         -- Absolute path to the static file referenced by this route
@@ -24,13 +25,16 @@ data EmanoteRoute
 
 instance Ema Model EmanoteRoute where
   encodeRoute = \case
+    ERIndex ->
+      "@index.html"
     ERNoteHtml r ->
       R.encodeRoute r
     EROtherFile (r, _fpAbs) ->
       R.encodeRoute r
 
   decodeRoute model fp =
-    fmap staticFileRoute (M.modelLookupStaticFile fp model)
+    (ERIndex <$ guard (fp == "@index.html" || fp == "@index"))
+      <|> fmap staticFileRoute (M.modelLookupStaticFile fp model)
       <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
 
   allRoutes model =
@@ -42,7 +46,7 @@ instance Ema Model EmanoteRoute where
           model ^. M.modelStaticFiles
             & Ix.toList
             <&> staticFileRoute
-     in htmlRoutes <> staticRoutes
+     in htmlRoutes <> staticRoutes <> [ERIndex]
 
 lmlHtmlRoute :: LinkableLMLRoute -> EmanoteRoute
 lmlHtmlRoute =
