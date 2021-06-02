@@ -29,11 +29,6 @@
       <result>
         <!-- This should be a grid -->
         <div class="flex flex-row items-end space-y-2">
-          <div class="flex items-center pr-2">
-            <note:metadata>
-              <value var="date" />
-            </note:metadata>
-          </div>
           <div class="flex items-center">
             <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${note:url}">
               <note:title />
