@@ -145,22 +145,22 @@ querySplice model RenderCtx {..} blk = do
     (Q.parseQuery -> Just q) <-
     pure blk
   guard $ List.elem "query" classes
-  let mOtherCls = nonEmpty $ List.delete "query" classes
-  queryTags <- nonEmpty $ X.childElementsTag "CodeBlock:Query" rootNode
-  -- TODO: This tag still remains in the HTML.
-  let queryNode =
-        fromMaybe (head queryTags) $ do
-          otherCls <- T.intercalate "/" . toList <$> mOtherCls
-          fmap head . nonEmpty $
-            NE.filter ((\x -> x == Just otherCls) . X.getAttribute "class") queryTags
-  let res = Q.runQuery model q
-  Just $ do
-    let topSplices = do
-          "query" ## HI.textSplice (show q)
-          "result"
-            ## (HI.runChildrenWith . noteSplice) `foldMapM` res
-    H.localHS (HI.bindSplices topSplices) $
+  let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
+  -- TODO: This tag still remains in the HTML; it should be removed.
+  queryNode <- childElementTagWithClass "CodeBlock:Query" mOtherCls rootNode
+  let splices = do
+        "query"
+          ## HI.textSplice (show q)
+        "result"
+          ## (HI.runChildrenWith . noteSplice) `foldMapM` Q.runQuery model q
+  pure $
+    H.localHS (HI.bindSplices splices) $
       HI.runNode queryNode
+  where
+    childElementTagWithClass tag mCls node = do
+      queryNodes <- nonEmpty $ X.childElementsTag tag node
+      fmap head . nonEmpty $
+        NE.filter ((== mCls) . X.getAttribute "class") queryNodes
 
 -- TODO: Reuse this elsewhere
 noteSplice :: Monad n => MN.Note -> H.Splices (HI.Splice n)
