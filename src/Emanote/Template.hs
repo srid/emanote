@@ -62,57 +62,7 @@ renderIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Index"
-    -- TODO: Style tree differently in index
     routeTreeSplice Nothing model
-
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
-commonSplices emaAction meta routeTitle = do
-  let siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
-  -- Heist helpers
-  "bind" ## HB.bindImpl
-  "apply" ## HA.applyImpl
-  -- Add tailwind css shim
-  "tailwindCssShim"
-    ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
-  "ema:metadata"
-    ## HJ.bindJson meta
-  "ema:title" ## HI.textSplice routeTitle
-  "ema:titleFull"
-    ## HI.textSplice
-    $ if routeTitle == siteTitle
-      then siteTitle
-      else routeTitle <> " – " <> siteTitle
-
--- | If there is no 'current route', all sub-trees are marked as active/open.
-routeTreeSplice :: Monad n => Maybe R.LinkableLMLRoute -> Model -> H.Splices (HI.Splice n)
-routeTreeSplice mr model = do
-  "ema:route-tree"
-    ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
-             getOrder tr =
-               ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
-               )
-             getCollapsed tr =
-               Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
-             lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
-          in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-               "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
-               let isActiveNode = Just nodeRoute == mr
-                   isActiveTree =
-                     -- Active tree checking is applicable only when there is an
-                     -- active route (i.e., mr is a Just)
-                     flip (maybe True) mr $ \r ->
-                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
-                   openTree =
-                     isActiveTree -- Active tree is always open
-                       || not (getCollapsed nodeRoute)
-               "node:active" ## Heist.ifElseISplice isActiveNode
-               "node:terminal" ## Heist.ifElseISplice (null children)
-               "tree:childrenCount" ## HI.textSplice (show $ length children)
-               "tree:open" ## Heist.ifElseISplice openTree
-       )
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
 renderLmlHtml emaAction model r = do
@@ -164,6 +114,55 @@ renderLmlHtml emaAction model r = do
   where
     resolvePandoc =
       EP.rewriteLinks (resolveUrl emaAction model)
+
+commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
+commonSplices emaAction meta routeTitle = do
+  let siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  -- Heist helpers
+  "bind" ## HB.bindImpl
+  "apply" ## HA.applyImpl
+  -- Add tailwind css shim
+  "tailwindCssShim"
+    ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+  "ema:metadata"
+    ## HJ.bindJson meta
+  "ema:title" ## HI.textSplice routeTitle
+  "ema:titleFull"
+    ## HI.textSplice
+    $ if routeTitle == siteTitle
+      then siteTitle
+      else routeTitle <> " – " <> siteTitle
+
+-- | If there is no 'current route', all sub-trees are marked as active/open.
+routeTreeSplice :: Monad n => Maybe R.LinkableLMLRoute -> Model -> H.Splices (HI.Splice n)
+routeTreeSplice mr model = do
+  "ema:route-tree"
+    ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
+             getOrder tr =
+               ( Meta.lookupMeta @Int 0 (one "order") tr model,
+                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+               )
+             getCollapsed tr =
+               Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+             mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
+             lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
+          in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+               "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
+               "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
+               let isActiveNode = Just nodeRoute == mr
+                   isActiveTree =
+                     -- Active tree checking is applicable only when there is an
+                     -- active route (i.e., mr is a Just)
+                     flip (maybe True) mr $ \r ->
+                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
+                   openTree =
+                     isActiveTree -- Active tree is always open
+                       || not (getCollapsed nodeRoute)
+               "node:active" ## Heist.ifElseISplice isActiveNode
+               "node:terminal" ## Heist.ifElseISplice (null children)
+               "tree:childrenCount" ## HI.textSplice (show $ length children)
+               "tree:open" ## Heist.ifElseISplice openTree
+       )
 
 querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
 querySplice model RenderCtx {..} blk = do
