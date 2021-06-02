@@ -95,6 +95,8 @@ routeTreeSplice mr model = do
                "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
+                     -- Active tree checking is applicable only when there is an
+                     -- active route (i.e., mr is a Just)
                      flip (maybe True) mr $ \r ->
                        toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
                    openTree =
@@ -109,7 +111,7 @@ routeTreeSplice mr model = do
 renderLmlHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
 renderLmlHtml emaAction model r = do
   let meta = Meta.getEffectiveRouteMeta r model
-      templateName = MN.lookupAeson @Text "templates/_default" ("template" :| ["name"]) meta
+      templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
