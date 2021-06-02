@@ -38,7 +38,7 @@ instance Show TemplateState where
       "Heist errors: \n" <> toString (unlines (toText <$> errs))
     TemplateState (Right st) ->
       let names :: [Text] = sort $ H.templateNames st <&> T.intercalate "/" . reverse . fmap (decodeUtf8 @Text)
-       in "Heist templates: " <> toString (T.intercalate ", " names)
+       in "Heist templates loaded: " <> toString (T.intercalate ", " names)
 
 newTemplateState :: MonadIO m => m TemplateState
 newTemplateState = do
@@ -58,7 +58,7 @@ addTemplateFile fp fpRel s (TemplateState eSt) =
       XmlHtml.HtmlDocument {..} -> do
         Right $ HI.addTemplate (tmplName fpRel) docContent (Just fp) st
 
-tmplName :: String -> ByteString
+tmplName :: HasCallStack => String -> ByteString
 tmplName fp = fromMaybe (error "Not a .tpl file") $ do
   let (base, ext) = splitExtension fp
   guard $ ext == ".tpl"
