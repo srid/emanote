@@ -61,21 +61,27 @@ renderIndex :: Ema.CLI.Action -> Model -> LByteString
 renderIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta
+    commonSplices emaAction meta "@Index"
     -- TODO: Style tree differently in index
     routeTreeSplice Nothing model
 
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> H.Splices (HI.Splice n)
-commonSplices emaAction meta = do
+commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
+commonSplices emaAction meta routeTitle = do
+  let siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
   -- Heist helpers
   "bind" ## HB.bindImpl
   "apply" ## HA.applyImpl
   -- Add tailwind css shim
   "tailwindCssShim"
     ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
-  -- TODO: Add site title
   "ema:metadata"
     ## HJ.bindJson meta
+  "ema:title" ## HI.textSplice routeTitle
+  "ema:titleFull"
+    ## HI.textSplice
+    $ if routeTitle == siteTitle
+      then siteTitle
+      else routeTitle <> " – " <> siteTitle
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LinkableLMLRoute -> Model -> H.Splices (HI.Splice n)
@@ -113,10 +119,9 @@ renderLmlHtml emaAction model r = do
   let meta = Meta.getEffectiveRouteMeta r model
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
-      siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta
+    commonSplices emaAction meta pageTitle
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
@@ -128,8 +133,6 @@ renderLmlHtml emaAction model r = do
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice pageTitle
-    "ema:note:titleFull"
-      ## HI.textSplice (if pageTitle == siteTitle then pageTitle else pageTitle <> " – " <> siteTitle)
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftLinkableRoute . R.someLinkableLMLRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do

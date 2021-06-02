@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>
-    <ema:note:titleFull />
+    <ema:titleFull />
   </title>
   <with var="page">
     <meta property="og:description" content="${value:description}" />
