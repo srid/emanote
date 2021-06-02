@@ -32,6 +32,16 @@
         <!-- Sidebar column -->
         <div
           class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
+          <div class="float-right p-2 text-gray-500 hover:text-${theme}-700">
+            <a href="/@index" title="Expand full tree">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                </path>
+              </svg>
+            </a>
+          </div>
           <div class="pt-1 pb-2 rounded bg-${theme}-50">
             <ema:route-tree>
               <apply template="components/sidebar-tree" />
@@ -55,11 +65,7 @@
             </div>
           </note-meta>
 
-          <footer class="flex items-center justify-center my-8 space-x-4 text-center text-gray-500">
-            <div>
-              Powered by <a class="font-bold" href="https://note.ema.srid.ca/">Emanote</a>
-            </div>
-          </footer>
+          <apply template="components/footer" />
         </div>
       </div>
     </div>

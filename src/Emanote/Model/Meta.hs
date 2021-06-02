@@ -28,7 +28,7 @@ getEffectiveRouteMeta :: R.LinkableLMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
   let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.someLinkableLMLRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
-        v <- fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
+        v <- getYamlMeta r model
         guard $ v /= Aeson.Null
         pure v
       frontmatter = do
@@ -37,3 +37,11 @@ getEffectiveRouteMeta mr model =
         pure x
       metas = defaults <> maybe mempty one frontmatter
    in maybe Aeson.Null SData.mergeAesons $ nonEmpty metas
+
+getYamlMeta :: R.R 'R.Yaml -> Model -> Maybe Aeson.Value
+getYamlMeta r model =
+  fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
+
+getIndexYamlMeta :: Model -> Aeson.Value
+getIndexYamlMeta =
+  fromMaybe Aeson.Null . getYamlMeta R.indexRoute

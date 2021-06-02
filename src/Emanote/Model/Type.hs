@@ -91,6 +91,10 @@ modelLookupNote :: LinkableLMLRoute -> Model -> Maybe Note
 modelLookupNote k =
   Ix.getOne . Ix.getEQ k . _modelNotes
 
+modelAllNotes :: Model -> [Note]
+modelAllNotes =
+  Ix.toList . _modelNotes
+
 modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeBaseName $ R.someLinkableLMLRouteCase r) noteTitle . modelLookupNote r
