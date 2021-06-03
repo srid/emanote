@@ -78,7 +78,7 @@ renderLmlHtml emaAction model r = do
       ## Splices.listSplice (init $ R.routeInits . R.someLinkableLMLRouteCase $ r) "each-crumb"
       $ \(R.liftLinkableLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## Ema.routeUrl $ C.lmlHtmlRoute crumbR
+          "crumb:url" ## Ema.routeUrl model $ C.lmlHtmlRoute crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
@@ -89,7 +89,7 @@ renderLmlHtml emaAction model r = do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ C.lmlHtmlRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
           $ ctxDoc & resolvePandoc
@@ -148,7 +148,7 @@ routeTreeSplice mr model = do
              lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ Ema.routeUrl $ C.lmlHtmlRoute nodeRoute
+               "node:url" ## HI.textSplice $ Ema.routeUrl model $ C.lmlHtmlRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
                      -- Active tree checking is applicable only when there is an
@@ -178,7 +178,7 @@ querySplice model RenderCtx {..} blk = do
         "query"
           ## HI.textSplice (show q)
         "result"
-          ## (HI.runChildrenWith . noteSplice) `foldMapM` Q.runQuery model q
+          ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery model q
   pure $
     H.localHS (HI.bindSplices splices) $
       HI.runNode queryNode
@@ -189,10 +189,10 @@ querySplice model RenderCtx {..} blk = do
         NE.filter ((== mCls) . X.getAttribute "class") queryNodes
 
 -- TODO: Reuse this elsewhere
-noteSplice :: Monad n => MN.Note -> H.Splices (HI.Splice n)
-noteSplice note = do
+noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
+noteSplice model note = do
   "note:title" ## HI.textSplice (MN.noteTitle note)
-  "note:url" ## HI.textSplice (Ema.routeUrl $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
+  "note:url" ## HI.textSplice (Ema.routeUrl model $ C.lmlHtmlRoute $ note ^. MN.noteRoute)
   "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
@@ -222,7 +222,7 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
               guard $ emaAction == Ema.CLI.Run
               t <- mTime
               pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
-      pure (fromMaybe inner mNewInner, Ema.routeUrl r <> queryString)
+      pure (fromMaybe inner mNewInner, Ema.routeUrl model r <> queryString)
 
 resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text (EmanoteRoute, Maybe UTCTime))
 resolveRelTarget model = \case
