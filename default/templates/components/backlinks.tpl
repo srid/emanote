@@ -3,10 +3,11 @@
     <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
     <ul class="space-y-1">
       <backlink>
-        <li><a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
+        <li>
+          <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
             <backlink:note:title />
           </a>
-          <div class="mb-4 text-sm text-gray-500">
+          <div class="mb-4 overflow-auto text-sm text-gray-500">
             <!-- TODO: How to style the backlinks list item element? Or render each separately?
                     -->
             <backlink:note:context>

@@ -15,10 +15,10 @@
   <!-- TODO: Table styling -->
   <Header>
     <h1 class="pb-2 mt-4 mb-2 text-6xl font-bold text-center" />
-    <h2 class="mt-4 mb-4 text-5xl font-bold text-gray-700" />
-    <h3 class="mb-2 text-4xl font-bold text-gray-700 jmt-4" />
-    <h4 class="mt-4 mb-2 text-3xl font-bold text-gray-700" />
-    <h5 class="mt-4 mb-2 text-2xl font-bold text-gray-700" />
+    <h2 class="mt-4 mb-4 text-4xl font-bold text-gray-700" />
+    <h3 class="mb-2 text-3xl font-bold text-gray-700 jmt-4" />
+    <h4 class="mt-4 mb-2 text-2xl font-bold text-gray-700" />
+    <h5 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
   </Header>
   <CodeBlock:Query>
