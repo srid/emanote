@@ -3,7 +3,7 @@
     <div class="container mx-auto xl:max-w-screen-lg">
       <apply template="components/breadcrumbs" />
       <div class="flex items-center justify-center">
-        <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
+        <h1 class="pb-2 mt-2 mb-2 text-6xl font-bold text-center">
           <ema:note:title />
         </h1>
       </div>
