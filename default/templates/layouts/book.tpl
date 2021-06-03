@@ -2,7 +2,7 @@
   <bind tag="body-main">
     <div class="container mx-auto xl:max-w-screen-lg">
       <!-- Header row-->
-      <div class="grid grid-cols-12 px-2">
+      <div class="grid grid-cols-12 md:px-2">
         <!-- Logo column -->
         <div class="hidden md:mr-4 md:block md:col-span-3">
           <div class="flex items-end h-full pl-2 mt-2 space-x-2">
@@ -18,12 +18,7 @@
         </div>
         <!-- Title column -->
         <div class="col-span-12 md:col-span-9">
-
-          <div class="flex items-center justify-center">
-            <h1 class="pb-2 mt-2 mb-2 text-6xl font-bold text-center">
-              <ema:note:title />
-            </h1>
-          </div>
+          <apply template="components/breadcrumbs" />
         </div>
       </div>
 
@@ -50,10 +45,10 @@
         </div>
         <!-- Main body column -->
         <div class="col-span-12 md:col-span-9">
-          <apply template="components/pandoc" />
+          <div class="overflow-auto">
+            <apply template="components/pandoc" />
+          </div>
           <apply template="components/backlinks" />
-
-          <apply template="components/breadcrumbs" />
 
           <note-meta>
             <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">

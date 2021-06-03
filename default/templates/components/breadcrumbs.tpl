@@ -1,11 +1,11 @@
 <ema:breadcrumbs>
-  <div class="w-full p-4 mt-4 text-gray-700 bg-${theme}-500 rounded">
-    <div class="flex justify-center">
-      <div class="w-full py-2 rounded">
-        <ul class="flex text-sm lg:text-base">
+  <div class="w-full text-gray-700">
+    <div class="flex justify-left">
+      <div class="bg-${theme}-100 md:rounded-b-lg w-full py-2 px-2 md:w-auto md:py-0 md:px-0">
+        <ul class="flex flex-wrap text-lg md:text-sm">
           <each-crumb>
             <li class="inline-flex items-center">
-              <a class="px-1 font-bold bg-gray-100 rounded" href="${crumb:url}">
+              <a class="px-1 font-bold" href="${crumb:url}">
                 <crumb:title />
               </a>
               <svg fill="currentColor" viewBox="0 0 20 20" class="w-auto h-5 text-gray-400">
@@ -15,13 +15,14 @@
               </svg>
             </li>
           </each-crumb>
-          <li class="inline-flex items-center text-gray-200 font-bold">
-            <a>
-              <ema:note:title />
-            </a>
-          </li>
         </ul>
       </div>
     </div>
   </div>
+
 </ema:breadcrumbs>
+<h1 class="flex items-center justify-center mt-2 text-4xl font-extrabold text-black bg-white">
+  <a>
+    <ema:note:title />
+  </a>
+</h1>
