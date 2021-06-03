@@ -7,12 +7,12 @@
   <title>
     <ema:titleFull />
   </title>
-  <with var="page">
-    <meta property="og:description" content="${value:description}" />
-    <meta property="og:site_name" content="${value:siteName}" />
-  </with>
   <tailwindCssShim />
   <ema:metadata>
+    <with var="page">
+      <meta property="og:description" content="${value:description}" />
+      <meta property="og:site_name" content="${value:siteName}" />
+    </with>
     <with var="template">
       <base href="${value:baseUrl}" />
       <link href="${value:iconUrl}" rel="icon" />
