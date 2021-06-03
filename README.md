@@ -85,6 +85,7 @@ Milestone (notes.srid.ca),
     - [x] Query by tag (in code block)
     - [x] Date in queries (requires Heist withJson changes)
 - [ ] Theme touches
+  - dd styling
 - Nice to have, but not essential
   - [ ] RSS feeds
 

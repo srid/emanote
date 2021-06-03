@@ -16,6 +16,7 @@ data FileType
   | Yaml
   | HeistTpl
   | Html
+  | Folder
   | -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
     -- "catch all" type to capture files using an arbitrary.
     AnyExt
@@ -57,6 +58,11 @@ instance HasExt 'HeistTpl where
   fileType = HeistTpl
   withExt = flip FP.addExtension ".tpl"
   withoutKnownExt = fpWithoutExt ".tpl"
+
+instance HasExt 'Folder where
+  fileType = Folder
+  withExt = id
+  withoutKnownExt = pure
 
 -- | The AnyExt instance ignores explicitly dealing with extensions, expecting
 -- the user to explicitly encode the extension in their value tpye.
