@@ -50,7 +50,7 @@
           </div>
           <apply template="components/backlinks" />
 
-          <note-meta>
+          <ema:metadata>
             <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
               <with var="tags">
                 <a title="Tag" class="px-1 bg-gray-100 rounded">
@@ -58,7 +58,7 @@
                 </a>
               </with>
             </div>
-          </note-meta>
+          </ema:metadata>
 
           <apply template="components/footer" />
         </div>
