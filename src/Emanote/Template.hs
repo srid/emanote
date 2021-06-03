@@ -50,16 +50,11 @@ render emaAction m = \case
   EROtherFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
   ERNoteHtml htmlRoute -> do
-    let note =
-          flip fromMaybe (MN.lookupNote htmlRoute (m ^. M.modelNotes)) $
-            -- Because the sidebar / @index can link to "folder" routes, which
-            -- may not have a corresponding .md file, we are obliged to handle
-            -- them gracefully here so that clicking the sidebar doesn't give
-            -- 404 on folders.
-            let emptyDoc =
-                  Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
-             in MN.Note emptyDoc Aeson.Null [] (R.liftLinkableLMLRoute @('LMLType 'Md) . coerce $ htmlRoute) Nothing
-    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
+    case MN.lookupNoteOrItsParent htmlRoute (m ^. M.modelNotes) of
+      Just note ->
+        Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
+      Nothing ->
+        error $ "Bad route: " <> show htmlRoute
   ERIndex ->
     Ema.AssetGenerated Ema.Html $ renderIndex emaAction m
 

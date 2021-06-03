@@ -12,7 +12,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route.Ext (FileType (Html), HasExt (..))
+import Emanote.Route.Ext (FileType (Folder, Html), HasExt (..))
 import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 
@@ -44,6 +44,10 @@ mkRouteFromSlug =
 routeBaseName :: R ext -> Text
 routeBaseName =
   Ema.unSlug . head . NE.reverse . unRoute
+
+routeParent :: R ext -> Maybe (R 'Folder)
+routeParent =
+  fmap R . nonEmpty . NE.init . unRoute
 
 -- | For use in breadcrumbs
 routeInits :: R ext -> NonEmpty (R ext)

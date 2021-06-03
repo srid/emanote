@@ -21,10 +21,12 @@ import qualified Emanote.Route as R
 import qualified Emanote.WikiLink as WL
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.Pandoc.Definition as B
 
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
+    -- TODO:L remove and derive from meta
     _noteTags :: [Text],
     _noteRoute :: R.LinkableLMLRoute,
     -- | Custom slug set in frontmatter if any. Overrides _noteRoute for
@@ -40,7 +42,7 @@ noteSelfRefs =
     . (R.liftLinkableRoute . R.someLinkableLMLRouteCase)
     . _noteRoute
 
-type NoteIxs = '[R.LinkableLMLRoute, WL.WikiLink, Text, Slug]
+type NoteIxs = '[R.LinkableLMLRoute, R 'R.Folder, WL.WikiLink, Text, Slug]
 
 type IxNote = IxSet NoteIxs Note
 
@@ -48,6 +50,8 @@ instance Indexable NoteIxs Note where
   indices =
     ixList
       (ixFun $ one . _noteRoute)
+      -- The parent folder of this note.
+      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
       (ixFun noteSelfRefs)
       (ixFun _noteTags)
       (ixFun $ maybeToList . _noteSlug)
@@ -68,6 +72,11 @@ noteHtmlRoute note =
     Just slug ->
       R.mkRouteFromSlug slug
 
+-- | Does the given folder have any notes?
+hasNotes :: R 'R.Folder -> IxNote -> Bool
+hasNotes r =
+  not . Ix.null . Ix.getEQ r
+
 -- | TODO: Ditch this in favour of direct indexing in html route.
 lookupNote :: R 'R.Html -> IxNote -> Maybe Note
 lookupNote htmlRoute ns =
@@ -79,6 +88,20 @@ lookupNote htmlRoute ns =
       pure slug
     mdRoute :: R ('R.LMLType 'R.Md) =
       coerce htmlRoute
+
+lookupNoteOrItsParent :: R 'R.Html -> IxNote -> Maybe Note
+lookupNoteOrItsParent r ns =
+  case lookupNote r ns of
+    Just note -> pure note
+    Nothing -> do
+      guard $ hasNotes (coerce r) ns
+      let placeHolder =
+            Pandoc mempty $ one $ B.Plain $ one $ B.Str "Folder without associated .md file"
+          folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
+      pure $ mkEmptyNoteWith folderMdR placeHolder
+  where
+    mkEmptyNoteWith someR doc =
+      Note doc Aeson.Null [] someR Nothing
 
 parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do

@@ -14,6 +14,9 @@ import qualified Emanote.Model.StaticFile as SF
 import Emanote.Route (FileType (AnyExt, Html, LMLType), LML (Md), LinkableLMLRoute, R)
 import qualified Emanote.Route as R
 
+-- TODO: Remove html route knolwedge from this type.
+-- This should only semantically act as a route to somewhere in `Model` (could
+-- reuse Route to source file wherever appropriate).
 data EmanoteRoute
   = ERIndex
   | ERNoteHtml (R 'Html)
