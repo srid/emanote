@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emanote.Class where
@@ -10,7 +11,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
-import Emanote.Route (FileType (AnyExt, Html), LinkableLMLRoute, R)
+import Emanote.Route (FileType (AnyExt, Html, LMLType), LML (Md), LinkableLMLRoute, R)
 import qualified Emanote.Route as R
 
 data EmanoteRoute
@@ -24,17 +25,22 @@ data EmanoteRoute
   deriving (Eq, Show, Ord)
 
 instance Ema Model EmanoteRoute where
-  encodeRoute _model = \case
+  encodeRoute model = \case
     ERIndex ->
       "@index.html"
     ERNoteHtml r ->
-      R.encodeRoute r
+      R.encodeRoute $
+        fromMaybe r $ do
+          note <- M.modelLookupNote (R.liftLinkableLMLRoute @('LMLType 'Md) $ coerce r) model
+          pure $ N.noteHtmlRoute note
     EROtherFile (r, _fpAbs) ->
       R.encodeRoute r
 
   decodeRoute model fp =
     (ERIndex <$ guard (fp == "@index.html" || fp == "@index"))
       <|> fmap staticFileRoute (M.modelLookupStaticFile fp model)
+      -- TODO: Lookup model here or actually change the route type.
+      -- BUT we do want to account for non-existant folder routes.
       <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
 
   allRoutes model =
