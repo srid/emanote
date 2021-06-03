@@ -49,13 +49,19 @@ render :: Ema.CLI.Action -> Model -> EmanoteRoute -> Ema.Asset LByteString
 render emaAction m = \case
   EROtherFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
-  ERNoteHtml (mdRouteForHtmlRoute -> r) ->
-    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m r
+  ERNoteHtml htmlRoute -> do
+    let note =
+          flip fromMaybe (MN.lookupNote htmlRoute (m ^. M.modelNotes)) $
+            -- Because the sidebar / @index can link to "folder" routes, which
+            -- may not have a corresponding .md file, we are obliged to handle
+            -- them gracefully here so that clicking the sidebar doesn't give
+            -- 404 on folders.
+            let emptyDoc =
+                  Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
+             in MN.Note emptyDoc Aeson.Null [] (R.liftLinkableLMLRoute @('LMLType 'Md) . coerce $ htmlRoute) Nothing
+    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
   ERIndex ->
     Ema.AssetGenerated Ema.Html $ renderIndex emaAction m
-  where
-    mdRouteForHtmlRoute :: R 'Html -> R.LinkableLMLRoute
-    mdRouteForHtmlRoute = R.liftLinkableLMLRoute . coerce @(R 'Html) @(R ('LMLType 'Md))
 
 renderIndex :: Ema.CLI.Action -> Model -> LByteString
 renderIndex emaAction model = do
@@ -64,9 +70,10 @@ renderIndex emaAction model = do
     commonSplices emaAction meta "@Index"
     routeTreeSplice Nothing model
 
-renderLmlHtml :: Ema.CLI.Action -> Model -> R.LinkableLMLRoute -> LByteString
-renderLmlHtml emaAction model r = do
-  let meta = Meta.getEffectiveRouteMeta r model
+renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
+renderLmlHtml emaAction model note = do
+  let r = note ^. MN.noteRoute
+      meta = Meta.getEffectiveRouteMeta r model
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       pageTitle = M.modelLookupTitle r model
@@ -98,19 +105,10 @@ renderLmlHtml emaAction model r = do
         rewriteClass
         (querySplice model)
         (const . const $ Nothing)
-      $ case M.modelLookupNote r model of
-        Nothing ->
-          -- This route doesn't correspond to any Markdown file on disk. Could be one of the reasons,
-          -- 1. Refers to a folder route (and no ${folder}.md exists)
-          -- 2. A broken wiki-links
-          -- In both cases, we take the lenient approach, and display an empty page (but with title).
-          -- TODO: Display folder children if this is a folder note. It is hinted to in the sidebar too.
-          Pandoc mempty $ one $ B.Plain $ one $ B.Str "No Markdown file exists for this route."
-        Just note ->
-          note ^. MN.noteDoc
-            & ( EP.withoutH1 -- Because, handling note title separately
-                  >>> resolvePandoc
-              )
+      $ note ^. MN.noteDoc
+        & ( EP.withoutH1 -- Because, handling note title separately
+              >>> resolvePandoc
+          )
   where
     resolvePandoc =
       EP.rewriteLinks (resolveUrl emaAction model)

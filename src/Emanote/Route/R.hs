@@ -36,6 +36,10 @@ mkRouteFromFilePath fp = do
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   R <$> nonEmpty slugs
 
+mkRouteFromSlug :: forall ext. HasExt ext => Slug -> R ext
+mkRouteFromSlug =
+  R . one
+
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text
 routeBaseName =
