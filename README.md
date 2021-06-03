@@ -78,13 +78,14 @@ Before tests (tasks impacting the larger architectural context in code base),
 
 Milestone (notes.srid.ca),
 
-- Footnotes
+- [ ] Footnotes
 - [ ] Custom route slugs https://github.com/srid/emanote/discussions/42
 - Blog post friendly
   - Queries
     - [x] Query by tag (in code block)
     - [x] Date in queries (requires Heist withJson changes)
-    - [ ] RSS feeds
+- Nice to have, but not essential
+  - [ ] RSS feeds
 
 To triage,
 

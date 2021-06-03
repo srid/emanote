@@ -24,7 +24,7 @@ data EmanoteRoute
   deriving (Eq, Show, Ord)
 
 instance Ema Model EmanoteRoute where
-  encodeRoute = \case
+  encodeRoute _model = \case
     ERIndex ->
       "@index.html"
     ERNoteHtml r ->
