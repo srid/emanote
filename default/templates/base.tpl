@@ -17,8 +17,8 @@
       <base href="${value:baseUrl}" />
       <link href="${value:iconUrl}" rel="icon" />
     </with>
+    <snippet var="page.headHtml" />
   </ema:metadata>
-  <snippet var="page.headHtml" />
   <head-extra />
 </head>
 
