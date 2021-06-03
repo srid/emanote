@@ -67,6 +67,8 @@ modelDeleteNote :: LinkableLMLRoute -> Model -> Model
 modelDeleteNote k =
   modelNotes %~ Ix.deleteIx k
     >>> modelRels %~ Ix.deleteIx k
+    -- FIXME: If removing folder.md, this shoudn't remove children!
+    -- Use `treeDeleteLeafPath` to ensure we remove only leaf paths.
     >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . R.someLinkableLMLRouteCase $ k)
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
