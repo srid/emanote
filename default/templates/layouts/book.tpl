@@ -20,7 +20,7 @@
         <div class="col-span-12 md:col-span-9">
 
           <div class="flex items-center justify-center">
-            <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
+            <h1 class="pb-2 mt-2 mb-2 text-6xl font-bold text-center">
               <ema:note:title />
             </h1>
           </div>
@@ -42,7 +42,7 @@
               </svg>
             </a>
           </div>
-          <div class="pt-1 pb-2 rounded bg-${theme}-50">
+          <div class="pt-1 pb-2 rounded bg-${theme}-50 border-2 shadow-lg">
             <ema:route-tree>
               <apply template="components/sidebar-tree" />
             </ema:route-tree>
