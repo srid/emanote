@@ -6,7 +6,7 @@ module Emanote.Source.Pattern where
 import qualified Emanote.Route as R
 import System.FilePattern (FilePattern)
 
-filePattern :: R.FileType -> FilePath
+filePattern :: HasCallStack => R.FileType -> FilePath
 filePattern = \case
   R.LMLType R.Md ->
     R.withExt @('R.LMLType 'R.Md) $
@@ -22,6 +22,8 @@ filePattern = \case
       "**/*"
   R.AnyExt ->
     "**"
+  R.Folder ->
+    error "Unsupported"
 
 filePatterns :: [(R.FileType, FilePattern)]
 filePatterns =
