@@ -11,7 +11,7 @@ import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
 import qualified Data.IxSet.Typed as Ix
-import Emanote.Model (Model, modelLookupNote, modelSData)
+import Emanote.Model (Model, modelLookupNoteByRoute, modelSData)
 import Emanote.Model.Note (lookupAeson, noteMeta)
 import Emanote.Model.SData (sdataValue)
 import qualified Emanote.Model.SData as SData
@@ -32,7 +32,7 @@ getEffectiveRouteMeta mr model =
         guard $ v /= Aeson.Null
         pure v
       frontmatter = do
-        x <- (^. noteMeta) <$> modelLookupNote mr model
+        x <- (^. noteMeta) <$> modelLookupNoteByRoute mr model
         guard $ x /= Aeson.Null
         pure x
       metas = defaults <> maybe mempty one frontmatter

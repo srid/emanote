@@ -1,7 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -32,10 +31,14 @@ data Note = Note
 
 type NoteIxs =
   '[ R.LinkableLMLRoute,
-     -- Parent folder (unless a root file).
-     R 'R.Folder,
      -- Allowed ways to wiki-link to this note.
      WL.WikiLink,
+     -- HTML route for this note
+     R 'R.Html,
+     -- Parent folder (unless a root file).
+     -- TODO: Index parent folder's allowed wikilinks, somehow, to support
+     -- linking to them.
+     R 'R.Folder,
      -- Tag
      Text,
      -- "slug" alias
@@ -48,8 +51,9 @@ instance Indexable NoteIxs Note where
   indices =
     ixList
       (ixFun $ one . _noteRoute)
-      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
       (ixFun noteSelfRefs)
+      (ixFun $ one . noteHtmlRoute)
+      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
@@ -73,10 +77,11 @@ noteSlug :: Note -> Maybe Slug
 noteSlug =
   lookupAeson Nothing (one "slug") . _noteMeta
 
+-- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
-noteHtmlRoute Note {..} =
+noteHtmlRoute note@Note {..} =
   -- Favour slug if one exixts, otherwise use the full path.
-  case lookupAeson @(Maybe Slug) Nothing (one "slug") _noteMeta of
+  case noteSlug note of
     Nothing ->
       coerce $ R.someLinkableLMLRouteCase _noteRoute
     Just slug ->
@@ -87,28 +92,34 @@ hasNotes :: R 'R.Folder -> IxNote -> Bool
 hasNotes r =
   not . Ix.null . Ix.getEQ r
 
--- | TODO: Ditch this in favour of direct indexing in html route.
-lookupNote :: R 'R.Html -> IxNote -> Maybe Note
-lookupNote htmlRoute ns =
-  (Ix.getOne . Ix.getEQ (R.liftLinkableLMLRoute mdRoute)) ns
-    <|> (mSlug >>= \slug -> (Ix.getOne . Ix.getEQ slug) ns)
-  where
-    mSlug :: Maybe Slug = do
-      slug :| [] <- pure $ R.unRoute htmlRoute
-      pure slug
-    mdRoute :: R ('R.LMLType 'R.Md) =
-      coerce htmlRoute
+singleNote :: HasCallStack => [Note] -> Maybe Note
+singleNote ns = do
+  res@(x :| xs) <- nonEmpty ns
+  if null xs
+    then pure x
+    else error $ "Ambiguous notes: " <> show (_noteRoute <$> res)
 
-lookupNoteOrItsParent :: R 'R.Html -> IxNote -> Maybe Note
-lookupNoteOrItsParent r ns =
-  case lookupNote r ns of
-    Just note -> pure note
-    Nothing -> do
-      guard $ hasNotes (coerce r) ns
-      let placeHolder =
-            Pandoc mempty $ one $ B.Plain $ one $ B.Str "Folder without associated .md file"
-          folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
-      pure $ mkEmptyNoteWith folderMdR placeHolder
+lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
+lookupNotesByHtmlRoute htmlRoute =
+  Ix.toList . Ix.getEQ htmlRoute
+
+lookupNotesByRoute :: R.LinkableLMLRoute -> IxNote -> [Note]
+lookupNotesByRoute htmlRoute =
+  Ix.toList . Ix.getEQ htmlRoute
+
+lookupFolderWithNotes :: R 'R.Folder -> IxNote -> Maybe Note
+lookupFolderWithNotes r ns = do
+  guard $ hasNotes (coerce r) ns
+  let placeHolder =
+        Pandoc mempty $
+          one $
+            B.Plain
+              [ B.Str
+                  "Placeholder: To add content here, write to file: ",
+                B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
+              ]
+      folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
+  pure $ mkEmptyNoteWith folderMdR placeHolder
   where
     mkEmptyNoteWith someR doc =
       Note doc Aeson.Null someR

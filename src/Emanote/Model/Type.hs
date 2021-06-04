@@ -20,9 +20,8 @@ import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model.Note
   ( IxNote,
     Note,
-    noteRoute,
-    noteTitle,
   )
+import qualified Emanote.Model.Note as N
 import Emanote.Model.Rel (IxRel)
 import qualified Emanote.Model.Rel as Rel
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
@@ -61,7 +60,7 @@ modelInsertNote note =
          )
     >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.someLinkableLMLRouteCase $ r)
   where
-    r = note ^. noteRoute
+    r = note ^. N.noteRoute
 
 modelDeleteNote :: LinkableLMLRoute -> Model -> Model
 modelDeleteNote k =
@@ -89,17 +88,19 @@ modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNote :: LinkableLMLRoute -> Model -> Maybe Note
-modelLookupNote k =
-  Ix.getOne . Ix.getEQ k . _modelNotes
+modelLookupNoteByRoute :: LinkableLMLRoute -> Model -> Maybe Note
+modelLookupNoteByRoute r (_modelNotes -> notes) =
+  N.singleNote (N.lookupNotesByRoute r notes)
+    <|> N.lookupFolderWithNotes (coerce $ R.someLinkableLMLRouteCase r) notes
 
-modelAllNotes :: Model -> [Note]
-modelAllNotes =
-  Ix.toList . _modelNotes
+modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
+modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
+  N.singleNote (N.lookupNotesByHtmlRoute r notes)
+    <|> N.lookupFolderWithNotes (coerce r) notes
 
 modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeBaseName $ R.someLinkableLMLRouteCase r) noteTitle . modelLookupNote r
+  maybe (R.routeBaseName $ R.someLinkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
 
 modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
 modelLookupRouteByWikiLink wl model =
@@ -108,7 +109,7 @@ modelLookupRouteByWikiLink wl model =
   --
   -- Could store `modelNoteDirs` and look that up.
   let noteRoutes =
-        fmap (R.liftLinkableRoute . R.someLinkableLMLRouteCase . (^. noteRoute)) . Ix.toList $
+        fmap (R.liftLinkableRoute . R.someLinkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
           (model ^. modelNotes) @= wl
       staticRoutes =
         fmap (R.liftLinkableRoute . (^. staticFileRoute)) . Ix.toList $

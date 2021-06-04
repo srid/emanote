@@ -111,3 +111,6 @@ transformAction src fps = do
     R.Html -> do
       -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
       pure id
+    R.Folder -> do
+      -- Unused! But maybe we should ... TODO:
+      pure id

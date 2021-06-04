@@ -50,7 +50,7 @@ render emaAction m = \case
   RStaticFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
   RLMLFile lmlRoute -> do
-    case MN.lookupNoteOrItsParent (coerce $ R.someLinkableLMLRouteCase lmlRoute) (m ^. M.modelNotes) of
+    case M.modelLookupNoteByRoute lmlRoute m of
       Just note ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
       Nothing ->
@@ -133,7 +133,7 @@ routeTreeSplice mr model = do
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
                ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNote tr model
+                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
                )
              getCollapsed tr =
                Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
@@ -200,7 +200,7 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             guard $ plainify inner == url
             case r of
               RLMLFile lmlR -> do
-                one . B.Str . MN.noteTitle <$> M.modelLookupNote lmlR model
+                one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
               RStaticFile _ -> do
                 -- Just append a file: prefix.
                 pure $ B.Str "File: " : inner
