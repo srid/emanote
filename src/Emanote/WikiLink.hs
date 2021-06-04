@@ -75,6 +75,8 @@ data WikiLinkType
     WikiLinkBranch
   | -- | #[[Foo]]
     WikiLinkTag
+  | -- | ![[Foo]]
+    WikiLinkEmbed
   deriving (Eq, Show, Ord, Typeable, Data)
 
 instance Read WikiLinkType where
@@ -82,6 +84,7 @@ instance Read WikiLinkType where
     | s == show WikiLinkNormal = [(WikiLinkNormal, "")]
     | s == show WikiLinkBranch = [(WikiLinkBranch, "")]
     | s == show WikiLinkTag = [(WikiLinkTag, "")]
+    | s == show WikiLinkEmbed = [(WikiLinkEmbed, "")]
     | otherwise = []
 
 class HasWikiLink il where
@@ -116,6 +119,7 @@ wikilinkSpec =
         [ P.try $
             P.choice
               [ P.try (CT.symbol '#' *> pWikilink WikiLinkTag),
+                P.try (CT.symbol '!' *> pWikilink WikiLinkEmbed),
                 P.try (pWikilink WikiLinkBranch <* CT.symbol '#'),
                 P.try (pWikilink WikiLinkNormal)
               ]
