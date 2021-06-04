@@ -31,7 +31,7 @@ instance Ema Model Route where
     RLMLFile r ->
       R.encodeRoute $
         fromMaybe (coerce . R.someLinkableLMLRouteCase $ r) $ do
-          note <- M.modelLookupNote r model
+          note <- M.modelLookupNoteByRoute r model
           pure $ N.noteHtmlRoute note
     RStaticFile (r, _fpAbs) ->
       R.encodeRoute r
@@ -41,7 +41,7 @@ instance Ema Model Route where
       <|> fmap staticFileRoute (M.modelLookupStaticFile fp model)
       <|> fmap
         (RLMLFile . N._noteRoute)
-        (flip N.lookupNoteOrItsParent (model ^. M.modelNotes) =<< R.decodeHtmlRoute fp)
+        (flip M.modelLookupNoteByHtmlRoute model =<< R.decodeHtmlRoute fp)
 
   allRoutes model =
     let htmlRoutes =
