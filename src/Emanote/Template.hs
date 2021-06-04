@@ -94,7 +94,10 @@ renderLmlHtml emaAction model note = do
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ C.RLMLFile source)
         "backlink:note:context"
-          ## Splices.pandocSplice
+          ## Splices.pandocSpliceWithCustomClass
+            rewriteClass
+            (const . const $ Nothing)
+            (const . const $ Nothing)
           $ ctxDoc & resolvePandoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass
@@ -192,30 +195,38 @@ noteSplice model note = do
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
-    res <- resolveUnresolvedRelTarget model <=< Rel.parseUnresolvedRelTarget linkAttrs $ url
-    pure $ do
-      (r, mTime) <- res
-      let mNewInner = do
-            -- Automatic link text replacement is done only if the user has not set
-            -- a custom link text.
-            guard $ plainify inner == url
-            case r of
-              RLMLFile lmlR -> do
-                one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-              RStaticFile _ -> do
-                -- Just append a file: prefix.
-                pure $ B.Str "File: " : inner
-              RIndex ->
-                Nothing
-          queryString =
-            fromMaybe "" $ do
-              -- In live server mode, append last modification time if any, such
-              -- that the browser is forced to refresh the inline image on hot
-              -- reload (Ema's DOM patch).
-              guard $ emaAction == Ema.CLI.Run
-              t <- mTime
-              pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
-      pure (fromMaybe inner mNewInner, Ema.routeUrl model r <> queryString)
+    fmap (fmap renderUrl)
+      . resolveUnresolvedRelTarget model
+      <=< Rel.parseUnresolvedRelTarget linkAttrs
+      $ url
+  where
+    renderUrl ::
+      (Route, Maybe UTCTime) ->
+      ([B.Inline], Text)
+    renderUrl (r, mTime) =
+      let isWikiLinkSansCustom = url == plainify inner
+          mQuery = do
+            -- In live server mode, append last modification time if any, such
+            -- that the browser is forced to refresh the inline image on hot
+            -- reload (Ema's DOM patch).
+            guard $ emaAction == Ema.CLI.Run
+            t <- mTime
+            pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
+       in ( fromMaybe
+              inner
+              ( guard isWikiLinkSansCustom >> wikiLinkDefaultInnerText r
+              ),
+            Ema.routeUrl model r <> fromMaybe "" mQuery
+          )
+      where
+        wikiLinkDefaultInnerText = \case
+          RLMLFile lmlR -> do
+            one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
+          RStaticFile _ -> do
+            -- Just append a file: prefix.
+            pure $ B.Str "File: " : inner
+          RIndex ->
+            Nothing
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (Route, Maybe UTCTime))
