@@ -8,12 +8,11 @@ import Data.Default (Default (def))
 import Data.LVar (LVar)
 import qualified Ema
 import qualified Ema.CLI as CLI
-import Emanote.Class ()
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Source as Source
 import qualified Emanote.Source.Mount as Mount
-import qualified Emanote.Template as Template
+import qualified Emanote.View.Template as Template
 import qualified Heist.Extra.TemplateState as T
 import Main.Utf8 (withUtf8)
 import UnliftIO (MonadUnliftIO)

@@ -22,8 +22,8 @@ import Emanote.Model.Note
     Note,
   )
 import qualified Emanote.Model.Note as N
-import Emanote.Model.Rel (IxRel)
-import qualified Emanote.Model.Rel as Rel
+import Emanote.Model.Link.Rel (IxRel)
+import qualified Emanote.Model.Link.Rel as Rel
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.StaticFile
   ( IxStaticFile,
@@ -32,7 +32,7 @@ import Emanote.Model.StaticFile
   )
 import Emanote.Route (FileType (AnyExt), LinkableLMLRoute, LinkableRoute, R)
 import qualified Emanote.Route as R
-import qualified Emanote.WikiLink as WL
+import qualified Emanote.Model.Link.WikiLink as WL
 import Heist.Extra.TemplateState (TemplateState)
 import qualified Text.Pandoc.Definition as B
 
@@ -58,7 +58,7 @@ modelInsertNote note =
       %~ ( Ix.deleteIx r
              >>> Ix.insertList (Rel.extractRels note)
          )
-    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.someLinkableLMLRouteCase $ r)
+    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
   where
     r = note ^. N.noteRoute
 
@@ -68,7 +68,7 @@ modelDeleteNote k =
     >>> modelRels %~ Ix.deleteIx k
     -- FIXME: If removing folder.md, this shoudn't remove children!
     -- Use `treeDeleteLeafPath` to ensure we remove only leaf paths.
-    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . R.someLinkableLMLRouteCase $ k)
+    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
@@ -91,7 +91,7 @@ modelDeleteData k =
 modelLookupNoteByRoute :: LinkableLMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByRoute r notes)
-    <|> N.lookupFolderWithNotes (coerce $ R.someLinkableLMLRouteCase r) notes
+    <|> N.lookupFolderWithNotes (coerce $ R.linkableLMLRouteCase r) notes
 
 modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
 modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
@@ -100,7 +100,7 @@ modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
 
 modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeBaseName $ R.someLinkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
+  maybe (R.routeBaseName $ R.linkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
 
 modelResolveWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
 modelResolveWikiLink wl model =
@@ -109,7 +109,7 @@ modelResolveWikiLink wl model =
   --
   -- See TODO in Note.hs
   let noteRoutes =
-        fmap (R.liftLinkableRoute . R.someLinkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
+        fmap (R.liftLinkableRoute . R.linkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
           (model ^. modelNotes) @= wl
       staticRoutes =
         fmap (R.liftLinkableRoute . (^. staticFileRoute)) . Ix.toList $
@@ -125,10 +125,6 @@ modelLookupBacklinks r model =
       backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
-
-modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
-modelLookupStaticFile fp model = do
-  flip modelLookupStaticFileByRoute model =<< R.mkRouteFromFilePath @'AnyExt fp
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
 modelLookupStaticFileByRoute r model = do

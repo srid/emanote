@@ -6,7 +6,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Emanote.Model.Rel where
+module Emanote.Model.Link.Rel where
 
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
@@ -16,15 +16,15 @@ import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Route (LinkableLMLRoute, LinkableRoute)
 import qualified Emanote.Route as R
-import qualified Emanote.WikiLink as WL
+import qualified Emanote.Model.Link.WikiLink as WL
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
--- | A link target that has not been resolved (using model) yet.
-type UnresolvedRelTarget = Either WL.WikiLink LinkableRoute
-
--- | A relation from a note to another note or static file.
+-- | A relation from one note to any other file (note or static file)
+--
+-- Target will remain unresolved in the `Rel`, and can be resolved at a latter
+-- time (eg: during rendering).
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LinkableLMLRoute,
@@ -34,6 +34,9 @@ data Rel = Rel
     _relCtx :: [B.Block]
   }
   deriving (Show)
+
+-- | A link target that has not been resolved (using model) yet.
+type UnresolvedRelTarget = Either WL.WikiLink LinkableRoute
 
 instance Eq Rel where
   (==) = (==) `on` (_relFrom &&& _relTo)

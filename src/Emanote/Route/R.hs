@@ -12,7 +12,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route.Ext (FileType (Folder, Html), HasExt (..))
+import Emanote.Route.Ext (FileType (AnyExt, Folder, Html), HasExt (..))
 import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 
@@ -39,6 +39,11 @@ mkRouteFromFilePath fp = do
 mkRouteFromSlug :: forall ext. HasExt ext => Slug -> R ext
 mkRouteFromSlug =
   R . one
+
+routeSlug :: R ext -> Maybe Slug
+routeSlug r = do
+  x :| [] <- pure $ unRoute r
+  pure x
 
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text
@@ -88,3 +93,7 @@ decodeHtmlRoute fp = do
       let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
       parts <- nonEmpty $ T.splitOn "/" base
       pure $ R $ fmap Ema.decodeSlug parts
+
+decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
+decodeAnyRoute =
+  mkRouteFromFilePath @'AnyExt

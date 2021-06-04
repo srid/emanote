@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.WikiLink where
+module Emanote.Model.Link.WikiLink where
 
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
@@ -16,7 +16,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route (LinkableRoute, R (unRoute), linkableRouteCase, someLinkableLMLRouteCase)
+import Emanote.Route (LinkableRoute, R (unRoute), linkableLMLRouteCase, linkableRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
@@ -58,7 +58,7 @@ allowedWikiLinks =
     . wlParts
   where
     wlParts =
-      either (unRoute . someLinkableLMLRouteCase) unRoute
+      either (unRoute . linkableLMLRouteCase) unRoute
         . linkableRouteCase
 
 -------------------------
