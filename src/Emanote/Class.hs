@@ -11,59 +11,49 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
-import Emanote.Route (FileType (AnyExt, Html, LMLType), LML (Md), LinkableLMLRoute, R)
+import Emanote.Route (FileType (AnyExt, Html), LinkableLMLRoute, R)
 import qualified Emanote.Route as R
 
--- TODO: Remove html route knolwedge from this type.
--- This should only semantically act as a route to somewhere in `Model` (could
--- reuse Route to source file wherever appropriate).
-data EmanoteRoute
-  = ERIndex
-  | ERNoteHtml (R 'Html)
-  | EROtherFile
-      ( R 'AnyExt,
-        -- Absolute path to the static file referenced by this route
-        FilePath
-      )
+-- | Route to something or some view in the `Model`, that we also want generated in static site.
+data Route
+  = -- | Route to a special note-index view
+    RIndex
+  | -- | Route to a LML file that gets generated as HTML
+    RLMLFile LinkableLMLRoute
+  | -- | Route to a static file, along with its absolute path on disk
+    RStaticFile (R 'AnyExt, FilePath)
   deriving (Eq, Show, Ord)
 
-instance Ema Model EmanoteRoute where
+instance Ema Model Route where
   encodeRoute model = \case
-    ERIndex ->
-      "@index.html"
-    ERNoteHtml r ->
+    RIndex ->
+      R.encodeRoute $ R.mkRouteFromSlug @'Html "@index"
+    RLMLFile r ->
       R.encodeRoute $
-        fromMaybe r $ do
-          note <- M.modelLookupNote (R.liftLinkableLMLRoute @('LMLType 'Md) $ coerce r) model
+        fromMaybe (coerce . R.someLinkableLMLRouteCase $ r) $ do
+          note <- M.modelLookupNote r model
           pure $ N.noteHtmlRoute note
-    EROtherFile (r, _fpAbs) ->
+    RStaticFile (r, _fpAbs) ->
       R.encodeRoute r
 
   decodeRoute model fp =
-    (ERIndex <$ guard (fp == "@index.html" || fp == "@index"))
+    (RIndex <$ (R.decodeHtmlRoute fp >>= \r -> guard $ r == R.mkRouteFromSlug "@index"))
       <|> fmap staticFileRoute (M.modelLookupStaticFile fp model)
-      -- TODO: Lookup model here or actually change the route type.
-      -- BUT we do want to account for non-existant folder routes.
-      <|> fmap ERNoteHtml (R.decodeHtmlRoute fp)
+      <|> fmap
+        (RLMLFile . N._noteRoute)
+        (flip N.lookupNoteOrItsParent (model ^. M.modelNotes) =<< R.decodeHtmlRoute fp)
 
   allRoutes model =
     let htmlRoutes =
           model ^. M.modelNotes
             & Ix.toList
-            <&> lmlHtmlRoute . (^. N.noteRoute)
+            <&> RLMLFile . (^. N.noteRoute)
         staticRoutes =
           model ^. M.modelStaticFiles
             & Ix.toList
             <&> staticFileRoute
-     in htmlRoutes <> staticRoutes <> [ERIndex]
+     in htmlRoutes <> staticRoutes <> [RIndex]
 
-lmlHtmlRoute :: LinkableLMLRoute -> EmanoteRoute
-lmlHtmlRoute =
-  ERNoteHtml . htmlRouteForLmlRoute
-  where
-    htmlRouteForLmlRoute :: LinkableLMLRoute -> R 'Html
-    htmlRouteForLmlRoute = coerce . R.someLinkableLMLRouteCase
-
-staticFileRoute :: SF.StaticFile -> EmanoteRoute
+staticFileRoute :: SF.StaticFile -> Route
 staticFileRoute =
-  EROtherFile . (SF._staticFileRoute &&& SF._staticFilePath)
+  RStaticFile . (SF._staticFileRoute &&& SF._staticFilePath)
