@@ -3,12 +3,12 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Note where
 
-import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
@@ -26,14 +26,32 @@ import qualified Text.Pandoc.Definition as B
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    -- TODO:L remove and derive from meta
-    _noteTags :: [Text],
-    _noteRoute :: R.LinkableLMLRoute,
-    -- | Custom slug set in frontmatter if any. Overrides _noteRoute for
-    -- determining the URL.
-    _noteSlug :: Maybe Slug
+    _noteRoute :: R.LinkableLMLRoute
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+
+type NoteIxs =
+  '[ R.LinkableLMLRoute,
+     -- Parent folder (unless a root file).
+     R 'R.Folder,
+     -- Allowed ways to wiki-link to this note.
+     WL.WikiLink,
+     -- Tag
+     Text,
+     -- "slug" alias
+     Slug
+   ]
+
+type IxNote = IxSet NoteIxs Note
+
+instance Indexable NoteIxs Note where
+  indices =
+    ixList
+      (ixFun $ one . _noteRoute)
+      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
+      (ixFun noteSelfRefs)
+      (ixFun noteTags)
+      (ixFun $ maybeToList . noteSlug)
 
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [WL.WikiLink]
@@ -42,33 +60,25 @@ noteSelfRefs =
     . (R.liftLinkableRoute . R.someLinkableLMLRouteCase)
     . _noteRoute
 
-type NoteIxs = '[R.LinkableLMLRoute, R 'R.Folder, WL.WikiLink, Text, Slug]
-
-type IxNote = IxSet NoteIxs Note
-
-instance Indexable NoteIxs Note where
-  indices =
-    ixList
-      (ixFun $ one . _noteRoute)
-      -- The parent folder of this note.
-      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
-      (ixFun noteSelfRefs)
-      (ixFun _noteTags)
-      (ixFun $ maybeToList . _noteSlug)
-
-makeLenses ''Note
+noteTags :: Note -> [Text]
+noteTags =
+  lookupAeson mempty (one "tags") . _noteMeta
 
 noteTitle :: Note -> Text
-noteTitle note =
-  fromMaybe (R.routeBaseName . R.someLinkableLMLRouteCase $ note ^. noteRoute) $
-    EP.getPandocTitle $ note ^. noteDoc
+noteTitle Note {..} =
+  fromMaybe (R.routeBaseName . R.someLinkableLMLRouteCase $ _noteRoute) $
+    EP.getPandocTitle _noteDoc
+
+noteSlug :: Note -> Maybe Slug
+noteSlug =
+  lookupAeson Nothing (one "slug") . _noteMeta
 
 noteHtmlRoute :: Note -> R 'R.Html
-noteHtmlRoute note =
+noteHtmlRoute Note {..} =
   -- Favour slug if one exixts, otherwise use the full path.
-  case lookupAeson @(Maybe Slug) Nothing (one "slug") (note ^. noteMeta) of
+  case lookupAeson @(Maybe Slug) Nothing (one "slug") _noteMeta of
     Nothing ->
-      coerce $ R.someLinkableLMLRouteCase (note ^. noteRoute)
+      coerce $ R.someLinkableLMLRouteCase _noteRoute
     Just slug ->
       R.mkRouteFromSlug slug
 
@@ -101,7 +111,7 @@ lookupNoteOrItsParent r ns =
       pure $ mkEmptyNoteWith folderMdR placeHolder
   where
     mkEmptyNoteWith someR doc =
-      Note doc Aeson.Null [] someR Nothing
+      Note doc Aeson.Null someR
 
 parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
@@ -109,9 +119,7 @@ parseNote r fp = do
   pure $ do
     (mMeta, doc) <- parseMarkdown fp s
     let meta = fromMaybe Aeson.Null mMeta
-        tags = lookupAeson [] (one "tags") meta
-        mSlug = lookupAeson Nothing (one "slug") meta
-    pure $ Note doc meta tags r mSlug
+    pure $ Note doc meta r
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
@@ -131,3 +139,5 @@ lookupAeson x (k :| ks) meta =
     resultToMaybe = \case
       Aeson.Error _ -> Nothing
       Aeson.Success b -> pure b
+
+makeLenses ''Note
