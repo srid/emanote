@@ -9,7 +9,6 @@ module Emanote.Model.Type where
 
 import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
-import Data.Default (Default (..))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Set as Set
@@ -17,13 +16,14 @@ import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
+import Emanote.Model.Link.Rel (IxRel)
+import qualified Emanote.Model.Link.Rel as Rel
+import qualified Emanote.Model.Link.WikiLink as WL
 import Emanote.Model.Note
   ( IxNote,
     Note,
   )
 import qualified Emanote.Model.Note as N
-import Emanote.Model.Link.Rel (IxRel)
-import qualified Emanote.Model.Link.Rel as Rel
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.StaticFile
   ( IxStaticFile,
@@ -32,8 +32,7 @@ import Emanote.Model.StaticFile
   )
 import Emanote.Route (FileType (AnyExt), LinkableLMLRoute, LinkableRoute, R)
 import qualified Emanote.Route as R
-import qualified Emanote.Model.Link.WikiLink as WL
-import Heist.Extra.TemplateState (TemplateState)
+import Heist.Extra.TemplateState (TemplateState, newTemplateState)
 import qualified Text.Pandoc.Definition as B
 
 -- TODO: Use https://hackage.haskell.org/package/data-lens-ixset-0.1.4/docs/Data-Lens-IxSet.html
@@ -48,8 +47,10 @@ data Model = Model
 
 makeLenses ''Model
 
-instance Default Model where
-  def = Model Ix.empty Ix.empty Ix.empty mempty mempty def
+newModel :: MonadIO m => m Model
+newModel =
+  Model Ix.empty Ix.empty Ix.empty mempty mempty
+    <$> newTemplateState
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
