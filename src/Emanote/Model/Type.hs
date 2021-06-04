@@ -102,12 +102,12 @@ modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeBaseName $ R.someLinkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
 
-modelLookupRouteByWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
-modelLookupRouteByWikiLink wl model =
+modelResolveWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
+modelResolveWikiLink wl model =
   -- TODO: Also lookup wiki links to *directories* without an associated zettel.
   -- Eg: my [[Public Post Ideas]]
   --
-  -- Could store `modelNoteDirs` and look that up.
+  -- See TODO in Note.hs
   let noteRoutes =
         fmap (R.liftLinkableRoute . R.someLinkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
           (model ^. modelNotes) @= wl

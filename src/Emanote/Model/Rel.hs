@@ -21,14 +21,15 @@ import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
-type RelTarget = Either WL.WikiLink LinkableRoute
+-- | A link target that has not been resolved (using model) yet.
+type UnresolvedRelTarget = Either WL.WikiLink LinkableRoute
 
 -- | A relation from a note to another note or static file.
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LinkableLMLRoute,
     -- The target of the relation (can be a note or anything)
-    _relTo :: RelTarget,
+    _relTo :: UnresolvedRelTarget,
     -- | The relation context in LML
     _relCtx :: [B.Block]
   }
@@ -40,7 +41,7 @@ instance Eq Rel where
 instance Ord Rel where
   (<=) = (<=) `on` (_relFrom &&& _relTo)
 
-type RelIxs = '[LinkableLMLRoute, RelTarget]
+type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -60,12 +61,12 @@ extractRels note =
     extractLinks m =
       flip concatMap (Map.toList m) $ \(url, instances) -> do
         flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-          target <- parseRelTarget attrs url
+          target <- parseUnresolvedRelTarget attrs url
           pure $ Rel (note ^. noteRoute) target ctx
 
--- | Parse a URL string
-parseRelTarget :: [(Text, Text)] -> Text -> Maybe RelTarget
-parseRelTarget attrs url = do
+-- | Parse a URL string for later resolution.
+parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
+parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
   fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap

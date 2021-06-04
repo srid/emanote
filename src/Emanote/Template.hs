@@ -5,6 +5,7 @@
 module Emanote.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import Control.Monad.Except (throwError)
 import qualified Data.Aeson.Types as Aeson
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
@@ -191,7 +192,7 @@ noteSplice model note = do
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
-    res <- resolveRelTarget model <=< Rel.parseRelTarget linkAttrs $ url
+    res <- resolveUnresolvedRelTarget model <=< Rel.parseUnresolvedRelTarget linkAttrs $ url
     pure $ do
       (r, mTime) <- res
       let mNewInner = do
@@ -216,23 +217,27 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
               pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
       pure (fromMaybe inner mNewInner, Ema.routeUrl model r <> queryString)
 
-resolveRelTarget :: Model -> Rel.RelTarget -> Maybe (Either Text (Route, Maybe UTCTime))
-resolveRelTarget model = \case
+resolveUnresolvedRelTarget ::
+  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (Route, Maybe UTCTime))
+resolveUnresolvedRelTarget model = \case
   Right r ->
-    Right <$> resolveLinkableRoute r
+    pure <$> resolveLinkableRoute r
   Left wl ->
-    case nonEmpty (M.modelLookupRouteByWikiLink wl model) of
+    case nonEmpty (M.modelResolveWikiLink wl model) of
       Nothing -> do
-        pure $ Left "Unresolved link"
+        pure $ throwError "Unresolved wiki-link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        Right <$> resolveLinkableRoute (head targets)
+        pure <$> resolveLinkableRoute (head targets)
   where
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
-        Left mdR ->
-          -- NOTE: Because don't support slugs yet.
-          pure (C.RLMLFile mdR, Nothing)
+        Left lmlR -> do
+          lmlRoute lmlR model <&> (,Nothing)
         Right sR -> do
           staticFile <- M.modelLookupStaticFileByRoute sR model
           pure (C.staticFileRoute staticFile, Just $ staticFile ^. SF.staticFileTime)
+    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe Route
+    lmlRoute r m = do
+      note <- M.modelLookupNoteByRoute r m
+      pure $ RLMLFile $ note ^. MN.noteRoute
