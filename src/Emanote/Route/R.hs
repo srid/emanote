@@ -12,7 +12,7 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route.Ext (FileType (Html), HasExt (..))
+import Emanote.Route.Ext (FileType (Folder, Html), HasExt (..))
 import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 
@@ -36,10 +36,18 @@ mkRouteFromFilePath fp = do
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   R <$> nonEmpty slugs
 
+mkRouteFromSlug :: forall ext. HasExt ext => Slug -> R ext
+mkRouteFromSlug =
+  R . one
+
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text
 routeBaseName =
   Ema.unSlug . head . NE.reverse . unRoute
+
+routeParent :: R ext -> Maybe (R 'Folder)
+routeParent =
+  fmap R . nonEmpty . NE.init . unRoute
 
 -- | For use in breadcrumbs
 routeInits :: R ext -> NonEmpty (R ext)
