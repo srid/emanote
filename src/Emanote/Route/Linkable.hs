@@ -12,7 +12,7 @@ module Emanote.Route.Linkable
     -- Only LML routes
     LinkableLMLRoute,
     liftLinkableLMLRoute,
-    someLinkableLMLRouteCase,
+    linkableLMLRouteCase,
   )
 where
 
@@ -55,10 +55,10 @@ liftLinkableRoute ::
 liftLinkableRoute =
   openUnionLift
 
-someLinkableLMLRouteCase ::
+linkableLMLRouteCase ::
   LinkableLMLRoute ->
   R ('LMLType 'Md)
-someLinkableLMLRouteCase =
+linkableLMLRouteCase =
   absurdUnion
     `openUnionHandle` id
 

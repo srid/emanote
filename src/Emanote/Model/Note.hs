@@ -17,7 +17,7 @@ import qualified Ema.Helper.Markdown as Markdown
 import qualified Emanote.Prelude as EP
 import Emanote.Route (R)
 import qualified Emanote.Route as R
-import qualified Emanote.WikiLink as WL
+import qualified Emanote.Model.Link.WikiLink as WL
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
@@ -53,7 +53,7 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
-      (ixFun $ maybeToList . R.routeParent . R.someLinkableLMLRouteCase . _noteRoute)
+      (ixFun $ maybeToList . R.routeParent . R.linkableLMLRouteCase . _noteRoute)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
@@ -61,7 +61,7 @@ instance Indexable NoteIxs Note where
 noteSelfRefs :: Note -> [WL.WikiLink]
 noteSelfRefs =
   WL.allowedWikiLinks
-    . (R.liftLinkableRoute . R.someLinkableLMLRouteCase)
+    . (R.liftLinkableRoute . R.linkableLMLRouteCase)
     . _noteRoute
 
 noteTags :: Note -> [Text]
@@ -70,7 +70,7 @@ noteTags =
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
-  fromMaybe (R.routeBaseName . R.someLinkableLMLRouteCase $ _noteRoute) $
+  fromMaybe (R.routeBaseName . R.linkableLMLRouteCase $ _noteRoute) $
     EP.getPandocTitle _noteDoc
 
 noteSlug :: Note -> Maybe Slug
@@ -83,7 +83,7 @@ noteHtmlRoute note@Note {..} =
   -- Favour slug if one exixts, otherwise use the full path.
   case noteSlug note of
     Nothing ->
-      coerce $ R.someLinkableLMLRouteCase _noteRoute
+      coerce $ R.linkableLMLRouteCase _noteRoute
     Just slug ->
       R.mkRouteFromSlug slug
 

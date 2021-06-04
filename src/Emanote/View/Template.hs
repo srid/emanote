@@ -2,7 +2,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.Template (render) where
+-- TODO: Split this sensibly.
+module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
@@ -18,18 +19,18 @@ import qualified Ema.CLI
 import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
 import qualified Ema.Helper.Tailwind as Tailwind
-import Emanote.Class (Route (..))
-import qualified Emanote.Class as C
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
-import qualified Emanote.Model.Rel as Rel
+import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
+import Emanote.View.SiteRoute (SiteRoute (..))
+import qualified Emanote.View.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc (RenderCtx (..))
@@ -46,21 +47,21 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.XmlHtml as X
 
-render :: Ema.CLI.Action -> Model -> Route -> Ema.Asset LByteString
+render :: Ema.CLI.Action -> Model -> SiteRoute -> Ema.Asset LByteString
 render emaAction m = \case
-  RStaticFile (_r, fpAbs) ->
+  SRStaticFile (_r, fpAbs) ->
     Ema.AssetStatic fpAbs
-  RLMLFile lmlRoute -> do
+  SRLMLFile lmlRoute -> do
     case M.modelLookupNoteByRoute lmlRoute m of
       Just note ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
       Nothing ->
         error $ "Bad route: " <> show lmlRoute
-  RIndex ->
-    Ema.AssetGenerated Ema.Html $ renderIndex emaAction m
+  SRIndex ->
+    Ema.AssetGenerated Ema.Html $ rendeSRIndex emaAction m
 
-renderIndex :: Ema.CLI.Action -> Model -> LByteString
-renderIndex emaAction model = do
+rendeSRIndex :: Ema.CLI.Action -> Model -> LByteString
+rendeSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Index"
@@ -78,21 +79,21 @@ renderLmlHtml emaAction model note = do
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits . R.someLinkableLMLRouteCase $ r) "each-crumb"
+      ## Splices.listSplice (init $ R.routeInits . R.linkableLMLRouteCase $ r) "each-crumb"
       $ \(R.liftLinkableLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## Ema.routeUrl model $ C.RLMLFile crumbR
+          "crumb:url" ## Ema.routeUrl model $ SR.SRLMLFile crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
       ## HI.textSplice pageTitle
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks (R.liftLinkableRoute . R.someLinkableLMLRouteCase $ r) model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks (R.liftLinkableRoute . R.linkableLMLRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ C.RLMLFile source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile source)
         "backlink:note:context"
           ## Splices.pandocSpliceWithCustomClass
             rewriteClass
@@ -137,15 +138,15 @@ routeTreeSplice mr model = do
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
                ( Meta.lookupMeta @Int 0 (one "order") tr model,
-                 maybe (R.routeBaseName . R.someLinkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
+                 maybe (R.routeBaseName . R.linkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
                )
              getCollapsed tr =
                Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
              mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
-             lmlRouteSlugs = R.unRoute . R.someLinkableLMLRouteCase
+             lmlRouteSlugs = R.unRoute . R.linkableLMLRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ Ema.routeUrl model $ C.RLMLFile nodeRoute
+               "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.SRLMLFile nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
                      -- Active tree checking is applicable only when there is an
@@ -189,7 +190,7 @@ querySplice model RenderCtx {..} blk = do
 noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
 noteSplice model note = do
   "note:title" ## HI.textSplice (MN.noteTitle note)
-  "note:url" ## HI.textSplice (Ema.routeUrl model $ C.RLMLFile $ note ^. MN.noteRoute)
+  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile $ note ^. MN.noteRoute)
   "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
@@ -201,7 +202,7 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
       $ url
   where
     renderUrl ::
-      (Route, Maybe UTCTime) ->
+      (SiteRoute, Maybe UTCTime) ->
       ([B.Inline], Text)
     renderUrl (r, mTime) =
       let isWikiLinkSansCustom = url == plainify inner
@@ -220,16 +221,16 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
           )
       where
         wikiLinkDefaultInnerText = \case
-          RLMLFile lmlR -> do
+          SRLMLFile lmlR -> do
             one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-          RStaticFile _ -> do
+          SRStaticFile _ -> do
             -- Just append a file: prefix.
             pure $ B.Str "File: " : inner
-          RIndex ->
+          SRIndex ->
             Nothing
 
 resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (Route, Maybe UTCTime))
+  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
 resolveUnresolvedRelTarget model = \case
   Right r ->
     pure <$> resolveLinkableRoute r
@@ -244,11 +245,13 @@ resolveUnresolvedRelTarget model = \case
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
         Left lmlR -> do
-          lmlRoute lmlR model <&> (,Nothing)
+          lmlRoute lmlR model
+            <&> (,Nothing)
         Right sR -> do
-          staticFile <- M.modelLookupStaticFileByRoute sR model
-          pure (C.staticFileRoute staticFile, Just $ staticFile ^. SF.staticFileTime)
-    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe Route
+          sf <- M.modelLookupStaticFileByRoute sR model
+          pure $
+            SR.staticFileSiteRoute sf
+              & (,Just $ sf ^. SF.staticFileTime)
+    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe SiteRoute
     lmlRoute r m = do
-      note <- M.modelLookupNoteByRoute r m
-      pure $ RLMLFile $ note ^. MN.noteRoute
+      SR.noteFileSiteRoute <$> M.modelLookupNoteByRoute r m

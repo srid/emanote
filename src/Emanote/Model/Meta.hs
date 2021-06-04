@@ -26,7 +26,7 @@ lookupMeta x k r =
 -- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.LinkableLMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
-  let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.someLinkableLMLRouteCase mr)
+  let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.linkableLMLRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- getYamlMeta r model
         guard $ v /= Aeson.Null
