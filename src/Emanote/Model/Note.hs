@@ -81,7 +81,17 @@ noteTags =
 noteTitle :: Note -> Text
 noteTitle Note {..} =
   fromMaybe (R.routeBaseName . R.linkableLMLRouteCase $ _noteRoute) $
-    EP.getPandocTitle _noteDoc
+    getPandocTitle _noteDoc
+  where
+    getPandocTitle :: Pandoc -> Maybe Text
+    getPandocTitle =
+      fmap Markdown.plainify . getPandocH1
+      where
+        getPandocH1 :: Pandoc -> Maybe [B.Inline]
+        getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =
+          Just inlines
+        getPandocH1 _ =
+          Nothing
 
 noteSlug :: Note -> Maybe Slug
 noteSlug =

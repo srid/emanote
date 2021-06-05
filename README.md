@@ -95,6 +95,7 @@ Milestone (notes.srid.ca),
 
 To triage,
 
+- [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
 - [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
   - Display children inline?
 - [ ] fsnotify: reliably handle directory renames/ moves
