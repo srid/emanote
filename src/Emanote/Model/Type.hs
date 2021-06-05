@@ -47,8 +47,8 @@ data Model = Model
 
 makeLenses ''Model
 
-newModel :: MonadIO m => m Model
-newModel =
+emptyModel :: MonadIO m => m Model
+emptyModel =
   Model Ix.empty Ix.empty Ix.empty mempty mempty
     <$> newTemplateState
 

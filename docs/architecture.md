@@ -15,7 +15,7 @@ Emanote transforms a bunch of "source files" (Markdown, static files, etc.) into
 
 Ema acts as the framework orchestrating two things at the same time: 
 
-1. `Emanote.Source.run` which is responsible for keeping the in-memory `Model` in sync with what's on disk
+1. `Emanote.Source.emanate` which is responsible for keeping the in-memory `Model` in sync with what's on disk
 1. `Emanote.View.render` which, whilst querying the `Model`, is responsible for producing the final HTML for every `SiteRoute` in the target website.
 
 In addition, we have the following non-source files in the Git repository that are vital to Emanote's functionality:
