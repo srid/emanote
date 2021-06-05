@@ -12,6 +12,7 @@ Emanote transforms a bunch of "source files" (Markdown, static files, etc.) into
   - The individual modules in this package should be `import`ed separately to use the specific model types.
 - `Emanote.Route`: Haskell route types to point to somewhere in `Emanote.Model` (eg: route to a .md file, or a route to a .jpeg file)
 - `Emanote.View`: Rendering code (HTML, templates, site routes)
+- `Emanote.PandocFilter`: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
 
 Ema acts as the framework orchestrating two things at the same time: 
 

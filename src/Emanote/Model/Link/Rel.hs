@@ -13,10 +13,10 @@ import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
+import qualified Emanote.Model.Link.WikiLink as WL
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Route (LinkableLMLRoute, LinkableRoute)
 import qualified Emanote.Route as R
-import qualified Emanote.Model.Link.WikiLink as WL
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC

@@ -17,7 +17,6 @@ import qualified Data.IxSet.Typed as Ix
 import Ema (Slug)
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Emanote.Model.Link.WikiLink as WL
-import qualified Emanote.Prelude as EP
 import Emanote.Route (R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
