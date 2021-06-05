@@ -3,7 +3,7 @@
 -- | Emanote.Source is responsible for managing the source files and its
 -- changes, and communicating them to `Emanote.Model`.
 module Emanote.Source
-  ( run,
+  ( emanate,
   )
 where
 
@@ -16,8 +16,9 @@ import Emanote.Source.Patch (transformActions)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import UnliftIO (MonadUnliftIO)
 
-run :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> Model -> m ()
-run modelLvar initialModel = do
+-- | Emanate on-disk sources onto an in-memory `Model` (stored in a LVar)
+emanate :: (MonadUnliftIO m, MonadLogger m) => LVar Model -> Model -> m ()
+emanate modelLvar initialModel = do
   fsLayers <- liftIO locLayers
   Mount.unionMountOnLVar
     fsLayers

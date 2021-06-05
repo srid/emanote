@@ -11,5 +11,5 @@ import Main.Utf8 (withUtf8)
 main :: IO ()
 main =
   withUtf8 $
-    Ema.runEma View.render $ \_act m -> do
-      Source.run m =<< Model.newModel
+    Ema.runEma View.render $ \_act m ->
+      Source.emanate m =<< Model.emptyModel
