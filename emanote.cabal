@@ -36,6 +36,7 @@ executable emanote
     , blaze-html
     , bytestring
     , commonmark
+    , commonmark-extensions
     , commonmark-pandoc
     , containers
     , data-default

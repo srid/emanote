@@ -8,16 +8,18 @@
 
 module Emanote.Model.Note where
 
+import qualified Commonmark.Extensions as CE
+import qualified Commonmark.Syntax as CM
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import Ema (Slug)
 import qualified Ema.Helper.Markdown as Markdown
+import qualified Emanote.Model.Link.WikiLink as WL
 import qualified Emanote.Prelude as EP
 import Emanote.Route (R)
 import qualified Emanote.Route as R
-import qualified Emanote.Model.Link.WikiLink as WL
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
@@ -134,7 +136,32 @@ parseNote r fp = do
   where
     parseMarkdown =
       Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
-        WL.wikilinkSpec <> Markdown.fullMarkdownSpec
+        -- As the commonmark documentation states, pipeTableSpec should be placed after
+        -- fancyListSpec and defaultSyntaxSpec to avoid bad results when parsing
+        -- non-table lines.
+        -- see https://github.com/jgm/commonmark-hs/issues/52
+        baseExtsSansPipeTable
+          <> gfmExtensionsSansPipeTable
+          <> CE.pipeTableSpec
+          <> WL.wikilinkSpec
+    baseExtsSansPipeTable =
+      mconcat
+        [ CE.fancyListSpec,
+          CE.footnoteSpec,
+          CE.mathSpec,
+          CE.smartPunctuationSpec,
+          CE.definitionListSpec,
+          CE.attributesSpec,
+          CE.rawAttributeSpec,
+          CE.fencedDivSpec,
+          CE.bracketedSpanSpec,
+          CE.autolinkSpec,
+          CM.defaultSyntaxSpec
+        ]
+    gfmExtensionsSansPipeTable =
+      CE.emojiSpec <> CE.strikethroughSpec <> CE.autolinkSpec
+        <> CE.autoIdentifiersSpec
+        <> CE.taskListSpec
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
