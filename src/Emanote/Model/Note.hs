@@ -31,6 +31,9 @@ data Note = Note
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
+newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
+  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+
 type NoteIxs =
   '[ R.LinkableLMLRoute,
      -- Allowed ways to wiki-link to this note.
@@ -41,6 +44,8 @@ type NoteIxs =
      -- TODO: Index parent folder's allowed wikilinks, somehow, to support
      -- linking to them.
      R 'R.Folder,
+     -- All ancestors
+     RAncestor,
      -- Tag
      Text,
      -- "slug" alias
@@ -55,9 +60,12 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
-      (ixFun $ maybeToList . R.routeParent . R.linkableLMLRouteCase . _noteRoute)
+      (ixFun $ maybeToList . noteParent)
+      (ixFun $ maybe [] (toList . fmap RAncestor . R.routeInits) . noteParent)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
+    where
+      noteParent = R.routeParent . R.linkableLMLRouteCase . _noteRoute
 
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [WL.WikiLink]
