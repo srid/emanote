@@ -6,6 +6,11 @@ module Heist.Extra.Splices.Pandoc
   ( RenderCtx (..),
     pandocSplice,
     pandocSpliceWithCustomClass,
+    -- | To delegate rendering of blocks and inlines from a custom splice.
+    rpBlock,
+    rpInline,
+    rpBlock',
+    rpInline',
   )
 where
 

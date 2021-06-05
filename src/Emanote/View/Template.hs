@@ -21,10 +21,10 @@ import qualified Ema.Helper.PathTree as PathTree
 import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
-import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Prelude as EP
 import Emanote.Route (FileType (LMLType), LML (Md))
@@ -98,20 +98,21 @@ renderLmlHtml emaAction model note = do
           ## Splices.pandocSpliceWithCustomClass
             rewriteClass
             (const . const $ Nothing)
-            (const . const $ Nothing)
-          $ ctxDoc & resolvePandoc
+            (linkSplice emaAction model)
+          $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass
         rewriteClass
         (querySplice model)
-        (const . const $ Nothing)
+        (linkSplice emaAction model)
       $ note ^. MN.noteDoc
-        & ( EP.withoutH1 -- Because, handling note title separately
-              >>> resolvePandoc
-          )
+        & withoutH1 -- Because, handling note title separately
   where
-    resolvePandoc =
-      EP.rewriteLinks (resolveUrl emaAction model)
+    withoutH1 :: Pandoc -> Pandoc
+    withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
+      Pandoc meta rest
+    withoutH1 doc =
+      doc
 
 commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
 commonSplices emaAction meta routeTitle = do
@@ -162,6 +163,13 @@ routeTreeSplice mr model = do
                "tree:open" ## Heist.ifElseISplice openTree
        )
 
+-- TODO: Reuse this elsewhere
+noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
+noteSplice model note = do
+  "note:title" ## HI.textSplice (MN.noteTitle note)
+  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile $ note ^. MN.noteRoute)
+  "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
+
 querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
 querySplice model RenderCtx {..} blk = do
   B.CodeBlock
@@ -170,7 +178,7 @@ querySplice model RenderCtx {..} blk = do
     pure blk
   guard $ List.elem "query" classes
   let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
-  -- TODO: This tag still remains in the HTML; it should be removed.
+  -- TODO: This tag still remains in th>>e HTML; it should be removed.
   queryNode <- childElementTagWithClass "CodeBlock:Query" mOtherCls rootNode
   let splices = do
         "query"
@@ -186,12 +194,26 @@ querySplice model RenderCtx {..} blk = do
       fmap head . nonEmpty $
         NE.filter ((== mCls) . X.getAttribute "class") queryNodes
 
--- TODO: Reuse this elsewhere
-noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
-noteSplice model note = do
-  "note:title" ## HI.textSplice (MN.noteTitle note)
-  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile $ note ^. MN.noteRoute)
-  "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
+linkSplice :: Monad n => Ema.CLI.Action -> Model -> RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
+linkSplice emaAction model ctx =
+  let ctxTerm = ctx {Splices.blockSplice = const Nothing, Splices.inlineSplice = const Nothing}
+   in Just . Splices.rpInline ctxTerm . handleInline
+  where
+    handleInline inl =
+      case inl of
+        B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
+          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+            Left err ->
+              B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
+            Right (newIs, newUrl) ->
+              B.Link attr newIs (newUrl, tit)
+        B.Image attr@(_id, _class, otherAttrs) is (url, tit) ->
+          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+            Left err ->
+              B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
+            Right (newIs, newUrl) ->
+              B.Image attr newIs (newUrl, tit)
+        _ -> inl
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
