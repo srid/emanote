@@ -6,34 +6,26 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
-import Control.Monad.Except (throwError)
 import qualified Data.Aeson.Types as Aeson
-import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
-import qualified Data.Text as T
-import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import qualified Ema
 import qualified Ema.CLI
-import Ema.Helper.Markdown (plainify)
 import qualified Ema.Helper.PathTree as PathTree
 import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
-import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.Query as Q
-import qualified Emanote.Model.StaticFile as SF
-import qualified Emanote.Prelude as EP
+import qualified Emanote.PandocFilter.Query as PF
+import qualified Emanote.PandocFilter.Url as PF
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import Emanote.View.SiteRoute (SiteRoute (..))
 import qualified Emanote.View.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
-import Heist.Extra.Splices.Pandoc (RenderCtx (..))
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
@@ -45,7 +37,6 @@ import qualified Heist.Splices.Json as HJ
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.XmlHtml as X
 
 render :: Ema.CLI.Action -> Model -> SiteRoute -> Ema.Asset LByteString
 render emaAction m = \case
@@ -98,13 +89,13 @@ renderLmlHtml emaAction model note = do
           ## Splices.pandocSpliceWithCustomClass
             rewriteClass
             (const . const $ Nothing)
-            (linkSplice emaAction model)
+            (PF.urlResolvingSplice emaAction model)
           $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSpliceWithCustomClass
         rewriteClass
-        (querySplice model)
-        (linkSplice emaAction model)
+        (PF.queryResolvingSplice model)
+        (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
   where
@@ -162,118 +153,3 @@ routeTreeSplice mr model = do
                "tree:childrenCount" ## HI.textSplice (show $ length children)
                "tree:open" ## Heist.ifElseISplice openTree
        )
-
--- TODO: Reuse this elsewhere
-noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
-noteSplice model note = do
-  "note:title" ## HI.textSplice (MN.noteTitle note)
-  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile $ note ^. MN.noteRoute)
-  "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
-
-querySplice :: Monad n => Model -> RenderCtx n -> B.Block -> Maybe (HI.Splice n)
-querySplice model RenderCtx {..} blk = do
-  B.CodeBlock
-    (_id', classes, _attrs)
-    (Q.parseQuery -> Just q) <-
-    pure blk
-  guard $ List.elem "query" classes
-  let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
-  -- TODO: This tag still remains in th>>e HTML; it should be removed.
-  queryNode <- childElementTagWithClass "CodeBlock:Query" mOtherCls rootNode
-  let splices = do
-        "query"
-          ## HI.textSplice (show q)
-        "result"
-          ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery model q
-  pure $
-    H.localHS (HI.bindSplices splices) $
-      HI.runNode queryNode
-  where
-    childElementTagWithClass tag mCls node = do
-      queryNodes <- nonEmpty $ X.childElementsTag tag node
-      fmap head . nonEmpty $
-        NE.filter ((== mCls) . X.getAttribute "class") queryNodes
-
-linkSplice :: Monad n => Ema.CLI.Action -> Model -> RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
-linkSplice emaAction model ctx =
-  let ctxTerm = ctx {Splices.blockSplice = const Nothing, Splices.inlineSplice = const Nothing}
-   in Just . Splices.rpInline ctxTerm . handleInline
-  where
-    handleInline inl =
-      case inl of
-        B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
-          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
-            Left err ->
-              B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
-            Right (newIs, newUrl) ->
-              B.Link attr newIs (newUrl, tit)
-        B.Image attr@(_id, _class, otherAttrs) is (url, tit) ->
-          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
-            Left err ->
-              B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
-            Right (newIs, newUrl) ->
-              B.Image attr newIs (newUrl, tit)
-        _ -> inl
-
-resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
-resolveUrl emaAction model linkAttrs x@(inner, url) =
-  fromMaybe (Right x) $ do
-    fmap (fmap renderUrl)
-      . resolveUnresolvedRelTarget model
-      <=< Rel.parseUnresolvedRelTarget linkAttrs
-      $ url
-  where
-    renderUrl ::
-      (SiteRoute, Maybe UTCTime) ->
-      ([B.Inline], Text)
-    renderUrl (r, mTime) =
-      let isWikiLinkSansCustom = url == plainify inner
-          mQuery = do
-            -- In live server mode, append last modification time if any, such
-            -- that the browser is forced to refresh the inline image on hot
-            -- reload (Ema's DOM patch).
-            guard $ emaAction == Ema.CLI.Run
-            t <- mTime
-            pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
-       in ( fromMaybe
-              inner
-              ( guard isWikiLinkSansCustom >> wikiLinkDefaultInnerText r
-              ),
-            Ema.routeUrl model r <> fromMaybe "" mQuery
-          )
-      where
-        wikiLinkDefaultInnerText = \case
-          SRLMLFile lmlR -> do
-            one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-          SRStaticFile _ -> do
-            -- Just append a file: prefix.
-            pure $ B.Str "File: " : inner
-          SRIndex ->
-            Nothing
-
-resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
-resolveUnresolvedRelTarget model = \case
-  Right r ->
-    pure <$> resolveLinkableRoute r
-  Left wl ->
-    case nonEmpty (M.modelResolveWikiLink wl model) of
-      Nothing -> do
-        pure $ throwError "Unresolved wiki-link"
-      Just targets ->
-        -- TODO: Deal with ambiguous targets here
-        pure <$> resolveLinkableRoute (head targets)
-  where
-    resolveLinkableRoute r =
-      case R.linkableRouteCase r of
-        Left lmlR -> do
-          lmlRoute lmlR model
-            <&> (,Nothing)
-        Right sR -> do
-          sf <- M.modelLookupStaticFileByRoute sR model
-          pure $
-            SR.staticFileSiteRoute sf
-              & (,Just $ sf ^. SF.staticFileTime)
-    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe SiteRoute
-    lmlRoute r m = do
-      SR.noteFileSiteRoute <$> M.modelLookupNoteByRoute r m
