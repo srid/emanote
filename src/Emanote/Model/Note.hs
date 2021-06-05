@@ -17,7 +17,6 @@ import qualified Data.IxSet.Typed as Ix
 import Ema (Slug)
 import qualified Ema.Helper.Markdown as Markdown
 import qualified Emanote.Model.Link.WikiLink as WL
-import qualified Emanote.Prelude as EP
 import Emanote.Route (R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
@@ -81,7 +80,17 @@ noteTags =
 noteTitle :: Note -> Text
 noteTitle Note {..} =
   fromMaybe (R.routeBaseName . R.linkableLMLRouteCase $ _noteRoute) $
-    EP.getPandocTitle _noteDoc
+    getPandocTitle _noteDoc
+  where
+    getPandocTitle :: Pandoc -> Maybe Text
+    getPandocTitle =
+      fmap Markdown.plainify . getPandocH1
+      where
+        getPandocH1 :: Pandoc -> Maybe [B.Inline]
+        getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =
+          Just inlines
+        getPandocH1 _ =
+          Nothing
 
 noteSlug :: Note -> Maybe Slug
 noteSlug =

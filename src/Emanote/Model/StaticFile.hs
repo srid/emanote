@@ -11,8 +11,8 @@ import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Time (UTCTime)
-import qualified Emanote.Route as R
 import qualified Emanote.Model.Link.WikiLink as WL
+import qualified Emanote.Route as R
 
 data StaticFile = StaticFile
   { _staticFileRoute :: R.R 'R.AnyExt,
