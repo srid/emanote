@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.PandocFilter.Query (queryResolvingSplice) where
+module Emanote.Pandoc.Filter.Query (queryResolvingSplice) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List as List

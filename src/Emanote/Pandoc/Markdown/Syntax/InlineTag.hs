@@ -1,6 +1,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.Model.LML.Syntax.InlineTag (inlineTagSpec) where
+module Emanote.Pandoc.Markdown.Syntax.InlineTag (inlineTagSpec) where
 
 import Commonmark (TokType (..))
 import qualified Commonmark as CM

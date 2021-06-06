@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.Model.LML.Markdown
+module Emanote.Pandoc.Markdown.Parser
   ( parseMarkdown,
     plainify,
   )
@@ -10,8 +10,8 @@ import qualified Commonmark as CM
 import qualified Commonmark.Extensions as CE
 import qualified Data.Aeson as Aeson
 import Ema.Helper.Markdown (parseMarkdownWithFrontMatter, plainify)
-import qualified Emanote.Model.LML.Syntax.InlineTag as IT
-import qualified Emanote.Model.LML.Syntax.WikiLink as WL
+import qualified Emanote.Pandoc.Markdown.Syntax.InlineTag as IT
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc)
 
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, Pandoc)

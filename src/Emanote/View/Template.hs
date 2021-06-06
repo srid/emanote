@@ -18,8 +18,8 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.PandocFilter.Query as PF
-import qualified Emanote.PandocFilter.Url as PF
+import qualified Emanote.Pandoc.Filter.Query as PF
+import qualified Emanote.Pandoc.Filter.Url as PF
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import Emanote.View.SiteRoute (SiteRoute (..))
