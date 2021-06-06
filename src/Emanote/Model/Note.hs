@@ -10,10 +10,14 @@ module Emanote.Model.Note where
 
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
+import qualified Data.HashMap.Strict as HM
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
 import Ema (Slug)
+import qualified Emanote.Model.SData as SData
 import qualified Emanote.Pandoc.Markdown.Parser as Markdown
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (R)
 import qualified Emanote.Route as R
@@ -44,7 +48,7 @@ type NoteIxs =
      -- All ancestors
      RAncestor,
      -- Tag
-     Text,
+     HT.HashTag,
      -- "slug" alias
      Slug
    ]
@@ -71,9 +75,9 @@ noteSelfRefs =
     . (R.liftLinkableRoute . R.linkableLMLRouteCase)
     . _noteRoute
 
-noteTags :: Note -> [Text]
+noteTags :: Note -> [HT.HashTag]
 noteTags =
-  lookupAeson mempty (one "tags") . _noteMeta
+  fmap HT.HashTag . lookupAeson mempty (one "tags") . _noteMeta
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
@@ -146,7 +150,12 @@ parseNote r fp = do
   !s <- readFileText fp
   pure $ do
     (mMeta, doc) <- Markdown.parseMarkdown fp s
-    let meta = fromMaybe Aeson.Null mMeta
+    let inlineTags = HT.hashTags doc
+        frontmatter = fromMaybe Aeson.Null mMeta
+        meta =
+          SData.mergeAeson frontmatter $
+            Aeson.toJSON $
+              Map.fromList @Text @[Text] [("tags", HT.unHashTag <$> inlineTags)]
     pure $ Note doc meta r
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
