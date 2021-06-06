@@ -8,9 +8,10 @@
 
 module Emanote.Model.Note where
 
+import Control.Lens.Operators ((.~))
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
-import qualified Data.HashMap.Strict as HM
+import qualified Data.Aeson.Lens as A
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
@@ -149,14 +150,23 @@ parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
   !s <- readFileText fp
   pure $ do
-    (mMeta, doc) <- Markdown.parseMarkdown fp s
-    let inlineTags = HT.hashTags doc
-        frontmatter = fromMaybe Aeson.Null mMeta
-        meta =
-          SData.mergeAeson frontmatter $
-            Aeson.toJSON $
-              Map.fromList @Text @[Text] [("tags", HT.unHashTag <$> inlineTags)]
+    (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
+      Markdown.parseMarkdown fp s
+    let meta =
+          frontmatter
+            -- Merge frontmatter tags with inline tags in Pandoc document.
+            & A.key "tags" . A._Array
+              .~ ( fromList . fmap Aeson.toJSON $
+                     lookupAeson mempty (one "tags") frontmatter
+                       <> HT.inlineTagsInPandoc doc
+                 )
     pure $ Note doc meta r
+  where
+    withAesonDefault def mv =
+      fromMaybe def mv
+        `SData.mergeAeson` def
+    defaultFrontMatter =
+      Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a

@@ -48,6 +48,7 @@ executable emanote
     , heist                  >=1.1.0.1
     , ixset-typed
     , lens
+    , lens-aeson
     , lvar
     , map-syntax
     , megaparsec
