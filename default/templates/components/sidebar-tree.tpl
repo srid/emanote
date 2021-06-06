@@ -1,5 +1,5 @@
 <!-- Variable bindings for this tree-->
-<bind tag="iconSize">w-4 h-4</bind>
+<bind tag="iconSize">w-4 h-4 flex-shrink-0</bind>
 <node:active>
   <bind tag="link-class">font-bold text-${theme}-600 hover:underline</bind>
   <else />
@@ -56,7 +56,7 @@
   <!-- Node's rootLabel-->
   <div class="flex items-center my-2 space-x-2 justify-left">
     <icon />
-    <a class="${link-class}" href="${node:url}">
+    <a class="${link-class} truncate" title="${node:text}" href="${node:url}">
       <node:text />
     </a>
     <tree:open>
