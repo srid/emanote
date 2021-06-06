@@ -18,9 +18,9 @@ class HasInlineTag il where
 
 instance HasInlineTag (CP.Cm b B.Inlines) where
   inlineTag (InlineTag tag) =
-    CP.Cm $ B.spanWith ("", [], one attrs) $ B.str tag
+    CP.Cm $ B.spanWith ("", one cls, one ("title", "Tag")) $ B.str $ "#" <> tag
     where
-      attrs = ("emanote-type", "inline-tag")
+      cls = "emanote:inline-tag"
 
 inlineTagSpec ::
   (Monad m, CM.IsBlock il bl, CM.IsInline il, HasInlineTag il) =>

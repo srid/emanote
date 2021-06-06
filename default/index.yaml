@@ -27,8 +27,10 @@ pandoc:
   # This feature is useful when managing a "library" of CSS styling to use on
   # Markdown text, especially when using Tailwind.
   rewriteClass:
+    # TODO: Should these be done instead on Heist (pandoc.tpl)?
+    emanote:inline-tag: font-bold bg-gray-100 py-1 px-2 rounded-lg 
     # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
-    emanote:broken-link: line-through italic
+    emanote:broken-link: line-through italic bg-${theme}-100 
     # You can also add your own class -> style mappings.
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
