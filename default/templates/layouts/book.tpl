@@ -1,6 +1,6 @@
 <apply template="base">
   <bind tag="body-main">
-    <div class="container mx-auto xl:max-w-screen-lg">
+    <div class="container mx-auto">
       <!-- Header row-->
       <div class="grid grid-cols-12 md:px-2">
         <!-- Logo column -->
