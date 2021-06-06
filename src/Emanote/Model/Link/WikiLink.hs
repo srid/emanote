@@ -90,17 +90,6 @@ instance Read WikiLinkType where
 class HasWikiLink il where
   wikilink :: WikiLinkType -> Text -> il -> il
 
-instance CM.Rangeable (CM.Html a) => HasWikiLink (CM.Html a) where
-  wikilink typ url il =
-    -- Store `typ` in link title, for later lookup.
-    CM.link url (show typ) il
-
-instance
-  (HasWikiLink il, Semigroup il, Monoid il) =>
-  HasWikiLink (CM.WithSourceMap il)
-  where
-  wikilink typ url il = (wikilink typ url <$> il) <* CM.addName "wikilink"
-
 instance HasWikiLink (CP.Cm b B.Inlines) where
   wikilink typ t il = CP.Cm $ B.link t (show typ) $ CP.unCm il
 
