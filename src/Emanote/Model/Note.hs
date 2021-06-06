@@ -8,14 +8,12 @@
 
 module Emanote.Model.Note where
 
-import qualified Commonmark.Extensions as CE
-import qualified Commonmark.Syntax as CM
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import Ema (Slug)
-import qualified Ema.Helper.Markdown as Markdown
+import qualified Emanote.Model.LML.Markdown as Markdown
 import qualified Emanote.Model.Link.WikiLink as WL
 import Emanote.Route (R)
 import qualified Emanote.Route as R
@@ -147,38 +145,9 @@ parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
   !s <- readFileText fp
   pure $ do
-    (mMeta, doc) <- parseMarkdown fp s
+    (mMeta, doc) <- Markdown.parseMarkdown fp s
     let meta = fromMaybe Aeson.Null mMeta
     pure $ Note doc meta r
-  where
-    parseMarkdown =
-      Markdown.parseMarkdownWithFrontMatter @Aeson.Value $
-        -- As the commonmark documentation states, pipeTableSpec should be placed after
-        -- fancyListSpec and defaultSyntaxSpec to avoid bad results when parsing
-        -- non-table lines.
-        -- see https://github.com/jgm/commonmark-hs/issues/52
-        baseExtsSansPipeTable
-          <> gfmExtensionsSansPipeTable
-          <> CE.pipeTableSpec
-          <> WL.wikilinkSpec
-    baseExtsSansPipeTable =
-      mconcat
-        [ CE.fancyListSpec,
-          CE.footnoteSpec,
-          CE.mathSpec,
-          CE.smartPunctuationSpec,
-          CE.definitionListSpec,
-          CE.attributesSpec,
-          CE.rawAttributeSpec,
-          CE.fencedDivSpec,
-          CE.bracketedSpanSpec,
-          CE.autolinkSpec,
-          CM.defaultSyntaxSpec
-        ]
-    gfmExtensionsSansPipeTable =
-      CE.emojiSpec <> CE.strikethroughSpec <> CE.autolinkSpec
-        <> CE.autoIdentifiersSpec
-        <> CE.taskListSpec
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
