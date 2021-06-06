@@ -9,19 +9,20 @@ import qualified Data.Text as T
 import Emanote.Model.Note (Note)
 import qualified Emanote.Model.Note as N
 import Emanote.Model.Type (Model, modelNotes)
+import Emanote.Pandoc.Markdown.Syntax.HashTag (HashTag (..))
 import qualified Emanote.Route as R
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as M
 import qualified Text.Show as Show
 
 data Query
-  = QueryByTag Text
+  = QueryByTag HashTag
   | QueryByPath FilePath
   deriving (Eq)
 
 instance Show.Show Query where
   show = \case
-    QueryByTag tag ->
+    QueryByTag (HashTag tag) ->
       toString $ "Pages tagged #" <> tag
     QueryByPath p ->
       "Pages under path '" <> p <> "'"
@@ -37,7 +38,7 @@ parseQuery = do
 
 queryParser :: M.Parsec Void Text Query
 queryParser = do
-  (M.string "tag:#" *> fmap (QueryByTag . T.strip) M.takeRest)
+  (M.string "tag:#" *> fmap (QueryByTag . HashTag . T.strip) M.takeRest)
     <|> (M.string "path:" *> fmap (QueryByPath . toString . T.strip) M.takeRest)
 
 runQuery :: Model -> Query -> [Note]

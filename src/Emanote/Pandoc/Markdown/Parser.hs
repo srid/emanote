@@ -10,7 +10,7 @@ import qualified Commonmark as CM
 import qualified Commonmark.Extensions as CE
 import qualified Data.Aeson as Aeson
 import Ema.Helper.Markdown (parseMarkdownWithFrontMatter, plainify)
-import qualified Emanote.Pandoc.Markdown.Syntax.InlineTag as IT
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as IT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc)
 
@@ -25,7 +25,7 @@ parseMarkdown =
       <> gfmExtensionsSansPipeTable
       <> CE.pipeTableSpec
       <> WL.wikilinkSpec
-      <> IT.inlineTagSpec
+      <> IT.hashTagSpec
   where
     baseExtsSansPipeTable =
       mconcat
