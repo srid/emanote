@@ -6,10 +6,11 @@ module Emanote.Model.LML.Markdown
   )
 where
 
+import qualified Commonmark as CM
 import qualified Commonmark.Extensions as CE
-import qualified Commonmark.Syntax as CM
 import qualified Data.Aeson as Aeson
 import Ema.Helper.Markdown (parseMarkdownWithFrontMatter, plainify)
+import qualified Emanote.Model.LML.Syntax.InlineTag as IT
 import qualified Emanote.Model.Link.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc)
 
@@ -24,6 +25,7 @@ parseMarkdown =
       <> gfmExtensionsSansPipeTable
       <> CE.pipeTableSpec
       <> WL.wikilinkSpec
+      <> IT.inlineTagSpec
   where
     baseExtsSansPipeTable =
       mconcat
