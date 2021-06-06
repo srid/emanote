@@ -32,7 +32,7 @@
             inherit returnShellEnv;
             name = "emanote";
             root = ./.;
-            withHoogle = false;
+            withHoogle = true;
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
               pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
