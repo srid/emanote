@@ -16,9 +16,9 @@ import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Emanote.Model.LML.Syntax.WikiLink as WL
 import Emanote.Model.Link.Rel (IxRel)
 import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.WikiLink as WL
 import Emanote.Model.Note
   ( IxNote,
     Note,
