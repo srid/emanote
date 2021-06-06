@@ -99,6 +99,7 @@ executable emanote
     Emanote.Model
     Emanote.Model.Link.Rel
     Emanote.Model.Link.WikiLink
+    Emanote.Model.LML.Markdown
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Query
