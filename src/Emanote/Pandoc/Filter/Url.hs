@@ -1,4 +1,4 @@
-module Emanote.PandocFilter.Url (urlResolvingSplice) where
+module Emanote.Pandoc.Filter.Url (urlResolvingSplice) where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)

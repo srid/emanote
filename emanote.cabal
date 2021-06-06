@@ -98,17 +98,17 @@ executable emanote
   other-modules:
     Emanote.Model
     Emanote.Model.Link.Rel
-    Emanote.Model.LML.Markdown
-    Emanote.Model.LML.Syntax.InlineTag
-    Emanote.Model.LML.Syntax.WikiLink
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Query
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Model.Type
-    Emanote.PandocFilter.Query
-    Emanote.PandocFilter.Url
+    Emanote.Pandoc.Filter.Query
+    Emanote.Pandoc.Filter.Url
+    Emanote.Pandoc.Markdown.Parser
+    Emanote.Pandoc.Markdown.Syntax.InlineTag
+    Emanote.Pandoc.Markdown.Syntax.WikiLink
     Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext

@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.Model.LML.Syntax.WikiLink
+module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink,
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
@@ -129,6 +129,7 @@ wikilinkSpec =
             )
       title <-
         M.option url $
+          -- TODO: Should parse as inline so link text can be formatted?
           CM.untokenize
             <$> ( CT.symbol '|'
                     *> many (CT.satisfyTok (not . CT.hasType (CM.Symbol ']')))
