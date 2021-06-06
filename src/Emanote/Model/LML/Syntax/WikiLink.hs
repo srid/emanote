@@ -5,7 +5,13 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.Model.Link.WikiLink where
+module Emanote.Model.LML.Syntax.WikiLink
+  ( WikiLink,
+    wikilinkSpec,
+    mkWikiLinkFromUrlAndAttrs,
+    allowedWikiLinks,
+  )
+where
 
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
@@ -28,11 +34,6 @@ import Text.Read (Read (readsPrec))
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Show, Ord, Typeable, Data)
-
--- | The contents of treated as a filepath
-wikiLinkFilePath :: WikiLink -> FilePath
-wikiLinkFilePath (WikiLink slugs) =
-  toString $ T.intercalate "/" (toList $ Ema.unSlug <$> slugs)
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do

@@ -11,7 +11,7 @@ import qualified Commonmark.Extensions as CE
 import qualified Data.Aeson as Aeson
 import Ema.Helper.Markdown (parseMarkdownWithFrontMatter, plainify)
 import qualified Emanote.Model.LML.Syntax.InlineTag as IT
-import qualified Emanote.Model.Link.WikiLink as WL
+import qualified Emanote.Model.LML.Syntax.WikiLink as WL
 import Text.Pandoc.Definition (Pandoc)
 
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, Pandoc)

@@ -14,7 +14,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import Ema (Slug)
 import qualified Emanote.Model.LML.Markdown as Markdown
-import qualified Emanote.Model.Link.WikiLink as WL
+import qualified Emanote.Model.LML.Syntax.WikiLink as WL
 import Emanote.Route (R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
