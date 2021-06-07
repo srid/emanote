@@ -85,14 +85,21 @@ encodeRoute (R slugs) =
    in withExt @ft $ toString $ T.intercalate "/" (toList parts)
 
 -- | Parse our route from html file path
-decodeHtmlRoute :: FilePath -> Maybe (R 'Html)
+decodeHtmlRoute :: FilePath -> R 'Html
 decodeHtmlRoute fp = do
-  if null fp
-    then pure $ R $ one "index"
-    else do
-      let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
-      parts <- nonEmpty $ T.splitOn "/" base
-      pure $ R $ fmap Ema.decodeSlug parts
+  let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
+  R $ case splitOnNE "/" base of
+    Nothing ->
+      one "index"
+    Just parts ->
+      fmap Ema.decodeSlug parts
+  where
+    -- Like `T.splitOn` but returns a NonEmpty list with sensible semantics
+    splitOnNE k s =
+      case T.splitOn k s of
+        [] -> Nothing
+        [""] -> Nothing
+        x : xs -> Just $ x :| xs
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =

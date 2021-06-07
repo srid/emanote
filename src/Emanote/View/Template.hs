@@ -7,7 +7,9 @@ module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
+import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
+import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Ema
@@ -18,8 +20,10 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.PandocFilter.Query as PF
-import qualified Emanote.PandocFilter.Url as PF
+import qualified Emanote.Pandoc.Filter.Query as PF
+import qualified Emanote.Pandoc.Filter.Url as PF
+import Emanote.Pandoc.Markdown.Syntax.HashTag (HashTag)
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import Emanote.View.SiteRoute (SiteRoute (..))
@@ -47,9 +51,16 @@ render emaAction m = \case
       Just note ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
       Nothing ->
+        -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show lmlRoute
   SRIndex ->
     Ema.AssetGenerated Ema.Html $ rendeSRIndex emaAction m
+  SRTagIndex ->
+    Ema.AssetGenerated Ema.Html $ rendeSRTagIndex emaAction m
+  SR404 urlPath -> do
+    let route404 = R.liftLinkableLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+        note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
+    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
 
 rendeSRIndex :: Ema.CLI.Action -> Model -> LByteString
 rendeSRIndex emaAction model = do
@@ -57,6 +68,31 @@ rendeSRIndex emaAction model = do
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Index"
     routeTreeSplice Nothing model
+
+rendeSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
+rendeSRTagIndex emaAction model = do
+  let meta = Meta.getIndexYamlMeta model
+  flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
+    commonSplices emaAction meta "@Tags"
+    "ema:tagindex"
+      ## Splices.listSplice tagIndex "each-tag"
+      $ \(tag, notes) -> do
+        "tag" ## HI.textSplice (HT.unHashTag tag)
+        "notes"
+          ## Splices.listSplice notes "each-note"
+          $ \note ->
+            PF.noteSplice model note
+  where
+    tagIndex =
+      model ^. M.modelNotes
+        & Ix.toList
+        & concatMap
+          ( \note ->
+              let tags = note ^. MN.noteMeta & MN.lookupAeson @[HashTag] [] (one "tags")
+               in tags <&> (,[note])
+          )
+        & Map.fromListWith (<>)
+        & Map.toAscList
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do

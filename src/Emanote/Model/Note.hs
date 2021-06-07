@@ -8,13 +8,18 @@
 
 module Emanote.Model.Note where
 
+import Control.Lens.Operators ((.~))
 import Control.Lens.TH (makeLenses)
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Lens as A
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
 import Ema (Slug)
-import qualified Emanote.Model.LML.Markdown as Markdown
-import qualified Emanote.Model.Link.WikiLink as WL
+import qualified Emanote.Model.SData as SData
+import qualified Emanote.Pandoc.Markdown.Parser as Markdown
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
@@ -44,7 +49,7 @@ type NoteIxs =
      -- All ancestors
      RAncestor,
      -- Tag
-     Text,
+     HT.HashTag,
      -- "slug" alias
      Slug
    ]
@@ -71,9 +76,9 @@ noteSelfRefs =
     . (R.liftLinkableRoute . R.linkableLMLRouteCase)
     . _noteRoute
 
-noteTags :: Note -> [Text]
+noteTags :: Note -> [HT.HashTag]
 noteTags =
-  lookupAeson mempty (one "tags") . _noteMeta
+  fmap HT.HashTag . lookupAeson mempty (one "tags") . _noteMeta
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
@@ -97,7 +102,7 @@ noteSlug =
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
-  -- Favour slug if one exixts, otherwise use the full path.
+  -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
     Nothing ->
       coerce $ R.linkableLMLRouteCase _noteRoute
@@ -128,26 +133,39 @@ lookupFolderWithNotes :: R 'R.Folder -> IxNote -> Maybe Note
 lookupFolderWithNotes r ns = do
   guard $ hasNotes (coerce r) ns
   let placeHolder =
-        Pandoc mempty $
-          one $
-            B.Plain
-              [ B.Str
-                  "Placeholder: To add content here, write to file: ",
-                B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
-              ]
+        B.Plain
+          [ B.Str
+              "Placeholder: To add content here, write to file: ",
+            B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
+          ]
       folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
   pure $ mkEmptyNoteWith folderMdR placeHolder
-  where
-    mkEmptyNoteWith someR doc =
-      Note doc Aeson.Null someR
+
+mkEmptyNoteWith :: R.LinkableLMLRoute -> B.Block -> Note
+mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =
+  Note doc Aeson.Null someR
 
 parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
   !s <- readFileText fp
   pure $ do
-    (mMeta, doc) <- Markdown.parseMarkdown fp s
-    let meta = fromMaybe Aeson.Null mMeta
+    (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
+      Markdown.parseMarkdown fp s
+    let meta =
+          frontmatter
+            -- Merge frontmatter tags with inline tags in Pandoc document.
+            & A.key "tags" . A._Array
+              .~ ( fromList . fmap Aeson.toJSON $
+                     lookupAeson mempty (one "tags") frontmatter
+                       <> HT.inlineTagsInPandoc doc
+                 )
     pure $ Note doc meta r
+  where
+    withAesonDefault def mv =
+      fromMaybe def mv
+        `SData.mergeAeson` def
+    defaultFrontMatter =
+      Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a

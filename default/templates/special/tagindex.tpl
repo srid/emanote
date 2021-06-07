@@ -20,9 +20,32 @@
             </a>
           </div>
           <div class="pt-1 pb-2 rounded bg-${theme}-50 pl-4">
-            <ema:route-tree>
-              <apply template="components/sidebar-tree" />
-            </ema:route-tree>
+            <div class="flex flex-row">
+              <ema:tagindex>
+                <div>
+                  <each-tag>
+                    <h2 title="Tag" class="font-bold text-l text-gray-700 py-1 font-mono">
+                      <!-- DoNotFormat -->
+                      #<tag />
+                      <!-- DoNotFormat -->
+                    </h2>
+                    <div class="flex flex-col ml-2 mb-4">
+                      <notes>
+                        <each-note>
+                          <div>
+                            <!-- TODO: DRY -->
+                            <a class="font-bold text-${theme}-600 hover:underline truncate"
+                              href="${note:url}">
+                              <note:title />
+                            </a>
+                          </div>
+                        </each-note>
+                      </notes>
+                    </div>
+                  </each-tag>
+                </div>
+              </ema:tagindex>
+            </div>
           </div>
         </div>
       </main>

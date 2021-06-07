@@ -5,7 +5,13 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Emanote.Model.Link.WikiLink where
+module Emanote.Pandoc.Markdown.Syntax.WikiLink
+  ( WikiLink,
+    wikilinkSpec,
+    mkWikiLinkFromUrlAndAttrs,
+    allowedWikiLinks,
+  )
+where
 
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
@@ -28,11 +34,6 @@ import Text.Read (Read (readsPrec))
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Show, Ord, Typeable, Data)
-
--- | The contents of treated as a filepath
-wikiLinkFilePath :: WikiLink -> FilePath
-wikiLinkFilePath (WikiLink slugs) =
-  toString $ T.intercalate "/" (toList $ Ema.unSlug <$> slugs)
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
@@ -90,17 +91,6 @@ instance Read WikiLinkType where
 class HasWikiLink il where
   wikilink :: WikiLinkType -> Text -> il -> il
 
-instance CM.Rangeable (CM.Html a) => HasWikiLink (CM.Html a) where
-  wikilink typ url il =
-    -- Store `typ` in link title, for later lookup.
-    CM.link url (show typ) il
-
-instance
-  (HasWikiLink il, Semigroup il, Monoid il) =>
-  HasWikiLink (CM.WithSourceMap il)
-  where
-  wikilink typ url il = (wikilink typ url <$> il) <* CM.addName "wikilink"
-
 instance HasWikiLink (CP.Cm b B.Inlines) where
   wikilink typ t il = CP.Cm $ B.link t (show typ) $ CP.unCm il
 
@@ -139,6 +129,7 @@ wikilinkSpec =
             )
       title <-
         M.option url $
+          -- TODO: Should parse as inline so link text can be formatted?
           CM.untokenize
             <$> ( CT.symbol '|'
                     *> many (CT.satisfyTok (not . CT.hasType (CM.Symbol ']')))
