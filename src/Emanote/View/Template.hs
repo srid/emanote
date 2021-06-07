@@ -51,11 +51,16 @@ render emaAction m = \case
       Just note ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
       Nothing ->
+        -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show lmlRoute
   SRIndex ->
     Ema.AssetGenerated Ema.Html $ rendeSRIndex emaAction m
   SRTagIndex ->
     Ema.AssetGenerated Ema.Html $ rendeSRTagIndex emaAction m
+  SR404 urlPath -> do
+    let route404 = R.liftLinkableLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+        note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
+    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
 
 rendeSRIndex :: Ema.CLI.Action -> Model -> LByteString
 rendeSRIndex emaAction model = do
