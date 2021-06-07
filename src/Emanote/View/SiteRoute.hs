@@ -22,6 +22,8 @@ import qualified Emanote.Route as R
 data SiteRoute
   = -- | Route to a special note-index view
     SRIndex
+  | -- | Route to tag index
+    SRTagIndex
   | -- | Route to a LML file that gets generated as HTML
     SRLMLFile LinkableLMLRoute
   | -- | Route to a static file, along with its absolute path on disk
@@ -33,6 +35,9 @@ instance Ema Model SiteRoute where
     SRIndex ->
       R.encodeRoute $
         R.mkRouteFromSlug @'Html "@index"
+    SRTagIndex ->
+      R.encodeRoute $
+        R.mkRouteFromSlug @'Html "@tags"
     SRLMLFile r ->
       R.encodeRoute $
         maybe (coerce . R.linkableLMLRouteCase $ r) N.noteHtmlRoute $
@@ -41,9 +46,8 @@ instance Ema Model SiteRoute where
       R.encodeRoute r
 
   decodeRoute model fp =
-    ( SRIndex
-        <$ ((guard . (== "@index")) <=< R.routeSlug <=< R.decodeHtmlRoute $ fp)
-    )
+    (SRIndex <$ ((guard . (== "@index")) <=< R.routeSlug <=< R.decodeHtmlRoute $ fp))
+      <|> (SRTagIndex <$ ((guard . (== "@tags")) <=< R.routeSlug <=< R.decodeHtmlRoute $ fp))
       <|> fmap
         staticFileSiteRoute
         (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)

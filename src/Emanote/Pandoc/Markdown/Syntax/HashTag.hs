@@ -16,7 +16,7 @@ import qualified Commonmark as CM
 import qualified Commonmark.Inlines as CM
 import qualified Commonmark.Pandoc as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
-import Data.Aeson (FromJSON, ToJSON)
+import Data.Aeson (FromJSON, ToJSON, ToJSONKey)
 import qualified Data.Map.Strict as Map
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Pandoc.Walk as W
@@ -34,7 +34,7 @@ inlineTagsInPandoc :: B.Pandoc -> [HashTag]
 inlineTagsInPandoc = W.query $ maybeToList . mkHashTagFrom
 
 newtype HashTag = HashTag {unHashTag :: Text}
-  deriving (Eq, Show, Ord, Generic, ToJSON, FromJSON)
+  deriving (Eq, Show, Ord, Generic, ToJSON, ToJSONKey, FromJSON)
 
 class HasHashTag il where
   hashTag :: HashTag -> il
