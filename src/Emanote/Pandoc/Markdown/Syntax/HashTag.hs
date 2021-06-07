@@ -3,7 +3,6 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
--- | TODO: Rename to HashTag?
 module Emanote.Pandoc.Markdown.Syntax.HashTag
   ( hashTagSpec,
     inlineTagsInPandoc,
