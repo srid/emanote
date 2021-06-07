@@ -77,6 +77,8 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             Nothing
           SRTagIndex ->
             Nothing
+          SR404 _ ->
+            Nothing
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
