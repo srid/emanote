@@ -11,7 +11,6 @@ import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.Set as Set
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -119,11 +118,7 @@ modelResolveWikiLink wl model =
 
 modelLookupBacklinks :: LinkableRoute -> Model -> [(LinkableLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
-  let refsToSelf =
-        Set.fromList $
-          (Left <$> toList (WL.allowedWikiLinks r))
-            <> [Right r]
-      backlinks = Ix.toList $ (model ^. modelRels) @+ toList refsToSelf
+  let backlinks = Ix.toList $ (model ^. modelRels) @+ Rel.unresolvedRelsTo r
    in backlinks <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 

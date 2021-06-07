@@ -30,6 +30,7 @@ emanote -C /path/to/notebook gen /tmp/output
 
 * [ema.srid.ca](https://ema.srid.ca) (generated from [these sources](https://github.com/srid/emanote/tree/master/docs)).
 * [Haskell KB](https://taylor.fausak.me/haskell-knowledge-base/) (generated from [these sources](https://github.com/tfausak/haskell-knowledge-base))
+* [Unofficial r/TheMotte Wiki](https://themotte.zettel.page/)
 
 ## Developing
 
@@ -92,9 +93,11 @@ Milestone (notes.srid.ca),
   - dd styling
 - Nice to have, but not essential
   - [ ] RSS feeds
+    - Or switch to email lists.
 
 To triage,
 
+- [ ] Link inline tags to @tags index
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
 - [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
   - Display children inline?

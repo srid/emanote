@@ -67,6 +67,11 @@ extractRels note =
           target <- parseUnresolvedRelTarget attrs url
           pure $ Rel (note ^. noteRoute) target ctx
 
+unresolvedRelsTo :: LinkableRoute -> [UnresolvedRelTarget]
+unresolvedRelsTo r =
+  (Left <$> toList (WL.allowedWikiLinks r))
+    <> [Right r]
+
 -- | Parse a URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
