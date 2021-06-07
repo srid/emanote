@@ -5,6 +5,9 @@
         <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
           <ema:title />
         </h1>
+        <apply template="experimental">
+          <bind tag="dnum">50</bind>
+        </apply>
         <div>
           <div class="float-right p-2 text-gray-500 hover:text-${theme}-700">
             <a href="/" title="Go to Home">
