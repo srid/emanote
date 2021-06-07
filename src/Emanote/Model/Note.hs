@@ -133,18 +133,17 @@ lookupFolderWithNotes :: R 'R.Folder -> IxNote -> Maybe Note
 lookupFolderWithNotes r ns = do
   guard $ hasNotes (coerce r) ns
   let placeHolder =
-        Pandoc mempty $
-          one $
-            B.Plain
-              [ B.Str
-                  "Placeholder: To add content here, write to file: ",
-                B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
-              ]
+        B.Plain
+          [ B.Str
+              "Placeholder: To add content here, write to file: ",
+            B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
+          ]
       folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
   pure $ mkEmptyNoteWith folderMdR placeHolder
-  where
-    mkEmptyNoteWith someR doc =
-      Note doc Aeson.Null someR
+
+mkEmptyNoteWith :: R.LinkableLMLRoute -> B.Block -> Note
+mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =
+  Note doc Aeson.Null someR
 
 parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do

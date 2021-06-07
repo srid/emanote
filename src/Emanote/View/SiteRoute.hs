@@ -28,6 +28,8 @@ data SiteRoute
     SRLMLFile LinkableLMLRoute
   | -- | Route to a static file, along with its absolute path on disk
     SRStaticFile (R 'AnyExt, FilePath)
+  | -- | A link that points to nowhere in model. Used in live-server mainly.
+    SR404 FilePath
   deriving (Eq, Show, Ord)
 
 instance Ema Model SiteRoute where
@@ -44,16 +46,19 @@ instance Ema Model SiteRoute where
           M.modelLookupNoteByRoute r model
     SRStaticFile (r, _fpAbs) ->
       R.encodeRoute r
+    SR404 _fp ->
+      error "emanote: attempt to encode a 404 route"
 
   decodeRoute model fp =
-    (SRIndex <$ ((guard . (== "@index")) <=< R.routeSlug <=< R.decodeHtmlRoute $ fp))
-      <|> (SRTagIndex <$ ((guard . (== "@tags")) <=< R.routeSlug <=< R.decodeHtmlRoute $ fp))
+    (SRIndex <$ ((guard . (== "@index")) <=< R.routeSlug . R.decodeHtmlRoute $ fp))
+      <|> (SRTagIndex <$ ((guard . (== "@tags")) <=< R.routeSlug . R.decodeHtmlRoute $ fp))
       <|> fmap
         staticFileSiteRoute
         (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
       <|> fmap
         noteFileSiteRoute
-        (flip M.modelLookupNoteByHtmlRoute model =<< R.decodeHtmlRoute fp)
+        (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
+      <|> pure (SR404 fp)
 
   allRoutes model =
     let htmlRoutes =
