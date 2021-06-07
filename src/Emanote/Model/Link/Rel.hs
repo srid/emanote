@@ -33,16 +33,10 @@ data Rel = Rel
     -- | The relation context in LML
     _relCtx :: [B.Block]
   }
-  deriving (Show)
+  deriving (Eq, Ord, Show)
 
 -- | A link target that has not been resolved (using model) yet.
 type UnresolvedRelTarget = Either WL.WikiLink LinkableRoute
-
-instance Eq Rel where
-  (==) = (==) `on` (_relFrom &&& _relTo)
-
-instance Ord Rel where
-  (<=) = (<=) `on` (_relFrom &&& _relTo)
 
 type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
 
