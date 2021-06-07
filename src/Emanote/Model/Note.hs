@@ -102,7 +102,7 @@ noteSlug =
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
-  -- Favour slug if one exixts, otherwise use the full path.
+  -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
     Nothing ->
       coerce $ R.linkableLMLRouteCase _noteRoute

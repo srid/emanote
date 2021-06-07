@@ -75,6 +75,8 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             pure $ B.Str "File: " : inner
           SRIndex ->
             Nothing
+          SRTagIndex ->
+            Nothing
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
