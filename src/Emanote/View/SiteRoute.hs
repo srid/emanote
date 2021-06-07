@@ -69,7 +69,7 @@ instance Ema Model SiteRoute where
           model ^. M.modelStaticFiles
             & Ix.toList
             <&> staticFileSiteRoute
-     in htmlRoutes <> staticRoutes <> [SRIndex]
+     in htmlRoutes <> staticRoutes <> [SRIndex, SRTagIndex]
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
