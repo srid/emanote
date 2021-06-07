@@ -88,11 +88,18 @@ encodeRoute (R slugs) =
 decodeHtmlRoute :: FilePath -> R 'Html
 decodeHtmlRoute fp = do
   let base = fromMaybe (toText fp) $ T.stripSuffix ".html" (toText fp)
-  R $ case nonEmpty $ T.splitOn "/" base of
+  R $ case splitOnNE "/" base of
     Nothing ->
       one "index"
     Just parts ->
       fmap Ema.decodeSlug parts
+  where
+    -- Like `T.splitOn` but returns a NonEmpty list with sensible semantics
+    splitOnNE k s =
+      case T.splitOn k s of
+        [] -> Nothing
+        [""] -> Nothing
+        x : xs -> Just $ x :| xs
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =
