@@ -1,4 +1,4 @@
-module Emanote.PandocFilter.Url (urlResolvingSplice) where
+module Emanote.Pandoc.Filter.Url (urlResolvingSplice) where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
@@ -12,7 +12,7 @@ import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Route as R
-import Emanote.View.SiteRoute (SiteRoute (SRIndex, SRLMLFile, SRStaticFile))
+import Emanote.View.SiteRoute (SiteRoute (..))
 import qualified Emanote.View.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Interpreted as HI
@@ -74,6 +74,10 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             -- Just append a file: prefix.
             pure $ B.Str "File: " : inner
           SRIndex ->
+            Nothing
+          SRTagIndex ->
+            Nothing
+          SR404 _ ->
             Nothing
 
 resolveUnresolvedRelTarget ::

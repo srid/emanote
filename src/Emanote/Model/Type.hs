@@ -18,7 +18,6 @@ import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model.Link.Rel (IxRel)
 import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.WikiLink as WL
 import Emanote.Model.Note
   ( IxNote,
     Note,
@@ -30,6 +29,7 @@ import Emanote.Model.StaticFile
     StaticFile (StaticFile),
     staticFileRoute,
   )
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (AnyExt), LinkableLMLRoute, LinkableRoute, R)
 import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState, newTemplateState)
