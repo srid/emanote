@@ -24,12 +24,13 @@
               <ema:tagindex>
                 <div>
                   <each-tag>
-                    <h2 title="Tag" class="font-bold text-l text-gray-700 py-1 font-mono">
+                    <h2 name="${tag}" title="Tag"
+                      class="py-1 font-mono font-bold text-gray-700 text-l">
                       <!-- DoNotFormat -->
                       #<tag />
                       <!-- DoNotFormat -->
                     </h2>
-                    <div class="flex flex-col ml-2 mb-4">
+                    <div class="flex flex-col mb-4 ml-2">
                       <notes>
                         <each-note>
                           <div>
