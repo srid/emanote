@@ -27,7 +27,7 @@
         <!-- Sidebar column -->
         <div
           class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
-          <div class="float-right flex flex-row space-x-2 p-2 text-gray-500">
+          <div class="flex flex-row float-right p-2 space-x-2 text-gray-500">
             <a href="@tags" title="View tags">
               <svg class="w-4 h-4 hover:text-${theme}-700" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -57,17 +57,7 @@
             <apply template="components/pandoc" />
           </div>
           <apply template="components/backlinks" />
-
-          <ema:metadata>
-            <div class="flex items-center justify-center mt-8 space-x-2 font-mono text-sm">
-              <with var="tags">
-                <a title="Tag" class="px-1 bg-gray-100 rounded">
-                  <value />
-                </a>
-              </with>
-            </div>
-          </ema:metadata>
-
+          <apply template="components/metadata" />
           <apply template="components/footer" />
         </div>
       </div>

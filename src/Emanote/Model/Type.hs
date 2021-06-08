@@ -55,7 +55,9 @@ modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes %~ Ix.updateIx r note
     >>> modelRels
-      %~ ( Ix.deleteIx r
+      %~ ( -- FIXME: `deleteIx` may not do what we want it to do.
+           -- cf. "Only works if there is at most one item with that index in the IxSet"
+           Ix.deleteIx r
              >>> Ix.insertList (Rel.extractRels note)
          )
     >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
