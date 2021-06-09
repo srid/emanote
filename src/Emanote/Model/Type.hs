@@ -11,6 +11,7 @@ import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Set as Set
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -54,15 +55,15 @@ emptyModel =
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes %~ Ix.updateIx r note
-    >>> modelRels
-      %~ ( -- FIXME: `deleteIx` may not do what we want it to do.
-           -- cf. "Only works if there is at most one item with that index in the IxSet"
-           Ix.deleteIx r
-             >>> Ix.insertList (Rel.extractRels note)
-         )
+    >>> modelRels %~ replaceNoteRels
     >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
   where
     r = note ^. N.noteRoute
+    replaceNoteRels rels =
+      let old = rels @= r
+          new = Rel.noteRels note
+          deleteMany = foldr Ix.delete
+       in new `Ix.union` (rels `deleteMany` old)
 
 modelDeleteNote :: LinkableLMLRoute -> Model -> Model
 modelDeleteNote k =
