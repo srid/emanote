@@ -36,6 +36,7 @@ import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
 import UnliftIO (BufferMode (..), hSetBuffering)
+import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
@@ -103,9 +104,14 @@ transformAction src fps = do
         Just r -> case action of
           Mount.Update overlays -> do
             let fpAbs = locResolve $ head overlays
-            logD $ "Adding file: " <> toText fpAbs <> " " <> show r
-            t <- liftIO getCurrentTime
-            pure $ M.modelInsertStaticFile t r fpAbs
+            doesDirectoryExist fpAbs >>= \case
+              True ->
+                -- A directory got added; this is not a static 'file'
+                pure id
+              False -> do
+                logD $ "Adding file: " <> toText fpAbs <> " " <> show r
+                t <- liftIO getCurrentTime
+                pure $ M.modelInsertStaticFile t r fpAbs
           Mount.Delete -> do
             pure $ M.modelDeleteStaticFile r
     R.Html -> do

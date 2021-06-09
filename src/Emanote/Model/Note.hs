@@ -20,7 +20,7 @@ import qualified Emanote.Model.SData as SData
 import qualified Emanote.Pandoc.Markdown.Parser as Markdown
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import Emanote.Route (R)
+import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
@@ -44,6 +44,8 @@ type NoteIxs =
      R 'R.Html,
      -- Ancestor folder routes
      RAncestor,
+     -- Parent folder
+     R 'R.Folder,
      -- Tag
      HT.HashTag,
      -- "slug" alias
@@ -59,6 +61,7 @@ instance Indexable NoteIxs Note where
       (ixFun noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
       (ixFun noteAncestors)
+      (ixFun $ maybeToList . noteParent)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
@@ -75,6 +78,10 @@ noteAncestors =
 
 noteParent :: Note -> Maybe (R 'R.Folder)
 noteParent = R.routeParent . R.linkableLMLRouteCase . _noteRoute
+
+hasChildNotes :: R 'Folder -> IxNote -> Bool
+hasChildNotes r =
+  not . Ix.null . Ix.getEQ r
 
 noteTags :: Note -> [HT.HashTag]
 noteTags =
