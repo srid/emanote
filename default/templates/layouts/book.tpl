@@ -25,7 +25,7 @@
       <!-- Main row-->
       <div class="grid grid-cols-12 px-2">
         <!-- Sidebar column -->
-        <div
+        <nav
           class="hidden overflow-x-auto md:mr-4 md:block md:col-span-3 md:sticky md:top-0 md:h-screen">
           <div class="flex flex-row float-right p-2 space-x-2 text-gray-500">
             <a href="@tags" title="View tags">
@@ -50,14 +50,16 @@
               <apply template="components/sidebar-tree" />
             </ema:route-tree>
           </div>
-        </div>
+        </nav>
         <!-- Main body column -->
         <div class="col-span-12 md:col-span-9">
-          <div class="overflow-auto">
-            <apply template="components/pandoc" />
-          </div>
-          <apply template="components/backlinks" />
-          <apply template="components/metadata" />
+          <main>
+            <article class="overflow-auto">
+              <apply template="components/pandoc" />
+            </article>
+            <apply template="components/backlinks" />
+            <apply template="components/metadata" />
+          </main>
           <apply template="components/footer" />
         </div>
       </div>
