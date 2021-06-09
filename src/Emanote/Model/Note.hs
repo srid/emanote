@@ -42,11 +42,7 @@ type NoteIxs =
      WL.WikiLink,
      -- HTML route for this note
      R 'R.Html,
-     -- Parent folder (unless a root file).
-     -- TODO: Index parent folder's allowed wikilinks, somehow, to support
-     -- linking to them.
-     R 'R.Folder,
-     -- All ancestors
+     -- Ancestor folder routes
      RAncestor,
      -- Tag
      HT.HashTag,
@@ -62,12 +58,9 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . _noteRoute)
       (ixFun noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
-      (ixFun $ maybeToList . noteParent)
-      (ixFun $ maybe [] (toList . fmap RAncestor . R.routeInits) . noteParent)
+      (ixFun noteAncestors)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
-    where
-      noteParent = R.routeParent . R.linkableLMLRouteCase . _noteRoute
 
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [WL.WikiLink]
@@ -75,6 +68,13 @@ noteSelfRefs =
   WL.allowedWikiLinks
     . (R.liftLinkableRoute . R.linkableLMLRouteCase)
     . _noteRoute
+
+noteAncestors :: Note -> [RAncestor]
+noteAncestors =
+  maybe [] (toList . fmap RAncestor . R.routeInits) . noteParent
+
+noteParent :: Note -> Maybe (R 'R.Folder)
+noteParent = R.routeParent . R.linkableLMLRouteCase . _noteRoute
 
 noteTags :: Note -> [HT.HashTag]
 noteTags =
@@ -109,11 +109,6 @@ noteHtmlRoute note@Note {..} =
     Just slug ->
       R.mkRouteFromSlug slug
 
--- | Does the given folder have any notes?
-hasNotes :: R 'R.Folder -> IxNote -> Bool
-hasNotes r =
-  not . Ix.null . Ix.getEQ r
-
 singleNote :: HasCallStack => [Note] -> Maybe Note
 singleNote ns = do
   res@(x :| xs) <- nonEmpty ns
@@ -129,17 +124,15 @@ lookupNotesByRoute :: R.LinkableLMLRoute -> IxNote -> [Note]
 lookupNotesByRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-lookupFolderWithNotes :: R 'R.Folder -> IxNote -> Maybe Note
-lookupFolderWithNotes r ns = do
-  guard $ hasNotes (coerce r) ns
+placeHolderNote :: R.LinkableLMLRoute -> Note
+placeHolderNote r =
   let placeHolder =
         B.Plain
           [ B.Str
-              "Placeholder: To add content here, write to file: ",
-            B.Code B.nullAttr $ toText (R.encodeRoute r) <> ".md"
+              "To add content here, create a file named: ",
+            B.Code B.nullAttr $ toText (R.encodeRoute $ R.linkableLMLRouteCase r)
           ]
-      folderMdR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ r
-  pure $ mkEmptyNoteWith folderMdR placeHolder
+   in mkEmptyNoteWith r placeHolder
 
 mkEmptyNoteWith :: R.LinkableLMLRoute -> B.Block -> Note
 mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =

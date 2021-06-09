@@ -11,7 +11,6 @@ import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
-import qualified Data.Set as Set
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -35,7 +34,6 @@ import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState, newTemplateState)
 import qualified Text.Pandoc.Definition as B
 
--- TODO: Use https://hackage.haskell.org/package/data-lens-ixset-0.1.4/docs/Data-Lens-IxSet.html
 data Model = Model
   { _modelNotes :: IxNote,
     _modelRels :: IxRel,
@@ -54,9 +52,14 @@ emptyModel =
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
-  modelNotes %~ Ix.updateIx r note
-    >>> modelRels %~ replaceNoteRels
-    >>> modelNav %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
+  modelNotes
+    %~ ( Ix.updateIx r note
+           >>> flip (foldr injectAncestor) (N.noteAncestors note)
+       )
+    >>> modelRels
+    %~ replaceNoteRels
+    >>> modelNav
+    %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
   where
     r = note ^. N.noteRoute
     replaceNoteRels rels =
@@ -64,6 +67,14 @@ modelInsertNote note =
           new = Rel.noteRels note
           deleteMany = foldr Ix.delete
        in new `Ix.union` (rels `deleteMany` old)
+    -- Automatically add notes corresponding to parent paths if a
+    -- corresponding .md does not exist.
+    injectAncestor :: N.RAncestor -> IxNote -> IxNote
+    injectAncestor ancestor ns =
+      let lmlR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
+       in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
+            Just _ -> ns
+            Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
 
 modelDeleteNote :: LinkableLMLRoute -> Model -> Model
 modelDeleteNote k =
@@ -94,12 +105,10 @@ modelDeleteData k =
 modelLookupNoteByRoute :: LinkableLMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByRoute r notes)
-    <|> N.lookupFolderWithNotes (coerce $ R.linkableLMLRouteCase r) notes
 
 modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
 modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByHtmlRoute r notes)
-    <|> N.lookupFolderWithNotes (coerce r) notes
 
 modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
@@ -107,10 +116,6 @@ modelLookupTitle r =
 
 modelResolveWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
 modelResolveWikiLink wl model =
-  -- TODO: Also lookup wiki links to *directories* without an associated zettel.
-  -- Eg: my [[Public Post Ideas]]
-  --
-  -- See TODO in Note.hs
   let noteRoutes =
         fmap (R.liftLinkableRoute . R.linkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
           (model ^. modelNotes) @= wl

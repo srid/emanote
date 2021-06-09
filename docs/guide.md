@@ -18,6 +18,7 @@ Mega features,
 
 - notebook layers overlay
 - polymorphic (in filetype, and path signifier) wiki-links: `[[Foo]]`, `[[Bar/Qux]]`, `[[Examples/Program.py]]`
+- linking to 'folders' (even without $folder.md)
 - [data cascade](https://www.11ty.dev/docs/data-cascade/)
 - s/[shortcodes](https://web.dev/how-we-build-webdev-and-use-web-components/#templating)/attribute class/ (i., `:::{.foo}`)
 - Powerful and simpler query system (cf. Obsidian search)
