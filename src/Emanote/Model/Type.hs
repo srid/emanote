@@ -28,6 +28,7 @@ import Emanote.Model.StaticFile
     StaticFile (StaticFile),
     staticFileRoute,
   )
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (AnyExt), LinkableLMLRoute, LinkableRoute, R)
 import qualified Emanote.Route as R
@@ -147,3 +148,7 @@ modelLookupBacklinks r model =
 modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
 modelLookupStaticFileByRoute r model = do
   Ix.getOne . Ix.getEQ r . _modelStaticFiles $ model
+
+modelTags :: Model -> [(HT.Tag, [Note])]
+modelTags =
+  Ix.groupAscBy @HT.Tag . _modelNotes
