@@ -36,9 +36,8 @@ filePatterns =
 
 ignorePatterns :: [FilePattern]
 ignorePatterns =
-  [ -- Ignore all top-level dotfile directories (eg: .git, .vscode)
-    ".*/**",
-    -- /@index is reserved by Emanote
-    "@index.*",
-    "@index/**"
+  [ -- Ignore all dotfile directories (eg: .git, .vscode)
+    "**/.*/**",
+    -- /Top-levels beginning with '@' are reserved by Emanote
+    "@*/**"
   ]
