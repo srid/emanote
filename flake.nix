@@ -12,6 +12,10 @@
       url = "github:srid/pandoc-link-context";
       flake = false;
     };
+    tagtree = {
+      url = "github:srid/tagtree";
+      flake = false;
+    };
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
@@ -36,6 +40,7 @@
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
               pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
+              tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
               # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
             };
             modifier = drv:

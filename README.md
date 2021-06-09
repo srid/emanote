@@ -89,11 +89,12 @@ Milestone (notes.srid.ca),
   - Queries
     - [x] Query by tag (in code block)
     - [x] Date in queries (requires Heist withJson changes)
+		- [ ] Hierarchical tags?
 - [ ] Theme touches
   - dd styling
 - Nice to have, but not essential
-  - [ ] RSS feeds
-    - Or switch to email lists.
+  - RSS feeds
+    - [ ] Or switch to email lists.
 
 To triage,
 

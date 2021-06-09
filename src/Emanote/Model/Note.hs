@@ -47,7 +47,7 @@ type NoteIxs =
      -- Parent folder
      R 'R.Folder,
      -- Tag
-     HT.HashTag,
+     HT.Tag,
      -- "slug" alias
      Slug
    ]
@@ -83,9 +83,9 @@ hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
   not . Ix.null . Ix.getEQ r
 
-noteTags :: Note -> [HT.HashTag]
+noteTags :: Note -> [HT.Tag]
 noteTags =
-  fmap HT.HashTag . lookupAeson mempty (one "tags") . _noteMeta
+  fmap HT.Tag . lookupAeson mempty (one "tags") . _noteMeta
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =

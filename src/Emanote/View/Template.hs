@@ -22,7 +22,6 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
-import Emanote.Pandoc.Markdown.Syntax.HashTag (HashTag)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
@@ -77,7 +76,7 @@ rendeSRTagIndex emaAction model = do
     "ema:tagindex"
       ## Splices.listSplice tagIndex "each-tag"
       $ \(tag, notes) -> do
-        "tag" ## HI.textSplice (HT.unHashTag tag)
+        "tag" ## HI.textSplice (HT.unTag tag)
         "notes"
           ## Splices.listSplice notes "each-note"
           $ \note ->
@@ -88,7 +87,7 @@ rendeSRTagIndex emaAction model = do
         & Ix.toList
         & concatMap
           ( \note ->
-              let tags = note ^. MN.noteMeta & MN.lookupAeson @[HashTag] [] (one "tags")
+              let tags = note ^. MN.noteMeta & MN.lookupAeson @[HT.Tag] [] (one "tags")
                in tags <&> (,[note])
           )
         & Map.fromListWith (<>)

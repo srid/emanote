@@ -6,7 +6,10 @@
 module Emanote.Pandoc.Markdown.Syntax.HashTag
   ( hashTagSpec,
     inlineTagsInPandoc,
-    HashTag (..),
+    TT.Tag (..),
+    TT.TagPattern (..),
+    TT.mkTagPattern,
+    TT.tagMatch,
   )
 where
 
@@ -15,57 +18,54 @@ import qualified Commonmark as CM
 import qualified Commonmark.Inlines as CM
 import qualified Commonmark.Pandoc as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
-import Data.Aeson (FromJSON, ToJSON, ToJSONKey)
 import qualified Data.Map.Strict as Map
+import qualified Data.TagTree as TT
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Pandoc.Walk as W
 import qualified Text.Parsec as P
 
-mkHashTagFrom :: B.Inline -> Maybe HashTag
-mkHashTagFrom = \case
+mkTagFrom :: B.Inline -> Maybe TT.Tag
+mkTagFrom = \case
   B.Span (_, [cls], Map.fromList -> attrs) _
-    | cls == hashTagCls -> do
+    | cls == tagCls -> do
       tag <- Map.lookup "data" attrs
-      pure $ HashTag tag
+      pure $ TT.Tag tag
   _ -> Nothing
 
-inlineTagsInPandoc :: B.Pandoc -> [HashTag]
-inlineTagsInPandoc = W.query $ maybeToList . mkHashTagFrom
-
-newtype HashTag = HashTag {unHashTag :: Text}
-  deriving (Eq, Show, Ord, Generic, ToJSON, ToJSONKey, FromJSON)
+inlineTagsInPandoc :: B.Pandoc -> [TT.Tag]
+inlineTagsInPandoc = W.query $ maybeToList . mkTagFrom
 
 class HasHashTag il where
-  hashTag :: HashTag -> il
+  hashTag :: TT.Tag -> il
 
 instance HasHashTag (CP.Cm b B.Inlines) where
-  hashTag (HashTag tag) =
+  hashTag (TT.Tag tag) =
     let attrs =
           [ ("title", "Tag"),
             ("data", tag)
           ]
-     in CP.Cm $ B.spanWith ("", one hashTagCls, attrs) $ B.str $ "#" <> tag
+     in CP.Cm $ B.spanWith ("", one tagCls, attrs) $ B.str $ "#" <> tag
 
-hashTagCls :: Text
-hashTagCls = "emanote:inline-tag"
+tagCls :: Text
+tagCls = "emanote:inline-tag"
 
 hashTagSpec ::
   (Monad m, CM.IsBlock il bl, CM.IsInline il, HasHashTag il) =>
   CM.SyntaxSpec m il bl
 hashTagSpec =
   mempty
-    { CM.syntaxInlineParsers = [pHashTag]
+    { CM.syntaxInlineParsers = [pTag]
     }
   where
-    pHashTag ::
+    pTag ::
       (Monad m, CM.IsInline il, HasHashTag il) =>
       CM.InlineParser m il
-    pHashTag = P.try $ do
+    pTag = P.try $ do
       _ <- symbol '#'
-      tag <- CM.untokenize <$> hashTagP
-      pure $ hashTag $ HashTag tag
-    hashTagP :: Monad m => P.ParsecT [CM.Tok] s m [CM.Tok]
-    hashTagP =
+      tag <- CM.untokenize <$> tagP
+      pure $ hashTag $ TT.Tag tag
+    tagP :: Monad m => P.ParsecT [CM.Tok] s m [CM.Tok]
+    tagP =
       some (noneOfToks $ [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation)
       where
         punctuation = "[];:,.?!"
