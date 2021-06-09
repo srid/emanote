@@ -54,6 +54,7 @@ modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
+           -- Insert folder placeholder automatically for ancestor paths
            >>> flip (foldr injectAncestor) (N.noteAncestors note)
        )
     >>> modelRels
@@ -67,22 +68,33 @@ modelInsertNote note =
           new = Rel.noteRels note
           deleteMany = foldr Ix.delete
        in new `Ix.union` (rels `deleteMany` old)
-    -- Automatically add notes corresponding to parent paths if a
-    -- corresponding .md does not exist.
-    injectAncestor :: N.RAncestor -> IxNote -> IxNote
-    injectAncestor ancestor ns =
-      let lmlR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
-       in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
-            Just _ -> ns
-            Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
+
+injectAncestor :: N.RAncestor -> IxNote -> IxNote
+injectAncestor ancestor ns =
+  let lmlR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
+   in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
+        Just _ -> ns
+        Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
 
 modelDeleteNote :: LinkableLMLRoute -> Model -> Model
 modelDeleteNote k =
-  modelNotes %~ Ix.deleteIx k
-    >>> modelRels %~ Ix.deleteIx k
+  modelNotes
+    %~ ( Ix.deleteIx k
+           -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+           >>> restoreFolderPlaceholder
+       )
+    >>> modelRels
+    %~ Ix.deleteIx k
     -- FIXME: If removing folder.md, this shoudn't remove children!
     -- Use `treeDeleteLeafPath` to ensure we remove only leaf paths.
-    >>> modelNav %~ PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)
+    >>> modelNav
+    %~ PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)
+  where
+    restoreFolderPlaceholder notes =
+      maybe notes (flip injectAncestor notes . N.RAncestor) $ do
+        let folderR = coerce $ R.linkableLMLRouteCase k
+        guard $ N.hasChildNotes folderR notes
+        pure folderR
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
