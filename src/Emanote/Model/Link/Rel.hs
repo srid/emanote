@@ -11,6 +11,7 @@ module Emanote.Model.Link.Rel where
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
+import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
@@ -50,16 +51,17 @@ instance Indexable RelIxs Rel where
 
 makeLenses ''Rel
 
-extractRels :: Note -> [Rel]
-extractRels note =
+noteRels :: Note -> IxSet RelIxs Rel
+noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
-    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> [Rel]
+    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxSet RelIxs Rel
     extractLinks m =
-      flip concatMap (Map.toList m) $ \(url, instances) -> do
-        flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-          target <- parseUnresolvedRelTarget attrs url
-          pure $ Rel (note ^. noteRoute) target ctx
+      Ix.fromList $
+        flip concatMap (Map.toList m) $ \(url, instances) -> do
+          flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
+            target <- parseUnresolvedRelTarget attrs url
+            pure $ Rel (note ^. noteRoute) target ctx
 
 unresolvedRelsTo :: LinkableRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
