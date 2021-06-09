@@ -48,7 +48,7 @@
                 ormolu
                 pkgs.nixpkgs-fmt
 
-                tailwindNix
+                # tailwindNix
               ]);
           };
       in
