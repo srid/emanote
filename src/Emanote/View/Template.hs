@@ -7,9 +7,7 @@ module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
-import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import qualified Ema
@@ -74,24 +72,13 @@ rendeSRTagIndex emaAction model = do
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Tags"
     "ema:tagindex"
-      ## Splices.listSplice tagIndex "each-tag"
+      ## Splices.listSplice (M.modelTags model) "each-tag"
       $ \(tag, notes) -> do
         "tag" ## HI.textSplice (HT.unTag tag)
         "notes"
           ## Splices.listSplice notes "each-note"
           $ \note ->
             PF.noteSplice model note
-  where
-    tagIndex =
-      model ^. M.modelNotes
-        & Ix.toList
-        & concatMap
-          ( \note ->
-              let tags = note ^. MN.noteMeta & MN.lookupAeson @[HT.Tag] [] (one "tags")
-               in tags <&> (,[note])
-          )
-        & Map.fromListWith (<>)
-        & Map.toAscList
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
