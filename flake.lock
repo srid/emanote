@@ -125,7 +125,24 @@
           "nixpkgs"
         ],
         "pandoc-link-context": "pandoc-link-context",
+        "tagtree": "tagtree",
         "tailwind": "tailwind"
+      }
+    },
+    "tagtree": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1623279971,
+        "narHash": "sha256-O8VHrbFDDLP6wo6BFK9UN1fHQyYsHYElJzYfT1B7O4c=",
+        "owner": "srid",
+        "repo": "tagtree",
+        "rev": "59d84f738722800f3a0ef942213a725eeb511900",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "tagtree",
+        "type": "github"
       }
     },
     "tailwind": {

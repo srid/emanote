@@ -62,6 +62,7 @@ executable emanote
     , relude
     , shower
     , tagged
+    , tagtree
     , text
     , time
     , unliftio
