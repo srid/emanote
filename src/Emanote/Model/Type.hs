@@ -81,12 +81,13 @@ modelDeleteNote k model =
   model & modelNotes
     %~ ( Ix.deleteIx k
            -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+           -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
            >>> maybe id restoreFolderPlaceholder mFolderR
        )
       & modelRels
     %~ Ix.deleteIx k
       & modelNav
-    %~ maybe id (const $ PathTree.treeDeleteLeafPath (R.unRoute . R.linkableLMLRouteCase $ k)) mFolderR
+    %~ maybe (PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
