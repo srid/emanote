@@ -77,24 +77,25 @@ injectAncestor ancestor ns =
         Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
 
 modelDeleteNote :: LinkableLMLRoute -> Model -> Model
-modelDeleteNote k =
-  modelNotes
+modelDeleteNote k model =
+  model & modelNotes
     %~ ( Ix.deleteIx k
            -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
-           >>> restoreFolderPlaceholder
+           >>> maybe id restoreFolderPlaceholder mFolderR
        )
-    >>> modelRels
+      & modelRels
     %~ Ix.deleteIx k
-    -- FIXME: If removing folder.md, this shoudn't remove children!
-    -- Use `treeDeleteLeafPath` to ensure we remove only leaf paths.
-    >>> modelNav
-    %~ PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)
+      & modelNav
+    %~ maybe id (const $ PathTree.treeDeleteLeafPath (R.unRoute . R.linkableLMLRouteCase $ k)) mFolderR
   where
-    restoreFolderPlaceholder notes =
-      maybe notes (flip injectAncestor notes . N.RAncestor) $ do
-        let folderR = coerce $ R.linkableLMLRouteCase k
-        guard $ N.hasChildNotes folderR notes
-        pure folderR
+    -- If the note being deleted is $folder.md *and* folder/ has .md files, this
+    -- will be `Just folderRoute`.
+    mFolderR = do
+      let folderR = coerce $ R.linkableLMLRouteCase k
+      guard $ N.hasChildNotes folderR $ model ^. modelNotes
+      pure folderR
+    restoreFolderPlaceholder =
+      injectAncestor . N.RAncestor
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
