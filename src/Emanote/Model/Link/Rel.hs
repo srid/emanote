@@ -51,11 +51,11 @@ instance Indexable RelIxs Rel where
 
 makeLenses ''Rel
 
-noteRels :: Note -> IxSet RelIxs Rel
+noteRels :: Note -> IxRel
 noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
-    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxSet RelIxs Rel
+    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
       Ix.fromList $
         flip concatMap (Map.toList m) $ \(url, instances) -> do
