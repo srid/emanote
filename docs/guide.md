@@ -30,6 +30,8 @@ Mega features,
 
 Known limitations
 
-- JS won't eval (properly) in live-server mode.
+- JS unreliability in live-server mode.
+	- PrismJS works
+	- MathJS does not
 - Fsnotify limitations
   - If doing a directory move/rename, restart emanote.
