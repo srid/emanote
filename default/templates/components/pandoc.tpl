@@ -6,14 +6,14 @@
   <Para class="my-3" />
   <Note:Ref>
     <!-- DoNotFormat -->
-    <sup class="px-0.5"><footnote:idx /></sup>
+    <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="#fn${footnote:idx}"><footnote:idx /></a></sup>
     <!-- DoNotFormat -->
   </Note:Ref>
   <Note:List>
     <ol title="Footnotes"
       class="list-decimal list-inside space-y-1 mt-4 pt-2 pl-2 border-t-2 text-gray-700">
       <footnote>
-        <li>
+        <li id="fn${footnote:idx}">
           <div class="inline-block">
             <footnote:content />
           </div>
