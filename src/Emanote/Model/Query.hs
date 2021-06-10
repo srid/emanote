@@ -17,14 +17,17 @@ import qualified Text.Megaparsec.Char as M
 import qualified Text.Show as Show
 
 data Query
-  = QueryByTag TagPattern
+  = QueryByTag HT.Tag
+  | QueryByTagPattern TagPattern
   | QueryByPath FilePath
   deriving (Eq)
 
 instance Show.Show Query where
   show = \case
-    QueryByTag pat ->
-      toString $ "Pages tagged #" <> HT.unTagPattern pat
+    QueryByTag tag ->
+      toString $ "Pages tagged #" <> HT.unTag tag
+    QueryByTagPattern pat ->
+      toString $ "Pages tagged by " <> HT.unTagPattern pat
     QueryByPath p ->
       "Pages under path '" <> p <> "'"
 
@@ -39,12 +42,15 @@ parseQuery = do
 
 queryParser :: M.Parsec Void Text Query
 queryParser = do
-  (M.string "tag:#" *> fmap (QueryByTag . HT.mkTagPattern . T.strip) M.takeRest)
+  (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
+    <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
     <|> (M.string "path:" *> fmap (QueryByPath . toString . T.strip) M.takeRest)
 
 runQuery :: Model -> Query -> [Note]
 runQuery model = \case
-  QueryByTag pat ->
+  QueryByTag tag ->
+    Ix.toList $ (model ^. modelNotes) @= tag
+  QueryByTagPattern pat ->
     -- TODO: We don't supporting filepattern-based matching (i.e., `foo/**`) yet.
     --
     -- Doing it requires some consideration, such as indexing it for effecient
