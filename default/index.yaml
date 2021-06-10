@@ -39,8 +39,8 @@ page:
   siteName: Emanote
   siteTitle: Emanote
   description: | 
-    Emanote -- Markdown static site generator and live server. Supports
-    Wiki-links, directories, HTML templates for complete theming.
+    Emanote -- create beautiful websites out of plain-text notes. Supports
+    Markdown, Wiki-links, directories, HTML templates for complete theming.
   headHtml: |
     <!-- Syntax highlighting -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
