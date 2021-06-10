@@ -27,16 +27,13 @@ queryResolvingSplice model HP.RenderCtx {..} blk = do
     pure blk
   guard $ List.elem "query" classes
   let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
-  -- TODO: This tag still remains in th>>e HTML; it should be removed.
   queryNode <- childElementTagWithClass "CodeBlock:Query" mOtherCls rootNode
-  let splices = do
-        "query"
-          ## HI.textSplice (show q)
-        "result"
-          ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery model q
   pure $
-    H.localHS (HI.bindSplices splices) $
-      HI.runNode queryNode
+    HP.runCustomNode queryNode $ do
+      "query"
+        ## HI.textSplice (show q)
+      "result"
+        ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery model q
   where
     childElementTagWithClass tag mCls node = do
       queryNodes <- nonEmpty $ X.childElementsTag tag node
