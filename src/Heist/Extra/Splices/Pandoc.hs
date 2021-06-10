@@ -9,6 +9,8 @@ module Heist.Extra.Splices.Pandoc
     -- | To delegate rendering of blocks and inlines from a custom splice.
     rpBlock,
     rpInline,
+    -- Related Heist helpers (for working with pandoc.tpl)
+    runCustomNode,
   )
 where
 
@@ -16,6 +18,7 @@ import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     mkRenderCtx,
+    runCustomNode,
   )
 import Heist.Extra.Splices.Pandoc.Footnotes (footnoteRefSplice, gatherFootnotes, renderFootnotesWith)
 import Heist.Extra.Splices.Pandoc.Render
