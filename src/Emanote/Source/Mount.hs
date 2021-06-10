@@ -177,7 +177,9 @@ onChange q roots = do
           Modified (rel -> fp) _ _ -> f x fp $ Update ()
           Removed (rel -> fp) _ _ -> f x fp Delete
           Unknown (rel -> fp) _ _ -> f x fp Delete
-    liftIO $ threadDelay maxBound `finally` forM_ stops id
+    liftIO $
+      threadDelay maxBound
+        `finally` (putTextLn "Stopping change monitor" >> forM_ stops id)
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>

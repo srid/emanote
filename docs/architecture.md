@@ -4,7 +4,9 @@ order: 99
 
 # Architecture
 
-Emanote transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website", and does so in a *reactive* manner such that as the source files change the resultant website updates in real-time. The hot-reload aspect is delegated to [Ema](https://ema.srid.ca/), but Emanote's high-level architecture is as follows,
+Emanote is a Haskell program that transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website", and does so in a [reactive](https://en.wikipedia.org/wiki/Reactive_programming) manner such that as the source files change the resultant website updates in real-time (thanks to [Ema](https://ema.srid.ca/)'s hot-reload). 
+
+Emanote's high-level architecture is as follows,
 
 - `Emanote.Source`: manages source files and communicates them to `Emanote.Model`.
   - The key concept here is the notion of "union mount", implemented by `Emanote.Source.Mount`, which will eventually be made its own Haskell library.
