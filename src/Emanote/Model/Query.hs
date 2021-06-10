@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Query where
@@ -12,6 +13,7 @@ import Emanote.Model.Type (Model, modelNotes, modelTags)
 import Emanote.Pandoc.Markdown.Syntax.HashTag (TagPattern)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route as R
+import System.FilePattern (FilePattern, (?==))
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as M
 import qualified Text.Show as Show
@@ -20,6 +22,7 @@ data Query
   = QueryByTag HT.Tag
   | QueryByTagPattern TagPattern
   | QueryByPath FilePath
+  | QueryByPathPattern FilePattern
   deriving (Eq)
 
 instance Show.Show Query where
@@ -30,6 +33,8 @@ instance Show.Show Query where
       toString $ "Pages tagged by '" <> HT.unTagPattern pat <> "'"
     QueryByPath p ->
       "Pages under path '" <> p <> "'"
+    QueryByPathPattern pat ->
+      "Pages matching path '" <> pat <> "'"
 
 parseQuery :: Text -> Maybe Query
 parseQuery = do
@@ -44,10 +49,15 @@ queryParser :: M.Parsec Void Text Query
 queryParser = do
   (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
     <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
-    <|> (M.string "path:" *> fmap (QueryByPath . toString . T.strip) M.takeRest)
+    <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
+  where
+    fromUserPath s =
+      if "*" `T.isInfixOf` s
+        then QueryByPathPattern (toString s)
+        else QueryByPath (toString s)
 
-runQuery :: Model -> Query -> [Note]
-runQuery model = \case
+runQuery :: Note -> Model -> Query -> [Note]
+runQuery currentNote model = \case
   QueryByTag tag ->
     Ix.toList $ (model ^. modelNotes) @= tag
   QueryByTagPattern pat ->
@@ -58,3 +68,21 @@ runQuery model = \case
     fromMaybe mempty $ do
       r <- R.mkRouteFromFilePath path
       pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
+  QueryByPathPattern (resolveDotInFilePattern -> pat) ->
+    let notes = Ix.toList $ model ^. modelNotes
+     in flip mapMaybe notes $ \note -> do
+          guard $ pat ?== (R.encodeRoute . R.linkableLMLRouteCase $ note ^. N.noteRoute)
+          pure note
+  where
+    -- Resolve the ./ prefix which will for substituting "$PWD" in current
+    -- note's route context.
+    resolveDotInFilePattern (toText -> pat) =
+      if "./" `T.isPrefixOf` pat
+        then
+          let folderR :: R.R 'R.Folder = coerce $ R.linkableLMLRouteCase $ currentNote ^. N.noteRoute
+           in if folderR == R.indexRoute
+                then -- If in "index.md", discard the ./
+                  toString (T.drop 2 pat)
+                else -- If in "$folder.md", discard the ./ and prepend with folder path prefix
+                  R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
+        else toString pat
