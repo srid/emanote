@@ -116,7 +116,7 @@ renderLmlHtml emaAction model note = do
     "ema:note:pandoc"
       ## Splices.pandocSplice
         rewriteClass
-        (PF.queryResolvingSplice model)
+        (PF.queryResolvingSplice note model)
         (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately

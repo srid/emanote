@@ -11,6 +11,7 @@ import qualified Ema
 import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
+import qualified Emanote.Route as R
 import qualified Emanote.View.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.Pandoc as HP
@@ -19,8 +20,8 @@ import qualified Heist.Splices.Json as HJ
 import qualified Text.Pandoc.Definition as B
 import qualified Text.XmlHtml as X
 
-queryResolvingSplice :: Monad n => Model -> HP.RenderCtx n -> B.Block -> Maybe (HI.Splice n)
-queryResolvingSplice model HP.RenderCtx {..} blk = do
+queryResolvingSplice :: Monad n => MN.Note -> Model -> HP.RenderCtx n -> B.Block -> Maybe (HI.Splice n)
+queryResolvingSplice currentNote model HP.RenderCtx {..} blk = do
   B.CodeBlock
     (_id', classes, _attrs)
     (Q.parseQuery -> Just q) <-
@@ -33,7 +34,7 @@ queryResolvingSplice model HP.RenderCtx {..} blk = do
       "query"
         ## HI.textSplice (show q)
       "result"
-        ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery model q
+        ## (HI.runChildrenWith . noteSplice model) `foldMapM` Q.runQuery currentNote model q
   where
     childElementTagWithClass tag mCls node = do
       queryNodes <- nonEmpty $ X.childElementsTag tag node
