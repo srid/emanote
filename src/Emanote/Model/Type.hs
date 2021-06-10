@@ -146,8 +146,8 @@ modelLookupBacklinks r model =
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
-modelLookupStaticFileByRoute r model = do
-  Ix.getOne . Ix.getEQ r . _modelStaticFiles $ model
+modelLookupStaticFileByRoute r =
+  Ix.getOne . Ix.getEQ r . _modelStaticFiles
 
 modelTags :: Model -> [(HT.Tag, [Note])]
 modelTags =
