@@ -22,6 +22,7 @@ import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
+import Heist.Extra.Splices.Pandoc.Render (plainify)
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
@@ -94,7 +95,7 @@ noteTitle Note {..} =
   where
     getPandocTitle :: Pandoc -> Maybe Text
     getPandocTitle =
-      fmap Markdown.plainify . getPandocH1
+      fmap plainify . getPandocH1
       where
         getPandocH1 :: Pandoc -> Maybe [B.Inline]
         getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =

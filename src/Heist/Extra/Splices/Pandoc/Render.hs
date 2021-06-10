@@ -9,11 +9,11 @@ module Heist.Extra.Splices.Pandoc.Render
     rpInline,
     rpBlock',
     rpInline',
+    plainify,
   )
 where
 
 import qualified Data.Text as T
-import qualified Ema.Helper.Markdown as Markdown
 import Heist.Extra.Splices.Pandoc.Attr (addAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
@@ -22,6 +22,7 @@ import Heist.Extra.Splices.Pandoc.Ctx
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.Pandoc.Walk as W
 import qualified Text.XmlHtml as X
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
@@ -174,7 +175,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
     let attrs = [("href", url), ("title", tit)] <> rpAttr (addAttr attr $ iAttr i)
     one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
   B.Image attr is (url, tit) -> do
-    let attrs = [("src", url), ("title", tit), ("alt", Markdown.plainify is)] <> rpAttr attr
+    let attrs = [("src", url), ("title", tit), ("alt", plainify is)] <> rpAttr attr
     pure $ one . X.Element "img" attrs $ mempty
   B.Note bs -> do
     one . X.Element "aside" mempty
@@ -198,3 +199,18 @@ rawNode :: Text -> Text -> [X.Node]
 rawNode wrapperTag s =
   one . X.Element wrapperTag (one ("xmlhtmlRaw", "")) $
     one . X.TextNode $ s
+
+-- | Convert Pandoc AST inlines to raw text.
+plainify :: [B.Inline] -> Text
+plainify = W.query $ \case
+  B.Str x -> x
+  B.Code _attr x -> x
+  B.Space -> " "
+  B.SoftBreak -> " "
+  B.LineBreak -> " "
+  B.RawInline _fmt s -> s
+  -- TODO: How to wrap math stuff here?
+  B.Math _mathTyp s -> s
+  -- Ignore the rest of AST nodes, as they are recursively defined in terms of
+  -- `Inline` which `W.query` will traverse again.
+  _ -> ""
