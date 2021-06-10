@@ -135,13 +135,19 @@ renderFootnotesWith ctx = \case
   footnotes -> do
     let footnotesWithIdx = zip [1 :: Int ..] footnotes
     -- TODO: Allow styling pandoc.tpl
-    fmap (one . X.Element "ol" [("class", "list-decimal list-inside mt-4 pl-2 border-t-2 text-gray-700")]) $
+    fmap (one . X.Element "ol" [("title", "Footnotes"), ("class", "list-decimal list-inside space-y-1 mt-4 pt-2 pl-2 border-t-2 text-gray-700")]) $
       flip foldMapM footnotesWithIdx $
         fmap (one . X.Element "li" mempty) . uncurry rpFootnote
   where
     -- TODO: Use index to create hyperlinks
     rpFootnote :: Int -> [B.Block] -> HI.Splice n
-    rpFootnote _idx blk = one . X.Element "div" [("class", "inline-block")] <$> foldMapM (rpBlock ctx) blk
+    rpFootnote _idx bs =
+      one . X.Element "div" [("class", "inline-block")] <$> case bs of
+        [B.Para is] ->
+          -- Optimize for the most usual case, but discarding the paragraph, which adds unnecessary styling.
+          foldMapM (rpInline ctx) is
+        _ ->
+          foldMapM (rpBlock ctx) bs
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =
