@@ -22,23 +22,23 @@ import qualified Text.Pandoc.Definition as B
 urlResolvingSplice :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
 urlResolvingSplice emaAction model ctx =
   let ctxTerm = ctx {HP.blockSplice = const Nothing, HP.inlineSplice = const Nothing}
-   in Just . HP.rpInline ctxTerm . handleInline
+   in fmap (HP.rpInline ctxTerm) . handleInline
   where
     handleInline inl =
       case inl of
         B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
-          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+          pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
             Left err ->
               B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
             Right (newIs, newUrl) ->
               B.Link attr newIs (newUrl, tit)
         B.Image attr@(_id, _class, otherAttrs) is (url, tit) ->
-          case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+          pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
             Left err ->
               B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
             Right (newIs, newUrl) ->
               B.Image attr newIs (newUrl, tit)
-        _ -> inl
+        _ -> Nothing
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =

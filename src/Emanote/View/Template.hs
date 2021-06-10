@@ -108,13 +108,13 @@ renderLmlHtml emaAction model note = do
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile source)
         "backlink:note:context"
-          ## Splices.pandocSpliceWithCustomClass
+          ## Splices.pandocSplice
             rewriteClass
             (const . const $ Nothing)
             (PF.urlResolvingSplice emaAction model)
           $ ctxDoc
     "ema:note:pandoc"
-      ## Splices.pandocSpliceWithCustomClass
+      ## Splices.pandocSplice
         rewriteClass
         (PF.queryResolvingSplice model)
         (PF.urlResolvingSplice emaAction model)
