@@ -4,8 +4,23 @@
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
   <Para class="my-3" />
-  <!-- FIXME: See the TODO in Pandoc.hs -->
-  <Note class="inline-block float-right clear-right w-2/5 text-left bg-red-100" />
+  <Note:Ref>
+    <!-- DoNotFormat -->
+    <sup class="px-0.5"><footnote:idx /></sup>
+    <!-- DoNotFormat -->
+  </Note:Ref>
+  <Note:List>
+    <ol title="Footnotes"
+      class="list-decimal list-inside space-y-1 mt-4 pt-2 pl-2 border-t-2 text-gray-700">
+      <footnote>
+        <li>
+          <div class="inline-block">
+            <footnote:content />
+          </div>
+        </li>
+      </footnote>
+    </ol>
+  </Note:List>
   <CodeBlock class="py-0.5 text-sm" />
   <Code class="py-0.5 bg-gray-100 text-sm" />
   <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
