@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -14,6 +15,7 @@ module Heist.Extra.Splices.Pandoc
   )
 where
 
+import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Ema.Helper.Markdown as Markdown
@@ -21,6 +23,7 @@ import qualified Heist as H
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
+import qualified Text.Pandoc.Walk as W
 import qualified Text.XmlHtml as X
 
 pandocSplice :: Monad n => Pandoc -> HI.Splice n
@@ -52,15 +55,37 @@ pandocSpliceWithCustomClass classMap bS iS doc = do
           classMap
           (bS ctx)
           (iS ctx)
-  renderPandocWith ctx doc
+          (gatherFootnotes doc)
+  docNodes <- renderPandocWith ctx doc
+  footnotesNodes <- renderFootnotesWith (ctx {footnotes = []}) $ footnotes ctx
+  pure $ docNodes <> footnotesNodes
+
+type Footnotes = [[B.Block]]
+
+gatherFootnotes :: Pandoc -> Footnotes
+gatherFootnotes = W.query $ \case
+  B.Note footnote ->
+    [footnote]
+  _ ->
+    []
+
+lookupFootnote :: HasCallStack => [B.Block] -> Footnotes -> Int
+lookupFootnote note fs =
+  fromMaybe (error $ "Missing footnote: " <> show note) $ do
+    (+ 1) <$> List.elemIndex note fs
 
 data RenderCtx n = RenderCtx
   { rootNode :: X.Node,
+    -- Attributes for a given AST node.
     bAttr :: B.Block -> B.Attr,
     iAttr :: B.Inline -> B.Attr,
+    -- Class attribute rewrite rules
     classMap :: Map Text Text,
+    -- Custom render functions for AST nodes.
     blockSplice :: B.Block -> Maybe (HI.Splice n),
-    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
+    inlineSplice :: B.Inline -> Maybe (HI.Splice n),
+    -- Footnotes gathered in advance
+    footnotes :: Footnotes
   }
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
@@ -103,6 +128,20 @@ attrFromNode node =
       id' = fromMaybe "" $ X.getAttribute "id" node
       attrs = filter ((/= "class") . fst) $ X.elementAttrs node
    in (id', mClass, attrs)
+
+renderFootnotesWith :: forall n. Monad n => RenderCtx n -> Footnotes -> HI.Splice n
+renderFootnotesWith ctx = \case
+  [] -> pure []
+  footnotes -> do
+    let footnotesWithIdx = zip [1 :: Int ..] footnotes
+    -- TODO: Allow styling pandoc.tpl
+    fmap (one . X.Element "ol" [("class", "list-decimal list-inside mt-4 pl-2 border-t-2 text-gray-700")]) $
+      flip foldMapM footnotesWithIdx $
+        fmap (one . X.Element "li" mempty) . uncurry rpFootnote
+  where
+    -- TODO: Use index to create hyperlinks
+    rpFootnote :: Int -> [B.Block] -> HI.Splice n
+    rpFootnote _idx blk = one . X.Element "div" [("class", "inline-block")] <$> foldMapM (rpBlock ctx) blk
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =
@@ -257,12 +296,11 @@ rpInline' ctx@RenderCtx {..} i = case i of
     let attrs = [("src", url), ("title", tit), ("alt", Markdown.plainify is)] <> rpAttr attr
     pure $ one . X.Element "img" attrs $ mempty
   B.Note bs -> do
-    -- TODO: Style this properly to be Tufte like. Maybe integrate https://edwardtufte.github.io/tufte-css/
-    noteBody <- foldMapM (rpBlock ctx) bs
-    pure
-      [ X.Element "sup" [("style", "margin-left: 3px;")] $ one . X.TextNode $ "node",
-        X.Element "div" (rpAttr $ iAttr i) noteBody
-      ]
+    let idx = lookupFootnote bs footnotes
+    -- TODO: Allow styling via pandoc.tpl
+    pure $
+      one $
+        X.Element "sup" [("class", "px-0.5")] $ one . X.TextNode $ show idx
   B.Span attr is ->
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr) <$> foldMapM (rpInline ctx) is
   x ->
