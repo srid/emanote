@@ -89,7 +89,7 @@ Milestone (notes.srid.ca),
   - Queries
     - [x] Query by tag (in code block)
     - [x] Date in queries (requires Heist withJson changes)
-		- [ ] Hierarchical tags?
+		- [x] Hierarchical tags?
 - [ ] Theme touches
   - dd styling
 - Nice to have, but not essential

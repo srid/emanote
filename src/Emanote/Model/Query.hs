@@ -3,12 +3,12 @@
 module Emanote.Model.Query where
 
 import Control.Lens.Operators ((^.))
-import Data.IxSet.Typed ((@=))
+import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Text as T
 import Emanote.Model.Note (Note)
 import qualified Emanote.Model.Note as N
-import Emanote.Model.Type (Model, modelNotes)
+import Emanote.Model.Type (Model, modelNotes, modelTags)
 import Emanote.Pandoc.Markdown.Syntax.HashTag (TagPattern)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route as R
@@ -27,7 +27,7 @@ instance Show.Show Query where
     QueryByTag tag ->
       toString $ "Pages tagged #" <> HT.unTag tag
     QueryByTagPattern pat ->
-      toString $ "Pages tagged by " <> HT.unTagPattern pat
+      toString $ "Pages tagged by '" <> HT.unTagPattern pat <> "'"
     QueryByPath p ->
       "Pages under path '" <> p <> "'"
 
@@ -51,12 +51,9 @@ runQuery model = \case
   QueryByTag tag ->
     Ix.toList $ (model ^. modelNotes) @= tag
   QueryByTagPattern pat ->
-    -- TODO: We don't supporting filepattern-based matching (i.e., `foo/**`) yet.
-    --
-    -- Doing it requires some consideration, such as indexing it for effecient
-    -- access. Or not?
-    let asTag = HT.Tag $ toText $ HT.unTagPattern pat
-     in Ix.toList $ (model ^. modelNotes) @= asTag
+    let allTags = fst <$> modelTags model
+        matchingTags = filter (HT.tagMatch pat) allTags
+     in Ix.toList $ (model ^. modelNotes) @+ matchingTags
   QueryByPath path ->
     fromMaybe mempty $ do
       r <- R.mkRouteFromFilePath path
