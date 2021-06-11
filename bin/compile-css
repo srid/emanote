@@ -1,0 +1,17 @@
+#!/usr/bin/env nix-shell 
+#! nix-shell ../shell.nix -i bash
+set -xe
+
+OUTPUTDIR=$1
+
+echo "Compiling CSS ..."
+pushd ${OUTPUTDIR}/
+find . -name \*.html -print0 | xargs -0 \
+  windicss -t -o emanote-compiled.css
+
+echo "Patching HTML ..."
+
+find . -name \*.html -print0 | xargs -0 \
+	sed -i -n '/CSSSTART/{p;:a;N;/CSSEND/!ba;s/.*\n/\t<link rel="stylesheet" href="style.css" \/>\n/};p'
+
+popd 
