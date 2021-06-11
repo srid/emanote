@@ -51,13 +51,13 @@
     <h5 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
   </Header>
-  <CodeBlock:Query>
+  <CodeBlock:Query class="legacy">
     <div class="px-4 py-2 border-2 rounded">
       <header class="mb-2 font-bold text-gray-800">
         <query />
       </header>
       <!-- This should be a grid -->
-      <div class="flex flex-col space-y-1">
+      <div class="flex flex-col space-y-2">
         <result>
           <div class="flex items-center">
             <a class="text-${theme}-600 font-bold hover:underline" href="${note:url}">
@@ -68,28 +68,50 @@
       </div>
     </div>
   </CodeBlock:Query>
-  <!-- TODO: DRY (same as above, except for date column)-->
-  <CodeBlock:Query class="timeline">
-    <div class="px-4 py-2 border-2 rounded">
-      <header class="mb-2 font-bold text-gray-800">
-        <query />
-      </header>
+  <CodeBlock:Query>
+    <nav>
       <!-- This should be a grid -->
-      <div class="flex flex-col space-y-1">
+      <div class="grid grid-cols-12 gap-2 mt-4">
+        <span class="col-span-1"></span>
+        <header class="col-span-11 pb-2 mb-2 font-semibold text-gray-600 border-b-2">
+          <query />
+        </header>
         <result>
-          <div class="flex items-center">
-            <note:metadata>
-              <span class="mr-4">
-                <value var="date" />
-              </span>
-            </note:metadata>
-            <a class="text-${theme}-600 font-bold hover:underline" href="${note:url}">
-              <note:title />
-            </a>
-          </div>
+          <note:metadata>
+            <span class="col-span-1 pr-2 mr-2 text-right text-gray-600 border-r-2 ">
+
+            </span>
+          </note:metadata>
+          <a class="col-span-11 text-${theme}-600 font-bold hover:underline" href="${note:url}">
+            <note:title />
+          </a>
         </result>
       </div>
-    </div>
+    </nav>
+  </CodeBlock:Query>
+
+
+  <!-- TODO: DRY (same as above, except for date column)-->
+  <CodeBlock:Query class="timeline">
+    <nav>
+      <!-- This should be a grid -->
+      <div class="grid grid-cols-12 gap-2 mt-4">
+        <span class="col-span-3"></span>
+        <header class="col-span-9 pb-2 mb-2 font-semibold text-gray-600 border-b-2">
+          <query />
+        </header>
+        <result>
+          <note:metadata>
+            <span class="col-span-3 pr-2 mr-2 text-right text-gray-600 border-r-2">
+              <value var="date" />
+            </span>
+          </note:metadata>
+          <a class="col-span-9 text-${theme}-600 font-bold hover:underline" href="${note:url}">
+            <note:title />
+          </a>
+        </result>
+      </div>
+    </nav>
   </CodeBlock:Query>
 
 
