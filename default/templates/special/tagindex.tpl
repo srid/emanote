@@ -24,7 +24,7 @@
               <ema:tagindex>
                 <div>
                   <each-tag>
-                    <h2 name="${tag}" title="Tag"
+                    <h2 id="${tag}" title="Tag"
                       class="py-1 font-mono font-bold text-gray-700 text-l">
                       <!-- DoNotFormat -->
                       #<tag />
