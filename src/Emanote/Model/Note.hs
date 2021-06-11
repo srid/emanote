@@ -117,10 +117,6 @@ noteHtmlRoute note@Note {..} =
     Just slug ->
       R.mkRouteFromSlug slug
 
-notePath :: Note -> FilePath
-notePath =
-  R.encodeRoute . R.linkableLMLRouteCase . _noteRoute
-
 singleNote :: HasCallStack => [Note] -> Maybe Note
 singleNote ns = do
   res@(x :| xs) <- nonEmpty ns
