@@ -21,7 +21,7 @@
   </div>
 
 </ema:breadcrumbs>
-<h1 class="flex items-center justify-center mt-2 text-4xl font-extrabold text-black bg-white">
+<h1 class="flex items-center justify-center mt-2 text-5xl font-extrabold text-black bg-white">
   <a>
     <ema:note:title />
   </a>
