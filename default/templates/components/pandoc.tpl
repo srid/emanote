@@ -42,7 +42,6 @@
   <Code class="py-0.5 bg-gray-100 text-sm" />
   <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
   <BulletList class="ml-4 space-y-1 list-disc list-inside" />
-  <!-- TODO: Table styling -->
   <Header>
     <h1 class="pb-2 mt-4 mb-2 text-5xl font-bold text-center" />
     <h2 class="mt-4 mb-4 text-4xl font-bold text-gray-700" />

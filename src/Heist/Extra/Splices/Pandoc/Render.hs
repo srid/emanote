@@ -106,19 +106,22 @@ rpBlock' ctx@RenderCtx {..} b = case b of
   B.HorizontalRule ->
     pure $ one $ X.Element "hr" mempty mempty
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
+    -- TODO: Move tailwind styles to pandoc.tpl
+    let rowStyle = [("class", "border-b-2 border-gray-100")]
+        cellStyle = [("class", "py-2")]
     -- TODO: Apply captions, colSpec, etc.
     fmap (one . X.Element "table" (rpAttr attr)) $ do
       thead <- fmap (one . X.Element "thead" mempty) $
         flip foldMapM hrows $ \(B.Row _ cells) ->
-          fmap (one . X.Element "tr" mempty) $
+          fmap (one . X.Element "tr" rowStyle) $
             flip foldMapM cells $ \(B.Cell _ _ _ _ blks) ->
-              one . X.Element "th" mempty <$> foldMapM (rpBlock ctx) blks
+              one . X.Element "th" cellStyle <$> foldMapM (rpBlock ctx) blks
       tbody <- fmap (one . X.Element "tbody" mempty) $
         flip foldMapM tbodys $ \(B.TableBody _ _ _ rows) ->
           flip foldMapM rows $ \(B.Row _ cells) ->
-            fmap (one . X.Element "tr" mempty) $
+            fmap (one . X.Element "tr" rowStyle) $
               flip foldMapM cells $ \(B.Cell _ _ _ _ blks) ->
-                one . X.Element "td" mempty <$> foldMapM (rpBlock ctx) blks
+                one . X.Element "td" cellStyle <$> foldMapM (rpBlock ctx) blks
       pure $ thead <> tbody
   B.Div attr bs ->
     one . X.Element "div" (rpAttr $ rewriteClass ctx attr)
