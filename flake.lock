@@ -148,11 +148,11 @@
     "tailwind": {
       "flake": false,
       "locked": {
-        "lastModified": 1620858460,
-        "narHash": "sha256-j3N9uemn96qzWUtqIEX81ivYF6zFxaqAhEDUztn1Tps=",
+        "lastModified": 1623452657,
+        "narHash": "sha256-CqHBwgvXW9984EIHmoAuB3kMSdv5kNTlkV25XrVQzN4=",
         "owner": "srid",
         "repo": "tailwind-nix",
-        "rev": "4ebb92f645b389abe93be9c892396c1a8bebe07a",
+        "rev": "9cab9baff1db4752175d9efaa622176c6867652a",
         "type": "github"
       },
       "original": {
