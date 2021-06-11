@@ -45,7 +45,7 @@
               </svg>
             </a>
           </div>
-          <div class="pt-1 pb-2 rounded bg-${theme}-50 border-2 shadow-lg">
+          <div class="pt-1 pb-2 rounded bg-${theme}-50 border-2 border-${theme}-200 shadow-inner">
             <ema:route-tree>
               <apply template="components/sidebar-tree" />
             </ema:route-tree>
