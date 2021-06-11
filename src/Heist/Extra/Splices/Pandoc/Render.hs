@@ -13,11 +13,14 @@ module Heist.Extra.Splices.Pandoc.Render
   )
 where
 
+import Data.Map.Syntax ((##))
 import qualified Data.Text as T
+import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Attr (addAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     rewriteClass,
+    runCustomNode,
   )
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
@@ -37,12 +40,20 @@ rpBlock ctx@RenderCtx {..} b = do
     Just userSplice ->
       userSplice
 
+-- | Render using user override in pandoc.tpl, falling back to default HTML.
+withTplTag :: Monad n => RenderCtx n -> Text -> H.Splices (HI.Splice n) -> HI.Splice n -> HI.Splice n
+withTplTag RenderCtx {..} name splices default_ =
+  case X.childElementTag name rootNode of
+    Nothing -> default_
+    Just node -> runCustomNode node splices
+
 rpBlock' :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
 rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
     foldMapM (rpInline ctx) is
-  B.Para is ->
-    one . X.Element "p" (rpAttr $ bAttr b) <$> foldMapM (rpInline ctx) is
+  B.Para is -> do
+    withTplTag ctx "Para" ("inlines" ## rpInline ctx `foldMapM` is) $
+      one . X.Element "p" mempty <$> foldMapM (rpInline ctx) is
   B.LineBlock iss ->
     flip foldMapM iss $ \is ->
       foldMapM (rpInline ctx) is >> pure [X.TextNode "\n"]
@@ -71,7 +82,8 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       _ ->
         one . X.Element "pre" [("class", "pandoc-raw-" <> show fmt)] $ one . X.TextNode $ s
   B.BlockQuote bs ->
-    one . X.Element "blockquote" (rpAttr $bAttr b) <$> foldMapM (rpBlock ctx) bs
+    withTplTag ctx "BlockQuote" ("blocks" ## rpBlock ctx `foldMapM` bs) $
+      one . X.Element "blockquote" mempty <$> foldMapM (rpBlock ctx) bs
   B.OrderedList _ bss ->
     fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
       flip foldMapM bss $
@@ -186,7 +198,8 @@ rpInline' ctx@RenderCtx {..} i = case i of
     foldMapM (rpInline ctx) is
   B.Cite _citations is ->
     -- TODO: What to do with _citations here?
-    one . X.Element "cite" mempty <$> foldMapM (rpInline ctx) is
+    withTplTag ctx "Cite" ("inlines" ## rpInline ctx `foldMapM` is) $
+      one . X.Element "cite" mempty <$> foldMapM (rpInline ctx) is
   where
     inQuotes :: Monad n => HI.Splice n -> B.QuoteType -> HI.Splice n
     inQuotes w = \case
