@@ -57,13 +57,11 @@ rpBlock' ctx@RenderCtx {..} b = case b of
   B.LineBlock iss ->
     flip foldMapM iss $ \is ->
       foldMapM (rpInline ctx) is >> pure [X.TextNode "\n"]
-  B.CodeBlock (id', classes, attrs) s -> do
-    -- PrismJS friendly classes
-    let classes' = flip concatMap classes $ \cls -> [cls, "language-" <> cls]
+  B.CodeBlock (id', mkLangClass -> classes, attrs) s -> do
     pure $
       one . X.Element "div" (rpAttr $ bAttr b) $
-        one . X.Element "pre" (rpAttr (id', classes', attrs)) $
-          one . X.Element "code" (rpAttr ("", classes', [])) $
+        one . X.Element "pre" mempty $
+          one . X.Element "code" (rpAttr (id', classes, attrs)) $
             one $ X.TextNode s
   B.RawBlock (B.Format fmt) s -> do
     pure $ case fmt of
@@ -128,6 +126,22 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       <$> foldMapM (rpBlock ctx) bs
   B.Null ->
     pure []
+  where
+    mkLangClass classes' =
+      -- Tag code block with "foo language-foo" classes, if the user specified
+      -- "foo" as the language identifier. This enables external syntax
+      -- highlighters to detect the language.
+      --
+      -- If no language is specified, use "language-none" as the language This
+      -- works at least on prism.js,[1] in that - syntax highlighting is turned
+      -- off all the while background styling is applied, to be consistent with
+      -- code blocks with language set.
+      --
+      -- [1] https://github.com/PrismJS/prism/pull/2738
+      fromMaybe ["language-none"] $ do
+        classes <- nonEmpty classes'
+        let lang = head classes
+        pure $ lang : ("language-" <> lang) : tail classes
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
