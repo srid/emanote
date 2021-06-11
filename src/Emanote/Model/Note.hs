@@ -86,7 +86,15 @@ hasChildNotes r =
 
 noteTags :: Note -> [HT.Tag]
 noteTags =
-  fmap HT.Tag . lookupAeson mempty (one "tags") . _noteMeta
+  fmap HT.Tag . fromMaybe mempty . lookupMeta (one "tags")
+
+noteSlug :: Note -> Maybe Slug
+noteSlug =
+  lookupMeta (one "slug")
+
+lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
+lookupMeta k =
+  lookupAeson Nothing k . _noteMeta
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
@@ -102,10 +110,6 @@ noteTitle Note {..} =
           Just inlines
         getPandocH1 _ =
           Nothing
-
-noteSlug :: Note -> Maybe Slug
-noteSlug =
-  lookupAeson Nothing (one "slug") . _noteMeta
 
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html

@@ -81,26 +81,12 @@ Before tests (tasks impacting the larger architectural context in code base),
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
 
-Milestone (notes.srid.ca),
-
-- [x] Footnotes
-- [x] Custom route slugs https://github.com/srid/emanote/discussions/42
-- Blog post friendly
-  - Queries
-    - [x] Query by tag (in code block)
-    - [x] Date in queries (requires Heist withJson changes)
-		- [x] Hierarchical tags?
-- Theme touches
-  - [x] Timeline query styling (use CSS grid)
-  - [x] Ugly footnote empty line with multi-block notes
-  - [ ] Final website look (not boring)
-- [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
-- Nice to have, but not essential
-  - RSS feeds
-    - [ ] Or switch to email lists.
-
 To triage,
 
+- [ ] RSS
+- [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
+  - `.timeline` query in particular should be sort by date
+  - calendar children shoiuld be sorted by name (thus day), just as other notes?
 - [ ] dd styling
 - [ ] Table styling
 - [x] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
@@ -152,4 +138,18 @@ Initial MVP,
 - [x] Avoid "Ema - Ema" kind of title. Pass ifIndexRoute splice?
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
+
+Milestone (notes.srid.ca),
+
+- [x] Footnotes
+- [x] Custom route slugs https://github.com/srid/emanote/discussions/42
+- Blog post friendly
+  - Queries
+    - [x] Query by tag (in code block)
+    - [x] Date in queries (requires Heist withJson changes)
+		- [x] Hierarchical tags?
+- Theme touches
+  - [x] Timeline query styling (use CSS grid)
+  - [x] Ugly footnote empty line with multi-block notes
+  - [x] Final website look (not boring)
 

@@ -156,11 +156,11 @@ routeTreeSplice mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
-               ( Meta.lookupMeta @Int 0 (one "order") tr model,
+               ( Meta.lookupRouteMeta @Int 0 (one "order") tr model,
                  maybe (R.routeBaseName . R.linkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
                )
              getCollapsed tr =
-               Meta.lookupMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+               Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
              mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.linkableLMLRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do

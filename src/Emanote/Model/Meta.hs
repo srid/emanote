@@ -18,8 +18,8 @@ import qualified Emanote.Model.SData as SData
 import qualified Emanote.Route as R
 
 -- | Look up a specific key in the meta for a given route.
-lookupMeta :: FromJSON a => a -> NonEmpty Text -> R.LinkableLMLRoute -> Model -> a
-lookupMeta x k r =
+lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LinkableLMLRoute -> Model -> a
+lookupRouteMeta x k r =
   lookupAeson x k . getEffectiveRouteMeta r
 
 -- | Get the (final) metadata of a note at the given route, by merging it with

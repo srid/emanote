@@ -59,11 +59,11 @@ queryParser = do
 runQuery :: Note -> Model -> Query -> [Note]
 runQuery currentNote model = \case
   QueryByTag tag ->
-    Ix.toList $ (model ^. modelNotes) @= tag
+    sortByDateOrTitle $ Ix.toList $ (model ^. modelNotes) @= tag
   QueryByTagPattern pat ->
     let allTags = fst <$> modelTags model
         matchingTags = filter (HT.tagMatch pat) allTags
-     in Ix.toList $ (model ^. modelNotes) @+ matchingTags
+     in sortByDateOrTitle $ Ix.toList $ (model ^. modelNotes) @+ matchingTags
   QueryByPath path ->
     fromMaybe mempty $ do
       r <- R.mkRouteFromFilePath path
@@ -86,3 +86,8 @@ runQuery currentNote model = \case
                 else -- If in "$folder.md", discard the ./ and prepend with folder path prefix
                   R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
         else toString pat
+    -- HACK: Until we have a proper search support
+    sortByDateOrTitle =
+      sortOn $
+        Down . \note ->
+          (N.lookupMeta @Text (one "date") note, N.noteTitle note)
