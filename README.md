@@ -28,9 +28,11 @@ emanote -C /path/to/notebook gen /tmp/output
 
 ### Examples
 
-* [ema.srid.ca](https://ema.srid.ca) (generated from [these sources](https://github.com/srid/emanote/tree/master/docs)).
-* [Haskell KB](https://taylor.fausak.me/haskell-knowledge-base/) (generated from [these sources](https://github.com/tfausak/haskell-knowledge-base))
-* [Unofficial r/TheMotte Wiki](https://themotte.zettel.page/)
+Emanote is suitable for creating ...
+* ... **project** sites, such as: [ema.srid.ca](https://ema.srid.ca) (view [source](https://github.com/srid/emanote/tree/master/docs)).
+* ... **knowledgebase** sites, such as: [Haskell KB](https://taylor.fausak.me/haskell-knowledge-base/) (view [source](https://github.com/tfausak/haskell-knowledge-base))
+* ... **wiki**/**Zettelkasten** sites, such as: [Unofficial r/TheMotte Wiki](https://themotte.zettel.page/) (view [source](https://github.com/Kuratoro/TheMotte.zettel.page))
+* ... even **personal website**/**blogs**, such as: [www.srid.ca](https://www.srid.ca/) (view [source](https://github.com/srid/www.srid.ca))
 
 ## Developing
 
