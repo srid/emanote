@@ -3,7 +3,7 @@ on:
   # Run only when pushing to master branch
   push:
     branches:
-      - master
+      - windicss
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -39,10 +39,10 @@ jobs:
         run: |
           mkdir ./output
           nix run . -- -C ./docs gen $(pwd)/output
+          bin/compile-css $(pwd)/output
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: output
           cname: note.ema.srid.ca
- 
