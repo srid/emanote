@@ -2,16 +2,23 @@
 #! nix-shell ../shell.nix -i bash
 set -xe
 
+# This script will migrate a Emanote-generated static site from using twind shim
+# (dynamic) to windicss compiled CSS (static).
+
 OUTPUTDIR=$1
 
+# Produce a CSS file that contains only the Tailwind styles in use by the
+# generated HTML files.
 echo "Compiling CSS ..."
 pushd ${OUTPUTDIR}/
 find . -name \*.html -print0 | xargs -0 \
   windicss -t -o emanote-compiled.css
 
+# Then, replace the twind shim with our generated CSS in all HTML files.
+# 
+# The `sed` hack is from https://fahdshariff.blogspot.com/2012/12/sed-mutli-line-replacement-between-two.html
 echo "Patching HTML ..."
-
 find . -name \*.html -print0 | xargs -0 \
-	sed -i -n '/CSSSTART/{p;:a;N;/CSSEND/!ba;s/.*\n/\t<link rel="stylesheet" href="style.css" \/>\n/};p'
+	sed -i -n '/CSSSTART/{p;:a;N;/CSSEND/!ba;s/.*\n/\t<link rel="stylesheet" href="emanote-compiled.css" \/>\n/};p'
 
 popd 
