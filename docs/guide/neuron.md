@@ -5,7 +5,9 @@ TODO
 Neuron notes should mostly work, except for the below:
 
 - `z:zettels` => Obsidian-style queries
+  - Query results do not impact graph connections (thus backlinks). If you want to establish connections to multiple notes, do it by explicitly linking to them individually. Emanote chose this option, because it was simpler to implement. Users are encouraged to try to persuade the author otherwise if there is a compelling rationale.
 - Full path based URLs (unless `slug` is set)
+- No RSS support yet.
 
 Capabilities Emanote provides, but neuron does not:
 
