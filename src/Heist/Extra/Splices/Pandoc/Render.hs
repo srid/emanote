@@ -182,9 +182,11 @@ rpInline' ctx@RenderCtx {..} i = case i of
       <$> foldMapM (rpBlock ctx) bs
   B.Span attr is ->
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr) <$> foldMapM (rpInline ctx) is
-  x ->
-    -- TODO: Implement these
-    pure $ one . X.Element "pre" mempty $ one . X.TextNode $ show x
+  B.SmallCaps is ->
+    foldMapM (rpInline ctx) is
+  B.Cite _citations is ->
+    -- TODO: What to do with _citations here?
+    one . X.Element "cite" mempty <$> foldMapM (rpInline ctx) is
   where
     inQuotes :: Monad n => HI.Splice n -> B.QuoteType -> HI.Splice n
     inQuotes w = \case

@@ -11,7 +11,6 @@ import qualified Ema
 import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
-import qualified Emanote.Route as R
 import qualified Emanote.View.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.Pandoc as HP

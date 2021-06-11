@@ -5,7 +5,6 @@
 module Emanote.Source.Mount where
 
 import Control.Concurrent (threadDelay)
-import Control.Exception (finally, try)
 import Control.Monad.Logger
   ( LogLevel (LevelDebug, LevelError, LevelInfo),
     MonadLogger,
@@ -27,7 +26,7 @@ import System.FSNotify
 import System.FilePath (isRelative, makeRelative)
 import System.FilePattern (FilePattern, (?==))
 import System.FilePattern.Directory (getDirectoryFilesIgnore)
-import UnliftIO (MonadUnliftIO, newTBQueueIO, race_, toIO, withRunInIO, writeTBQueue)
+import UnliftIO (MonadUnliftIO, finally, newTBQueueIO, race_, try, withRunInIO, writeTBQueue)
 import UnliftIO.STM (TBQueue, readTBQueue)
 
 -- | Like `unionMount` but updates a `LVar` as well handles exceptions by logging them.
@@ -67,8 +66,7 @@ unionMountOnLVar sources pats ignore modelLVar model0 handleAction = do
 -- TODO: Make user defineeable?
 interceptExceptions :: (MonadIO m, MonadUnliftIO m, MonadLogger m) => a -> m a -> m a
 interceptExceptions default_ f = do
-  f' <- toIO f
-  liftIO (try f') >>= \case
+  try f >>= \case
     Left (ex :: SomeException) -> do
       log LevelError $ "User exception: " <> show ex
       pure default_
@@ -177,9 +175,10 @@ onChange q roots = do
           Modified (rel -> fp) _ _ -> f x fp $ Update ()
           Removed (rel -> fp) _ _ -> f x fp Delete
           Unknown (rel -> fp) _ _ -> f x fp Delete
-    liftIO $
-      threadDelay maxBound
-        `finally` (putTextLn "Stopping change monitor" >> forM_ stops id)
+    liftIO (threadDelay maxBound)
+      `finally` do
+        log LevelInfo "Stopping change monitor"
+        liftIO $ forM_ stops id
 
 withManagerM ::
   (MonadIO m, MonadUnliftIO m) =>
