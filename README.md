@@ -93,7 +93,7 @@ Milestone (notes.srid.ca),
 - Theme touches
   - [ ] Table styling
   - [ ] dd styling
-  - [ ] Timeline query styling (use CSS grid)
+  - [x] Timeline query styling (use CSS grid)
   - [ ] Ugly footnote empty line with multi-block notes
   - [ ] Final website look
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
