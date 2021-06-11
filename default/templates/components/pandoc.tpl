@@ -21,16 +21,19 @@
     <!-- DoNotFormat -->
   </Note:Ref>
   <Note:List>
-    <ol title="Footnotes"
-      class="pt-2 pl-2 mt-4 space-y-1 text-gray-700 list-decimal list-inside border-t-2">
+    <div title="Footnotes" class="pt-2 mt-4 space-y-1 text-gray-700 transform scale-90 border-t-2">
+      <header class="font-semibold">Footnotes</header>
       <footnote>
-        <li id="fn${footnote:idx}">
-          <div class="inline-block">
+        <div id="fn${footnote:idx}">
+          <header class="italic">
+            <footnote:idx />.
+          </header>
+          <div class="inline-block mb-2 ml-4">
             <footnote:content />
           </div>
-        </li>
+        </div>
       </footnote>
-    </ol>
+    </div>
   </Note:List>
 
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
