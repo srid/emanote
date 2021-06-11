@@ -91,10 +91,8 @@ Milestone (notes.srid.ca),
     - [x] Date in queries (requires Heist withJson changes)
 		- [x] Hierarchical tags?
 - Theme touches
-  - [ ] Table styling
-  - [ ] dd styling
   - [x] Timeline query styling (use CSS grid)
-  - [ ] Ugly footnote empty line with multi-block notes
+  - [x] Ugly footnote empty line with multi-block notes
   - [ ] Final website look
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
 - Nice to have, but not essential
@@ -103,6 +101,8 @@ Milestone (notes.srid.ca),
 
 To triage,
 
+- [ ] dd styling
+- [ ] Table styling
 - [x] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
   - Display children inline?
 - [ ] fsnotify: reliably handle directory renames/ moves
