@@ -10,6 +10,7 @@ import qualified Data.Aeson.Types as Aeson
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
+import Data.Version (showVersion)
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
@@ -35,6 +36,7 @@ import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
+import qualified Paths_emanote as Paths_emanote
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -135,7 +137,10 @@ commonSplices emaAction meta routeTitle = do
   "apply" ## HA.applyImpl
   -- Add tailwind css shim
   "tailwindCssShim"
-    ## pure (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+    ## pure
+      (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+  "ema:version"
+    ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
     ## HJ.bindJson meta
   "ema:title" ## HI.textSplice routeTitle

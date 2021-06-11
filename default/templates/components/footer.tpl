@@ -2,7 +2,9 @@
   <div class="flex space-x-2">
     <div><a class="font-bold" href="@index">@Index</a></div>
     <div>|</div>
-    <div>Powered by <a class="font-bold" href="https://note.ema.srid.ca/">Emanote</a></div>
+    <div>Powered by <a class="font-bold" href="https://note.ema.srid.ca/">Emanote</a>
+      <ema:version />
+    </div>
     <div>|</div>
     <div><a class="font-bold" href="@tags">@Tags</a></div>
   </div>

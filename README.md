@@ -73,7 +73,7 @@ Before tests (tasks impacting the larger architectural context in code base),
       - Including wiki-links (thus supplanting rewriteLinks)
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
-  - Queries and results embed (see below)
+  - [x] Queries and results embed (see below)
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?
@@ -98,15 +98,13 @@ Milestone (notes.srid.ca),
 
 To triage,
 
-- [ ] Link inline tags to @tags index
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
-- [ ] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
+- [x] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
   - Display children inline?
 - [ ] fsnotify: reliably handle directory renames/ moves
   - Straightforward to do using unionMount's OverlayFs?
   - If nothing, restart mount on such events.
-- [ ] apply prismJS on live server refresh?
-  - Hack on `<script class="ema-rerun">`?
+- [x] apply prismJS on live server refresh?
 - [x] Add fsnotify watcher for default template files (etc), but only in ghcid mode
 - [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
 - [ ] `neuron query` equivalent?
