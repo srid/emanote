@@ -20,6 +20,7 @@ let
       )
       { };
   emanote = (import ./.).defaultPackage.x86_64-linux;
+  windicss = (import ./.).windicss.x86_64-linux;
 in
 { name ? "sridca/emanote"
 , tag ? "dev"
@@ -27,6 +28,8 @@ in
   inherit name tag;
   contents = [
     emanote
+    # For compiling CSS (requires nodeJS runtime and .js files; so disabled)
+    # windicss
     # These are required for the GitLab CI runner
     pkgs.coreutils
     pkgs.bash_5
