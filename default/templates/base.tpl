@@ -7,7 +7,6 @@
   <title>
     <ema:titleFull />
   </title>
-  <tailwindCssShim />
   <ema:metadata>
     <with var="page">
       <meta property="og:description" content="${value:description}" />
@@ -19,6 +18,9 @@
     </with>
     <snippet var="page.headHtml" />
   </ema:metadata>
+  <!-- CSSSTART -->
+  <tailwindCssShim />
+  <!-- CSSEND -->
   <head-extra />
 </head>
 

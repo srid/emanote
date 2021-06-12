@@ -14,7 +14,7 @@ template:
   name: templates/layouts/book
   theme: blue
   baseUrl: /
-  iconUrl: /favicon.svg
+  iconUrl: favicon.svg
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
@@ -28,9 +28,9 @@ pandoc:
   # Markdown text, especially when using Tailwind.
   rewriteClass:
     # TODO: Should these be done instead on Heist (pandoc.tpl)?
-    emanote:inline-tag: font-bold bg-gray-100 py-1 px-2 rounded-lg 
+    emanote:inline-tag: font-bold bg-gray-100 py-1 px-2 rounded-lg
     # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
-    emanote:broken-link: line-through italic bg-${theme}-100 
+    emanote:broken-link: line-through italic bg-${theme}-100
     # You can also add your own class -> style mappings.
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
@@ -38,7 +38,7 @@ pandoc:
 page:
   siteName: Emanote
   siteTitle: Emanote
-  description: | 
+  description: |
     Emanote -- create beautiful websites out of plain-text notes. Supports
     Markdown, Wiki-links, directories, HTML templates for complete theming.
   headHtml: |

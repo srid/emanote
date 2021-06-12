@@ -126,7 +126,7 @@
         ],
         "pandoc-link-context": "pandoc-link-context",
         "tagtree": "tagtree",
-        "tailwind": "tailwind"
+        "windicss": "windicss"
       }
     },
     "tagtree": {
@@ -145,19 +145,19 @@
         "type": "github"
       }
     },
-    "tailwind": {
+    "windicss": {
       "flake": false,
       "locked": {
-        "lastModified": 1623452657,
-        "narHash": "sha256-CqHBwgvXW9984EIHmoAuB3kMSdv5kNTlkV25XrVQzN4=",
+        "lastModified": 1623457620,
+        "narHash": "sha256-J5Um1mRGxMUJu0vVVv3cfIORI55IY48XaZetxSwmFuA=",
         "owner": "srid",
-        "repo": "tailwind-nix",
-        "rev": "9cab9baff1db4752175d9efaa622176c6867652a",
+        "repo": "windicss-nix",
+        "rev": "8777cc33119ce859d13ffb8d7246ade5fdd9d099",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "repo": "tailwind-nix",
+        "repo": "windicss-nix",
         "type": "github"
       }
     }
