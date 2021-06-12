@@ -4,8 +4,8 @@
     ema.url = "github:srid/ema/master";
     # Use the nixpkgs used by the pinned ema.
     nixpkgs.follows = "ema/nixpkgs";
-    tailwind = {
-      url = "github:srid/tailwind-nix";
+    windicss = {
+      url = "github:srid/windicss-nix";
       flake = false;
     };
     pandoc-link-context = {
@@ -29,8 +29,8 @@
         overlays = [ ];
         pkgs =
           import nixpkgs { inherit system overlays; config.allowBroken = true; };
-        tailwindNix =
-          (import inputs.tailwind { inherit pkgs; }).shell.nodeDependencies;
+        windicss =
+          (import inputs.windicss { inherit pkgs; }).shell.nodeDependencies;
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
             inherit returnShellEnv;
@@ -53,13 +53,15 @@
                 ormolu
                 pkgs.nixpkgs-fmt
 
-                tailwindNix
+                windicss
               ]);
           };
       in
       {
         # Used by `nix build` & `nix run`
         defaultPackage = project false;
+
+        inherit windicss;
 
         # Used by `nix develop`
         devShell = project true;
