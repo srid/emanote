@@ -48,6 +48,14 @@ mkRenderCtx node classMap bS iS footnotes = do
           footnotes
    in ctx
 
+-- | Strip any custom splicing out of the given render context
+ctxSansCustomSplicing :: RenderCtx n -> RenderCtx n
+ctxSansCustomSplicing ctx =
+  ctx
+    { blockSplice = const Nothing,
+      inlineSplice = const Nothing
+    }
+
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', cls, attr) =
   let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
