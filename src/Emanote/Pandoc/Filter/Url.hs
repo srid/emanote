@@ -93,28 +93,31 @@ resolveUnresolvedRelTarget ::
 resolveUnresolvedRelTarget model = \case
   Right r ->
     resolveLinkableRouteMustExist r
-  Left (wlType, wl) ->
-    case nonEmpty (M.modelResolveWikiLink wl model) of
-      Nothing -> do
-        throwError "Wiki-link does not resolve to any known file"
-      Just targets ->
-        -- TODO: Deal with ambiguous targets here
-        resolveLinkableRouteMustExist (head targets)
+  Left (wlType, wl) -> do
+    resolveLinkableRouteMustExist <=< resolveWikiLinkMust $ wl
   where
+    resolveWikiLinkMust wl =
+      case nonEmpty (M.modelResolveWikiLink wl model) of
+        Nothing -> do
+          throwError "Wiki-link does not resolve to any known file"
+        Just targets ->
+          -- TODO: Deal with ambiguous targets here
+          pure $ head targets
     resolveLinkableRouteMustExist r =
-      case resolveLinkableRoute r of
+      case resolveLinkableRoute model r of
         Nothing -> Left "Link does not resolve to any known file"
         Just v -> Right v
-    resolveLinkableRoute r =
-      case R.linkableRouteCase r of
-        Left lmlR -> do
-          lmlRoute lmlR model
-            <&> (,Nothing)
-        Right sR -> do
-          sf <- M.modelLookupStaticFileByRoute sR model
-          pure $
-            SR.staticFileSiteRoute sf
-              & (,Just $ sf ^. SF.staticFileTime)
-    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe SiteRoute
-    lmlRoute r m = do
-      SR.noteFileSiteRoute <$> M.modelLookupNoteByRoute r m
+
+resolveLinkableRoute :: Model -> R.LinkableRoute -> Maybe (SiteRoute, Maybe UTCTime)
+resolveLinkableRoute model lr =
+  case R.linkableRouteCase lr of
+    Left lmlR -> do
+      note <- M.modelLookupNoteByRoute lmlR model
+      pure $
+        SR.noteFileSiteRoute note
+          & (,Nothing)
+    Right sR -> do
+      sf <- M.modelLookupStaticFileByRoute sR model
+      pure $
+        SR.staticFileSiteRoute sf
+          & (,Just $ sf ^. SF.staticFileTime)
