@@ -31,7 +31,6 @@ pandoc:
     emanote:inline-tag: font-bold bg-gray-100 py-1 px-2 rounded-lg
     # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
     emanote:broken-link: line-through italic
-    emanote:broken-image: line-through italic
     # You can also add your own class -> style mappings.
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or

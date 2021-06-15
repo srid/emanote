@@ -27,16 +27,15 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
       pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
         Left err ->
-          HP.rpInline ctx $ B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
+          brokenLinkSpanWrapper err inl
         Right (newIs, newUrl) ->
           HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
     B.Image attr@(id', class', otherAttrs) is' (url, tit) -> do
       let is = imageInlineFallback url is'
       pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
         Left err ->
-          HP.rpInline ctx $
-            B.Span ("", one "emanote:broken-image", one ("title", err)) $
-              one $ B.Image (id', class', otherAttrs) is (url, tit)
+          brokenLinkSpanWrapper err $
+            B.Image (id', class', otherAttrs) is (url, tit)
         Right (newIs, newUrl) ->
           HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
     _ -> Nothing
@@ -45,6 +44,10 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
     imageInlineFallback fn = \case
       [] -> one $ B.Str fn
       x -> x
+    brokenLinkSpanWrapper err inline =
+      HP.rpInline ctx $
+        B.Span ("", one "emanote:broken-link", one ("title", err)) $
+          one inline
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
@@ -93,14 +96,14 @@ resolveUnresolvedRelTarget model = \case
   Left (wlType, wl) ->
     case nonEmpty (M.modelResolveWikiLink wl model) of
       Nothing -> do
-        throwError "Unresolved wiki-link"
+        throwError "Wiki-link does not resolve to any known file"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
         resolveLinkableRouteMustExist (head targets)
   where
     resolveLinkableRouteMustExist r =
       case resolveLinkableRoute r of
-        Nothing -> Left "Missing link"
+        Nothing -> Left "Link does not resolve to any known file"
         Just v -> Right v
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
