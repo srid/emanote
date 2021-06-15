@@ -35,8 +35,19 @@ data Rel = Rel
   }
   deriving (Eq, Ord, Show)
 
--- | A link target to somewhere in model that has not been resolved (using model) yet.
-type UnresolvedRelTarget = Either (WL.WikiLinkType, WL.WikiLink) LinkableRoute
+-- | A link target that has not been resolved (using model) yet.
+--
+-- Resolving this may or may not result in a resource in the model. In some
+-- cases, the link may point to something else entirely (see
+-- `decodeNonResourceRoute`).
+--
+-- TODO: This information should ideally be captured at the type-level. ie. have
+-- /@index/.. and /@tags/.. captured as their own route type. Them open-union
+-- them all in `SiteRoute.
+type UnresolvedRelTarget =
+  Either
+    (WL.WikiLinkType, WL.WikiLink)
+    LinkableRoute
 
 type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
 
