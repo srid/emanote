@@ -4,7 +4,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emanote.Model.Link.Rel where
 
@@ -22,7 +21,7 @@ import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
--- | A relation from one note to any other file (note or static file)
+-- | A relation from one note to anywhere in the model.
 --
 -- Target will remain unresolved in the `Rel`, and can be resolved at a latter
 -- time (eg: during rendering).
@@ -36,7 +35,7 @@ data Rel = Rel
   }
   deriving (Eq, Ord, Show)
 
--- | A link target that has not been resolved (using model) yet.
+-- | A link target to somewhere in model that has not been resolved (using model) yet.
 type UnresolvedRelTarget = Either (WL.WikiLinkType, WL.WikiLink) LinkableRoute
 
 type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
@@ -68,7 +67,7 @@ unresolvedRelsTo r =
   (Left <$> toList (WL.allowedWikiLinks r))
     <> [Right r]
 
--- | Parse a URL string for later resolution.
+-- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
