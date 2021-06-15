@@ -35,16 +35,15 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
         Left err ->
           HP.rpInline ctx $ B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
         Right (newIs, newUrl) ->
-          HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
+          HP.rpInline ctx $ traceShowId $ B.Image attr newIs (newUrl, tit)
     _ -> Nothing
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
-    fmap (fmap renderUrl)
-      . resolveUnresolvedRelTarget model
-      <=< Rel.parseUnresolvedRelTarget linkAttrs
-      $ url
+    uRel <- Rel.parseUnresolvedRelTarget linkAttrs url
+    let target = resolveUnresolvedRelTarget model uRel
+    pure $ second renderUrl target
   where
     renderUrl ::
       (SiteRoute, Maybe UTCTime) ->
@@ -79,18 +78,22 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             Nothing
 
 resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
+  Model -> Rel.UnresolvedRelTarget -> Either Text (SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Right r ->
-    pure <$> resolveLinkableRoute r
+    resolveLinkableRouteMustExist r
   Left (wlType, wl) ->
     case nonEmpty (M.modelResolveWikiLink wl model) of
       Nothing -> do
-        pure $ throwError "Unresolved wiki-link"
+        throwError "Unresolved wiki-link"
       Just targets ->
         -- TODO: Deal with ambiguous targets here
-        pure <$> resolveLinkableRoute (head targets)
+        resolveLinkableRouteMustExist (head targets)
   where
+    resolveLinkableRouteMustExist r =
+      case resolveLinkableRoute r of
+        Nothing -> Left "Missing link"
+        Just v -> Right v
     resolveLinkableRoute r =
       case R.linkableRouteCase r of
         Left lmlR -> do
