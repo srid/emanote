@@ -2,6 +2,7 @@ module Emanote.Pandoc.Filter.Url (urlResolvingSplice) where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
+import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import qualified Ema
 import qualified Ema.CLI
@@ -45,6 +46,7 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
       [] -> one $ B.Str fn
       x -> x
     brokenLinkSpanWrapper err inline =
+      -- FIXME: The "title" here doesn't have effect if the inline is a <a> with its own title.
       HP.rpInline ctx $
         B.Span ("", one "emanote:broken-link", one ("title", err)) $
           one inline
@@ -93,16 +95,25 @@ resolveUnresolvedRelTarget ::
 resolveUnresolvedRelTarget model = \case
   Right r ->
     resolveLinkableRouteMustExist r
-  Left (wlType, wl) -> do
-    resourceSiteRoute <$> resolveWikiLinkMust wl
+  Left (_wlType, wl) -> do
+    resourceSiteRoute <$> resolveWikiLinkMustExist wl
   where
-    resolveWikiLinkMust wl =
+    resolveWikiLinkMustExist wl =
       case nonEmpty (M.modelWikiLinkTargets wl model) of
         Nothing -> do
           throwError "Wiki-link does not resolve to any known file"
-        Just targets ->
-          -- TODO: Deal with ambiguous targets here
-          pure $ head targets
+        Just (target :| []) ->
+          pure target
+        Just targets -> do
+          let targetsStr =
+                targets <&> \case
+                  Left note -> R.encodeRoute $ R.linkableLMLRouteCase $ note ^. MN.noteRoute
+                  Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
+          throwError $
+            "Wikilink "
+              <> show wl
+              <> " is ambiguous; referring to one of: "
+              <> T.intercalate ", " (toText <$> toList targetsStr)
     resolveLinkableRouteMustExist r =
       case resolveLinkableRoute model r of
         Nothing ->

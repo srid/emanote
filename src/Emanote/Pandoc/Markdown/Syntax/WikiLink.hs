@@ -6,7 +6,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
-  ( WikiLink,
+  ( WikiLink (unWikiLink),
     WikiLinkType,
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
@@ -22,20 +22,25 @@ import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
-import Ema (Slug)
+import Ema (Slug (unSlug))
 import qualified Ema
 import Emanote.Route (LinkableRoute, R (unRoute), linkableLMLRouteCase, linkableRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
 import Text.Read (Read (readsPrec))
+import qualified Text.Show (Show (show))
 
 -- | Represents the "Foo" in [[Foo]]
 --
 -- As wiki links may contain multiple path components, it can also represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
-  deriving (Eq, Show, Ord, Typeable, Data)
+  deriving (Eq, Ord, Typeable, Data)
+
+instance Show WikiLink where
+  show (WikiLink (toList . fmap unSlug -> slugs)) =
+    toString $ "[[" <> T.intercalate "/" slugs <> "]]"
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
