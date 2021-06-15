@@ -30,13 +30,21 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
           HP.rpInline ctx $ B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
         Right (newIs, newUrl) ->
           HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
-    B.Image attr@(_id, _class, otherAttrs) is (url, tit) ->
+    B.Image attr@(id', class', otherAttrs) is' (url, tit) -> do
+      let is = imageInlineFallback url is'
       pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
         Left err ->
-          HP.rpInline ctx $ B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
+          HP.rpInline ctx $
+            B.Span ("", one "emanote:broken-image", one ("title", err)) $
+              one $ B.Image (id', class', otherAttrs) is (url, tit)
         Right (newIs, newUrl) ->
-          HP.rpInline ctx $ traceShowId $ B.Image attr newIs (newUrl, tit)
+          HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
     _ -> Nothing
+  where
+    -- Fallback to filename if no "alt" text is specified
+    imageInlineFallback fn = \case
+      [] -> one $ B.Str fn
+      x -> x
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
