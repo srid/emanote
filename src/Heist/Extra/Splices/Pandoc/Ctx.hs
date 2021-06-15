@@ -5,7 +5,7 @@ module Heist.Extra.Splices.Pandoc.Ctx where
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Heist as H
-import Heist.Extra.Splices.Pandoc.Attr (addAttr)
+import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
 import qualified Text.XmlHtml as X
@@ -83,7 +83,7 @@ inlineLookupAttr node = \case
     fromMaybe B.nullAttr $ do
       link <- X.childElementTag "PandocLink" node
       let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
-      pure $ attrFromNode link `addAttr` childTagAttr link innerTag
+      pure $ attrFromNode link `concatAttr` childTagAttr link innerTag
   _ -> B.nullAttr
 
 -- | Useful for running a splice against an arbitrary node (such as that pulled from pandoc.tpl)
