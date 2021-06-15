@@ -16,7 +16,7 @@ where
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import qualified Heist as H
-import Heist.Extra.Splices.Pandoc.Attr (addAttr, rpAttr)
+import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     rewriteClass,
@@ -99,7 +99,7 @@ rpBlock' ctx@RenderCtx {..} b = case b of
             fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
         pure $ a <> as
   B.Header level attr is ->
-    one . X.Element (headerTag level) (rpAttr $ addAttr attr $ bAttr b)
+    one . X.Element (headerTag level) (rpAttr $ concatAttr attr $ bAttr b)
       <$> foldMapM (rpInline ctx) is
   B.HorizontalRule ->
     pure $ one $ X.Element "hr" mempty mempty
@@ -177,7 +177,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
     flip inQuotes qt $ foldMapM (rpInline ctx) is
   B.Code attr s ->
     pure $
-      one . X.Element "code" (rpAttr $ addAttr attr $ iAttr i) $
+      one . X.Element "code" (rpAttr $ concatAttr attr $ iAttr i) $
         one . X.TextNode $ s
   B.Space -> pure $ one . X.TextNode $ " "
   B.SoftBreak -> pure $ one . X.TextNode $ " "
@@ -201,10 +201,14 @@ rpInline' ctx@RenderCtx {..} i = case i of
           one . X.Element "span" [("class", "math display")] $
             one . X.TextNode $ "$$" <> s <> "$$"
   B.Link attr is (url, tit) -> do
-    let attrs = [("href", url), ("title", tit)] <> rpAttr (addAttr attr $ iAttr i)
+    let attrs =
+          catMaybes [Just ("href", url), guard (not $ T.null tit) >> pure ("title", tit)]
+            <> rpAttr (concatAttr attr $ iAttr i)
     one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
   B.Image attr is (url, tit) -> do
-    let attrs = [("src", url), ("title", tit), ("alt", plainify is)] <> rpAttr attr
+    let attrs =
+          catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", plainify is)]
+            <> rpAttr attr
     pure $ one . X.Element "img" attrs $ mempty
   B.Note bs -> do
     one . X.Element "aside" mempty
