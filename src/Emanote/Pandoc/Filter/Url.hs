@@ -83,7 +83,7 @@ resolveUnresolvedRelTarget ::
 resolveUnresolvedRelTarget model = \case
   Right r ->
     pure <$> resolveLinkableRoute r
-  Left wl ->
+  Left (wlType, wl) ->
     case nonEmpty (M.modelResolveWikiLink wl model) of
       Nothing -> do
         pure $ throwError "Unresolved wiki-link"

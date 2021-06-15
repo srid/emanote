@@ -34,7 +34,8 @@ instance Indexable StaticFileIxs StaticFile where
 
 staticFileSelfRefs :: StaticFile -> [WL.WikiLink]
 staticFileSelfRefs =
-  WL.allowedWikiLinks
+  fmap snd
+    . WL.allowedWikiLinks
     . R.liftLinkableRoute
     . _staticFileRoute
 

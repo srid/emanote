@@ -37,7 +37,7 @@ data Rel = Rel
   deriving (Eq, Ord, Show)
 
 -- | A link target that has not been resolved (using model) yet.
-type UnresolvedRelTarget = Either WL.WikiLink LinkableRoute
+type UnresolvedRelTarget = Either (WL.WikiLinkType, WL.WikiLink) LinkableRoute
 
 type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
 
@@ -72,7 +72,7 @@ unresolvedRelsTo r =
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap (Left . snd) (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+  fmap Left (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
       Right
       (R.mkLinkableRouteFromFilePath $ UE.decode (toString url))
