@@ -31,6 +31,7 @@ type LMLRoutes =
   '[ R ('LMLType 'Md)
    ]
 
+-- | A "route" into the `Model`.
 type Routes =
   R 'AnyExt
     ': LMLRoutes

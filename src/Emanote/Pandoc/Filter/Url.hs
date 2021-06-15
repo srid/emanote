@@ -94,10 +94,10 @@ resolveUnresolvedRelTarget model = \case
   Right r ->
     resolveLinkableRouteMustExist r
   Left (wlType, wl) -> do
-    resolveLinkableRouteMustExist <=< resolveWikiLinkMust $ wl
+    resourceSiteRoute <$> resolveWikiLinkMust wl
   where
     resolveWikiLinkMust wl =
-      case nonEmpty (M.modelResolveWikiLink wl model) of
+      case nonEmpty (M.modelWikiLinkTargets wl model) of
         Nothing -> do
           throwError "Wiki-link does not resolve to any known file"
         Just targets ->
@@ -105,19 +105,38 @@ resolveUnresolvedRelTarget model = \case
           pure $ head targets
     resolveLinkableRouteMustExist r =
       case resolveLinkableRoute model r of
-        Nothing -> Left "Link does not resolve to any known file"
+        Nothing ->
+          Left "Link does not resolve to any known file"
         Just v -> Right v
 
 resolveLinkableRoute :: Model -> R.LinkableRoute -> Maybe (SiteRoute, Maybe UTCTime)
-resolveLinkableRoute model lr =
-  case R.linkableRouteCase lr of
-    Left lmlR -> do
-      note <- M.modelLookupNoteByRoute lmlR model
-      pure $
-        SR.noteFileSiteRoute note
-          & (,Nothing)
-    Right sR -> do
-      sf <- M.modelLookupStaticFileByRoute sR model
-      pure $
-        SR.staticFileSiteRoute sf
-          & (,Just $ sf ^. SF.staticFileTime)
+resolveLinkableRoute model lr = do
+  let eRoute = R.linkableRouteCase lr
+  let meRes =
+        bitraverse
+          (`M.modelLookupNoteByRoute` model)
+          (`M.modelLookupStaticFileByRoute` model)
+          eRoute
+  case meRes of
+    Just eRes ->
+      -- The route resolves to something in the model
+      pure $ resourceSiteRoute eRes
+    Nothing -> do
+      -- The route does not resolve to anything in the model
+      -- If this route is a AnyExt, let's decoding it as a "non resource" route.
+      -- This HACK should go away upon refactoring SiteRoute /
+      -- UnresolvedRelTarget types (see their comments).
+      case eRoute of
+        Left _ -> Nothing
+        Right (R.encodeRoute -> rawPath) -> do
+          SR.decodeNonResourceRoute rawPath
+            <&> (,Nothing)
+
+resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SiteRoute, Maybe UTCTime)
+resourceSiteRoute = \case
+  Left note ->
+    SR.noteFileSiteRoute note
+      & (,Nothing)
+  Right sf ->
+    SR.staticFileSiteRoute sf
+      & (,Just $ sf ^. SF.staticFileTime)
