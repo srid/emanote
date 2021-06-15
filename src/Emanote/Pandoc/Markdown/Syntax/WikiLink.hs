@@ -7,6 +7,7 @@
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink,
+    WikiLinkType,
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
     allowedWikiLinks,
@@ -16,6 +17,7 @@ where
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
 import qualified Commonmark.TokParsers as CT
+import Control.Monad (liftM2)
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -51,13 +53,17 @@ mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinks :: LinkableRoute -> [WikiLink]
+--
+-- All possible combinations of Wikilink type use is automatically included.
+allowedWikiLinks :: LinkableRoute -> [(WikiLinkType, WikiLink)]
 allowedWikiLinks =
-  mapMaybe (fmap WikiLink . nonEmpty)
+  liftM2 (,) wlAllTypes
+    . mapMaybe (fmap WikiLink . nonEmpty)
     . toList
     . NE.tails
     . wlParts
   where
+    wlAllTypes :: [WikiLinkType] = [minBound .. maxBound]
     wlParts =
       either (unRoute . linkableLMLRouteCase) unRoute
         . linkableRouteCase
@@ -78,7 +84,7 @@ data WikiLinkType
     WikiLinkTag
   | -- | ![[Foo]]
     WikiLinkEmbed
-  deriving (Eq, Show, Ord, Typeable, Data)
+  deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded)
 
 instance Read WikiLinkType where
   readsPrec _ s
