@@ -1,0 +1,110 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
+module Emanote.Route.SiteRoute.Class
+  ( decodeVirtualRoute,
+    noteFileSiteRoute,
+    staticFileSiteRoute,
+    lmlSiteRoute,
+  )
+where
+
+import Control.Lens.Operators ((^.))
+import qualified Data.IxSet.Typed as Ix
+import Data.WorldPeace.Union
+  ( absurdUnion,
+    openUnionLift,
+  )
+import Ema (Ema (..))
+import qualified Emanote.Model as M
+import qualified Emanote.Model.Note as N
+import qualified Emanote.Model.StaticFile as SF
+import Emanote.Model.Type (Model)
+import Emanote.Prelude (h)
+import Emanote.Route (FileType (Html))
+import qualified Emanote.Route as R
+import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
+import Emanote.Route.SiteRoute.Type
+
+instance Ema Model SiteRoute where
+  encodeRoute model =
+    absurdUnion
+      `h` ( \(MissingR _fp) ->
+              error "emanote: attempt to encode a 404 route"
+          )
+      `h` encodeResourceRoute model
+      `h` encodeVirtualRoute
+
+  decodeRoute model fp =
+    fmap openUnionLift (decodeVirtualRoute fp)
+      <|> decodeGeneratedRoute model fp
+      <|> pure (openUnionLift $ MissingR fp)
+
+  allRoutes model =
+    let htmlRoutes =
+          model ^. M.modelNotes
+            & Ix.toList
+            <&> noteFileSiteRoute
+        staticRoutes =
+          model ^. M.modelStaticFiles
+            & Ix.toList
+            <&> staticFileSiteRoute
+        virtualRoutes :: [VirtualRoute] =
+          [openUnionLift IndexR, openUnionLift TagIndexR]
+     in htmlRoutes
+          <> staticRoutes
+          <> fmap openUnionLift virtualRoutes
+
+encodeResourceRoute :: Model -> ResourceRoute -> FilePath
+encodeResourceRoute model =
+  absurdUnion
+    `h` ( \(r :: LMLRoute) ->
+            R.encodeRoute $
+              maybe (coerce . R.lmlRouteCase $ r) N.noteHtmlRoute $
+                M.modelLookupNoteByRoute r model
+        )
+    `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
+            R.encodeRoute r
+        )
+
+encodeVirtualRoute :: VirtualRoute -> FilePath
+encodeVirtualRoute =
+  absurdUnion
+    `h` ( \TagIndexR ->
+            R.encodeRoute $ R.mkRouteFromSlug @'Html "@tags"
+        )
+    `h` ( \IndexR ->
+            R.encodeRoute $ R.mkRouteFromSlug @'Html "@index"
+        )
+
+-- | Decode a route that is known to refer to a resource in the model
+decodeGeneratedRoute :: Model -> FilePath -> Maybe SiteRoute
+decodeGeneratedRoute model fp =
+  fmap
+    staticFileSiteRoute
+    (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
+    <|> fmap
+      noteFileSiteRoute
+      (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
+
+noteFileSiteRoute :: N.Note -> SiteRoute
+noteFileSiteRoute =
+  lmlSiteRoute . N._noteRoute
+
+lmlSiteRoute :: LMLRoute -> SiteRoute
+lmlSiteRoute =
+  openUnionLift . lmlResourceRoute
+
+lmlResourceRoute :: LMLRoute -> ResourceRoute
+lmlResourceRoute =
+  openUnionLift
+
+staticFileSiteRoute :: SF.StaticFile -> SiteRoute
+staticFileSiteRoute =
+  (openUnionLift . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
+  where
+    staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
+    staticResourceRoute =
+      openUnionLift

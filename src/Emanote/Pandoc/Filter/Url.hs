@@ -95,9 +95,9 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
-  Right r ->
+  Rel.URTResource r ->
     resolveModelRouteMustExist r
-  Left (_wlType, wl) -> do
+  Rel.URTWikiLink (_wlType, wl) -> do
     resourceSiteRoute <$> resolveWikiLinkMustExist wl
   where
     resolveWikiLinkMustExist wl =

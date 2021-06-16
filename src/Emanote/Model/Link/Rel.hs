@@ -42,12 +42,12 @@ data Rel = Rel
 -- `decodeNonResourceRoute`).
 --
 -- TODO: This information should ideally be captured at the type-level. ie. have
--- /@index/.. and /@tags/.. captured as their own route type. Them open-union
+-- /@index/.. and /@tags/.. captured as their own route type. Then open-union
 -- them all in `SiteRoute.
-type UnresolvedRelTarget =
-  Either
-    (WL.WikiLinkType, WL.WikiLink)
-    ModelRoute
+data UnresolvedRelTarget
+  = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
+  | URTResource ModelRoute
+  deriving (Eq, Show, Ord)
 
 type RelIxs = '[LMLRoute, UnresolvedRelTarget]
 
@@ -75,14 +75,14 @@ noteRels note =
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
-  (Left <$> toList (WL.allowedWikiLinks r))
-    <> [Right r]
+  (URTWikiLink <$> toList (WL.allowedWikiLinks r))
+    <> [URTResource r]
 
 -- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Left (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+  fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
-      Right
+      URTResource
       (R.mkModelRouteFromFilePath $ UE.decode (toString url))
