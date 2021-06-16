@@ -4,27 +4,39 @@
 
 module Emanote.Route.SiteRoute
   ( SiteRoute,
+    IndexR (..),
+    TagIndexR (..),
+    MissingR (..),
+    VirtualRoute,
     decodeVirtualRoute,
     noteFileSiteRoute,
     staticFileSiteRoute,
+    lmlSiteRoute,
   )
 where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
 import Data.WorldPeace.Union
+  ( OpenUnion,
+    absurdUnion,
+    openUnionLift,
+  )
 import Ema (Ema (..))
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
 import Emanote.Model.Type (Model)
+import Emanote.Prelude (h)
 import Emanote.Route (FileType (Html))
 import qualified Emanote.Route as R
-import Emanote.Route.ModelRoute
+import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 
 data IndexR = IndexR
+  deriving (Eq, Show, Ord)
 
 data TagIndexR = TagIndexR
+  deriving (Eq, Show, Ord)
 
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}
@@ -121,12 +133,12 @@ decodeTagIndexR fp = do
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
-  openUnionLift . N._noteRoute
+  lmlSiteRoute . N._noteRoute
+
+lmlSiteRoute :: LMLRoute -> SiteRoute
+lmlSiteRoute =
+  openUnionLift
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
   openUnionLift . (SF._staticFileRoute &&& SF._staticFilePath)
-
--- Just an alias to avoid having to write this repeatedly.
-h :: forall a (as :: [*]) b. ElemRemove a as => (OpenUnion (Remove a as) -> b) -> (a -> b) -> OpenUnion as -> b
-h = openUnionHandle

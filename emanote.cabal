@@ -124,7 +124,6 @@ executable emanote
     Emanote.Source.Patch
     Emanote.Source.Pattern
     Emanote.View
-    Emanote.View.SiteRoute
     Emanote.View.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
