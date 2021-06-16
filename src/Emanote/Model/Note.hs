@@ -30,7 +30,7 @@ import qualified Text.Pandoc.Definition as B
 data Note = Note
   { _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteRoute :: R.LinkableLMLRoute
+    _noteRoute :: R.LMLRoute
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
@@ -38,7 +38,7 @@ newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
 type NoteIxs =
-  '[ R.LinkableLMLRoute,
+  '[ R.LMLRoute,
      -- Allowed ways to wiki-link to this note.
      WL.WikiLink,
      -- HTML route for this note
@@ -71,7 +71,7 @@ noteSelfRefs :: Note -> [WL.WikiLink]
 noteSelfRefs =
   fmap snd
     . WL.allowedWikiLinks
-    . (R.liftLinkableRoute . R.linkableLMLRouteCase)
+    . (R.liftModelRoute . R.lmlRouteCase)
     . _noteRoute
 
 noteAncestors :: Note -> [RAncestor]
@@ -79,7 +79,7 @@ noteAncestors =
   maybe [] (toList . fmap RAncestor . R.routeInits) . noteParent
 
 noteParent :: Note -> Maybe (R 'R.Folder)
-noteParent = R.routeParent . R.linkableLMLRouteCase . _noteRoute
+noteParent = R.routeParent . R.lmlRouteCase . _noteRoute
 
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
@@ -99,7 +99,7 @@ lookupMeta k =
 
 noteTitle :: Note -> Text
 noteTitle Note {..} =
-  fromMaybe (R.routeBaseName . R.linkableLMLRouteCase $ _noteRoute) $
+  fromMaybe (R.routeBaseName . R.lmlRouteCase $ _noteRoute) $
     getPandocTitle _noteDoc
   where
     getPandocTitle :: Pandoc -> Maybe Text
@@ -118,7 +118,7 @@ noteHtmlRoute note@Note {..} =
   -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
     Nothing ->
-      coerce $ R.linkableLMLRouteCase _noteRoute
+      coerce $ R.lmlRouteCase _noteRoute
     Just slug ->
       R.mkRouteFromSlug slug
 
@@ -133,25 +133,25 @@ lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-lookupNotesByRoute :: R.LinkableLMLRoute -> IxNote -> [Note]
+lookupNotesByRoute :: R.LMLRoute -> IxNote -> [Note]
 lookupNotesByRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-placeHolderNote :: R.LinkableLMLRoute -> Note
+placeHolderNote :: R.LMLRoute -> Note
 placeHolderNote r =
   let placeHolder =
         B.Plain
           [ B.Str
               "To add content here, create a file named: ",
-            B.Code B.nullAttr $ toText (R.encodeRoute $ R.linkableLMLRouteCase r)
+            B.Code B.nullAttr $ toText (R.encodeRoute $ R.lmlRouteCase r)
           ]
    in mkEmptyNoteWith r placeHolder
 
-mkEmptyNoteWith :: R.LinkableLMLRoute -> B.Block -> Note
+mkEmptyNoteWith :: R.LMLRoute -> B.Block -> Note
 mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =
   Note doc Aeson.Null someR
 
-parseNote :: MonadIO m => R.LinkableLMLRoute -> FilePath -> m (Either Text Note)
+parseNote :: MonadIO m => R.LMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
   !s <- readFileText fp
   pure $ do

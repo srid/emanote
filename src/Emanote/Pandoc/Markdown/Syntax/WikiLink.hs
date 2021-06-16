@@ -24,7 +24,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
-import Emanote.Route (LinkableRoute, R (unRoute), linkableLMLRouteCase, linkableRouteCase)
+import Emanote.Route (ModelRoute, R (unRoute), lmlRouteCase, modelRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
@@ -60,7 +60,7 @@ mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --
 -- All possible combinations of Wikilink type use is automatically included.
-allowedWikiLinks :: LinkableRoute -> [(WikiLinkType, WikiLink)]
+allowedWikiLinks :: ModelRoute -> [(WikiLinkType, WikiLink)]
 allowedWikiLinks =
   liftM2 (,) wlAllTypes
     . mapMaybe (fmap WikiLink . nonEmpty)
@@ -70,8 +70,8 @@ allowedWikiLinks =
   where
     wlAllTypes :: [WikiLinkType] = [minBound .. maxBound]
     wlParts =
-      either (unRoute . linkableLMLRouteCase) unRoute
-        . linkableRouteCase
+      either (unRoute . lmlRouteCase) unRoute
+        . modelRouteCase
 
 -------------------------
 -- Parser

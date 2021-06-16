@@ -24,8 +24,8 @@ extra-source-files:
 data-dir:           default
 data-files:
   favicon.svg
-  index.yaml
   index.md
+  index.yaml
   templates/**/*.tpl
 
 executable emanote
@@ -115,7 +115,7 @@ executable emanote
     Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext
-    Emanote.Route.Linkable
+    Emanote.Route.ModelRoute
     Emanote.Route.R
     Emanote.Source
     Emanote.Source.Loc

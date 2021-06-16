@@ -71,7 +71,7 @@ runQuery currentNote model = \case
   QueryByPathPattern (resolveDotInFilePattern -> pat) ->
     let notes = Ix.toList $ model ^. modelNotes
      in flip mapMaybe notes $ \note -> do
-          guard $ pat ?== (R.encodeRoute . R.linkableLMLRouteCase $ note ^. N.noteRoute)
+          guard $ pat ?== (R.encodeRoute . R.lmlRouteCase $ note ^. N.noteRoute)
           pure note
   where
     -- Resolve the ./ prefix which will for substituting "$PWD" in current
@@ -79,7 +79,7 @@ runQuery currentNote model = \case
     resolveDotInFilePattern (toText -> pat) =
       if "./" `T.isPrefixOf` pat
         then
-          let folderR :: R.R 'R.Folder = coerce $ R.linkableLMLRouteCase $ currentNote ^. N.noteRoute
+          let folderR :: R.R 'R.Folder = coerce $ R.lmlRouteCase $ currentNote ^. N.noteRoute
            in if folderR == R.indexRoute
                 then -- If in "index.md", discard the ./
                   toString (T.drop 2 pat)

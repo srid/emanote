@@ -16,7 +16,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
-import Emanote.Route (FileType (AnyExt, Html), LinkableLMLRoute, R)
+import Emanote.Route (FileType (AnyExt, Html), LMLRoute, R)
 import qualified Emanote.Route as R
 
 -- | Route representing the pages/URLs in the generated website.
@@ -29,7 +29,7 @@ data SiteRoute
   | -- | Route to tag index
     SRTagIndex
   | -- | Route to a LML file that gets generated as HTML
-    SRLMLFile LinkableLMLRoute
+    SRLMLFile LMLRoute
   | -- | Route to a static file, along with its absolute path on disk
     SRStaticFile (R 'AnyExt, FilePath)
   | -- | A link that points to nowhere in model. Used in live-server mainly.
@@ -46,7 +46,7 @@ instance Ema Model SiteRoute where
         R.mkRouteFromSlug @'Html "@tags"
     SRLMLFile r ->
       R.encodeRoute $
-        maybe (coerce . R.linkableLMLRouteCase $ r) N.noteHtmlRoute $
+        maybe (coerce . R.lmlRouteCase $ r) N.noteHtmlRoute $
           M.modelLookupNoteByRoute r model
     SRStaticFile (r, _fpAbs) ->
       R.encodeRoute r

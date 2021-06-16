@@ -36,7 +36,7 @@ staticFileSelfRefs :: StaticFile -> [WL.WikiLink]
 staticFileSelfRefs =
   fmap snd
     . WL.allowedWikiLinks
-    . R.liftLinkableRoute
+    . R.liftModelRoute
     . _staticFileRoute
 
 makeLenses ''StaticFile

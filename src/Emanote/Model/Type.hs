@@ -29,7 +29,7 @@ import Emanote.Model.StaticFile
   )
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import Emanote.Route (FileType (AnyExt), LinkableLMLRoute, LinkableRoute, R)
+import Emanote.Route (FileType (AnyExt), LMLRoute, ModelRoute, R)
 import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState, newTemplateState)
 import qualified Text.Pandoc.Definition as B
@@ -60,7 +60,7 @@ modelInsertNote note =
     >>> modelRels
     %~ replaceNoteRels
     >>> modelNav
-    %~ PathTree.treeInsertPath (R.unRoute . R.linkableLMLRouteCase $ r)
+    %~ PathTree.treeInsertPath (R.unRoute . R.lmlRouteCase $ r)
   where
     r = note ^. N.noteRoute
     replaceNoteRels rels =
@@ -71,12 +71,12 @@ modelInsertNote note =
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
-  let lmlR = R.liftLinkableLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
+  let lmlR = R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
    in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
         Just _ -> ns
         Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
 
-modelDeleteNote :: LinkableLMLRoute -> Model -> Model
+modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
   model & modelNotes
     %~ ( Ix.deleteIx k
@@ -87,12 +87,12 @@ modelDeleteNote k model =
       & modelRels
     %~ Ix.deleteIx k
       & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.unRoute . R.linkableLMLRouteCase $ k)) (const id) mFolderR
+    %~ maybe (PathTree.treeDeletePath (R.unRoute . R.lmlRouteCase $ k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
     mFolderR = do
-      let folderR = coerce $ R.linkableLMLRouteCase k
+      let folderR = coerce $ R.lmlRouteCase k
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
     restoreFolderPlaceholder =
@@ -116,7 +116,7 @@ modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNoteByRoute :: LinkableLMLRoute -> Model -> Maybe Note
+modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByRoute r notes)
 
@@ -124,9 +124,9 @@ modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
 modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByHtmlRoute r notes)
 
-modelLookupTitle :: LinkableLMLRoute -> Model -> Text
+modelLookupTitle :: LMLRoute -> Model -> Text
 modelLookupTitle r =
-  maybe (R.routeBaseName $ R.linkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
+  maybe (R.routeBaseName $ R.lmlRouteCase r) N.noteTitle . modelLookupNoteByRoute r
 
 -- Lookup the wiki-link and return its candidates in the model.
 modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either Note StaticFile]
@@ -139,7 +139,7 @@ modelWikiLinkTargets wl model =
           (model ^. modelStaticFiles) @= wl
    in fmap Right staticFiles <> fmap Left notes
 
-modelLookupBacklinks :: LinkableRoute -> Model -> [(LinkableLMLRoute, [B.Block])]
+modelLookupBacklinks :: ModelRoute -> Model -> [(LMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let backlinks = Ix.toList $ (model ^. modelRels) @+ Rel.unresolvedRelsTo r
    in backlinks <&> \rel ->

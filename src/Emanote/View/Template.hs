@@ -57,7 +57,7 @@ render emaAction m = \case
   SRTagIndex ->
     Ema.AssetGenerated Ema.Html $ rendeSRTagIndex emaAction m
   SR404 urlPath -> do
-    let route404 = R.liftLinkableLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+    let route404 = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
         note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
     Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
 
@@ -94,8 +94,8 @@ renderLmlHtml emaAction model note = do
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits . R.linkableLMLRouteCase $ r) "each-crumb"
-      $ \(R.liftLinkableLMLRoute -> crumbR) ->
+      ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
+      $ \(R.liftLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
           "crumb:url" ## Ema.routeUrl model $ SR.SRLMLFile crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
@@ -103,7 +103,7 @@ renderLmlHtml emaAction model note = do
     "ema:note:title"
       ## HI.textSplice pageTitle
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks (R.liftLinkableRoute . R.linkableLMLRouteCase $ r) model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
@@ -151,18 +151,18 @@ commonSplices emaAction meta routeTitle = do
       else routeTitle <> " – " <> siteTitle
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
-routeTreeSplice :: Monad n => Maybe R.LinkableLMLRoute -> Model -> H.Splices (HI.Splice n)
+routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)
 routeTreeSplice mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
                ( Meta.lookupRouteMeta @Int 0 (one "order") tr model,
-                 maybe (R.routeBaseName . R.linkableLMLRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
+                 maybe (R.routeBaseName . R.lmlRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
                )
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute = R.liftLinkableLMLRoute . R.R @('LMLType 'Md)
-             lmlRouteSlugs = R.unRoute . R.linkableLMLRouteCase
+             mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
+             lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
                "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.SRLMLFile nodeRoute
