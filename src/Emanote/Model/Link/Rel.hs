@@ -17,6 +17,7 @@ import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
+import qualified Emanote.Route.SiteRoute.Type as SR
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
@@ -37,17 +38,14 @@ data Rel = Rel
 
 -- | A link target that has not been resolved (using model) yet.
 --
--- Resolving this may or may not result in a resource in the model. In some
--- cases, the link may point to something else entirely (see
--- `decodeNonResourceRoute`).
---
--- TODO: This information should ideally be captured at the type-level. ie. have
--- /@index/.. and /@tags/.. captured as their own route type. Them open-union
--- them all in `SiteRoute.
-type UnresolvedRelTarget =
-  Either
-    (WL.WikiLinkType, WL.WikiLink)
-    ModelRoute
+-- Resolving this may or may not result in a resource in the model. The ADT
+-- constructors capture the different possible types of links the user is
+-- allowed to link to.
+data UnresolvedRelTarget
+  = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
+  | URTResource ModelRoute
+  | URTVirtual SR.VirtualRoute
+  deriving (Eq, Show, Ord)
 
 type RelIxs = '[LMLRoute, UnresolvedRelTarget]
 
@@ -75,14 +73,14 @@ noteRels note =
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
-  (Left <$> toList (WL.allowedWikiLinks r))
-    <> [Right r]
+  (URTWikiLink <$> toList (WL.allowedWikiLinks r))
+    <> [URTResource r]
 
 -- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
-  fmap Left (WL.mkWikiLinkFromUrlAndAttrs attrs url)
-    <|> fmap
-      Right
-      (R.mkModelRouteFromFilePath $ UE.decode (toString url))
+  let fp = UE.decode (toString url)
+  fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+    <|> fmap URTVirtual (SR.decodeVirtualRoute fp)
+    <|> fmap URTResource (R.mkModelRouteFromFilePath fp)

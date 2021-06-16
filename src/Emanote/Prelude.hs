@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
@@ -7,6 +8,12 @@
 module Emanote.Prelude where
 
 import Control.Monad.Logger (MonadLogger, logDebugNS, logErrorNS, logInfoNS)
+import Data.WorldPeace.Union
+  ( ElemRemove,
+    OpenUnion,
+    Remove,
+    openUnionHandle,
+  )
 
 -- | Monadic version of `chain`
 chainM :: Monad m => (b -> m (a -> a)) -> [b] -> m (a -> a)
@@ -35,3 +42,9 @@ logD = logDebugNS "emanote"
 
 logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
+
+-- OpenUnion
+
+-- Just an alias to avoid having to write this repeatedly.
+h :: forall a (as :: [*]) b. ElemRemove a as => (OpenUnion (Remove a as) -> b) -> (a -> b) -> OpenUnion as -> b
+h = openUnionHandle
