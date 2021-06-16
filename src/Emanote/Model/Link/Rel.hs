@@ -15,7 +15,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import Emanote.Route (LinkableLMLRoute, LinkableRoute)
+import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
 import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
@@ -27,7 +27,7 @@ import qualified Text.Pandoc.LinkContext as LC
 -- time (eg: during rendering).
 data Rel = Rel
   { -- The note containing this relation
-    _relFrom :: LinkableLMLRoute,
+    _relFrom :: LMLRoute,
     -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget,
     -- | The relation context in LML
@@ -47,9 +47,9 @@ data Rel = Rel
 type UnresolvedRelTarget =
   Either
     (WL.WikiLinkType, WL.WikiLink)
-    LinkableRoute
+    ModelRoute
 
-type RelIxs = '[LinkableLMLRoute, UnresolvedRelTarget]
+type RelIxs = '[LMLRoute, UnresolvedRelTarget]
 
 type IxRel = IxSet RelIxs Rel
 
@@ -73,7 +73,7 @@ noteRels note =
             target <- parseUnresolvedRelTarget attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 
-unresolvedRelsTo :: LinkableRoute -> [UnresolvedRelTarget]
+unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
   (Left <$> toList (WL.allowedWikiLinks r))
     <> [Right r]
@@ -85,4 +85,4 @@ parseUnresolvedRelTarget attrs url = do
   fmap Left (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap
       Right
-      (R.mkLinkableRouteFromFilePath $ UE.decode (toString url))
+      (R.mkModelRouteFromFilePath $ UE.decode (toString url))

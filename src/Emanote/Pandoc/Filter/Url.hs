@@ -93,7 +93,7 @@ resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Right r ->
-    resolveLinkableRouteMustExist r
+    resolveModelRouteMustExist r
   Left (_wlType, wl) -> do
     resourceSiteRoute <$> resolveWikiLinkMustExist wl
   where
@@ -106,22 +106,22 @@ resolveUnresolvedRelTarget model = \case
         Just targets -> do
           let targetsStr =
                 targets <&> \case
-                  Left note -> R.encodeRoute $ R.linkableLMLRouteCase $ note ^. MN.noteRoute
+                  Left note -> R.encodeRoute $ R.lmlRouteCase $ note ^. MN.noteRoute
                   Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
           throwError $
             "Wikilink "
               <> show wl
               <> " is ambiguous; referring to one of: "
               <> T.intercalate ", " (toText <$> toList targetsStr)
-    resolveLinkableRouteMustExist r =
-      case resolveLinkableRoute model r of
+    resolveModelRouteMustExist r =
+      case resolveModelRoute model r of
         Nothing ->
           Left "Link does not refer to any known file"
         Just v -> Right v
 
-resolveLinkableRoute :: Model -> R.LinkableRoute -> Maybe (SiteRoute, Maybe UTCTime)
-resolveLinkableRoute model lr = do
-  let eRoute = R.linkableRouteCase lr
+resolveModelRoute :: Model -> R.ModelRoute -> Maybe (SiteRoute, Maybe UTCTime)
+resolveModelRoute model lr = do
+  let eRoute = R.modelRouteCase lr
   let meRes =
         bitraverse
           (`M.modelLookupNoteByRoute` model)

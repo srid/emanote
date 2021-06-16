@@ -29,7 +29,7 @@ import Emanote.Prelude
     chainM,
     logD,
   )
-import Emanote.Route (liftLinkableLMLRoute)
+import Emanote.Route (liftLMLRoute)
 import qualified Emanote.Route as R
 import Emanote.Source.Loc (Loc, locLayers, locResolve)
 import qualified Emanote.Source.Mount as Mount
@@ -61,7 +61,7 @@ transformAction ::
 transformAction src fps = do
   flip chainM (Map.toList fps) $ \(fp, action) -> case src of
     R.LMLType R.Md ->
-      case fmap liftLinkableLMLRoute . R.mkRouteFromFilePath @('R.LMLType 'R.Md) $ fp of
+      case fmap liftLMLRoute . R.mkRouteFromFilePath @('R.LMLType 'R.Md) $ fp of
         Nothing ->
           pure id
         Just r -> case action of
