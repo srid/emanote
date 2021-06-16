@@ -99,6 +99,10 @@ resolveUnresolvedRelTarget model = \case
     resolveModelRouteMustExist r
   Rel.URTWikiLink (_wlType, wl) -> do
     resourceSiteRoute <$> resolveWikiLinkMustExist wl
+  Rel.URTVirtual virtualRoute -> do
+    pure $
+      openUnionLift virtualRoute
+        & (,Nothing)
   where
     resolveWikiLinkMustExist wl =
       case nonEmpty (M.modelWikiLinkTargets wl model) of
@@ -125,25 +129,11 @@ resolveUnresolvedRelTarget model = \case
 resolveModelRoute :: Model -> R.ModelRoute -> Maybe (SR.SiteRoute, Maybe UTCTime)
 resolveModelRoute model lr = do
   let eRoute = R.modelRouteCase lr
-  let meRes =
-        bitraverse
-          (`M.modelLookupNoteByRoute` model)
-          (`M.modelLookupStaticFileByRoute` model)
-          eRoute
-  case meRes of
-    Just eRes ->
-      -- The route resolves to something in the model
-      pure $ resourceSiteRoute eRes
-    Nothing -> do
-      -- The route does not resolve to anything in the model
-      -- If this route is a AnyExt, let's decoding it as a "non resource" route.
-      -- This HACK should go away upon refactoring SiteRoute /
-      -- UnresolvedRelTarget types (see their comments).
-      case eRoute of
-        Left _ -> Nothing
-        Right (R.encodeRoute -> rawPath) -> do
-          SR.decodeVirtualRoute rawPath
-            <&> (,Nothing) . openUnionLift
+  resourceSiteRoute
+    <$> bitraverse
+      (`M.modelLookupNoteByRoute` model)
+      (`M.modelLookupStaticFileByRoute` model)
+      eRoute
 
 resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)
 resourceSiteRoute = \case
