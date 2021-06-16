@@ -3,6 +3,8 @@
 {-# LANGUAGE TypeOperators #-}
 
 -- | Route types representing the resources in our `Model`.
+--
+-- See also: `Emanote.Route.SiteRoute`.
 module Emanote.Route.ModelRoute
   ( -- Some route in a generated site
     ModelRoute,

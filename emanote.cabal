@@ -118,6 +118,8 @@ executable emanote
     Emanote.Route.ModelRoute
     Emanote.Route.R
     Emanote.Route.SiteRoute
+    Emanote.Route.SiteRoute.Class
+    Emanote.Route.SiteRoute.Type
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
