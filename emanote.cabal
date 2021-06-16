@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.1.0
+version:            0.1.1.1
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -117,13 +117,15 @@ executable emanote
     Emanote.Route.Ext
     Emanote.Route.ModelRoute
     Emanote.Route.R
+    Emanote.Route.SiteRoute
+    Emanote.Route.SiteRoute.Class
+    Emanote.Route.SiteRoute.Type
     Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Mount
     Emanote.Source.Patch
     Emanote.Source.Pattern
     Emanote.View
-    Emanote.View.SiteRoute
     Emanote.View.Template
     Heist.Extra.Splices.List
     Heist.Extra.Splices.Pandoc
