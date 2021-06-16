@@ -46,7 +46,6 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
       [] -> one $ B.Str fn
       x -> x
     brokenLinkSpanWrapper err inline =
-      -- FIXME: The "title" here doesn't have effect if the inline is a <a> with its own title.
       HP.rpInline ctx $
         B.Span ("", one "emanote:broken-link", one ("title", err)) $
           one inline
@@ -101,7 +100,7 @@ resolveUnresolvedRelTarget model = \case
     resolveWikiLinkMustExist wl =
       case nonEmpty (M.modelWikiLinkTargets wl model) of
         Nothing -> do
-          throwError "Wiki-link does not resolve to any known file"
+          throwError "Wiki-link does not refer to any known file"
         Just (target :| []) ->
           pure target
         Just targets -> do
@@ -117,7 +116,7 @@ resolveUnresolvedRelTarget model = \case
     resolveLinkableRouteMustExist r =
       case resolveLinkableRoute model r of
         Nothing ->
-          Left "Link does not resolve to any known file"
+          Left "Link does not refer to any known file"
         Just v -> Right v
 
 resolveLinkableRoute :: Model -> R.LinkableRoute -> Maybe (SiteRoute, Maybe UTCTime)

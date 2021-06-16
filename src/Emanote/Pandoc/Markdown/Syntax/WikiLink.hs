@@ -44,7 +44,7 @@ instance Show WikiLink where
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
-  wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup "title" $ attrs
+  wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
   wl <- mkWikiLinkFromUrl s
   pure (wlType, wl)
   where
@@ -99,11 +99,17 @@ instance Read WikiLinkType where
     | s == show WikiLinkEmbed = [(WikiLinkEmbed, "")]
     | otherwise = []
 
+-- | The HTML 'data attribute' storing the wiki-link type.
+htmlAttr :: Text
+htmlAttr = "data-wikilink-type"
+
 class HasWikiLink il where
   wikilink :: WikiLinkType -> Text -> il -> il
 
 instance HasWikiLink (CP.Cm b B.Inlines) where
-  wikilink typ t il = CP.Cm $ B.link t (show typ) $ CP.unCm il
+  wikilink typ t il = CP.Cm $ B.linkWith attrs t "" $ CP.unCm il
+    where
+      attrs = ("", [], [(htmlAttr, show typ)])
 
 -- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
 --
