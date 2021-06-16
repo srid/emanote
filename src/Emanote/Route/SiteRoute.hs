@@ -8,6 +8,7 @@ module Emanote.Route.SiteRoute
     TagIndexR (..),
     MissingR (..),
     VirtualRoute,
+    ResourceRoute,
     decodeVirtualRoute,
     noteFileSiteRoute,
     staticFileSiteRoute,
@@ -50,10 +51,20 @@ type VirtualRoute' =
 
 type VirtualRoute = OpenUnion VirtualRoute'
 
+-- | A route to a resource in `Model`
+--
+-- This is *mostly isomorphic* to `ModelRoute`, except for containing the
+-- absolute path to the static file.
+type ResourceRoute' =
+  '[ (StaticFileRoute, FilePath),
+     LMLRoute
+   ]
+
+type ResourceRoute = OpenUnion ResourceRoute'
+
 type SiteRoute' =
   '[ VirtualRoute,
-     (StaticFileRoute, FilePath),
-     LMLRoute,
+     ResourceRoute,
      MissingR
    ]
 
@@ -65,20 +76,14 @@ instance Ema Model SiteRoute where
       `h` ( \(MissingR _fp) ->
               error "emanote: attempt to encode a 404 route"
           )
-      `h` ( \(r :: LMLRoute) ->
-              R.encodeRoute $
-                maybe (coerce . R.lmlRouteCase $ r) N.noteHtmlRoute $
-                  M.modelLookupNoteByRoute r model
-          )
-      `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
-              R.encodeRoute r
-          )
+      `h` encodeResourceRoute model
       `h` encodeVirtualRoute
 
   decodeRoute model fp =
     fmap openUnionLift (decodeVirtualRoute fp)
       <|> decodeGeneratedRoute model fp
       <|> pure (openUnionLift $ MissingR fp)
+
   allRoutes model =
     let htmlRoutes =
           model ^. M.modelNotes
@@ -93,6 +98,18 @@ instance Ema Model SiteRoute where
      in htmlRoutes
           <> staticRoutes
           <> fmap openUnionLift virtualRoutes
+
+encodeResourceRoute :: Model -> ResourceRoute -> FilePath
+encodeResourceRoute model =
+  absurdUnion
+    `h` ( \(r :: LMLRoute) ->
+            R.encodeRoute $
+              maybe (coerce . R.lmlRouteCase $ r) N.noteHtmlRoute $
+                M.modelLookupNoteByRoute r model
+        )
+    `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
+            R.encodeRoute r
+        )
 
 encodeVirtualRoute :: VirtualRoute -> FilePath
 encodeVirtualRoute =
@@ -137,8 +154,16 @@ noteFileSiteRoute =
 
 lmlSiteRoute :: LMLRoute -> SiteRoute
 lmlSiteRoute =
+  openUnionLift . lmlResourceRoute
+
+lmlResourceRoute :: LMLRoute -> ResourceRoute
+lmlResourceRoute =
   openUnionLift
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-  openUnionLift . (SF._staticFileRoute &&& SF._staticFilePath)
+  (openUnionLift . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
+  where
+    staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
+    staticResourceRoute =
+      openUnionLift
