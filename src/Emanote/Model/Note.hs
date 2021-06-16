@@ -69,7 +69,8 @@ instance Indexable NoteIxs Note where
 -- | All possible wiki-links that refer to this note.
 noteSelfRefs :: Note -> [WL.WikiLink]
 noteSelfRefs =
-  WL.allowedWikiLinks
+  fmap snd
+    . WL.allowedWikiLinks
     . (R.liftLinkableRoute . R.linkableLMLRouteCase)
     . _noteRoute
 

@@ -5,7 +5,7 @@ module Heist.Extra.Splices.Pandoc.Ctx where
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Heist as H
-import Heist.Extra.Splices.Pandoc.Attr (addAttr)
+import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
 import qualified Text.XmlHtml as X
@@ -48,6 +48,14 @@ mkRenderCtx node classMap bS iS footnotes = do
           footnotes
    in ctx
 
+-- | Strip any custom splicing out of the given render context
+ctxSansCustomSplicing :: RenderCtx n -> RenderCtx n
+ctxSansCustomSplicing ctx =
+  ctx
+    { blockSplice = const Nothing,
+      inlineSplice = const Nothing
+    }
+
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', cls, attr) =
   let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
@@ -75,7 +83,7 @@ inlineLookupAttr node = \case
     fromMaybe B.nullAttr $ do
       link <- X.childElementTag "PandocLink" node
       let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
-      pure $ attrFromNode link `addAttr` childTagAttr link innerTag
+      pure $ attrFromNode link `concatAttr` childTagAttr link innerTag
   _ -> B.nullAttr
 
 -- | Useful for running a splice against an arbitrary node (such as that pulled from pandoc.tpl)

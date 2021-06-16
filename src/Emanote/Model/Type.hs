@@ -26,7 +26,6 @@ import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
-    staticFileRoute,
   )
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
@@ -129,15 +128,16 @@ modelLookupTitle :: LinkableLMLRoute -> Model -> Text
 modelLookupTitle r =
   maybe (R.routeBaseName $ R.linkableLMLRouteCase r) N.noteTitle . modelLookupNoteByRoute r
 
-modelResolveWikiLink :: WL.WikiLink -> Model -> [LinkableRoute]
-modelResolveWikiLink wl model =
-  let noteRoutes =
-        fmap (R.liftLinkableRoute . R.linkableLMLRouteCase . (^. N.noteRoute)) . Ix.toList $
+-- Lookup the wiki-link and return its candidates in the model.
+modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either Note StaticFile]
+modelWikiLinkTargets wl model =
+  let notes =
+        Ix.toList $
           (model ^. modelNotes) @= wl
-      staticRoutes =
-        fmap (R.liftLinkableRoute . (^. staticFileRoute)) . Ix.toList $
+      staticFiles =
+        Ix.toList $
           (model ^. modelStaticFiles) @= wl
-   in staticRoutes <> noteRoutes
+   in fmap Right staticFiles <> fmap Left notes
 
 modelLookupBacklinks :: LinkableRoute -> Model -> [(LinkableLMLRoute, [B.Block])]
 modelLookupBacklinks r model =
