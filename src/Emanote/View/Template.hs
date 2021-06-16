@@ -11,6 +11,13 @@ import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import Data.Version (showVersion)
+import Data.WorldPeace.Union
+  ( ElemRemove,
+    OpenUnion,
+    Remove,
+    absurdUnion,
+    openUnionHandle,
+  )
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
@@ -22,10 +29,10 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
-import Emanote.View.SiteRoute (SiteRoute (..))
-import qualified Emanote.View.SiteRoute as SR
+import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -36,40 +43,51 @@ import qualified Heist.Splices as Heist
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
-import qualified Paths_emanote as Paths_emanote
+import qualified Paths_emanote
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: Ema.CLI.Action -> Model -> SiteRoute -> Ema.Asset LByteString
-render emaAction m = \case
-  SRStaticFile (_r, fpAbs) ->
-    Ema.AssetStatic fpAbs
-  SRLMLFile lmlRoute -> do
-    case M.modelLookupNoteByRoute lmlRoute m of
-      Just note ->
-        Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
-      Nothing ->
-        -- This should never be reached because decodeRoute looks up the model.
-        error $ "Bad route: " <> show lmlRoute
-  SRIndex ->
-    Ema.AssetGenerated Ema.Html $ rendeSRIndex emaAction m
-  SRTagIndex ->
-    Ema.AssetGenerated Ema.Html $ rendeSRTagIndex emaAction m
-  SR404 urlPath -> do
-    let route404 = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-        note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
-    Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
+render emaAction m =
+  absurdUnion
+    `h` ( \(SR.MissingR urlPath) -> do
+            let route404 = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+                note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
+            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+        )
+    `h` ( \(r :: R.LMLRoute) -> do
+            case M.modelLookupNoteByRoute r m of
+              Just note ->
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
+              Nothing ->
+                -- This should never be reached because decodeRoute looks up the model.
+                error $ "Bad route: " <> show r
+        )
+    `h` ( \(_ :: R.StaticFileRoute, fpAbs :: FilePath) -> do
+            Ema.AssetStatic fpAbs
+        )
+    `h` renderVirtualRoute emaAction m
 
-rendeSRIndex :: Ema.CLI.Action -> Model -> LByteString
-rendeSRIndex emaAction model = do
+renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
+renderVirtualRoute emaAction m =
+  absurdUnion
+    `h` ( \SR.TagIndexR ->
+            Ema.AssetGenerated Ema.Html $ renderSRTagIndex emaAction m
+        )
+    `h` ( \SR.IndexR ->
+            Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
+        )
+
+renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
+renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Index"
     routeTreeSplice Nothing model
 
-rendeSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
-rendeSRTagIndex emaAction model = do
+renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
+renderSRTagIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta "@Tags"
@@ -97,7 +115,7 @@ renderLmlHtml emaAction model note = do
       ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
       $ \(R.liftLMLRoute -> crumbR) ->
         MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## Ema.routeUrl model $ SR.SRLMLFile crumbR
+          "crumb:url" ## Ema.routeUrl model $ SR.lmlSiteRoute crumbR
           "crumb:title" ## M.modelLookupTitle crumbR model
     -- Note stuff
     "ema:note:title"
@@ -108,7 +126,7 @@ renderLmlHtml emaAction model note = do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile source)
+        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
             rewriteClass
@@ -165,7 +183,7 @@ routeTreeSplice mr model = do
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.SRLMLFile nodeRoute
+               "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.lmlSiteRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
                      -- Active tree checking is applicable only when there is an

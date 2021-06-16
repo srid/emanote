@@ -4,6 +4,7 @@ import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
 import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
+import Data.WorldPeace.Union (absurdUnion, openUnionLift)
 import qualified Ema
 import qualified Ema.CLI
 import Emanote.Model (Model)
@@ -11,9 +12,9 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
+import Emanote.Prelude (h)
 import qualified Emanote.Route as R
-import Emanote.View.SiteRoute (SiteRoute (..))
-import qualified Emanote.View.SiteRoute as SR
+import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Extra.Splices.Pandoc.Render (plainify)
@@ -58,7 +59,7 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
     pure $ second renderUrl target
   where
     renderUrl ::
-      (SiteRoute, Maybe UTCTime) ->
+      (SR.SiteRoute, Maybe UTCTime) ->
       ([B.Inline], Text)
     renderUrl (r, mTime) =
       let isWikiLinkSansCustom = url == plainify inner
@@ -76,21 +77,20 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             Ema.routeUrl model r <> fromMaybe "" mQuery
           )
       where
-        wikiLinkDefaultInnerText = \case
-          SRLMLFile lmlR -> do
-            one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-          SRStaticFile _ -> do
-            -- Just append a file: prefix.
-            pure $ B.Str "File: " : inner
-          SRIndex ->
-            Nothing
-          SRTagIndex ->
-            Nothing
-          SR404 _ ->
-            Nothing
+        wikiLinkDefaultInnerText =
+          absurdUnion
+            `h` (\(SR.MissingR _) -> Nothing)
+            `h` ( \(lmlR :: R.LMLRoute) ->
+                    one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
+                )
+            `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
+                    -- Just append a file: prefix.
+                    pure $ B.Str "File: " : inner
+                )
+            `h` (\(_ :: SR.VirtualRoute) -> Nothing)
 
 resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Either Text (SiteRoute, Maybe UTCTime)
+  Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Right r ->
     resolveModelRouteMustExist r
@@ -119,7 +119,7 @@ resolveUnresolvedRelTarget model = \case
           Left "Link does not refer to any known file"
         Just v -> Right v
 
-resolveModelRoute :: Model -> R.ModelRoute -> Maybe (SiteRoute, Maybe UTCTime)
+resolveModelRoute :: Model -> R.ModelRoute -> Maybe (SR.SiteRoute, Maybe UTCTime)
 resolveModelRoute model lr = do
   let eRoute = R.modelRouteCase lr
   let meRes =
@@ -139,10 +139,10 @@ resolveModelRoute model lr = do
       case eRoute of
         Left _ -> Nothing
         Right (R.encodeRoute -> rawPath) -> do
-          SR.decodeNonResourceRoute rawPath
-            <&> (,Nothing)
+          SR.decodeVirtualRoute rawPath
+            <&> (,Nothing) . openUnionLift
 
-resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SiteRoute, Maybe UTCTime)
+resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)
 resourceSiteRoute = \case
   Left note ->
     SR.noteFileSiteRoute note

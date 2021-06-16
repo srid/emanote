@@ -11,7 +11,7 @@ import qualified Ema
 import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
-import qualified Emanote.View.SiteRoute as SR
+import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Interpreted as HI
@@ -44,5 +44,5 @@ queryResolvingSplice currentNote model HP.RenderCtx {..} blk = do
 noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
 noteSplice model note = do
   "note:title" ## HI.textSplice (MN.noteTitle note)
-  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.SRLMLFile $ note ^. MN.noteRoute)
+  "note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
