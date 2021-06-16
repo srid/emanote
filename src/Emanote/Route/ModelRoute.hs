@@ -13,6 +13,8 @@ module Emanote.Route.ModelRoute
     LMLRoute,
     liftLMLRoute,
     lmlRouteCase,
+    -- Static file routes
+    StaticFileRoute,
   )
 where
 
@@ -31,9 +33,11 @@ type LMLRoutes' =
   '[ R ('LMLType 'Md)
    ]
 
+type StaticFileRoute = R 'AnyExt
+
 -- | A "route" into the `Model`.
 type ModelRoutes' =
-  R 'AnyExt
+  StaticFileRoute
     ': LMLRoutes'
 
 -- | A R to anywhere in `Model`
@@ -65,7 +69,7 @@ lmlRouteCase =
 
 modelRouteCase ::
   ModelRoute ->
-  Either LMLRoute (R 'AnyExt)
+  Either LMLRoute StaticFileRoute
 modelRouteCase =
   first (liftLMLRoute @('LMLType 'Md))
     . ( absurdUnion
