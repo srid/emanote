@@ -2,6 +2,7 @@ module Emanote.Pandoc.Filter.Url (urlResolvingSplice) where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
+import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import qualified Ema
 import qualified Ema.CLI
@@ -14,39 +15,47 @@ import qualified Emanote.Route as R
 import Emanote.View.SiteRoute (SiteRoute (..))
 import qualified Emanote.View.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
+import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
 -- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
-urlResolvingSplice emaAction model ctx =
-  let ctxTerm = ctx {HP.blockSplice = const Nothing, HP.inlineSplice = const Nothing}
-   in fmap (HP.rpInline ctxTerm) . handleInline
+urlResolvingSplice ::
+  Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
+urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
+  case inl of
+    B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
+      pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+        Left err ->
+          brokenLinkSpanWrapper err inl
+        Right (newIs, newUrl) ->
+          HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
+    B.Image attr@(id', class', otherAttrs) is' (url, tit) -> do
+      let is = imageInlineFallback url is'
+      pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+        Left err ->
+          brokenLinkSpanWrapper err $
+            B.Image (id', class', otherAttrs) is (url, tit)
+        Right (newIs, newUrl) ->
+          HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
+    _ -> Nothing
   where
-    handleInline inl =
-      case inl of
-        B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
-          pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
-            Left err ->
-              B.Span ("", one "emanote:broken-link", one ("title", err)) (one inl)
-            Right (newIs, newUrl) ->
-              B.Link attr newIs (newUrl, tit)
-        B.Image attr@(_id, _class, otherAttrs) is (url, tit) ->
-          pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
-            Left err ->
-              B.Span ("", one "emanote:broken-image", one ("title", err)) (one inl)
-            Right (newIs, newUrl) ->
-              B.Image attr newIs (newUrl, tit)
-        _ -> Nothing
+    -- Fallback to filename if no "alt" text is specified
+    imageInlineFallback fn = \case
+      [] -> one $ B.Str fn
+      x -> x
+    brokenLinkSpanWrapper err inline =
+      HP.rpInline ctx $
+        B.Span ("", one "emanote:broken-link", one ("title", err)) $
+          one inline
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
 resolveUrl emaAction model linkAttrs x@(inner, url) =
   fromMaybe (Right x) $ do
-    fmap (fmap renderUrl)
-      . resolveUnresolvedRelTarget model
-      <=< Rel.parseUnresolvedRelTarget linkAttrs
-      $ url
+    uRel <- Rel.parseUnresolvedRelTarget linkAttrs url
+    let target = resolveUnresolvedRelTarget model uRel
+    pure $ second renderUrl target
   where
     renderUrl ::
       (SiteRoute, Maybe UTCTime) ->
@@ -81,28 +90,63 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
             Nothing
 
 resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Maybe (Either Text (SiteRoute, Maybe UTCTime))
+  Model -> Rel.UnresolvedRelTarget -> Either Text (SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Right r ->
-    pure <$> resolveLinkableRoute r
-  Left wl ->
-    case nonEmpty (M.modelResolveWikiLink wl model) of
-      Nothing -> do
-        pure $ throwError "Unresolved wiki-link"
-      Just targets ->
-        -- TODO: Deal with ambiguous targets here
-        pure <$> resolveLinkableRoute (head targets)
+    resolveLinkableRouteMustExist r
+  Left (_wlType, wl) -> do
+    resourceSiteRoute <$> resolveWikiLinkMustExist wl
   where
-    resolveLinkableRoute r =
-      case R.linkableRouteCase r of
-        Left lmlR -> do
-          lmlRoute lmlR model
+    resolveWikiLinkMustExist wl =
+      case nonEmpty (M.modelWikiLinkTargets wl model) of
+        Nothing -> do
+          throwError "Wiki-link does not refer to any known file"
+        Just (target :| []) ->
+          pure target
+        Just targets -> do
+          let targetsStr =
+                targets <&> \case
+                  Left note -> R.encodeRoute $ R.linkableLMLRouteCase $ note ^. MN.noteRoute
+                  Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
+          throwError $
+            "Wikilink "
+              <> show wl
+              <> " is ambiguous; referring to one of: "
+              <> T.intercalate ", " (toText <$> toList targetsStr)
+    resolveLinkableRouteMustExist r =
+      case resolveLinkableRoute model r of
+        Nothing ->
+          Left "Link does not refer to any known file"
+        Just v -> Right v
+
+resolveLinkableRoute :: Model -> R.LinkableRoute -> Maybe (SiteRoute, Maybe UTCTime)
+resolveLinkableRoute model lr = do
+  let eRoute = R.linkableRouteCase lr
+  let meRes =
+        bitraverse
+          (`M.modelLookupNoteByRoute` model)
+          (`M.modelLookupStaticFileByRoute` model)
+          eRoute
+  case meRes of
+    Just eRes ->
+      -- The route resolves to something in the model
+      pure $ resourceSiteRoute eRes
+    Nothing -> do
+      -- The route does not resolve to anything in the model
+      -- If this route is a AnyExt, let's decoding it as a "non resource" route.
+      -- This HACK should go away upon refactoring SiteRoute /
+      -- UnresolvedRelTarget types (see their comments).
+      case eRoute of
+        Left _ -> Nothing
+        Right (R.encodeRoute -> rawPath) -> do
+          SR.decodeNonResourceRoute rawPath
             <&> (,Nothing)
-        Right sR -> do
-          sf <- M.modelLookupStaticFileByRoute sR model
-          pure $
-            SR.staticFileSiteRoute sf
-              & (,Just $ sf ^. SF.staticFileTime)
-    lmlRoute :: R.LinkableLMLRoute -> Model -> Maybe SiteRoute
-    lmlRoute r m = do
-      SR.noteFileSiteRoute <$> M.modelLookupNoteByRoute r m
+
+resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SiteRoute, Maybe UTCTime)
+resourceSiteRoute = \case
+  Left note ->
+    SR.noteFileSiteRoute note
+      & (,Nothing)
+  Right sf ->
+    SR.staticFileSiteRoute sf
+      & (,Just $ sf ^. SF.staticFileTime)

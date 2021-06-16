@@ -6,7 +6,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
-  ( WikiLink,
+  ( WikiLink (unWikiLink),
+    WikiLinkType,
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
     allowedWikiLinks,
@@ -16,28 +17,34 @@ where
 import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
 import qualified Commonmark.TokParsers as CT
+import Control.Monad (liftM2)
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
-import Ema (Slug)
+import Ema (Slug (unSlug))
 import qualified Ema
 import Emanote.Route (LinkableRoute, R (unRoute), linkableLMLRouteCase, linkableRouteCase)
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
 import Text.Read (Read (readsPrec))
+import qualified Text.Show (Show (show))
 
 -- | Represents the "Foo" in [[Foo]]
 --
 -- As wiki links may contain multiple path components, it can also represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
-  deriving (Eq, Show, Ord, Typeable, Data)
+  deriving (Eq, Ord, Typeable, Data)
+
+instance Show WikiLink where
+  show (WikiLink (toList . fmap unSlug -> slugs)) =
+    toString $ "[[" <> T.intercalate "/" slugs <> "]]"
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
 mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
-  wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup "title" $ attrs
+  wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
   wl <- mkWikiLinkFromUrl s
   pure (wlType, wl)
   where
@@ -51,13 +58,17 @@ mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
 -- | Return the various ways to link to this markdown route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
-allowedWikiLinks :: LinkableRoute -> [WikiLink]
+--
+-- All possible combinations of Wikilink type use is automatically included.
+allowedWikiLinks :: LinkableRoute -> [(WikiLinkType, WikiLink)]
 allowedWikiLinks =
-  mapMaybe (fmap WikiLink . nonEmpty)
+  liftM2 (,) wlAllTypes
+    . mapMaybe (fmap WikiLink . nonEmpty)
     . toList
     . NE.tails
     . wlParts
   where
+    wlAllTypes :: [WikiLinkType] = [minBound .. maxBound]
     wlParts =
       either (unRoute . linkableLMLRouteCase) unRoute
         . linkableRouteCase
@@ -78,7 +89,7 @@ data WikiLinkType
     WikiLinkTag
   | -- | ![[Foo]]
     WikiLinkEmbed
-  deriving (Eq, Show, Ord, Typeable, Data)
+  deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded)
 
 instance Read WikiLinkType where
   readsPrec _ s
@@ -88,11 +99,17 @@ instance Read WikiLinkType where
     | s == show WikiLinkEmbed = [(WikiLinkEmbed, "")]
     | otherwise = []
 
+-- | The HTML 'data attribute' storing the wiki-link type.
+htmlAttr :: Text
+htmlAttr = "data-wikilink-type"
+
 class HasWikiLink il where
   wikilink :: WikiLinkType -> Text -> il -> il
 
 instance HasWikiLink (CP.Cm b B.Inlines) where
-  wikilink typ t il = CP.Cm $ B.link t (show typ) $ CP.unCm il
+  wikilink typ t il = CP.Cm $ B.linkWith attrs t "" $ CP.unCm il
+    where
+      attrs = ("", [], [(htmlAttr, show typ)])
 
 -- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
 --
