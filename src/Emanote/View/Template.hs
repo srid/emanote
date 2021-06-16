@@ -12,11 +12,7 @@ import Data.Map.Syntax ((##))
 import qualified Data.Map.Syntax as MapSyntax
 import Data.Version (showVersion)
 import Data.WorldPeace.Union
-  ( ElemRemove,
-    OpenUnion,
-    Remove,
-    absurdUnion,
-    openUnionHandle,
+  ( absurdUnion,
   )
 import qualified Ema
 import qualified Ema.CLI
@@ -56,6 +52,12 @@ render emaAction m =
                 note404 = MN.mkEmptyNoteWith route404 $ B.Plain [B.Str $ "No note found for '" <> toText urlPath <> "'"]
             Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
         )
+    `h` renderResourceRoute emaAction m
+    `h` renderVirtualRoute emaAction m
+
+renderResourceRoute :: Ema.CLI.Action -> Model -> SR.ResourceRoute -> Ema.Asset LByteString
+renderResourceRoute emaAction m =
+  absurdUnion
     `h` ( \(r :: R.LMLRoute) -> do
             case M.modelLookupNoteByRoute r m of
               Just note ->
@@ -67,7 +69,6 @@ render emaAction m =
     `h` ( \(_ :: R.StaticFileRoute, fpAbs :: FilePath) -> do
             Ema.AssetStatic fpAbs
         )
-    `h` renderVirtualRoute emaAction m
 
 renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
 renderVirtualRoute emaAction m =

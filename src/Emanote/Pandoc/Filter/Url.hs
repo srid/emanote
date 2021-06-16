@@ -80,12 +80,15 @@ resolveUrl emaAction model linkAttrs x@(inner, url) =
         wikiLinkDefaultInnerText =
           absurdUnion
             `h` (\(SR.MissingR _) -> Nothing)
-            `h` ( \(lmlR :: R.LMLRoute) ->
-                    one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-                )
-            `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                    -- Just append a file: prefix.
-                    pure $ B.Str "File: " : inner
+            `h` ( \(resR :: SR.ResourceRoute) ->
+                    resR & absurdUnion
+                      `h` ( \(lmlR :: R.LMLRoute) ->
+                              one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
+                          )
+                      `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
+                              -- Just append a file: prefix.
+                              pure $ B.Str "File: " : inner
+                          )
                 )
             `h` (\(_ :: SR.VirtualRoute) -> Nothing)
 
