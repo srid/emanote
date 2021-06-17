@@ -6,4 +6,8 @@ Emanote is still a **work in progress**; therefore this site does not yet have m
 
 Checkout [[start]]. Some doc hints are available in [[guide]], but nothing is fleshed out yet. If you are interested in contributing, see [[architecture]].
 
+:::{.flex .justify-center .items-center}
+[![FAIR](https://img.shields.io/badge/FAIR-pledge-blue)](https://www.fairforall.org/about/)
+:::
+
 [gh]: https://github.com/srid/emanote

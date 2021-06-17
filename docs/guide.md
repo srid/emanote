@@ -27,6 +27,7 @@ Mega features,
   - Including citations
 - mdBook like search (emanote should provide the index)
 - Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)
+- Tailwind styling in Markdown
 
 Known limitations
 
