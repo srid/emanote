@@ -52,53 +52,56 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
           one inline
 
 resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
-resolveUrl emaAction model linkAttrs x@(inner, url) =
+resolveUrl emaAction model linkAttrs x@(_inner, url) =
   fromMaybe (Right x) $ do
     uRel <- Rel.parseUnresolvedRelTarget linkAttrs url
     let target = resolveUnresolvedRelTarget model uRel
-    pure $ second renderUrl target
+    pure $ second (renderUrl emaAction model x) target
+
+renderUrl ::
+  Ema.CLI.Action ->
+  Model ->
+  ([B.Inline], Text) ->
+  (SR.SiteRoute, Maybe UTCTime) ->
+  ([B.Inline], Text)
+renderUrl emaAction model (inner, url) (r, mTime) =
+  let isWikiLinkSansCustom = url == plainify inner
+      mQuery = do
+        -- In live server mode, append last modification time if any, such
+        -- that the browser is forced to refresh the inline image on hot
+        -- reload (Ema's DOM patch).
+        guard $ emaAction == Ema.CLI.Run
+        t <- mTime
+        pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
+   in ( fromMaybe
+          inner
+          ( guard isWikiLinkSansCustom >> wikiLinkDefaultInnerText r
+          ),
+        Ema.routeUrl model r <> fromMaybe "" mQuery
+      )
   where
-    renderUrl ::
-      (SR.SiteRoute, Maybe UTCTime) ->
-      ([B.Inline], Text)
-    renderUrl (r, mTime) =
-      let isWikiLinkSansCustom = url == plainify inner
-          mQuery = do
-            -- In live server mode, append last modification time if any, such
-            -- that the browser is forced to refresh the inline image on hot
-            -- reload (Ema's DOM patch).
-            guard $ emaAction == Ema.CLI.Run
-            t <- mTime
-            pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
-       in ( fromMaybe
-              inner
-              ( guard isWikiLinkSansCustom >> wikiLinkDefaultInnerText r
-              ),
-            Ema.routeUrl model r <> fromMaybe "" mQuery
-          )
-      where
-        wikiLinkDefaultInnerText =
-          absurdUnion
-            `h` (\(SR.MissingR _) -> Nothing)
-            `h` ( \(resR :: SR.ResourceRoute) ->
-                    resR & absurdUnion
-                      `h` ( \(lmlR :: R.LMLRoute) ->
-                              one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
-                          )
-                      `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                              -- Just append a file: prefix.
-                              pure $ B.Str "File: " : inner
-                          )
-                )
-            `h` (\(_ :: SR.VirtualRoute) -> Nothing)
+    wikiLinkDefaultInnerText =
+      absurdUnion
+        `h` (\(SR.MissingR _) -> Nothing)
+        `h` ( \(resR :: SR.ResourceRoute) ->
+                resR & absurdUnion
+                  `h` ( \(lmlR :: R.LMLRoute) ->
+                          one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
+                      )
+                  `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
+                          -- Just append a file: prefix.
+                          pure $ B.Str "File: " : inner
+                      )
+            )
+        `h` (\(_ :: SR.VirtualRoute) -> Nothing)
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
-  Rel.URTResource r ->
-    resolveModelRouteMustExist r
   Rel.URTWikiLink (_wlType, wl) -> do
     resourceSiteRoute <$> resolveWikiLinkMustExist wl
+  Rel.URTResource r ->
+    resourceSiteRoute <$> resolveModelRouteMustExist r
   Rel.URTVirtual virtualRoute -> do
     pure $
       openUnionLift virtualRoute
@@ -126,14 +129,13 @@ resolveUnresolvedRelTarget model = \case
           Left "Link does not refer to any known file"
         Just v -> Right v
 
-resolveModelRoute :: Model -> R.ModelRoute -> Maybe (SR.SiteRoute, Maybe UTCTime)
+resolveModelRoute :: Model -> R.ModelRoute -> Maybe (Either MN.Note SF.StaticFile)
 resolveModelRoute model lr = do
   let eRoute = R.modelRouteCase lr
-  resourceSiteRoute
-    <$> bitraverse
-      (`M.modelLookupNoteByRoute` model)
-      (`M.modelLookupStaticFileByRoute` model)
-      eRoute
+  bitraverse
+    (`M.modelLookupNoteByRoute` model)
+    (`M.modelLookupStaticFileByRoute` model)
+    eRoute
 
 resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)
 resourceSiteRoute = \case

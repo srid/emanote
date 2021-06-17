@@ -12,7 +12,9 @@ Emanote's high-level architecture is as follows,
   - The key concept here is the notion of "union mount", implemented by `Emanote.Source.Mount`, which will eventually be made its own Haskell library.
 - `Emanote.Model`: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
   - The individual modules in this package should be `import`ed separately to use the specific model types.
-- `Emanote.Route`: Haskell route types to point to somewhere in `Emanote.Model` (eg: route to a .md file, or a route to a .jpeg file)
+- `Emanote.Route`: Route types
+  - `Emanote.Route.ModelRoute`: Haskell route types to point to somewhere in `Emanote.Model` (eg: route to a .md file, or a route to a .jpeg file)
+  - `Emanote.Route.SiteRoute`: Haskell route types pointing to somewhere in the generated site.
 - `Emanote.View`: Rendering code (HTML, templates, site routes)
 - `Emanote.Pandoc`: Everything to do with light-weight markup processing
   - `Emanote.Pandoc.Markdown`: Markdown-specific parsers and syntax.
