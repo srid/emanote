@@ -11,7 +11,7 @@
             <!-- TODO: How to style the backlinks list item element? Or render each separately?
                     -->
             <backlink:note:context>
-              <PandocLink class="text-black-600">
+              <PandocLink class="text-gray-600">
                 <Internal class="font-bold hover:bg-gray-50" />
                 <External class="hover:underline" target="_blank" rel="noopener" />
               </PandocLink>
