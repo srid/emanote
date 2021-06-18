@@ -41,9 +41,9 @@ pandoc:
 page:
   siteName: Emanote
   siteTitle: Emanote
-  description: |
-    Emanote -- create beautiful websites out of plain-text notes. Supports
-    Markdown, Wiki-links, directories, HTML templates for complete theming.
+  # Desription should be set on per-page basis.
+  # HACK: We are setting it to empty here, because Heist doesn't work well.
+  description: ""
   headHtml: |
     <!-- Syntax highlighting -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />

@@ -6,6 +6,6 @@ Embedding a note will simply inline it. For example, using `![[start]]` displays
 
 ![[start]]
 
-Embedding of [[file-links]], as indicated in the aforementioned Obsidian help page, will eventually be supported; embedding image files already work (`![[foo.jpg]]` is equivalent to `![](/path/to/foo.jpeg))`.
+Embedding of [[file-links]], as indicated in the aforementioned Obsidian help page, will eventually be supported; embedding image files already work (`![[foo.jpg]]` is equivalent to `![](path/to/foo.jpeg))`.
 
 See https://github.com/srid/emanote/issues/24 for progress.

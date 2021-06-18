@@ -1,3 +1,9 @@
+---
+page:
+  description: |
+    Emanote -- create beautiful websites out of plain-text notes. Supports
+    Markdown, Wiki-links, directories, HTML templates for complete theming.
+---
 # Emanote
 
 Welcome to [Emanote][gh], which aims to be next-gen [neuron](https://neuron.zettel.page/) with powerful features.
