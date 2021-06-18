@@ -28,13 +28,13 @@ embedWikiLinkResolvingSplice ::
 embedWikiLinkResolvingSplice model (ctxSansCustomSplicing -> ctx) blk =
   case blk of
     B.Para [B.Link (_id, _class, otherAttrs) _is (url, tit)] -> do
-      uRel@(Rel.URTWikiLink (WL.WikiLinkEmbed, _)) <-
+      Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
         Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-      case Url.resolveUnresolvedRelTarget model uRel of
+      case Url.resolveWikiLinkMustExist model wl of
         Left err ->
           pure $ brokenLinkDivWrapper err blk
-        Right (fst -> sr) -> do
-          embedSiteRoute model ctx sr
+        Right res -> do
+          embedSiteRoute model ctx res
     _ ->
       Nothing
   where
@@ -43,24 +43,18 @@ embedWikiLinkResolvingSplice model (ctxSansCustomSplicing -> ctx) blk =
         B.Div (Url.brokenLinkAttr err) $
           one block
 
-embedSiteRoute :: Monad n => Model -> HP.RenderCtx n -> SR.SiteRoute -> Maybe (HI.Splice n)
-embedSiteRoute model ctx =
-  absurdUnion
-    `h` (\(SR.MissingR _) -> Nothing)
-    `h` ( \(resR :: SR.ResourceRoute) ->
-            resR & absurdUnion
-              `h` ( \(lmlR :: R.LMLRoute) ->
-                      HP.rpBlock ctx <$> do
-                        pure $ B.Plain [B.Str "emanote-error: ![[..]] is TODO; see https://github.com/srid/emanote/issues/24"]
-                  )
-              `h` ( \(r :: R.StaticFileRoute, fp :: FilePath) ->
-                      HP.rpBlock ctx <$> do
-                        if any (`T.isSuffixOf` toText fp) imageExts
-                          then pure $ B.Plain $ one $ B.Image B.nullAttr [] (toText $ R.encodeRoute r, "")
-                          else Nothing
-                  )
-        )
-    `h` (\(_ :: SR.VirtualRoute) -> Nothing)
+embedSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
+embedSiteRoute model ctx = \case
+  Left note -> do
+    HP.rpBlock ctx <$> do
+      pure $ B.Plain [B.Str "emanote-error: ![[..]] is TODO; see https://github.com/srid/emanote/issues/24"]
+  Right staticFile -> do
+    let r = staticFile ^. SF.staticFileRoute
+        fp = staticFile ^. SF.staticFilePath
+    HP.rpBlock ctx <$> do
+      if any (`T.isSuffixOf` toText fp) imageExts
+        then pure $ B.Plain $ one $ B.Image B.nullAttr [] (toText $ R.encodeRoute r, "")
+        else Nothing
 
 imageExts :: [Text]
 imageExts =

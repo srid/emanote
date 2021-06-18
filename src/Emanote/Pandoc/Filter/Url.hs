@@ -1,11 +1,12 @@
 module Emanote.Pandoc.Filter.Url
   ( urlResolvingSplice,
     brokenLinkAttr,
-    resolveUnresolvedRelTarget,
+    resolveWikiLinkMustExist,
   )
 where
 
 import Control.Lens.Operators ((^.))
+import Control.Monad.Error (MonadError)
 import Control.Monad.Except (throwError)
 import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
@@ -17,6 +18,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
@@ -113,7 +115,7 @@ resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Rel.URTWikiLink (_wlType, wl) -> do
-    resourceSiteRoute <$> resolveWikiLinkMustExist wl
+    resourceSiteRoute <$> resolveWikiLinkMustExist model wl
   Rel.URTResource r ->
     resourceSiteRoute <$> resolveModelRouteMustExist r
   Rel.URTVirtual virtualRoute -> do
@@ -121,27 +123,29 @@ resolveUnresolvedRelTarget model = \case
       openUnionLift virtualRoute
         & (,Nothing)
   where
-    resolveWikiLinkMustExist wl =
-      case nonEmpty (M.modelWikiLinkTargets wl model) of
-        Nothing -> do
-          throwError "Wiki-link does not refer to any known file"
-        Just (target :| []) ->
-          pure target
-        Just targets -> do
-          let targetsStr =
-                targets <&> \case
-                  Left note -> R.encodeRoute $ R.lmlRouteCase $ note ^. MN.noteRoute
-                  Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
-          throwError $
-            "Wikilink "
-              <> show wl
-              <> " is ambiguous; referring to one of: "
-              <> T.intercalate ", " (toText <$> toList targetsStr)
     resolveModelRouteMustExist r =
       case resolveModelRoute model r of
         Nothing ->
           Left "Link does not refer to any known file"
         Just v -> Right v
+
+resolveWikiLinkMustExist :: MonadError Text m => Model -> WL.WikiLink -> m (Either MN.Note SF.StaticFile)
+resolveWikiLinkMustExist model wl =
+  case nonEmpty (M.modelWikiLinkTargets wl model) of
+    Nothing -> do
+      throwError "Wiki-link does not refer to any known file"
+    Just (target :| []) ->
+      pure target
+    Just targets -> do
+      let targetsStr =
+            targets <&> \case
+              Left note -> R.encodeRoute $ R.lmlRouteCase $ note ^. MN.noteRoute
+              Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
+      throwError $
+        "Wikilink "
+          <> show wl
+          <> " is ambiguous; referring to one of: "
+          <> T.intercalate ", " (toText <$> toList targetsStr)
 
 resolveModelRoute :: Model -> R.ModelRoute -> Maybe (Either MN.Note SF.StaticFile)
 resolveModelRoute model lr = do
