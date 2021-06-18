@@ -77,5 +77,7 @@ imageExts =
   [ ".jpg",
     ".jpeg",
     ".png",
-    ".svg"
+    ".svg",
+    ".gif",
+    ".bmp"
   ]
