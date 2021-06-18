@@ -53,7 +53,7 @@ render emaAction m =
             Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
         )
     `h` renderResourceRoute emaAction m
-    `h` renderVirtualRoute emaAction m
+    `h` renderVirtualRoute m
 
 renderResourceRoute :: Ema.CLI.Action -> Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute emaAction m =
@@ -70,28 +70,28 @@ renderResourceRoute emaAction m =
             Ema.AssetStatic fpAbs
         )
 
-renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
-renderVirtualRoute emaAction m =
+renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
+renderVirtualRoute m =
   absurdUnion
     `h` ( \SR.TagIndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRTagIndex emaAction m
+            Ema.AssetGenerated Ema.Html $ renderSRTagIndex m
         )
     `h` ( \SR.IndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
+            Ema.AssetGenerated Ema.Html $ renderSRIndex m
         )
 
-renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
-renderSRIndex emaAction model = do
+renderSRIndex :: Model -> LByteString
+renderSRIndex model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "@Index"
+    commonSplices meta "@Index"
     routeTreeSplice Nothing model
 
-renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
-renderSRTagIndex emaAction model = do
+renderSRTagIndex :: Model -> LByteString
+renderSRTagIndex model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "@Tags"
+    commonSplices meta "@Tags"
     "ema:tagindex"
       ## Splices.listSplice (M.modelTags model) "each-tag"
       $ \(tag, notes) -> do
@@ -109,7 +109,7 @@ renderLmlHtml emaAction model note = do
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta pageTitle
+    commonSplices meta pageTitle
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
@@ -148,8 +148,8 @@ renderLmlHtml emaAction model note = do
     withoutH1 doc =
       doc
 
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
-commonSplices emaAction meta routeTitle = do
+commonSplices :: Monad n => Aeson.Value -> Text -> H.Splices (HI.Splice n)
+commonSplices meta routeTitle = do
   let siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
   -- Heist helpers
   "bind" ## HB.bindImpl
@@ -157,7 +157,7 @@ commonSplices emaAction meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim"
     ## pure
-      (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+      (RX.renderHtmlNodes Tailwind.twindShimUnofficial)
   "ema:version"
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
