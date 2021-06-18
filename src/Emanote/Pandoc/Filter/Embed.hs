@@ -17,6 +17,7 @@ import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (..), ctxSansCustomSplicing)
+import Heist.Extra.Splices.Pandoc.Render (withoutH1)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 import qualified Text.XmlHtml as X
@@ -51,7 +52,7 @@ embedSiteRoute emaAction model ctx@RenderCtx {..} linkInline = \case
           classMap
           (PF.queryResolvingSplice note model)
           (Url.urlResolvingSplice emaAction model)
-          $ note ^. MN.noteDoc
+          $ note ^. MN.noteDoc & withoutH1
       let embedBoxCls = ("class",) <$> Map.lookup "emanote:embed-box" classMap
           embedBoxHeaderCls = ("class",) <$> Map.lookup "emanote:embed-box:header" classMap
       linkHeading <-
@@ -60,7 +61,7 @@ embedSiteRoute emaAction model ctx@RenderCtx {..} linkInline = \case
         one $
           X.Element
             "div"
-            (maybeToList embedBoxCls)
+            (maybeToList embedBoxCls <> one ("title", "Embedded note"))
             $ X.Element "div" (maybeToList embedBoxHeaderCls) linkHeading :
             embedNodes
   Right staticFile -> do
