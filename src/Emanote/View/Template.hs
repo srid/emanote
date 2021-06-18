@@ -139,7 +139,7 @@ renderLmlHtml emaAction model note = do
       ## Splices.pandocSplice
         rewriteClass
         ( \ctx blk ->
-            PF.embedWikiLinkResolvingSplice model ctx blk
+            PF.embedWikiLinkResolvingSplice emaAction model ctx blk
               <|> PF.queryResolvingSplice note model ctx blk
         )
         (PF.urlResolvingSplice emaAction model)
