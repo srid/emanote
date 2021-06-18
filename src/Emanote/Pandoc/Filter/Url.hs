@@ -12,6 +12,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
@@ -26,20 +27,28 @@ urlResolvingSplice ::
   Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
 urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
   case inl of
-    B.Link attr@(_id, _class, otherAttrs) is (url, tit) ->
-      pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+    B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
+      uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+      case resolveUnresolvedRelTarget model uRel of
         Left err ->
-          brokenLinkSpanWrapper err inl
-        Right (newIs, newUrl) ->
-          HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
+          pure $ brokenLinkSpanWrapper err inl
+        Right sr -> do
+          -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
+          -- in B.Para (so do this in block-level custom splice), then embed it.
+          -- We don't do this here, as this inline splice can't embed block elements.
+          let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
+          pure $ HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
     B.Image attr@(id', class', otherAttrs) is' (url, tit) -> do
       let is = imageInlineFallback url is'
-      pure $ case resolveUrl emaAction model (otherAttrs <> one ("title", tit)) (is, url) of
+      uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+      case resolveUnresolvedRelTarget model uRel of
         Left err ->
-          brokenLinkSpanWrapper err $
-            B.Image (id', class', otherAttrs) is (url, tit)
-        Right (newIs, newUrl) ->
-          HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
+          pure $
+            brokenLinkSpanWrapper err $
+              B.Image (id', class', otherAttrs) is (url, tit)
+        Right sr -> do
+          let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
+          pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
     _ -> Nothing
   where
     -- Fallback to filename if no "alt" text is specified
@@ -51,36 +60,22 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
         B.Span ("", one "emanote:broken-link", one ("title", err)) $
           one inline
 
-resolveUrl :: Ema.CLI.Action -> Model -> [(Text, Text)] -> ([B.Inline], Text) -> Either Text ([B.Inline], Text)
-resolveUrl emaAction model linkAttrs x@(_inner, url) =
-  fromMaybe (Right x) $ do
-    uRel <- Rel.parseUnresolvedRelTarget linkAttrs url
-    let target = resolveUnresolvedRelTarget model uRel
-    pure $ second (renderUrl emaAction model x) target
-
-renderUrl ::
+replaceLinkNodeWithRoute ::
   Ema.CLI.Action ->
   Model ->
-  ([B.Inline], Text) ->
   (SR.SiteRoute, Maybe UTCTime) ->
+  ([B.Inline], Text) ->
   ([B.Inline], Text)
-renderUrl emaAction model (inner, url) (r, mTime) =
-  let isWikiLinkSansCustom = url == plainify inner
-      mQuery = do
-        -- In live server mode, append last modification time if any, such
-        -- that the browser is forced to refresh the inline image on hot
-        -- reload (Ema's DOM patch).
-        guard $ emaAction == Ema.CLI.Run
-        t <- mTime
-        pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
-   in ( fromMaybe
-          inner
-          ( guard isWikiLinkSansCustom >> wikiLinkDefaultInnerText r
-          ),
-        Ema.routeUrl model r <> fromMaybe "" mQuery
+replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
+  let finalInner =
+        if url == plainify inner -- It's a wiki-link with no custom text
+          then fromMaybe inner $ siteRouteDefaultInnerText r
+          else inner
+   in ( finalInner,
+        foldUrlTime (Ema.routeUrl model r) mTime
       )
   where
-    wikiLinkDefaultInnerText =
+    siteRouteDefaultInnerText =
       absurdUnion
         `h` (\(SR.MissingR _) -> Nothing)
         `h` ( \(resR :: SR.ResourceRoute) ->
@@ -89,11 +84,23 @@ renderUrl emaAction model (inner, url) (r, mTime) =
                           one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
                       )
                   `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                          -- Just append a file: prefix.
-                          pure $ B.Str "File: " : inner
+                          -- Just append a file: prefix, to existing wiki-link.
+                          pure $ B.Str "File:" : inner
                       )
             )
         `h` (\(_ :: SR.VirtualRoute) -> Nothing)
+    foldUrlTime linkUrl mUrlTime =
+      linkUrl
+        -- In live server mode, append last modification time if any, such
+        -- that the browser is forced to refresh the inline image on hot
+        -- reload (Ema's DOM patch).
+        <> fromMaybe
+          ""
+          ( do
+              guard $ emaAction == Ema.CLI.Run
+              t <- mUrlTime
+              pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
+          )
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
