@@ -1,4 +1,9 @@
-module Emanote.Pandoc.Filter.Url (urlResolvingSplice) where
+module Emanote.Pandoc.Filter.Url
+  ( urlResolvingSplice,
+    brokenLinkAttr,
+    resolveUnresolvedRelTarget,
+  )
+where
 
 import Control.Lens.Operators ((^.))
 import Control.Monad.Except (throwError)
@@ -12,7 +17,6 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
@@ -57,8 +61,11 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
       x -> x
     brokenLinkSpanWrapper err inline =
       HP.rpInline ctx $
-        B.Span ("", one "emanote:broken-link", one ("title", err)) $
-          one inline
+        B.Span (brokenLinkAttr err) $ one inline
+
+brokenLinkAttr :: Text -> B.Attr
+brokenLinkAttr err =
+  ("", ["emanote:broken-link"], [("title", err)])
 
 replaceLinkNodeWithRoute ::
   Ema.CLI.Action ->

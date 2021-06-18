@@ -22,6 +22,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
@@ -137,7 +138,10 @@ renderLmlHtml emaAction model note = do
     "ema:note:pandoc"
       ## Splices.pandocSplice
         rewriteClass
-        (PF.queryResolvingSplice note model)
+        ( \ctx blk ->
+            PF.embedWikiLinkResolvingSplice model ctx blk
+              <|> PF.queryResolvingSplice note model ctx blk
+        )
         (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
