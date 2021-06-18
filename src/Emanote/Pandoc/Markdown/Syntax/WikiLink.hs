@@ -7,7 +7,7 @@
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink (unWikiLink),
-    WikiLinkType,
+    WikiLinkType (..),
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
     allowedWikiLinks,
