@@ -69,12 +69,13 @@ Before tests (tasks impacting the larger architectural context in code base),
   - [x] Refactor `R` to accomodate them all, and ditch `Either FilePath`
   - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
 - Embedding / Filtering / Transforming / etc
-  - [ ] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+  - [x] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
     - Consider designing this in the larger context of Pandoc splice with customizable rendering 
       - Including wiki-links (thus supplanting rewriteLinks)
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [x] Queries and results embed (see below)
+- [ ] WikiLink embedding for note should use .tpl layout
 - [ ] neuron UpTree?
   - ixset + path finding traversal
   - rendering design: where to place? esp. in relation to sidebar?

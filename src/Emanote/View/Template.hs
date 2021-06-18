@@ -22,6 +22,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
@@ -32,6 +33,7 @@ import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
+import Heist.Extra.Splices.Pandoc.Render (withoutH1)
 import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
@@ -137,16 +139,13 @@ renderLmlHtml emaAction model note = do
     "ema:note:pandoc"
       ## Splices.pandocSplice
         rewriteClass
-        (PF.queryResolvingSplice note model)
+        ( \ctx blk ->
+            PF.embedWikiLinkResolvingSplice emaAction model ctx blk
+              <|> PF.queryResolvingSplice note model ctx blk
+        )
         (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
-  where
-    withoutH1 :: Pandoc -> Pandoc
-    withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
-      Pandoc meta rest
-    withoutH1 doc =
-      doc
 
 commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
 commonSplices emaAction meta routeTitle = do

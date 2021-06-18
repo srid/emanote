@@ -23,6 +23,7 @@ Mega features,
 - s/[shortcodes](https://web.dev/how-we-build-webdev-and-use-web-components/#templating)/attribute class/ (i., `:::{.foo}`)
 - Powerful and simpler query system (cf. Obsidian search)
   - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
+- Obsidian-style embedding
 - Pandoc filters (`Pandoc -> IO Pandoc`)
   - Including citations
 - mdBook like search (emanote should provide the index)

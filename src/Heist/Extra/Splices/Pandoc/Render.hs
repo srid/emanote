@@ -10,6 +10,7 @@ module Heist.Extra.Splices.Pandoc.Render
     rpBlock',
     rpInline',
     plainify,
+    withoutH1,
   )
 where
 
@@ -250,3 +251,9 @@ plainify = W.query $ \case
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
   -- `Inline` which `W.query` will traverse again.
   _ -> ""
+
+withoutH1 :: Pandoc -> Pandoc
+withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
+  Pandoc meta rest
+withoutH1 doc =
+  doc
