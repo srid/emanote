@@ -1,8 +1,7 @@
 ---
 order: 20
+title: Demo page
 ---
-
-# Demo
 
 This section demonstrates some of Emanote's features. The list here is not comprehensive, due to WIP stage of the project. 
 
