@@ -79,8 +79,19 @@ unresolvedRelsTo r =
 -- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
+  -- Let absolute URLs pass through
   guard $ not $ "://" `T.isInfixOf` url
-  let fp = UE.decode (toString url)
-  fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
-    <|> fmap URTVirtual (SR.decodeVirtualRoute fp)
-    <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
+  wikiLink <|> hyperLinks
+  where
+    wikiLink =
+      fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
+    hyperLinks = do
+      -- Avoid links like "mailto:", "magnet:", etc.
+      -- An easy way to parse them is to look for colon character.
+      --
+      -- This does mean that "Foo: Bar.md" cannot be linked to this way, however
+      -- the user can do it using wiki-links.
+      guard $ not $ ":" `T.isInfixOf` url
+      let fp = UE.decode (toString url)
+      fmap URTVirtual (SR.decodeVirtualRoute fp)
+        <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
