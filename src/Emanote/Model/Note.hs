@@ -98,9 +98,11 @@ lookupMeta k =
   lookupAeson Nothing k . _noteMeta
 
 noteTitle :: Note -> Text
-noteTitle Note {..} =
-  fromMaybe (R.routeBaseName . R.lmlRouteCase $ _noteRoute) $
-    getPandocTitle _noteDoc
+noteTitle note@Note {..} =
+  let yamlNoteTitle = lookupMeta (one "title") note
+      fileNameTitle = R.routeBaseName . R.lmlRouteCase $ _noteRoute
+      notePandocTitle = getPandocTitle _noteDoc
+   in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Text
     getPandocTitle =
