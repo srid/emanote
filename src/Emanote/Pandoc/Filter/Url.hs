@@ -6,8 +6,7 @@ module Emanote.Pandoc.Filter.Url
 where
 
 import Control.Lens.Operators ((^.))
-import Control.Monad.Error (MonadError)
-import Control.Monad.Except (throwError)
+import Control.Monad.Except (MonadError, throwError)
 import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import Data.WorldPeace.Union (absurdUnion, openUnionLift)
