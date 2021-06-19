@@ -50,8 +50,6 @@ mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
   where
     mkWikiLinkFromUrl :: Text -> Maybe WikiLink
     mkWikiLinkFromUrl url = do
-      -- TODO: Handle mailto: etc.
-      guard $ not $ "://" `T.isInfixOf` url
       slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" url
       pure $ WikiLink slugs
 
