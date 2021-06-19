@@ -102,7 +102,7 @@ noteTitle note@Note {..} =
   let yamlNoteTitle = lookupMeta (one "title") note
       fileNameTitle = R.routeBaseName . R.lmlRouteCase $ _noteRoute
       notePandocTitle = getPandocTitle _noteDoc
-   in fromMaybe (fromMaybe fileNameTitle notePandocTitle) yamlNoteTitle
+   in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Text
     getPandocTitle =
