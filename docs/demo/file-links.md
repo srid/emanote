@@ -7,3 +7,5 @@ For example, here is a link to some text file: [[Sample.txt]]
 You can also specify the full, or subset of, the path: [[demo/Sample.txt]]
 
 Of course, a custom link text may also be specified: [[Sample.txt|Some text file]]
+
+You can also add emails, but they are not considered as *links*: mailto: foo@bar.com

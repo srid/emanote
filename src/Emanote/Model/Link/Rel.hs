@@ -80,6 +80,7 @@ unresolvedRelsTo r =
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   guard $ not $ "://" `T.isInfixOf` url
+  guard $ not $ "mailto:" `T.isInfixOf` url
   let fp = UE.decode (toString url)
   fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
     <|> fmap URTVirtual (SR.decodeVirtualRoute fp)
