@@ -47,24 +47,30 @@ embedWikiLinkResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) blk 
 embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
 embedSiteRoute emaAction model ctx@RenderCtx {..} = \case
   Left note -> do
-    pure $ do
-      tpl <- HE.lookupHtmlTemplateMust "/templates/filters/embed-note"
-      HE.runCustomTemplate tpl $ do
-        "ema:note:title" ## HI.textSplice (MN.noteTitle note)
-        "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
-        "ema:note:pandoc"
-          ## Splices.pandocSplice
-            classMap
-            (PF.queryResolvingSplice note model)
-            (Url.urlResolvingSplice emaAction model)
-          $ note ^. MN.noteDoc & withoutH1
+    pure . runEmbedTemplate "note" $ do
+      "ema:note:title" ## HI.textSplice (MN.noteTitle note)
+      "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+      "ema:note:pandoc"
+        ## Splices.pandocSplice
+          classMap
+          (PF.queryResolvingSplice note model)
+          (Url.urlResolvingSplice emaAction model)
+        $ note ^. MN.noteDoc & withoutH1
   Right staticFile -> do
     let r = staticFile ^. SF.staticFileRoute
         fp = staticFile ^. SF.staticFilePath
-    HP.rpBlock ctx <$> do
-      if any (`T.isSuffixOf` toText fp) imageExts
-        then pure $ B.Plain $ one $ B.Image B.nullAttr [] (toText $ R.encodeRoute r, "")
-        else Nothing
+    if
+        | any (`T.isSuffixOf` toText fp) imageExts ->
+          pure . HP.rpBlock ctx $
+            B.Plain $ one $ B.Image B.nullAttr [] (toText $ R.encodeRoute r, "")
+        | any (`T.isSuffixOf` toText fp) videoExts -> do
+          pure . runEmbedTemplate "video" $ do
+            "ema:url" ## HI.textSplice (toText $ R.encodeRoute r)
+        | otherwise -> Nothing
+  where
+    runEmbedTemplate name splices = do
+      tpl <- HE.lookupHtmlTemplateMust $ "/templates/filters/embed-" <> name
+      HE.runCustomTemplate tpl splices
 
 imageExts :: [Text]
 imageExts =
@@ -74,4 +80,11 @@ imageExts =
     ".svg",
     ".gif",
     ".bmp"
+  ]
+
+videoExts :: [Text]
+videoExts =
+  [ ".mp4",
+    ".webm",
+    ".ogv"
   ]
