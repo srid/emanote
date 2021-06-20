@@ -1,4 +1,4 @@
--- TODO: Eventually move `Heist.Extra` to Ema.Helper
+-- TODO: Eventually move `Heist.Extra` to its own library
 -- Consider first the full practical range of template patterns,
 -- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
 {-# LANGUAGE RecordWildCards #-}
@@ -16,11 +16,11 @@ where
 import Control.Lens.Operators ((.~))
 import Control.Monad.Except (runExcept)
 import Data.ByteString.Builder (toLazyByteString)
-import qualified Data.ByteString.Char8 as BC
 import Data.Default (Default (..))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import qualified Heist as H
+import qualified Heist.Common as H
 import qualified Heist.Internal.Types as HT
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension)
@@ -68,7 +68,7 @@ removeTemplateFile :: HasCallStack => FilePath -> TemplateState -> TemplateState
 removeTemplateFile fp (TemplateState eSt) =
   TemplateState $ do
     st <- eSt
-    let tpath = splitPathWith '/' (tmplName fp)
+    let tpath = H.splitPathWith '/' (tmplName fp)
     Right $ st {HT._templateMap = HM.delete tpath (HT._templateMap st)}
 
 renderHeistTemplate ::
@@ -89,15 +89,3 @@ renderHeistTemplate name splices st =
     -- A 'fromJust' that fails in the 'ExceptT' monad
     tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
     tryJust e = hoistEither . maybeToRight e
-
--- Uhh, a fork of heist function not exposed.
-
--- | Converts a path into an array of the elements in reverse order.  If the
--- path is absolute, we need to remove the leading slash so the split doesn't
--- leave @\"\"@ as the last element of the TPath.
---
--- FIXME @\"..\"@ currently doesn't work in paths, the solution is non-trivial
-splitPathWith :: Char -> ByteString -> H.TPath
-splitPathWith s p = if BC.null p then [] else (reverse $ BC.split s path)
-  where
-    path = if BC.head p == s then BC.tail p else p
