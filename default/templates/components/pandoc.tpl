@@ -53,6 +53,8 @@
     <h5 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
     <h6 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
   </Header>
+
+  <!-- TODO: Move this to its own file, like embed-pandoc.tpl -->
   <CodeBlock:Query class="legacy">
     <div class="px-4 py-2 border-2 rounded">
       <header class="mb-2 font-bold text-gray-800">
