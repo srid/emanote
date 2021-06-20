@@ -83,6 +83,23 @@
         "type": "github"
       }
     },
+    "heist": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1624205223,
+        "narHash": "sha256-+bcrEKjB/kDRAqOunCD/cKBBVOJUTmY9RoCQ++I42oM=",
+        "owner": "srid",
+        "repo": "heist",
+        "rev": "a8be6f93656f87199e03b9dfb9979dc061614108",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "ref": "emanote",
+        "repo": "heist",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1623154001,
@@ -120,6 +137,7 @@
         "ema": "ema",
         "flake-compat": "flake-compat_2",
         "flake-utils": "flake-utils_2",
+        "heist": "heist",
         "nixpkgs": [
           "ema",
           "nixpkgs"

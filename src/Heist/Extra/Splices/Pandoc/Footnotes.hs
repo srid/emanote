@@ -3,7 +3,8 @@ module Heist.Extra.Splices.Pandoc.Footnotes where
 import qualified Data.List as List
 import Data.Map.Syntax ((##))
 import qualified Heist as H
-import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (footnotes, rootNode), runCustomNode)
+import Heist.Extra (runCustomNode)
+import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (footnotes, rootNode))
 import Heist.Extra.Splices.Pandoc.Render (renderPandocWith)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
