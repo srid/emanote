@@ -48,20 +48,16 @@ embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> Either
 embedSiteRoute emaAction model ctx@RenderCtx {..} = \case
   Left note -> do
     pure $ do
-      let embedTpl = "embed-pandoc"
-      HE.lookupHtmlTemplate embedTpl >>= \case
-        Nothing ->
-          error $ decodeUtf8 embedTpl <> " not found"
-        Just tpl -> do
-          HE.runCustomTemplate tpl $ do
-            "ema:note:title" ## HI.textSplice (MN.noteTitle note)
-            "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
-            "ema:note:pandoc"
-              ## Splices.pandocSplice
-                classMap
-                (PF.queryResolvingSplice note model)
-                (Url.urlResolvingSplice emaAction model)
-              $ note ^. MN.noteDoc & withoutH1
+      tpl <- HE.lookupHtmlTemplateMust "/templates/filters/embed-note"
+      HE.runCustomTemplate tpl $ do
+        "ema:note:title" ## HI.textSplice (MN.noteTitle note)
+        "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+        "ema:note:pandoc"
+          ## Splices.pandocSplice
+            classMap
+            (PF.queryResolvingSplice note model)
+            (Url.urlResolvingSplice emaAction model)
+          $ note ^. MN.noteDoc & withoutH1
   Right staticFile -> do
     let r = staticFile ^. SF.staticFileRoute
         fp = staticFile ^. SF.staticFilePath
