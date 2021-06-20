@@ -15,6 +15,22 @@
       <blocks />
     </blockquote>
   </BlockQuote>
+  <DefinitionList>
+    <dl>
+      <definitionList:content>
+        <div class="px-4 py-5 sm:grid sm:grid-cols-${definitionList:grid-cols} sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            <definitionTerm:content />
+          </dt>
+          <definitionDescription:root>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+              <definitionDescription:content />
+            </dd>
+          </definitionDescription:root>
+        </div>
+      </definitionList:content>
+    </dl>
+  </DefinitionList>
   <Note:Ref>
     <!-- DoNotFormat -->
     <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="#fn${footnote:idx}"><footnote:idx /></a></sup>
