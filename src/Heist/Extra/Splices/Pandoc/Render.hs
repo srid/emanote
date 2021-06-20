@@ -17,11 +17,11 @@ where
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import qualified Heist as H
+import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     rewriteClass,
-    runCustomNode,
   )
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B

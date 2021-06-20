@@ -4,7 +4,6 @@ module Heist.Extra.Splices.Pandoc.Ctx where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
-import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
@@ -85,18 +84,6 @@ inlineLookupAttr node = \case
       let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
       pure $ attrFromNode link `concatAttr` childTagAttr link innerTag
   _ -> B.nullAttr
-
--- | Useful for running a splice against an arbitrary node (such as that pulled from pandoc.tpl)
-runCustomNode :: Monad n => X.Node -> H.Splices (HI.Splice n) -> HI.Splice n
-runCustomNode node splices =
-  H.localHS (HI.bindSplices splices) $ do
-    HI.runNode node <&> \case
-      [resNode]
-        | X.elementTag resNode == X.elementTag node ->
-          -- Get rid of the `node` itself.
-          X.elementChildren resNode
-      res ->
-        res
 
 childTagAttr :: X.Node -> Text -> B.Attr
 childTagAttr x name =
