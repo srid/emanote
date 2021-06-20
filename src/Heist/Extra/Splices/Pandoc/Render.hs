@@ -92,13 +92,14 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       flip foldMapM bss $
         fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.DefinitionList defs ->
-    fmap (one . X.Element "dl" mempty) $
-      flip foldMapM defs $ \(term, descList) -> do
-        a <- foldMapM (rpInline ctx) term
-        as <-
-          flip foldMapM descList $
-            fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
-        pure $ a <> as
+    withTplTag ctx "DefinitionList" (definitionListSplices ctx defs) $
+      fmap (one . X.Element "dl" mempty) $
+        flip foldMapM defs $ \(term, descList) -> do
+          a <- foldMapM (rpInline ctx) term
+          as <-
+            flip foldMapM descList $
+              fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
+          pure $ a <> as
   B.Header level attr is ->
     one . X.Element (headerTag level) (rpAttr $ concatAttr attr $ bAttr b)
       <$> foldMapM (rpInline ctx) is
@@ -143,6 +144,23 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         classes <- nonEmpty classes'
         let lang = head classes
         pure $ lang : ("language-" <> lang) : tail classes
+
+definitionListSplices :: Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
+definitionListSplices ctx definitionList = do
+  let colDescriptions = foldr maxlenDescriptions 0 definitionList
+  "definitionList:grid-cols" ## HI.textSplice (show (colDescriptions + 1))
+  "definitionList:content" ## (HI.runChildrenWith . uncurry (definitionListContentSplices ctx)) `foldMapM` definitionList
+  where
+    maxlenDescriptions :: ([B.Inline], [[B.Block]]) -> Int -> Int
+    maxlenDescriptions (_, bs) l2 = let l1 = length bs in if l1 >= l2 then l1 else l2
+
+    definitionListContentSplices :: Monad n => RenderCtx n -> [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
+    definitionListContentSplices dlCtx term descriptions = do
+      "definitionTerm:content" ## foldMapM (rpInline dlCtx) term
+      "definitionDescription:root" ## (HI.runChildrenWith . descriptionSplices dlCtx) `foldMapM` descriptions
+
+    descriptionSplices :: Monad n => RenderCtx n -> [B.Block] -> H.Splices (HI.Splice n)
+    descriptionSplices dCtx bs = "definitionDescription:content" ## rpBlock dCtx `foldMapM` bs
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
