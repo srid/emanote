@@ -13,6 +13,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
+import qualified Heist.Extra as H
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Json as HJ
@@ -29,7 +30,7 @@ queryResolvingSplice currentNote model HP.RenderCtx {..} blk = do
   let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
   queryNode <- childElementTagWithClass "CodeBlock:Query" mOtherCls rootNode
   pure $
-    HP.runCustomNode queryNode $ do
+    H.runCustomNode queryNode $ do
       "query"
         ## HI.textSplice (show q)
       "result"
