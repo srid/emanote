@@ -76,10 +76,11 @@ Before tests (tasks impacting the larger architectural context in code base),
       - Including queries (see below)
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [x] Queries and results embed (see below)
-- [ ] WikiLink embedding for note should use .tpl layout
-- [ ] neuron UpTree?
-  - ixset + path finding traversal
-  - rendering design: where to place? esp. in relation to sidebar?
+  - [x] WikiLink embedding for note should use .tpl layout
+- Zettelkasten / Graph considerations
+  - [ ] neuron UpTree?
+    - ixset + path finding traversal
+    - rendering design: where to place? esp. in relation to sidebar?
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
