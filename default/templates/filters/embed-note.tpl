@@ -6,6 +6,6 @@
     </a>
   </header>
   <div>
-    <apply template="pandoc" />
+    <apply template="/templates/components/pandoc" />
   </div>
 </section>

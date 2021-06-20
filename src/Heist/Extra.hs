@@ -1,5 +1,8 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Heist.Extra where
 
+import qualified Data.Text as T
 import qualified Heist as H
 import qualified Heist.Common as H
 import qualified Heist.Internal.Types as HT
@@ -29,3 +32,16 @@ lookupHtmlTemplate name = do
   pure $ do
     X.HtmlDocument _ _ nodes <- H.dfDoc . fst <$> H.lookupTemplate name st HT._templateMap
     pure nodes
+
+lookupHtmlTemplateMust :: forall m n. Monad n => ByteString -> HT.HeistT m n HT.Template
+lookupHtmlTemplateMust name =
+  lookupHtmlTemplate name >>= \case
+    Nothing -> do
+      st <- HT.getHS
+      error $ "heist: " <> decodeUtf8 name <> " not found ... among: " <> T.intercalate ", " (availableTemplates st)
+    Just tpl ->
+      pure tpl
+
+availableTemplates :: HT.HeistState n -> [Text]
+availableTemplates st =
+  sort $ H.templateNames st <&> T.intercalate "/" . reverse . fmap (decodeUtf8 @Text)

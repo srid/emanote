@@ -21,6 +21,7 @@ import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import qualified Heist as H
 import qualified Heist.Common as H
+import qualified Heist.Extra as HE
 import qualified Heist.Internal.Types as HT
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension)
@@ -37,8 +38,7 @@ instance Show TemplateState where
     TemplateState (Left errs) ->
       "Heist errors: \n" <> toString (unlines (toText <$> errs))
     TemplateState (Right st) ->
-      let names :: [Text] = sort $ H.templateNames st <&> T.intercalate "/" . reverse . fmap (decodeUtf8 @Text)
-       in "Heist templates loaded: " <> toString (T.intercalate ", " names)
+      "Heist templates loaded: " <> toString (T.intercalate ", " $ HE.availableTemplates st)
 
 newTemplateState :: MonadIO m => m TemplateState
 newTemplateState = do
