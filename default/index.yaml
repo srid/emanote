@@ -31,7 +31,8 @@ pandoc:
     emanote:inline-tag: font-bold bg-gray-100 py-1 px-2 rounded-lg
     # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
     emanote:broken-link: line-through italic
-    # You can also add your own class -> style mappings.
+    # You can also add your own class -> style mappings. We provide a sample below.
+    sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.

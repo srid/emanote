@@ -15,6 +15,24 @@
       <blocks />
     </blockquote>
   </BlockQuote>
+  <DefinitionList>
+    <dl class="flex flex-col">
+      <DefinitionList:Items>
+        <div class="my-1">
+          <dt class="text-l font-bold">
+            <DefinitionList:Item:Term />
+          </dt>
+          <DefinitionList:Item:DescList>
+            <div class="flex flex-col pl-2">
+              <dd class="text-gray-700">
+                <DefinitionList:Item:Desc />
+              </dd>
+            </div>
+          </DefinitionList:Item:DescList>
+        </div>
+      </DefinitionList:Items>
+    </dl>
+  </DefinitionList>
   <Note:Ref>
     <!-- DoNotFormat -->
     <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="#fn${footnote:idx}"><footnote:idx /></a></sup>

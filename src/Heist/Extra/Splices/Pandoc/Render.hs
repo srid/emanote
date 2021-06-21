@@ -92,13 +92,14 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       flip foldMapM bss $
         fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.DefinitionList defs ->
-    fmap (one . X.Element "dl" mempty) $
-      flip foldMapM defs $ \(term, descList) -> do
-        a <- foldMapM (rpInline ctx) term
-        as <-
-          flip foldMapM descList $
-            fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
-        pure $ a <> as
+    withTplTag ctx "DefinitionList" (definitionListSplices ctx defs) $
+      fmap (one . X.Element "dl" mempty) $
+        flip foldMapM defs $ \(term, descList) -> do
+          a <- foldMapM (rpInline ctx) term
+          as <-
+            flip foldMapM descList $
+              fmap (one . X.Element "dd" mempty) . foldMapM (rpBlock ctx)
+          pure $ a <> as
   B.Header level attr is ->
     one . X.Element (headerTag level) (rpAttr $ concatAttr attr $ bAttr b)
       <$> foldMapM (rpInline ctx) is
@@ -143,6 +144,17 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         classes <- nonEmpty classes'
         let lang = head classes
         pure $ lang : ("language-" <> lang) : tail classes
+
+    definitionListSplices :: forall n. Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
+    definitionListSplices ctx defs = do
+      "DefinitionList:Items" ## (HI.runChildrenWith . uncurry itemsSplices) `foldMapM` defs
+      where
+        itemsSplices :: Monad n => [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
+        itemsSplices term descriptions = do
+          "DefinitionList:Item:Term" ## foldMapM (rpInline ctx) term
+          "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descListSplices) `foldMapM` descriptions
+        descListSplices :: Monad n => [B.Block] -> H.Splices (HI.Splice n)
+        descListSplices bs = "DefinitionList:Item:Desc" ## rpBlock ctx `foldMapM` bs
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
