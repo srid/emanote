@@ -147,18 +147,12 @@ rpBlock' ctx@RenderCtx {..} b = case b of
 
 definitionListSplices :: Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
 definitionListSplices ctx definitionList = do
-  let colDescriptions = foldr maxlenDescriptions 0 definitionList
-  "definitionList:grid-cols" ## HI.textSplice (show (colDescriptions + 1))
   "definitionList:content" ## (HI.runChildrenWith . uncurry (definitionListContentSplices ctx)) `foldMapM` definitionList
   where
-    maxlenDescriptions :: ([B.Inline], [[B.Block]]) -> Int -> Int
-    maxlenDescriptions (_, bs) l2 = let l1 = length bs in if l1 >= l2 then l1 else l2
-
     definitionListContentSplices :: Monad n => RenderCtx n -> [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
     definitionListContentSplices dlCtx term descriptions = do
       "definitionTerm:content" ## foldMapM (rpInline dlCtx) term
       "definitionDescription:root" ## (HI.runChildrenWith . descriptionSplices dlCtx) `foldMapM` descriptions
-
     descriptionSplices :: Monad n => RenderCtx n -> [B.Block] -> H.Splices (HI.Splice n)
     descriptionSplices dCtx bs = "definitionDescription:content" ## rpBlock dCtx `foldMapM` bs
 
