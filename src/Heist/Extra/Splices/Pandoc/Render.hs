@@ -147,14 +147,14 @@ rpBlock' ctx@RenderCtx {..} b = case b of
 
 definitionListSplices :: Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
 definitionListSplices ctx definitionList = do
-  "definitionList:content" ## (HI.runChildrenWith . uncurry (definitionListContentSplices ctx)) `foldMapM` definitionList
+  "DefinitionList:Items" ## (HI.runChildrenWith . uncurry (definitionListContentSplices ctx)) `foldMapM` definitionList
   where
     definitionListContentSplices :: Monad n => RenderCtx n -> [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
     definitionListContentSplices dlCtx term descriptions = do
-      "definitionTerm:content" ## foldMapM (rpInline dlCtx) term
-      "definitionDescription:root" ## (HI.runChildrenWith . descriptionSplices dlCtx) `foldMapM` descriptions
+      "DefinitionList:Item:Term" ## foldMapM (rpInline dlCtx) term
+      "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descriptionSplices dlCtx) `foldMapM` descriptions
     descriptionSplices :: Monad n => RenderCtx n -> [B.Block] -> H.Splices (HI.Splice n)
-    descriptionSplices dCtx bs = "definitionDescription:content" ## rpBlock dCtx `foldMapM` bs
+    descriptionSplices dCtx bs = "DefinitionList:Item:Desc" ## rpBlock dCtx `foldMapM` bs
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =

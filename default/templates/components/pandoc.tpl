@@ -17,20 +17,20 @@
   </BlockQuote>
   <DefinitionList>
     <dl class="flex flex-col">
-      <definitionList:content>
+      <DefinitionList:Items>
         <div class="my-1">
           <dt class="text-l font-bold">
-            <definitionTerm:content />
+            <DefinitionList:Item:Term />
           </dt>
-          <definitionDescription:root>
+          <DefinitionList:Item:DescList>
             <div class="flex flex-col pl-2">
               <dd class="text-gray-700">
-                <definitionDescription:content />
+                <DefinitionList:Item:Desc />
               </dd>
             </div>
-          </definitionDescription:root>
+          </DefinitionList:Item:DescList>
         </div>
-      </definitionList:content>
+      </DefinitionList:Items>
     </dl>
   </DefinitionList>
   <Note:Ref>
