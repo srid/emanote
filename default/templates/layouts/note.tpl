@@ -3,7 +3,7 @@
     <div class="container mx-auto xl:max-w-screen-lg">
       <apply template="components/breadcrumbs" />
       <main>
-        <apply template="components/pandoc" />
+        <apply template="components/note-body" />
         <apply template="components/backlinks" />
         <apply template="components/metadata" />
       </main>
