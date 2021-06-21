@@ -54,9 +54,7 @@
         <!-- Main body column -->
         <div class="col-span-12 md:col-span-9">
           <main>
-            <article class="overflow-auto">
-              <apply template="components/pandoc" />
-            </article>
+            <apply template="components/note-body" />
             <apply template="components/backlinks" />
             <apply template="components/metadata" />
           </main>
