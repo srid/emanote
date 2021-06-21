@@ -145,16 +145,16 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         let lang = head classes
         pure $ lang : ("language-" <> lang) : tail classes
 
-definitionListSplices :: Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
-definitionListSplices ctx definitionList = do
-  "DefinitionList:Items" ## (HI.runChildrenWith . uncurry (definitionListContentSplices ctx)) `foldMapM` definitionList
-  where
-    definitionListContentSplices :: Monad n => RenderCtx n -> [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
-    definitionListContentSplices dlCtx term descriptions = do
-      "DefinitionList:Item:Term" ## foldMapM (rpInline dlCtx) term
-      "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descriptionSplices dlCtx) `foldMapM` descriptions
-    descriptionSplices :: Monad n => RenderCtx n -> [B.Block] -> H.Splices (HI.Splice n)
-    descriptionSplices dCtx bs = "DefinitionList:Item:Desc" ## rpBlock dCtx `foldMapM` bs
+    definitionListSplices :: forall n. Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
+    definitionListSplices ctx defs = do
+      "DefinitionList:Items" ## (HI.runChildrenWith . uncurry itemsSplices) `foldMapM` defs
+      where
+        itemsSplices :: Monad n => [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
+        itemsSplices term descriptions = do
+          "DefinitionList:Item:Term" ## foldMapM (rpInline ctx) term
+          "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descListSplices) `foldMapM` descriptions
+        descListSplices :: Monad n => [B.Block] -> H.Splices (HI.Splice n)
+        descListSplices bs = "DefinitionList:Item:Desc" ## rpBlock ctx `foldMapM` bs
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
