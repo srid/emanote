@@ -16,16 +16,18 @@
     </blockquote>
   </BlockQuote>
   <DefinitionList>
-    <dl>
+    <dl class="flex flex-col">
       <definitionList:content>
-        <div class="px-4 py-5 sm:grid sm:grid-cols-${definitionList:grid-cols} sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
+        <div class="my-1">
+          <dt class="text-l font-bold">
             <definitionTerm:content />
           </dt>
           <definitionDescription:root>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-              <definitionDescription:content />
-            </dd>
+            <div class="flex flex-col pl-2">
+              <dd class="text-gray-700">
+                <definitionDescription:content />
+              </dd>
+            </div>
           </definitionDescription:root>
         </div>
       </definitionList:content>
