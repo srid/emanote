@@ -24,6 +24,7 @@ Mega features,
 - Powerful and simpler query system (cf. Obsidian search)
   - Fully customizable 'results' layout (eg: to produce blog timeline with summary snippet)
 - Obsidian-style embedding
+  - Describe a workflow of daily note + note context (alternative to Andy's stacked notes)
 - Pandoc filters (`Pandoc -> IO Pandoc`)
   - Including citations
 - mdBook like search (emanote should provide the index)
