@@ -30,6 +30,7 @@ import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
+import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -42,6 +43,9 @@ import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
 import qualified Heist.Splices.Json as HJ
 import qualified Paths_emanote
+import Text.Blaze.Html ((!))
+import qualified Text.Blaze.Html5 as H
+import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -156,7 +160,7 @@ commonSplices emaAction meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim"
     ## pure
-      (RX.renderHtmlNodes $ Tailwind.twindShim emaAction)
+      (RX.renderHtmlNodes $ twindShim emaAction)
   "ema:version"
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
@@ -167,6 +171,19 @@ commonSplices emaAction meta routeTitle = do
     $ if routeTitle == siteTitle
       then siteTitle
       else routeTitle <> " – " <> siteTitle
+  where
+    twindShim :: Ema.CLI.Action -> H.Html
+    twindShim action =
+      case action of
+        Ema.CLI.Generate _ ->
+          Tailwind.twindShimUnofficial
+        _ ->
+          -- Twind shim doesn't reliably work in dev server mode. Let's just use the
+          -- tailwind CDN.
+          H.link
+            ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
+            ! A.rel "stylesheet"
+            ! A.type_ "text/css"
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)

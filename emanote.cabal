@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.9.0
+version:            0.1.10.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -27,6 +27,7 @@ data-files:
   index.md
   index.yaml
   templates/**/*.tpl
+  _emanote-live-server/**/*.css
 
 executable emanote
   build-depends:
@@ -127,6 +128,7 @@ executable emanote
     Emanote.Source.Patch
     Emanote.Source.Pattern
     Emanote.View
+    Emanote.View.LiveServerFiles
     Emanote.View.Template
     Heist.Extra
     Heist.Extra.Splices.List
