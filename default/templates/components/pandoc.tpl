@@ -4,6 +4,22 @@
       <inlines />
     </p>
   </Para>
+  <Task:Checked>
+    <label class="inline-flex items-center space-x-2">
+      <input checked type="checkbox" class="w-5 h-5 checked:bg-blue-600 checked:border-transparent">
+      <span>
+        <inlines />
+      </span>
+    </label>
+  </Task:Checked>
+  <Task:Unchecked>
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" class="w-5 h-5">
+      <span>
+        <inlines />
+      </span>
+    </label>
+  </Task:Unchecked>
   <Cite>
     <cite>
       <inlines />
@@ -19,7 +35,7 @@
     <dl class="flex flex-col">
       <DefinitionList:Items>
         <div class="my-1">
-          <dt class="text-l font-bold">
+          <dt class="font-bold text-l">
             <DefinitionList:Item:Term />
           </dt>
           <DefinitionList:Item:DescList>

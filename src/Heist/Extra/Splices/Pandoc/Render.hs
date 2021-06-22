@@ -48,13 +48,17 @@ withTplTag RenderCtx {..} name splices default_ =
     Nothing -> default_
     Just node -> runCustomNode node splices
 
-rpBlock' :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
+rpBlock' :: forall n. Monad n => RenderCtx n -> B.Block -> HI.Splice n
 rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
-    foldMapM (rpInline ctx) is
+    maybe 
+      (rpInline ctx `foldMapM` is)
+      (rpTasks is) 
+      (taskFromInlines is)
   B.Para is -> do
-    withTplTag ctx "Para" ("inlines" ## rpInline ctx `foldMapM` is) $
-      one . X.Element "p" mempty <$> foldMapM (rpInline ctx) is
+    let innerSplice = maybe (rpInline ctx `foldMapM` is) (rpTasks is) (taskFromInlines is)
+    withTplTag ctx "Para" ("inlines" ## innerSplice) $
+      one . X.Element "p" mempty <$> innerSplice
   B.LineBlock iss ->
     flip foldMapM iss $ \is ->
       foldMapM (rpInline ctx) is >> pure [X.TextNode "\n"]
@@ -92,7 +96,7 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       flip foldMapM bss $
         fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.DefinitionList defs ->
-    withTplTag ctx "DefinitionList" (definitionListSplices ctx defs) $
+    withTplTag ctx "DefinitionList" (definitionListSplices defs) $
       fmap (one . X.Element "dl" mempty) $
         flip foldMapM defs $ \(term, descList) -> do
           a <- foldMapM (rpInline ctx) term
@@ -145,8 +149,8 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         let lang = head classes
         pure $ lang : ("language-" <> lang) : tail classes
 
-    definitionListSplices :: forall n. Monad n => RenderCtx n -> [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
-    definitionListSplices ctx defs = do
+    definitionListSplices :: Monad n => [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
+    definitionListSplices defs = do
       "DefinitionList:Items" ## (HI.runChildrenWith . uncurry itemsSplices) `foldMapM` defs
       where
         itemsSplices :: Monad n => [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
@@ -155,6 +159,19 @@ rpBlock' ctx@RenderCtx {..} b = case b of
           "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descListSplices) `foldMapM` descriptions
         descListSplices :: Monad n => [B.Block] -> H.Splices (HI.Splice n)
         descListSplices bs = "DefinitionList:Item:Desc" ## rpBlock ctx `foldMapM` bs
+
+    taskFromInlines = \case
+      B.Str "[" : B.Space : B.Str "]" : B.Space : is ->
+        pure (False, is)
+      B.Str "[x]" : B.Space : is ->
+        pure (True, is)
+      _ ->
+        Nothing
+
+    rpTasks is' (checked, is) = do
+      let tag = bool "Task:Unchecked" "Task:Checked" checked
+      withTplTag ctx tag ("inlines" ## rpInline ctx `foldMapM` is) $
+        foldMapM (rpInline ctx) is'
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
