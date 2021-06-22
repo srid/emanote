@@ -6,6 +6,8 @@ where
 
 import qualified Data.Text as T
 
+-- TODO: Check this compile-time using TH?
+
 baseDir :: FilePath
 baseDir = "_emanote-live-server"
 
