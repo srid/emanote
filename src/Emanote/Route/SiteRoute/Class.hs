@@ -27,6 +27,7 @@ import Emanote.Route (FileType (Html))
 import qualified Emanote.Route as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
+import qualified Emanote.View.LiveServerFiles as LiveServerFile
 
 instance Ema Model SiteRoute where
   encodeRoute model =
@@ -50,6 +51,7 @@ instance Ema Model SiteRoute where
         staticRoutes =
           model ^. M.modelStaticFiles
             & Ix.toList
+            & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
             <&> staticFileSiteRoute
         virtualRoutes :: [VirtualRoute] =
           [openUnionLift IndexR, openUnionLift TagIndexR]

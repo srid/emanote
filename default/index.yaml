@@ -43,6 +43,8 @@ page:
   # HACK: We are setting it to empty here, because Heist doesn't work well.
   description: ""
   headHtml: |
-    <!-- Syntax highlighting -->
+    <!-- Syntax highlighting 
+    TODO: Cache these in default layer, and use them directly, rather than relying on CDN.
+    -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
