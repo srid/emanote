@@ -81,11 +81,11 @@ allowedWikiLinks =
 data WikiLinkType
   = -- | [[Foo]]
     WikiLinkNormal
-  | -- | [[Foo]]#
+  | <input type="checkbox" class="appearance-none checked:bg-blue-600 checked:border-transparent ...">
     WikiLinkBranch
-  | -- | #[[Foo]]
+  |  <input type="checkbox" class="appearance-none checked:bg-blue-600 checked:border-transparent ...">
     WikiLinkTag
-  | -- | ![[Foo]]
+  | <input type="checkbox" class="appearance-none checked:bg-blue-600 checked:border-transparent ...">
     WikiLinkEmbed
   deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded)
 
