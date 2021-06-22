@@ -8,6 +8,18 @@ https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/foot
 
 Demo: Checkout this note[^1] and this other note[^2] as both are footnotes.
 
+## Task lists
+
+- [x] A task that was done
+- [ ] A task that is to be done.
+- A list item with no task marker
+
+Tasks can also be written outside of list context, such as paragraphs:
+
+[ ] This is a task on its own paragraph.
+
+[x] Here we have the next paragraph.
+
 ## Definition lists
 
 https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md

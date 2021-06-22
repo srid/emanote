@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.10.0
+version:            0.1.11.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -23,11 +23,11 @@ extra-source-files:
 
 data-dir:           default
 data-files:
+  _emanote-live-server/**/*.css
   favicon.svg
   index.md
   index.yaml
   templates/**/*.tpl
-  _emanote-live-server/**/*.css
 
 executable emanote
   build-depends:
