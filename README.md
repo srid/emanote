@@ -57,58 +57,34 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 
 ## Tasks
 
+(Archived/Done tasks further below)
+
 ### Current
 
 Before tests (tasks impacting the larger architectural context in code base),
 
-- [x] Interlude(architecture): a layer between ema and emanote
-  - source -> target file transformation with routing
-  - examples
-    - source: .md, .org, static files, ..
-    - output: .rss/.xml
-- [x] WikiLink: allow linking to non-HTML files.
-  - [x] Refactor `R` to accomodate them all, and ditch `Either FilePath`
-  - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
-- Embedding / Filtering / Transforming / etc
-  - [x] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
-    - Consider designing this in the larger context of Pandoc splice with customizable rendering 
-      - Including wiki-links (thus supplanting rewriteLinks)
-      - Including queries (see below)
-    - Also consider non-Obsidian formats, `![[program.hs:2-13]]
-  - [x] Queries and results embed (see below)
-  - [x] WikiLink embedding for note should use .tpl layout
 - Zettelkasten / Graph considerations
-  - [ ] neuron UpTree?
-    - ixset + path finding traversal
-    - rendering design: where to place? esp. in relation to sidebar?
+  - [ ] Incrementally build a graph of notes
+    - Really need it? Or can we do away with ixset + path finding traversal?
+  - [ ] Reinstate Neuron UpTree 
+  - [ ] Reinstate Neuron look & feel 
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
 
 To triage,
 
-- [ ] RSS
+- [ ] `neuron query` equivalent?
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
   - `.timeline` query in particular should be sort by date
   - calendar children shoiuld be sorted by name (thus day), just as other notes?
-- [ ] dd styling
-- [ ] Table styling
-- [x] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
-  - Display children inline?
 - [ ] fsnotify: reliably handle directory renames/ moves
   - Straightforward to do using unionMount's OverlayFs?
   - If nothing, restart mount on such events.
-- [x] apply prismJS on live server refresh?
-- [x] Add fsnotify watcher for default template files (etc), but only in ghcid mode
-- [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
-- [ ] `neuron query` equivalent?
-- [ ] Generation of pages with no associated Markdown
-  - eg: Pagination ala https://web.dev/authors/ | https://web.dev/how-we-build-webdev-and-use-web-components/#collections
+- [ ] RSS
 
 Before public release
 
-- [x] Finalize in HTML templating: heist vs a more popular one?
-  - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
 - [ ] Finalize Heist variables/structures and template locations
 
 ### Archived Tasks
@@ -142,8 +118,14 @@ Initial MVP,
 - [x] Avoid "Ema - Ema" kind of title. Pass ifIndexRoute splice?
 - [x] BUG: /Haskell.org (with dot in it) crashes ema dev server
 - [x] Milestone: `./emanote -C ~/code/haskell-knowledge-base` should just work.
+- [x] apply prismJS on live server refresh?
+- [x] Add fsnotify watcher for default template files (etc), but only in ghcid mode
+- [x] Sidebar: expand-by-default on per-tree basis, by enabling it on yaml or frontmatter
+- [x] Directory routes (allow `$dir.html` even if `$dir.md` doesn't exist)
+- [x] Finalize in HTML templating: heist vs a more popular one?
+  - Probably gonna take the heist trade-off, given the ability to customize breadcrumbs/sidebar/pandoc HTML
 
-Milestone (notes.srid.ca),
+Milestone (www.srid.ca),
 
 - [x] Footnotes
 - [x] Custom route slugs https://github.com/srid/emanote/discussions/42
@@ -156,4 +138,19 @@ Milestone (notes.srid.ca),
   - [x] Timeline query styling (use CSS grid)
   - [x] Ugly footnote empty line with multi-block notes
   - [x] Final website look (not boring)
-
+- [x] Interlude(architecture): a layer between ema and emanote
+  - source -> target file transformation with routing
+  - examples
+    - source: .md, .org, static files, ..
+    - output: .rss/.xml
+- [x] WikiLink: allow linking to non-HTML files.
+  - [x] Refactor `R` to accomodate them all, and ditch `Either FilePath`
+  - [x] Try `OpenUnion` to make Note/Ref's route field polymorphic over file type
+- Embedding / Filtering / Transforming / etc
+  - [x] Link embedding: support `![[]]` of Obsidian? https://help.obsidian.md/How+to/Embed+files
+    - Consider designing this in the larger context of Pandoc splice with customizable rendering 
+      - Including wiki-links (thus supplanting rewriteLinks)
+      - Including queries (see below)
+    - Also consider non-Obsidian formats, `![[program.hs:2-13]]
+  - [x] Queries and results embed (see below)
+  - [x] WikiLink embedding for note should use .tpl layout
