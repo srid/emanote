@@ -2,9 +2,17 @@
 
 Emanote notes are written in Markdown format. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
+## Emojis
+
+:smile:
+
+:runner: :ant:
+
+See [list of available emojis](https://gist.github.com/rxaviers/7360908) for reference.
+
 ## Footnotes
 
-https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md
+https://github.com/jgm/commonmark-hs/blob/master/jcommonmark-extensions/test/footnotes.md
 
 Demo: Checkout this note[^1] and this other note[^2] as both are footnotes.
 

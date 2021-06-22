@@ -243,8 +243,18 @@ rpInline' ctx@RenderCtx {..} i = case i of
   B.Note bs -> do
     one . X.Element "aside" mempty
       <$> foldMapM (rpBlock ctx) bs
-  B.Span attr is ->
-    one . X.Element "span" (rpAttr $ rewriteClass ctx attr) <$> foldMapM (rpInline ctx) is
+  B.Span attr is -> do
+    -- HACK: Make emoji fonts render correctly.
+    -- Undo font-familly on emoji spans, so the browser uses an emoji font.
+    -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
+    let attr' = 
+          case attr of 
+            (id', ["emoji"], attrs) ->
+              let emojiFontAttr = ("style", "font-family: emoji")
+              in (id', ["emoji"], attrs <> one emojiFontAttr)
+            _ ->
+              attr
+    one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is
   B.SmallCaps is ->
     foldMapM (rpInline ctx) is
   B.Cite _citations is ->

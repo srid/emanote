@@ -86,6 +86,8 @@ To triage,
 Before public release
 
 - [ ] Finalize Heist variables/structures and template locations
+  - Try Heist.Compiled
+- [ ] Finalize Tailwind styling of Pandoc (esp. margins)
 
 ### Archived Tasks
 
