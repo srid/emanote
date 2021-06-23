@@ -23,13 +23,10 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build 🔧
-        run: |
-          nix -L run -j 4 . -- --help
-      - name: Publish Docker image to Docker Hub
+      - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
-          docker load -i $(nix-build docker.nix --argstr tag "${{ env.DOCKERTAG }}")
+          docker load -i $(nix-build -j 4 docker.nix --argstr tag "${{ env.DOCKERTAG }}")
           # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
