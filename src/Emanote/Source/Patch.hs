@@ -38,6 +38,7 @@ import qualified Heist.Extra.TemplateState as T
 import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
+import qualified Data.ByteString as BS
 
 -- | Like `transformAction` but operates on multiple source types at a time
 transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc R.FileType -> m (Model -> Model)
@@ -94,6 +95,7 @@ transformAction src fps = do
           fmap (M.modelHeistTemplate %~) $ do
             logD $ "Reading template: " <> toText fpAbs
             s <- readFileBS fpAbs
+            logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
         Mount.Delete -> do
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
