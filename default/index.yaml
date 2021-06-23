@@ -12,7 +12,7 @@ tags: []
 template:
   # Use file "./${template.name}.tpl" to render HTML
   name: templates/layouts/book
-  theme: blue
+  theme: purple
   baseUrl: /
   iconUrl: favicon.svg
   sidebar:
