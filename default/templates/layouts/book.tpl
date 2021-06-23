@@ -24,7 +24,7 @@
         <nav id="sidebar"
           class="hidden leading-relaxed md:block md:col-span-3 md:sticky md:top-0 md:h-full bg-gray-50">
 
-          <div class="pt-1 pl-2 text-gray-800">
+          <div class="px-2 pt-1 text-gray-800">
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
               <a href="@tags" title="View tags">
                 <svg class="w-5 h-5 hover:text-${theme}-700" fill="none" stroke="currentColor"
@@ -49,7 +49,7 @@
           </div>
         </nav>
         <!-- Main body column -->
-        <div class="col-span-12 px-0 bg-white md:col-span-9 ">
+        <div class="col-span-12 px-0 pt-3 bg-white md:col-span-9 ">
           <main class="px-2 md:pl-4">
             <apply template="components/note-body" />
             <apply template="components/backlinks" />
