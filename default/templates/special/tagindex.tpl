@@ -36,8 +36,8 @@
                           <div>
                             <!-- TODO: DRY -->
                             <a class="font-bold text-${theme}-600 hover:underline truncate"
-                              href="${note:url}">
-                              <note:title />
+                              href="${ema:note:url}">
+                              <ema:note:title />
                             </a>
                           </div>
                         </each-note>
