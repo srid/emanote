@@ -24,11 +24,11 @@
   <head-extra />
 </head>
 
-<body class="overflow-y-scroll">
-  <!-- DoNotFormat -->
-  <bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
-  <!-- DoNotFormat -->
+<!-- DoNotFormat -->
+<bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
+<!-- DoNotFormat -->
 
+<body class="overflow-y-scroll bg-${theme}-50">
   <body-main />
 </body>
 
