@@ -3,7 +3,7 @@
     <div class="container mx-auto">
       <div class="grid grid-cols-12">
         <!-- Sidebar column -->
-        <nav class="hidden bg-${theme}-100 md:block md:col-span-3 md:sticky md:top-0 md:h-full">
+        <nav class="hidden bg-${theme}-50 md:block md:col-span-3 md:sticky md:top-0 md:h-full">
 
           <div class="flex items-end pl-2 mt-2 space-x-2">
             <a href="">
