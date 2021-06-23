@@ -22,8 +22,8 @@
 
 </ema:breadcrumbs>
 <h1
-  class="flex items-center justify-center mt-2 text-5xl font-extrabold text-black md:text-6xl md:py-2 md:mb-4 md:justify-start">
-  <a class="border-b-8 border-${theme}-50 pl-2">
+  class="flex items-center justify-center mt-2 text-5xl font-extrabold text-black md:mt-0 md:shadow-inner md:text-6xl md:py-3 md:mb-4 md:justify-start ">
+  <a class="tracking-tighter md:pl-4">
     <ema:note:title />
   </a>
 </h1>
