@@ -1,9 +1,10 @@
 <apply template="base">
   <bind tag="body-main">
     <div class="container mx-auto">
-      <div class="grid grid-cols-12">
+      <div class="grid grid-cols-12 md:shadow-2xl md:rounded-lg md:my-8">
         <!-- Sidebar column -->
-        <nav class="hidden bg-${theme}-50 md:block md:col-span-3 md:sticky md:top-0 md:h-full">
+        <nav id="sidebar"
+          class="hidden leading-relaxed md:block md:col-span-3 md:sticky md:top-0 md:h-full bg-gray-50">
 
           <div class="flex items-end pl-2 mt-2 space-x-2">
             <a href="">
@@ -41,8 +42,7 @@
           </div>
         </nav>
         <!-- Main body column -->
-        <div
-          class="col-span-12 px-0 md:col-span-9 md:min-h-screen md:border-r-4 md:border-${theme}-50">
+        <div class="col-span-12 px-0 bg-white md:col-span-9 ">
           <apply template="components/breadcrumbs" />
           <main class="px-2 md:pl-4">
             <apply template="components/note-body" />
