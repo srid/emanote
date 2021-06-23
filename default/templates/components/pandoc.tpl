@@ -5,16 +5,18 @@
     </p>
   </Para>
   <Task:Checked>
-    <label class="inline-flex items-center space-x-2">
-      <input checked type="checkbox" class="w-5 h-5 checked:bg-blue-600 checked:border-transparent">
+    <!-- FIXME: Fix list styling to use flexbox, so task lists don't botch them up -->
+    <label class="inline-flex items-start space-x-2">
+      <input checked type="checkbox"
+        class="flex-shrink-0 w-5 h-5 checked:bg-blue-600 checked:border-transparent">
       <span>
         <inlines />
       </span>
     </label>
   </Task:Checked>
   <Task:Unchecked>
-    <label class="inline-flex items-center space-x-2">
-      <input type="checkbox" class="w-5 h-5">
+    <label class="inline-flex items-start space-x-2">
+      <input type="checkbox" class="flex-shrink-0 w-5 h-5">
       <span>
         <inlines />
       </span>
