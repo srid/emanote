@@ -1,7 +1,7 @@
 <ema:breadcrumbs>
-  <div class="w-full text-gray-700">
+  <nav id="breadcrumbs" class="w-full text-gray-700">
     <div class="flex justify-left">
-      <div class="bg-${theme}-100 md:rounded-b-lg w-full py-2 px-2 md:w-auto md:py-0 md:px-0">
+      <div class="bg-${theme}-100 md:rounded-br-lg w-full py-2 px-2 md:w-auto md:py-0 md:px-0">
         <ul class="flex flex-wrap text-lg md:text-sm">
           <each-crumb>
             <li class="inline-flex items-center">
@@ -18,10 +18,10 @@
         </ul>
       </div>
     </div>
-  </div>
+  </nav>
 
 </ema:breadcrumbs>
-<h1 class="flex items-center justify-center mt-2 text-5xl font-extrabold text-black ">
+<h1 class="flex items-center justify-center px-2 mt-2 text-5xl font-extrabold text-black">
   <a>
     <ema:note:title />
   </a>
