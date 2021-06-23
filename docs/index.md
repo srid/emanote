@@ -6,9 +6,9 @@ page:
 ---
 # Emanote
 
-Welcome to [Emanote][gh], which aims to be next-gen [neuron](https://neuron.zettel.page/) with powerful features.
+[Emanote][gh] enables you to create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time. It aims to be next-gen [neuron](https://neuron.zettel.page/) with powerful features.
 
-Emanote is still a **work in progress**; therefore this site does not yet have much useful content.
+[Emanote][gh] is still a **work in progress**; therefore this site does not yet have much useful content.
 
 Checkout [[start]]. Some doc hints are available in [[guide]], but nothing is fleshed out yet. If you are interested in contributing, see [[architecture]].
 
