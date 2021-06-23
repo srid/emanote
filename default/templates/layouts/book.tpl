@@ -1,21 +1,28 @@
 <apply template="base">
   <bind tag="body-main">
     <div class="container mx-auto">
-      <div class="grid grid-cols-12 md:shadow-2xl md:rounded-lg md:my-8">
+
+      <div id="site-header" class="grid grid-cols-12">
+        <div id="site-logo" class="hidden col-span-3 pl-2 mt-2 space-x-2 md:block">
+          <a href="">
+            <ema:metadata>
+              <with var="template">
+                <img class="z-50 h-20 transition transform hover:scale-110 hover:opacity-80"
+                  src="${value:iconUrl}" />
+              </with>
+            </ema:metadata>
+          </a>
+        </div>
+        <div class="col-span-12 md:col-span-9">
+
+          <apply template="components/breadcrumbs" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-12 md:shadow-2xl md:rounded-lg md:mb-8">
         <!-- Sidebar column -->
         <nav id="sidebar"
           class="hidden leading-relaxed md:block md:col-span-3 md:sticky md:top-0 md:h-full bg-gray-50">
-
-          <div class="flex items-end pl-2 mt-2 space-x-2">
-            <a href="">
-              <ema:metadata>
-                <with var="template">
-                  <img class="z-50 h-20 transition transform hover:scale-110 hover:opacity-80"
-                    src="${value:iconUrl}" />
-                </with>
-              </ema:metadata>
-            </a>
-          </div>
 
           <div class="pt-1 pl-2 text-gray-800">
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
@@ -43,7 +50,6 @@
         </nav>
         <!-- Main body column -->
         <div class="col-span-12 px-0 bg-white md:col-span-9 ">
-          <apply template="components/breadcrumbs" />
           <main class="px-2 md:pl-4">
             <apply template="components/note-body" />
             <apply template="components/backlinks" />
