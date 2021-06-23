@@ -49,9 +49,9 @@
             <apply template="components/backlinks" />
             <apply template="components/metadata" />
           </main>
-          <apply template="components/footer" />
         </div>
       </div>
+      <apply template="components/footer" />
     </div>
   </bind>
 </apply>
