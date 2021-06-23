@@ -1,8 +1,8 @@
 <ema:breadcrumbs>
-  <nav id="breadcrumbs" class="w-full text-gray-700">
+  <nav id="breadcrumbs" class="w-full text-gray-700 md:hidden">
     <div class="flex justify-left">
-      <div class="bg-${theme}-100 md:rounded-br-lg w-full py-2 px-2 md:w-auto md:py-0 md:px-0">
-        <ul class="flex flex-wrap text-lg md:text-sm">
+      <div class="bg-${theme}-100 w-full py-2 px-2">
+        <ul class="flex flex-wrap text-lg">
           <each-crumb>
             <li class="inline-flex items-center">
               <a class="px-1 font-bold" href="${crumb:url}">
@@ -21,8 +21,9 @@
   </nav>
 
 </ema:breadcrumbs>
-<h1 class="flex items-center justify-center px-2 mt-2 text-5xl font-extrabold text-black">
-  <a>
+<h1
+  class="flex items-center justify-center px-2 mt-2 text-5xl font-extrabold text-black md:text-6xl md:py-2 md:mb-4 md:justify-start">
+  <a class="border-b-8 border-${theme}-400">
     <ema:note:title />
   </a>
 </h1>

@@ -1,7 +1,6 @@
 <apply template="base">
   <bind tag="body-main">
     <div class="container mx-auto">
-      <!-- Main row-->
       <div class="grid grid-cols-12">
         <!-- Sidebar column -->
         <nav class="hidden bg-${theme}-100 md:block md:col-span-3 md:sticky md:top-0 md:h-full">
@@ -42,7 +41,8 @@
           </div>
         </nav>
         <!-- Main body column -->
-        <div class="col-span-12 px-0 md:col-span-9 md:min-h-screen">
+        <div
+          class="col-span-12 px-0 md:col-span-9 md:min-h-screen md:border-r-4 md:border-${theme}-50">
           <apply template="components/breadcrumbs" />
           <main class="px-2 md:pl-4">
             <apply template="components/note-body" />
