@@ -12,7 +12,7 @@ See [list of available emojis](https://gist.github.com/rxaviers/7360908) for ref
 
 ## Footnotes
 
-https://github.com/jgm/commonmark-hs/blob/master/jcommonmark-extensions/test/footnotes.md
+https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md
 
 Demo: Checkout this note[^1] and this other note[^2] as both are footnotes.
 
