@@ -3,7 +3,7 @@
     <div class="container mx-auto">
 
       <div id="site-header" class="grid grid-cols-12">
-        <div id="site-logo" class="hidden col-span-3 pl-2 mt-2 space-x-2 md:block">
+        <div id="site-logo" class="hidden col-span-3 mt-2 space-x-2 md:block">
           <div class="flex items-end justify-start h-full">
             <a href="">
               <ema:metadata>
