@@ -1,6 +1,6 @@
 <ema:note:pandoc>
   <Para>
-    <p class="my-3">
+    <p class="mb-3">
       <inlines />
     </p>
   </Para>
@@ -72,22 +72,39 @@
     </div>
   </Note:List>
 
+  <BulletList>
+    <ul class="my-3 ml-4 space-y-1 list-disc list-inside">
+      <BulletList:Items>
+        <li>
+          <BulletList:Item />
+        </li>
+      </BulletList:Items>
+    </ul>
+  </BulletList>
+  <OrderedList>
+    <ul class="my-3 ml-4 space-y-1 list-decimal list-inside">
+      <OrderedList:Items>
+        <li>
+          <OrderedList:Item />
+        </li>
+      </OrderedList:Items>
+    </ul>
+  </OrderedList>
+
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600">
     <Internal class="font-bold hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-0.5 text-sm" />
+  <CodeBlock class="py-0.5 mb-3 text-sm" />
   <Code class="py-0.5 bg-gray-100 text-sm" />
-  <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-  <BulletList class="ml-4 space-y-1 list-disc list-inside" />
   <Header>
-    <h1 class="pb-2 mt-4 mb-2 text-5xl font-bold text-center" />
-    <h2 class="mt-4 mb-4 text-4xl font-bold text-gray-700" />
-    <h3 class="mt-4 mb-2 text-3xl font-bold text-gray-700" />
-    <h4 class="mt-4 mb-2 text-2xl font-bold text-gray-700" />
-    <h5 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
-    <h6 class="mt-4 mb-2 text-xl font-bold text-gray-700" />
+    <h1 class="pb-2 mb-2 text-5xl font-bold text-center" />
+    <h2 class="mb-4 text-4xl font-bold text-gray-700" />
+    <h3 class="mb-2 text-3xl font-bold text-gray-700" />
+    <h4 class="mb-2 text-2xl font-bold text-gray-700" />
+    <h5 class="mb-2 text-xl font-bold text-gray-700" />
+    <h6 class="mb-2 text-xl font-bold text-gray-700" />
   </Header>
 
 </ema:note:pandoc>

@@ -1,6 +1,6 @@
 <nav>
   <!-- This should be a grid -->
-  <div class="grid grid-cols-12 gap-2 mt-4">
+  <div class="grid grid-cols-12 gap-2 mb-8">
     <span class="col-span-1"></span>
     <header class="col-span-11 pb-2 mb-2 font-semibold text-gray-600 border-b-2">
       <query />

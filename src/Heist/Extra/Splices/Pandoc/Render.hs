@@ -88,13 +88,15 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     withTplTag ctx "BlockQuote" ("blocks" ## rpBlock ctx `foldMapM` bs) $
       one . X.Element "blockquote" mempty <$> foldMapM (rpBlock ctx) bs
   B.OrderedList _ bss ->
-    fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
-      flip foldMapM bss $
-        fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
+    withTplTag ctx "OrderedList" (pandocListSplices "OrderedList" bss) $ do
+      fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
+        flip foldMapM bss $
+          fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.BulletList bss ->
-    fmap (one . X.Element "ul" (rpAttr $ bAttr b)) $
-      flip foldMapM bss $
-        fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
+    withTplTag ctx "BulletList" (pandocListSplices "BulletList" bss) $ do
+      fmap (one . X.Element "ul" (rpAttr $ bAttr b)) $
+        flip foldMapM bss $
+          fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.DefinitionList defs ->
     withTplTag ctx "DefinitionList" (definitionListSplices defs) $
       fmap (one . X.Element "dl" mempty) $
@@ -108,7 +110,8 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     one . X.Element (headerTag level) (rpAttr $ concatAttr attr $ bAttr b)
       <$> foldMapM (rpInline ctx) is
   B.HorizontalRule ->
-    pure $ one $ X.Element "hr" mempty mempty
+    -- TODO: Style in pandoc.tpl
+    pure $ one $ X.Element "hr" [("class", "mb-3")] mempty
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
     -- TODO: Move tailwind styles to pandoc.tpl
     let rowStyle = [("class", "border-b-2 border-gray-100")]
@@ -172,6 +175,15 @@ rpBlock' ctx@RenderCtx {..} b = case b of
       let tag = bool "Task:Unchecked" "Task:Checked" checked
       withTplTag ctx tag ("inlines" ## rpInline ctx `foldMapM` is) $
         foldMapM (rpInline ctx) is'
+
+    pandocListSplices :: Text -> [[B.Block]] -> H.Splices (HI.Splice n)
+    pandocListSplices tagPrefix bss = 
+      (tagPrefix <> ":Items") ## (HI.runChildrenWith  . itemsSplices) `foldMapM` bss 
+      where
+        itemsSplices :: [B.Block] -> H.Splices (HI.Splice n)
+        itemsSplices bs = do
+          (tagPrefix <> ":Item") ## foldMapM (rpBlock ctx) bs
+
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
