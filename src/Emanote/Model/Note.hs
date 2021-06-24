@@ -101,14 +101,14 @@ lookupMeta k =
 
 queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> Tit.Title
 queryNoteTitle r doc meta =
-  let yamlNoteTitle = Tit.TitlePlain <$> lookupAeson Nothing (one "title") meta
+  let yamlNoteTitle = Tit.fromPlain <$> lookupAeson Nothing (one "title") meta
       fileNameTitle = Tit.fromRoute r
       notePandocTitle = getPandocTitle doc
    in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Tit.Title
     getPandocTitle =
-      fmap Tit.TitlePandoc . getPandocH1
+      fmap Tit.fromInlines . getPandocH1
       where
         getPandocH1 :: Pandoc -> Maybe [B.Inline]
         getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =
