@@ -42,5 +42,9 @@ Animal Foods
 : Offal
 : Muscle meat
 
+## Hash Tags
+
+Add an #hashtag anywhere in Markdown file. They can also be added to the YAML frontmatter.
+
 [^1]: Reference to a note.
 [^2]: Another reference to a note.

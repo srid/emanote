@@ -81,6 +81,8 @@ parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
   -- Let absolute URLs pass through
   guard $ not $ "://" `T.isInfixOf` url
+  -- URLs with anchors are ignored (such as in @tags#foo).
+  guard $ not $ "#" `T.isInfixOf` url
   wikiLink <|> hyperLinks
   where
     wikiLink =
