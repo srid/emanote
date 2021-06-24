@@ -34,7 +34,7 @@
     </blockquote>
   </BlockQuote>
   <DefinitionList>
-    <dl class="flex flex-col">
+    <dl class="flex flex-col mb-3">
       <DefinitionList:Items>
         <div class="my-1">
           <dt class="font-bold text-l">
