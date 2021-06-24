@@ -2,7 +2,20 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.Model.Title where
+module Emanote.Model.Title
+  ( Title,
+
+    -- * Title conversion
+    fromRoute,
+    fromInlines,
+    fromPlain,
+    toInlines,
+    toPlain,
+
+    -- * Rendering a Title
+    titleSplice,
+  )
+where
 
 import Data.Aeson
 import qualified Emanote.Route as R
@@ -30,9 +43,6 @@ fromRoute :: R.LMLRoute -> Title
 fromRoute =
   TitlePlain . R.routeBaseName . R.lmlRouteCase
 
-fromPlainAsPandoc :: Text -> Title
-fromPlainAsPandoc = TitlePandoc . one . B.Str
-
 fromPlain :: Text -> Title
 fromPlain = TitlePlain
 
@@ -40,6 +50,9 @@ toPlain :: Title -> Text
 toPlain = \case
   TitlePlain s -> s
   TitlePandoc is -> plainify is
+
+fromInlines :: [B.Inline] -> Title
+fromInlines = TitlePandoc
 
 toInlines :: Title -> [B.Inline]
 toInlines = \case
