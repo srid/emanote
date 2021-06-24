@@ -22,6 +22,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
@@ -90,14 +91,14 @@ renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "Index"
+    commonSplices emaAction meta $ Tit.fromPlain "Index"
     routeTreeSplice Nothing model
 
 renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRTagIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "Tags"
+    commonSplices emaAction meta $ Tit.fromPlain "Tags"
     "ema:tagindex"
       ## Splices.listSplice (M.modelTags model) "each-tag"
       $ \(tag, notes) -> do
@@ -120,19 +121,18 @@ renderLmlHtml emaAction model note = do
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
-      $ \(R.liftLMLRoute -> crumbR) ->
-        MapSyntax.mapV HI.textSplice $ do
-          "crumb:url" ## Ema.routeUrl model $ SR.lmlSiteRoute crumbR
-          "crumb:title" ## M.modelLookupTitle crumbR model
+      $ \(R.liftLMLRoute -> crumbR) -> do
+        "crumb:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute crumbR)
+        "crumb:title" ## Tit.titleSplice (M.modelLookupTitle crumbR model)
     -- Note stuff
     "ema:note:title"
-      ## HI.textSplice pageTitle
+      ## Tit.titleSplice pageTitle
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
-        "backlink:note:title" ## HI.textSplice (M.modelLookupTitle source model)
+        "backlink:note:title" ## Tit.titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
@@ -151,9 +151,13 @@ renderLmlHtml emaAction model note = do
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
 
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Text -> H.Splices (HI.Splice n)
+commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
 commonSplices emaAction meta routeTitle = do
-  let siteTitle = MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = Tit.fromPlainAsPandoc $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+      routeTitleFull =
+        if routeTitle == siteTitle
+          then siteTitle
+          else routeTitle <> Tit.fromPlainAsPandoc " – " <> siteTitle
   -- Heist helpers
   "bind" ## HB.bindImpl
   "apply" ## HA.applyImpl
@@ -165,12 +169,9 @@ commonSplices emaAction meta routeTitle = do
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
     ## HJ.bindJson meta
-  "ema:title" ## HI.textSplice routeTitle
+  "ema:title" ## Tit.titleSplice routeTitle
   "ema:titleFull"
-    ## HI.textSplice
-    $ if routeTitle == siteTitle
-      then siteTitle
-      else routeTitle <> " – " <> siteTitle
+    ## Tit.titleSplice routeTitleFull
   where
     twindShim :: Ema.CLI.Action -> H.Html
     twindShim action =
@@ -192,14 +193,14 @@ routeTreeSplice mr model = do
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
                ( Meta.lookupRouteMeta @Int 0 (one "order") tr model,
-                 maybe (R.routeBaseName . R.lmlRouteCase $ tr) MN.noteTitle $ M.modelLookupNoteByRoute tr model
+                 maybe (Tit.fromRoute tr) MN._noteTitle $ M.modelLookupNoteByRoute tr model
                )
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
              mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-               "node:text" ## HI.textSplice $ M.modelLookupTitle nodeRoute model
+               "node:text" ## Tit.titleSplice $ M.modelLookupTitle nodeRoute model
                "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.lmlSiteRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =

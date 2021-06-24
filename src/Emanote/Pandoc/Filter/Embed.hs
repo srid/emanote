@@ -11,6 +11,7 @@ import Emanote.Model (Model)
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
+import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as Url
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
@@ -48,7 +49,7 @@ embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> Either
 embedSiteRoute emaAction model ctx@RenderCtx {..} = \case
   Left note -> do
     pure . runEmbedTemplate "note" $ do
-      "ema:note:title" ## HI.textSplice (MN.noteTitle note)
+      "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
       "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
       "ema:note:pandoc"
         ## Splices.pandocSplice

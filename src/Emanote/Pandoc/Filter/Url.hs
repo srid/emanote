@@ -17,6 +17,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
+import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
@@ -89,7 +90,7 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
         `h` ( \(resR :: SR.ResourceRoute) ->
                 resR & absurdUnion
                   `h` ( \(lmlR :: R.LMLRoute) ->
-                          one . B.Str . MN.noteTitle <$> M.modelLookupNoteByRoute lmlR model
+                          Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
                       )
                   `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
                           -- Just append a file: prefix, to existing wiki-link.
