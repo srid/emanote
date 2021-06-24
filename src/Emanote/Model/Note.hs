@@ -17,20 +17,21 @@ import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
 import Ema (Slug)
 import qualified Emanote.Model.SData as SData
+import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Parser as Markdown
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
-import Heist.Extra.Splices.Pandoc.Render (plainify)
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Definition as B
 
 data Note = Note
-  { _noteDoc :: Pandoc,
+  { _noteRoute :: R.LMLRoute,
+    _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteRoute :: R.LMLRoute
+    _noteTitle :: Tit.Title
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
@@ -38,7 +39,8 @@ newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 
 type NoteIxs =
-  '[ R.LMLRoute,
+  '[ -- Route to this note
+     R.LMLRoute,
      -- Allowed ways to wiki-link to this note.
      WL.WikiLink,
      -- HTML route for this note
@@ -97,16 +99,16 @@ lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
   lookupAeson Nothing k . _noteMeta
 
-noteTitle :: Note -> Text
-noteTitle note@Note {..} =
-  let yamlNoteTitle = lookupMeta (one "title") note
-      fileNameTitle = R.routeBaseName . R.lmlRouteCase $ _noteRoute
-      notePandocTitle = getPandocTitle _noteDoc
+queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> Tit.Title
+queryNoteTitle r doc meta =
+  let yamlNoteTitle = Tit.TitlePlain <$> lookupAeson Nothing (one "title") meta
+      fileNameTitle = Tit.fromRoute r
+      notePandocTitle = getPandocTitle doc
    in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
   where
-    getPandocTitle :: Pandoc -> Maybe Text
+    getPandocTitle :: Pandoc -> Maybe Tit.Title
     getPandocTitle =
-      fmap plainify . getPandocH1
+      fmap Tit.TitlePandoc . getPandocH1
       where
         getPandocH1 :: Pandoc -> Maybe [B.Inline]
         getPandocH1 (Pandoc _ (B.Header 1 _ inlines : _rest)) =
@@ -151,7 +153,9 @@ placeHolderNote r =
 
 mkEmptyNoteWith :: R.LMLRoute -> B.Block -> Note
 mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =
-  Note doc Aeson.Null someR
+  Note someR doc meta (queryNoteTitle someR doc meta)
+  where
+    meta = Aeson.Null
 
 parseNote :: MonadIO m => R.LMLRoute -> FilePath -> m (Either Text Note)
 parseNote r fp = do
@@ -167,7 +171,7 @@ parseNote r fp = do
                      lookupAeson mempty (one "tags") frontmatter
                        <> HT.inlineTagsInPandoc doc
                  )
-    pure $ Note doc meta r
+    pure $ Note r doc meta (queryNoteTitle r doc meta)
   where
     withAesonDefault def mv =
       fromMaybe def mv

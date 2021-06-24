@@ -27,6 +27,7 @@ import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
   )
+import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, ModelRoute, R)
@@ -124,9 +125,9 @@ modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
 modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
   N.singleNote (N.lookupNotesByHtmlRoute r notes)
 
-modelLookupTitle :: LMLRoute -> Model -> Text
+modelLookupTitle :: LMLRoute -> Model -> Tit.Title
 modelLookupTitle r =
-  maybe (R.routeBaseName $ R.lmlRouteCase r) N.noteTitle . modelLookupNoteByRoute r
+  maybe (Tit.fromRoute r) N._noteTitle . modelLookupNoteByRoute r
 
 -- Lookup the wiki-link and return its candidates in the model.
 modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either Note StaticFile]
