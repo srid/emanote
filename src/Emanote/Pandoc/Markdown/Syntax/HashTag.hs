@@ -6,6 +6,7 @@
 module Emanote.Pandoc.Markdown.Syntax.HashTag
   ( hashTagSpec,
     inlineTagsInPandoc,
+    getTagFromInline,
     TT.Tag (..),
     TT.TagPattern (..),
     TT.mkTagPattern,
@@ -24,16 +25,16 @@ import qualified Text.Pandoc.Builder as B
 import qualified Text.Pandoc.Walk as W
 import qualified Text.Parsec as P
 
-mkTagFrom :: B.Inline -> Maybe TT.Tag
-mkTagFrom = \case
+inlineTagsInPandoc :: B.Pandoc -> [TT.Tag]
+inlineTagsInPandoc = W.query $ maybeToList . getTagFromInline
+
+getTagFromInline :: B.Inline -> Maybe TT.Tag
+getTagFromInline = \case
   B.Span (_, [cls], Map.fromList -> attrs) _
     | cls == tagCls -> do
-      tag <- Map.lookup "data" attrs
+      tag <- Map.lookup "data-tag" attrs
       pure $ TT.Tag tag
   _ -> Nothing
-
-inlineTagsInPandoc :: B.Pandoc -> [TT.Tag]
-inlineTagsInPandoc = W.query $ maybeToList . mkTagFrom
 
 class HasHashTag il where
   hashTag :: TT.Tag -> il
@@ -42,7 +43,7 @@ instance HasHashTag (CP.Cm b B.Inlines) where
   hashTag (TT.Tag tag) =
     let attrs =
           [ ("title", "Tag"),
-            ("data", tag)
+            ("data-tag", tag)
           ]
      in CP.Cm $ B.spanWith ("", one tagCls, attrs) $ B.str $ "#" <> tag
 
