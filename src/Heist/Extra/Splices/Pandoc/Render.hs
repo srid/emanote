@@ -252,9 +252,9 @@ rpInline' ctx@RenderCtx {..} i = case i of
           catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", plainify is)]
             <> rpAttr attr
     pure $ one . X.Element "img" attrs $ mempty
-  B.Note bs -> do
-    one . X.Element "aside" mempty
-      <$> foldMapM (rpBlock ctx) bs
+  B.Note _bs -> do
+    -- Footnotes are to be handled separately; see Footenotes.hs
+    pure $ one $ X.Element "sup" mempty $ one $ X.TextNode "*"
   B.Span attr@(id', classes, attrs) is -> do
     let (attr', is') =
           if
