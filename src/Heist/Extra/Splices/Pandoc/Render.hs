@@ -16,6 +16,7 @@ where
 
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
@@ -28,7 +29,6 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W
 import qualified Text.XmlHtml as X
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =
@@ -52,9 +52,9 @@ withTplTag RenderCtx {..} name splices default_ =
 rpBlock' :: forall n. Monad n => RenderCtx n -> B.Block -> HI.Splice n
 rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
-    maybe 
+    maybe
       (rpInline ctx `foldMapM` is)
-      (rpTasks is) 
+      (rpTasks is)
       (taskFromInlines is)
   B.Para is -> do
     let innerSplice = maybe (rpInline ctx `foldMapM` is) (rpTasks is) (taskFromInlines is)
@@ -178,13 +178,12 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         foldMapM (rpInline ctx) is'
 
     pandocListSplices :: Text -> [[B.Block]] -> H.Splices (HI.Splice n)
-    pandocListSplices tagPrefix bss = 
-      (tagPrefix <> ":Items") ## (HI.runChildrenWith  . itemsSplices) `foldMapM` bss 
+    pandocListSplices tagPrefix bss =
+      (tagPrefix <> ":Items") ## (HI.runChildrenWith . itemsSplices) `foldMapM` bss
       where
         itemsSplices :: [B.Block] -> H.Splices (HI.Splice n)
         itemsSplices bs = do
           (tagPrefix <> ":Item") ## foldMapM (rpBlock ctx) bs
-
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
@@ -257,18 +256,19 @@ rpInline' ctx@RenderCtx {..} i = case i of
     one . X.Element "aside" mempty
       <$> foldMapM (rpBlock ctx) bs
   B.Span attr@(id', classes, attrs) is -> do
-    let (attr', is') = 
-          if | classes == ["emoji"] ->
-              -- HACK: Make emoji fonts render correctly.
-              -- Undo font-familly on emoji spans, so the browser uses an emoji font.
-              -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
-              let emojiFontAttr = ("style", "font-family: emoji")
-              in ((id', classes, attrs <> one emojiFontAttr), is)
-             | Just inlineTag <- HT.getTagFromInline i  ->
-               -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
-               (attr, one $ B.Link mempty is ("-/tags#" <> HT.unTag inlineTag, "Tag"))
-             | otherwise ->
-              (attr, is)
+    let (attr', is') =
+          if
+              | classes == ["emoji"] ->
+                -- HACK: Make emoji fonts render correctly.
+                -- Undo font-familly on emoji spans, so the browser uses an emoji font.
+                -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
+                let emojiFontAttr = ("style", "font-family: emoji")
+                 in ((id', classes, attrs <> one emojiFontAttr), is)
+              | Just inlineTag <- HT.getTagFromInline i ->
+                -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
+                (attr, one $ B.Link mempty is ("-/tags#" <> HT.unTag inlineTag, "Tag"))
+              | otherwise ->
+                (attr, is)
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is'
   B.SmallCaps is ->
     foldMapM (rpInline ctx) is

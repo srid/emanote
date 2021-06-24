@@ -42,7 +42,7 @@ mkRouteFromSlug =
 
 mkRouteFromSlugs :: forall ext. HasExt ext => NonEmpty Slug -> R ext
 mkRouteFromSlugs =
-  R 
+  R
 
 -- | If the route is a single-slug URL, return the only slug.
 routeSlug :: R ext -> Maybe Slug
@@ -56,8 +56,6 @@ routeSlugWithPrefix prefix r = do
   lastSlug :| (nonEmpty -> Just prevSlugs) <- pure $ NE.reverse $ unRoute r
   guard $ NE.reverse prevSlugs == prefix
   pure lastSlug
-
-
 
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text

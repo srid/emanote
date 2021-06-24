@@ -18,10 +18,10 @@ import Data.WorldPeace.Union
   ( OpenUnion,
     openUnionLift,
   )
-import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
-import qualified Emanote.Route.R as R
 import Ema (Slug)
 import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
+import qualified Emanote.Route.R as R
 
 data IndexR = IndexR
   deriving (Eq, Show, Ord)
@@ -78,8 +78,8 @@ decodeTagIndexR fp = do
   pure TagIndexR
 
 specialRouteSlug :: R.R ext -> Maybe Slug
-specialRouteSlug = 
-  R.routeSlugWithPrefix (one "-") 
+specialRouteSlug =
+  R.routeSlugWithPrefix (one "-")
 
 mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
 mkSpecialRoute slug =
