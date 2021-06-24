@@ -184,10 +184,12 @@ commonSplices emaAction meta routeTitle = do
         _ ->
           -- Twind shim doesn't reliably work in dev server mode. Let's just use the
           -- tailwind CDN.
-          H.link
-            ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
-            ! A.rel "stylesheet"
-            ! A.type_ "text/css"
+          cachedTailwindCdn
+    cachedTailwindCdn =
+      H.link
+        ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
+        ! A.rel "stylesheet"
+        ! A.type_ "text/css"
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)

@@ -8,7 +8,7 @@
     <!-- FIXME: Fix list styling to use flexbox, so task lists don't botch them up -->
     <label class="inline-flex items-start space-x-2">
       <input checked type="checkbox"
-        class="flex-shrink-0 w-5 h-5 checked:bg-blue-600 checked:border-transparent">
+        class="flex-shrink-0 w-5 h-5 checked:bg-${theme}-600 checked:border-transparent">
       <span>
         <inlines />
       </span>
@@ -29,7 +29,7 @@
   </Cite>
   <BlockQuote>
     <blockquote
-      class="py-0.5 px-4 italic border-l-4 bg-gray-50 text-gray-600 border-gray-400 quote">
+      class="py-0.5 px-4 mb-3 italic border-l-4 bg-gray-50 text-gray-600 border-gray-400 quote">
       <blocks />
     </blockquote>
   </BlockQuote>
