@@ -10,6 +10,7 @@ module Emanote.Route.SiteRoute.Type
     VirtualRoute,
     ResourceRoute,
     decodeVirtualRoute,
+    mkSpecialRoute,
   )
 where
 
@@ -19,6 +20,8 @@ import Data.WorldPeace.Union
   )
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import qualified Emanote.Route.R as R
+import Ema (Slug)
+import qualified Emanote.Route.Ext as Ext
 
 data IndexR = IndexR
   deriving (Eq, Show, Ord)
@@ -64,12 +67,20 @@ decodeVirtualRoute fp =
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
-  slug <- R.routeSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "@index"
+  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
+  guard $ slug == "index"
   pure IndexR
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
-  slug <- R.routeSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "@tags"
+  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
+  guard $ slug == "tags"
   pure TagIndexR
+
+specialRouteSlug :: R.R ext -> Maybe Slug
+specialRouteSlug = 
+  R.routeSlugWithPrefix (one "-") 
+
+mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
+mkSpecialRoute slug =
+  R.mkRouteFromSlugs ("-" :| one slug)
