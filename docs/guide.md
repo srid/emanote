@@ -36,6 +36,6 @@ Known limitations
 
 - JS unreliability in live-server mode.
 	- PrismJS works
-	- MathJS does not
+	- MathJS may not work in live-server (works, however, on the generated site)
 - Fsnotify limitations
   - If doing a directory move/rename, restart emanote.
