@@ -266,7 +266,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
               in ((id', classes, attrs <> one emojiFontAttr), is)
              | Just inlineTag <- HT.getTagFromInline i  ->
                -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
-               (attr, one $ B.Link mempty is ("@tags#" <> HT.unTag inlineTag, "Tag"))
+               (attr, one $ B.Link mempty is ("-/tags#" <> HT.unTag inlineTag, "Tag"))
              | otherwise ->
               (attr, is)
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is'

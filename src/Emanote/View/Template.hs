@@ -90,14 +90,14 @@ renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "@Index"
+    commonSplices emaAction meta "Index"
     routeTreeSplice Nothing model
 
 renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRTagIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "@Tags"
+    commonSplices emaAction meta "Tags"
     "ema:tagindex"
       ## Splices.listSplice (M.modelTags model) "each-tag"
       $ \(tag, notes) -> do

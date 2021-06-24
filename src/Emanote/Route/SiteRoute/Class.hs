@@ -75,10 +75,10 @@ encodeVirtualRoute :: VirtualRoute -> FilePath
 encodeVirtualRoute =
   absurdUnion
     `h` ( \TagIndexR ->
-            R.encodeRoute $ R.mkRouteFromSlug @'Html "@tags"
+            R.encodeRoute $ mkSpecialRoute @'Html "tags"
         )
     `h` ( \IndexR ->
-            R.encodeRoute $ R.mkRouteFromSlug @'Html "@index"
+            R.encodeRoute $ mkSpecialRoute @'Html "index"
         )
 
 -- | Decode a route that is known to refer to a resource in the model
