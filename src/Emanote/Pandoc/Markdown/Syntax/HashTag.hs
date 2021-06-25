@@ -14,6 +14,7 @@ module Emanote.Pandoc.Markdown.Syntax.HashTag
     TT.tagMatch,
     TT.constructTag,
     TT.deconstructTag,
+    TT.tagTree,
   )
 where
 

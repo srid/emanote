@@ -129,7 +129,9 @@ executable emanote
     Emanote.Source.Patch
     Emanote.Source.Pattern
     Emanote.View
+    Emanote.View.Common
     Emanote.View.LiveServerFiles
+    Emanote.View.TagIndex
     Emanote.View.Template
     Heist.Extra
     Heist.Extra.Splices.List
