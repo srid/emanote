@@ -1,0 +1,1 @@
+<img class="mb-3" src="${ema:url}" alt="${ema:alt}" />

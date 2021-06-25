@@ -57,7 +57,8 @@
     <!-- DoNotFormat -->
   </Note:Ref>
   <Note:List>
-    <div title="Footnotes" class="pt-2 mt-4 space-y-1 text-gray-700 transform scale-90 border-t-2">
+    <div title="Footnotes"
+      class="pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2">
       <header class="font-semibold">Footnotes</header>
       <footnote>
         <div id="fn${footnote:idx}">
