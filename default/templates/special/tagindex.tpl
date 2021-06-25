@@ -26,9 +26,11 @@
                   <each-tag>
                     <h2 id="${tag}" title="Tag"
                       class="py-1 font-mono font-bold text-gray-700 text-l">
-                      <!-- DoNotFormat -->
-                      #<tag />
-                      <!-- DoNotFormat -->
+                      <a href="-/tags/${tag}">
+                        <!-- DoNotFormat -->
+                        #<tag />
+                        <!-- DoNotFormat -->
+                      </a>
                     </h2>
                     <div class="flex flex-col mb-4 ml-2">
                       <notes>

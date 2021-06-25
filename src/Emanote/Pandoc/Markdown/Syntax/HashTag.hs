@@ -9,8 +9,11 @@ module Emanote.Pandoc.Markdown.Syntax.HashTag
     getTagFromInline,
     TT.Tag (..),
     TT.TagPattern (..),
+    TT.TagNode (..),
     TT.mkTagPattern,
     TT.tagMatch,
+    TT.constructTag,
+    TT.deconstructTag,
   )
 where
 
