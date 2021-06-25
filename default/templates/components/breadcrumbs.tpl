@@ -19,11 +19,4 @@
       </div>
     </div>
   </nav>
-
 </ema:breadcrumbs>
-<h1
-  class="flex items-end justify-center pl-2 md:pl-0 md:h-full mt-2 text-5xl font-extrabold text-${theme}-900 md:mt-0 md:text-6xl md:justify-start ">
-  <a class="z-40 tracking-tighter md:pl-4">
-    <ema:note:title />
-  </a>
-</h1>
