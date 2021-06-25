@@ -9,7 +9,6 @@ import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
-import qualified Data.Map.Syntax as MapSyntax
 import Data.Version (showVersion)
 import Data.WorldPeace.Union
   ( absurdUnion,

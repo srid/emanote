@@ -4,7 +4,7 @@
 
       <apply template="components/breadcrumbs" />
 
-      <div class="flex md:mt-8 md:shadow-2xl md:rounded-lg md:mb-8 bg-gray-50">
+      <div class="flex bg-gray-50 md:mt-8 md:shadow-2xl md:mb-8">
         <!-- Sidebar column -->
         <nav id="sidebar" class="hidden leading-relaxed md:block md:sticky md:top-0 md:h-full">
           <div class="px-2 py-2 text-gray-800">
