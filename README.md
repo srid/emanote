@@ -16,10 +16,12 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 
 ```bash
 # Install (`cachix use srid` for cached binaries)
-nix-env -if ./default.nix
+nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz
+# Or, from the Git repo: nix-env -if ./default.nix
 
-# Run live server
-PORT=8001 emanote -C /path/to/notebook
+# Run live server (PORT is optional)
+cd /path/to/notebook
+PORT=8001 emanote
 
 # Generate static files
 mkdir /tmp/output
