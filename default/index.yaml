@@ -12,7 +12,8 @@ tags: []
 template:
   # Use file "./${template.name}.tpl" to render HTML
   name: templates/layouts/book
-  theme: indigo
+  # List of available colors: https://tailwindcss.com/docs/customizing-colors
+  theme: blue
   baseUrl: /
   iconUrl: favicon.svg
   sidebar:

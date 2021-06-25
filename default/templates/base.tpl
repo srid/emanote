@@ -28,7 +28,7 @@
 <bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
 <!-- DoNotFormat -->
 
-<body class="overflow-y-scroll bg-${theme}-50">
+<body class="overflow-y-scroll bg-gray-400">
   <body-main />
 </body>
 
