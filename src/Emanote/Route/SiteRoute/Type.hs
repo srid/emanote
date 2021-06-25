@@ -10,15 +10,18 @@ module Emanote.Route.SiteRoute.Type
     VirtualRoute,
     ResourceRoute,
     decodeVirtualRoute,
-    mkSpecialRoute,
+    encodeVirtualRoute,
   )
 where
 
 import Data.WorldPeace.Union
   ( OpenUnion,
+    absurdUnion,
     openUnionLift,
   )
-import Ema (Slug)
+import Ema (Slug (unSlug))
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import Emanote.Prelude (h)
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import qualified Emanote.Route.R as R
@@ -26,7 +29,7 @@ import qualified Emanote.Route.R as R
 data IndexR = IndexR
   deriving (Eq, Show, Ord)
 
-data TagIndexR = TagIndexR
+newtype TagIndexR = TagIndexR [HT.TagNode]
   deriving (Eq, Show, Ord)
 
 -- | A 404 route
@@ -73,9 +76,23 @@ decodeIndexR fp = do
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
-  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "tags"
-  pure TagIndexR
+  "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
+  let tagNodes = fmap (HT.TagNode . Ema.unSlug) tagPath
+  pure $ TagIndexR tagNodes
+
+encodeVirtualRoute :: VirtualRoute -> FilePath
+encodeVirtualRoute =
+  absurdUnion
+    `h` ( \tr@(TagIndexR _) ->
+            R.encodeRoute $ encodeTagIndexR tr
+        )
+    `h` ( \IndexR ->
+            R.encodeRoute $ mkSpecialRoute @'Ext.Html "index"
+        )
+
+encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
+encodeTagIndexR (TagIndexR tagNodes) =
+  R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
 
 specialRouteSlug :: R.R ext -> Maybe Slug
 specialRouteSlug =

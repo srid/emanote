@@ -22,8 +22,8 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
 import Emanote.Model.Type (Model)
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import Emanote.Prelude (h)
-import Emanote.Route (FileType (Html))
 import qualified Emanote.Route as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
@@ -54,7 +54,9 @@ instance Ema Model SiteRoute where
             & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
             <&> staticFileSiteRoute
         virtualRoutes :: [VirtualRoute] =
-          [openUnionLift IndexR, openUnionLift TagIndexR]
+          let tags = fst <$> M.modelTags model
+           in openUnionLift IndexR :
+              (openUnionLift . TagIndexR <$> [] : fmap (toList . HT.deconstructTag) tags)
      in htmlRoutes
           <> staticRoutes
           <> fmap openUnionLift virtualRoutes
@@ -69,16 +71,6 @@ encodeResourceRoute model =
         )
     `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
             R.encodeRoute r
-        )
-
-encodeVirtualRoute :: VirtualRoute -> FilePath
-encodeVirtualRoute =
-  absurdUnion
-    `h` ( \TagIndexR ->
-            R.encodeRoute $ mkSpecialRoute @'Html "tags"
-        )
-    `h` ( \IndexR ->
-            R.encodeRoute $ mkSpecialRoute @'Html "index"
         )
 
 -- | Decode a route that is known to refer to a resource in the model

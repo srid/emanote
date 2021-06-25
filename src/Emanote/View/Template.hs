@@ -79,8 +79,8 @@ renderResourceRoute emaAction m =
 renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
 renderVirtualRoute emaAction m =
   absurdUnion
-    `h` ( \SR.TagIndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRTagIndex emaAction m
+    `h` ( \(SR.TagIndexR mtag) ->
+            Ema.AssetGenerated Ema.Html $ renderSRTagIndex emaAction m mtag
         )
     `h` ( \SR.IndexR ->
             Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
@@ -93,8 +93,10 @@ renderSRIndex emaAction model = do
     commonSplices emaAction meta $ Tit.fromPlain "Index"
     routeTreeSplice Nothing model
 
-renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
-renderSRTagIndex emaAction model = do
+renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
+renderSRTagIndex emaAction model tagPath = do
+  -- TODO: Implement tagPath-based rendering, including:
+  -- - Tag breadcrumbs
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta $ Tit.fromPlain "Tags"

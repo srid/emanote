@@ -150,11 +150,11 @@
     "tagtree": {
       "flake": false,
       "locked": {
-        "lastModified": 1623279971,
-        "narHash": "sha256-O8VHrbFDDLP6wo6BFK9UN1fHQyYsHYElJzYfT1B7O4c=",
+        "lastModified": 1624639437,
+        "narHash": "sha256-MfpTQ2cUQ/Q53/oa/KmI1NZZsI9pe4ZkiXQixQVpB0A=",
         "owner": "srid",
         "repo": "tagtree",
-        "rev": "59d84f738722800f3a0ef942213a725eeb511900",
+        "rev": "7d118d29b2357544e5428a433df124a3d770c3b4",
         "type": "github"
       },
       "original": {
