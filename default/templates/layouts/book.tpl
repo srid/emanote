@@ -2,32 +2,15 @@
   <bind tag="body-main">
     <div class="container mx-auto">
 
-      <div id="site-header" class="grid grid-cols-12">
-        <div id="site-logo" class="hidden col-span-3 mt-2 space-x-2 md:block">
-          <div class="flex items-end justify-start h-full">
-            <a href="">
-              <ema:metadata>
-                <with var="template">
-                  <img class="z-50 h-20 transition transform hover:scale-110 hover:opacity-80"
-                    src="${value:iconUrl}" />
-                </with>
-              </ema:metadata>
-            </a>
-          </div>
-        </div>
-        <div class="col-span-12 md:col-span-9">
-
-          <apply template="components/breadcrumbs" />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-12 md:shadow-2xl md:rounded-lg md:mb-8">
+      <apply template="components/breadcrumbs" />
+      <div class="grid grid-cols-12 md:mt-8 md:shadow-2xl md:rounded-lg md:mb-8">
         <!-- Sidebar column -->
         <nav id="sidebar"
-          class="hidden leading-relaxed md:block md:col-span-3 md:sticky md:top-0 md:h-full bg-gray-50">
+          class="hidden leading-relaxed md:block md:col-span-3 md:sticky md:top-0 md:h-full bg-gray-50 border-r-2 border-${theme}-50">
 
           <div class="px-2 py-2 text-gray-800">
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
+
               <a href="-/tags" title="View tags">
                 <svg class="w-5 h-5 hover:text-${theme}-700" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -45,14 +28,36 @@
                 </svg>
               </a>
             </div>
+            <div id="site-logo" class="pl-2">
+              <div class="flex items-center my-2 space-x-2 justify-left">
+                <a href="" title="Go to Home">
+                  <ema:metadata>
+                    <with var="template">
+                      <img class="w-4 h-4 transition transform hover:scale-110 hover:opacity-80"
+                        src="${value:iconUrl}" />
+                    </with>
+                  </ema:metadata>
+                </a>
+                <a class="font-bold truncate" title="Go to Home" href="">
+                  Home
+                </a>
+              </div>
+            </div>
             <ema:route-tree>
               <apply template="components/sidebar-tree" />
             </ema:route-tree>
           </div>
         </nav>
+
         <!-- Main body column -->
         <div class="col-span-12 bg-white md:col-span-9 ">
-          <main class="px-2 py-4 md:pl-4">
+          <main class="px-4 py-4">
+            <h1
+              class="flex items-end justify-center mb-4 p-3 bg-${theme}-600 text-5xl font-extrabold text-${theme}-900 rounded">
+              <a class="z-40 tracking-tighter text-gray-100">
+                <ema:note:title />
+              </a>
+            </h1>
             <apply template="components/note-body" />
             <apply template="components/backlinks" />
             <apply template="components/metadata" />
