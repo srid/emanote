@@ -67,6 +67,7 @@ Before tests (tasks impacting the larger architectural context in code base),
   - [ ] Incrementally build a graph of notes
     - Really need it? Or can we do away with ixset + path finding traversal?
     - [ ] First, prototype using traversal (+ z-index on /-/index)
+      - How to deal with >10,000 of notes when doing z-index?
   - [ ] Reinstate Neuron UpTree 
   - [ ] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
   - [ ] Move tags/index links from sidebar to header (esp. if sidebar is gonna ignore folgezettel)

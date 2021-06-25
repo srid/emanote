@@ -6,7 +6,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
-  ( WikiLink (unWikiLink),
+  ( WikiLink,
     WikiLinkType (..),
     wikilinkSpec,
     mkWikiLinkFromUrlAndAttrs,
@@ -39,7 +39,7 @@ newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data)
 
 instance Show WikiLink where
-  show (WikiLink (toList . fmap unSlug -> slugs)) =
+  show (toList . fmap unSlug . unWikiLink -> slugs) =
     toString $ "[[" <> T.intercalate "/" slugs <> "]]"
 
 mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)

@@ -36,7 +36,7 @@ embedWikiLinkResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) blk 
         Left err ->
           pure $ brokenLinkDivWrapper err blk
         Right res -> do
-          embedSiteRoute emaAction model ctx res
+          embedSiteRoute emaAction model ctx wl res
     _ ->
       Nothing
   where
@@ -45,8 +45,8 @@ embedWikiLinkResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) blk 
         B.Div (Url.brokenLinkAttr err) $
           one block
 
-embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
-embedSiteRoute emaAction model ctx@RenderCtx {..} = \case
+embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
+embedSiteRoute emaAction model RenderCtx {..} wl = \case
   Left note -> do
     pure . runEmbedTemplate "note" $ do
       "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
@@ -62,8 +62,9 @@ embedSiteRoute emaAction model ctx@RenderCtx {..} = \case
         fp = staticFile ^. SF.staticFilePath
     if
         | any (`T.isSuffixOf` toText fp) imageExts ->
-          pure . HP.rpBlock ctx $
-            B.Plain $ one $ B.Image B.nullAttr [] (toText $ R.encodeRoute r, "")
+          pure . runEmbedTemplate "image" $ do
+            "ema:url" ## HI.textSplice (toText $ R.encodeRoute r)
+            "ema:alt" ## HI.textSplice $ show wl
         | any (`T.isSuffixOf` toText fp) videoExts -> do
           pure . runEmbedTemplate "video" $ do
             "ema:url" ## HI.textSplice (toText $ R.encodeRoute r)
