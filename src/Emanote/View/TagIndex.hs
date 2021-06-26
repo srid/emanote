@@ -100,6 +100,7 @@ renderSRTagIndex emaAction model tagPath = do
       $ \note ->
         PF.noteSplice model note
   where
+    -- TODO: Use SiteRoute encoder
     tagNodesUrl =
       ("-/tags" `concatUrl`) . T.intercalate "/" . fmap HT.unTagNode
     concatUrl :: Text -> Text -> Text
