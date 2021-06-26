@@ -72,6 +72,7 @@ renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
 renderSRTagIndex emaAction model tagPath = do
   -- TODO: Implement tagPath-based rendering, including:
   -- - Tag breadcrumbs
+  -- - Note count (and tag child count)
   -- - Tag links from elsewhere
   let meta = Meta.getIndexYamlMeta model
       TagIndex {..} = mkTagIndex model tagPath
