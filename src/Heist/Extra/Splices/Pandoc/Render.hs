@@ -17,6 +17,7 @@ where
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Route.SiteRoute.Type as SR
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
@@ -116,7 +117,7 @@ rpBlock' ctx@RenderCtx {..} b = case b of
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
     -- TODO: Move tailwind styles to pandoc.tpl
     let rowStyle = [("class", "border-b-2 border-gray-100")]
-        cellStyle = [("class", "py-2")]
+        cellStyle = [("class", "py-2 px-2")]
     -- TODO: Apply captions, colSpec, etc.
     fmap (one . X.Element "table" (rpAttr attr)) $ do
       thead <- fmap (one . X.Element "thead" mempty) $
@@ -266,7 +267,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
                  in ((id', classes, attrs <> one emojiFontAttr), is)
               | Just inlineTag <- HT.getTagFromInline i ->
                 -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
-                (attr, one $ B.Link mempty is ("-/tags#" <> HT.unTag inlineTag, "Tag"))
+                (attr, one $ B.Link mempty is (SR.tagUrl inlineTag, "Tag"))
               | otherwise ->
                 (attr, is)
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is'
