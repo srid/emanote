@@ -13,6 +13,8 @@ where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Set as Set
 import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
@@ -55,8 +57,13 @@ instance Ema Model SiteRoute where
             <&> staticFileSiteRoute
         virtualRoutes :: [VirtualRoute] =
           let tags = fst <$> M.modelTags model
+              tagPaths =
+                Set.fromList $
+                  concat $
+                    tags <&> \(HT.deconstructTag -> tagPath) ->
+                      toList $ NE.inits tagPath
            in openUnionLift IndexR :
-              (openUnionLift . TagIndexR <$> [] : fmap (toList . HT.deconstructTag) tags)
+              (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
           <> staticRoutes
           <> fmap openUnionLift virtualRoutes
