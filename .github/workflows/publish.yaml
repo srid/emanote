@@ -35,7 +35,7 @@ jobs:
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
       - name: Generate website HTML 🔧
         run: |
-          mkdir ./.ci/output
+          mkdir -p ./.ci/output
           nix run . -- -C ./docs gen $(pwd)/.ci/output
           bin/compile-css $(pwd)/.ci/output
       - name: Deploy to website to gh-pages 🚀
