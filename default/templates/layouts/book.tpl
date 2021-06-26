@@ -58,7 +58,7 @@
         </nav>
 
         <!-- Main body column -->
-        <div class="flex-1 w-full bg-white">
+        <div class="flex-1 w-full overflow-x-auto bg-white">
           <main class="px-4 py-4">
             <apply template="components/note-title" />
             <apply template="components/note-body" />
