@@ -1,5 +1,4 @@
 <!-- Variable bindings for this tree-->
-<bind tag="iconSize">w-4 h-4 flex-shrink-0</bind>
 <node:active>
   <bind tag="link-class">font-bold text-${theme}-600 hover:underline</bind>
   <else />

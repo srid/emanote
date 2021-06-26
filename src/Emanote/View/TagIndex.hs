@@ -71,17 +71,13 @@ mkTagIndex model tagPath' =
 
 renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
 renderSRTagIndex emaAction model tagPath = do
-  -- TODO: Implement tagPath-based rendering, including:
-  -- - [x] Tag breadcrumbs
-  -- - [ ] Note count (and tag child count)
-  -- - [ ] Tag links from elsewhere
   let meta = Meta.getIndexYamlMeta model
-      TagIndex {..} = mkTagIndex model tagPath
+      tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta $ Tit.fromPlain tagIndexTitle
+    commonSplices emaAction meta $ Tit.fromPlain (tagIndexTitle tagIdx)
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (tagNodesUrl tagPath)
-    let parents = maybe [] (inits . init) $ nonEmpty tagIndexPath
+    let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
     "ema:tagcrumbs" ## Splices.listSplice parents "ema:each-crumb" $
       \crumb -> do
         let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
@@ -89,14 +85,15 @@ renderSRTagIndex emaAction model tagPath = do
         "ema:tagcrumb:title" ## HI.textSplice crumbTitle
         "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags"
-      ## Splices.listSplice tagIndexChildren "ema:each-childTag"
+      ## Splices.listSplice (tagIndexChildren tagIdx) "ema:each-childTag"
       $ \childTag -> do
+        let childIndex = mkTagIndex model (toList . fst $ childTag)
         "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
         "ema:childTag:url" ## HI.textSplice (tagNodesUrl (toList $ fst childTag))
-        -- TODO: Also subtag count
-        "ema:childTag:count" ## HI.textSplice (show (length $ snd childTag))
+        "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))
+        "ema:childTag:count-tag" ## HI.textSplice (show (length $ tagIndexChildren childIndex))
     "ema:notes"
-      ## Splices.listSplice tagIndexNotes "ema:each-note"
+      ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
         PF.noteSplice model note
   where
