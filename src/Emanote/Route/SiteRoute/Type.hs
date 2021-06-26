@@ -17,6 +17,7 @@ module Emanote.Route.SiteRoute.Type
   )
 where
 
+import qualified Data.Text as T
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
@@ -98,7 +99,11 @@ encodeTagIndexR (TagIndexR tagNodes) =
 
 tagNodesUrl :: [HT.TagNode] -> Text
 tagNodesUrl =
-  toText . R.encodeRoute . encodeTagIndexR . TagIndexR
+  -- HACK: Use Ema.routeUrl here
+  stripSuffix ".html" . toText . R.encodeRoute . encodeTagIndexR . TagIndexR
+  where
+    stripSuffix k s =
+      fromMaybe s $ T.stripSuffix k s
 
 tagUrl :: HT.Tag -> Text
 tagUrl =
