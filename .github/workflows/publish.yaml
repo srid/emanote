@@ -39,8 +39,8 @@ jobs:
           mkdir ./output
           # Use the just-built Docker image to generate the website.
           docker run -v $PWD:/data sridca/emanote:${{ env.DOCKERTAG }} emanote -C /data gen /data/output
-          bin/compile-css $(pwd)/output
           popd
+          bin/compile-css $(pwd)/docs/output
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
