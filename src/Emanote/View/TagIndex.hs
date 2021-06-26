@@ -72,30 +72,33 @@ renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
 renderSRTagIndex emaAction model tagPath = do
   -- TODO: Implement tagPath-based rendering, including:
   -- - Tag breadcrumbs
-  -- - Note count (and tag child count)
+  -- - Note count (and tag child count)g
   -- - Tag links from elsewhere
   let meta = Meta.getIndexYamlMeta model
       TagIndex {..} = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta $ Tit.fromPlain tagIndexTitle
-    "ema:tagcrumbs" ## Splices.listSplice (inits tagIndexPath) "ema:each-crumb" $
+    "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
+    "ema:tag:url" ## HI.textSplice (tagNodesUrl tagPath)
+    let parents = maybe [] (inits . init) $ nonEmpty tagIndexPath
+    "ema:tagcrumbs" ## Splices.listSplice parents "ema:each-crumb" $
       \crumb -> do
         let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
-            crumbUrl = "-/tags" `concatUrl` tagNodesUrl crumb
+            crumbUrl = tagNodesUrl crumb
         "ema:tagcrumb:title" ## HI.textSplice crumbTitle
         "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags"
       ## Splices.listSplice tagIndexChildren "ema:each-childTag"
       $ \childTag -> do
         "ema:childTag:title" ## HI.textSplice (tagNodesText childTag)
-        "ema:childTag:url" ## HI.textSplice ("/-/tags" `concatUrl` tagNodesUrl (toList childTag))
+        "ema:childTag:url" ## HI.textSplice (tagNodesUrl (toList childTag))
     "ema:notes"
       ## Splices.listSplice tagIndexNotes "ema:each-note"
       $ \note ->
         PF.noteSplice model note
   where
     tagNodesUrl =
-      T.intercalate "/" . fmap HT.unTagNode
+      ("-/tags" `concatUrl`) . T.intercalate "/" . fmap HT.unTagNode
     concatUrl :: Text -> Text -> Text
     concatUrl a "" = a
     concatUrl a b = a <> "/" <> b
