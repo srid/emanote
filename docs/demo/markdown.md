@@ -48,9 +48,17 @@ Animal Foods
 : Offal
 : Muscle meat
 
+## Tables
+
+| Category      | Favourite App                      |
+| ------------- | ---------------------------------- |
+| Web Browser   | [Brave](https://brave.com/)        |
+| Search Engine | [Brave Search](https://brave.com/) |
+
+
 ## Hash Tags
 
-Add an #hashtag anywhere in Markdown file. They can also be added to the YAML frontmatter.
+Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the YAML frontmatter. Hash tags can also be "hierarchical", for instance: #emanote/demo/syntax
 
 ## Code Syntax Highlighting
 

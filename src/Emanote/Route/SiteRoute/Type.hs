@@ -10,15 +10,21 @@ module Emanote.Route.SiteRoute.Type
     VirtualRoute,
     ResourceRoute,
     decodeVirtualRoute,
-    mkSpecialRoute,
+    encodeVirtualRoute,
+    encodeTagIndexR,
+    tagNodesUrl,
+    tagUrl,
   )
 where
 
 import Data.WorldPeace.Union
   ( OpenUnion,
+    absurdUnion,
     openUnionLift,
   )
-import Ema (Slug)
+import Ema (Slug (unSlug))
+import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import Emanote.Prelude (h)
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import qualified Emanote.Route.R as R
@@ -26,7 +32,7 @@ import qualified Emanote.Route.R as R
 data IndexR = IndexR
   deriving (Eq, Show, Ord)
 
-data TagIndexR = TagIndexR
+newtype TagIndexR = TagIndexR [HT.TagNode]
   deriving (Eq, Show, Ord)
 
 -- | A 404 route
@@ -67,20 +73,33 @@ decodeVirtualRoute fp =
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
-  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "index"
+  "-" :| ["index"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure IndexR
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
-  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "tags"
-  pure TagIndexR
+  "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
+  let tagNodes = fmap (HT.TagNode . Ema.unSlug) tagPath
+  pure $ TagIndexR tagNodes
 
-specialRouteSlug :: R.R ext -> Maybe Slug
-specialRouteSlug =
-  R.routeSlugWithPrefix (one "-")
+encodeVirtualRoute :: VirtualRoute -> FilePath
+encodeVirtualRoute =
+  absurdUnion
+    `h` ( \tr@(TagIndexR _) ->
+            R.encodeRoute $ encodeTagIndexR tr
+        )
+    `h` ( \IndexR ->
+            R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["index"]
+        )
 
-mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
-mkSpecialRoute slug =
-  R.mkRouteFromSlugs ("-" :| one slug)
+encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
+encodeTagIndexR (TagIndexR tagNodes) =
+  R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
+
+tagNodesUrl :: [HT.TagNode] -> Text
+tagNodesUrl =
+  toText . R.encodeRoute . encodeTagIndexR . TagIndexR
+
+tagUrl :: HT.Tag -> Text
+tagUrl =
+  tagNodesUrl . toList . HT.deconstructTag

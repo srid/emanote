@@ -6,17 +6,14 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
-import qualified Data.Aeson.Types as Aeson
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
-import Data.Version (showVersion)
 import Data.WorldPeace.Union
   ( absurdUnion,
   )
 import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
-import qualified Ema.Helper.Tailwind as Tailwind
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
@@ -25,12 +22,12 @@ import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import qualified Emanote.View.LiveServerFiles as LiveServerFiles
+import Emanote.View.Common (commonSplices)
+import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -39,14 +36,6 @@ import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
-import qualified Heist.Splices.Apply as HA
-import qualified Heist.Splices.Bind as HB
-import qualified Heist.Splices.Json as HJ
-import qualified Paths_emanote
-import Text.Blaze.Html ((!))
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
-import qualified Text.Blaze.Renderer.XmlHtml as RX
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -79,8 +68,8 @@ renderResourceRoute emaAction m =
 renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
 renderVirtualRoute emaAction m =
   absurdUnion
-    `h` ( \SR.TagIndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRTagIndex emaAction m
+    `h` ( \(SR.TagIndexR mtag) ->
+            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex emaAction m mtag
         )
     `h` ( \SR.IndexR ->
             Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
@@ -92,20 +81,6 @@ renderSRIndex emaAction model = do
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta $ Tit.fromPlain "Index"
     routeTreeSplice Nothing model
-
-renderSRTagIndex :: Ema.CLI.Action -> Model -> LByteString
-renderSRTagIndex emaAction model = do
-  let meta = Meta.getIndexYamlMeta model
-  flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta $ Tit.fromPlain "Tags"
-    "ema:tagindex"
-      ## Splices.listSplice (M.modelTags model) "each-tag"
-      $ \(tag, notes) -> do
-        "tag" ## HI.textSplice (HT.unTag tag)
-        "notes"
-          ## Splices.listSplice notes "each-note"
-          $ \note ->
-            PF.noteSplice model note
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
@@ -149,46 +124,6 @@ renderLmlHtml emaAction model note = do
         (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
-
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
-commonSplices emaAction meta routeTitle = do
-  let siteTitle = Tit.fromPlain $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
-      routeTitleFull =
-        if routeTitle == siteTitle
-          then siteTitle
-          else routeTitle <> Tit.fromPlain " – " <> siteTitle
-  -- Heist helpers
-  "bind" ## HB.bindImpl
-  "apply" ## HA.applyImpl
-  -- Add tailwind css shim
-  "tailwindCssShim"
-    ## pure
-      (RX.renderHtmlNodes $ twindShim emaAction)
-  "ema:version"
-    ## HI.textSplice (toText $ showVersion Paths_emanote.version)
-  "ema:metadata"
-    ## HJ.bindJson meta
-  "ema:title" ## Tit.titleSplice routeTitle
-  -- Convert full title to plain text, because <head>'s <title> (which is where
-  -- titleFull is expected to be used) cannot contain HTML.
-  "ema:titleFull"
-    ## HI.textSplice
-    $ Tit.toPlain routeTitleFull
-  where
-    twindShim :: Ema.CLI.Action -> H.Html
-    twindShim action =
-      case action of
-        Ema.CLI.Generate _ ->
-          Tailwind.twindShimUnofficial
-        _ ->
-          -- Twind shim doesn't reliably work in dev server mode. Let's just use the
-          -- tailwind CDN.
-          cachedTailwindCdn
-    cachedTailwindCdn =
-      H.link
-        ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
-        ! A.rel "stylesheet"
-        ! A.type_ "text/css"
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)
