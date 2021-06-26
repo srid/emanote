@@ -4,10 +4,10 @@
 
       <apply template="components/breadcrumbs" />
 
-      <div class="flex bg-gray-50 md:mt-8 md:shadow-2xl md:mb-8">
+      <div class="flex flex-nowrap bg-gray-50 md:mt-8 md:shadow-2xl md:mb-8">
         <!-- Sidebar column -->
         <nav id="sidebar"
-          class="hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:max-w-xs">
+          class="flex-auto hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:max-w-xs">
           <div class="px-2 py-2 text-gray-800">
 
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
@@ -58,7 +58,7 @@
         </nav>
 
         <!-- Main body column -->
-        <div class="w-full bg-white">
+        <div class="flex-1 w-full bg-white">
           <main class="px-4 py-4">
             <apply template="components/note-title" />
             <apply template="components/note-body" />
