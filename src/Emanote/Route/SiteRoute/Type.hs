@@ -11,6 +11,9 @@ module Emanote.Route.SiteRoute.Type
     ResourceRoute,
     decodeVirtualRoute,
     encodeVirtualRoute,
+    encodeTagIndexR,
+    tagNodesUrl,
+    tagUrl,
   )
 where
 
@@ -73,6 +76,10 @@ decodeIndexR fp = do
   slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
   guard $ slug == "index"
   pure IndexR
+  where
+    specialRouteSlug :: R.R ext -> Maybe Slug
+    specialRouteSlug =
+      R.routeSlugWithPrefix (one "-")
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
@@ -89,15 +96,19 @@ encodeVirtualRoute =
     `h` ( \IndexR ->
             R.encodeRoute $ mkSpecialRoute @'Ext.Html "index"
         )
+  where
+    mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
+    mkSpecialRoute slug =
+      R.mkRouteFromSlugs ("-" :| one slug)
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
 encodeTagIndexR (TagIndexR tagNodes) =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
 
-specialRouteSlug :: R.R ext -> Maybe Slug
-specialRouteSlug =
-  R.routeSlugWithPrefix (one "-")
+tagNodesUrl :: [HT.TagNode] -> Text
+tagNodesUrl =
+  toText . R.encodeRoute . encodeTagIndexR . TagIndexR
 
-mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
-mkSpecialRoute slug =
-  R.mkRouteFromSlugs ("-" :| one slug)
+tagUrl :: HT.Tag -> Text
+tagUrl =
+  tagNodesUrl . toList . HT.deconstructTag

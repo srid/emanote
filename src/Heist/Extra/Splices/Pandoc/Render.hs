@@ -17,6 +17,7 @@ where
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Route.SiteRoute.Type as SR
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
@@ -266,7 +267,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
                  in ((id', classes, attrs <> one emojiFontAttr), is)
               | Just inlineTag <- HT.getTagFromInline i ->
                 -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
-                (attr, one $ B.Link mempty is ("-/tags/" <> HT.unTag inlineTag, "Tag"))
+                (attr, one $ B.Link mempty is (SR.tagUrl inlineTag, "Tag"))
               | otherwise ->
                 (attr, is)
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is'

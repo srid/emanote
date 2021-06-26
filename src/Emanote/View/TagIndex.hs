@@ -1,8 +1,5 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
--- TODO: Split this sensibly.
 module Emanote.View.TagIndex (renderSRTagIndex) where
 
 import Control.Lens.Operators ((^.))
@@ -10,7 +7,6 @@ import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
-import qualified Data.Text as T
 import Data.Tree (Forest, Tree)
 import qualified Data.Tree as Tree
 import qualified Ema.CLI
@@ -21,6 +17,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Route.SiteRoute.Type as SR
 import Emanote.View.Common (commonSplices)
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
@@ -76,12 +73,12 @@ renderSRTagIndex emaAction model tagPath = do
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction meta $ Tit.fromPlain (tagIndexTitle tagIdx)
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
-    "ema:tag:url" ## HI.textSplice (tagNodesUrl tagPath)
+    "ema:tag:url" ## HI.textSplice (SR.tagNodesUrl tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
     "ema:tagcrumbs" ## Splices.listSplice parents "ema:each-crumb" $
       \crumb -> do
         let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
-            crumbUrl = tagNodesUrl crumb
+            crumbUrl = SR.tagNodesUrl crumb
         "ema:tagcrumb:title" ## HI.textSplice crumbTitle
         "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags"
@@ -89,20 +86,13 @@ renderSRTagIndex emaAction model tagPath = do
       $ \childTag -> do
         let childIndex = mkTagIndex model (toList . fst $ childTag)
         "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
-        "ema:childTag:url" ## HI.textSplice (tagNodesUrl (toList $ fst childTag))
+        "ema:childTag:url" ## HI.textSplice (SR.tagNodesUrl (toList $ fst childTag))
         "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))
         "ema:childTag:count-tag" ## HI.textSplice (show (length $ tagIndexChildren childIndex))
     "ema:notes"
       ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
         PF.noteSplice model note
-  where
-    -- TODO: Use SiteRoute encoder
-    tagNodesUrl =
-      ("-/tags" `concatUrl`) . T.intercalate "/" . fmap HT.unTagNode
-    concatUrl :: Text -> Text -> Text
-    concatUrl a "" = a
-    concatUrl a b = a <> "/" <> b
 
 tagNodesText :: NonEmpty HT.TagNode -> Text
 tagNodesText =
