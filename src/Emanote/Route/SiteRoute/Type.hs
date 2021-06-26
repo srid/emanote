@@ -73,13 +73,8 @@ decodeVirtualRoute fp =
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
-  slug <- specialRouteSlug . R.decodeHtmlRoute $ fp
-  guard $ slug == "index"
+  "-" :| ["index"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure IndexR
-  where
-    specialRouteSlug :: R.R ext -> Maybe Slug
-    specialRouteSlug =
-      R.routeSlugWithPrefix (one "-")
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
@@ -94,12 +89,8 @@ encodeVirtualRoute =
             R.encodeRoute $ encodeTagIndexR tr
         )
     `h` ( \IndexR ->
-            R.encodeRoute $ mkSpecialRoute @'Ext.Html "index"
+            R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["index"]
         )
-  where
-    mkSpecialRoute :: Ext.HasExt ext => Slug -> R.R ext
-    mkSpecialRoute slug =
-      R.mkRouteFromSlugs ("-" :| one slug)
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
 encodeTagIndexR (TagIndexR tagNodes) =

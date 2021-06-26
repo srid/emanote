@@ -69,7 +69,7 @@ renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LB
 renderVirtualRoute emaAction m =
   absurdUnion
     `h` ( \(SR.TagIndexR mtag) ->
-            Ema.AssetGenerated Ema.Html $ TagIndex.renderSRTagIndex emaAction m mtag
+            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex emaAction m mtag
         )
     `h` ( \SR.IndexR ->
             Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
