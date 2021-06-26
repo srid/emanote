@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.View.TagIndex (renderSRTagIndex) where
+module Emanote.View.TagIndex (renderTagIndex) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.List as List
@@ -23,10 +23,17 @@ import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 
+-- An index view into the notebook indexed by the given tag path.
 data TagIndex = TagIndex
-  { tagIndexPath :: [HT.TagNode],
+  { -- | The tag path under which this index is creatd
+    tagIndexPath :: [HT.TagNode],
+    -- | User descriptive title of this index
     tagIndexTitle :: Text,
+    -- | All notes tagged precisely with this tag path
     tagIndexNotes :: [MN.Note],
+    -- | Tags immediately under this tag path.
+    --
+    -- If the tag path being index is "foo/bar", this will contain "foo/bar/qux".
     tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
   }
   deriving (Eq)
@@ -47,11 +54,13 @@ mkTagIndex model tagPath' =
            in (t, fromMaybe mempty $ Map.lookup (HT.constructTag t) tagMap)
    in case mTagPath of
         Nothing ->
+          -- The root index displays all top-level tags (no notes)
           TagIndex [] "Tag Index" [] childTags
         Just tagPath ->
           let notes =
                 snd . Tree.rootLabel $ lookupForestMust tagPath tagForest
-           in TagIndex (toList tagPath) ("#" <> tagNodesText tagPath <> " - Tag Index") notes childTags
+              viewTitle = "#" <> tagNodesText tagPath <> " - Tag Index"
+           in TagIndex (toList tagPath) viewTitle notes childTags
   where
     lookupForestMust :: (Show k, Eq k) => NonEmpty k -> Forest (k, a) -> Tree (k, a)
     lookupForestMust path =
@@ -66,8 +75,8 @@ mkTagIndex model tagPath' =
           subForest <- Tree.subForest <$> List.find (\(Tree.Node lbl _) -> fst lbl == k) trees
           lookupForest ks subForest
 
-renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
-renderSRTagIndex emaAction model tagPath = do
+renderTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
+renderTagIndex emaAction model tagPath = do
   let meta = Meta.getIndexYamlMeta model
       tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
