@@ -4,6 +4,7 @@ template:
 pandoc:
   rewriteClass:
     greenery: bg-green-100 text-green-700 font-bold text-3xl
+tags: [emanote/yaml/demo]
 ---
 
 # YAML configuration

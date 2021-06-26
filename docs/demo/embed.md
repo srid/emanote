@@ -1,3 +1,7 @@
+---
+tags: [emanote/syntax/demo]
+---
+
 # Embedding
 
 You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/How+to/Embed+files). The HTML can be fully customized for each embed types.
