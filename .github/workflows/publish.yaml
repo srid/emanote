@@ -35,10 +35,12 @@ jobs:
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
       - name: Generate website HTML 🔧
         run: |
+          pushd ./docs
           mkdir ./output
           # Use the just-built Docker image to generate the website.
           docker run -v $PWD:/data sridca/emanote:${{ env.DOCKERTAG }} emanote -C /data gen /data/output
           bin/compile-css $(pwd)/output
+          popd
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
