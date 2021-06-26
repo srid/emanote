@@ -30,7 +30,7 @@ data TagIndex = TagIndex
   { tagIndexPath :: [HT.TagNode],
     tagIndexTitle :: Text,
     tagIndexNotes :: [MN.Note],
-    tagIndexChildren :: [NonEmpty HT.TagNode]
+    tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
   }
   deriving (Eq)
 
@@ -46,7 +46,8 @@ mkTagIndex model tagPath' =
           mTagPath
       childTags =
         childNodes <&> \childNode ->
-          NE.reverse $ childNode :| reverse tagPath'
+          let t = NE.reverse $ childNode :| reverse tagPath'
+           in (t, fromMaybe mempty $ Map.lookup (HT.constructTag t) tagMap)
    in case mTagPath of
         Nothing ->
           TagIndex [] "Tag Index" [] childTags
@@ -71,9 +72,9 @@ mkTagIndex model tagPath' =
 renderSRTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
 renderSRTagIndex emaAction model tagPath = do
   -- TODO: Implement tagPath-based rendering, including:
-  -- - Tag breadcrumbs
-  -- - Note count (and tag child count)g
-  -- - Tag links from elsewhere
+  -- - [x] Tag breadcrumbs
+  -- - [ ] Note count (and tag child count)
+  -- - [ ] Tag links from elsewhere
   let meta = Meta.getIndexYamlMeta model
       TagIndex {..} = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
@@ -90,8 +91,10 @@ renderSRTagIndex emaAction model tagPath = do
     "ema:childTags"
       ## Splices.listSplice tagIndexChildren "ema:each-childTag"
       $ \childTag -> do
-        "ema:childTag:title" ## HI.textSplice (tagNodesText childTag)
-        "ema:childTag:url" ## HI.textSplice (tagNodesUrl (toList childTag))
+        "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
+        "ema:childTag:url" ## HI.textSplice (tagNodesUrl (toList $ fst childTag))
+        -- TODO: Also subtag count
+        "ema:childTag:count" ## HI.textSplice (show (length $ snd childTag))
     "ema:notes"
       ## Splices.listSplice tagIndexNotes "ema:each-note"
       $ \note ->
