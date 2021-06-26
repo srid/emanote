@@ -1,5 +1,6 @@
 ---
 order: 99
+tags: [emanote/dev]
 ---
 
 # Architecture
