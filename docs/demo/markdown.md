@@ -58,7 +58,7 @@ Animal Foods
 
 ## Hash Tags
 
-Add an #hashtag anywhere in Markdown file. They can also be added to the YAML frontmatter.
+Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the YAML frontmatter. Hash tags can also be "hierarchical", for instance: #emanote/demo/syntax
 
 ## Code Syntax Highlighting
 
