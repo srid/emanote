@@ -41,8 +41,8 @@
             <DefinitionList:Item:Term />
           </dt>
           <DefinitionList:Item:DescList>
-            <div class="flex flex-col pl-2">
-              <dd class="text-gray-700">
+            <div class="flex flex-col pl-1">
+              <dd class="pl-2 my-1 text-gray-700 border-l-2">
                 <DefinitionList:Item:Desc />
               </dd>
             </div>
