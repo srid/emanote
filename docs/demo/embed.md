@@ -6,7 +6,7 @@ tags: [emanote/syntax/demo]
 
 You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/How+to/Embed+files). The HTML can be fully customized for each embed types.
 
-Note that the embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk]
+Note that the embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported.
 
 [^blk]: This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
 
