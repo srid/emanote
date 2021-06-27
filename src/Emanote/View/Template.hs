@@ -19,7 +19,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc)
+import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc, preparePandoc)
 import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
@@ -91,22 +91,23 @@ renderLmlHtml emaAction model note = do
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction model meta pageTitle
+    let titleSplice = Tit.titleSplice $ preparePandoc model
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
       $ \(R.liftLMLRoute -> crumbR) -> do
         "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
-        "crumb:title" ## Tit.titleSplice (M.modelLookupTitle crumbR model)
+        "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
     -- Note stuff
     "ema:note:title"
-      ## Tit.titleSplice pageTitle
+      ## titleSplice pageTitle
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
-        "backlink:note:title" ## Tit.titleSplice (M.modelLookupTitle source model)
+        "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
@@ -139,7 +140,7 @@ routeTreeSplice mr model = do
              mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-               "node:text" ## Tit.titleSplice $ M.modelLookupTitle nodeRoute model
+               "node:text" ## Tit.titleSplice (preparePandoc model) $ M.modelLookupTitle nodeRoute model
                "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =

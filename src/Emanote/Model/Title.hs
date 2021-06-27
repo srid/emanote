@@ -67,12 +67,12 @@ toPlain = \case
   TitlePlain s -> s
   TitlePandoc is -> plainify is
 
-titleSplice :: Monad n => Title -> HI.Splice n
-titleSplice = \case
+titleSplice :: Monad n => (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
+titleSplice f = \case
   TitlePlain x ->
     HI.textSplice x
   TitlePandoc is ->
-    let titleDoc = B.Pandoc mempty $ one $ B.Plain is
+    let titleDoc = f $ B.Pandoc mempty $ one $ B.Plain is
      in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
