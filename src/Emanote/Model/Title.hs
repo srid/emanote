@@ -27,7 +27,17 @@ import qualified Text.Pandoc.Definition as B
 data Title
   = TitlePlain Text
   | TitlePandoc [B.Inline]
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving (Show, Ord, Generic, ToJSON)
+
+instance Eq Title where
+  TitlePlain a == TitlePlain b =
+    a == b
+  TitlePandoc a == TitlePandoc b =
+    a == b
+  TitlePlain a == TitlePandoc b =
+    [B.Str a] == b
+  TitlePandoc a == TitlePlain b =
+    a == [B.Str b]
 
 instance Semigroup Title where
   TitlePlain a <> TitlePlain b =
