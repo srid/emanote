@@ -79,7 +79,7 @@ renderTagIndex emaAction model tagPath = do
   let meta = Meta.getIndexYamlMeta model
       tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta $ fromString . toString $ tagIndexTitle tagIdx
+    commonSplices emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.tagNodesUrl model tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)

@@ -8,7 +8,9 @@ module Emanote.Route.SiteRoute.Class
     noteFileSiteRoute,
     staticFileSiteRoute,
     lmlSiteRoute,
+    indexRoute,
     siteRouteUrl,
+    urlStrategySuffix,
     tagNodesUrl,
     tagUrl,
   )
@@ -22,7 +24,7 @@ import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
   )
-import Ema (Ema (..), UrlStrategy (UrlDirect), routeUrlWith)
+import Ema (Ema (..), UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Model
 import qualified Emanote.Model.Note as N
@@ -116,17 +118,30 @@ staticFileSiteRoute =
 
 siteRouteUrl :: Model -> SiteRoute -> Text
 siteRouteUrl model =
-  Ema.routeUrlWith urlStrategy model
+  Ema.routeUrlWith (urlStrategy model) model
+
+urlStrategySuffix :: Model -> Text
+urlStrategySuffix model =
+  case urlStrategy model of
+    Ema.UrlDirect -> ".html"
+    Ema.UrlPretty -> ""
+
+urlStrategy :: Model -> UrlStrategy
+urlStrategy =
+  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute
   where
-    urlStrategy =
-      Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute model
     indexLmlRoute =
       R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+
+indexRoute :: SiteRoute
+indexRoute =
+  let virtR :: VirtualRoute = openUnionLift IndexR
+   in openUnionLift virtR
 
 tagNodesUrl :: Model -> [HT.TagNode] -> Text
 tagNodesUrl model (TagIndexR -> tagR) =
   let virtR :: VirtualRoute = openUnionLift tagR
-      sRoute :: SiteRoute = openUnionLift virtR
+      sRoute = openUnionLift virtR
    in siteRouteUrl model sRoute
 
 tagUrl :: Model -> HT.Tag -> Text
