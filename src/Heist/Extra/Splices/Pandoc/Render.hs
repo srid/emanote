@@ -116,8 +116,9 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     pure $ one $ X.Element "hr" [("class", "mb-3")] mempty
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
     -- TODO: Move tailwind styles to pandoc.tpl
-    let rowStyle = [("class", "border-b-2 border-gray-100")]
-        cellStyle = [("class", "py-2 px-2")]
+    let borderStyle = "border-gray-300"
+        rowStyle = [("class", "border-b-2 border-t-2 " <> borderStyle)]
+        cellStyle = [("class", "py-2 px-2 align-top border-r-2 border-l-2 " <> borderStyle)]
     -- TODO: Apply captions, colSpec, etc.
     fmap (one . X.Element "table" (rpAttr attr)) $ do
       thead <- fmap (one . X.Element "thead" mempty) $
