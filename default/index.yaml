@@ -15,7 +15,7 @@ template:
   # List of available colors: https://tailwindcss.com/docs/customizing-colors
   theme: blue
   baseUrl: /
-  urlStrategy: direct
+  urlStrategy: pretty
   iconUrl: favicon.svg
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
