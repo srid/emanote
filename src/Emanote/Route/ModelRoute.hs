@@ -49,6 +49,7 @@ type ModelRoute = OpenUnion ModelRoutes'
 type LMLRoute = OpenUnion LMLRoutes'
 
 liftLMLRoute ::
+  forall ext.
   IsMember (R ext) LMLRoutes' =>
   R (ext :: FileType) ->
   LMLRoute

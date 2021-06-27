@@ -13,6 +13,7 @@ module Emanote.Route.SiteRoute
     noteFileSiteRoute,
     staticFileSiteRoute,
     lmlSiteRoute,
+    siteRouteUrl,
   )
 where
 

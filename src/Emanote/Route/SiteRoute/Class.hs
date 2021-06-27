@@ -8,6 +8,7 @@ module Emanote.Route.SiteRoute.Class
     noteFileSiteRoute,
     staticFileSiteRoute,
     lmlSiteRoute,
+    siteRouteUrl,
   )
 where
 
@@ -19,8 +20,9 @@ import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
   )
-import Ema (Ema (..))
+import Ema (Ema (..), UrlStrategy (UrlDirect), routeUrlWith)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Meta as Model
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
 import Emanote.Model.Type (Model)
@@ -109,3 +111,12 @@ staticFileSiteRoute =
     staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
     staticResourceRoute =
       openUnionLift
+
+siteRouteUrl :: Model -> SiteRoute -> Text
+siteRouteUrl model =
+  Ema.routeUrlWith urlStrategy model
+  where
+    urlStrategy =
+      Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute model
+    indexLmlRoute =
+      R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
