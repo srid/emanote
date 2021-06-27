@@ -25,11 +25,11 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 
 commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
 commonSplices emaAction meta routeTitle = do
-  let siteTitle = Tit.fromPlain $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
-          else routeTitle <> Tit.fromPlain " – " <> siteTitle
+          else routeTitle <> " – " <> siteTitle
   -- Heist helpers
   "bind" ## HB.bindImpl
   "apply" ## HA.applyImpl
@@ -45,8 +45,7 @@ commonSplices emaAction meta routeTitle = do
   -- Convert full title to plain text, because <head>'s <title> (which is where
   -- titleFull is expected to be used) cannot contain HTML.
   "ema:titleFull"
-    ## HI.textSplice
-    $ Tit.toPlain routeTitleFull
+    ## Tit.titleSplice routeTitleFull
   where
     twindShim :: Ema.CLI.Action -> H.Html
     twindShim action =

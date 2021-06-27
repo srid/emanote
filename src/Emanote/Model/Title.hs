@@ -8,9 +8,7 @@ module Emanote.Model.Title
     -- * Title conversion
     fromRoute,
     fromInlines,
-    fromPlain,
     toInlines,
-    toPlain,
 
     -- * Rendering a Title
     titleSplice,
@@ -20,7 +18,6 @@ where
 import Data.Aeson
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
-import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -30,36 +27,20 @@ data Title
   deriving (Show, Ord, Generic, ToJSON)
 
 instance Eq Title where
-  TitlePlain a == TitlePlain b =
-    a == b
-  TitlePandoc a == TitlePandoc b =
-    a == b
-  TitlePlain a == TitlePandoc b =
-    [B.Str a] == b
-  TitlePandoc a == TitlePlain b =
-    a == [B.Str b]
+  (==) = on (==) toInlines
 
 instance Semigroup Title where
   TitlePlain a <> TitlePlain b =
     TitlePlain (a <> b)
-  TitlePandoc a <> TitlePandoc b =
-    TitlePandoc (a <> b)
-  TitlePlain a <> TitlePandoc b =
-    TitlePandoc ([B.Str a] <> b)
-  TitlePandoc a <> TitlePlain b =
-    TitlePandoc (a <> [B.Str b])
+  x <> y =
+    TitlePandoc $ on (<>) toInlines x y
+
+instance IsString Title where
+  fromString = TitlePlain . toText
 
 fromRoute :: R.LMLRoute -> Title
 fromRoute =
   TitlePlain . R.routeBaseName . R.lmlRouteCase
-
-fromPlain :: Text -> Title
-fromPlain = TitlePlain
-
-toPlain :: Title -> Text
-toPlain = \case
-  TitlePlain s -> s
-  TitlePandoc is -> plainify is
 
 fromInlines :: [B.Inline] -> Title
 fromInlines = TitlePandoc
