@@ -1,7 +1,7 @@
 {
   description = "emanote";
   inputs = {
-    ema.url = "github:srid/ema/non-pretty-url";
+    ema.url = "github:srid/ema/master";
     # Use the nixpkgs used by the pinned ema.
     nixpkgs.follows = "ema/nixpkgs";
     windicss = {
