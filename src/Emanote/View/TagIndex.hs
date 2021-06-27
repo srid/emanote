@@ -81,12 +81,12 @@ renderTagIndex emaAction model tagPath = do
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
-    "ema:tag:url" ## HI.textSplice (SR.tagNodesUrl model tagPath)
+    "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
     "ema:tagcrumbs" ## Splices.listSplice parents "ema:each-crumb" $
       \crumb -> do
         let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
-            crumbUrl = SR.tagNodesUrl model crumb
+            crumbUrl = SR.siteRouteUrl model $ SR.tagIndexRoute crumb
         "ema:tagcrumb:title" ## HI.textSplice crumbTitle
         "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags"
@@ -94,7 +94,7 @@ renderTagIndex emaAction model tagPath = do
       $ \childTag -> do
         let childIndex = mkTagIndex model (toList . fst $ childTag)
         "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
-        "ema:childTag:url" ## HI.textSplice (SR.tagNodesUrl model (toList $ fst childTag))
+        "ema:childTag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute (toList $ fst childTag))
         "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))
         "ema:childTag:count-tag" ## HI.textSplice (show (length $ tagIndexChildren childIndex))
     "ema:notes"

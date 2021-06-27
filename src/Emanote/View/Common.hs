@@ -50,7 +50,7 @@ commonSplices emaAction model meta routeTitle = do
   "ema:indexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
   "ema:tagIndexUrl"
-    ## HI.textSplice (SR.tagNodesUrl model [])
+    ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)

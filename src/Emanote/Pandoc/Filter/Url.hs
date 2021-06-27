@@ -10,7 +10,6 @@ import Control.Monad.Except (MonadError, throwError)
 import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import Data.WorldPeace.Union (absurdUnion, openUnionLift)
-import qualified Ema
 import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model as M

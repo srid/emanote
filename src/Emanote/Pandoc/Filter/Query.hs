@@ -6,7 +6,6 @@ import Control.Lens.Operators ((^.))
 import qualified Data.List as List
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
-import qualified Ema
 import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
