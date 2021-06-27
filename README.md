@@ -10,7 +10,7 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: Partially implemented enough to be usable for *certain* use-cases (see examples below). HTML templates are yet to be finalized (so do not customize your templates just yet), and most importantly folgezettel graph and visualization needs to be implemented to act as true neuron replacement (see tasks below).
+**Project Status**: Progressed enough to be usable for *certain* use-cases (see examples below). HTML templates are yet to be finalized (so do not customize your templates just yet), and most importantly folgezettel graph and visualization needs to be implemented to act as true neuron replacement (see tasks below).
 
 ## Installing and using
 
