@@ -29,7 +29,7 @@ data Title
   deriving (Show, Ord, Generic, ToJSON)
 
 instance Eq Title where
-  (==) = on (==) toInlines
+  (==) = on (==) toPlain
 
 instance Semigroup Title where
   TitlePlain a <> TitlePlain b =
@@ -52,13 +52,18 @@ toInlines = \case
   TitlePlain s -> one (B.Str s)
   TitlePandoc is -> is
 
+toPlain :: Title -> Text
+toPlain = \case
+  TitlePlain s -> s
+  TitlePandoc is -> plainify is
+
 titleSplice :: Monad n => Title -> HI.Splice n
-titleSplice title =
-  let titleDoc = B.Pandoc mempty $ one $ B.Plain $ toInlines title
-   in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
+titleSplice = \case
+  TitlePlain x -> HI.textSplice x
+  TitlePandoc is ->
+    let titleDoc = B.Pandoc mempty $ one $ B.Plain is
+     in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
 titleSpliceNoHtml =
-  HI.textSplice . \case
-    TitlePlain x -> x
-    TitlePandoc is -> plainify is
+  HI.textSplice . toPlain
