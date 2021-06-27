@@ -99,7 +99,7 @@ encodeTagIndexR (TagIndexR tagNodes) =
 
 tagNodesUrl :: [HT.TagNode] -> Text
 tagNodesUrl =
-  -- HACK: Use Ema.routeUrl here
+  -- FIXME: Use siteRouteUrl here
   stripSuffix ".html" . toText . R.encodeRoute . encodeTagIndexR . TagIndexR
   where
     stripSuffix k s =

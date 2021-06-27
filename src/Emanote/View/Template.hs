@@ -96,7 +96,7 @@ renderLmlHtml emaAction model note = do
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
       $ \(R.liftLMLRoute -> crumbR) -> do
-        "crumb:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute crumbR)
+        "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
         "crumb:title" ## Tit.titleSplice (M.modelLookupTitle crumbR model)
     -- Note stuff
     "ema:note:title"
@@ -107,7 +107,7 @@ renderLmlHtml emaAction model note = do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
         -- TODO: reuse note splice
         "backlink:note:title" ## Tit.titleSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute source)
+        "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
             rewriteClass
@@ -140,7 +140,7 @@ routeTreeSplice mr model = do
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## Tit.titleSplice $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ Ema.routeUrl model $ SR.lmlSiteRoute nodeRoute
+               "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
                      -- Active tree checking is applicable only when there is an

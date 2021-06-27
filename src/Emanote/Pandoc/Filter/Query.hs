@@ -40,5 +40,5 @@ queryResolvingSplice currentNote model _ctx blk = do
 noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
 noteSplice model note = do
   "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
-  "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+  "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

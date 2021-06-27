@@ -81,7 +81,7 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
           then fromMaybe inner $ siteRouteDefaultInnerText r
           else inner
    in ( finalInner,
-        foldUrlTime (Ema.routeUrl model r) mTime
+        foldUrlTime (SR.siteRouteUrl model r) mTime
       )
   where
     siteRouteDefaultInnerText =

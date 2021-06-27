@@ -50,7 +50,7 @@ embedSiteRoute emaAction model RenderCtx {..} wl = \case
   Left note -> do
     pure . runEmbedTemplate "note" $ do
       "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
-      "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+      "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
       "ema:note:pandoc"
         -- TODO: DRY (see Template.hs use)
         ## Splices.pandocSplice
