@@ -52,9 +52,13 @@ embedSiteRoute emaAction model RenderCtx {..} wl = \case
       "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
       "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
       "ema:note:pandoc"
+        -- TODO: DRY (see Template.hs use)
         ## Splices.pandocSplice
           classMap
-          (PF.queryResolvingSplice note model)
+          ( \ctx blk ->
+              embedWikiLinkResolvingSplice emaAction model ctx blk
+                <|> PF.queryResolvingSplice note model ctx blk
+          )
           (Url.urlResolvingSplice emaAction model)
         $ note ^. MN.noteDoc & withoutH1
   Right staticFile -> do

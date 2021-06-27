@@ -50,11 +50,15 @@ Animal Foods
 
 ## Tables
 
-| Category      | Favourite App                      |
-| ------------- | ---------------------------------- |
-| Web Browser   | [Brave](https://brave.com/)        |
-| Search Engine | [Brave Search](https://brave.com/) |
+| Category      | Favourite      |
+| ------------- | -------------- |
+| Web Browser   | [Brave]        |
+| Search Engine | [Brave Search] |
+| Chat          | [Element]      |
 
+[Brave]: https://brave.com/
+[Brave Search]: https://search.brave.com/
+[Element]: https://element.io/
 
 ## Hash Tags
 
