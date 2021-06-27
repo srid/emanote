@@ -26,24 +26,24 @@ import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
 embedWikiLinkResolvingSplice ::
-  Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
-embedWikiLinkResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inline =
-  case inline of
-    B.Link (_id, _class, otherAttrs) _is (url, tit) -> do
+  Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Block -> Maybe (HI.Splice n)
+embedWikiLinkResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) blk =
+  case blk of
+    B.Para [B.Link (_id, _class, otherAttrs) _is (url, tit)] -> do
       Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
         Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case Url.resolveWikiLinkMustExist model wl of
         Left err ->
-          pure $ brokenLinkDivWrapper err inline
+          pure $ brokenLinkDivWrapper err blk
         Right res -> do
           embedSiteRoute emaAction model ctx wl res
     _ ->
       Nothing
   where
-    brokenLinkDivWrapper err inl =
-      HP.rpInline ctx $
-        B.Span (Url.brokenLinkAttr err) $
-          one inl
+    brokenLinkDivWrapper err block =
+      HP.rpBlock ctx $
+        B.Div (Url.brokenLinkAttr err) $
+          one block
 
 embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
 embedSiteRoute emaAction model RenderCtx {..} wl = \case
