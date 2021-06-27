@@ -11,6 +11,9 @@ import qualified Ema.CLI
 import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
+import Emanote.Model.Type (Model)
+import Emanote.Pandoc.Filter.Builtin (preparePandoc)
+import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
@@ -23,8 +26,8 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 
-commonSplices :: Monad n => Ema.CLI.Action -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
-commonSplices emaAction meta routeTitle = do
+commonSplices :: Monad n => Ema.CLI.Action -> Model -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
+commonSplices emaAction model meta routeTitle = do
   let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
@@ -41,10 +44,17 @@ commonSplices emaAction meta routeTitle = do
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
     ## HJ.bindJson meta
-  "ema:title" ## Tit.titleSplice routeTitle
+  "ema:title" ## Tit.titleSplice (preparePandoc model) routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull
+  "ema:indexUrl"
+    ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
+  "ema:tagIndexUrl"
+    ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
+  -- For those cases the user really wants to hardcode the URL
+  "ema:urlStrategySuffix"
+    ## HI.textSplice (SR.urlStrategySuffix model)
   where
     twindShim :: Ema.CLI.Action -> H.Html
     twindShim action =

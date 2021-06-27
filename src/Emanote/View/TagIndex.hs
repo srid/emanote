@@ -16,7 +16,7 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Route.SiteRoute.Type as SR
+import qualified Emanote.Route.SiteRoute.Class as SR
 import Emanote.View.Common (commonSplices)
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
@@ -79,14 +79,14 @@ renderTagIndex emaAction model tagPath = do
   let meta = Meta.getIndexYamlMeta model
       tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta $ fromString . toString $ tagIndexTitle tagIdx
+    commonSplices emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
-    "ema:tag:url" ## HI.textSplice (SR.tagNodesUrl tagPath)
+    "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
     "ema:tagcrumbs" ## Splices.listSplice parents "ema:each-crumb" $
       \crumb -> do
         let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
-            crumbUrl = SR.tagNodesUrl crumb
+            crumbUrl = SR.siteRouteUrl model $ SR.tagIndexRoute crumb
         "ema:tagcrumb:title" ## HI.textSplice crumbTitle
         "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags"
@@ -94,7 +94,7 @@ renderTagIndex emaAction model tagPath = do
       $ \childTag -> do
         let childIndex = mkTagIndex model (toList . fst $ childTag)
         "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
-        "ema:childTag:url" ## HI.textSplice (SR.tagNodesUrl (toList $ fst childTag))
+        "ema:childTag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute (toList $ fst childTag))
         "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))
         "ema:childTag:count-tag" ## HI.textSplice (show (length $ tagIndexChildren childIndex))
     "ema:notes"

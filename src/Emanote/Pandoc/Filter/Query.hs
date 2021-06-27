@@ -6,11 +6,11 @@ import Control.Lens.Operators ((^.))
 import qualified Data.List as List
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
-import qualified Ema
 import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
 import qualified Emanote.Model.Title as Tit
+import Emanote.Pandoc.Filter.Builtin (preparePandoc)
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra as HE
@@ -39,6 +39,6 @@ queryResolvingSplice currentNote model _ctx blk = do
 -- TODO: Reuse this elsewhere
 noteSplice :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
 noteSplice model note = do
-  "ema:note:title" ## Tit.titleSplice (MN._noteTitle note)
-  "ema:note:url" ## HI.textSplice (Ema.routeUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+  "ema:note:title" ## Tit.titleSplice (preparePandoc model) (MN._noteTitle note)
+  "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

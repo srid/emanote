@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.26.1
+version:            0.1.27.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -109,6 +109,7 @@ executable emanote
     Emanote.Model.StaticFile
     Emanote.Model.Title
     Emanote.Model.Type
+    Emanote.Pandoc.Filter.Builtin
     Emanote.Pandoc.Filter.Embed
     Emanote.Pandoc.Filter.Query
     Emanote.Pandoc.Filter.Url
