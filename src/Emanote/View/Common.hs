@@ -42,10 +42,9 @@ commonSplices emaAction meta routeTitle = do
   "ema:metadata"
     ## HJ.bindJson meta
   "ema:title" ## Tit.titleSplice routeTitle
-  -- Convert full title to plain text, because <head>'s <title> (which is where
-  -- titleFull is expected to be used) cannot contain HTML.
+  -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
-    ## Tit.titleSplice routeTitleFull
+    ## Tit.titleSpliceNoHtml routeTitleFull
   where
     twindShim :: Ema.CLI.Action -> H.Html
     twindShim action =
