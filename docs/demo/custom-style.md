@@ -25,5 +25,5 @@ You should expect the above text to appear styled like a yellow sticky note, bec
 ### `highlight-block`
 
 :::{.highlight-block}
-A portion of Markdown that highlighted compared to the rest
+A portion of Markdown that is highlighted compared to the rest
 :::
