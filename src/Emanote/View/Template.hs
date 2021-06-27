@@ -79,7 +79,7 @@ renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta "Index"
+    commonSplices emaAction model meta "Index"
     routeTreeSplice Nothing model
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
@@ -90,7 +90,7 @@ renderLmlHtml emaAction model note = do
       rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta pageTitle
+    commonSplices emaAction model meta pageTitle
     -- Sidebar navigation
     routeTreeSplice (Just r) model
     "ema:breadcrumbs"
