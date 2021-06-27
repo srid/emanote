@@ -10,14 +10,11 @@ module Heist.Extra.Splices.Pandoc.Render
     rpBlock',
     rpInline',
     plainify,
-    withoutH1,
   )
 where
 
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Route.SiteRoute.Type as SR
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
@@ -266,9 +263,6 @@ rpInline' ctx@RenderCtx {..} i = case i of
                 -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
                 let emojiFontAttr = ("style", "font-family: emoji")
                  in ((id', classes, attrs <> one emojiFontAttr), is)
-              | Just inlineTag <- HT.getTagFromInline i ->
-                -- HACK: Handle and render inline tag as link. Hardcoding Emanote URL as well, uhh.
-                (attr, one $ B.Link mempty is (SR.tagUrl inlineTag, "Tag"))
               | otherwise ->
                 (attr, is)
     one . X.Element "span" (rpAttr $ rewriteClass ctx attr') <$> foldMapM (rpInline ctx) is'
@@ -307,9 +301,3 @@ plainify = W.query $ \case
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
   -- `Inline` which `W.query` will traverse again.
   _ -> ""
-
-withoutH1 :: Pandoc -> Pandoc
-withoutH1 (Pandoc meta (B.Header 1 _ _ : rest)) =
-  Pandoc meta rest
-withoutH1 doc =
-  doc
