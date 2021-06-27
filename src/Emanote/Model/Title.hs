@@ -26,10 +26,20 @@ import qualified Text.Pandoc.Definition as B
 data Title
   = TitlePlain Text
   | TitlePandoc [B.Inline]
-  deriving (Show, Ord, Generic, ToJSON)
+  deriving (Show, Generic, ToJSON)
 
 instance Eq Title where
-  (==) = on (==) toPlain
+  (==) =
+    -- Use toPlain here, rather than toInlines, because the same text can have
+    -- different inlines structure. For example, "Foo Bar" can be represented as
+    --   [Str "Foo", Space, Str "Bar"],
+    -- or as,
+    --   [Str "Foo Bar"]
+    on (==) toPlain
+
+instance Ord Title where
+  compare =
+    on compare toPlain
 
 instance Semigroup Title where
   TitlePlain a <> TitlePlain b =
@@ -59,7 +69,8 @@ toPlain = \case
 
 titleSplice :: Monad n => Title -> HI.Splice n
 titleSplice = \case
-  TitlePlain x -> HI.textSplice x
+  TitlePlain x ->
+    HI.textSplice x
   TitlePandoc is ->
     let titleDoc = B.Pandoc mempty $ one $ B.Plain is
      in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
