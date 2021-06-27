@@ -117,11 +117,12 @@ renderLmlHtml emaAction model note = do
     "ema:note:pandoc"
       ## Splices.pandocSplice
         rewriteClass
-        ( \ctx blk ->
-            PF.embedWikiLinkResolvingSplice emaAction model ctx blk
-              <|> PF.queryResolvingSplice note model ctx blk
+        ( PF.queryResolvingSplice note model
         )
-        (PF.urlResolvingSplice emaAction model)
+        ( \ctx inl ->
+            PF.embedWikiLinkResolvingSplice emaAction model ctx inl
+              <|> PF.urlResolvingSplice emaAction model ctx inl
+        )
       $ note ^. MN.noteDoc
         & withoutH1 -- Because, handling note title separately
 
