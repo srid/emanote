@@ -12,6 +12,7 @@ import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
+import Emanote.Pandoc.Filter.Builtin (preparePandoc)
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
@@ -43,7 +44,7 @@ commonSplices emaAction model meta routeTitle = do
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
     ## HJ.bindJson meta
-  "ema:title" ## Tit.titleSplice routeTitle
+  "ema:title" ## Tit.titleSplice (preparePandoc model) routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull
