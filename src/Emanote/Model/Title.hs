@@ -12,12 +12,14 @@ module Emanote.Model.Title
 
     -- * Rendering a Title
     titleSplice,
+    titleSpliceNoHtml,
   )
 where
 
 import Data.Aeson
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
+import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -54,3 +56,9 @@ titleSplice :: Monad n => Title -> HI.Splice n
 titleSplice title =
   let titleDoc = B.Pandoc mempty $ one $ B.Plain $ toInlines title
    in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
+
+titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
+titleSpliceNoHtml =
+  HI.textSplice . \case
+    TitlePlain x -> x
+    TitlePandoc is -> plainify is
