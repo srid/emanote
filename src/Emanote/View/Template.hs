@@ -19,6 +19,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
+import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc)
 import qualified Emanote.Pandoc.Filter.Embed as PF
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as PF
@@ -31,7 +32,6 @@ import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
-import Heist.Extra.Splices.Pandoc.Render (withoutH1)
 import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
@@ -123,7 +123,7 @@ renderLmlHtml emaAction model note = do
         )
         (PF.urlResolvingSplice emaAction model)
       $ note ^. MN.noteDoc
-        & withoutH1 -- Because, handling note title separately
+        & prepareNoteDoc model -- Because, handling note title separately
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)

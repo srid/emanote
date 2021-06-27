@@ -5,13 +5,13 @@ module Emanote.Pandoc.Filter.Embed where
 import Control.Lens.Operators ((^.))
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
-import qualified Ema
 import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
+import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc)
 import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Filter.Url as Url
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
@@ -21,7 +21,6 @@ import qualified Heist.Extra as HE
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (..), ctxSansCustomSplicing)
-import Heist.Extra.Splices.Pandoc.Render (withoutH1)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -60,7 +59,7 @@ embedSiteRoute emaAction model RenderCtx {..} wl = \case
                 <|> PF.queryResolvingSplice note model ctx blk
           )
           (Url.urlResolvingSplice emaAction model)
-        $ note ^. MN.noteDoc & withoutH1
+        $ note ^. MN.noteDoc & prepareNoteDoc model
   Right staticFile -> do
     let r = staticFile ^. SF.staticFileRoute
         fp = staticFile ^. SF.staticFilePath

@@ -9,6 +9,8 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     siteRouteUrl,
+    tagNodesUrl,
+    tagUrl,
   )
 where
 
@@ -120,3 +122,13 @@ siteRouteUrl model =
       Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute model
     indexLmlRoute =
       R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+
+tagNodesUrl :: Model -> [HT.TagNode] -> Text
+tagNodesUrl model (TagIndexR -> tagR) =
+  let virtR :: VirtualRoute = openUnionLift tagR
+      sRoute :: SiteRoute = openUnionLift virtR
+   in siteRouteUrl model sRoute
+
+tagUrl :: Model -> HT.Tag -> Text
+tagUrl model =
+  tagNodesUrl model . toList . HT.deconstructTag

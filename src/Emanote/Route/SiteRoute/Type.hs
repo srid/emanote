@@ -12,12 +12,9 @@ module Emanote.Route.SiteRoute.Type
     decodeVirtualRoute,
     encodeVirtualRoute,
     encodeTagIndexR,
-    tagNodesUrl,
-    tagUrl,
   )
 where
 
-import qualified Data.Text as T
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
@@ -96,15 +93,3 @@ encodeVirtualRoute =
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
 encodeTagIndexR (TagIndexR tagNodes) =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
-
-tagNodesUrl :: [HT.TagNode] -> Text
-tagNodesUrl =
-  -- FIXME: Use siteRouteUrl here
-  stripSuffix ".html" . toText . R.encodeRoute . encodeTagIndexR . TagIndexR
-  where
-    stripSuffix k s =
-      fromMaybe s $ T.stripSuffix k s
-
-tagUrl :: HT.Tag -> Text
-tagUrl =
-  tagNodesUrl . toList . HT.deconstructTag
