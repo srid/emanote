@@ -34,7 +34,6 @@ import Emanote.Route (FileType (AnyExt), LMLRoute, ModelRoute, R)
 import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState, newTemplateState)
 import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.Walk as W
 
 data Model = Model
   { _modelNotes :: IxNote,

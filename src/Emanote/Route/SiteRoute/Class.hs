@@ -9,10 +9,9 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     indexRoute,
+    tagIndexRoute,
     siteRouteUrl,
     urlStrategySuffix,
-    tagNodesUrl,
-    tagUrl,
   )
 where
 
@@ -138,12 +137,7 @@ indexRoute =
   let virtR :: VirtualRoute = openUnionLift IndexR
    in openUnionLift virtR
 
-tagNodesUrl :: Model -> [HT.TagNode] -> Text
-tagNodesUrl model (TagIndexR -> tagR) =
+tagIndexRoute :: [HT.TagNode] -> SiteRoute
+tagIndexRoute (TagIndexR -> tagR) =
   let virtR :: VirtualRoute = openUnionLift tagR
-      sRoute = openUnionLift virtR
-   in siteRouteUrl model sRoute
-
-tagUrl :: Model -> HT.Tag -> Text
-tagUrl model =
-  tagNodesUrl model . toList . HT.deconstructTag
+   in openUnionLift virtR

@@ -18,11 +18,14 @@ prepareNoteDoc model =
         inline@(B.Span _attr is) ->
           if
               | Just inlineTag <- HT.getTagFromInline inline ->
-                B.Link mempty is (SR.tagUrl model inlineTag, "Tag")
+                B.Link mempty is (tagUrl inlineTag, "Tag")
               | otherwise ->
                 inline
         x ->
           x
+      where
+        tagUrl =
+          SR.siteRouteUrl model . SR.tagIndexRoute . toList . HT.deconstructTag
     withoutH1 :: B.Pandoc -> B.Pandoc
     withoutH1 (B.Pandoc meta (B.Header 1 _ _ : rest)) =
       B.Pandoc meta rest
