@@ -79,7 +79,7 @@ renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction meta $ Tit.fromPlain "Index"
+    commonSplices emaAction meta "Index"
     routeTreeSplice Nothing model
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
