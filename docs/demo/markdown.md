@@ -8,6 +8,11 @@ page:
 
 Emanote notes are written in Markdown format. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
+## Links
+
+You can link to a document by doing this `[[neuron]]` and it will be rendered as [[neuron]]. See that it is using the title defined in the document,
+but you can specify an alternative title as well like this [[neuron|Neuron guide]] or any other text [[neuron|neuron]].
+
 ## Emojis
 
 :smile:
