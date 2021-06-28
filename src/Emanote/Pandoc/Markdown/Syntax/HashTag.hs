@@ -34,10 +34,9 @@ inlineTagsInPandoc = W.query $ maybeToList . getTagFromInline
 
 getTagFromInline :: B.Inline -> Maybe TT.Tag
 getTagFromInline = \case
-  B.Span (_, [cls], Map.fromList -> attrs) _
-    | cls == tagCls -> do
-      tag <- Map.lookup "data-tag" attrs
-      pure $ TT.Tag tag
+  B.Span (_, _, Map.fromList -> attrs) _ -> do
+    tag <- Map.lookup tagDataAttr attrs
+    pure $ TT.Tag tag
   _ -> Nothing
 
 class HasHashTag il where
@@ -47,12 +46,12 @@ instance HasHashTag (CP.Cm b B.Inlines) where
   hashTag (TT.Tag tag) =
     let attrs =
           [ ("title", "Tag"),
-            ("data-tag", tag)
+            (tagDataAttr, tag)
           ]
-     in CP.Cm $ B.spanWith ("", one tagCls, attrs) $ B.str $ "#" <> tag
+     in CP.Cm $ B.spanWith ("", one "emanote:inline-tag", attrs) $ B.str $ "#" <> tag
 
-tagCls :: Text
-tagCls = "emanote:inline-tag"
+tagDataAttr :: Text
+tagDataAttr = "data-tag"
 
 hashTagSpec ::
   (Monad m, CM.IsBlock il bl, CM.IsInline il, HasHashTag il) =>

@@ -18,17 +18,17 @@ prepareNoteDoc model =
 preparePandoc :: W.Walkable B.Inline b => Model -> b -> b
 preparePandoc model =
   linkifyInlineTags model
-    >> fixEmojiFontFamily
+    >>> fixEmojiFontFamily
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
 linkifyInlineTags :: W.Walkable B.Inline b => Model -> b -> b
 linkifyInlineTags model =
   W.walk $ \case
-    inline@(B.Span _attr is) ->
+    inline@(B.Span attr is) ->
       if
           | Just inlineTag <- HT.getTagFromInline inline ->
-            B.Link mempty is (tagUrl inlineTag, "Tag")
+            B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
           | otherwise ->
             inline
     x ->
