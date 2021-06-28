@@ -64,9 +64,10 @@ instance Ema Model SiteRoute where
           let tags = fst <$> M.modelTags model
               tagPaths =
                 Set.fromList $
-                  concat $
-                    tags <&> \(HT.deconstructTag -> tagPath) ->
-                      toList $ NE.inits tagPath
+                  ([] :) $ -- [] Triggers generation of main tag index.
+                    concat $
+                      tags <&> \(HT.deconstructTag -> tagPath) ->
+                        NE.filter (not . null) $ NE.inits tagPath
            in openUnionLift IndexR :
               (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
