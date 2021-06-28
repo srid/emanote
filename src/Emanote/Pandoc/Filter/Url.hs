@@ -23,7 +23,6 @@ import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
-import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -76,8 +75,8 @@ replaceLinkNodeWithRoute ::
   ([B.Inline], Text)
 replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
   let finalInner =
-        if url == plainify inner -- It's a wiki-link with no custom text
-          then fromMaybe inner $ siteRouteDefaultInnerText r
+        if null inner -- It's a wiki-link with no custom text
+          then fromMaybe [B.Str url] $ siteRouteDefaultInnerText r
           else inner
    in ( finalInner,
         foldUrlTime (SR.siteRouteUrl model r) mTime
@@ -93,7 +92,7 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
                       )
                   `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
                           -- Just append a file: prefix, to existing wiki-link.
-                          pure $ B.Str "File:" : inner
+                          pure $ B.Str "File:" : [B.Str url]
                       )
             )
         `h` (\(_ :: SR.VirtualRoute) -> Nothing)
