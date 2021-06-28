@@ -10,7 +10,6 @@ module Emanote.Source.Patch
   ( transformActions,
     filePatterns,
     ignorePatterns,
-    locLayers,
   )
 where
 
@@ -32,7 +31,7 @@ import Emanote.Prelude
   )
 import Emanote.Route (liftLMLRoute)
 import qualified Emanote.Route as R
-import Emanote.Source.Loc (Loc, locLayers, locResolve)
+import Emanote.Source.Loc (Loc, locResolve)
 import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
