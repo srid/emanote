@@ -23,7 +23,6 @@ import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
-import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
