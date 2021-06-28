@@ -102,10 +102,10 @@ htmlAttr :: Text
 htmlAttr = "data-wikilink-type"
 
 class HasWikiLink il where
-  wikilink :: WikiLinkType -> Text -> il -> il
+  wikilink :: WikiLinkType -> Text -> Maybe il -> il
 
 instance HasWikiLink (CP.Cm b B.Inlines) where
-  wikilink typ t il = CP.Cm $ B.linkWith attrs t "" $ CP.unCm il
+  wikilink typ t il = CP.Cm $ B.linkWith attrs t "" $ maybe mempty CP.unCm il
     where
       attrs = ("", [], [(htmlAttr, show typ)])
 
@@ -143,11 +143,11 @@ wikilinkSpec =
                 )
             )
       title <-
-        M.option url $
+        M.optional $
           -- TODO: Should parse as inline so link text can be formatted?
           CM.untokenize
             <$> ( CT.symbol '|'
                     *> many (CT.satisfyTok (not . CT.hasType (CM.Symbol ']')))
                 )
       replicateM_ 2 $ CT.symbol ']'
-      return $ wikilink typ url (CM.str title)
+      return $ wikilink typ url (fmap CM.str title)
