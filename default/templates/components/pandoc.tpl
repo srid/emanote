@@ -53,7 +53,7 @@
   </DefinitionList>
   <Note:Ref>
     <!-- DoNotFormat -->
-    <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="#fn${footnote:idx}"><footnote:idx /></a></sup>
+    <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="javascript:;" onclick="document.location.hash='#fn${footnote:idx}';"><footnote:idx /></a></sup>
     <!-- DoNotFormat -->
   </Note:Ref>
   <Note:List>
