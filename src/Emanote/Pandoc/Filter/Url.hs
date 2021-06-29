@@ -35,7 +35,9 @@ urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case resolveUnresolvedRelTarget model uRel of
         Left err ->
-          pure $ brokenLinkSpanWrapper err inl
+          pure $
+            brokenLinkSpanWrapper err $
+              B.Link attr (nonEmptyLinkInlines model url Nothing is) (url, tit)
         Right sr -> do
           -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
           -- in B.Para (so do this in block-level custom splice), then embed it.
@@ -74,28 +76,10 @@ replaceLinkNodeWithRoute ::
   ([B.Inline], Text) ->
   ([B.Inline], Text)
 replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
-  let finalInner =
-        if null inner -- It's a wiki-link with no custom text
-          then fromMaybe [B.Str url] $ siteRouteDefaultInnerText r
-          else inner
-   in ( finalInner,
-        foldUrlTime (SR.siteRouteUrl model r) mTime
-      )
+  ( nonEmptyLinkInlines model url (Just r) inner,
+    foldUrlTime (SR.siteRouteUrl model r) mTime
+  )
   where
-    siteRouteDefaultInnerText =
-      absurdUnion
-        `h` (\(SR.MissingR _) -> Nothing)
-        `h` ( \(resR :: SR.ResourceRoute) ->
-                resR & absurdUnion
-                  `h` ( \(lmlR :: R.LMLRoute) ->
-                          Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
-                      )
-                  `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                          -- Just append a file: prefix, to existing wiki-link.
-                          pure $ B.Str "File:" : [B.Str url]
-                      )
-            )
-        `h` (\(_ :: SR.VirtualRoute) -> Nothing)
     foldUrlTime linkUrl mUrlTime =
       linkUrl
         -- In live server mode, append last modification time if any, such
@@ -108,6 +92,29 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
               t <- mUrlTime
               pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
           )
+
+nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
+nonEmptyLinkInlines model url mr = \case
+  [] ->
+    fromMaybe [B.Str url] $
+      siteRouteDefaultInnerText model url =<< mr
+  x -> x
+
+siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
+siteRouteDefaultInnerText model url =
+  absurdUnion
+    `h` (\(SR.MissingR _) -> Nothing)
+    `h` ( \(resR :: SR.ResourceRoute) ->
+            resR & absurdUnion
+              `h` ( \(lmlR :: R.LMLRoute) ->
+                      Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
+                  )
+              `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
+                      -- Just append a file: prefix, to existing wiki-link.
+                      pure $ B.Str "File:" : [B.Str url]
+                  )
+        )
+    `h` (\(_ :: SR.VirtualRoute) -> Nothing)
 
 resolveUnresolvedRelTarget ::
   Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
