@@ -116,8 +116,9 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     let borderStyle = "border-gray-300"
         rowStyle = [("class", "border-b-2 border-t-2 " <> borderStyle)]
         cellStyle = [("class", "py-2 px-2 align-top border-r-2 border-l-2 " <> borderStyle)]
+        tableAttr = ("", ["mb-3"], mempty)
     -- TODO: Apply captions, colSpec, etc.
-    fmap (one . X.Element "table" (rpAttr attr)) $ do
+    fmap (one . X.Element "table" (rpAttr $ concatAttr attr tableAttr)) $ do
       thead <- fmap (one . X.Element "thead" mempty) $
         flip foldMapM hrows $ \(B.Row _ cells) ->
           fmap (one . X.Element "tr" rowStyle) $

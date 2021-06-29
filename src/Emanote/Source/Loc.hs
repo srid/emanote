@@ -21,9 +21,10 @@ emanoteDefaultLayer = do
   pure (LocEmanoteDefault defaultFiles, defaultFiles)
 
 userLayers :: NonEmpty FilePath -> Set (Loc, FilePath)
-userLayers paths = 
-  fromList $ zip [1..] (toList paths) <&> \(idx, path) -> 
-    (LocUser idx path, path)
+userLayers paths =
+  fromList $
+    zip [1 ..] (toList paths) <&> \(idx, path) ->
+      (LocUser idx path, path)
 
 -- | Return the effective path of a file.
 locResolve :: (Loc, FilePath) -> FilePath
