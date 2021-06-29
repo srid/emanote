@@ -32,11 +32,11 @@ A portion of Markdown that is highlighted compared to the rest
 
 ## Advanced styling 
 
-Using [fenced_divs extension](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md), you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement you can make use of CSS grids as provided by Tailwind's classes. 
+Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes. 
 
 [div]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div
 
-:::{.grid .grid-cols-2 .grid-flow-row .gap-0 .p-3 .bg-gray-500}
+:::{class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-0 p-3 bg-gray-500"}
 ![[examples]]
 
 ![[start]]
@@ -45,3 +45,4 @@ Using [fenced_divs extension](https://github.com/jgm/commonmark-hs/blob/master/c
 :::
 
 
+[^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accept non-standard class names, such as the Tailwind responsive classes (ie. `lg:grid-cols-2`).
