@@ -1,16 +1,17 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.CLI (
-  Cli(..),
-  parseCli
-) where
+module Emanote.CLI
+  ( Cli (..),
+    parseCli,
+  )
+where
 
+import qualified Data.Text as T
+import Data.Version (showVersion)
 import qualified Ema.CLI
 import Options.Applicative hiding (action)
 import qualified Paths_emanote
-import Data.Version (showVersion)
-import qualified Data.Text as T
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
@@ -33,9 +34,9 @@ cliParser cwd = do
             help "List of notebook folders to 'union mount', with the right-side folders taking priority."
           ]
     pathListReader :: ReadM (NonEmpty FilePath)
-    pathListReader = 
+    pathListReader =
       maybeReader $ \paths ->
-        nonEmpty $ fmap toString $ T.split (== ';') . toText $ paths 
+        nonEmpty $ fmap toString $ T.split (== ';') . toText $ paths
 
 parseCli' :: FilePath -> ParserInfo Cli
 parseCli' cwd =
@@ -52,5 +53,5 @@ parseCli' cwd =
         (long "version" <> help "Show version")
 
 parseCli :: IO Cli
-parseCli = 
-  execParser . parseCli' =<< getCurrentDirectory 
+parseCli =
+  execParser . parseCli' =<< getCurrentDirectory

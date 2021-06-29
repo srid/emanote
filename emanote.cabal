@@ -101,6 +101,7 @@ executable emanote
   default-language:   Haskell2010
   autogen-modules:    Paths_emanote
   other-modules:
+    Emanote.CLI
     Emanote.Model
     Emanote.Model.Link.Rel
     Emanote.Model.Meta
