@@ -27,7 +27,7 @@
     strong.error {
       color: lightcoral;
       font-size: 90%;
-      font-family: mono;
+      font-family: monospace;
     }
   </style>
   <head-extra />

@@ -46,5 +46,6 @@ page:
   # Desription is expected to be set on a per-page basis.
   # HACK: We are setting it to empty here, because Heist doesn't work well otherwise.
   description: ""
+  # Put anything that should go in <head> of these routes here:
   headHtml: |
-    <!-- Add anything that should go in <head> of these routes here -->
+    <meta name="generator" content="Emanote" />
