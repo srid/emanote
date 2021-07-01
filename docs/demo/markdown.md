@@ -71,11 +71,9 @@ Animal Foods
 
 Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the YAML frontmatter. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
 
-### Hightlight-inline
+### Hightlighting
 
-You can highlight ==inline text== by doing this: `==inline text==`. The inline style for our content can be customized in a 
-similar way as we do in "highlight-block" in [[custom-style]]. In fact, we have a `highlight-inline` similar to `highlight-block` 
-to do it.
+You can highlight any ==inline text== by wraping them in `==` (ie. `==inline text==`). The CSS style for highlighted inlines can be specified in [[custom-style|index.yaml]]. 
 
 ## Code Syntax Highlighting
 
