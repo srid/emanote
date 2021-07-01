@@ -10,10 +10,11 @@ tags: []
 
 # TODO: How to design this when generating RSS feeds?
 template:
-  # Use file "./${template.name}.tpl" to render HTML
-  name: templates/layouts/book
+  # Which template to use to render notes. The filepath without the .tpl extension.
+  name: /templates/layouts/book
   # List of available colors: https://tailwindcss.com/docs/customizing-colors
   theme: blue
+  # Value of the <base> tag.
   baseUrl: /
   urlStrategy: direct
   iconUrl: favicon.svg
