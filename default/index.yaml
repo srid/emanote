@@ -36,7 +36,7 @@ pandoc:
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
     highlight-block: px-3 py-1 rounded bg-${theme}-100 hover:border-${theme}-400 hover:shadow border-t-8 border-${theme}-200
-    highlight-inline: bg-${theme}-100 px-2 py-1 rounded-xl
+    highlight-inline: bg-yellow-200 px-2 py-1 rounded-xl
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
