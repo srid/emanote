@@ -15,11 +15,13 @@ import qualified Text.XmlHtml as X
 type Footnotes = [[B.Block]]
 
 gatherFootnotes :: Pandoc -> Footnotes
-gatherFootnotes = W.query $ \case
-  B.Note footnote ->
-    [footnote]
-  _ ->
-    []
+gatherFootnotes = List.nub . W.query queryFootnotes
+  where
+    queryFootnotes = \case
+      B.Note footnote ->
+        [footnote]
+      _ ->
+        []
 
 lookupFootnote :: HasCallStack => [B.Block] -> Footnotes -> Int
 lookupFootnote note fs =
