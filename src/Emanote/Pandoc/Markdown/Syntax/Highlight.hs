@@ -9,8 +9,9 @@ module Emanote.Pandoc.Markdown.Syntax.Highlight
 where
 
 import qualified Commonmark as CM
-import qualified Commonmark.Html as CH
 import qualified Commonmark.Inlines as CM
+import qualified Commonmark.Pandoc as CP
+import qualified Text.Pandoc.Builder as B
 
 highlightSpec ::
   (Monad m, CM.IsInline il, HasHighlight il) =>
@@ -25,8 +26,10 @@ highlightSpec =
 class HasHighlight a where
   highlight :: a -> a
 
-instance HasHighlight (CH.Html a) where
-  highlight x = CH.htmlInline "mark" (Just x)
+instance HasHighlight (CP.Cm a B.Inlines) where
+  highlight il = B.spanWith attr <$> il
+    where
+      attr = ("", one "highlight-inline", [])
 
 instance
   (HasHighlight i, Monoid i) =>
