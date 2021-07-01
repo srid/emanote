@@ -36,7 +36,7 @@ jobs:
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./.ci/output
-          nix run . -- --layers "./docs;./docs/.deploy/github" gen $(pwd)/.ci/output
+          nix run . -- --layers ./docs gen $(pwd)/.ci/output
           bin/compile-css $(pwd)/.ci/output
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3

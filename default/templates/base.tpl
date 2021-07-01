@@ -21,7 +21,17 @@
   <!-- CSSSTART -->
   <tailwindCssShim />
   <!-- CSSEND -->
+
+  <!-- Heist error element -->
+  <style type="text/css">
+    strong.error {
+      color: lightcoral;
+      font-size: 90%;
+      font-family: monospace;
+    }
+  </style>
   <head-extra />
+  <apply template="/templates/hooks/more-head" />
 </head>
 
 <!-- DoNotFormat -->

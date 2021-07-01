@@ -6,7 +6,7 @@ page:
 ---
 # Emanote
 
-:::{.text-xl .mb-8}
+:::{.text-xl .leading-relaxed .my-6}
 [Emanote][gh] enables you to **create beautiful websites** -- such as *personal webpage*, *blog*, *wiki*, *Zettelkasten*, *notebook*, *knowledge-base*, *documentation*, etc. from future-proof **plain-text notes** and arbitrary data -- with live preview that updates in real-time. It aims to be next-gen [neuron](https://neuron.zettel.page/) with powerful features.
 :::
 
