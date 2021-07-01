@@ -30,17 +30,13 @@ You should expect the above text to appear styled like a yellow sticky note, bec
 A portion of Markdown that is highlighted compared to the rest
 :::
 
-### hightlight-inline
-
-You can highlight ==inline text== as well.
-
 ## Advanced styling 
 
 Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes. 
 
 [div]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div
 
-:::{class="grid grid-flow-row grid-cols-1 gap-0 p-3 bg-gray-500 lg:grid-cols-2"}
+:::{class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-0 p-3 bg-gray-500"}
 ![[examples]]
 
 ![[start]]

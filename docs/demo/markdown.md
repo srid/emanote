@@ -71,6 +71,12 @@ Animal Foods
 
 Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the YAML frontmatter. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
 
+### Hightlight-inline
+
+You can highlight ==inline text== by doing this: `==inline text==`. The inline style for our content can be customized in a 
+similar way as we do in "highlight-block" in [[custom-style]]. In fact, we have a `highlight-inline` similar to `highlight-block` 
+to do it.
+
 ## Code Syntax Highlighting
 
 In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [PrismJS](https://prismjs.com/), and add it to `page.headHtml` of [[yaml-config]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route):
