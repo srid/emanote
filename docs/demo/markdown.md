@@ -73,7 +73,9 @@ Add Twitter-like hashtags anywhere in Markdown file. They can also be added to t
 
 ### Hightlighting
 
-You can highlight any ==inline text== by wraping them in `==` (ie. `==inline text==`). The CSS style for highlighted inlines can be specified in [[custom-style|index.yaml]]. 
+You can highlight any ==inline text== by wraping them in `==` (ie. `==inline text==`).[^prop] The CSS style for highlighted inlines can be specified in [[custom-style|index.yaml]]. 
+
+[^prop]: See original proposal for this syntax [here](https://talk.commonmark.org/t/highlighting-text-with-the-mark-element/840).
 
 ## Code Syntax Highlighting
 
