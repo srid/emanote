@@ -30,9 +30,3 @@ instance HasHighlight (CP.Cm a B.Inlines) where
   highlight il = B.spanWith attr <$> il
     where
       attr = ("", one "highlight-inline", [])
-
-instance
-  (HasHighlight i, Monoid i) =>
-  HasHighlight (CM.WithSourceMap i)
-  where
-  highlight x = (highlight <$> x) <* CM.addName "highlight"
