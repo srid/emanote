@@ -11,7 +11,7 @@
   }
 
   body {
-    font-family: 'Nunito' !important;
+    font-family: 'Nunito', sans-serif;
   }
 
   h1,
@@ -21,6 +21,6 @@
   h5,
   h6,
   header {
-    font-family: 'Nunito-Bold' !important;
+    font-family: 'Nunito-Bold', sans-serif;
   }
 </style>
