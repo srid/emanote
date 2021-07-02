@@ -3,7 +3,7 @@ on:
   # Run only when pushing to master branch
   push:
     branches:
-      - windicss-docker
+      - master
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
