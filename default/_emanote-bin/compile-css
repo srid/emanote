@@ -1,5 +1,4 @@
-#!/usr/bin/env nix-shell 
-#! nix-shell ../shell.nix -i bash
+#!/usr/bin/env bash
 set -xe
 
 # This script will migrate a Emanote-generated static site from using twind shim
