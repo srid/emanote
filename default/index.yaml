@@ -39,6 +39,7 @@ pandoc:
     note: p-2 mb-3 rounded shadow bg-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both 
     highlight-block: px-3 py-1 rounded bg-${theme}-100 hover:border-${theme}-400 hover:shadow border-t-8 border-${theme}-200
     highlight-inline: bg-yellow-200 px-2 py-0.5 rounded-xl
+    center: flex justify-center items-center mx-auto
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
