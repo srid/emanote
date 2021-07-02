@@ -101,7 +101,7 @@
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm" />
-  <Code class="py-0.5 bg-gray-100 text-sm" />
+  <Code class="py-0.5 px-1 rounded bg-gray-700 text-sm text-white" />
   <Header>
     <h1 class="pb-2 mb-2 text-5xl font-bold text-center" />
     <h2 class="inline-block mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2" />
