@@ -25,6 +25,7 @@ data-dir:           default
 data-files:
   _emanote-live-server/**/*.css
   _emanote-static/**/*.ttf
+  _emanote-bin/compile-css
   favicon.svg
   index.md
   index.yaml
