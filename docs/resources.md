@@ -2,7 +2,7 @@
 order: 15
 ---
 
-# Apps
+# Resources
 
 Applications you can use along-side Emanote.
 

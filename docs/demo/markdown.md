@@ -27,7 +27,10 @@ See [list of available emojis](https://gist.github.com/rxaviers/7360908) for ref
 
 https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md
 
-Demo: Checkout this note[^1] and this other note[^2] as both are footnotes.
+Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You may also reuse[^1] footnotes.
+
+[^1]: First footnote example
+[^2]: Second footnote example
 
 ## Task lists
 
@@ -99,6 +102,3 @@ def fib(n):
     print()
 fib(1000)
 ```
-
-[^1]: Reference to a note.
-[^2]: Another reference to a note.
