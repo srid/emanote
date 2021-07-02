@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p ./.ci/output
           nix run . -- --layers ./docs gen $(pwd)/.ci/output
-          ./.ci/output/_emanote-bin/compile-css $(pwd)/.ci/output
+          bash ./.ci/output/_emanote-bin/compile-css $(pwd)/.ci/output
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
