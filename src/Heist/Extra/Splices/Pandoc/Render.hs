@@ -250,7 +250,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
   B.Image attr is (url, tit) -> do
     let attrs =
           catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", plainify is)]
-            <> rpAttr attr
+            <> rpAttr (rewriteClass ctx attr)
     pure $ one . X.Element "img" attrs $ mempty
   B.Note _bs -> do
     -- Footnotes are to be handled separately; see Footenotes.hs

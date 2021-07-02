@@ -6,9 +6,10 @@ Note that the extension uses the traditional `![]()` syntax to link to the image
 
 If your image is already copied in the OS clipboard---many screenshoting tools[^scr] already provide this capability---and if you use [[vscode]], you can use the [Paste Image](https://marketplace.visualstudio.com/items?itemName=mushan.vscode-paste-image) extension to *directly paste* it in your Markdown note. This does the following,
 
-
 - Save the copied image to your project directory
 - Add a link to it in the currently active Markdown file
+
+![](https://raw.githubusercontent.com/mushanshitiancai/vscode-paste-image/master/res/vscode-paste-image.gif){.center}
 
 It basically automates the workflow of manually moving the file to your notebook, and then writing the Markdown image syntax to link to it.
 
