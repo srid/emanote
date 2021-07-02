@@ -3,7 +3,7 @@ on:
   # Run only when pushing to master branch
   push:
     branches:
-      - master
+      - windicss-docker
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p ./.ci/output
           nix run . -- --layers ./docs gen $(pwd)/.ci/output
-          bin/compile-css $(pwd)/.ci/output
+          ./.ci/output/_emanote-bin/compile-css $(pwd)/.ci/output
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:

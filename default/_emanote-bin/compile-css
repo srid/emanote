@@ -12,7 +12,7 @@ OUTPUTDIR=$1
 echo "Compiling CSS ..."
 pushd ${OUTPUTDIR}/
 find . -name \*.html -print0 | xargs -0 \
-  windicss -t -o emanote-compiled.css
+  docker run -v ${OUTPUTDIR}:/data sridca/windicss -t -o emanote-compiled.css
 
 # Rename to invalidate cache on deploy if the CSS has changed
 MD5=$(md5sum emanote-compiled.css | cut -f1 -d' ')
