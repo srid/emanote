@@ -24,7 +24,7 @@ Embedding of [[file-links]], as indicated in the aforementioned Obsidian help pa
 See https://github.com/srid/emanote/issues/24 for progress.
 ### Images 
 
-Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg))`. 
+Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg))`.  See also the tip: [[adding-images]].
 
 ![[disaster-girl.jpg]]
 
