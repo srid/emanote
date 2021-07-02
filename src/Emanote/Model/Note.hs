@@ -51,8 +51,8 @@ type NoteIxs =
      R 'R.Folder,
      -- Tag
      HT.Tag,
-     -- "slug" alias
-     Slug
+     -- Alias route for this note. Can be "foo" or "foo/bar".
+     NonEmpty Slug
    ]
 
 type IxNote = IxSet NoteIxs Note
@@ -91,9 +91,10 @@ noteTags :: Note -> [HT.Tag]
 noteTags =
   fmap HT.Tag . fromMaybe mempty . lookupMeta (one "tags")
 
-noteSlug :: Note -> Maybe Slug
-noteSlug =
-  lookupMeta (one "slug")
+noteSlug :: Note -> Maybe (NonEmpty Slug)
+noteSlug note = do
+  slugPath :: Text <- lookupMeta (one "slug") note
+  fmap R.unRoute $ R.mkRouteFromFilePath @'R.AnyExt $ toString slugPath
 
 lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
@@ -123,8 +124,8 @@ noteHtmlRoute note@Note {..} =
   case noteSlug note of
     Nothing ->
       coerce $ R.lmlRouteCase _noteRoute
-    Just slug ->
-      R.mkRouteFromSlug slug
+    Just slugs ->
+      R.mkRouteFromSlugs slugs
 
 singleNote :: HasCallStack => [Note] -> Maybe Note
 singleNote ns = do
