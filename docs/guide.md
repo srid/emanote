@@ -31,6 +31,7 @@ Mega features,
 - Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)
 - Tailwind styling in Markdown
 - template hooks
+- compiled css: via _emanote-bin/compile-css script
 
 Known limitations
 
