@@ -1,4 +1,9 @@
 <!-- What goes in this file will appear on near the end of <head>-->
+<link rel="preload" href="_emanote-static/fonts/Nunito/Nunito-Regular.ttf" as="font" type="font/ttf"
+  crossorigin>
+<link rel="preload" href="_emanote-static/fonts/Nunito/Nunito-ExtraBold.ttf" as="font"
+  type="font/ttf" crossorigin>
+
 <style>
   @font-face {
     font-family: 'Nunito';
