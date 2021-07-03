@@ -30,7 +30,6 @@
       font-family: monospace;
     }
   </style>
-  <head-extra />
   <apply template="/templates/hooks/more-head" />
 </head>
 
