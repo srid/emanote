@@ -4,7 +4,7 @@ set -xe
 # This script will migrate a Emanote-generated static site from using twind shim
 # (dynamic) to windicss compiled CSS (static).
 
-OUTPUTDIR=$1
+OUTPUTDIR="$(dirname "$(dirname "$(readlink -fm "$0")")")"
 
 # Produce a CSS file that contains only the Tailwind styles in use by the
 # generated HTML files.
