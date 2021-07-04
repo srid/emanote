@@ -145,15 +145,22 @@ lookupNotesByRoute htmlRoute =
 placeHolderNote :: R.LMLRoute -> Note
 placeHolderNote r =
   let placeHolder =
-        B.Plain
-          [ B.Str
-              "To add content here, create a file named: ",
-            B.Code B.nullAttr $ toText (R.encodeRoute $ R.lmlRouteCase r)
-          ]
+        [ folderListingQuery,
+          B.Div (cls "text-gray-400 border-t-2 inline-block pt-0.5") . one . B.Para $
+            [ B.Str
+                "Note: To override the auto-generated content here, create a file named: ",
+              B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.encodeRoute $ R.lmlRouteCase r)
+            ]
+        ]
    in mkEmptyNoteWith r placeHolder
+  where
+    folderListingQuery =
+      B.CodeBlock (cls "query") "path:./*"
+    cls x =
+      ("", one x, mempty) :: B.Attr
 
-mkEmptyNoteWith :: R.LMLRoute -> B.Block -> Note
-mkEmptyNoteWith someR (Pandoc mempty . one -> doc) =
+mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
+mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   Note someR doc meta (queryNoteTitle someR doc meta)
   where
     meta = Aeson.Null
