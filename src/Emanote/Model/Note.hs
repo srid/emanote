@@ -146,7 +146,7 @@ placeHolderNote :: R.LMLRoute -> Note
 placeHolderNote r =
   let placeHolder =
         [ folderListingQuery,
-          B.Div (cls "text-gray-400 border-t-2 inline-block pt-0.5") . one . B.Para $
+          B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
                 "Note: To override the auto-generated content here, create a file named: ",
               B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.encodeRoute $ R.lmlRouteCase r)
