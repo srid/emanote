@@ -32,7 +32,7 @@ instance Show.Show Query where
     QueryByTagPattern pat ->
       toString $ "Pages tagged by '" <> HT.unTagPattern pat <> "'"
     QueryByPath p ->
-      "Pages under path '" <> p <> "'"
+      "Pages under path '/" <> p <> "'"
     QueryByPathPattern pat ->
       "Pages matching path '" <> pat <> "'"
 
@@ -52,9 +52,13 @@ queryParser = do
     <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
   where
     fromUserPath s =
-      if "*" `T.isInfixOf` s
-        then QueryByPathPattern (toString s)
-        else QueryByPath (toString s)
+      if
+          | "*" `T.isInfixOf` s ->
+            QueryByPathPattern (toString s)
+          | "/" `T.isPrefixOf` s ->
+            QueryByPath (toString $ T.drop 1 s)
+          | otherwise ->
+            QueryByPathPattern (toString $ "**/" <> s <> "/**")
 
 runQuery :: Note -> Model -> Query -> [Note]
 runQuery currentNote model = \case
