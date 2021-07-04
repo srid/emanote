@@ -11,3 +11,7 @@ Emanote is suitable for creating ...
 * ... **personal website**/**blogs**, such as: [www.srid.ca](https://www.srid.ca/) (view [source](https://github.com/srid/www.srid.ca))
 * ... **Zettelkasten** sites: *coming soon*
 
+## Others who use Emanote
+
+* https://notes.ybaumy.space/
+* https://n.xygn.us/
