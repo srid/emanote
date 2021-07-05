@@ -89,7 +89,7 @@ renderLmlHtml emaAction model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMeta r model
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
-      rewriteClass = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
+      classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction model meta pageTitle
@@ -113,13 +113,13 @@ renderLmlHtml emaAction model note = do
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## Splices.pandocSplice
-            rewriteClass
+            classRules
             (const . const $ Nothing)
             (PF.urlResolvingSplice emaAction model)
           $ ctxDoc
     "ema:note:pandoc"
       ## Splices.pandocSplice
-        rewriteClass
+        classRules
         ( \ctx blk ->
             PF.embedWikiLinkResolvingSplice emaAction model ctx blk
               <|> PF.queryResolvingSplice note model ctx blk

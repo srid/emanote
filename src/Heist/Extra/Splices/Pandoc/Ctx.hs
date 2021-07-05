@@ -1,6 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Heist.Extra.Splices.Pandoc.Ctx where
+module Heist.Extra.Splices.Pandoc.Ctx
+  ( RenderCtx (..),
+    mkRenderCtx,
+    rewriteClass,
+    ctxSansCustomSplicing,
+  )
+where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
@@ -57,10 +63,11 @@ ctxSansCustomSplicing ctx =
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', classes, attr) =
-  let x =
-        classes <&> \cls ->
-          fromMaybe cls $ Map.lookup cls classMap
-   in (id', x, attr)
+  (id', rewrite classMap <$> classes, attr)
+  where
+    rewrite :: Ord a => Map a a -> a -> a
+    rewrite rules x =
+      fromMaybe x $ Map.lookup x rules
 
 blockLookupAttr :: X.Node -> B.Block -> B.Attr
 blockLookupAttr node = \case
