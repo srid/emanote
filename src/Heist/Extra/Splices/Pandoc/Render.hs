@@ -86,12 +86,14 @@ rpBlock' ctx@RenderCtx {..} b = case b of
   B.BlockQuote bs ->
     withTplTag ctx "BlockQuote" ("blocks" ## rpBlock ctx `foldMapM` bs) $
       one . X.Element "blockquote" mempty <$> foldMapM (rpBlock ctx) bs
-  B.OrderedList _ bss ->
+  B.OrderedList _ bss' -> do
+    let bss = handleSpacing bss'
     withTplTag ctx "OrderedList" (pandocListSplices "OrderedList" bss) $ do
       fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
         flip foldMapM bss $
           fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
-  B.BulletList bss ->
+  B.BulletList bss' -> do
+    let bss = handleSpacing bss'
     withTplTag ctx "BulletList" (pandocListSplices "BulletList" bss) $ do
       fmap (one . X.Element "ul" (rpAttr $ bAttr b)) $
         flip foldMapM bss $
@@ -184,6 +186,13 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         itemsSplices :: [B.Block] -> H.Splices (HI.Splice n)
         itemsSplices bs = do
           (tagPrefix <> ":Item") ## foldMapM (rpBlock ctx) bs
+
+handleSpacing :: [[B.Block]] -> [[B.Block]]
+handleSpacing = map (map paraToPlain)
+
+paraToPlain :: B.Block -> B.Block
+paraToPlain (B.Para xs) = B.Plain xs
+paraToPlain x = x
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
