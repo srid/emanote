@@ -56,9 +56,11 @@ ctxSansCustomSplicing ctx =
     }
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
-rewriteClass RenderCtx {..} (id', cls, attr) =
-  let cls' = maybe cls T.words $ Map.lookup (T.intercalate " " cls) classMap
-   in (id', cls', attr)
+rewriteClass RenderCtx {..} (id', classes, attr) =
+  let x =
+        classes <&> \cls ->
+          fromMaybe cls $ Map.lookup cls classMap
+   in (id', x, attr)
 
 blockLookupAttr :: X.Node -> B.Block -> B.Attr
 blockLookupAttr node = \case
