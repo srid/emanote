@@ -91,6 +91,7 @@ runQuery currentNote model = \case
                   R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
         else toString pat
     -- HACK: Until we have a proper search support
+    -- See also another sortOn in Model/Type.hs
     sortByDateOrTitle =
       sortOn $
         Down . \note ->

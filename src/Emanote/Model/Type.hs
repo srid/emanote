@@ -143,8 +143,11 @@ modelWikiLinkTargets wl model =
 modelLookupBacklinks :: ModelRoute -> Model -> [(LMLRoute, [B.Block])]
 modelLookupBacklinks r model =
   let backlinks = Ix.toList $ (model ^. modelRels) @+ Rel.unresolvedRelsTo r
-   in backlinks <&> \rel ->
-        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+   in -- HACK: See also sortByDateOrTitle in Query.hs
+      -- This is so that calendar backlinks are sorted properly.
+      sortOn (Down . flip modelLookupTitle model . fst) $
+        backlinks <&> \rel ->
+          (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
 modelLookupStaticFileByRoute r =
