@@ -60,8 +60,8 @@ queryParser = do
           | otherwise ->
             QueryByPathPattern (toString $ "**/" <> s <> "/**")
 
-runQuery :: Note -> Model -> Query -> [Note]
-runQuery currentNote model = \case
+runQuery :: R.LMLRoute -> Model -> Query -> [Note]
+runQuery currentRoute model = \case
   QueryByTag tag ->
     sortByDateOrTitle $ Ix.toList $ (model ^. modelNotes) @= tag
   QueryByTagPattern pat ->
@@ -83,7 +83,7 @@ runQuery currentNote model = \case
     resolveDotInFilePattern (toText -> pat) =
       if "./" `T.isPrefixOf` pat
         then
-          let folderR :: R.R 'R.Folder = coerce $ R.lmlRouteCase $ currentNote ^. N.noteRoute
+          let folderR :: R.R 'R.Folder = coerce $ R.lmlRouteCase currentRoute
            in if folderR == R.indexRoute
                 then -- If in "index.md", discard the ./
                   toString (T.drop 2 pat)
