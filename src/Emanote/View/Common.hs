@@ -2,7 +2,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.View.Common (commonSplices) where
+module Emanote.View.Common
+  ( commonSplices,
+  )
+where
 
 import qualified Data.Aeson.Types as Aeson
 import Data.Map.Syntax ((##))
@@ -70,3 +73,4 @@ commonSplices emaAction model meta routeTitle = do
         ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
+

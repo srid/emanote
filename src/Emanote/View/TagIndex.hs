@@ -100,7 +100,7 @@ renderTagIndex emaAction model tagPath = do
     "ema:notes"
       ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
-        PF.noteSplice model note
+        PF.noteSpliceMap model note
 
 tagNodesText :: NonEmpty HT.TagNode -> Text
 tagNodesText =

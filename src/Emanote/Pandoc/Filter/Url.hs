@@ -17,19 +17,19 @@ import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
+import Emanote.Pandoc.Filter
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
-import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
 -- | Resolve all URLs in inlines (<a> and <img>)
 urlResolvingSplice ::
-  Monad n => Ema.CLI.Action -> Model -> HP.RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
-urlResolvingSplice emaAction model (ctxSansCustomSplicing -> ctx) inl =
+  Monad n => InlineFilter n x
+urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
   case inl of
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
