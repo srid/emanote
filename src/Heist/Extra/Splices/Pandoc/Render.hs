@@ -87,13 +87,13 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     withTplTag ctx "BlockQuote" ("blocks" ## rpBlock ctx `foldMapM` bs) $
       one . X.Element "blockquote" mempty <$> foldMapM (rpBlock ctx) bs
   B.OrderedList _ bss' -> do
-    let bss = handleSpacing bss'
+    let bss = convertFirstParaToPlain bss'
     withTplTag ctx "OrderedList" (pandocListSplices "OrderedList" bss) $ do
       fmap (one . X.Element "ol" (rpAttr $ bAttr b)) $
         flip foldMapM bss $
           fmap (one . X.Element "li" mempty) . foldMapM (rpBlock ctx)
   B.BulletList bss' -> do
-    let bss = handleSpacing bss'
+    let bss = convertFirstParaToPlain bss'
     withTplTag ctx "BulletList" (pandocListSplices "BulletList" bss) $ do
       fmap (one . X.Element "ul" (rpAttr $ bAttr b)) $
         flip foldMapM bss $
@@ -187,12 +187,11 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         itemsSplices bs = do
           (tagPrefix <> ":Item") ## foldMapM (rpBlock ctx) bs
 
-handleSpacing :: [[B.Block]] -> [[B.Block]]
-handleSpacing = map (map paraToPlain)
-
-paraToPlain :: B.Block -> B.Block
-paraToPlain (B.Para xs) = B.Plain xs
-paraToPlain x = x
+    convertFirstParaToPlain :: [[B.Block]] -> [[B.Block]]
+    convertFirstParaToPlain = fmap applyFirst
+      where
+        applyFirst ((B.Para xs) : bss) = B.Plain xs : bss
+        applyFirst bss = bss
 
 headerTag :: HasCallStack => Int -> Text
 headerTag n =
