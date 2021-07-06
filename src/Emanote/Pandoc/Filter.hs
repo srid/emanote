@@ -7,6 +7,7 @@ import qualified Emanote.Model.Note as MN
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc)
 import Emanote.Route (LMLRoute)
+import Heist (HeistT, Template)
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
@@ -34,17 +35,16 @@ noteFiltersInlineOnly :: NoteFilters n -> NoteFilters n
 noteFiltersInlineOnly nf =
   nf {noteBlockFilters = mempty}
 
-pandocSpliceWithFilters ::
-  Monad n =>
+mkRenderCtxWithNoteFilters ::
+  (Monad m, Monad n) =>
   NoteFilters n ->
   Map Text Text ->
   Ema.CLI.Action ->
   Model ->
   LMLRoute ->
-  B.Pandoc ->
-  HI.Splice n
-pandocSpliceWithFilters nf@NoteFilters {..} classRules emaAction model x =
-  Splices.pandocSplice
+  HeistT n m (Splices.RenderCtx n)
+mkRenderCtxWithNoteFilters nf@NoteFilters {..} classRules emaAction model x =
+  Splices.mkRenderCtxWithoutFootnotes
     classRules
     ( \ctx blk ->
         asum $
@@ -56,6 +56,19 @@ pandocSpliceWithFilters nf@NoteFilters {..} classRules emaAction model x =
           noteInlineFilters <&> \f ->
             f emaAction model nf ctx x blk
     )
+
+pandocSpliceWithFilters ::
+  Monad n =>
+  NoteFilters n ->
+  Map Text Text ->
+  Ema.CLI.Action ->
+  Model ->
+  LMLRoute ->
+  B.Pandoc ->
+  HI.Splice n
+pandocSpliceWithFilters nf classRules emaAction model x doc = do
+  ctx <- mkRenderCtxWithNoteFilters nf classRules emaAction model x
+  Splices.pandocSplice ctx doc
 
 -- | Like `pandocSpliceWithFilters` but when it is known that we are rendering a `Note`
 --

@@ -5,6 +5,7 @@ module Heist.Extra.Splices.Pandoc.Ctx
     mkRenderCtx,
     rewriteClass,
     ctxSansCustomSplicing,
+    concatSpliceFunc,
   )
 where
 
@@ -60,6 +61,13 @@ ctxSansCustomSplicing ctx =
     { blockSplice = const Nothing,
       inlineSplice = const Nothing
     }
+
+concatSpliceFunc :: Alternative f => (t -> f a) -> (t -> f a) -> t -> f a
+concatSpliceFunc f g x =
+  asum
+    [ f x,
+      g x
+    ]
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', classes, attr) =

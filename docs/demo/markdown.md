@@ -30,7 +30,7 @@ https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/foot
 Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You may also reuse[^1] footnotes.
 
 [^1]: First footnote example
-[^2]: Second footnote example
+[^2]: Second footnote example. Footnotes *within*[^1] footnotes are not handled.
 
 ## Task lists
 
