@@ -114,11 +114,13 @@ renderLmlHtml emaAction model note = do
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
+            -- Remove block filters, as we expect backlinks section to be compact and brief.
+            ctxNoteFilters = noteFilters {noteBlockFilters = mempty}
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
-          ## pandocSpliceWithFilters (noteFiltersInlineOnly noteFilters) classRules emaAction model (MN._noteRoute note) ctxDoc
+          ## pandocSpliceWithFilters ctxNoteFilters classRules emaAction model (MN._noteRoute note) ctxDoc
     "ema:note:pandoc"
       ## noteSpliceWithFilters noteFilters classRules emaAction model note
 
