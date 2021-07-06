@@ -24,6 +24,7 @@ type InlineFilter n x = PandocFilter B.Inline n x
 
 type BlockFilter n x = PandocFilter B.Block n x
 
+-- | Filters to apply when rendering a note (available at a LMLRoute)
 data NoteFilters n = NoteFilters
   { noteInlineFilters :: [InlineFilter n LMLRoute],
     noteBlockFilters :: [BlockFilter n LMLRoute]
