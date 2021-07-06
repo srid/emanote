@@ -11,6 +11,7 @@ where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
+import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
@@ -25,12 +26,25 @@ data RenderCtx n = RenderCtx
     classMap :: Map Text Text,
     -- Custom render functions for AST nodes.
     blockSplice :: B.Block -> Maybe (HI.Splice n),
-    inlineSplice :: B.Inline -> Maybe (HI.Splice n),
-    -- Footnotes gathered in advance
-    footnotes :: [[B.Block]]
+    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
   }
 
 mkRenderCtx ::
+  (Monad m, Monad n) =>
+  Map Text Text ->
+  (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
+  (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
+  H.HeistT n m (RenderCtx n)
+mkRenderCtx classMap bS iS = do
+  node <- H.getParamNode
+  pure $
+    mkRenderCtxWith
+      node
+      classMap
+      bS
+      iS
+
+mkRenderCtxWith ::
   Monad n =>
   X.Node ->
   -- | How to replace classes in Div and Span nodes.
@@ -39,10 +53,8 @@ mkRenderCtx ::
   (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
   -- | Custom handling of AST inline nodes
   (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
-  -- | Footnotes gathered ahead
-  [[B.Block]] ->
   RenderCtx n
-mkRenderCtx node classMap bS iS footnotes = do
+mkRenderCtxWith node classMap bS iS = do
   let ctx =
         RenderCtx
           node
@@ -51,7 +63,6 @@ mkRenderCtx node classMap bS iS footnotes = do
           classMap
           (bS ctx)
           (iS ctx)
-          footnotes
    in ctx
 
 -- | Strip any custom splicing out of the given render context

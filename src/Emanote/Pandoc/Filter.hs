@@ -1,14 +1,22 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.Pandoc.Filter where
+module Emanote.Pandoc.Filter
+  ( NoteFilters (..),
+    InlineFilter,
+    BlockFilter,
+    pandocSpliceWithFilters,
+    noteSpliceWithFilters,
+  )
+where
 
 import qualified Ema.CLI
 import qualified Emanote.Model.Note as MN
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.Filter.Builtin (prepareNoteDoc)
 import Emanote.Route (LMLRoute)
-import Heist (HeistT, Template)
+import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as Splices
+import qualified Heist.Extra.Splices.Pandoc.Ctx as Splices
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -31,10 +39,6 @@ data NoteFilters n = NoteFilters
     noteBlockFilters :: [BlockFilter n LMLRoute]
   }
 
-noteFiltersInlineOnly :: NoteFilters n -> NoteFilters n
-noteFiltersInlineOnly nf =
-  nf {noteBlockFilters = mempty}
-
 mkRenderCtxWithNoteFilters ::
   (Monad m, Monad n) =>
   NoteFilters n ->
@@ -44,7 +48,7 @@ mkRenderCtxWithNoteFilters ::
   LMLRoute ->
   HeistT n m (Splices.RenderCtx n)
 mkRenderCtxWithNoteFilters nf@NoteFilters {..} classRules emaAction model x =
-  Splices.mkRenderCtxWithoutFootnotes
+  Splices.mkRenderCtx
     classRules
     ( \ctx blk ->
         asum $
