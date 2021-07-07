@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.37.2
+version:            0.1.37.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -23,9 +23,9 @@ extra-source-files:
 
 data-dir:           default
 data-files:
+  _emanote-bin/compile-css
   _emanote-live-server/**/*.css
   _emanote-static/**/*.ttf
-  _emanote-bin/compile-css
   favicon.svg
   index.md
   index.yaml
@@ -113,14 +113,14 @@ executable emanote
     Emanote.Model.StaticFile
     Emanote.Model.Title
     Emanote.Model.Type
-    Emanote.Pandoc.Filter.Builtin
-    Emanote.Pandoc.Filter.Embed
-    Emanote.Pandoc.Filter.Query
-    Emanote.Pandoc.Filter.Url
+    Emanote.Pandoc.BuiltinFilters
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag
-    Emanote.Pandoc.Markdown.Syntax.WikiLink
     Emanote.Pandoc.Markdown.Syntax.Highlight
+    Emanote.Pandoc.Markdown.Syntax.WikiLink
+    Emanote.Pandoc.Renderer.Embed
+    Emanote.Pandoc.Renderer.Query
+    Emanote.Pandoc.Renderer.Url
     Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext

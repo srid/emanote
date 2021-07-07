@@ -2,7 +2,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.View.Common (commonSplices) where
+module Emanote.View.Common
+  ( commonSplices,
+  )
+where
 
 import qualified Data.Aeson.Types as Aeson
 import Data.Map.Syntax ((##))
@@ -12,7 +15,7 @@ import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
-import Emanote.Pandoc.Filter.Builtin (preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
