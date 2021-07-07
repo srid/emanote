@@ -36,7 +36,7 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 
 [div]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div
 
-:::{class="grid grid-cols-1 lg:grid-cols-2 grid-flow-row gap-0 p-3 bg-gray-500"}
+:::{class="grid grid-flow-row grid-cols-1 gap-0 p-3 bg-gray-500 lg:grid-cols-2"}
 ![[examples]]
 
 ![[start]]
@@ -45,4 +45,4 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 :::
 
 
-[^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accept non-standard class names, such as the Tailwind responsive classes (ie. `lg:grid-cols-2`).
+[^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accepting non-standard class names, such as the Tailwind responsive classes (eg. `lg:grid-cols-2`).

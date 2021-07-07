@@ -14,8 +14,8 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
 import Emanote.View.Common (commonSplices)
 import qualified Heist.Extra.Splices.List as Splices
@@ -100,7 +100,7 @@ renderTagIndex emaAction model tagPath = do
     "ema:notes"
       ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
-        PF.noteSplice model note
+        PF.noteSpliceMap model note
 
 tagNodesText :: NonEmpty HT.TagNode -> Text
 tagNodesText =

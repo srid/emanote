@@ -19,6 +19,7 @@ where
 import Data.Aeson
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
+import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
@@ -71,9 +72,14 @@ titleSplice :: Monad n => (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
 titleSplice f = \case
   TitlePlain x ->
     HI.textSplice x
-  TitlePandoc is ->
+  TitlePandoc is -> do
     let titleDoc = f $ B.Pandoc mempty $ one $ B.Plain is
-     in HP.pandocSplice mempty (const . const $ Nothing) (const . const $ Nothing) titleDoc
+    ctx <- mkEmptyRenderCtx
+    HP.pandocSplice ctx titleDoc
+  where
+    -- TODO: We probably *do* want inline splicing here, and classMap here.
+    mkEmptyRenderCtx =
+      HP.mkRenderCtx mempty (const . const $ Nothing) (const . const $ Nothing)
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
 titleSpliceNoHtml =

@@ -4,7 +4,7 @@ import qualified Data.List as List
 import Data.Map.Syntax ((##))
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
-import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (footnotes, rootNode))
+import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (rootNode))
 import Heist.Extra.Splices.Pandoc.Render (renderPandocWith)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Builder as B
@@ -51,10 +51,10 @@ footnoteSplices ctx idx bs = do
   "footnote:idx" ## HI.textSplice (show idx)
   "footnote:content" ## renderPandocWith ctx footnoteDoc
 
-footnoteRefSplice :: Monad n => RenderCtx n -> B.Inline -> Maybe (HI.Splice n)
-footnoteRefSplice ctx inline = do
+footnoteRefSplice :: Monad n => RenderCtx n -> [[B.Block]] -> B.Inline -> Maybe (HI.Splice n)
+footnoteRefSplice ctx footnotes inline = do
   B.Note bs <- pure inline
-  let idx = lookupFootnote bs $ footnotes ctx
+  let idx = lookupFootnote bs footnotes
   renderNode <- fmap head . nonEmpty $ X.childElementsTag "Note:Ref" (rootNode ctx)
   Just $
     runCustomNode renderNode $
