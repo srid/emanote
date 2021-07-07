@@ -18,7 +18,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import Emanote.Pandoc.Renderer
+import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
