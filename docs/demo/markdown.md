@@ -32,6 +32,7 @@ Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You 
 [^1]: First footnote example
 [^2]: Second footnote example. Footnotes *within*[^1] footnotes are not handled.
 
+
 ## Task lists
 
 - [x] A task that was done
@@ -57,6 +58,34 @@ Animal Foods
 : Diary
 : Offal
 : Muscle meat
+
+## Lists
+
+Simple lists,
+
+- Apple
+- Orange
+- Mango
+
+Lists with sub-lists,
+
+- Muscle meat
+- Offal
+  - Liver
+  - Heart
+- Misc
+  - Bone Marrow
+  - Cartillage
+  - Skin
+
+List items can contain multiple block elements (eg: paragraph),
+
+- Meat is the only nutritionally complete food
+- Animal foods contain all of the protein, fat, vitamins and minerals that humans need to function.
+
+  They contain absolutely everything we need in just the right proportions.
+- In contrast to vegetables, meat does not contain any “anti-nutrients”
+
 
 ## Tables
 
