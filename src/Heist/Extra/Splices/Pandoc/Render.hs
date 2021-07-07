@@ -34,11 +34,7 @@ renderPandocWith ctx (Pandoc _meta blocks) =
 
 rpBlock :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
 rpBlock ctx@RenderCtx {..} b = do
-  case blockSplice b of
-    Nothing ->
-      rpBlock' ctx b
-    Just userSplice ->
-      userSplice
+  fromMaybe (rpBlock' ctx b) $ blockSplice b
 
 -- | Render using user override in pandoc.tpl, falling back to default HTML.
 withTplTag :: Monad n => RenderCtx n -> Text -> H.Splices (HI.Splice n) -> HI.Splice n -> HI.Splice n
@@ -201,11 +197,7 @@ headerTag n =
 
 rpInline :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
 rpInline ctx@RenderCtx {..} i = do
-  case inlineSplice i of
-    Nothing ->
-      rpInline' ctx i
-    Just userSplice ->
-      userSplice
+  fromMaybe (rpInline' ctx i) $ inlineSplice i
 
 rpInline' :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
 rpInline' ctx@RenderCtx {..} i = case i of

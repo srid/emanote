@@ -19,7 +19,7 @@ Emanote's high-level architecture is as follows,
 - `Emanote.View`: Rendering code (HTML, templates, site routes)
 - `Emanote.Pandoc`: Everything to do with light-weight markup processing
   - `Emanote.Pandoc.Markdown`: Markdown-specific parsers and syntax.
-  - `Emanote.Pandoc.Filter`: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
+  - `Emanote.Pandoc.Renderer`: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
 
 Ema acts as the framework orchestrating two things at the same time: 
 

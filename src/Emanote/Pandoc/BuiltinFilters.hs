@@ -1,4 +1,4 @@
-module Emanote.Pandoc.Filter.Builtin
+module Emanote.Pandoc.BuiltinFilters
   ( prepareNoteDoc,
     preparePandoc,
   )
