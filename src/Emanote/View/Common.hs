@@ -15,7 +15,7 @@ import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
-import Emanote.Pandoc.Filter.Builtin (preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
@@ -73,4 +73,3 @@ commonSplices emaAction model meta routeTitle = do
         ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
-

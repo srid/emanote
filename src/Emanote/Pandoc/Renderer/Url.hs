@@ -1,4 +1,4 @@
-module Emanote.Pandoc.Filter.Url
+module Emanote.Pandoc.Renderer.Url
   ( urlResolvingSplice,
     brokenLinkAttr,
     resolveWikiLinkMustExist,
@@ -17,8 +17,8 @@ import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.Filter
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Pandoc.Renderer
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
@@ -28,7 +28,7 @@ import qualified Text.Pandoc.Definition as B
 
 -- | Resolve all URLs in inlines (<a> and <img>)
 urlResolvingSplice ::
-  Monad n => InlineFilter n x
+  Monad n => PandocInlineRenderer n x
 urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
   case inl of
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do

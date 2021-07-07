@@ -14,8 +14,8 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.Pandoc.Filter.Query as PF
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
 import Emanote.View.Common (commonSplices)
 import qualified Heist.Extra.Splices.List as Splices
