@@ -187,7 +187,6 @@ parseNote r fp = do
     defaultFrontMatter =
       Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
 
-
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
 lookupAeson x (k :| ks) meta =

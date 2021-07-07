@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.Pandoc.Filter.Query
+module Emanote.Pandoc.Renderer.Query
   ( queryResolvingSplice,
     noteSpliceMap,
   )
@@ -14,8 +14,8 @@ import Emanote.Model (Model)
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Query as Q
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.Filter (BlockFilter)
-import Emanote.Pandoc.Filter.Builtin (preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.Renderer (PandocBlockRenderer)
 import Emanote.Route (LMLRoute)
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
@@ -24,7 +24,7 @@ import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Json as HJ
 import qualified Text.Pandoc.Definition as B
 
-queryResolvingSplice :: Monad n => BlockFilter n LMLRoute
+queryResolvingSplice :: Monad n => PandocBlockRenderer n LMLRoute
 queryResolvingSplice _ model _nf _ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)

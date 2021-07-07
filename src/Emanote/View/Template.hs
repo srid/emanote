@@ -19,11 +19,11 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.Filter
-import Emanote.Pandoc.Filter.Builtin (preparePandoc)
-import qualified Emanote.Pandoc.Filter.Embed as PF
-import qualified Emanote.Pandoc.Filter.Query as PF
-import qualified Emanote.Pandoc.Filter.Url as PF
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.Renderer
+import qualified Emanote.Pandoc.Renderer.Embed as PF
+import qualified Emanote.Pandoc.Renderer.Query as PF
+import qualified Emanote.Pandoc.Renderer.Url as PF
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
@@ -91,8 +91,8 @@ renderLmlHtml emaAction model note = do
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
       pageTitle = M.modelLookupTitle r model
-      noteFilters =
-        NoteFilters
+      noteRenderers =
+        NoteRenderers
           [PF.urlResolvingSplice]
           [ PF.embedWikiLinkResolvingSplice,
             PF.queryResolvingSplice
@@ -115,14 +115,14 @@ renderLmlHtml emaAction model note = do
       $ \(source, ctx) -> do
         let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
             -- Remove block filters, as we expect backlinks section to be compact and brief.
-            ctxNoteFilters = noteFilters {noteBlockFilters = mempty}
+            ctxNoteRenderers = noteRenderers {noteBlockRenderers = mempty}
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
-          ## pandocSpliceWithFilters ctxNoteFilters classRules emaAction model (MN._noteRoute note) ctxDoc
+          ## pandocSpliceWith ctxNoteRenderers classRules emaAction model (MN._noteRoute note) ctxDoc
     "ema:note:pandoc"
-      ## noteSpliceWithFilters noteFilters classRules emaAction model note
+      ## noteSpliceWith noteRenderers classRules emaAction model note
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)
