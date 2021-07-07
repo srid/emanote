@@ -80,12 +80,17 @@ Lists with sub-lists,
 
 List items can contain multiple block elements (eg: paragraph),
 
-- Meat is the only nutritionally complete food
+- [Meat](https://www.diagnosisdiet.com/full-article/meat) is the only nutritionally complete food
 - Animal foods contain all of the protein, fat, vitamins and minerals that humans need to function.
 
   They contain absolutely everything we need in just the right proportions.
 - In contrast to vegetables, meat does not contain any “anti-nutrients”
 
+Ordered lists,
+
+1. Be happy
+1. Be harmless
+1. Be naive
 
 ## Tables
 
