@@ -121,6 +121,7 @@ executable emanote
     Emanote.Pandoc.Renderer.Embed
     Emanote.Pandoc.Renderer.Query
     Emanote.Pandoc.Renderer.Url
+    Emanote.Pandoc.Renderer
     Emanote.Prelude
     Emanote.Route
     Emanote.Route.Ext
