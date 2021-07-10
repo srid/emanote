@@ -16,7 +16,7 @@ module Emanote.Model.Title
   )
 where
 
-import Data.Aeson
+import Data.Aeson (ToJSON)
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
