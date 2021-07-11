@@ -71,7 +71,7 @@ decodeVirtualRoute fp =
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
-  "-" :| ["index"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
+  "-" :| ["all"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure IndexR
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
@@ -87,7 +87,7 @@ encodeVirtualRoute =
             R.encodeRoute $ encodeTagIndexR tr
         )
     `h` ( \IndexR ->
-            R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["index"]
+            R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["all"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
