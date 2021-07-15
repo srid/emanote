@@ -20,9 +20,9 @@ To work with Markdown notes using Emanote on Windows, follow these steps.
 
 - Install [[vscode]] *natively* on Windows (not WSL).
 - Open VSCode and install the [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension
-- Press <kbd>Ctrl+Shift+P</kbd> and select `Remote-WSL: Open folder in WSL`
+- Press `Ctrl+Shift+P` and select `Remote-WSL: Open folder in WSL`
 - Open the aforementioned [[emanote-template]] local copy
-- Press <kbd>Ctrl+`</kbd> (that's backtick) to open Ubuntu Terminal inside VSCode, and in the terminal run `emanote`.
+- Press `Ctrl+Backtick` to open Ubuntu Terminal inside VSCode, and in the terminal run `emanote`.
 - Access the URL it shows, and make sure that you can view the notebook in your native Windows browser.
 - Finally, open a Markdown file and make a change to it, while making sure the the web browser updates in real-time.
 
