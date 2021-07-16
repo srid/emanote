@@ -3,6 +3,7 @@ module Emanote.Pandoc.Renderer.Url
     plainifyWikiLinkSplice,
     brokenLinkAttr,
     resolveWikiLinkMustExist,
+    nonEmptyLinkInlines,
   )
 where
 
