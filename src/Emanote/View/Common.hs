@@ -5,6 +5,7 @@
 module Emanote.View.Common
   ( commonSplices,
     noteRenderers,
+    getRouteContexts,
     inlineNoteRenderers,
   )
 where
@@ -18,10 +19,12 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
-import Emanote.Pandoc.Renderer (NoteRenderers (..))
+import Emanote.Pandoc.Renderer (NoteRenderers (..), PandocInlineRenderer)
+import qualified Emanote.Pandoc.Renderer as Renderer
 import qualified Emanote.Pandoc.Renderer.Embed as PF
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Pandoc.Renderer.Url as PF
+import Emanote.Route (LMLRoute)
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
@@ -39,21 +42,52 @@ import qualified Text.Blaze.Renderer.XmlHtml as RX
 -- | Custom renderers for Pandoc notes
 --
 -- Configure the default Pandoc splices here.
-noteRenderers :: Monad n => NoteRenderers n
+noteRenderers :: Monad n => NoteRenderers n i LMLRoute
 noteRenderers =
   NoteRenderers
-    [ PF.urlResolvingSplice
-    ]
+    pandocInlineRenderers
     [ PF.embedWikiLinkResolvingSplice,
       PF.queryResolvingSplice
     ]
 
 -- | Like `noteRenderers` but for use in inline contexts.
-inlineNoteRenderers :: Monad n => NoteRenderers n
+inlineNoteRenderers :: Monad n => NoteRenderers n i b
 inlineNoteRenderers =
-  -- Remove block filters, in render contexts where we expect to show inline
-  -- content (eg: backlinks and titles)
-  noteRenderers {noteBlockRenderers = mempty}
+  NoteRenderers
+    pandocInlineRenderers
+    -- Remove block filters, in render contexts where we expect to show inline
+    -- content (eg: backlinks and titles)
+    mempty
+
+pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b x]
+pandocInlineRenderers =
+  [ PF.urlResolvingSplice
+  ]
+
+getRouteContexts ::
+  (Monad m, Monad n) =>
+  Ema.CLI.Action ->
+  Model ->
+  Aeson.Value ->
+  ( Renderer.NoteRenderers n i b ->
+    i ->
+    b ->
+    (RenderCtx n -> H.HeistT n m x) ->
+    H.HeistT n m x
+  )
+getRouteContexts emaAction model meta =
+  let classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
+      withNoteRenderer nr i b f = do
+        renderCtx <-
+          Renderer.mkRenderCtxWithNoteRenderers
+            nr
+            classRules
+            emaAction
+            model
+            i
+            b
+        f renderCtx
+   in withNoteRenderer
 
 commonSplices ::
   Monad n =>

@@ -6,6 +6,7 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import Data.Aeson (Value)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import Data.WorldPeace.Union
@@ -25,7 +26,7 @@ import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineNoteRenderers, noteRenderers)
+import Emanote.View.Common (commonSplices, getRouteContexts, inlineNoteRenderers, noteRenderers)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
@@ -79,30 +80,24 @@ renderVirtualRoute emaAction m =
 renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
+      withNoteRenderer = getRouteContexts emaAction model meta
+      withInlineCtx =
+        withNoteRenderer inlineNoteRenderers () ()
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
-    routeTreeSplice undefined Nothing model
+    routeTreeSplice withInlineCtx Nothing model
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMeta r model
-      templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
-      classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
-      pageTitle = M.modelLookupTitle r model
-      withNoteRenderer nr f = do
-        renderCtx <-
-          Renderer.mkRenderCtxWithNoteRenderers
-            nr
-            classRules
-            emaAction
-            model
-            (MN._noteRoute note)
-        f renderCtx
+      withNoteRenderer = getRouteContexts emaAction model meta
       withInlineCtx =
-        withNoteRenderer inlineNoteRenderers
+        withNoteRenderer inlineNoteRenderers () ()
       withBlockCtx =
-        withNoteRenderer noteRenderers
+        withNoteRenderer noteRenderers () r
+      templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
+      pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices withInlineCtx emaAction model meta pageTitle
     let titleSplice titleDoc = withInlineCtx $ \x ->
