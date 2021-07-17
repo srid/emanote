@@ -20,12 +20,13 @@ import Emanote.Route (LMLRoute)
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra as HE
+import Heist.Extra.Splices.Pandoc (RenderCtx)
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Json as HJ
 import qualified Text.Pandoc.Definition as B
 
-queryResolvingSplice :: Monad n => PandocBlockRenderer n LMLRoute
-queryResolvingSplice _ model _nf _ctx noteRoute blk = do
+queryResolvingSplice :: forall n. Monad n => PandocBlockRenderer n LMLRoute
+queryResolvingSplice _emaAction model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)
     (Q.parseQuery -> Just q) <-
@@ -39,11 +40,11 @@ queryResolvingSplice _ model _nf _ctx noteRoute blk = do
       "query"
         ## HI.textSplice (show q)
       "result"
-        ## (HI.runChildrenWith . noteSpliceMap model) `foldMapM` Q.runQuery noteRoute model q
+        ## (HI.runChildrenWith . noteSpliceMap ctx model) `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
-noteSpliceMap :: Monad n => Model -> MN.Note -> H.Splices (HI.Splice n)
-noteSpliceMap model note = do
-  "ema:note:title" ## Tit.titleSplice (preparePandoc model) (MN._noteTitle note)
+noteSpliceMap :: Monad n => RenderCtx n -> Model -> MN.Note -> H.Splices (HI.Splice n)
+noteSpliceMap ctx model note = do
+  "ema:note:title" ## Tit.titleSplice ctx (preparePandoc model) (MN._noteTitle note)
   "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

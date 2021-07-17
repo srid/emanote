@@ -19,6 +19,7 @@ import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
 import Emanote.View.Common (commonSplices)
 import qualified Heist.Extra.Splices.List as Splices
+import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 
@@ -79,7 +80,7 @@ renderTagIndex emaAction model tagPath = do
   let meta = Meta.getIndexYamlMeta model
       tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
-    commonSplices emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
+    commonSplices ($ emptyRenderCtx) emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
@@ -100,7 +101,7 @@ renderTagIndex emaAction model tagPath = do
     "ema:notes"
       ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
-        PF.noteSpliceMap model note
+        PF.noteSpliceMap undefined model note
 
 tagNodesText :: NonEmpty HT.TagNode -> Text
 tagNodesText =

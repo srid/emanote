@@ -44,10 +44,10 @@ embedWikiLinkResolvingSplice emaAction model nf (ctxSansCustomSplicing -> ctx) _
           one block
 
 embedSiteRoute :: Monad n => Ema.CLI.Action -> Model -> NoteRenderers n -> HP.RenderCtx n -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
-embedSiteRoute emaAction model nf RenderCtx {..} wl = \case
+embedSiteRoute emaAction model nf ctx@RenderCtx {..} wl = \case
   Left note -> do
     pure . runEmbedTemplate "note" $ do
-      "ema:note:title" ## Tit.titleSplice (preparePandoc model) (MN._noteTitle note)
+      "ema:note:title" ## Tit.titleSplice ctx (preparePandoc model) (MN._noteTitle note)
       "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
       "ema:note:pandoc"
         ## noteSpliceWith nf classMap emaAction model note
