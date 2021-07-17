@@ -10,7 +10,6 @@ where
 
 import qualified Ema.CLI
 import Emanote.Model.Type (Model)
-import Emanote.Route (LMLRoute)
 import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Pandoc.Ctx as Splices
@@ -18,6 +17,8 @@ import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
 -- | Custom Heist renderer for specific Pandoc AST nodes
+--
+-- The `x` selects between `i` (inline) and `b` (block) types.
 type PandocRenderer astType n i b x =
   Ema.CLI.Action ->
   Model ->
@@ -27,9 +28,9 @@ type PandocRenderer astType n i b x =
   astType ->
   Maybe (HI.Splice n)
 
-type PandocInlineRenderer n i b x = PandocRenderer B.Inline n i b x
+type PandocInlineRenderer n i b = PandocRenderer B.Inline n i b i
 
-type PandocBlockRenderer n i b x = PandocRenderer B.Block n i b x
+type PandocBlockRenderer n i b = PandocRenderer B.Block n i b b
 
 -- | Custom render logic for a note (available at a LMLRoute)
 --
@@ -41,8 +42,8 @@ type PandocBlockRenderer n i b x = PandocRenderer B.Block n i b x
 -- So we expect the extensions to be in Haskell, however external script may be
 -- supported using a traditional whole-AST extension API.
 data NoteRenderers n i b = NoteRenderers
-  { noteInlineRenderers :: [PandocInlineRenderer n i b i],
-    noteBlockRenderers :: [PandocBlockRenderer n i b b]
+  { noteInlineRenderers :: [PandocInlineRenderer n i b],
+    noteBlockRenderers :: [PandocBlockRenderer n i b]
   }
 
 mkRenderCtxWithNoteRenderers ::

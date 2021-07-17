@@ -59,7 +59,7 @@ inlineNoteRenderers =
     -- content (eg: backlinks and titles)
     mempty
 
-pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b x]
+pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
 pandocInlineRenderers =
   [ PF.urlResolvingSplice
   ]
