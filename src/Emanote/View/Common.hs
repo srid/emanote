@@ -4,6 +4,8 @@
 
 module Emanote.View.Common
   ( commonSplices,
+    noteRenderers,
+    inlineNoteRenderers,
   )
 where
 
@@ -16,9 +18,14 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.Renderer (NoteRenderers (..))
+import qualified Emanote.Pandoc.Renderer.Embed as PF
+import qualified Emanote.Pandoc.Renderer.Query as PF
+import qualified Emanote.Pandoc.Renderer.Url as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
+import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
@@ -29,8 +36,34 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 
-commonSplices :: Monad n => Ema.CLI.Action -> Model -> Aeson.Value -> Tit.Title -> H.Splices (HI.Splice n)
-commonSplices emaAction model meta routeTitle = do
+-- | Custom renderers for Pandoc notes
+--
+-- Configure the default Pandoc splices here.
+noteRenderers :: Monad n => NoteRenderers n
+noteRenderers =
+  NoteRenderers
+    [ PF.urlResolvingSplice
+    ]
+    [ PF.embedWikiLinkResolvingSplice,
+      PF.queryResolvingSplice
+    ]
+
+-- | Like `noteRenderers` but for use in inline contexts.
+inlineNoteRenderers :: Monad n => NoteRenderers n
+inlineNoteRenderers =
+  -- Remove block filters, in render contexts where we expect to show inline
+  -- content (eg: backlinks and titles)
+  noteRenderers {noteBlockRenderers = mempty}
+
+commonSplices ::
+  Monad n =>
+  ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
+  Ema.CLI.Action ->
+  Model ->
+  Aeson.Value ->
+  Tit.Title ->
+  H.Splices (HI.Splice n)
+commonSplices withCtx emaAction model meta routeTitle = do
   let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
@@ -47,7 +80,8 @@ commonSplices emaAction model meta routeTitle = do
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
     ## HJ.bindJson meta
-  "ema:title" ## Tit.titleSplice (preparePandoc model) routeTitle
+  "ema:title" ## withCtx $ \ctx ->
+    Tit.titleSplice ctx (preparePandoc model) routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull

@@ -39,7 +39,7 @@ rpBlock ctx@RenderCtx {..} b = do
 -- | Render using user override in pandoc.tpl, falling back to default HTML.
 withTplTag :: Monad n => RenderCtx n -> Text -> H.Splices (HI.Splice n) -> HI.Splice n -> HI.Splice n
 withTplTag RenderCtx {..} name splices default_ =
-  case X.childElementTag name rootNode of
+  case X.childElementTag name =<< rootNode of
     Nothing -> default_
     Just node -> runCustomNode node splices
 

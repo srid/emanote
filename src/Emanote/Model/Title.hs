@@ -18,6 +18,7 @@ where
 
 import Data.Aeson (ToJSON)
 import qualified Emanote.Route as R
+import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
@@ -68,18 +69,17 @@ toPlain = \case
   TitlePlain s -> s
   TitlePandoc is -> plainify is
 
-titleSplice :: Monad n => (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
-titleSplice f = \case
+titleSplice :: Monad n => HP.RenderCtx n -> (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
+titleSplice ctx f = \case
   TitlePlain x ->
     HI.textSplice x
   TitlePandoc is -> do
     let titleDoc = f $ B.Pandoc mempty $ one $ B.Plain is
-    ctx <- mkEmptyRenderCtx
     HP.pandocSplice ctx titleDoc
-  where
-    -- TODO: We probably *do* want inline splicing here, and classMap here.
-    mkEmptyRenderCtx =
-      HP.mkRenderCtx mempty (const . const $ Nothing) (const . const $ Nothing)
+
+_mkEmptyRenderCtx :: (Monad m, Monad n) => HeistT n m (HP.RenderCtx n)
+_mkEmptyRenderCtx =
+  HP.mkRenderCtx mempty (const . const $ Nothing) (const . const $ Nothing)
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
 titleSpliceNoHtml =
