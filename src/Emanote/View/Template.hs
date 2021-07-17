@@ -19,7 +19,7 @@ import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
 import qualified Emanote.Pandoc.Renderer as Renderer
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
@@ -101,6 +101,8 @@ renderLmlHtml emaAction model note = do
         f renderCtx
       withInlineCtx =
         withNoteRenderer inlineNoteRenderers
+      withBlockCtx =
+        withNoteRenderer noteRenderers
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices withInlineCtx emaAction model meta pageTitle
     let titleSplice titleDoc = withInlineCtx $ \x ->
@@ -117,17 +119,19 @@ renderLmlHtml emaAction model note = do
       ## titleSplice pageTitle
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
-      $ \(source, ctx) -> do
+      $ \(source, backlinkCtx) -> do
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
           ## do
-            let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
-            withInlineCtx $ \renderCtx ->
-              Splices.pandocSplice renderCtx ctxDoc
+            let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+            withInlineCtx $ \ctx ->
+              Splices.pandocSplice ctx ctxDoc
     "ema:note:pandoc"
-      ## Renderer.noteSpliceWith noteRenderers classRules emaAction model note
+      ## withBlockCtx
+      $ \ctx ->
+        Splices.pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
