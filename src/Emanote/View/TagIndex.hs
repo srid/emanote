@@ -17,7 +17,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
-import Emanote.View.Common (commonSplices, getRouteContexts, inlineNoteRenderers)
+import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta)
 import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import qualified Heist.Extra.TemplateState as Tmpl
@@ -78,9 +78,9 @@ mkTagIndex model tagPath' =
 renderTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
 renderTagIndex emaAction model tagPath = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = getRouteContexts emaAction model meta
+      withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
-        withNoteRenderer inlineNoteRenderers () ()
+        withNoteRenderer inlineRenderers () ()
       tagIdx = mkTagIndex model tagPath
   flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx

@@ -6,7 +6,6 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
-import Data.Aeson (Value)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import Data.WorldPeace.Union
@@ -21,12 +20,11 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
-import qualified Emanote.Pandoc.Renderer as Renderer
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, getRouteContexts, inlineNoteRenderers, noteRenderers)
+import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, noteRenderers)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
@@ -80,9 +78,9 @@ renderVirtualRoute emaAction m =
 renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
 renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = getRouteContexts emaAction model meta
+      withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
-        withNoteRenderer inlineNoteRenderers () ()
+        withNoteRenderer inlineRenderers () ()
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
@@ -91,9 +89,9 @@ renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMeta r model
-      withNoteRenderer = getRouteContexts emaAction model meta
+      withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
-        withNoteRenderer inlineNoteRenderers () ()
+        withNoteRenderer inlineRenderers () ()
       withBlockCtx =
         withNoteRenderer noteRenderers () r
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta

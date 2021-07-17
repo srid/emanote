@@ -19,9 +19,7 @@ where
 
 import Data.Aeson (ToJSON)
 import qualified Emanote.Route as R
-import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as HP
-import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
@@ -84,10 +82,6 @@ titleSplice ctx f = \case
   TitlePandoc is -> do
     let titleDoc = B.Pandoc mempty $ one $ B.Plain $ f is
     HP.pandocSplice ctx titleDoc
-
-_mkEmptyRenderCtx :: (Monad m, Monad n) => HeistT n m (HP.RenderCtx n)
-_mkEmptyRenderCtx =
-  HP.mkRenderCtx mempty (const . const $ Nothing) (const . const $ Nothing)
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
 titleSpliceNoHtml =

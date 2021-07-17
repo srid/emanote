@@ -25,7 +25,7 @@ import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Json as HJ
 import qualified Text.Pandoc.Definition as B
 
-queryResolvingSplice :: forall n i b. Monad n => PandocBlockRenderer n i LMLRoute
+queryResolvingSplice :: forall n i. Monad n => PandocBlockRenderer n i LMLRoute
 queryResolvingSplice _emaAction model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)
