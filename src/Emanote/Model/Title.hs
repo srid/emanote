@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Title
@@ -24,6 +25,7 @@ import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
+import qualified Text.Pandoc.Walk as W
 
 data Title
   = TitlePlain Text
@@ -69,12 +71,18 @@ toPlain = \case
   TitlePlain s -> s
   TitlePandoc is -> plainify is
 
-titleSplice :: Monad n => HP.RenderCtx n -> (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
+titleSplice ::
+  forall b n.
+  (Monad n, W.Walkable B.Inline b, b ~ [B.Inline]) =>
+  HP.RenderCtx n ->
+  (b -> b) ->
+  Title ->
+  HI.Splice n
 titleSplice ctx f = \case
   TitlePlain x ->
     HI.textSplice x
   TitlePandoc is -> do
-    let titleDoc = f $ B.Pandoc mempty $ one $ B.Plain is
+    let titleDoc = B.Pandoc mempty $ one $ B.Plain $ f is
     HP.pandocSplice ctx titleDoc
 
 _mkEmptyRenderCtx :: (Monad m, Monad n) => HeistT n m (HP.RenderCtx n)
