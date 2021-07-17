@@ -4,9 +4,9 @@
 
 module Emanote.View.Common
   ( commonSplices,
+    mkRendererFromMeta,
     noteRenderers,
-    getRouteContexts,
-    inlineNoteRenderers,
+    inlineRenderers,
   )
 where
 
@@ -19,7 +19,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
-import Emanote.Pandoc.Renderer (NoteRenderers (..), PandocInlineRenderer)
+import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers (..))
 import qualified Emanote.Pandoc.Renderer as Renderer
 import qualified Emanote.Pandoc.Renderer.Embed as PF
 import qualified Emanote.Pandoc.Renderer.Query as PF
@@ -39,55 +39,32 @@ import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Renderer.XmlHtml as RX
 
--- | Custom renderers for Pandoc notes
---
--- Configure the default Pandoc splices here.
-noteRenderers :: Monad n => NoteRenderers n i LMLRoute
+noteRenderers :: Monad n => PandocRenderers n i LMLRoute
 noteRenderers =
-  NoteRenderers
-    pandocInlineRenderers
-    [ PF.embedWikiLinkResolvingSplice,
-      PF.queryResolvingSplice
-    ]
+  PandocRenderers
+    _pandocInlineRenderers
+    _pandocBlockRenderers
 
 -- | Like `noteRenderers` but for use in inline contexts.
-inlineNoteRenderers :: Monad n => NoteRenderers n i b
-inlineNoteRenderers =
-  NoteRenderers
-    pandocInlineRenderers
-    -- Remove block filters, in render contexts where we expect to show inline
-    -- content (eg: backlinks and titles)
+--
+-- Backlinks and titles constitute an example of inline context, where we don't
+-- care about block elements.
+inlineRenderers :: Monad n => PandocRenderers n i b
+inlineRenderers =
+  PandocRenderers
+    _pandocInlineRenderers
     mempty
 
-pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
-pandocInlineRenderers =
+_pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
+_pandocInlineRenderers =
   [ PF.urlResolvingSplice
   ]
 
-getRouteContexts ::
-  (Monad m, Monad n) =>
-  Ema.CLI.Action ->
-  Model ->
-  Aeson.Value ->
-  ( Renderer.NoteRenderers n i b ->
-    i ->
-    b ->
-    (RenderCtx n -> H.HeistT n m x) ->
-    H.HeistT n m x
-  )
-getRouteContexts emaAction model meta =
-  let classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) meta
-      withNoteRenderer nr i b f = do
-        renderCtx <-
-          Renderer.mkRenderCtxWithNoteRenderers
-            nr
-            classRules
-            emaAction
-            model
-            i
-            b
-        f renderCtx
-   in withNoteRenderer
+_pandocBlockRenderers :: Monad n => [PandocBlockRenderer n i LMLRoute]
+_pandocBlockRenderers =
+  [ PF.embedWikiLinkResolvingSplice,
+    PF.queryResolvingSplice
+  ]
 
 commonSplices ::
   Monad n =>
@@ -141,3 +118,47 @@ commonSplices withCtx emaAction model meta routeTitle = do
         ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
+
+-- | Given a route metadata, return the context generating function that can be
+-- used to render an arbitrary Pandoc AST
+--
+-- The returned function allows specifing a `PandocRenderers` type, along with
+-- the associated data arguments.
+mkRendererFromMeta ::
+  (Monad m, Monad n) =>
+  Ema.CLI.Action ->
+  Model ->
+  Aeson.Value ->
+  ( PandocRenderers n i b ->
+    i ->
+    b ->
+    (RenderCtx n -> H.HeistT n m x) ->
+    H.HeistT n m x
+  )
+mkRendererFromMeta emaAction model routeMeta =
+  let classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) routeMeta
+   in mkRendererWith emaAction model classRules
+
+mkRendererWith ::
+  (Monad m, Monad n) =>
+  Ema.CLI.Action ->
+  Model ->
+  Map Text Text ->
+  ( PandocRenderers n i b ->
+    i ->
+    b ->
+    (RenderCtx n -> H.HeistT n m x) ->
+    H.HeistT n m x
+  )
+mkRendererWith emaAction model classRules =
+  let withNoteRenderer nr i b f = do
+        renderCtx <-
+          Renderer.mkRenderCtxWithPandocRenderers
+            nr
+            classRules
+            emaAction
+            model
+            i
+            b
+        f renderCtx
+   in withNoteRenderer
