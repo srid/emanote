@@ -21,6 +21,9 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer
+  ( NoteRenderers (NoteRenderers, noteBlockRenderers),
+  )
+import qualified Emanote.Pandoc.Renderer as Renderer
 import qualified Emanote.Pandoc.Renderer.Embed as PF
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Pandoc.Renderer.Url as PF
@@ -32,6 +35,7 @@ import Emanote.View.Common (commonSplices)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
+import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
@@ -97,6 +101,9 @@ renderLmlHtml emaAction model note = do
           [ PF.embedWikiLinkResolvingSplice,
             PF.queryResolvingSplice
           ]
+      -- Remove block filters, in render contexts where we expect to show inline
+      -- content (eg: backlinks and titles)
+      inlineNoteRenderers = noteRenderers {noteBlockRenderers = mempty}
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices emaAction model meta pageTitle
     let titleSplice = Tit.titleSplice $ preparePandoc model
@@ -113,16 +120,17 @@ renderLmlHtml emaAction model note = do
     "ema:note:backlinks"
       ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
       $ \(source, ctx) -> do
-        let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
-            -- Remove block filters, as we expect backlinks section to be compact and brief.
-            ctxNoteRenderers = noteRenderers {noteBlockRenderers = mempty}
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
         "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
         "backlink:note:context"
-          ## pandocSpliceWith ctxNoteRenderers classRules emaAction model (MN._noteRoute note) ctxDoc
+          ## do
+            let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr ctx
+            renderCtx <-
+              Renderer.mkRenderCtxWithNoteRenderers inlineNoteRenderers classRules emaAction model (MN._noteRoute note)
+            Splices.pandocSplice renderCtx ctxDoc
     "ema:note:pandoc"
-      ## noteSpliceWith noteRenderers classRules emaAction model note
+      ## Renderer.noteSpliceWith noteRenderers classRules emaAction model note
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice :: Monad n => Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice n)

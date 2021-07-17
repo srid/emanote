@@ -4,8 +4,8 @@ module Emanote.Pandoc.Renderer
   ( NoteRenderers (..),
     PandocInlineRenderer,
     PandocBlockRenderer,
-    pandocSpliceWith,
     noteSpliceWith,
+    mkRenderCtxWithNoteRenderers,
   )
 where
 
@@ -70,19 +70,6 @@ mkRenderCtxWithNoteRenderers nf@NoteRenderers {..} classRules emaAction model x 
             f emaAction model nf ctx x blk
     )
 
-pandocSpliceWith ::
-  Monad n =>
-  NoteRenderers n ->
-  Map Text Text ->
-  Ema.CLI.Action ->
-  Model ->
-  LMLRoute ->
-  B.Pandoc ->
-  HI.Splice n
-pandocSpliceWith nr classRules emaAction model x doc = do
-  ctx <- mkRenderCtxWithNoteRenderers nr classRules emaAction model x
-  Splices.pandocSplice ctx doc
-
 -- | Like `pandocSpliceWith` but when it is known that we are rendering a `Note`
 --
 -- The note will be processed ahead using `prepareNoteDoc`.
@@ -98,3 +85,16 @@ noteSpliceWith nr rules act model note =
   pandocSpliceWith nr rules act model (MN._noteRoute note) $
     prepareNoteDoc model $
       MN._noteDoc note
+
+pandocSpliceWith ::
+  Monad n =>
+  NoteRenderers n ->
+  Map Text Text ->
+  Ema.CLI.Action ->
+  Model ->
+  LMLRoute ->
+  B.Pandoc ->
+  HI.Splice n
+pandocSpliceWith nr classRules emaAction model x doc = do
+  ctx <- mkRenderCtxWithNoteRenderers nr classRules emaAction model x
+  Splices.pandocSplice ctx doc
