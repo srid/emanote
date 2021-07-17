@@ -28,7 +28,7 @@ import qualified Text.Pandoc.Definition as B
 
 -- | Resolve all URLs in inlines (<a> and <img>)
 urlResolvingSplice ::
-  Monad n => PandocInlineRenderer n i b x
+  Monad n => PandocInlineRenderer n i b
 urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
   case inl of
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do

@@ -24,7 +24,7 @@ import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
 embedWikiLinkResolvingSplice ::
-  Monad n => PandocBlockRenderer n i b x
+  Monad n => PandocBlockRenderer n i b
 embedWikiLinkResolvingSplice _emaAction model _nf (ctxSansCustomSplicing -> ctx) _ blk =
   case blk of
     B.Para [B.Link (_id, _class, otherAttrs) _is (url, tit)] -> do
