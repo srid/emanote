@@ -3,6 +3,7 @@
 module Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     mkRenderCtx,
+    emptyRenderCtx,
     rewriteClass,
     ctxSansCustomSplicing,
     concatSpliceFunc,
@@ -18,7 +19,9 @@ import qualified Text.Pandoc.Builder as B
 import qualified Text.XmlHtml as X
 
 data RenderCtx n = RenderCtx
-  { rootNode :: X.Node,
+  { -- The XML node which contains individual AST rendering definitions
+    -- This corresponds to pandoc.tpl
+    rootNode :: Maybe X.Node,
     -- Attributes for a given AST node.
     bAttr :: B.Block -> B.Attr,
     iAttr :: B.Inline -> B.Attr,
@@ -57,13 +60,17 @@ mkRenderCtxWith ::
 mkRenderCtxWith node classMap bS iS = do
   let ctx =
         RenderCtx
-          node
+          (Just node)
           (blockLookupAttr node)
           (inlineLookupAttr node)
           classMap
           (bS ctx)
           (iS ctx)
    in ctx
+
+emptyRenderCtx :: RenderCtx n
+emptyRenderCtx =
+  RenderCtx Nothing (const B.nullAttr) (const B.nullAttr) mempty (const Nothing) (const Nothing)
 
 -- | Strip any custom splicing out of the given render context
 ctxSansCustomSplicing :: RenderCtx n -> RenderCtx n

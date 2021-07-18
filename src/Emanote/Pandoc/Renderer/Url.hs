@@ -1,5 +1,6 @@
 module Emanote.Pandoc.Renderer.Url
   ( urlResolvingSplice,
+    plainifyWikiLinkSplice,
     brokenLinkAttr,
     resolveWikiLinkMustExist,
   )
@@ -27,8 +28,7 @@ import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import qualified Text.Pandoc.Definition as B
 
 -- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice ::
-  Monad n => PandocInlineRenderer n x
+urlResolvingSplice :: Monad n => PandocInlineRenderer n i b
 urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
   case inl of
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
@@ -64,6 +64,11 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
     brokenLinkSpanWrapper err inline =
       HP.rpInline ctx $
         B.Span (brokenLinkAttr err) $ one inline
+
+plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer n i b
+plainifyWikiLinkSplice _emaAction _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
+  wl <- WL.inlineToWikiLink inl
+  pure $ HP.rpInline ctx $ B.Str $ show wl
 
 brokenLinkAttr :: Text -> B.Attr
 brokenLinkAttr err =

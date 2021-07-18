@@ -40,6 +40,10 @@ data Model = Model
     _modelRels :: IxRel,
     _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
+    -- TODO: Avoid incremental building (which is complex), and compute this on
+    -- demand like `modelTags`? Use memoization to avoid repeat computation if
+    -- model hasn't changed. NOTE: Recomputation on single-file change will be
+    -- O(n), so maybe this is not a good idea.
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }

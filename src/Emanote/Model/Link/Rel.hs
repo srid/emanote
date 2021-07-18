@@ -12,13 +12,11 @@ import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute.Type as SR
-import qualified Network.URI.Encode as UE
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 
@@ -79,21 +77,9 @@ unresolvedRelsTo r =
 -- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
 parseUnresolvedRelTarget attrs url = do
-  -- Let absolute URLs pass through
-  guard $ not $ "://" `T.isInfixOf` url
-  -- URLs with anchors are ignored (such as in -/tags#foo).
-  guard $ not $ "#" `T.isInfixOf` url
-  wikiLink <|> hyperLinks
-  where
-    wikiLink =
-      fmap URTWikiLink (WL.mkWikiLinkFromUrlAndAttrs attrs url)
-    hyperLinks = do
-      -- Avoid links like "mailto:", "magnet:", etc.
-      -- An easy way to parse them is to look for colon character.
-      --
-      -- This does mean that "Foo: Bar.md" cannot be linked to this way, however
-      -- the user can do it using wiki-links.
-      guard $ not $ ":" `T.isInfixOf` url
-      let fp = UE.decode (toString url)
+  WL.delineateLink attrs url >>= \case
+    Left wl ->
+      pure $ URTWikiLink wl
+    Right fp ->
       fmap URTVirtual (SR.decodeVirtualRoute fp)
         <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
