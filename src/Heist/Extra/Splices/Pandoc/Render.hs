@@ -280,6 +280,8 @@ plainify = W.query $ \case
   B.SoftBreak -> " "
   B.LineBreak -> " "
   B.RawInline _fmt s -> s
+  -- Ignore "wrapper" inlines like span.
+  B.Span _ _ -> ""
   -- TODO: How to wrap math stuff here?
   B.Math _mathTyp s -> s
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
