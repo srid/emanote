@@ -1,7 +1,4 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Heist.Extra.Splices.Pandoc.Render
   ( renderPandocWith,
@@ -279,13 +276,16 @@ plainify = W.query $ \case
   B.Space -> " "
   B.SoftBreak -> " "
   B.LineBreak -> " "
+  -- TODO: if fmt is html, we should strip the html tags
   B.RawInline _fmt s -> s
   -- Ignore "wrapper" inlines like span.
   B.Span _ _ -> ""
   -- TODO: How to wrap math stuff here?
   B.Math _mathTyp s -> s
-  -- Ignore the rest of AST nodes, as they are recursively defined in terms of
-  -- `Inline` which `W.query` will traverse again.
+  -- Wiki-links must be displayed using its show instance (which returns its
+  -- human-readable representation)
   (WL.inlineToWikiLink -> Just wl) ->
     show wl
+  -- Ignore the rest of AST nodes, as they are recursively defined in terms of
+  -- `Inline` which `W.query` will traverse again.
   _ -> "?"

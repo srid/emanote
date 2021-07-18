@@ -25,7 +25,7 @@ import qualified Text.Pandoc.Definition as B
 
 embedWikiLinkResolvingSplice ::
   Monad n => PandocBlockRenderer n i b
-embedWikiLinkResolvingSplice _emaAction model _nf (ctxSansCustomSplicing -> ctx) _ blk =
+embedWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
   case blk of
     B.Para [B.Link (_id, _class, otherAttrs) _is (url, tit)] -> do
       Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
@@ -39,7 +39,7 @@ embedWikiLinkResolvingSplice _emaAction model _nf (ctxSansCustomSplicing -> ctx)
       Nothing
   where
     brokenLinkDivWrapper err block =
-      HP.rpBlock ctx $
+      HP.rpBlock (ctxSansCustomSplicing ctx) $
         B.Div (Url.brokenLinkAttr err) $
           one block
 
