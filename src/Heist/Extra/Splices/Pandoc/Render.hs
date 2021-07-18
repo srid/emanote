@@ -15,6 +15,7 @@ where
 
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
+import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Heist as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
@@ -283,4 +284,6 @@ plainify = W.query $ \case
   B.Math _mathTyp s -> s
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
   -- `Inline` which `W.query` will traverse again.
+  (WL.inlineToWikiLink -> Just wl) ->
+    show wl
   _ -> ""

@@ -7,6 +7,7 @@ module Emanote.View.Common
     mkRendererFromMeta,
     noteRenderers,
     inlineRenderers,
+    linkInlineRenderers,
   )
 where
 
@@ -55,10 +56,28 @@ inlineRenderers =
     _pandocInlineRenderers
     mempty
 
+-- | Like `inlineRenderers` but suitable for use inside links (<a> tags).
+linkInlineRenderers :: Monad n => PandocRenderers n i b
+linkInlineRenderers =
+  PandocRenderers
+    _pandocLinkInlineRenderers
+    mempty
+
 _pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
 _pandocInlineRenderers =
   [ PF.urlResolvingSplice
   ]
+    <> _pandocInlineRenderersCommon
+
+_pandocLinkInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
+_pandocLinkInlineRenderers =
+  [ PF.plainifyWikiLinkSplice
+  ]
+    <> _pandocInlineRenderersCommon
+
+_pandocInlineRenderersCommon :: Monad n => [PandocInlineRenderer n i b]
+_pandocInlineRenderersCommon =
+  []
 
 _pandocBlockRenderers :: Monad n => [PandocBlockRenderer n i LMLRoute]
 _pandocBlockRenderers =
