@@ -32,7 +32,7 @@ renderFootnotesWith :: forall n. Monad n => RenderCtx n -> Footnotes -> HI.Splic
 renderFootnotesWith ctx fs' =
   fromMaybe (pure []) $ do
     fs <- toList <$> nonEmpty fs'
-    renderNode <- fmap head . nonEmpty $ X.childElementsTag "Note:List" (rootNode ctx)
+    renderNode <- fmap head . nonEmpty $ maybe [] (X.childElementsTag "Note:List") $ rootNode ctx
     let footnotesWithIdx = zip [1 :: Int ..] fs
     Just $
       runCustomNode renderNode $ do
@@ -55,7 +55,7 @@ footnoteRefSplice :: Monad n => RenderCtx n -> [[B.Block]] -> B.Inline -> Maybe 
 footnoteRefSplice ctx footnotes inline = do
   B.Note bs <- pure inline
   let idx = lookupFootnote bs footnotes
-  renderNode <- fmap head . nonEmpty $ X.childElementsTag "Note:Ref" (rootNode ctx)
+  renderNode <- fmap head . nonEmpty $ maybe [] (X.childElementsTag "Note:Ref") (rootNode ctx)
   Just $
     runCustomNode renderNode $
       footnoteSplices ctx idx bs

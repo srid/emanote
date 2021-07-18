@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Title
@@ -19,10 +20,10 @@ where
 import Data.Aeson (ToJSON)
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
-import qualified Heist.Extra.Splices.Pandoc.Ctx as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
+import qualified Text.Pandoc.Walk as W
 
 data Title
   = TitlePlain Text
@@ -68,18 +69,19 @@ toPlain = \case
   TitlePlain s -> s
   TitlePandoc is -> plainify is
 
-titleSplice :: Monad n => (B.Pandoc -> B.Pandoc) -> Title -> HI.Splice n
-titleSplice f = \case
+titleSplice ::
+  forall b n.
+  (Monad n, W.Walkable B.Inline b, b ~ [B.Inline]) =>
+  HP.RenderCtx n ->
+  (b -> b) ->
+  Title ->
+  HI.Splice n
+titleSplice ctx f = \case
   TitlePlain x ->
     HI.textSplice x
   TitlePandoc is -> do
-    let titleDoc = f $ B.Pandoc mempty $ one $ B.Plain is
-    ctx <- mkEmptyRenderCtx
+    let titleDoc = B.Pandoc mempty $ one $ B.Plain $ f is
     HP.pandocSplice ctx titleDoc
-  where
-    -- TODO: We probably *do* want inline splicing here, and classMap here.
-    mkEmptyRenderCtx =
-      HP.mkRenderCtx mempty (const . const $ Nothing) (const . const $ Nothing)
 
 titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
 titleSpliceNoHtml =
