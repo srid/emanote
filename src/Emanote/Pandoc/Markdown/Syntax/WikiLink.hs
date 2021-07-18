@@ -9,7 +9,8 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink,
     WikiLinkType (..),
     wikilinkSpec,
-    mkWikiLinkFromUrlAndAttrs,
+    delineateLink,
+    inlineToWikiLink,
     allowedWikiLinks,
   )
 where
@@ -25,6 +26,7 @@ import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
 import Emanote.Route (ModelRoute, R (unRoute), lmlRouteCase, modelRouteCase)
+import qualified Network.URI.Encode as UE
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P
@@ -42,16 +44,42 @@ instance Show WikiLink where
   show (toList . fmap unSlug . unWikiLink -> slugs) =
     toString $ "[[" <> T.intercalate "/" slugs <> "]]"
 
-mkWikiLinkFromUrlAndAttrs :: [(Text, Text)] -> Text -> Maybe (WikiLinkType, WikiLink)
-mkWikiLinkFromUrlAndAttrs (Map.fromList -> attrs) s = do
-  wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
-  wl <- mkWikiLinkFromUrl s
-  pure (wlType, wl)
+-- | Given a Pandoc Link node, apparaise what kind of link it is.
+--
+-- * Nothing, if the link is an absolute URL
+-- * Just (Left wl), if a wiki-link
+-- * Just (Right fp), if a relative path (not a wiki-link)
+delineateLink :: [(Text, Text)] -> Text -> Maybe (Either (WikiLinkType, WikiLink) FilePath)
+delineateLink (Map.fromList -> attrs) url = do
+  -- Let absolute URLs pass through
+  guard $ not $ "://" `T.isInfixOf` url
+  -- URLs with anchors are ignored (such as in -/tags#foo).
+  guard $ not $ "#" `T.isInfixOf` url
+  fmap Left wikiLink <|> fmap Right hyperLinks
   where
-    mkWikiLinkFromUrl :: Text -> Maybe WikiLink
-    mkWikiLinkFromUrl url = do
-      slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" url
-      pure $ WikiLink slugs
+    wikiLink = do
+      wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
+      wl <- mkWikiLinkFromUrl url
+      pure (wlType, wl)
+      where
+        mkWikiLinkFromUrl :: Text -> Maybe WikiLink
+        mkWikiLinkFromUrl s = do
+          slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
+          pure $ WikiLink slugs
+    hyperLinks = do
+      -- Avoid links like "mailto:", "magnet:", etc.
+      -- An easy way to parse them is to look for colon character.
+      --
+      -- This does mean that "Foo: Bar.md" cannot be linked to this way, however
+      -- the user can do it using wiki-links.
+      guard $ not $ ":" `T.isInfixOf` url
+      pure $ UE.decode (toString url)
+
+inlineToWikiLink :: B.Inline -> Maybe WikiLink
+inlineToWikiLink inl = do
+  B.Link (_id, _class, otherAttrs) _is (url, tit) <- pure inl
+  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
+  pure wl
 
 -- | Return the various ways to link to this markdown route
 --

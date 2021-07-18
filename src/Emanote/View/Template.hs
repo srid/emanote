@@ -24,7 +24,7 @@ import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, noteRenderers)
+import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
@@ -80,7 +80,7 @@ renderSRIndex emaAction model = do
   let meta = Meta.getIndexYamlMeta model
       withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
-        withNoteRenderer inlineRenderers () ()
+        withNoteRenderer linkInlineRenderers () ()
   flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
@@ -92,16 +92,19 @@ renderLmlHtml emaAction model note = do
       withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
+      withLinkInlineCtx =
+        withNoteRenderer linkInlineRenderers () ()
       withBlockCtx =
         withNoteRenderer noteRenderers () r
       templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       pageTitle = M.modelLookupTitle r model
   flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
-    commonSplices withInlineCtx emaAction model meta pageTitle
-    let titleSplice titleDoc = withInlineCtx $ \x ->
+    commonSplices withLinkInlineCtx emaAction model meta pageTitle
+    -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
+    let titleSplice titleDoc = withLinkInlineCtx $ \x ->
           Tit.titleSplice x (preparePandoc model) titleDoc
     -- Sidebar navigation
-    routeTreeSplice withInlineCtx (Just r) model
+    routeTreeSplice withLinkInlineCtx (Just r) model
     "ema:breadcrumbs"
       ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
       $ \(R.liftLMLRoute -> crumbR) -> do
