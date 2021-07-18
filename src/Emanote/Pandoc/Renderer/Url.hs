@@ -26,6 +26,7 @@ import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import qualified Text.Pandoc.Definition as B
+import qualified Text.Pandoc.Walk as W
 
 -- | Resolve all URLs in inlines (<a> and <img>)
 urlResolvingSplice :: Monad n => PandocInlineRenderer n i b
@@ -70,6 +71,12 @@ plainifyWikiLinkSplice _emaAction _model _nf (ctxSansCustomSplicing -> ctx) _ in
   wl <- WL.inlineToWikiLink inl
   pure $ HP.rpInline ctx $ B.Str $ show wl
 
+inlinesWithWikiLinksPlainified :: [B.Inline] -> [B.Inline]
+inlinesWithWikiLinksPlainified = W.walk $ \case
+  (WL.inlineToWikiLink -> Just wl) ->
+    B.Str (show wl)
+  x -> x
+
 brokenLinkAttr :: Text -> B.Attr
 brokenLinkAttr err =
   ("", ["emanote:broken-link"], [("title", err)])
@@ -81,7 +88,7 @@ replaceLinkNodeWithRoute ::
   ([B.Inline], Text) ->
   ([B.Inline], Text)
 replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
-  ( nonEmptyLinkInlines model url (Just r) inner,
+  ( inlinesWithWikiLinksPlainified $ nonEmptyLinkInlines model url (Just r) inner,
     foldUrlTime (SR.siteRouteUrl model r) mTime
   )
   where
