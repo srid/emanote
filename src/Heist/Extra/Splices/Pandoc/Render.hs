@@ -286,4 +286,4 @@ plainify = W.query $ \case
   -- `Inline` which `W.query` will traverse again.
   (WL.inlineToWikiLink -> Just wl) ->
     show wl
-  _ -> ""
+  _ -> "?"
