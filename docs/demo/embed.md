@@ -28,6 +28,8 @@ Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](pa
 
 ![[disaster-girl.jpg]]
 
+It is also posible to add images inline (example, here's the site favicon: [![[favicon.svg]]]{.w-6}) say in the middle of a paragraph.
+
 ### Videos
 
 The following is the result of using `![[death-note.mp4]]`.

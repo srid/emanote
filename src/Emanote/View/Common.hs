@@ -65,7 +65,8 @@ linkInlineRenderers =
 
 _pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
 _pandocInlineRenderers =
-  [ PF.urlResolvingSplice
+  [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+    PF.urlResolvingSplice
   ]
     <> _pandocInlineRenderersCommon
 
@@ -81,7 +82,7 @@ _pandocInlineRenderersCommon =
 
 _pandocBlockRenderers :: Monad n => [PandocBlockRenderer n i LMLRoute]
 _pandocBlockRenderers =
-  [ PF.embedWikiLinkResolvingSplice,
+  [ PF.embedBlockWikiLinkResolvingSplice,
     PF.queryResolvingSplice
   ]
 
