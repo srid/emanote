@@ -24,7 +24,6 @@ import qualified Heist as H
 import qualified Heist.Extra as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice)
 import qualified Heist.Extra.Splices.Pandoc as HP
-import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -38,7 +37,7 @@ embedBlockWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
       case Url.resolveWikiLinkMustExist model wl of
         Left err -> do
           let brokenLink = BrokenLink_Block attr is (url, tit)
-          pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
+          pure $ renderBrokenLink ctx err brokenLink
         Right res -> do
           embedBlockSiteRoute model ctx res
     _ ->
@@ -52,7 +51,7 @@ embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ inl = case inl of
     case Url.resolveWikiLinkMustExist model wl of
       Left err -> do
         let brokenLink = BrokenLink_Inline attr is (url, tit)
-        pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
+        pure $ renderBrokenLink ctx err brokenLink
       Right res -> do
         embedInlineSiteRoute wl res
   _ -> Nothing
