@@ -288,4 +288,4 @@ plainify = W.query $ \case
     show wl
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
   -- `Inline` which `W.query` will traverse again.
-  _ -> "?"
+  _ -> ""
