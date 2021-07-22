@@ -1,7 +1,6 @@
 module Emanote.Pandoc.Renderer.Url
   ( urlResolvingSplice,
     plainifyWikiLinkSplice,
-    brokenLinkAttr,
     resolveWikiLinkMustExist,
   )
 where
@@ -20,6 +19,11 @@ import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
+import Emanote.Pandoc.Renderer.BrokenLink
+  ( BrokenLink (BrokenLink_Inline),
+    nonEmptyInlines,
+    renderBrokenLink,
+  )
 import Emanote.Prelude (h)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
@@ -35,36 +39,26 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case resolveUnresolvedRelTarget model uRel of
-        Left err ->
-          pure $
-            brokenLinkSpanWrapper err $
-              B.Link attr (nonEmptyLinkInlines model url Nothing is) (url, tit)
+        Left err -> do
+          let brokenLink = BrokenLink_Inline attr is (url, tit)
+          pure $ renderBrokenLink ctx err brokenLink
         Right sr -> do
           -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
           -- in B.Para (so do this in block-level custom splice), then embed it.
           -- We don't do this here, as this inline splice can't embed block elements.
           let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
           pure $ HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
-    B.Image attr@(id', class', otherAttrs) is' (url, tit) -> do
-      let is = imageInlineFallback url is'
+    B.Image attr@(_, _, otherAttrs) is (url, tit) -> do
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case resolveUnresolvedRelTarget model uRel of
-        Left err ->
-          pure $
-            brokenLinkSpanWrapper err $
-              B.Image (id', class', otherAttrs) is (url, tit)
+        Left err -> do
+          let brokenLink = BrokenLink_Inline attr is (url, tit)
+          pure $ renderBrokenLink ctx err brokenLink
         Right sr -> do
-          let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
+          let (newIs, newUrl) =
+                replaceLinkNodeWithRoute emaAction model sr (toList $ nonEmptyInlines url is, url)
           pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
     _ -> Nothing
-  where
-    -- Fallback to filename if no "alt" text is specified
-    imageInlineFallback fn = \case
-      [] -> one $ B.Str fn
-      x -> x
-    brokenLinkSpanWrapper err inline =
-      HP.rpInline ctx $
-        B.Span (brokenLinkAttr err) $ one inline
 
 plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer n i b
 plainifyWikiLinkSplice _emaAction _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
@@ -76,10 +70,6 @@ inlinesWithWikiLinksPlainified = W.walk $ \case
   (WL.inlineToWikiLink -> Just wl) ->
     B.Str (show wl)
   x -> x
-
-brokenLinkAttr :: Text -> B.Attr
-brokenLinkAttr err =
-  ("", ["emanote:broken-link"], [("title", err)])
 
 replaceLinkNodeWithRoute ::
   Ema.CLI.Action ->
@@ -108,8 +98,10 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
 nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
 nonEmptyLinkInlines model url mr = \case
   [] ->
-    fromMaybe [B.Str url] $
-      siteRouteDefaultInnerText model url =<< mr
+    toList $
+      nonEmptyInlines url $
+        fromMaybe [] $
+          siteRouteDefaultInnerText model url =<< mr
   x -> x
 
 siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
