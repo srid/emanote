@@ -28,37 +28,30 @@ embedBlockWikiLinkResolvingSplice ::
   Monad n => PandocBlockRenderer n i b
 embedBlockWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
   case blk of
-    B.Para [B.Link (_id, _class, otherAttrs) _is (url, tit)] -> do
+    B.Para [B.Link attr@(_id, _class, otherAttrs) is (url, tit)] -> do
       Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
         Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case Url.resolveWikiLinkMustExist model wl of
-        Left err ->
-          pure $ brokenLinkDivWrapper (ctxSansCustomSplicing ctx) err blk
+        Left err -> do
+          let brokenLink = BrokenLink_Block attr is (url, tit)
+          pure $ renderBrokenLink model (ctxSansCustomSplicing ctx) err brokenLink
         Right res -> do
           embedBlockSiteRoute model ctx res
     _ ->
       Nothing
-  where
-    brokenLinkDivWrapper ctx' err block =
-      HP.rpBlock ctx' $
-        B.Div (Url.brokenLinkAttr err) $
-          one block
 
 embedInlineWikiLinkResolvingSplice ::
   Monad n => PandocInlineRenderer n i b
-embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ = \case
+embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ inl = case inl of
   B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
     Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
     case Url.resolveWikiLinkMustExist model wl of
-      Left err ->
-        pure $ brokenLinkSpanWrapper (ctxSansCustomSplicing ctx) err $ B.Link attr (Url.nonEmptyLinkInlines model url Nothing is) (url, tit)
+      Left err -> do
+        let brokenLink = BrokenLink_Inline attr is (url, tit)
+        pure $ renderBrokenLink model (ctxSansCustomSplicing ctx) err brokenLink
       Right res -> do
         embedInlineSiteRoute wl res
   _ -> Nothing
-  where
-    brokenLinkSpanWrapper ctx' err inline =
-      HP.rpInline ctx' $
-        B.Span (Url.brokenLinkAttr err) $ one inline
 
 embedBlockSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
 embedBlockSiteRoute model ctx = either (embedResourceRoute model ctx) (const Nothing)
@@ -109,3 +102,24 @@ videoExts =
     ".webm",
     ".ogv"
   ]
+
+-- | Like Pandoc's `Link` node, but for denoting "broken" links.
+data BrokenLink
+  = BrokenLink_Block B.Attr [B.Inline] (Text, Text)
+  | BrokenLink_Inline B.Attr [B.Inline] (Text, Text)
+  deriving (Eq, Show)
+
+renderBrokenLink :: Monad n => Model -> HP.RenderCtx n -> Text -> BrokenLink -> HI.Splice n
+renderBrokenLink model ctx err = \case
+  BrokenLink_Block attr is x ->
+    HP.rpBlock ctx $
+      B.Div (Url.brokenLinkAttr err) $
+        one . B.Para . one $
+          B.Link attr (fixIs (fst x) is) x
+  BrokenLink_Inline attr is x ->
+    HP.rpInline ctx $
+      B.Span (Url.brokenLinkAttr err) $
+        one $ B.Link attr (fixIs (fst x) is) x
+  where
+    fixIs url is =
+      Url.nonEmptyLinkInlines model url Nothing is
