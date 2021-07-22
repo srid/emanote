@@ -1,6 +1,7 @@
 module Emanote.Pandoc.Renderer.BrokenLink (BrokenLink (..), renderBrokenLink, nonEmptyInlines) where
 
 import qualified Heist.Extra.Splices.Pandoc as HP
+import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 
@@ -10,8 +11,12 @@ data BrokenLink
   | BrokenLink_Inline B.Attr [B.Inline] (Text, Text)
   deriving (Eq, Show)
 
+-- | Render a broken link
+--
+-- Uses ctxSansCustomSplicing on the given context, so as to avoid recursing
+-- into custom splices that in turns calls this function
 renderBrokenLink :: Monad n => HP.RenderCtx n -> Text -> BrokenLink -> HI.Splice n
-renderBrokenLink ctx err = \case
+renderBrokenLink (ctxSansCustomSplicing -> ctx) err = \case
   BrokenLink_Block attr is x ->
     HP.rpBlock ctx $
       B.Div (brokenLinkAttr err) $

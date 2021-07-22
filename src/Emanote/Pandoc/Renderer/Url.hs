@@ -41,7 +41,7 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
       case resolveUnresolvedRelTarget model uRel of
         Left err -> do
           let brokenLink = BrokenLink_Inline attr is (url, tit)
-          pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
+          pure $ renderBrokenLink ctx err brokenLink
         Right sr -> do
           -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
           -- in B.Para (so do this in block-level custom splice), then embed it.
@@ -53,7 +53,7 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
       case resolveUnresolvedRelTarget model uRel of
         Left err -> do
           let brokenLink = BrokenLink_Inline attr is (url, tit)
-          pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
+          pure $ renderBrokenLink ctx err brokenLink
         Right sr -> do
           let (newIs, newUrl) =
                 replaceLinkNodeWithRoute emaAction model sr (toList $ nonEmptyInlines url is, url)
