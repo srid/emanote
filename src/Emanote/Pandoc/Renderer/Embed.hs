@@ -38,7 +38,7 @@ embedBlockWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
       case Url.resolveWikiLinkMustExist model wl of
         Left err -> do
           let brokenLink = BrokenLink_Block attr is (url, tit)
-          pure $ renderBrokenLink model (ctxSansCustomSplicing ctx) err brokenLink
+          pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
         Right res -> do
           embedBlockSiteRoute model ctx res
     _ ->
@@ -52,7 +52,7 @@ embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ inl = case inl of
     case Url.resolveWikiLinkMustExist model wl of
       Left err -> do
         let brokenLink = BrokenLink_Inline attr is (url, tit)
-        pure $ renderBrokenLink model (ctxSansCustomSplicing ctx) err brokenLink
+        pure $ renderBrokenLink (ctxSansCustomSplicing ctx) err brokenLink
       Right res -> do
         embedInlineSiteRoute wl res
   _ -> Nothing
