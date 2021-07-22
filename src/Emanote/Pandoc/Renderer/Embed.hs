@@ -33,14 +33,14 @@ embedBlockWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
         Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
       case Url.resolveWikiLinkMustExist model wl of
         Left err ->
-          pure $ brokenLinkDivWrapper err blk
+          pure $ brokenLinkDivWrapper (ctxSansCustomSplicing ctx) err blk
         Right res -> do
           embedBlockSiteRoute model ctx res
     _ ->
       Nothing
   where
-    brokenLinkDivWrapper err block =
-      HP.rpBlock (ctxSansCustomSplicing ctx) $
+    brokenLinkDivWrapper ctx' err block =
+      HP.rpBlock ctx' $
         B.Div (Url.brokenLinkAttr err) $
           one block
 
@@ -51,13 +51,13 @@ embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ = \case
     Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
     case Url.resolveWikiLinkMustExist model wl of
       Left err ->
-        pure $ brokenLinkSpanWrapper err $ B.Link attr (Url.nonEmptyLinkInlines model url Nothing is) (url, tit)
+        pure $ brokenLinkSpanWrapper (ctxSansCustomSplicing ctx) err $ B.Link attr (Url.nonEmptyLinkInlines model url Nothing is) (url, tit)
       Right res -> do
         embedInlineSiteRoute wl res
   _ -> Nothing
   where
-    brokenLinkSpanWrapper err inline =
-      HP.rpInline ctx $
+    brokenLinkSpanWrapper ctx' err inline =
+      HP.rpInline ctx' $
         B.Span (Url.brokenLinkAttr err) $ one inline
 
 embedBlockSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
