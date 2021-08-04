@@ -66,16 +66,11 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 Before tests (tasks impacting the larger architectural context in code base),
 
 - Zettelkasten / Graph considerations
-  - [ ] Incrementally build a graph of notes
-    - Really need it? Or can we do away with ixset + path finding traversal?
-    - [ ] First, prototype using traversal (+ z-index on /-/index)
-      - How to deal with >10,000 of notes when doing z-index?
-  - [ ] Reinstate Neuron UpTree 
-  - [ ] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
-  - [ ] Move tags/index links from sidebar to header (esp. if sidebar is gonna ignore folgezettel)
-    - Sidebar is dirtree only for following reasons
-      - It depends on route-level yaml config
-      - No need to incrementally build graph (less complex code)
+  - [ ] Incrementally build a graph of notes using [algebraic-graphs-patch](https://github.com/srid/emanote.obelisk/tree/master/lib/algebraic-graphs-patch)
+  - [ ] Using the graph, produce a folgezettel index (z-index) at `/-/folgezettel.html`
+  - [ ] Using the graph, reinstate neuron UpTree on top of each note
+  - [x] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
+  - [ ] UI considerations (re: dirtree vs folgezettel heterarchy)
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
