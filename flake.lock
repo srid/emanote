@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "algebraic-graphs-patch": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1628088175,
+        "narHash": "sha256-WZ74rbNngaUlKSonXxNwV2j+Zk050XzJ+SvG5jJZlMA=",
+        "owner": "srid",
+        "repo": "algebraic-graphs-patch",
+        "rev": "7cd49ffa6f75a86ed47d79f57531dd52b562a88f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "algebraic-graphs-patch",
+        "type": "github"
+      }
+    },
     "ema": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -134,6 +150,7 @@
     },
     "root": {
       "inputs": {
+        "algebraic-graphs-patch": "algebraic-graphs-patch",
         "ema": "ema",
         "flake-compat": "flake-compat_2",
         "flake-utils": "flake-utils_2",

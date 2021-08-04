@@ -20,6 +20,10 @@
       url = "github:srid/heist/emanote";
       flake = false;
     };
+    algebraic-graphs-patch = {
+      url = "github:srid/algebraic-graphs-patch";
+      flake = false;
+    };
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
@@ -44,6 +48,7 @@
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
               pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
+              algebraic-graphs-patch = self.callCabal2nix "algebraic-graphs-patch" inputs.algebraic-graphs-patch { };
               tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
               heist = dontCheck (self.callCabal2nix "heist" inputs.heist { });
               # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
