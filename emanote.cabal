@@ -35,6 +35,8 @@ executable emanote
   build-depends:
     , aeson
     , aeson-extra
+    , algebraic-graphs
+    , algebraic-graphs-patch
     , async
     , base
     , blaze-html
