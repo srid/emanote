@@ -163,12 +163,14 @@ backlinkRels r model =
    in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
 
 -- WIP https://github.com/srid/emanote/issues/25
+--
+-- TODO: Do breadth-first instead of depth-first
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest LMLRoute
 modelFolgezettelAncestorTree r0 model =
   fst $ flip runState mempty $ go r0
   where
     go :: MonadState (Set ModelRoute) m => ModelRoute -> m (Forest LMLRoute)
-    go (traceShowId -> r) = do
+    go r = do
       let folgezettelBacklinks =
             backlinkRels r model
               & filter (selectFolgezttel . (^. Rel.relTo))
@@ -176,7 +178,7 @@ modelFolgezettelAncestorTree r0 model =
           parentFolderRoute = do
             pr <- R.routeParent . R.lmlRouteCase =<< leftToMaybe (R.modelRouteCase r)
             -- guard $ pr /= R.indexRoute
-            pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ traceShowId $ pr
+            pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ pr
           folgezettelParents =
             folgezettelBacklinks
               <> maybeToList parentFolderRoute
