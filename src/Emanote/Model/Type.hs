@@ -165,16 +165,20 @@ backlinkRels r model =
 -- WIP https://github.com/srid/emanote/issues/25
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest LMLRoute
 modelFolgezettelAncestorTree r0 model =
-  go mempty r0
+  fst $ flip runState mempty $ go r0
   where
-    go :: Set ModelRoute -> ModelRoute -> Forest LMLRoute
-    go visited = \case
-      r | r `Set.member` visited -> mempty
-      r ->
-        backlinkRels r model & filter (selectFolgezttel . (^. Rel.relTo)) <&> \rel ->
-          let parentR = rel ^. Rel.relFrom
-              parentModelR = R.liftModelRoute . R.lmlRouteCase $ parentR
-           in Node parentR $ go (Set.insert r visited) parentModelR
+    go :: MonadState (Set ModelRoute) m => ModelRoute -> m (Forest LMLRoute)
+    go r = do
+      let backlinks = backlinkRels r model & filter (selectFolgezttel . (^. Rel.relTo))
+      fmap catMaybes . forM backlinks $ \rel -> do
+        let parentR = rel ^. Rel.relFrom
+            parentModelR = R.liftModelRoute . R.lmlRouteCase $ parentR
+        gets (parentModelR `Set.member`) >>= \case
+          True -> pure Nothing
+          False -> do
+            sub <- go parentModelR
+            modify $ Set.insert parentModelR
+            pure $ Just $ Node parentR sub
     selectFolgezttel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, _wl) ->
         True
