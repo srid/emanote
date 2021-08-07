@@ -15,6 +15,7 @@ import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
+import qualified Emanote.Model.Graph as G
 import Emanote.Model.Link.Rel (IxRel)
 import qualified Emanote.Model.Link.Rel as Rel
 import Emanote.Model.Note
@@ -40,10 +41,12 @@ data Model = Model
     _modelRels :: IxRel,
     _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
+    _modelGraph :: G.Graph,
     -- TODO: Avoid incremental building (which is complex), and compute this on
     -- demand like `modelTags`? Use memoization to avoid repeat computation if
     -- model hasn't changed. NOTE: Recomputation on single-file change will be
     -- O(n), so maybe this is not a good idea.
+    -- TODO: Should modelNav be removed in favour of inferring nav from modelGraph?
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -52,7 +55,7 @@ makeLenses ''Model
 
 emptyModel :: MonadIO m => m Model
 emptyModel =
-  Model Ix.empty Ix.empty Ix.empty mempty mempty
+  Model Ix.empty Ix.empty Ix.empty mempty G.empty mempty
     <$> newTemplateState
 
 modelInsertNote :: Note -> Model -> Model
