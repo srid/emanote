@@ -1,10 +1,15 @@
 <!-- TODO: Main navigation links (Home, index, tags, ...) -->
+
+<!-- DoNotFormat -->
+<bind tag="containerClass"><ema:metadata><value var="template.layout.note.containerClass" /></ema:metadata></bind>
+<!-- DoNotFormat -->
+
 <apply template="base">
   <bind tag="head-main">
     <link rel="stylesheet" href="_emanote-static/inverted-tree.css" />
   </bind>
   <bind tag="body-main">
-    <div class="container mx-auto max-w-prose">
+    <div class="${containerClass}">
       <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
         <div class="md:shadow-2xl md:mb-8">
