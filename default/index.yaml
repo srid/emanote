@@ -12,6 +12,10 @@ tags: []
 template:
   # Which template to use to render notes. The filepath without the .tpl extension.
   name: /templates/layouts/book
+  # Layout specific settings
+  layout:
+    note:
+      containerClass: container mx-auto max-w-prose
   # List of available colors: https://tailwindcss.com/docs/customizing-colors
   theme: blue
   # Value of the <base> tag.
