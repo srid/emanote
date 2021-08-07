@@ -1,21 +1,17 @@
 module Emanote.Pandoc.Renderer.Url
   ( urlResolvingSplice,
     plainifyWikiLinkSplice,
-    resolveWikiLinkMustExist,
   )
 where
 
-import Control.Lens.Operators ((^.))
-import Control.Monad.Except (MonadError, throwError)
-import qualified Data.Text as T
 import Data.Time (UTCTime, defaultTimeLocale, formatTime)
-import Data.WorldPeace.Union (absurdUnion, openUnionLift)
+import Data.WorldPeace.Union (absurdUnion)
 import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
+import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
@@ -38,7 +34,7 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
   case inl of
     B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-      case resolveUnresolvedRelTarget model uRel of
+      case Resolve.resolveUnresolvedRelTarget model uRel of
         Left err -> do
           let brokenLink = BrokenLink_Inline attr is (url, tit)
           pure $ renderBrokenLink ctx err brokenLink
@@ -50,7 +46,7 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl =
           pure $ HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
     B.Image attr@(_, _, otherAttrs) is (url, tit) -> do
       uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-      case resolveUnresolvedRelTarget model uRel of
+      case Resolve.resolveUnresolvedRelTarget model uRel of
         Left err -> do
           let brokenLink = BrokenLink_Inline attr is (url, tit)
           pure $ renderBrokenLink ctx err brokenLink
@@ -119,56 +115,3 @@ siteRouteDefaultInnerText model url =
                   )
         )
     `h` (\(_ :: SR.VirtualRoute) -> Nothing)
-
-resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Either Text (SR.SiteRoute, Maybe UTCTime)
-resolveUnresolvedRelTarget model = \case
-  Rel.URTWikiLink (_wlType, wl) -> do
-    resourceSiteRoute <$> resolveWikiLinkMustExist model wl
-  Rel.URTResource r ->
-    resourceSiteRoute <$> resolveModelRouteMustExist r
-  Rel.URTVirtual virtualRoute -> do
-    pure $
-      openUnionLift virtualRoute
-        & (,Nothing)
-  where
-    resolveModelRouteMustExist r =
-      case resolveModelRoute model r of
-        Nothing ->
-          Left "Link does not refer to any known file"
-        Just v -> Right v
-
-resolveWikiLinkMustExist :: MonadError Text m => Model -> WL.WikiLink -> m (Either MN.Note SF.StaticFile)
-resolveWikiLinkMustExist model wl =
-  case nonEmpty (M.modelWikiLinkTargets wl model) of
-    Nothing -> do
-      throwError "Wiki-link does not refer to any known file"
-    Just (target :| []) ->
-      pure target
-    Just targets -> do
-      let targetsStr =
-            targets <&> \case
-              Left note -> R.encodeRoute $ R.lmlRouteCase $ note ^. MN.noteRoute
-              Right sf -> R.encodeRoute $ sf ^. SF.staticFileRoute
-      throwError $
-        "Wikilink "
-          <> show wl
-          <> " is ambiguous; referring to one of: "
-          <> T.intercalate ", " (toText <$> toList targetsStr)
-
-resolveModelRoute :: Model -> R.ModelRoute -> Maybe (Either MN.Note SF.StaticFile)
-resolveModelRoute model lr = do
-  let eRoute = R.modelRouteCase lr
-  bitraverse
-    (`M.modelLookupNoteByRoute` model)
-    (`M.modelLookupStaticFileByRoute` model)
-    eRoute
-
-resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)
-resourceSiteRoute = \case
-  Left note ->
-    SR.noteFileSiteRoute note
-      & (,Nothing)
-  Right sf ->
-    SR.staticFileSiteRoute sf
-      & (,Just $ sf ^. SF.staticFileTime)
