@@ -127,7 +127,6 @@ renderLmlHtml emaAction model note = do
             withInlineCtx $ \ctx ->
               Splices.pandocSplice ctx ctxDoc
     let folgeAnc = M.modelFolgezettelAncestorTree modelRoute model
-    let mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
     "ema:note:uptree"
       ## Splices.treeSplice (const ()) folgeAnc
       $ \(last -> nodeRoute) children -> do
@@ -135,6 +134,7 @@ renderLmlHtml emaAction model note = do
           Tit.titleSplice ctx (preparePandoc model) $ M.modelLookupTitle nodeRoute model
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
         "tree:open" ## Heist.ifElseISplice (not . null $ children)
+    "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
     "ema:note:uptreeStr" ## HI.textSplice (toText . Shower.shower $ folgeAnc)
     "ema:note:pandoc"
       ## withBlockCtx
