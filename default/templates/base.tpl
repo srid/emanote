@@ -31,6 +31,8 @@
     }
   </style>
   <apply template="/templates/hooks/more-head" />
+
+  <head-main />
 </head>
 
 <!-- DoNotFormat -->

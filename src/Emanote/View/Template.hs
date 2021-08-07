@@ -126,7 +126,16 @@ renderLmlHtml emaAction model note = do
             let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
             withInlineCtx $ \ctx ->
               Splices.pandocSplice ctx ctxDoc
-    "ema:note:uptree" ## HI.textSplice (toText . Shower.shower $ M.modelFolgezettelAncestorTree modelRoute model)
+    let folgeAnc = M.modelFolgezettelAncestorTree modelRoute model
+    let mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
+    "ema:note:uptree"
+      ## Splices.treeSplice (const ()) folgeAnc
+      $ \(last -> nodeRoute) children -> do
+        "node:text" ## withInlineCtx $ \ctx ->
+          Tit.titleSplice ctx (preparePandoc model) $ M.modelLookupTitle nodeRoute model
+        "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
+        "tree:open" ## Heist.ifElseISplice (not . null $ children)
+    "ema:note:uptreeStr" ## HI.textSplice (toText . Shower.shower $ folgeAnc)
     "ema:note:pandoc"
       ## withBlockCtx
       $ \ctx ->
