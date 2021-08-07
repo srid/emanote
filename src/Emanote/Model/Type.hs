@@ -11,8 +11,9 @@ import Control.Lens.Operators as Lens ((%~), (^.))
 import Control.Lens.TH (makeLenses)
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Set as Set
 import Data.Time (UTCTime)
-import Data.Tree (Tree)
+import Data.Tree (Forest, Tree (Node))
 import Ema (Slug)
 import qualified Ema.Helper.PathTree as PathTree
 import qualified Emanote.Model.Graph as G
@@ -41,6 +42,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
+    -- NOTE: This is unused.
     _modelGraph :: G.Graph,
     -- TODO: Avoid incremental building (which is complex), and compute this on
     -- demand like `modelTags`? Use memoization to avoid repeat computation if
@@ -149,12 +151,35 @@ modelWikiLinkTargets wl model =
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(LMLRoute, [B.Block])]
 modelLookupBacklinks r model =
-  let backlinks = Ix.toList $ (model ^. modelRels) @+ Rel.unresolvedRelsTo r
-   in -- HACK: See also sortByDateOrTitle in Query.hs
-      -- This is so that calendar backlinks are sorted properly.
-      sortOn (Down . flip modelLookupTitle model . fst) $
-        backlinks <&> \rel ->
-          (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+  -- HACK: See also sortByDateOrTitle in Query.hs
+  -- This is so that calendar backlinks are sorted properly.
+  sortOn (Down . flip modelLookupTitle model . fst) $
+    backlinkRels r model <&> \rel ->
+      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+
+backlinkRels :: ModelRoute -> Model -> [Rel.Rel]
+backlinkRels r model =
+  let allPossibleLinks = Rel.unresolvedRelsTo r
+   in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+
+-- WIP https://github.com/srid/emanote/issues/25
+modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest LMLRoute
+modelFolgezettelAncestorTree r0 model =
+  go mempty r0
+  where
+    go :: Set ModelRoute -> ModelRoute -> Forest LMLRoute
+    go visited = \case
+      r | r `Set.member` visited -> mempty
+      r ->
+        backlinkRels r model & filter (selectFolgezttel . (^. Rel.relTo)) <&> \rel ->
+          let parentR = rel ^. Rel.relFrom
+              parentModelR = R.liftModelRoute . R.lmlRouteCase $ parentR
+           in Node parentR $ go (Set.insert r visited) parentModelR
+    selectFolgezttel = \case
+      Rel.URTWikiLink (WL.WikiLinkBranch, _wl) ->
+        True
+      _ ->
+        False
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
 modelLookupStaticFileByRoute r =

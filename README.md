@@ -67,6 +67,8 @@ Before tests (tasks impacting the larger architectural context in code base),
 
 - Zettelkasten / Graph considerations
   - [ ] Incrementally build a graph of notes using [algebraic-graphs-patch](https://github.com/srid/emanote.obelisk/tree/master/lib/algebraic-graphs-patch)
+    - Tricky: unresolved wiki links cannot be resolved during graph patching; they must be deferred. This complicates implementation, and may involve using models like propagators. The same challenge applies to folgezettel queries (all querries, right now, are non-folgezettel for this reason).
+      - [ ] Consider computing uptree on demand (ie. when rendering a note) by traversing the IxSet's. https://github.com/srid/emanote/issues/25
   - [ ] Using the graph, produce a folgezettel index (z-index) at `/-/folgezettel.html`
   - [ ] Using the graph, reinstate neuron UpTree on top of each note
   - [x] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
