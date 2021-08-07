@@ -10,7 +10,7 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: Progressed enough to be usable for *certain* use-cases (see examples below). HTML templates are yet to be finalized (so do not customize your templates just yet), and most importantly folgezettel graph and visualization needs to be implemented to act as true neuron replacement (see tasks below).
+**Project Status**: Progressed enough to be usable for certain use-cases (see examples below). HTML templates are yet to be finalized (so do not customize your templates just yet), and most importantly folgezettel graph and visualization needs to be implemented to act as true [neuron replacement](https://github.com/srid/emanote/issues/22).
 
 ## Installing and using
 
@@ -65,14 +65,9 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 
 Before tests (tasks impacting the larger architectural context in code base),
 
-- Zettelkasten / Graph considerations
-  - [ ] Incrementally build a graph of notes using [algebraic-graphs-patch](https://github.com/srid/emanote.obelisk/tree/master/lib/algebraic-graphs-patch)
-    - Tricky: unresolved wiki links cannot be resolved during graph patching; they must be deferred. This complicates implementation, and may involve using models like propagators. The same challenge applies to folgezettel queries (all querries, right now, are non-folgezettel for this reason).
-      - [ ] Consider computing uptree on demand (ie. when rendering a note) by traversing the IxSet's. https://github.com/srid/emanote/issues/25
-  - [ ] Using the graph, produce a folgezettel index (z-index) at `/-/folgezettel.html`
-  - [ ] Using the graph, reinstate neuron UpTree on top of each note
+- Zettelkasten / Graph considerations (a la neuron),
+  - [-] Uplink tree https://github.com/srid/emanote/issues/25
   - [x] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
-  - [ ] UI considerations (re: dirtree vs folgezettel heterarchy)
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding

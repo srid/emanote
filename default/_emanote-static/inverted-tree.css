@@ -11,6 +11,10 @@ body .tree.flipped {
 }
 body .tree {
   overflow: auto;
+  /* See more-head.tpl */
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8em;
 }
 body .tree ul.root {
   padding-top: 0px;
@@ -101,7 +105,6 @@ body .tree li div.forest-link {
   text-decoration: none;
   display: inline-block;
   border-radius: 5px 5px 5px 5px;
-  color: #333333;
   position: relative;
   top: 2px;
 }
