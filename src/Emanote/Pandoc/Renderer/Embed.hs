@@ -7,6 +7,7 @@ import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import Emanote.Model (Model)
 import qualified Emanote.Model.Link.Rel as Rel
+import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
@@ -17,7 +18,6 @@ import Emanote.Pandoc.Renderer.BrokenLink
   ( BrokenLink (BrokenLink_Block, BrokenLink_Inline),
     renderBrokenLink,
   )
-import qualified Emanote.Pandoc.Renderer.Url as Url
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
@@ -34,7 +34,7 @@ embedBlockWikiLinkResolvingSplice _emaAction model _nf ctx _ blk =
     B.Para [B.Link attr@(_id, _class, otherAttrs) is (url, tit)] -> do
       Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
         Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-      case Url.resolveWikiLinkMustExist model wl of
+      case Resolve.resolveWikiLinkMustExist model wl of
         Left err -> do
           let brokenLink = BrokenLink_Block attr is (url, tit)
           pure $ renderBrokenLink ctx err brokenLink
@@ -48,7 +48,7 @@ embedInlineWikiLinkResolvingSplice ::
 embedInlineWikiLinkResolvingSplice _emaAction model _nf ctx _ inl = case inl of
   B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
     Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-    case Url.resolveWikiLinkMustExist model wl of
+    case Resolve.resolveWikiLinkMustExist model wl of
       Left err -> do
         let brokenLink = BrokenLink_Inline attr is (url, tit)
         pure $ renderBrokenLink ctx err brokenLink

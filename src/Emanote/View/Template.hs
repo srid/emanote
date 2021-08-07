@@ -16,6 +16,7 @@ import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Graph as G
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
@@ -116,7 +117,7 @@ renderLmlHtml emaAction model note = do
       ## titleSplice pageTitle
     let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks modelRoute model) "backlink"
+      ## Splices.listSplice (G.modelLookupBacklinks modelRoute model) "backlink"
       $ \(source, backlinkCtx) -> do
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
@@ -126,7 +127,7 @@ renderLmlHtml emaAction model note = do
             let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
             withInlineCtx $ \ctx ->
               Splices.pandocSplice ctx ctxDoc
-    let folgeAnc = M.modelFolgezettelAncestorTree modelRoute model
+    let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
     "ema:note:uptree"
       ## Splices.treeSplice (const ()) folgeAnc
       $ \(last -> nodeRoute) children -> do
