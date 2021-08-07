@@ -5,10 +5,9 @@
   </bind>
   <bind tag="body-main">
     <div class="container mx-auto max-w-prose">
-      <div class="md:mt-8">
+      <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
         <div class="md:shadow-2xl md:mb-8">
-          <apply template="components/breadcrumbs" />
           <div class="flex-1 w-full overflow-x-auto bg-white">
             <main class="px-4 py-4">
               <apply template="components/note-title" />
