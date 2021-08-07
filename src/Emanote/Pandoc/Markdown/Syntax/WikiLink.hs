@@ -81,7 +81,7 @@ inlineToWikiLink inl = do
   Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
   pure wl
 
--- | Return the various ways to link to this markdown route
+-- | Return the various ways to link to this model route
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --

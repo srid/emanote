@@ -6,6 +6,7 @@
         <apply template="components/breadcrumbs" />
         <div class="flex-1 w-full overflow-x-auto bg-white">
           <main class="px-4 py-4">
+            <apply template="components/note-uptree" />
             <apply template="components/note-title" />
             <apply template="components/note-body" />
             <apply template="components/backlinks" />

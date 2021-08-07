@@ -34,6 +34,7 @@ import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
+import qualified Shower
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -113,8 +114,9 @@ renderLmlHtml emaAction model note = do
     -- Note stuff
     "ema:note:title"
       ## titleSplice pageTitle
+    let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
     "ema:note:backlinks"
-      ## Splices.listSplice (M.modelLookupBacklinks (R.liftModelRoute . R.lmlRouteCase $ r) model) "backlink"
+      ## Splices.listSplice (M.modelLookupBacklinks modelRoute model) "backlink"
       $ \(source, backlinkCtx) -> do
         -- TODO: reuse note splice
         "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
@@ -124,6 +126,7 @@ renderLmlHtml emaAction model note = do
             let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
             withInlineCtx $ \ctx ->
               Splices.pandocSplice ctx ctxDoc
+    "ema:note:uptree" ## HI.textSplice (toText . Shower.shower $ M.modelFolgezettelAncestorTree modelRoute model)
     "ema:note:pandoc"
       ## withBlockCtx
       $ \ctx ->
