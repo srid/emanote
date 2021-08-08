@@ -17,4 +17,4 @@ template:
   name: /templates/layouts/note
 ```
 
-The "note" layout includes the [uplink tree of Neuron](https://neuron.zettel.page/uplink-tree) based on folgezettel links as well as directory layout. As a demo, the page youare viewing is rendered using the "note" layout (whilst leaving the rest of the site to use the default "book" layout.)
+The "note" layout includes the [uplink tree of Neuron](https://neuron.zettel.page/uplink-tree) based on folgezettel links as well as directory layout. As a demo, the page you are viewing is rendered using the "note" layout (whilst leaving the rest of the site to use the default "book" layout.)
