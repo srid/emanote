@@ -10,7 +10,7 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: Progressed enough to be usable for certain use-cases (see examples below). HTML templates are yet to be finalized (so do not customize your templates just yet), and most importantly folgezettel graph and visualization needs to be implemented to act as true [neuron replacement](https://github.com/srid/emanote/issues/22).
+**Project Status**: Mostly done! HTML templates are yet to be finalized (so do not customize your templates just yet).
 
 ## Installing and using
 
@@ -63,17 +63,11 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 
 ### Current
 
-Before tests (tasks impacting the larger architectural context in code base),
+Backlog,
 
-- Zettelkasten / Graph considerations (a la neuron),
-  - [-] Uplink tree https://github.com/srid/emanote/issues/25
-  - [x] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
 - [ ] Finally, **tests**!
   - URL parsing (.md and wiki-links) and route encoding/decoding
   - Metadata overriding
-
-To triage,
-
 - [ ] `neuron query` equivalent?
 - [ ] Consistent ordering of notes in sidebar, index, query listing, backlinks
   - `.timeline` query in particular should be sort by date
@@ -156,3 +150,7 @@ Milestone (www.srid.ca),
     - Also consider non-Obsidian formats, `![[program.hs:2-13]]
   - [x] Queries and results embed (see below)
   - [x] WikiLink embedding for note should use .tpl layout
+- Zettelkasten / Graph considerations (a la neuron),
+  - [x] Uplink tree https://github.com/srid/emanote/issues/25
+  - [x] Reinstate Neuron look & feel (or just improve on it; make Emanote's note template distinct-looking, and an improved version of neuron's)
+
