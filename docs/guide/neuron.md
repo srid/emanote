@@ -2,7 +2,7 @@
 
 To use Emanote in your existing notebook,
 
-1. Configure it to use [[neuron-layout]]
+1. Configure it to use [[neuron-layout]] (this is optional)
 2. In all notes, replace neuron's `z:zettels`-style [tag queries](https://neuron.zettel.page/tag-queries) with Obsidian-style queries. See [[demo|see demo]].
     - Note: Query results do not impact graph connections (thus backlinks). If you want to establish connections to multiple notes, do it by explicitly linking to them individually. Emanote chose this option, because it was simpler to implement. Users are encouraged to try to persuade the author otherwise if there is a compelling rationale.
 
