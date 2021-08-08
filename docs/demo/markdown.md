@@ -100,6 +100,8 @@ Ordered lists,
 | Search Engine | [Brave Search] |
 | Chat          | [Element]      |
 
+(Note that wiki links with a custom text must have their [pipe escaped](https://github.com/srid/emanote/issues/113#issuecomment-894808721) when used inside tables.)
+
 [Brave]: https://brave.com/
 [Brave Search]: https://search.brave.com/
 [Element]: https://element.io/
