@@ -20,10 +20,6 @@
       url = "github:srid/heist/emanote";
       flake = false;
     };
-    algebraic-graphs-patch = {
-      url = "github:srid/algebraic-graphs-patch";
-      flake = false;
-    };
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
@@ -48,7 +44,6 @@
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
               pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
-              algebraic-graphs-patch = self.callCabal2nix "algebraic-graphs-patch" inputs.algebraic-graphs-patch { };
               tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
               # Jailbreak heist to allow newer dlist
               heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));

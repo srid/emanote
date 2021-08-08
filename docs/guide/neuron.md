@@ -9,6 +9,8 @@ To use Emanote in your existing notebook,
 Capabilities Emanote provides, but neuron does not:
 
 - Live server with hot reload
+- Faster incremental build
+- More lenient handling of malformed Markdown (eg: broken links)
 - Flexible WikiLinks (link to directories, or based on path, eg: `[[Foo/Bar]]`) including [[file-links]].
 - Static files can be placed anywhere (not just in `./static` folder)
 - Full path based URLs (unless `slug` is set)
