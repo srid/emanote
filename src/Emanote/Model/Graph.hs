@@ -18,8 +18,6 @@ import Emanote.Route.ModelRoute (ModelRoute)
 import qualified Text.Pandoc.Definition as B
 import Prelude hiding (empty)
 
--- WIP https://github.com/srid/emanote/issues/25
---
 -- TODO: Do breadth-first instead of depth-first
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute
 modelFolgezettelAncestorTree r0 model =
@@ -37,8 +35,13 @@ modelFolgezettelAncestorTree r0 model =
               & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
           -- Folders are automatically made a folgezettel
           parentFolderRoute = do
-            pr <- R.routeParent . R.lmlRouteCase =<< leftToMaybe (R.modelRouteCase r)
-            -- guard $ pr /= R.indexRoute
+            pr <- do
+              lmlR <- R.lmlRouteCase <$> leftToMaybe (R.modelRouteCase r)
+              -- Root index do not have a parent folder.
+              guard $ lmlR /= R.indexRoute
+              -- Consider the index route as parent folder for all
+              -- top-level notes.
+              pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
             pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ pr
           folgezettelParents =
             folgezettelBacklinks
