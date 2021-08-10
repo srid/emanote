@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - nix-bundle
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -44,3 +45,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .ci/output
           cname: note.ema.srid.ca
+      - name: Create nix bundle
+        run: |
+          nix bundle .
+          du -sh ./emanote
