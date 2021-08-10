@@ -10,7 +10,7 @@ WIP: Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema]
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: Mostly done! HTML templates are yet to be finalized (so do not customize your templates just yet).
+**Project Status**: Nearly 1.0. HTML templates are yet to be finalized (so do not customize your templates just yet).
 
 ## Installing and using
 
