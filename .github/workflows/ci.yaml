@@ -29,8 +29,9 @@ jobs:
       - name: Build and cache 
         run: |
           # Run all nix commands we run latter, to cache their outputs.
-          nix-build -j 4 docker.nix --argstr tag latest --no-out-link
           nix -j 4 bundle .
+          rm ./emanote
+          nix-build -j 4 docker.nix --argstr tag latest --no-out-link
 
   bundle:
     needs: cached
@@ -67,6 +68,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: emanote-binary
+          retention-days: 5
           path: |
             ${{ steps.release-bundle.outputs.bundle-file }}
 
@@ -114,6 +116,8 @@ jobs:
           ls -l
           gzip -v -d ./emanote-*.gz
           ls -l
+          rm *.gz 
+          mv ./emanote-* ./emanote
           ./emanote -- --layers ./docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
