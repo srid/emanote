@@ -33,7 +33,7 @@ jobs:
           nix -j 4 bundle .
           rm ./emanote
           export DOCKERIMG=$(nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link)
-          echo "::set-output name=docker-img::${docker-img}"
+          echo "::set-output name=docker-img::${DOCKERIMG}"
       - name: Upload docker image tgz
         uses: actions/upload-artifact@v2
         with:
