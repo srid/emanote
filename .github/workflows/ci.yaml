@@ -66,10 +66,10 @@ jobs:
           du -sh ./${BUNDLEFILE}
           echo "::set-output name=bundle-file::${BUNDLEFILE}"
       - name: Upload release bundle
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v2
         with:
-          files: |
+          name: emanote-binary
+          path: |
             ${{ steps.release-bundle.outputs.bundle-file }}
 
   docker:
@@ -105,9 +105,14 @@ jobs:
     needs: bundle
     runs-on: ubuntu-latest
     steps:
+    - name: Download bundle
+      uses: actions/download-artifact@v2
+      with:
+        name: emanote-binary
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./.ci/output
+          gzip -d ./emanote-*.gz
           ./emanote -- --layers ./docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
