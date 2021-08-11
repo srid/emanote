@@ -11,3 +11,13 @@ WIP, but for now:
   - If using [[emanote-template]], open the notebook in [[vscode]] and install the recommended extensions.
 - Run `PORT=8080 emanote` on that notebook
   - Or `mkdir /tmp/output; emanote gen /tmp/output` to generate static files
+
+## Pre-built executable
+
+If you do not wish to use Nix, you may try the self-contained executable bundle on Linux or Windows Subsystem for Linux (WSL). They are built off the latest sources in GitHub Actions CI.
+
+1. Click the latest (passed) entry in [CI workflows](https://github.com/srid/emanote/actions?query=branch%3Amaster)
+1. Download "emanote-binary" (a zip file), and extract it.
+1. Run the binary in the zip file, as `./emanote --version` to verify that everything works
+   - The first time you run this, it will take a few seconds bootstrap (unpack dependencies).
+   - Note that this binary is produced using the [experimental nix bundle](https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-bundle.html) feature. Do not interrupt it (Ctrl+C) during the first run; it might break that binary permanently.
