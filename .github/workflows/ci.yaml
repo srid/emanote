@@ -24,15 +24,15 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build docker image
+      - name: Build bundle & docker img in parallel
         id: build
         run: |
           # Run in parallel
           parallel --tagstring [{}]: bash -c ::: \
             "nix -j 4 bundle ." \
-            "nix-build -j 4 docker.nix --argstr tag latest --no-out-link"
+            "nix-build -j 4 docker.nix --argstr tag latest -o docker-img"
           # docker
-          export DOCKERIMG=$(nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link)
+          export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
           # bundle
           ./emanote --version
@@ -68,14 +68,11 @@ jobs:
         with:
           name: docker-img
       - name: Build & Publish Docker image to Docker Hub
-        # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
           docker load -i *docker-image-emanote.tar.gz
-          # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
-          docker push "sridca/emanote:${{ env.DOCKERTAG }}"
-          # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
+          docker push sridca/emanote:latest
 
   website:
     needs: build
