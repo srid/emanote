@@ -6,7 +6,7 @@ order: 1
 
 ## Official method
 
-Follow the [README on GitHub](https://github.com/srid/emanote#emanote) to install Emanote using Nix. This is the recommended approach. 
+Follow the [README on GitHub](https://github.com/srid/emanote#emanote) to install Emanote using [Nix](https://nixos.org/download.html). This is the recommended approach. 
 
 For Windows, see [[wsl]].
 
@@ -14,21 +14,9 @@ For Windows, see [[wsl]].
 
 If you do not wish to use Nix, you may use Emanote in one of the following ways:
 
-### Pre-built executable
+| Method     | Long-term support | Platforms         |
+| ---------- | ----------------- | ----------------- |
+| [[binary]] | No guarantee      | Linux, WSL        |
+| [[docker]] | Guaranteed        | Linux, WSL, macOS |
 
-You may try the self-contained executable bundle on Linux or Windows Subsystem for Linux (WSL). They are built off the latest sources in GitHub Actions CI. For macOS, see the Docker section below.
-
-1. Click the latest (passed) entry in [CI workflows](https://github.com/srid/emanote/actions?query=branch%3Amaster)
-1. Download "emanote-binary" (a zip file), and extract it.
-1. Run the binary in the zip file, as `./emanote --version` to verify that everything works
-   - When you run it the first time, expect it to take a few seconds to bootstrap.
-      - Do *not* interrupt it (Ctrl+C) during its *first* run; doing so might break that binary permanently on that system.
-   - This binary is produced using the [experimental nix bundle](https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-bundle.html) feature. You mileage may vary.
-
-### Docker image
-
-[[emanote-template]] uses the official Docker image, which can be used as
-
-```
-docker run -v $PWD:/data sridca/emanote emanote --layers "/data" gen /data/output.docker
-```
+Emanote is not on [Hackage](https://hackage.haskell.org/) yet, as 1.0 is yet to be released. Once on Hackage, Emanote can be packaged up in various ways like [Pandoc](https://pandoc.org/) (another Haskell software on Hackage) is. It will become the distributor's responsibility to create and maintain this long-term. Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. 
