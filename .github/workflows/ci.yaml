@@ -25,17 +25,16 @@ jobs:
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build docker image
-        id: build-docker
+        id: build
         run: |
-          # Run all nix commands we run latter, to cache their outputs.
-          nix -j 4 bundle .
-          rm ./emanote
+          # Run in parallel
+          parallel --tagstring [{}]: bash -c ::: \
+            "nix -j 4 bundle ." \
+            "nix-build -j 4 docker.nix --argstr tag latest --no-out-link"
+          # docker
           export DOCKERIMG=$(nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link)
           echo "::set-output name=docker-img::${DOCKERIMG}"
-      - name: Build nix bundle 
-        id: build-bundle
-        run: |
-          nix -j 4 bundle .
+          # bundle
           ./emanote --version
           du -sh -D ./emanote
           # export VER=${{ github.event.release.tag_name }}
@@ -49,14 +48,14 @@ jobs:
           name: docker-img
           retention-days: 1
           path: |
-            ${{ steps.build-docker.outputs.docker-img }}
+            ${{ steps.build.outputs.docker-img }}
       - name: Upload nix bundle
         uses: actions/upload-artifact@v2
         with:
           name: emanote-binary
           retention-days: 5
           path: |
-            ${{ steps.build-bundle.outputs.bundle-file }}
+            ${{ steps.build.outputs.bundle-file }}
 
   docker:
     needs: build
