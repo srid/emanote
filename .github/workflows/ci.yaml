@@ -9,7 +9,7 @@ jobs:
 
   # Do all nix builds (including the bundle), and then push to cachix.
   # Then, expect other jobs pull from cache.
-  cached:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,44 +26,17 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build and cache 
-        id: build
+      - name: Build docker image
+        id: build-docker
         run: |
           # Run all nix commands we run latter, to cache their outputs.
           nix -j 4 bundle .
           rm ./emanote
           export DOCKERIMG=$(nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link)
           echo "::set-output name=docker-img::${DOCKERIMG}"
-      - name: Upload docker image tgz
-        uses: actions/upload-artifact@v2
-        with:
-          name: docker-img
-          retention-days: 1
-          path: |
-            ${{ steps.build.outputs.docker-img }}
-
-  bundle:
-    needs: cached
-    runs-on: ubuntu-latest
-    steps:
-      # TODO: DRY
-      - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v13
-        with:
-          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
-          install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - uses: cachix/cachix-action@v10
-        with:
-          name: srid
-          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
-      - name: Release bundle
-        id: release-bundle
-        # if: startsWith(github.ref, 'refs/tags/')
+      - name: Build nix bundle 
+        id: build-bundle
         run: |
-          set -x
           nix -j 4 bundle .
           ./emanote --version
           du -sh -D ./emanote
@@ -73,33 +46,27 @@ jobs:
           gzip -c -N -9 ./emanote > ./${BUNDLEFILE}
           du -sh ./${BUNDLEFILE}
           echo "::set-output name=bundle-file::${BUNDLEFILE}"
-      - name: Upload release bundle
+      - name: Upload docker image tgz
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-img
+          retention-days: 1
+          path: |
+            ${{ steps.build-docker.outputs.docker-img }}
+      - name: Upload nix bundle
         uses: actions/upload-artifact@v2
         with:
           name: emanote-binary
           retention-days: 5
           path: |
-            ${{ steps.release-bundle.outputs.bundle-file }}
+            ${{ steps.build-bundle.outputs.bundle-file }}
 
   docker:
-    needs: cached
+    needs: build
     runs-on: ubuntu-latest
     env:
       DOCKERTAG: latest
     steps:
-      # TODO: DRY
-      - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v13
-        with:
-          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
-          install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - uses: cachix/cachix-action@v10
-        with:
-          name: srid
-          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
       - name: Download docker img
         uses: actions/download-artifact@v2
         with:
@@ -116,7 +83,7 @@ jobs:
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
 
   publish:
-    needs: bundle
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download bundle
