@@ -9,7 +9,7 @@ To work with Markdown notes using Emanote on Windows, follow these steps.
 ## Setup WSL2
 
 - Follow [these instructions](https://docs.microsoft.com/en-us/windows/wsl/install-win10) to install WSL2 as well as Ubuntu. 
-- Install Emanote in Ubuntu.[^term]
+- [[install|Install Emanote]] in Ubuntu.[^term]
 - Run `git clone https://github.com/srid/emanote-template.git` to make a local copy of [[emanote-template]] in your Ubuntu instance
 - Run `emanote` inside the emanote-template directory, and make sure you that you can access the webpage in Windows.
 - Press <kbd>Ctrl+C</kbd> to exit Emanote.
