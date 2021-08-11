@@ -7,8 +7,6 @@ on:
       - nix-bundle
 jobs:
 
-  # Do all nix builds (including the bundle), and then push to cachix.
-  # Then, expect other jobs pull from cache.
   build:
     runs-on: ubuntu-latest
     steps:
@@ -42,9 +40,8 @@ jobs:
           du -sh -D ./emanote
           # export VER=${{ github.event.release.tag_name }}
           export VER=$(git describe --always)
-          export BUNDLEFILE=emanote-${VER}.gz
-          gzip -c -N -9 ./emanote > ./${BUNDLEFILE}
-          du -sh ./${BUNDLEFILE}
+          export BUNDLEFILE=emanote-${VER}
+          mv ./emanote ./${BUNDLEFILE}
           echo "::set-output name=bundle-file::${BUNDLEFILE}"
       - name: Upload docker image tgz
         uses: actions/upload-artifact@v2
@@ -74,7 +71,6 @@ jobs:
       - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
-          ls -l
           docker load -i *docker-image-emanote.tar.gz
           # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
@@ -82,7 +78,7 @@ jobs:
           docker push "sridca/emanote:${{ env.DOCKERTAG }}"
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
 
-  publish:
+  website:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -95,9 +91,8 @@ jobs:
           mkdir -p ./.ci/output
           set -x 
           ls -l
-          gzip -v -d ./emanote-*.gz
-          ls -l
           mv ./emanote-* ./emanote
+          chmod u+x ./emanote
           ./emanote -- --layers ./docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
