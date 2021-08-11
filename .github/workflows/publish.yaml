@@ -45,7 +45,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .ci/output
           cname: note.ema.srid.ca
-      - name: Create nix bundle
+      - name: Release bundle
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
         run: |
           nix bundle .
+          ./emanote --version
           du -sh ./emanote
+          export VER=${{ github.event.release.tag_name }}
+          gzip -c -N -9 ./emanote > ./emanote-${VER}.gz
+          du -sh ./emanote-${VER}.gz
