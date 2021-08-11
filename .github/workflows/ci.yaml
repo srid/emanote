@@ -1,4 +1,4 @@
-name: "Build & Publish site"
+name: "CI"
 on:
   # Run only when pushing to master branch
   push:
@@ -6,7 +6,7 @@ on:
       - master
       - nix-bundle
 jobs:
-  build-and-publish:
+  ci:
     runs-on: ubuntu-latest
     env:
       DOCKERTAG: latest
@@ -25,6 +25,16 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Release bundle
+        # uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          nix bundle .
+          ./emanote --version
+          du -sh ./emanote
+          export VER=${{ github.event.release.tag_name }}
+          gzip -c -N -9 ./emanote > ./emanote-${VER}.gz
+          du -sh ./emanote-${VER}.gz
       - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
@@ -45,13 +55,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .ci/output
           cname: note.ema.srid.ca
-      - name: Release bundle
-        uses: softprops/action-gh-release@v1
-        # if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          nix bundle .
-          ./emanote --version
-          du -sh ./emanote
-          export VER=${{ github.event.release.tag_name }}
-          gzip -c -N -9 ./emanote > ./emanote-${VER}.gz
-          du -sh ./emanote-${VER}.gz
