@@ -90,7 +90,7 @@ jobs:
           ls -l
           mv ./emanote-* ./emanote
           chmod u+x ./emanote
-          ./emanote --layers ./docs gen $(pwd)/.ci/output
+          ./emanote --layers $(pwd)/docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
