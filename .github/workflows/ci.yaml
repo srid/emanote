@@ -27,11 +27,20 @@ jobs:
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build and cache 
+        id: build
         run: |
           # Run all nix commands we run latter, to cache their outputs.
           nix -j 4 bundle .
           rm ./emanote
-          nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link
+          export DOCKERIMG=$(nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link)
+          echo "::set-output name=docker-img::${docker-img}"
+      - name: Upload docker image tgz
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-img
+          retention-days: 1
+          path: |
+            ${{ steps.build.outputs.docker-img }}
 
   bundle:
     needs: cached
@@ -91,10 +100,15 @@ jobs:
         with:
           name: srid
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+      - name: Download docker img
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-img
       - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
-          docker load -i $(nix-build -j 4 docker.nix --argstr tag "${{ env.DOCKERTAG }}")
+          ls -l
+          docker load -i *docker-image-emanote.tar.gz
           # docker tag "sridca/emanote:${{ env.DOCKERTAG }}" "sridca/emanote:${{env.NEURONVER}}"
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
