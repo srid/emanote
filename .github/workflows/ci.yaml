@@ -7,6 +7,8 @@ on:
       - nix-bundle
 jobs:
 
+  # Do all nix builds (including the bundle), and then push to cachix.
+  # Then, expect other jobs pull from cache.
   cached:
     runs-on: ubuntu-latest
     steps:
@@ -26,7 +28,11 @@ jobs:
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build and cache 
         run: |
-          nix build
+          # Run all nix commands we run latter, to cache their outputs.
+          nix-build -j 4 docker.nix --no-out-link
+          nix bundle .
+          rm ./emanote
+          nix run . -- --version
 
   bundle:
     needs: cached
