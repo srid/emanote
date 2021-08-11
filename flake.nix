@@ -35,11 +35,25 @@
           import nixpkgs { inherit system overlays; config.allowBroken = true; };
         windicss =
           (import inputs.windicss { inherit pkgs; }).shell.nodeDependencies;
+        # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
+        filter = name: type:
+          let
+            baseName = baseNameOf (toString name);
+            sansPrefix = pkgs.lib.removePrefix (toString ./.) name;
+          in
+          # Ignore these files when building emanote source package
+            !(
+              baseName == "README.md" ||
+              sansPrefix == "/bin" ||
+              sansPrefix == "/docs" ||
+              sansPrefix == "/.github" ||
+              sansPrefix == "/.vscode"
+            );
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
             inherit returnShellEnv;
             name = "emanote";
-            root = ./.;
+            root = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
             withHoogle = true;
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";

@@ -1,0 +1,92 @@
+name: "CI"
+on:
+  # Run only when pushing to master branch
+  push:
+    branches:
+      - master
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v13
+        with:
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
+          install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v10
+        with:
+          name: srid
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+          # Only needed for private caches
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Build bundle & docker img in parallel
+        id: build
+        run: |
+          # Run in parallel
+          parallel --tagstring [{}]: bash -c ::: \
+            "nix -j 4 bundle ." \
+            "nix-build -j 4 docker.nix --argstr tag latest -o docker-img"
+          # docker
+          export DOCKERIMG=$(readlink ./docker-img)
+          echo "::set-output name=docker-img::${DOCKERIMG}"
+          # bundle
+          ./emanote --version
+          du -sh -D ./emanote
+          echo "::set-output name=bundle-file::emanote"
+      - name: Upload docker image tgz
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-img
+          retention-days: 1
+          path: |
+            ${{ steps.build.outputs.docker-img }}
+      - name: Upload nix bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: emanote-binary
+          retention-days: 5
+          path: |
+            ${{ steps.build.outputs.bundle-file }}
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      DOCKERTAG: latest
+    steps:
+      - name: Download docker img
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-img
+      - name: Build & Publish Docker image to Docker Hub
+        run: |
+          docker load -i *docker-image-emanote.tar.gz
+          echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
+          set -x
+          docker push sridca/emanote:latest
+
+  website:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download bundle
+        uses: actions/download-artifact@v2
+        with:
+          name: emanote-binary
+      - name: Generate website HTML 🔧
+        run: |
+          mkdir -p ./.ci/output
+          chmod u+x ./emanote
+          ./emanote --layers $(pwd)/docs gen $(pwd)/.ci/output
+          bash ./.ci/output/_emanote-bin/compile-css
+      - name: Deploy to website to gh-pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .ci/output
+          cname: note.ema.srid.ca

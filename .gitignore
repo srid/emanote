@@ -24,3 +24,6 @@ cabal.project.local~
 result
 result-*
 .ci
+
+# nix bundle
+emanote

@@ -12,5 +12,6 @@
     }
   )
   {
+    # TODO: We should filter out the source tree. See 'filter' in flake.nix
     src = ./.;
   }).defaultNix
