@@ -105,10 +105,10 @@ jobs:
     needs: bundle
     runs-on: ubuntu-latest
     steps:
-    - name: Download bundle
-      uses: actions/download-artifact@v2
-      with:
-        name: emanote-binary
+      - name: Download bundle
+        uses: actions/download-artifact@v2
+        with:
+          name: emanote-binary
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./.ci/output
