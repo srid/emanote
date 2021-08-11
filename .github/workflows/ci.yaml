@@ -37,11 +37,7 @@ jobs:
           # bundle
           ./emanote --version
           du -sh -D ./emanote
-          # export VER=${{ github.event.release.tag_name }}
-          export VER=$(git describe --always)
-          export BUNDLEFILE=emanote-${VER}
-          mv ./emanote ./${BUNDLEFILE}
-          echo "::set-output name=bundle-file::${BUNDLEFILE}"
+          echo "::set-output name=bundle-file::emanote"
       - name: Upload docker image tgz
         uses: actions/upload-artifact@v2
         with:
@@ -86,9 +82,6 @@ jobs:
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./.ci/output
-          set -x 
-          ls -l
-          mv ./emanote-* ./emanote
           chmod u+x ./emanote
           ./emanote --layers $(pwd)/docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
