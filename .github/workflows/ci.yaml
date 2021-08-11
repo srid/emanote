@@ -31,7 +31,7 @@ jobs:
           # Run all nix commands we run latter, to cache their outputs.
           nix -j 4 bundle .
           rm ./emanote
-          nix-build -j 4 docker.nix --argstr tag latest --no-out-link
+          nix-build -j 4 docker.nix --argstr tag "latest" --no-out-link
 
   bundle:
     needs: cached
@@ -116,7 +116,6 @@ jobs:
           ls -l
           gzip -v -d ./emanote-*.gz
           ls -l
-          rm *.gz 
           mv ./emanote-* ./emanote
           ./emanote -- --layers ./docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
