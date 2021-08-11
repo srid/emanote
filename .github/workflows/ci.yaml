@@ -28,10 +28,11 @@ jobs:
         run: |
           nix build
 
-  release:
+  bundle:
     needs: cached
     runs-on: ubuntu-latest
     steps:
+      # TODO: DRY
       - uses: actions/checkout@v2
       - uses: cachix/install-nix-action@v13
         with:
@@ -60,7 +61,7 @@ jobs:
           echo "::set-output name=bundle-file::${BUNDLEFILE}"
       - name: Upload release bundle
         uses: softprops/action-gh-release@v1
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             ${{ steps.release-bundle.outputs.bundle-file }}
@@ -84,8 +85,6 @@ jobs:
         with:
           name: srid
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
-          # Only needed for private caches
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
@@ -97,7 +96,7 @@ jobs:
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
 
   publish:
-    needs: release
+    needs: bundle
     runs-on: ubuntu-latest
     steps:
       - name: Generate website HTML 🔧
