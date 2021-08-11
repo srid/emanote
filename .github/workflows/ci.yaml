@@ -6,7 +6,8 @@ on:
       - master
       - nix-bundle
 jobs:
-  setup:
+
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,12 +24,6 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-
-  ci:
-    needs: setup
-    runs-on: ubuntu-latest
-    env:
-      DOCKERTAG: latest
     steps:
       - name: Release bundle
         id: release-bundle
@@ -50,6 +45,27 @@ jobs:
         with:
           files: |
             ${{ steps.release-bundle.outputs.bundle-file }}
+
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERTAG: latest
+    steps:
+      # TODO: DRY
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v13
+        with:
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
+          install_options: "--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve"
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v10
+        with:
+          name: srid
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
+          # Only needed for private caches
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build & Publish Docker image to Docker Hub
         # if: ${{ github.ref == env.MAINLINE && runner.os == 'Linux' }}
         run: |
@@ -59,10 +75,15 @@ jobs:
           set -x
           docker push "sridca/emanote:${{ env.DOCKERTAG }}"
           # docker push "sridca/emanote:${{ env.EMANOTEVER }}"
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./.ci/output
-          nix run . -- --layers ./docs gen $(pwd)/.ci/output
+          ./emanote -- --layers ./docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
