@@ -44,7 +44,10 @@
           # Ignore these files when building emanote source package
             !(
               baseName == "README.md" ||
-              sansPrefix == "/docs"
+              sansPrefix == "/bin" ||
+              sansPrefix == "/docs" ||
+              sansPrefix == "/.github" ||
+              sansPrefix == "/.vscode"
             );
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
