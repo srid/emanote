@@ -7,6 +7,18 @@ You may try the self-contained executable bundle on Linux or Windows Subsystem f
 1. Run the binary in the zip file, as `./emanote --version` to verify that everything works
    - When you run it the first time, expect it to take a few seconds to bootstrap.
       - Do *not* interrupt it (Ctrl+C) during its *first* run; doing so might break that binary permanently on that system.
-   - This binary is produced using the [experimental nix bundle](https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-bundle.html) feature. You mileage may vary.[^bug]
+   - This binary is produced using the [experimental nix bundle](https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-bundle.html) feature. You mileage may vary.
 
-[^bug]: If the relative path passed in command-line does not work, try passing absolute paths instead.
+## Using the binary
+
+Due to a limitation in nix-bundle you must *always* pass the absolute path to your notebook in the command line. Instead of running `emanote`, run:
+
+```
+/emanote --layers=$(pwd)
+```
+
+Likewise, instead of running `emanote gen /tmp/output`, run:
+
+```
+emanote --layers=$(pwd) gen /tmp/output
+```
