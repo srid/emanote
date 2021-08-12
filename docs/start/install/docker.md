@@ -1,6 +1,6 @@
 # Docker image
 
-The official Docker image, which is built in CI, can be uses as follows:
+The official Docker image, which is built in CI, can be used as follows:
 
 ```sh
 cd /path/to/notebook
