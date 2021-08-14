@@ -14,6 +14,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Lens as A
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
+import Data.List (nub)
 import qualified Data.Map.Strict as Map
 import Ema (Slug)
 import qualified Emanote.Model.SData as SData
@@ -176,8 +177,9 @@ parseNote r fp = do
             -- Merge frontmatter tags with inline tags in Pandoc document.
             & A.key "tags" . A._Array
               .~ ( fromList . fmap Aeson.toJSON $
-                     lookupAeson mempty (one "tags") frontmatter
-                       <> HT.inlineTagsInPandoc doc
+                     nub $
+                       lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                         <> HT.inlineTagsInPandoc doc
                  )
     pure $ Note r doc meta (queryNoteTitle r doc meta)
   where
