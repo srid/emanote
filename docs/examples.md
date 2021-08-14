@@ -13,6 +13,7 @@ Emanote is suitable for creating ...
 
 ## More examples
 
+* https://chenghaomou.github.io/
+* https://n.xygn.us/
 * https://free.zettel.page/
 * https://notes.ybaumy.space/
-* https://n.xygn.us/
