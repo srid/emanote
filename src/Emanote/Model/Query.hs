@@ -61,22 +61,23 @@ queryParser = do
             QueryByPathPattern (toString $ "**/" <> s <> "/**")
 
 runQuery :: R.LMLRoute -> Model -> Query -> [Note]
-runQuery currentRoute model = \case
-  QueryByTag tag ->
-    sortByDateOrTitle $ Ix.toList $ (model ^. modelNotes) @= tag
-  QueryByTagPattern pat ->
-    let allTags = fst <$> modelTags model
-        matchingTags = filter (HT.tagMatch pat) allTags
-     in sortByDateOrTitle $ Ix.toList $ (model ^. modelNotes) @+ matchingTags
-  QueryByPath path ->
-    fromMaybe mempty $ do
-      r <- R.mkRouteFromFilePath path
-      pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
-  QueryByPathPattern (resolveDotInFilePattern -> pat) ->
-    let notes = Ix.toList $ model ^. modelNotes
-     in flip mapMaybe notes $ \note -> do
-          guard $ pat ?== (R.encodeRoute . R.lmlRouteCase $ note ^. N.noteRoute)
-          pure note
+runQuery currentRoute model =
+  sortByDateOrTitle . \case
+    QueryByTag tag ->
+      Ix.toList $ (model ^. modelNotes) @= tag
+    QueryByTagPattern pat ->
+      let allTags = fst <$> modelTags model
+          matchingTags = filter (HT.tagMatch pat) allTags
+       in Ix.toList $ (model ^. modelNotes) @+ matchingTags
+    QueryByPath path ->
+      fromMaybe mempty $ do
+        r <- R.mkRouteFromFilePath path
+        pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
+    QueryByPathPattern (resolveDotInFilePattern -> pat) ->
+      let notes = Ix.toList $ model ^. modelNotes
+       in flip mapMaybe notes $ \note -> do
+            guard $ pat ?== (R.encodeRoute . R.lmlRouteCase $ note ^. N.noteRoute)
+            pure note
   where
     -- Resolve the ./ prefix which will for substituting "$PWD" in current
     -- note's route context.
