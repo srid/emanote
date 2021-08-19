@@ -17,3 +17,4 @@ Emanote is suitable for creating ...
 * https://n.xygn.us/
 * https://free.zettel.page/
 * https://notes.ybaumy.space/
+* https://coda-coda.github.io/zettels/
