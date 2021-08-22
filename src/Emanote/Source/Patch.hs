@@ -20,10 +20,11 @@ import qualified Data.ByteString as BS
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Map.Strict as Map
 import Data.Time (getCurrentTime)
-import Emanote.Model (Model)
+import qualified Ema.Helper.FileSystem as EmaFS
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.SData as SD
+import Emanote.Model.Type (Model)
 import Emanote.Prelude
   ( BadInput (BadInput),
     chainM,
@@ -32,7 +33,6 @@ import Emanote.Prelude
 import Emanote.Route (liftLMLRoute)
 import qualified Emanote.Route as R
 import Emanote.Source.Loc (Loc, locResolve)
-import qualified Emanote.Source.Mount as Mount
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
 import UnliftIO (BufferMode (..), hSetBuffering)
@@ -40,7 +40,7 @@ import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
-transformActions :: (MonadIO m, MonadLogger m) => Mount.Change Loc R.FileType -> m (Model -> Model)
+transformActions :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc R.FileType -> m (Model -> Model)
 transformActions ch = do
   withBlockBuffering $
     uncurry transformAction `chainM` Map.toList ch
@@ -56,7 +56,7 @@ transformActions ch = do
 transformAction ::
   (MonadIO m, MonadLogger m) =>
   R.FileType ->
-  Map FilePath (Mount.FileAction (NonEmpty (Loc, FilePath))) ->
+  Map FilePath (EmaFS.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
   flip chainM (Map.toList fps) $ \(fp, action) -> case src of
@@ -65,18 +65,18 @@ transformAction src fps = do
         Nothing ->
           pure id
         Just r -> case action of
-          Mount.Update overlays -> do
+          EmaFS.Update overlays -> do
             let fpAbs = locResolve $ head overlays
             logD $ "Reading note: " <> toText fpAbs
             fmap M.modelInsertNote $ either (throw . BadInput) pure =<< N.parseNote r fpAbs
-          Mount.Delete ->
+          EmaFS.Delete ->
             pure $ M.modelDeleteNote r
     R.Yaml ->
       case R.mkRouteFromFilePath fp of
         Nothing ->
           pure id
         Just r -> case action of
-          Mount.Update overlays -> do
+          EmaFS.Update overlays -> do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               logD $ "Reading data: " <> toText fpAbs
@@ -85,25 +85,25 @@ transformAction src fps = do
               either (throw . BadInput) pure $
                 SD.parseSDataCascading r yamlContents
             pure $ M.modelInsertData sData
-          Mount.Delete ->
+          EmaFS.Delete ->
             pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
-        Mount.Update overlays -> do
+        EmaFS.Update overlays -> do
           let fpAbs = locResolve $ head overlays
           fmap (M.modelHeistTemplate %~) $ do
             logD $ "Reading template: " <> toText fpAbs
             s <- readFileBS fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
-        Mount.Delete -> do
+        EmaFS.Delete -> do
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
     R.AnyExt -> do
       case R.mkRouteFromFilePath fp of
         Nothing ->
           pure id
         Just r -> case action of
-          Mount.Update overlays -> do
+          EmaFS.Update overlays -> do
             let fpAbs = locResolve $ head overlays
             doesDirectoryExist fpAbs >>= \case
               True ->
@@ -113,7 +113,7 @@ transformAction src fps = do
                 logD $ "Adding file: " <> toText fpAbs <> " " <> show r
                 t <- liftIO getCurrentTime
                 pure $ M.modelInsertStaticFile t r fpAbs
-          Mount.Delete -> do
+          EmaFS.Delete -> do
             pure $ M.modelDeleteStaticFile r
     R.Html -> do
       -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
