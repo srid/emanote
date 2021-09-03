@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.47.2
+version:            0.1.47.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -61,7 +61,7 @@ executable emanote
     , mtl
     , neat-interpolation
     , optparse-applicative
-    , pandoc-link-context     >=1.0.2
+    , pandoc-link-context     >=1.2.0
     , pandoc-types
     , parsec
     , profunctors
