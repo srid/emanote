@@ -6,6 +6,7 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens.Operators ((^.))
+import Data.List (partition)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
 import Data.WorldPeace.Union
@@ -16,6 +17,7 @@ import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Calendar as Calendar
 import qualified Emanote.Model.Graph as G
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
@@ -105,6 +107,17 @@ renderLmlHtml emaAction model note = do
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
           Tit.titleSplice x (preparePandoc model) titleDoc
+        backlinksSplice bs =
+          Splices.listSplice bs "backlink" $
+            \(source, backlinkCtx) -> do
+              -- TODO: reuse note splice
+              "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
+              "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
+              "backlink:note:context"
+                ## do
+                  let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                  withInlineCtx $ \ctx ->
+                    Splices.pandocSplice ctx ctxDoc
     -- Sidebar navigation
     routeTreeSplice withLinkInlineCtx (Just r) model
     "ema:breadcrumbs"
@@ -117,16 +130,12 @@ renderLmlHtml emaAction model note = do
       ## titleSplice pageTitle
     let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
     "ema:note:backlinks"
-      ## Splices.listSplice (G.modelLookupBacklinks modelRoute model) "backlink"
-      $ \(source, backlinkCtx) -> do
-        -- TODO: reuse note splice
-        "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
-        "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
-        "backlink:note:context"
-          ## do
-            let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-            withInlineCtx $ \ctx ->
-              Splices.pandocSplice ctx ctxDoc
+      ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
+    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
+    "ema:note:backlinks:daily"
+      ## backlinksSplice backlinksDaily
+    "ema:note:backlinks:nodaily"
+      ## backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
     "ema:note:uptree"
       ## Splices.treeSplice (const ()) folgeAnc
