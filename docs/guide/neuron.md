@@ -19,3 +19,4 @@ Capabilities Emanote provides, but neuron does not:
 - Full theming (customize HTML fully)
 - [[yaml-config|YAML based configuration]] at per-route level
 - Layers (merge Zettelkastens, or overlay them)
+- "Timeline backlinks" (Twitter-like registering of thoughts on any note)

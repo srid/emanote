@@ -17,6 +17,7 @@
             <main class="px-4 py-4">
               <apply template="components/note-title" />
               <apply template="components/note-body" />
+              <apply template="components/timeline" />
               <apply template="components/backlinks" />
               <apply template="components/metadata" />
             </main>
