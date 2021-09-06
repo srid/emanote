@@ -46,11 +46,11 @@ executable emanote
     , containers
     , data-default
     , directory
-    , ema                     >=0.2
+    , ema                    >=0.2
     , filepath
     , filepattern
     , fsnotify
-    , heist                   >=1.1.0.1
+    , heist                  >=1.1.0.1
     , ixset-typed
     , lens
     , lens-aeson
@@ -61,7 +61,7 @@ executable emanote
     , mtl
     , neat-interpolation
     , optparse-applicative
-    , pandoc-link-context     >=1.2.0
+    , pandoc-link-context    >=1.2.0
     , pandoc-types
     , parsec
     , profunctors
@@ -106,6 +106,7 @@ executable emanote
   other-modules:
     Emanote.CLI
     Emanote.Model
+    Emanote.Model.Calendar
     Emanote.Model.Graph
     Emanote.Model.Link.Rel
     Emanote.Model.Link.Resolve

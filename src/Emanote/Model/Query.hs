@@ -7,6 +7,7 @@ import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Text as T
+import qualified Emanote.Model.Calendar as Calendar
 import Emanote.Model.Note (Note)
 import qualified Emanote.Model.Note as N
 import Emanote.Model.Type (Model, modelNotes, modelTags)
@@ -62,7 +63,7 @@ queryParser = do
 
 runQuery :: R.LMLRoute -> Model -> Query -> [Note]
 runQuery currentRoute model =
-  sortByDateOrTitle . \case
+  sortOn Calendar.noteSortKey . \case
     QueryByTag tag ->
       Ix.toList $ (model ^. modelNotes) @= tag
     QueryByTagPattern pat ->
@@ -91,9 +92,3 @@ runQuery currentRoute model =
                 else -- If in "$folder.md", discard the ./ and prepend with folder path prefix
                   R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
         else toString pat
-    -- HACK: Until we have a proper search support
-    -- See also another sortOn in Model/Type.hs
-    sortByDateOrTitle =
-      sortOn $
-        \note ->
-          (Down $ N.lookupMeta @Text (one "date") note, N._noteTitle note)
