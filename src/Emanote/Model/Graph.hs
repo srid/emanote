@@ -8,10 +8,11 @@ import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Set as Set
 import Data.Tree (Forest, Tree (Node))
+import qualified Emanote.Model.Calendar as Calendar
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Note as MN
-import Emanote.Model.Type (Model, modelLookupTitle, modelRels)
+import Emanote.Model.Type (Model, modelRels)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Emanote.Route as R
 import Emanote.Route.ModelRoute (ModelRoute)
@@ -71,9 +72,7 @@ modelFolgezettelAncestorTree r0 model =
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, [B.Block])]
 modelLookupBacklinks r model =
-  -- HACK: See also sortByDateOrTitle in Query.hs
-  -- This is so that calendar backlinks are sorted properly.
-  sortOn (Down . flip modelLookupTitle model . fst) $
+  sortOn (Calendar.backlinkSortKey model . fst) $
     backlinkRels r model <&> \rel ->
       (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
 
