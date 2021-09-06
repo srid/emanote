@@ -1,5 +1,5 @@
 <ema:note:backlinks:daily>
-  <div class="p-4 mt-8 bg-${theme}-50 rounded">
+  <div class="p-4 mt-8 bg-${theme}-50 rounded flex-1">
     <header class="mb-2 text-xl font-semibold text-gray-500"
       title="Links to this page from daily notes">🗓️ Timeline</header>
     <ul class="space-y-1">

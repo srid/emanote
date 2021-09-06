@@ -63,12 +63,8 @@
             <apply template="components/note-title" />
             <apply template="components/note-body" />
             <div class="flex flex-col lg:flex-row lg:space-x-2">
-              <div class="lg:w-1/2">
-                <apply template="components/timeline" />
-              </div>
-              <div class="lg:w-1/2">
-                <apply template="components/backlinks" />
-              </div>
+              <apply template="components/timeline" />
+              <apply template="components/backlinks" />
             </div>
             <apply template="components/metadata" />
           </main>

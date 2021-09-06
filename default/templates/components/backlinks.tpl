@@ -1,5 +1,5 @@
 <ema:note:backlinks:nodaily>
-  <div class="p-4 mt-8 bg-gray-100 rounded">
+  <div class="p-4 mt-8 bg-gray-100 rounded flex-1">
     <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
     <ul class="space-y-1">
       <backlink>
