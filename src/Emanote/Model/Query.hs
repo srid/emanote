@@ -95,5 +95,5 @@ runQuery currentRoute model =
     -- See also another sortOn in Model/Type.hs
     sortByDateOrTitle =
       sortOn $
-        Down . \note ->
-          (N.lookupMeta @Text (one "date") note, N._noteTitle note)
+        \note ->
+          (Down $ N.lookupMeta @Text (one "date") note, N._noteTitle note)
