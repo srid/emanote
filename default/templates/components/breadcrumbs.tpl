@@ -1,8 +1,15 @@
-<ema:breadcrumbs>
-  <nav id="breadcrumbs" class="w-full text-gray-700 md:hidden">
-    <div class="flex justify-left">
-      <div class="w-full px-2 py-2 bg-gray-50">
-        <ul class="flex flex-wrap text-lg">
+<nav id="breadcrumbs" class="w-full text-gray-700 md:hidden">
+  <div class="flex justify-left">
+    <div class="w-full px-2 py-2 bg-gray-50">
+      <ul class="flex flex-wrap text-lg">
+        <li class="inline-flex items-center">
+          <ema:metadata>
+            <with var="template">
+              <img style="width: 1rem;" src="${value:iconUrl}" />
+            </with>
+          </ema:metadata>
+        </li>
+        <ema:breadcrumbs>
           <each-crumb>
             <li class="inline-flex items-center">
               <a class="px-1 font-bold" href="${crumb:url}">
@@ -15,8 +22,8 @@
               </svg>
             </li>
           </each-crumb>
-        </ul>
-      </div>
+        </ema:breadcrumbs>
+      </ul>
     </div>
-  </nav>
-</ema:breadcrumbs>
+  </div>
+</nav>
