@@ -4,7 +4,7 @@
 
       <apply template="components/breadcrumbs" />
 
-      <div class="flex flex-nowrap bg-gray-50 md:mt-8 md:shadow-2xl md:mb-8">
+      <div id="container" class="flex flex-nowrap bg-gray-50 md:mt-8 md:shadow-2xl md:mb-8">
         <!-- Sidebar column -->
         <nav id="sidebar"
           class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:w-48 xl:w-64">
@@ -70,6 +70,13 @@
           </main>
         </div>
       </div>
+      <style type="text/css">
+        @media (min-width: 768px) {
+          #container {
+            display: flex;
+          }
+        }
+      </style>
       <apply template="components/footer" />
     </div>
   </bind>

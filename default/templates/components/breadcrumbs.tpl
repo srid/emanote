@@ -25,5 +25,22 @@
         </ema:breadcrumbs>
       </ul>
     </div>
+    <button
+      class="inline px-3 py-1 text-xl leading-none text-white bg-transparent border border-transparent border-solid rounded outline-none cursor-pointer md:hidden focus:outline-none"
+      type="button" onclick="toggleHidden('sidebar');toggleFlex('container')">
+      <svg xmlns="http://www.w3.org/2000/svg" style="width: 1rem;" class="hover:text-${theme}-700"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    <script>
+      function toggleHidden(collapseID) {
+        document.getElementById(collapseID).classList.toggle("hidden");
+      }
+      function toggleFlex(collapseID) {
+        document.getElementById(collapseID).classList.toggle("flex");
+      }
+    </script>
   </div>
 </nav>
