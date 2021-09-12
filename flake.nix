@@ -8,10 +8,6 @@
       url = "github:srid/windicss-nix";
       flake = false;
     };
-    pandoc-link-context = {
-      url = "github:srid/pandoc-link-context";
-      flake = false;
-    };
     tagtree = {
       url = "github:srid/tagtree";
       flake = false;
@@ -57,7 +53,6 @@
             withHoogle = true;
             overrides = self: super: with pkgs.haskell.lib; {
               ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
-              pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
               tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
               # Jailbreak heist to allow newer dlist
               heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
