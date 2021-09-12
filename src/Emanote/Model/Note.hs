@@ -166,22 +166,20 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   where
     meta = Aeson.Null
 
-parseNote :: MonadIO m => R.LMLRoute -> FilePath -> m (Either Text Note)
-parseNote r fp = do
-  !s <- readFileText fp
-  pure $ do
-    (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
-      Markdown.parseMarkdown fp s
-    let meta =
-          frontmatter
-            -- Merge frontmatter tags with inline tags in Pandoc document.
-            & A.key "tags" . A._Array
-              .~ ( fromList . fmap Aeson.toJSON $
-                     nub $
-                       lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                         <> HT.inlineTagsInPandoc doc
-                 )
-    pure $ Note r doc meta (queryNoteTitle r doc meta)
+parseNote :: R.LMLRoute -> FilePath -> Text -> Either Text Note
+parseNote r fp s = do
+  (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
+    Markdown.parseMarkdown fp s
+  let meta =
+        frontmatter
+          -- Merge frontmatter tags with inline tags in Pandoc document.
+          & A.key "tags" . A._Array
+            .~ ( fromList . fmap Aeson.toJSON $
+                   nub $
+                     lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                       <> HT.inlineTagsInPandoc doc
+               )
+  pure $ Note r doc meta (queryNoteTitle r doc meta)
   where
     withAesonDefault def mv =
       fromMaybe def mv

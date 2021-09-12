@@ -36,6 +36,7 @@ import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
 import UnliftIO (BufferMode (..), hSetBuffering)
+import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
 
@@ -67,9 +68,14 @@ transformAction src fps = do
         Just r -> case action of
           EmaFS.Update overlays -> do
             let fpAbs = locResolve $ head overlays
-            logD $ "Reading note: " <> toText fpAbs
-            fmap M.modelInsertNote $ either (throw . BadInput) pure =<< N.parseNote r fpAbs
-          EmaFS.Delete ->
+            s <- readFileFollowingFsnotify fpAbs
+            case N.parseNote r fpAbs (decodeUtf8 s) of
+              Left e ->
+                throw $ BadInput e
+              Right note ->
+                pure $ M.modelInsertNote note
+          EmaFS.Delete -> do
+            logD $ "Removing note: " <> toText fp
             pure $ M.modelDeleteNote r
     R.Yaml ->
       case R.mkRouteFromFilePath fp of
@@ -79,24 +85,24 @@ transformAction src fps = do
           EmaFS.Update overlays -> do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
-              logD $ "Reading data: " <> toText fpAbs
-              readFileBS fpAbs
+              readFileFollowingFsnotify fpAbs
             sData <-
               either (throw . BadInput) pure $
                 SD.parseSDataCascading r yamlContents
             pure $ M.modelInsertData sData
-          EmaFS.Delete ->
+          EmaFS.Delete -> do
+            logD $ "Removing data: " <> toText fp
             pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
         EmaFS.Update overlays -> do
           let fpAbs = locResolve $ head overlays
           fmap (M.modelHeistTemplate %~) $ do
-            logD $ "Reading template: " <> toText fpAbs
-            s <- readFileBS fpAbs
+            s <- readFileFollowingFsnotify fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
         EmaFS.Delete -> do
+          logD $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
     R.AnyExt -> do
       case R.mkRouteFromFilePath fp of
@@ -121,3 +127,29 @@ transformAction src fps = do
     R.Folder -> do
       -- Unused! But maybe we should ... TODO:
       pure id
+
+-- | Like `readFileBS` but accounts for file truncation due to us responding
+-- *immediately* to a fsnotify modify event (which is triggered even before the
+-- writer *finishes* writing the new contents). We solve this "glitch" by
+-- delaying the read retry, expecting (hoping really) that *this time* the new
+-- non-empty contents will come through. 'tis a bit of a HACK though.
+readFileFollowingFsnotify :: (MonadIO m, MonadLogger m) => FilePath -> m ByteString
+readFileFollowingFsnotify fp = do
+  logD $ "Reading file: " <> toText fp
+  readFileBS fp >>= \case
+    "" ->
+      reReadFileBS 100 fp >>= \case
+        "" ->
+          -- Sometimes 100ms is not enough (eg: on WSL), so wait a bit more and
+          -- give it another try.
+          reReadFileBS 300 fp
+        s -> pure s
+    s -> pure s
+  where
+    -- File probably just got truncated (prior to actual write), but hasn't
+    -- been written to yet, so let's wait for that to happen before retrying
+    -- read of new contents.
+    reReadFileBS ms filePath = do
+      threadDelay $ 1000 * ms
+      logD $ "Re-reading (" <> show ms <> "ms" <> ") file: " <> toText filePath
+      readFileBS filePath
