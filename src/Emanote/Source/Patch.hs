@@ -66,9 +66,9 @@ transformAction src fps = do
         Nothing ->
           pure id
         Just r -> case action of
-          EmaFS.Update overlays -> do
+          EmaFS.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
-            s <- readFileFollowingFsnotify fpAbs
+            s <- readRefreshedFile refreshAction fpAbs
             case N.parseNote r fpAbs (decodeUtf8 s) of
               Left e ->
                 throw $ BadInput e
@@ -82,10 +82,10 @@ transformAction src fps = do
         Nothing ->
           pure id
         Just r -> case action of
-          EmaFS.Update overlays -> do
+          EmaFS.Refresh refreshAction overlays -> do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
-              readFileFollowingFsnotify fpAbs
+              readRefreshedFile refreshAction fpAbs
             sData <-
               either (throw . BadInput) pure $
                 SD.parseSDataCascading r yamlContents
@@ -95,10 +95,10 @@ transformAction src fps = do
             pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
-        EmaFS.Update overlays -> do
+        EmaFS.Refresh refreshAction overlays -> do
           let fpAbs = locResolve $ head overlays
           fmap (M.modelHeistTemplate %~) $ do
-            s <- readFileFollowingFsnotify fpAbs
+            s <- readRefreshedFile refreshAction fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
         EmaFS.Delete -> do
@@ -109,14 +109,17 @@ transformAction src fps = do
         Nothing ->
           pure id
         Just r -> case action of
-          EmaFS.Update overlays -> do
+          EmaFS.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
             doesDirectoryExist fpAbs >>= \case
               True ->
                 -- A directory got added; this is not a static 'file'
                 pure id
               False -> do
-                logD $ "Adding file: " <> toText fpAbs <> " " <> show r
+                let verb = case refreshAction of
+                      EmaFS.Existing -> "Registering"
+                      _ -> "Re-registering"
+                logD $ verb <> " file: " <> toText fpAbs <> " " <> show r
                 t <- liftIO getCurrentTime
                 pure $ M.modelInsertStaticFile t r fpAbs
           EmaFS.Delete -> do
@@ -127,6 +130,15 @@ transformAction src fps = do
     R.Folder -> do
       -- Unused! But maybe we should ... TODO:
       pure id
+
+readRefreshedFile :: (MonadLogger m, MonadIO m) => EmaFS.RefreshAction -> FilePath -> m ByteString
+readRefreshedFile refreshAction fp =
+  case refreshAction of
+    EmaFS.Existing -> do
+      logD $ "Loading file: " <> toText fp
+      readFileBS fp
+    _ ->
+      readFileFollowingFsnotify fp
 
 -- | Like `readFileBS` but accounts for file truncation due to us responding
 -- *immediately* to a fsnotify modify event (which is triggered even before the
@@ -146,9 +158,7 @@ readFileFollowingFsnotify fp = do
         s -> pure s
     s -> pure s
   where
-    -- File probably just got truncated (prior to actual write), but hasn't
-    -- been written to yet, so let's wait for that to happen before retrying
-    -- read of new contents.
+    -- Wait before reading, logging the given delay.
     reReadFileBS ms filePath = do
       threadDelay $ 1000 * ms
       logD $ "Re-reading (" <> show ms <> "ms" <> ") file: " <> toText filePath
