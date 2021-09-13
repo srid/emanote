@@ -85,7 +85,7 @@ renderSRIndex emaAction model = do
       withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
         withNoteRenderer linkInlineRenderers () ()
-  flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
+  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
 
@@ -100,9 +100,9 @@ renderLmlHtml emaAction model note = do
         withNoteRenderer linkInlineRenderers () ()
       withBlockCtx =
         withNoteRenderer noteRenderers () r
-      templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
+      templateName = encodeUtf8 $ MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       pageTitle = M.modelLookupTitle r model
-  flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
+  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices withLinkInlineCtx emaAction model meta pageTitle
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->

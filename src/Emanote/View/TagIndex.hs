@@ -9,6 +9,7 @@ import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import Data.Tree (Forest, Tree)
 import qualified Data.Tree as Tree
+import qualified Ema
 import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
@@ -82,7 +83,7 @@ renderTagIndex emaAction model tagPath = do
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
       tagIdx = mkTagIndex model tagPath
-  flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
+  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
