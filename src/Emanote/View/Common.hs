@@ -8,17 +8,21 @@ module Emanote.View.Common
     noteRenderers,
     inlineRenderers,
     linkInlineRenderers,
+    renderModelTemplate,
   )
 where
 
+import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
 import Data.Map.Syntax ((##))
 import Data.Version (showVersion)
+import qualified Ema
 import qualified Ema.CLI
 import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
+import qualified Emanote.Model.Type as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers (..))
 import qualified Emanote.Pandoc.Renderer as Renderer
@@ -30,6 +34,7 @@ import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
+import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Apply as HA
 import qualified Heist.Splices.Bind as HB
@@ -182,3 +187,13 @@ mkRendererWith emaAction model classRules =
             b
         f renderCtx
    in withNoteRenderer
+
+renderModelTemplate :: Ema.CLI.Action -> Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
+renderModelTemplate emaAction model templateName =
+  let handleErr = case emaAction of
+        Ema.CLI.Run -> Ema.emaErrorHtmlResponse
+        -- When staticaly generating, we must fail asap on template errors.
+        _ -> error
+   in -- Until Ema's error handling improves ...
+      either handleErr id
+        . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
