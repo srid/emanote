@@ -76,9 +76,9 @@ renderHeistTemplate ::
   Text ->
   H.Splices (HI.Splice Identity) ->
   TemplateState ->
-  LByteString
+  Either Text LByteString
 renderHeistTemplate name splices st =
-  either error id . runExcept $ do
+  runExcept $ do
     heist <-
       hoistEither . first (unlines . fmap toText) $ unTemplateState st
     (builder, _mimeType) <-
