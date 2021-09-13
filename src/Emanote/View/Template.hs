@@ -100,7 +100,7 @@ renderLmlHtml emaAction model note = do
         withNoteRenderer linkInlineRenderers () ()
       withBlockCtx =
         withNoteRenderer noteRenderers () r
-      templateName = MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
+      templateName = encodeUtf8 $ MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       pageTitle = M.modelLookupTitle r model
   either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
     commonSplices withLinkInlineCtx emaAction model meta pageTitle
