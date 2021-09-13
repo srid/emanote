@@ -143,8 +143,8 @@ lookupNotesByRoute :: R.LMLRoute -> IxNote -> [Note]
 lookupNotesByRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-placeHolderNote :: R.LMLRoute -> Note
-placeHolderNote r =
+ancestorPlaceholderNote :: R.LMLRoute -> Note
+ancestorPlaceholderNote r =
   let placeHolder =
         [ folderListingQuery,
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
@@ -159,6 +159,11 @@ placeHolderNote r =
       B.CodeBlock (cls "query") "path:./*"
     cls x =
       ("", one x, mempty) :: B.Attr
+
+missingNote :: R.LMLRoute -> Text -> Note
+missingNote route404 urlPath =
+  mkEmptyNoteWith route404 $
+    one $ B.Para [B.Str $ "No note found for '" <> urlPath <> "'"]
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
