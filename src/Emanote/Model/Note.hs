@@ -128,20 +128,13 @@ noteHtmlRoute note@Note {..} =
     Just slugs ->
       R.mkRouteFromSlugs slugs
 
-singleNote :: HasCallStack => [Note] -> Maybe Note
-singleNote ns = do
-  res@(x :| xs) <- nonEmpty ns
-  if null xs
-    then pure x
-    else error $ "Ambiguous notes: " <> show (_noteRoute <$> res)
-
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-lookupNotesByRoute :: R.LMLRoute -> IxNote -> [Note]
-lookupNotesByRoute htmlRoute =
-  Ix.toList . Ix.getEQ htmlRoute
+lookupNotesByRoute :: R.LMLRoute -> IxNote -> Maybe Note
+lookupNotesByRoute r =
+  Ix.getOne . Ix.getEQ r
 
 ancestorPlaceholderNote :: R.LMLRoute -> Note
 ancestorPlaceholderNote r =
@@ -164,6 +157,23 @@ missingNote :: R.LMLRoute -> Text -> Note
 missingNote route404 urlPath =
   mkEmptyNoteWith route404 $
     one $ B.Para [B.Str $ "No note found for '" <> urlPath <> "'"]
+
+ambiguousNote :: FilePath -> NonEmpty R.LMLRoute -> Note
+ambiguousNote urlPath rs =
+  mkEmptyNoteWith (head rs) $
+    [ B.Para
+        [ B.Str "Error! The path \"",
+          B.Code B.nullAttr $ toText urlPath,
+          B.Str "\" is ambiguous. It can be resolved to more than one note (see below). You should disambiguate them."
+        ]
+    ]
+      <> one list
+  where
+    list :: B.Block
+    list =
+      B.BulletList $
+        toList rs <&> \r ->
+          one $ B.Plain $ one $ B.Str (show r)
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =

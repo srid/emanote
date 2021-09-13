@@ -7,6 +7,7 @@ module Emanote.Route.SiteRoute.Type
     IndexR (..),
     TagIndexR (..),
     MissingR (..),
+    AmbiguousR (..),
     VirtualRoute,
     ResourceRoute,
     decodeVirtualRoute,
@@ -37,6 +38,10 @@ newtype TagIndexR = TagIndexR [HT.TagNode]
 newtype MissingR = MissingR {unMissingR :: FilePath}
   deriving (Eq, Show, Ord)
 
+-- | An ambiguous route
+newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
+  deriving (Eq, Show, Ord)
+
 type VirtualRoute' =
   '[ IndexR,
      TagIndexR
@@ -59,7 +64,8 @@ type ResourceRoute = OpenUnion ResourceRoute'
 type SiteRoute' =
   '[ VirtualRoute,
      ResourceRoute,
-     MissingR
+     MissingR,
+     AmbiguousR
    ]
 
 type SiteRoute = OpenUnion SiteRoute'

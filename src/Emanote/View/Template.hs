@@ -44,8 +44,12 @@ render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
 render emaAction m =
   absurdUnion
     `h` ( \(SR.MissingR urlPath) -> do
-            let route404 = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                note404 = MN.missingNote route404 (toText urlPath)
+            let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+                note404 = MN.missingNote hereRoute (toText urlPath)
+            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+        )
+    `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
+            let note404 = MN.ambiguousNote urlPath notes
             Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
         )
     `h` renderResourceRoute emaAction m
