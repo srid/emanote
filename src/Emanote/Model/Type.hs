@@ -77,7 +77,7 @@ modelInsertNote note =
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
   let lmlR = R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
-   in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
+   in case N.lookupNotesByRoute lmlR ns of
         Just _ -> ns
         Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
 
@@ -121,13 +121,17 @@ modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
+modelLookupNoteByRoute :: HasCallStack => LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
-  N.singleNote (N.lookupNotesByRoute r notes)
+  N.lookupNotesByRoute r notes
 
-modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
-modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
-  N.singleNote (N.lookupNotesByHtmlRoute r notes)
+modelLookupNoteByHtmlRoute :: HasCallStack => R 'R.Html -> Model -> Maybe (Either (NonEmpty Note) Note)
+modelLookupNoteByHtmlRoute r (_modelNotes -> notes) = do
+  nonEmpty (N.lookupNotesByHtmlRoute r notes) >>= \case
+    x :| [] -> pure $ Right x
+    xs ->
+      -- Ambiguous notes
+      pure $ Left xs
 
 modelLookupTitle :: LMLRoute -> Model -> Tit.Title
 modelLookupTitle r =

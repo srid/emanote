@@ -42,6 +42,9 @@ instance Ema Model SiteRoute where
       `h` ( \(MissingR _fp) ->
               error "emanote: attempt to encode a 404 route"
           )
+      `h` ( \(AmbiguousR _) ->
+              error "emanote: attempt to encode an ambiguous route"
+          )
       `h` encodeResourceRoute model
       `h` encodeVirtualRoute
 
@@ -93,8 +96,15 @@ decodeGeneratedRoute model fp =
     staticFileSiteRoute
     (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
     <|> fmap
-      noteFileSiteRoute
+      noteHtmlSiteRoute
       (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
+  where
+    noteHtmlSiteRoute :: Either (NonEmpty N.Note) N.Note -> SiteRoute
+    noteHtmlSiteRoute =
+      either ambiguousNotesRoute noteFileSiteRoute
+    ambiguousNotesRoute :: NonEmpty N.Note -> SiteRoute
+    ambiguousNotesRoute ns =
+      openUnionLift $ AmbiguousR (fp, N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =

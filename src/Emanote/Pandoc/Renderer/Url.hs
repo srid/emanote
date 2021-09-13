@@ -104,6 +104,7 @@ siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
 siteRouteDefaultInnerText model url =
   absurdUnion
     `h` (\(SR.MissingR _) -> Nothing)
+    `h` (\(SR.AmbiguousR _) -> Nothing)
     `h` ( \(resR :: SR.ResourceRoute) ->
             resR & absurdUnion
               `h` ( \(lmlR :: R.LMLRoute) ->
