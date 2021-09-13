@@ -79,7 +79,7 @@ injectAncestor ancestor ns =
   let lmlR = R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
    in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
         Just _ -> ns
-        Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
+        Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
 
 modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =

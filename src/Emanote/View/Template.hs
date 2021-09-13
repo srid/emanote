@@ -45,9 +45,7 @@ render emaAction m =
   absurdUnion
     `h` ( \(SR.MissingR urlPath) -> do
             let route404 = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                note404 =
-                  MN.mkEmptyNoteWith route404 $
-                    one $ B.Para [B.Str $ "No note found for '" <> toText urlPath <> "'"]
+                note404 = MN.missingNote route404 (toText urlPath)
             Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
         )
     `h` renderResourceRoute emaAction m
