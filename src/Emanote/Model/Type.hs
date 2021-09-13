@@ -121,14 +121,15 @@ modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNoteByRoute :: HasCallStack => LMLRoute -> Model -> Maybe Note
+modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.lookupNotesByRoute r notes
 
-modelLookupNoteByHtmlRoute :: HasCallStack => R 'R.Html -> Model -> Maybe (Either (NonEmpty Note) Note)
+modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe (Either (NonEmpty Note) Note)
 modelLookupNoteByHtmlRoute r (_modelNotes -> notes) = do
   nonEmpty (N.lookupNotesByHtmlRoute r notes) >>= \case
-    x :| [] -> pure $ Right x
+    x :| [] ->
+      pure $ Right x
     xs ->
       -- Ambiguous notes
       pure $ Left xs

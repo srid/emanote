@@ -104,7 +104,7 @@ decodeGeneratedRoute model fp =
       either ambiguousNotesRoute noteFileSiteRoute
     ambiguousNotesRoute :: NonEmpty N.Note -> SiteRoute
     ambiguousNotesRoute ns =
-      openUnionLift $ AmbiguousR (fp, N._noteRoute <$> ns)
+      openUnionLift $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =

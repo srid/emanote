@@ -5,7 +5,8 @@
 -- TODO: Split this sensibly.
 module Emanote.View.Template (render) where
 
-import Control.Lens.Operators ((^.))
+import Control.Lens
+import qualified Data.Aeson.Types as Aeson
 import Data.List (partition)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
@@ -45,12 +46,18 @@ render emaAction m =
   absurdUnion
     `h` ( \(SR.MissingR urlPath) -> do
             let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                note404 = MN.missingNote hereRoute (toText urlPath)
+                note404 =
+                  MN.missingNote hereRoute (toText urlPath)
+                    & MN.noteMeta .~ withTemplateName "/templates/error"
+                    & MN.noteTitle .~ "Emanote Error"
             Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
         )
     `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
-            let note404 = MN.ambiguousNote urlPath notes
-            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+            let noteAmb =
+                  MN.ambiguousNote urlPath notes
+                    & MN.noteMeta .~ withTemplateName "/templates/error"
+                    & MN.noteTitle .~ "Emanote Error"
+            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m noteAmb
         )
     `h` renderResourceRoute emaAction m
     `h` renderVirtualRoute emaAction m
@@ -90,10 +97,20 @@ renderSRIndex emaAction model = do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
 
+lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
+lookupTemplateName meta =
+  encodeUtf8 $ MN.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
+  where
+    defaultTemplate = "templates/layouts/book"
+
+withTemplateName :: Text -> Aeson.Value
+withTemplateName =
+  MN.oneAesonText (toList $ "template" :| ["name"])
+
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
   let r = note ^. MN.noteRoute
-      meta = Meta.getEffectiveRouteMeta r model
+      meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
@@ -101,10 +118,9 @@ renderLmlHtml emaAction model note = do
         withNoteRenderer linkInlineRenderers () ()
       withBlockCtx =
         withNoteRenderer noteRenderers () r
-      templateName = encodeUtf8 $ MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
-      pageTitle = M.modelLookupTitle r model
+      templateName = lookupTemplateName meta
   renderModelTemplate emaAction model templateName $ do
-    commonSplices withLinkInlineCtx emaAction model meta pageTitle
+    commonSplices withLinkInlineCtx emaAction model meta (note ^. MN.noteTitle)
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
           Tit.titleSplice x (preparePandoc model) titleDoc
@@ -128,7 +144,7 @@ renderLmlHtml emaAction model note = do
         "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
     -- Note stuff
     "ema:note:title"
-      ## titleSplice pageTitle
+      ## titleSplice (note ^. MN.noteTitle)
     let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
     "ema:note:backlinks"
       ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
