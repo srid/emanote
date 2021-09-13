@@ -162,7 +162,7 @@ ambiguousNote :: FilePath -> NonEmpty R.LMLRoute -> Note
 ambiguousNote urlPath rs =
   mkEmptyNoteWith (head rs) $
     [ B.Para
-        [ B.Str "Error! The path \"",
+        [ B.Str "The path \"",
           B.Code B.nullAttr $ toText urlPath,
           B.Str "\" is ambiguous. It can be resolved to more than one note (see below). You should disambiguate them."
         ]
@@ -216,5 +216,13 @@ lookupAeson x (k :| ks) meta =
     resultToMaybe = \case
       Aeson.Error _ -> Nothing
       Aeson.Success b -> pure b
+
+oneAesonText :: [Text] -> Text -> Aeson.Value
+oneAesonText k v =
+  case nonEmpty k of
+    Nothing ->
+      Aeson.String v
+    Just (x :| xs) ->
+      Aeson.object [x Aeson..= oneAesonText (toList xs) v]
 
 makeLenses ''Note
