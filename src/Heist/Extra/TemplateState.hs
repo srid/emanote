@@ -6,6 +6,7 @@
 
 module Heist.Extra.TemplateState
   ( TemplateState,
+    TemplateName,
     addTemplateFile,
     removeTemplateFile,
     renderHeistTemplate,

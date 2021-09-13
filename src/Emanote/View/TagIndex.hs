@@ -2,14 +2,12 @@
 
 module Emanote.View.TagIndex (renderTagIndex) where
 
-import Control.Lens.Operators ((^.))
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import Data.Tree (Forest, Tree)
 import qualified Data.Tree as Tree
-import qualified Ema
 import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
@@ -18,10 +16,9 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Route.SiteRoute.Class as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta)
+import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, renderModelTemplate)
 import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
-import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 
 -- An index view into the notebook indexed by the given tag path.
@@ -83,7 +80,7 @@ renderTagIndex emaAction model tagPath = do
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
       tagIdx = mkTagIndex model tagPath
-  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate "templates/special/tagindex") (model ^. M.modelHeistTemplate) $ do
+  renderModelTemplate emaAction model "templates/special/tagindex" $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)

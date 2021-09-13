@@ -27,14 +27,13 @@ import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers)
+import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import qualified Heist.Extra.Splices.Tree as Splices
-import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 import qualified Shower
@@ -85,7 +84,7 @@ renderSRIndex emaAction model = do
       withNoteRenderer = mkRendererFromMeta emaAction model meta
       withInlineCtx =
         withNoteRenderer linkInlineRenderers () ()
-  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate "templates/special/index") (model ^. M.modelHeistTemplate) $ do
+  renderModelTemplate emaAction model "templates/special/index" $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
 
@@ -102,7 +101,7 @@ renderLmlHtml emaAction model note = do
         withNoteRenderer noteRenderers () r
       templateName = encodeUtf8 $ MN.lookupAeson @Text "templates/layouts/book" ("template" :| ["name"]) meta
       pageTitle = M.modelLookupTitle r model
-  either Ema.emaErrorHtmlResponse id . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate) $ do
+  renderModelTemplate emaAction model templateName $ do
     commonSplices withLinkInlineCtx emaAction model meta pageTitle
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
