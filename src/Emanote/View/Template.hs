@@ -5,7 +5,7 @@
 -- TODO: Split this sensibly.
 module Emanote.View.Template (render) where
 
-import Control.Lens
+import Control.Lens ((.~), (^.))
 import qualified Data.Aeson.Types as Aeson
 import Data.List (partition)
 import qualified Data.List.NonEmpty as NE

@@ -25,8 +25,8 @@ import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
+import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.Pandoc.Definition as B
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -62,7 +62,7 @@ instance Indexable NoteIxs Note where
   indices =
     ixList
       (ixFun $ one . _noteRoute)
-      (ixFun noteSelfRefs)
+      (ixFun $ toList . noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
       (ixFun noteAncestors)
       (ixFun $ maybeToList . noteParent)
@@ -70,12 +70,16 @@ instance Indexable NoteIxs Note where
       (ixFun $ maybeToList . noteSlug)
 
 -- | All possible wiki-links that refer to this note.
-noteSelfRefs :: Note -> [WL.WikiLink]
+noteSelfRefs :: Note -> NonEmpty WL.WikiLink
 noteSelfRefs =
+  routeSelfRefs
+    . _noteRoute
+
+routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
+routeSelfRefs =
   fmap snd
     . WL.allowedWikiLinks
     . (R.liftModelRoute . R.lmlRouteCase)
-    . _noteRoute
 
 noteAncestors :: Note -> [RAncestor]
 noteAncestors =
@@ -164,7 +168,7 @@ ambiguousNote urlPath rs =
     [ B.Para
         [ B.Str "The path \"",
           B.Code B.nullAttr $ toText urlPath,
-          B.Str "\" is ambiguous. It can be resolved to more than one note (see below). You should disambiguate them."
+          B.Str "\" is ambiguous. It can be resolved to more than one note. You should disambiguate them. Here are the ambiguous notes:"
         ]
     ]
       <> one list
@@ -172,8 +176,12 @@ ambiguousNote urlPath rs =
     list :: B.Block
     list =
       B.BulletList $
-        toList rs <&> \r ->
-          one $ B.Plain $ one $ B.Str (show r)
+        toList rs <&> \(R.lmlRouteCase -> r) ->
+          let wl = WL.mkWikiLinkFromRoute r
+           in [ B.Plain $ toList $ WL.wikilinkInline WL.WikiLinkNormal wl $ B.fromList [B.Str $ show wl],
+                B.Plain $ one $ B.Str "  ",
+                B.Plain $ one $ B.Code B.nullAttr $ toText (R.encodeRoute r)
+              ]
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
