@@ -10,6 +10,7 @@ Emanote is suitable for creating ...
 * ... **wiki** sites, such as: [Unofficial r/TheMotte Wiki](https://themotte.zettel.page/) (view [source](https://github.com/Kuratoro/TheMotte.zettel.page))
 * ... **personal website**/**blogs**, such as: [www.srid.ca](https://www.srid.ca/) (view [source](https://github.com/srid/www.srid.ca))
 * ... **Zettelkasten** sites ([[neuron-layout|Neuron-like]]), such as: [woke.zettel.page](https://woke.zettel.page/) (view [source](https://github.com/Kuratoro/woke.zettel.page))
+* ... **public journals**, such as [inspirativity.zetetel.page](https://inspirativity.zettel.page/) (view [source](https://github.com/srid/inspirativity.zettel.page)) 
 
 ## More examples
 
