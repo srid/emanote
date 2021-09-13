@@ -6,7 +6,6 @@
 
 module Heist.Extra.TemplateState
   ( TemplateState,
-    newTemplateState,
     addTemplateFile,
     removeTemplateFile,
     renderHeistTemplate,
@@ -14,78 +13,122 @@ module Heist.Extra.TemplateState
 where
 
 import Control.Lens.Operators ((.~))
-import Control.Monad.Except (runExcept)
+import Control.Monad.Except (MonadError (throwError), runExcept)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
 import qualified Data.HashMap.Strict as HM
+import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
+import GHC.IO.Unsafe (unsafePerformIO)
 import qualified Heist as H
 import qualified Heist.Common as H
-import qualified Heist.Extra as HE
 import qualified Heist.Internal.Types as HT
 import qualified Heist.Interpreted as HI
 import System.FilePath (splitExtension)
-import Text.Show (Show (..))
 import qualified Text.XmlHtml as XmlHtml
 
-newtype TemplateState = TemplateState {unTemplateState :: Either [String] (H.HeistState Identity)}
+type TemplateName = ByteString
+
+data TemplateState = TemplateState (H.HeistState Identity) TemplateErrors
 
 instance Default TemplateState where
-  def = TemplateState $ Left $ one "Heist templates yet to be loaded"
+  def = unsafePerformIO emptyTemplateState
 
-instance Show TemplateState where
-  show = \case
-    TemplateState (Left errs) ->
-      "Heist errors: \n" <> toString (unlines (toText <$> errs))
-    TemplateState (Right st) ->
-      "Heist templates loaded: " <> toString (T.intercalate ", " $ HE.availableTemplates st)
-
-newTemplateState :: MonadIO m => m TemplateState
-newTemplateState = do
+emptyTemplateState :: MonadIO m => m TemplateState
+emptyTemplateState = do
   let heistCfg :: H.HeistConfig Identity =
         H.emptyHeistConfig
           & H.hcNamespace .~ ""
-  liftIO $ TemplateState <$> H.initHeist heistCfg
+  eSt <- liftIO $ H.initHeist heistCfg
+  let st = either (error . T.intercalate "," . fmap toText) id eSt
+  pure $ TemplateState st mempty
 
-addTemplateFile :: HasCallStack => FilePath -> FilePath -> ByteString -> TemplateState -> TemplateState
-addTemplateFile fp fpRel s (TemplateState eSt) =
-  TemplateState $ do
-    st <- eSt
-    first one (XmlHtml.parseHTML fp s) >>= \case
-      XmlHtml.XmlDocument {} ->
-        -- TODO: Need this for RSS feed generation.
-        Left $ one "Xml unsupported"
-      XmlHtml.HtmlDocument {..} -> do
-        Right $ HI.addTemplate (tmplName fpRel) docContent (Just fp) st
+getTemplateState :: MonadError Text m => TemplateState -> m (HT.HeistState Identity)
+getTemplateState (TemplateState st errs) =
+  if not $ null errs
+    then throwError $ showErrors errs
+    else pure st
 
-tmplName :: HasCallStack => String -> ByteString
+addTemplate :: TemplateName -> FilePath -> TemplateState -> Either Text HT.Template -> TemplateState
+addTemplate name fp (TemplateState st errs) = \case
+  Left err ->
+    TemplateState st (assignError name err errs)
+  Right doc ->
+    let newSt = HI.addTemplate name doc (Just fp) st
+     in TemplateState newSt (clearError name errs)
+
+addTemplateFile ::
+  HasCallStack =>
+  -- | Absolute path
+  FilePath ->
+  -- | Relative path (to template base)
+  FilePath ->
+  -- | Contents of the .tmpl file
+  ByteString ->
+  TemplateState ->
+  TemplateState
+addTemplateFile fp (tmplName -> name) s tmplSt =
+  addTemplate name fp tmplSt $
+    XmlHtml.parseHTML fp s & \case
+      Left (toText -> err) ->
+        Left err
+      Right XmlHtml.XmlDocument {} ->
+        Left "Xml unsupported"
+      Right XmlHtml.HtmlDocument {..} ->
+        Right docContent
+
+removeTemplate :: HasCallStack => TemplateName -> TemplateState -> TemplateState
+removeTemplate name (TemplateState st errs) =
+  let tpath = H.splitPathWith '/' name
+      newSt = st {HT._templateMap = HM.delete tpath (HT._templateMap st)}
+   in TemplateState newSt (clearError name errs)
+
+removeTemplateFile :: HasCallStack => FilePath -> TemplateState -> TemplateState
+removeTemplateFile (tmplName -> name) = removeTemplate name
+
+tmplName :: HasCallStack => String -> TemplateName
 tmplName fp = fromMaybe (error "Not a .tpl file") $ do
   let (base, ext) = splitExtension fp
   guard $ ext == ".tpl"
   pure $ encodeUtf8 base
 
-removeTemplateFile :: HasCallStack => FilePath -> TemplateState -> TemplateState
-removeTemplateFile fp (TemplateState eSt) =
-  TemplateState $ do
-    st <- eSt
-    let tpath = H.splitPathWith '/' (tmplName fp)
-    Right $ st {HT._templateMap = HM.delete tpath (HT._templateMap st)}
-
 renderHeistTemplate ::
   HasCallStack =>
-  Text ->
+  TemplateName ->
   H.Splices (HI.Splice Identity) ->
   TemplateState ->
   Either Text LByteString
-renderHeistTemplate name splices st =
+renderHeistTemplate name splices tmplSt =
   runExcept $ do
-    heist <-
-      hoistEither . first (unlines . fmap toText) $ unTemplateState st
+    st <- getTemplateState tmplSt
     (builder, _mimeType) <-
-      tryJust ("Unable to render template '" <> name <> "' -- " <> Prelude.show st) $
-        runIdentity $ HI.renderTemplate (HI.bindSplices splices heist) (encodeUtf8 name)
+      tryJust ("Unable to render template '" <> decodeUtf8 name <> "'") $
+        runIdentity $
+          HI.renderTemplate (HI.bindSplices splices st) name
     pure $ toLazyByteString builder
   where
     -- A 'fromJust' that fails in the 'ExceptT' monad
     tryJust :: Monad m => e -> Maybe a -> ExceptT e m a
     tryJust e = hoistEither . maybeToRight e
+
+-- | Type to track errors on a per template basis
+type TemplateErrors = Map TemplateName Text
+
+showErrors :: TemplateErrors -> Text
+showErrors m =
+  T.intercalate "\n" $
+    Map.toList m <&> \(k, v) ->
+      decodeUtf8 k <> ":\n" <> T.unlines (indent <$> T.lines v)
+  where
+    indent :: Text -> Text
+    indent s = "\t" <> s
+
+-- | Assign a new error for the given template
+assignError :: TemplateName -> Text -> TemplateErrors -> TemplateErrors
+assignError =
+  Map.insert
+
+-- | Indicate that the given template has no errors
+clearError :: TemplateName -> TemplateErrors -> TemplateErrors
+clearError =
+  Map.delete

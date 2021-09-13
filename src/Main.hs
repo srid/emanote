@@ -14,4 +14,4 @@ main =
   withUtf8 $ do
     cli <- CLI.parseCli
     Ema.runEmaWithCli (CLI.emaCli cli) View.render $ \_act m ->
-      Source.emanate (CLI.layers cli) m =<< Model.emptyModel
+      Source.emanate (CLI.layers cli) m Model.emptyModel
