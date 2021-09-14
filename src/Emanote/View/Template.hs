@@ -42,8 +42,9 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-render emaAction m =
-  absurdUnion
+render emaAction m (SR.SiteRoute sr) =
+  sr
+    & absurdUnion
     `h` ( \(SR.MissingR urlPath) -> do
             let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
                 note404 =

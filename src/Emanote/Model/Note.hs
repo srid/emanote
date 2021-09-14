@@ -166,9 +166,9 @@ ambiguousNote :: FilePath -> NonEmpty R.LMLRoute -> Note
 ambiguousNote urlPath rs =
   mkEmptyNoteWith (head rs) $
     [ B.Para
-        [ B.Str "The path \"",
+        [ B.Str "The URL ",
           B.Code B.nullAttr $ toText urlPath,
-          B.Str "\" is ambiguous. It can be resolved to more than one note. You should disambiguate them. Here are the ambiguous notes:"
+          B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
         ]
     ]
       <> one list
@@ -177,11 +177,9 @@ ambiguousNote urlPath rs =
     list =
       B.BulletList $
         toList rs <&> \(R.lmlRouteCase -> r) ->
-          let wl = WL.mkWikiLinkFromRoute r
-           in [ B.Plain $ toList $ WL.wikilinkInline WL.WikiLinkNormal wl $ B.fromList [B.Str $ show wl],
-                B.Plain $ one $ B.Str "  ",
-                B.Plain $ one $ B.Code B.nullAttr $ toText (R.encodeRoute r)
-              ]
+          [ B.Plain $ one $ B.Str "  ",
+            B.Plain $ one $ B.Code B.nullAttr $ show r
+          ]
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =

@@ -12,6 +12,7 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
     mkWikiLinkFromRoute,
     delineateLink,
     wikilinkInline,
+    wikiLinkInlineRendered,
     inlineToWikiLink,
     allowedWikiLinks,
   )
@@ -27,6 +28,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
+import Ema.Helper.Markdown (plainify)
 import Emanote.Route (ModelRoute, R (R, unRoute), lmlRouteCase, modelRouteCase)
 import qualified Network.URI.Encode as UE
 import qualified Text.Megaparsec as M
@@ -84,11 +86,22 @@ wikilinkUrl :: WikiLink -> Text
 wikilinkUrl =
   T.intercalate "/" . fmap unSlug . toList . unWikiLink
 
-inlineToWikiLink :: B.Inline -> Maybe WikiLink
+inlineToWikiLink :: B.Inline -> Maybe (WikiLink, [B.Inline])
 inlineToWikiLink inl = do
-  B.Link (_id, _class, otherAttrs) _is (url, tit) <- pure inl
+  B.Link (_id, _class, otherAttrs) is (url, tit) <- pure inl
   Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
-  pure wl
+  pure (wl, is)
+
+wikiLinkInlineRendered :: B.Inline -> Maybe Text
+wikiLinkInlineRendered x = do
+  (wl, inl) <- inlineToWikiLink x
+  pure $ case nonEmpty inl of
+    Nothing -> show wl
+    Just _ ->
+      let inlStr = plainify inl
+       in if inlStr == wikilinkUrl wl
+            then show wl
+            else "[[" <> wikilinkUrl wl <> "|" <> plainify inl <> "]]"
 
 -- | Return the various ways to link to this model route
 --
