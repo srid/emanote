@@ -91,12 +91,16 @@ renderSomeInlineRefWith f getSr (_, is, (url, tit)) rRel emaAction model (ctxSan
             )
         lnk <-
           HP.rpInline ctx $
+            -- FIXME: This aside is meaningless for non-wikilink links (regular
+            -- Markdown links)
             B.Span ("", ["emanote:error:aside"], []) $
               one $
                 tooltip "Find notes using this broken link" $
                   one $
                     B.Link B.nullAttr (one $ B.Str "Refs") (url, "")
-        pure $ raw <> lnk
+        if emaAction == Ema.CLI.Run
+          then pure $ raw <> lnk
+          else pure raw
     Rel.RRTAmbiguous srs -> do
       pure $ do
         raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ unParseLink origInl, B.Str "❗"]) -- TODO; add tooltip
@@ -113,7 +117,9 @@ renderSomeInlineRefWith f getSr (_, is, (url, tit)) rRel emaAction model (ctxSan
                       tooltip (show (fst sr) <> " -> " <> srRoute) $
                         one $
                           B.Link B.nullAttr newIs (newUrl, tit)
-        pure $ raw <> candids
+        if emaAction == Ema.CLI.Run
+          then pure $ raw <> candids
+          else pure raw
     Rel.RRTFound sr -> do
       f sr
 
