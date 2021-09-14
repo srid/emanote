@@ -72,8 +72,9 @@ noteRels note =
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
-  (URTWikiLink <$> toList (WL.allowedWikiLinks r))
-    <> [URTResource r]
+  let wls = either (WL.allowedWikiLinks . R.lmlRouteCase) WL.allowedWikiLinks $ R.modelRouteCase r
+   in (URTWikiLink <$> toList wls)
+        <> [URTResource r]
 
 -- | Parse a relative URL string for later resolution.
 parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
@@ -85,7 +86,9 @@ parseUnresolvedRelTarget attrs url = do
       fmap URTVirtual (SR.decodeVirtualRoute fp)
         <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
 
--- Maybe (Either (NonEmpty Note) Note)
+-- | An `UnresolvedRelTarget` that has been resolved.
+--
+-- See @Model.Link.Resolve@ for actual resolution logic.
 data ResolvedRelTarget a
   = RRTMissing
   | RRTAmbiguous (NonEmpty a)
@@ -101,8 +104,3 @@ resolvedRelTargetFromCandidates xs =
       RRTFound x
     Just xs' ->
       RRTAmbiguous xs'
-
-getFound :: ResolvedRelTarget a -> Maybe a
-getFound = \case
-  RRTFound x -> Just x
-  _ -> Nothing

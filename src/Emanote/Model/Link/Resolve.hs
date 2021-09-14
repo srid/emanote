@@ -12,14 +12,17 @@ import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 
--- | TODO: This is bad. "Either Text" (missing or ambiguous) is already encoded in SiteRoute. So use that.
 resolveUnresolvedRelTarget ::
-  Model -> Rel.UnresolvedRelTarget -> Rel.ResolvedRelTarget (SR.SiteRoute, Maybe UTCTime)
+  Model ->
+  Rel.UnresolvedRelTarget ->
+  Rel.ResolvedRelTarget (SR.SiteRoute, Maybe UTCTime)
 resolveUnresolvedRelTarget model = \case
   Rel.URTWikiLink (_wlType, wl) -> do
-    resourceSiteRoute <$> resolveWikiLinkMustExist model wl
+    resolveWikiLinkMustExist model wl
+      <&> resourceSiteRoute
   Rel.URTResource r ->
-    resourceSiteRoute <$> resolveModelRoute model r
+    resolveModelRoute model r
+      <&> resourceSiteRoute
   Rel.URTVirtual virtualRoute -> do
     Rel.RRTFound $
       SR.SiteRoute
@@ -27,17 +30,18 @@ resolveUnresolvedRelTarget model = \case
         )
         & (,Nothing)
 
-resolveWikiLinkMustExist :: Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
+resolveWikiLinkMustExist ::
+  Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
 resolveWikiLinkMustExist model wl =
   Rel.resolvedRelTargetFromCandidates $ M.modelWikiLinkTargets wl model
 
-resolveModelRoute :: Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
-resolveModelRoute model lr = do
-  let eRoute = R.modelRouteCase lr
+resolveModelRoute ::
+  Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
+resolveModelRoute model lr =
   bitraverse
     (`M.modelLookupNoteByRoute` model)
     (`M.modelLookupStaticFileByRoute` model)
-    eRoute
+    (R.modelRouteCase lr)
     & maybe Rel.RRTMissing Rel.RRTFound
 
 resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)

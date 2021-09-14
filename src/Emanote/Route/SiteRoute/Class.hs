@@ -79,13 +79,13 @@ instance Ema Model SiteRoute where
           <> staticRoutes
           <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
-encodeResourceRoute :: Model -> ResourceRoute -> FilePath
+encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
   absurdUnion
     `h` ( \(r :: LMLRoute) ->
             R.encodeRoute $
-              -- FIXME: huh why fallback to lml route as Html?
-              maybe (error $ show r) N.noteHtmlRoute $
+              -- This should never fail.
+              maybe (error $ "attempt to encode a non-existance note route: " <> show r) N.noteHtmlRoute $
                 M.modelLookupNoteByRoute r model
         )
     `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
@@ -108,9 +108,9 @@ decodeGeneratedRoute model fp =
       Rel.RRTFound note ->
         Just $ noteFileSiteRoute note
       Rel.RRTAmbiguous notes ->
-        Just $ ambiguousNotesRoute notes
-    ambiguousNotesRoute :: NonEmpty N.Note -> SiteRoute
-    ambiguousNotesRoute ns =
+        Just $ ambiguousNoteURLsRoute notes
+    ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
+    ambiguousNoteURLsRoute ns =
       SiteRoute $ openUnionLift $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
