@@ -125,14 +125,11 @@ modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.lookupNotesByRoute r notes
 
-modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe (Either (NonEmpty Note) Note)
-modelLookupNoteByHtmlRoute r (_modelNotes -> notes) = do
-  nonEmpty (N.lookupNotesByHtmlRoute r notes) >>= \case
-    x :| [] ->
-      pure $ Right x
-    xs ->
-      -- Ambiguous notes
-      pure $ Left xs
+modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Rel.ResolvedRelTarget Note
+modelLookupNoteByHtmlRoute r =
+  Rel.resolvedRelTargetFromCandidates
+    . N.lookupNotesByHtmlRoute r
+    . _modelNotes
 
 modelLookupTitle :: LMLRoute -> Model -> Tit.Title
 modelLookupTitle r =
