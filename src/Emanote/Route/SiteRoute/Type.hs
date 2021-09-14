@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Emanote.Route.SiteRoute.Type
-  ( SiteRoute,
+  ( SiteRoute (..),
     IndexR (..),
     TagIndexR (..),
     MissingR (..),
@@ -25,8 +25,10 @@ import Ema (Slug (unSlug))
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import Emanote.Prelude (h)
 import qualified Emanote.Route.Ext as Ext
-import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
+import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
 import qualified Emanote.Route.R as R
+import Text.Show (show)
+import Prelude hiding (show)
 
 data IndexR = IndexR
   deriving (Eq, Show, Ord)
@@ -68,7 +70,31 @@ type SiteRoute' =
      AmbiguousR
    ]
 
-type SiteRoute = OpenUnion SiteRoute'
+newtype SiteRoute = SiteRoute {unSiteRoute :: OpenUnion SiteRoute'}
+  deriving (Eq)
+
+instance Show SiteRoute where
+  show (SiteRoute sr) =
+    sr
+      & absurdUnion
+      `h` ( \(MissingR urlPath) ->
+              "404: " <> urlPath
+          )
+      `h` ( \(AmbiguousR (urlPath, _notes)) -> do
+              "Amb: " <> urlPath
+          )
+      `h` ( \(x :: ResourceRoute) ->
+              x & absurdUnion
+                `h` ( \(r :: StaticFileRoute, _fp :: FilePath) ->
+                        show r
+                    )
+                `h` ( \(r :: LMLRoute) ->
+                        show $ lmlRouteCase r
+                    )
+          )
+      `h` ( \(x :: VirtualRoute) ->
+              show x
+          )
 
 decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =

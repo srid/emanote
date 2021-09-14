@@ -123,7 +123,6 @@ executable emanote
     Emanote.Pandoc.Markdown.Syntax.Highlight
     Emanote.Pandoc.Markdown.Syntax.WikiLink
     Emanote.Pandoc.Renderer
-    Emanote.Pandoc.Renderer.BrokenLink
     Emanote.Pandoc.Renderer.Embed
     Emanote.Pandoc.Renderer.Query
     Emanote.Pandoc.Renderer.Url

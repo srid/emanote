@@ -22,12 +22,9 @@ newtype R (ext :: FileType) = R {unRoute :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data, Generic, ToJSON)
 
 instance HasExt ext => Show (R ext) where
-  show (R slugs) =
+  show r =
     toString $
-      "R["
-        <> show (fileType @ext)
-        <> "]:"
-        <> T.intercalate "/" (toList $ fmap Ema.unSlug slugs)
+      "R[/" <> encodeRoute r <> "]"
 
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall ext. HasExt ext => FilePath -> Maybe (R ext)

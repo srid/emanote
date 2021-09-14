@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Emanote.Route.SiteRoute
-  ( SiteRoute,
+  ( SiteRoute (..),
     IndexR (..),
     TagIndexR (..),
     MissingR (..),

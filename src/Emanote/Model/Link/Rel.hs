@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
@@ -13,7 +14,6 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import Emanote.Model.StaticFile (StaticFile)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
@@ -90,7 +90,7 @@ data ResolvedRelTarget a
   = RRTMissing
   | RRTAmbiguous (NonEmpty a)
   | RRTFound a
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Functor)
 
 resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
 resolvedRelTargetFromCandidates xs =
@@ -101,3 +101,8 @@ resolvedRelTargetFromCandidates xs =
       RRTFound x
     Just xs' ->
       RRTAmbiguous xs'
+
+getFound :: ResolvedRelTarget a -> Maybe a
+getFound = \case
+  RRTFound x -> Just x
+  _ -> Nothing
