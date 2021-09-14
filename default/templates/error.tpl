@@ -18,7 +18,14 @@
               <div class="bg-gray-50 p-2 my-4">
                 <apply template="/templates/components/pandoc" />
               </div>
-              Fix it now, or <a class="font-bold underline" href="/">go back to /</a>
+              <div class="flex items-center justify-center text-xl">
+                <div>Fix it now, or <a class="font-bold underline" href="/">go back to /</a>
+                </div>
+              </div>
+              <div class="transform scale-95 opacity-50 hover:opacity-100">
+                <apply template="components/timeline" />
+                <apply template="components/backlinks" />
+              </div>
             </main>
           </div>
         </div>
