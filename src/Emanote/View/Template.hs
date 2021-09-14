@@ -22,6 +22,7 @@ import qualified Emanote.Model.Calendar as Calendar
 import qualified Emanote.Model.Graph as G
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
+import qualified Emanote.Model.SData as SData
 import qualified Emanote.Model.Title as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
 import Emanote.Prelude (h)
@@ -43,25 +44,27 @@ import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
 render emaAction m (SR.SiteRoute sr) =
-  sr
-    & absurdUnion
-    `h` ( \(SR.MissingR urlPath) -> do
-            let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                note404 =
-                  MN.missingNote hereRoute (toText urlPath)
-                    & MN.noteMeta .~ withTemplateName "/templates/error"
-                    & MN.noteTitle .~ "Emanote Error"
-            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
-        )
-    `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
-            let noteAmb =
-                  MN.ambiguousNote urlPath notes
-                    & MN.noteMeta .~ withTemplateName "/templates/error"
-                    & MN.noteTitle .~ "Emanote Error"
-            Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m noteAmb
-        )
-    `h` renderResourceRoute emaAction m
-    `h` renderVirtualRoute emaAction m
+  let setErrorPageMeta =
+        MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
+   in sr
+        & absurdUnion
+        `h` ( \(SR.MissingR urlPath) -> do
+                let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+                    note404 =
+                      MN.missingNote hereRoute (toText urlPath)
+                        & setErrorPageMeta
+                        & MN.noteTitle .~ "! Missing link"
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+            )
+        `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
+                let noteAmb =
+                      MN.ambiguousNote urlPath notes
+                        & setErrorPageMeta
+                        & MN.noteTitle .~ "! Ambiguous link"
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m noteAmb
+            )
+        `h` renderResourceRoute emaAction m
+        `h` renderVirtualRoute emaAction m
 
 renderResourceRoute :: Ema.CLI.Action -> Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute emaAction m =
@@ -107,6 +110,10 @@ lookupTemplateName meta =
 withTemplateName :: Text -> Aeson.Value
 withTemplateName =
   MN.oneAesonText (toList $ "template" :| ["name"])
+
+withSiteTitle :: Text -> Aeson.Value
+withSiteTitle =
+  MN.oneAesonText (toList $ "page" :| ["siteTitle"])
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
