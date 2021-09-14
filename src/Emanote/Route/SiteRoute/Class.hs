@@ -25,6 +25,7 @@ import Data.WorldPeace.Union
   )
 import Ema (Ema (..), UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Meta as Model
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
@@ -95,13 +96,17 @@ decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
     (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
-    <|> fmap
-      noteHtmlSiteRoute
+    <|> noteHtmlSiteRoute
       (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
   where
-    noteHtmlSiteRoute :: Either (NonEmpty N.Note) N.Note -> SiteRoute
-    noteHtmlSiteRoute =
-      either ambiguousNotesRoute noteFileSiteRoute
+    noteHtmlSiteRoute :: Rel.ResolvedRelTarget N.Note -> Maybe SiteRoute
+    noteHtmlSiteRoute = \case
+      Rel.RRTMissing ->
+        Nothing
+      Rel.RRTFound note ->
+        Just $ noteFileSiteRoute note
+      Rel.RRTAmbiguous notes ->
+        Just $ ambiguousNotesRoute notes
     ambiguousNotesRoute :: NonEmpty N.Note -> SiteRoute
     ambiguousNotesRoute ns =
       openUnionLift $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)

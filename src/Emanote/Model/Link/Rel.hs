@@ -13,6 +13,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
+import Emanote.Model.StaticFile (StaticFile)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
@@ -83,3 +84,20 @@ parseUnresolvedRelTarget attrs url = do
     Right fp ->
       fmap URTVirtual (SR.decodeVirtualRoute fp)
         <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
+
+-- Maybe (Either (NonEmpty Note) Note)
+data ResolvedRelTarget a
+  = RRTMissing
+  | RRTAmbiguous (NonEmpty a)
+  | RRTFound a
+  deriving (Eq, Show, Ord)
+
+resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
+resolvedRelTargetFromCandidates xs =
+  case nonEmpty xs of
+    Nothing ->
+      RRTMissing
+    Just (x :| []) ->
+      RRTFound x
+    Just xs' ->
+      RRTAmbiguous xs'
