@@ -25,8 +25,8 @@ import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
 import Relude.Extra.Map (StaticMap (lookup))
+import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.Pandoc.Definition as B
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -62,7 +62,7 @@ instance Indexable NoteIxs Note where
   indices =
     ixList
       (ixFun $ one . _noteRoute)
-      (ixFun noteSelfRefs)
+      (ixFun $ toList . noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
       (ixFun noteAncestors)
       (ixFun $ maybeToList . noteParent)
@@ -70,12 +70,16 @@ instance Indexable NoteIxs Note where
       (ixFun $ maybeToList . noteSlug)
 
 -- | All possible wiki-links that refer to this note.
-noteSelfRefs :: Note -> [WL.WikiLink]
+noteSelfRefs :: Note -> NonEmpty WL.WikiLink
 noteSelfRefs =
-  fmap snd
-    . WL.allowedWikiLinks
-    . (R.liftModelRoute . R.lmlRouteCase)
+  routeSelfRefs
     . _noteRoute
+  where
+    routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
+    routeSelfRefs =
+      fmap snd
+        . WL.allowedWikiLinks
+        . R.lmlRouteCase
 
 noteAncestors :: Note -> [RAncestor]
 noteAncestors =
@@ -128,23 +132,16 @@ noteHtmlRoute note@Note {..} =
     Just slugs ->
       R.mkRouteFromSlugs slugs
 
-singleNote :: HasCallStack => [Note] -> Maybe Note
-singleNote ns = do
-  res@(x :| xs) <- nonEmpty ns
-  if null xs
-    then pure x
-    else error $ "Ambiguous notes: " <> show (_noteRoute <$> res)
-
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
-lookupNotesByRoute :: R.LMLRoute -> IxNote -> [Note]
-lookupNotesByRoute htmlRoute =
-  Ix.toList . Ix.getEQ htmlRoute
+lookupNotesByRoute :: R.LMLRoute -> IxNote -> Maybe Note
+lookupNotesByRoute r =
+  Ix.getOne . Ix.getEQ r
 
-placeHolderNote :: R.LMLRoute -> Note
-placeHolderNote r =
+ancestorPlaceholderNote :: R.LMLRoute -> Note
+ancestorPlaceholderNote r =
   let placeHolder =
         [ folderListingQuery,
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
@@ -159,6 +156,35 @@ placeHolderNote r =
       B.CodeBlock (cls "query") "path:./*"
     cls x =
       ("", one x, mempty) :: B.Attr
+
+missingNote :: R.LMLRoute -> Text -> Note
+missingNote route404 urlPath =
+  mkEmptyNoteWith route404 $
+    one $
+      B.Para
+        [ B.Str "No note has the URL ",
+          B.Code B.nullAttr $ "/" <> urlPath,
+          B.Str ". You may create a Markdown file with that name."
+        ]
+
+ambiguousNoteURL :: FilePath -> NonEmpty R.LMLRoute -> Note
+ambiguousNoteURL urlPath rs =
+  mkEmptyNoteWith (head rs) $
+    [ B.Para
+        [ B.Str "The URL ",
+          B.Code B.nullAttr $ toText urlPath,
+          B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
+        ]
+    ]
+      <> one candidates
+  where
+    candidates :: B.Block
+    candidates =
+      B.BulletList $
+        toList rs <&> \(R.lmlRouteCase -> r) ->
+          [ B.Plain $ one $ B.Str "  ",
+            B.Plain $ one $ B.Code B.nullAttr $ show r
+          ]
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
@@ -201,5 +227,13 @@ lookupAeson x (k :| ks) meta =
     resultToMaybe = \case
       Aeson.Error _ -> Nothing
       Aeson.Success b -> pure b
+
+oneAesonText :: [Text] -> Text -> Aeson.Value
+oneAesonText k v =
+  case nonEmpty k of
+    Nothing ->
+      Aeson.String v
+    Just (x :| xs) ->
+      Aeson.object [x Aeson..= oneAesonText (toList xs) v]
 
 makeLenses ''Note

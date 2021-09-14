@@ -16,6 +16,8 @@ template:
   layout:
     note:
       containerClass: container mx-auto max-w-prose
+  error:
+    containerClass: container mx-auto max-w-prose
   # List of available colors: https://tailwindcss.com/docs/customizing-colors
   theme: blue
   # Value of the <base> tag.
@@ -36,9 +38,8 @@ pandoc:
   rewriteClass:
     # TODO: Should these be done instead on Heist (pandoc.tpl)?
     emanote:inline-tag: font-bold bg-gray-100 py-0.5 px-2 rounded-lg
-    # Broken links are wrapped in a <span> with this class. Add its tailwind style here.
-    emanote:broken-link: line-through italic
     emanote:placeholder-message: text-gray-400 border-t-2 inline-block pt-0.5
+    emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
     note: p-2 mb-3 rounded shadow bg-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both 

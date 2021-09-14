@@ -77,9 +77,9 @@ modelInsertNote note =
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
   let lmlR = R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
-   in case nonEmpty (N.lookupNotesByRoute lmlR ns) of
+   in case N.lookupNotesByRoute lmlR ns of
         Just _ -> ns
-        Nothing -> Ix.updateIx lmlR (N.placeHolderNote lmlR) ns
+        Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
 
 modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
@@ -123,11 +123,13 @@ modelDeleteData k =
 
 modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
-  N.singleNote (N.lookupNotesByRoute r notes)
+  N.lookupNotesByRoute r notes
 
-modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Maybe Note
-modelLookupNoteByHtmlRoute r (_modelNotes -> notes) =
-  N.singleNote (N.lookupNotesByHtmlRoute r notes)
+modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Rel.ResolvedRelTarget Note
+modelLookupNoteByHtmlRoute r =
+  Rel.resolvedRelTargetFromCandidates
+    . N.lookupNotesByHtmlRoute r
+    . _modelNotes
 
 modelLookupTitle :: LMLRoute -> Model -> Tit.Title
 modelLookupTitle r =

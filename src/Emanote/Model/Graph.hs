@@ -67,8 +67,12 @@ modelFolgezettelAncestorTree r0 model =
       _ -> Nothing
     lookupWikiLink :: WL.WikiLink -> Maybe R.LMLRoute
     lookupWikiLink wl = do
-      note <- leftToMaybe <=< rightToMaybe $ Resolve.resolveWikiLinkMustExist model wl
+      note <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
       pure $ note ^. MN.noteRoute
+    getFound :: Rel.ResolvedRelTarget a -> Maybe a
+    getFound = \case
+      Rel.RRTFound x -> Just x
+      _ -> Nothing
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, [B.Block])]
 modelLookupBacklinks r model =
