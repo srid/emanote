@@ -12,6 +12,7 @@ import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.StaticFile as SF
 import qualified Emanote.Model.Title as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
+import qualified Emanote.Pandoc.Link as Link
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import qualified Emanote.Pandoc.Renderer.Url as RenderedUrl
@@ -26,26 +27,27 @@ import qualified Text.Pandoc.Definition as B
 
 embedBlockWikiLinkResolvingSplice ::
   Monad n => PandocBlockRenderer n i b
-embedBlockWikiLinkResolvingSplice emaAction model _nf ctx _ blk =
-  case blk of
-    B.Para [inl@(B.Link attr@(_id, _class, otherAttrs) is (url, tit))] -> do
-      Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
-        Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-      let rRel = Resolve.resolveWikiLinkMustExist model wl
-      let f = embedBlockSiteRoute model ctx
-      RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (attr, is, (url, tit)) rRel emaAction model ctx inl
-    _ ->
-      Nothing
+embedBlockWikiLinkResolvingSplice emaAction model _nf ctx _ = \case
+  B.Para [inl] -> do
+    (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
+    guard $ inlRef == Link.InlineLink
+    Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <-
+      Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+    let rRel = Resolve.resolveWikiLinkMustExist model wl
+    let f = embedBlockSiteRoute model ctx
+    RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel emaAction model ctx inl
+  _ ->
+    Nothing
 
 embedInlineWikiLinkResolvingSplice ::
   Monad n => PandocInlineRenderer n i b
-embedInlineWikiLinkResolvingSplice emaAction model _nf ctx _ inl = case inl of
-  B.Link attr@(_id, _class, otherAttrs) is (url, tit) -> do
-    Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-    let rRel = Resolve.resolveWikiLinkMustExist model wl
-        f = embedInlineSiteRoute wl
-    RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (attr, is, (url, tit)) rRel emaAction model ctx inl
-  _ -> Nothing
+embedInlineWikiLinkResolvingSplice emaAction model _nf ctx _ inl = do
+  (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
+  guard $ inlRef == Link.InlineLink
+  Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+  let rRel = Resolve.resolveWikiLinkMustExist model wl
+      f = embedInlineSiteRoute wl
+  RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel emaAction model ctx inl
 
 embedBlockSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
 embedBlockSiteRoute model ctx = either (embedResourceRoute model ctx) (const Nothing)

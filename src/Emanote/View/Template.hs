@@ -58,7 +58,7 @@ render emaAction m (SR.SiteRoute sr) =
             )
         `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
                 let noteAmb =
-                      MN.ambiguousNote urlPath notes
+                      MN.ambiguousNoteURL urlPath notes
                         & setErrorPageMeta
                         & MN.noteTitle .~ "! Ambiguous link"
                 Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m noteAmb
@@ -100,20 +100,6 @@ renderSRIndex emaAction model = do
   renderModelTemplate emaAction model "templates/special/index" $ do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
-
-lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
-lookupTemplateName meta =
-  encodeUtf8 $ MN.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
-  where
-    defaultTemplate = "templates/layouts/book"
-
-withTemplateName :: Text -> Aeson.Value
-withTemplateName =
-  MN.oneAesonText (toList $ "template" :| ["name"])
-
-withSiteTitle :: Text -> Aeson.Value
-withSiteTitle =
-  MN.oneAesonText (toList $ "page" :| ["siteTitle"])
 
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
@@ -212,3 +198,17 @@ routeTreeSplice withCtx mr model = do
                "tree:childrenCount" ## HI.textSplice (show $ length children)
                "tree:open" ## Heist.ifElseISplice openTree
        )
+
+lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
+lookupTemplateName meta =
+  encodeUtf8 $ MN.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
+  where
+    defaultTemplate = "templates/layouts/book"
+
+withTemplateName :: Text -> Aeson.Value
+withTemplateName =
+  MN.oneAesonText (toList $ "template" :| ["name"])
+
+withSiteTitle :: Text -> Aeson.Value
+withSiteTitle =
+  MN.oneAesonText (toList $ "page" :| ["siteTitle"])

@@ -74,12 +74,12 @@ noteSelfRefs :: Note -> NonEmpty WL.WikiLink
 noteSelfRefs =
   routeSelfRefs
     . _noteRoute
-
-routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
-routeSelfRefs =
-  fmap snd
-    . WL.allowedWikiLinks
-    . (R.liftModelRoute . R.lmlRouteCase)
+  where
+    routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
+    routeSelfRefs =
+      fmap snd
+        . WL.allowedWikiLinks
+        . R.lmlRouteCase
 
 noteAncestors :: Note -> [RAncestor]
 noteAncestors =
@@ -160,10 +160,15 @@ ancestorPlaceholderNote r =
 missingNote :: R.LMLRoute -> Text -> Note
 missingNote route404 urlPath =
   mkEmptyNoteWith route404 $
-    one $ B.Para [B.Str $ "No note found for '" <> urlPath <> "'"]
+    one $
+      B.Para
+        [ B.Str "No note has the URL ",
+          B.Code B.nullAttr $ "/" <> urlPath,
+          B.Str ". You may create a Markdown file with that name."
+        ]
 
-ambiguousNote :: FilePath -> NonEmpty R.LMLRoute -> Note
-ambiguousNote urlPath rs =
+ambiguousNoteURL :: FilePath -> NonEmpty R.LMLRoute -> Note
+ambiguousNoteURL urlPath rs =
   mkEmptyNoteWith (head rs) $
     [ B.Para
         [ B.Str "The URL ",
@@ -171,10 +176,10 @@ ambiguousNote urlPath rs =
           B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
         ]
     ]
-      <> one list
+      <> one candidates
   where
-    list :: B.Block
-    list =
+    candidates :: B.Block
+    candidates =
       B.BulletList $
         toList rs <&> \(R.lmlRouteCase -> r) ->
           [ B.Plain $ one $ B.Str "  ",

@@ -11,13 +11,13 @@ import Data.Time (UTCTime, defaultTimeLocale, formatTime)
 import Data.WorldPeace.Union (absurdUnion)
 import qualified Ema
 import qualified Ema.CLI
-import Ema.Helper.Markdown (plainify)
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
+import qualified Emanote.Pandoc.Link as Link
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Prelude (h)
@@ -30,53 +30,39 @@ import qualified Heist.Interpreted as HI
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.Walk as W
 
-unParseLink :: HasCallStack => B.Inline -> Text
-unParseLink inl =
-  case WL.wikiLinkInlineRendered inl of
-    Just url ->
-      url
-    Nothing ->
-      -- TODO: reuse parseInlineRef?
-      case inl of
-        B.Link _ is (url, _tit) ->
-          "[" <> plainify is <> "](" <> url <> ")"
-        B.Image _ is (url, _tit) ->
-          "![" <> plainify is <> "](" <> url <> ")"
-        _ ->
-          error "Non-link inline"
-
-tooltip :: Text -> [B.Inline] -> B.Inline
-tooltip s = B.Span ("", [], one ("title", s))
-
--- | A Pandoc inline that refers to something else.
-data InlineRef
-  = InlineLink
-  | InlineImage
-  deriving (Eq, Show)
-
-parseInlineRef :: B.Inline -> Maybe (InlineRef, B.Attr, [B.Inline], (Text, Text))
-parseInlineRef = \case
-  B.Link attr is (url, tit) ->
-    pure (InlineLink, attr, is, (url, tit))
-  B.Image attr is (url, tit) ->
-    pure (InlineImage, attr, is, (url, tit))
-  _ ->
-    Nothing
+-- | Resolve all URLs in inlines (<a> and <img>)
+urlResolvingSplice :: Monad n => PandocInlineRenderer n i b
+urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
+  (inlRef, attr@(_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
+  let f = \sr -> do
+        case inlRef of
+          Link.InlineLink -> do
+            -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
+            -- in B.Para (so do this in block-level custom splice), then embed it.
+            -- We don't do this here, as this inline splice can't embed block elements.
+            let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
+            pure $ HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
+          Link.InlineImage -> do
+            let (newIs, newUrl) =
+                  replaceLinkNodeWithRoute emaAction model sr (toList $ nonEmptyInlines url is, url)
+            pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
+  uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+  let rRel = Resolve.resolveUnresolvedRelTarget model uRel
+  renderSomeInlineRefWith f id (is, (url, tit)) rRel emaAction model ctx inl
 
 renderSomeInlineRefWith ::
   Monad n =>
-  ( a ->
-    Maybe (HI.Splice n)
-  ) ->
+  (a -> Maybe (HI.Splice n)) ->
   (a -> (SR.SiteRoute, Maybe UTCTime)) ->
-  (B.Attr, [B.Inline], (Text, Text)) ->
+  -- | AST Node attributes of @InlineRef@
+  ([B.Inline], (Text, Text)) ->
   Rel.ResolvedRelTarget a ->
   Ema.CLI.Action ->
   Model ->
   Splices.RenderCtx n ->
   B.Inline ->
   Maybe (HI.Splice n)
-renderSomeInlineRefWith f getSr (_, is, (url, tit)) rRel emaAction model (ctxSansCustomSplicing -> ctx) origInl = do
+renderSomeInlineRefWith f getSr (is, (url, tit)) rRel emaAction model (ctxSansCustomSplicing -> ctx) origInl = do
   case rRel of
     Rel.RRTMissing -> do
       pure $ do
@@ -85,26 +71,26 @@ renderSomeInlineRefWith f getSr (_, is, (url, tit)) rRel emaAction model (ctxSan
             ctx
             ( tooltip
                 "Link is broken"
-                [ B.Strikeout $ one $ B.Str $ unParseLink origInl,
-                  B.Str "❌" -- TODO; add tooltip
+                [ B.Strikeout $ one $ B.Str $ Link.unParseLink origInl,
+                  B.Str "❌"
                 ]
             )
-        lnk <-
+        details <-
           HP.rpInline ctx $
             -- FIXME: This aside is meaningless for non-wikilink links (regular
             -- Markdown links)
             B.Span ("", ["emanote:error:aside"], []) $
               one $
-                tooltip "Find notes using this broken link" $
+                tooltip "Find notes containing this broken link" $
                   one $
-                    B.Link B.nullAttr (one $ B.Str "Refs") (url, "")
+                    B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
         if emaAction == Ema.CLI.Run
-          then pure $ raw <> lnk
+          then pure $ raw <> details
           else pure raw
     Rel.RRTAmbiguous srs -> do
       pure $ do
-        raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ unParseLink origInl, B.Str "❗"]) -- TODO; add tooltip
-        candids <-
+        raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
+        candidates <-
           fmap mconcat . sequence $
             toList srs
               <&> \(getSr -> sr) -> do
@@ -118,30 +104,13 @@ renderSomeInlineRefWith f getSr (_, is, (url, tit)) rRel emaAction model (ctxSan
                         one $
                           B.Link B.nullAttr newIs (newUrl, tit)
         if emaAction == Ema.CLI.Run
-          then pure $ raw <> candids
+          then pure $ raw <> candidates
           else pure raw
     Rel.RRTFound sr -> do
       f sr
-
--- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice :: Monad n => PandocInlineRenderer n i b
-urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
-  (inlRef, attr@(_, _, otherAttrs), is, (url, tit)) <- parseInlineRef inl
-  let f = \sr -> do
-        case inlRef of
-          InlineLink -> do
-            -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
-            -- in B.Para (so do this in block-level custom splice), then embed it.
-            -- We don't do this here, as this inline splice can't embed block elements.
-            let (newIs, newUrl) = replaceLinkNodeWithRoute emaAction model sr (is, url)
-            pure $ HP.rpInline ctx $ B.Link attr newIs (newUrl, tit)
-          InlineImage -> do
-            let (newIs, newUrl) =
-                  replaceLinkNodeWithRoute emaAction model sr (toList $ nonEmptyInlines url is, url)
-            pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
-  uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveUnresolvedRelTarget model uRel
-  renderSomeInlineRefWith f id (attr, is, (url, tit)) rRel emaAction model ctx inl
+  where
+    tooltip :: Text -> [B.Inline] -> B.Inline
+    tooltip s = B.Span ("", [], one ("title", s))
 
 plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer n i b
 plainifyWikiLinkSplice _emaAction _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
@@ -151,7 +120,6 @@ plainifyWikiLinkSplice _emaAction _model _nf (ctxSansCustomSplicing -> ctx) _ in
 inlinesWithWikiLinksPlainified :: [B.Inline] -> [B.Inline]
 inlinesWithWikiLinksPlainified = W.walk $ \case
   (WL.wikiLinkInlineRendered -> Just s) ->
-    -- TODO: is
     B.Str s
   x -> x
 
@@ -178,15 +146,14 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
               t <- mUrlTime
               pure $ toText $ "?t=" <> formatTime defaultTimeLocale "%s" t
           )
-
-nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
-nonEmptyLinkInlines model url mr = \case
-  [] ->
-    toList $
-      nonEmptyInlines url $
-        fromMaybe [] $
-          siteRouteDefaultInnerText model url =<< mr
-  x -> x
+    nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
+    nonEmptyLinkInlines model' url' mr = \case
+      [] ->
+        toList $
+          nonEmptyInlines url $
+            fromMaybe [] $
+              siteRouteDefaultInnerText model' url' =<< mr
+      x -> x
 
 -- | Ensure that inlines list is non-empty, using the provided singleton value if necessary.
 nonEmptyInlines :: Text -> [B.Inline] -> NonEmpty B.Inline
@@ -202,7 +169,6 @@ siteRouteDefaultInnerText model url (SR.SiteRoute sr) =
     `h` ( \(resR :: SR.ResourceRoute) ->
             resR & absurdUnion
               `h` ( \(lmlR :: R.LMLRoute) ->
-                      -- XXX: should we really lookup?
                       Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
                   )
               `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->

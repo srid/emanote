@@ -13,7 +13,7 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
     delineateLink,
     wikilinkInline,
     wikiLinkInlineRendered,
-    inlineToWikiLink,
+    mkWikiLinkFromInline,
     allowedWikiLinks,
   )
 where
@@ -29,7 +29,7 @@ import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
 import Ema.Helper.Markdown (plainify)
-import Emanote.Route (ModelRoute, R (R, unRoute), lmlRouteCase, modelRouteCase)
+import Emanote.Route.R (R (..))
 import qualified Network.URI.Encode as UE
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
@@ -47,6 +47,24 @@ newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
 instance Show WikiLink where
   show wl =
     toString $ "[[" <> wikilinkUrl wl <> "]]"
+
+-- -----------------
+-- Making wiki links
+-- -----------------
+
+mkWikiLinkFromRoute :: R ext -> WikiLink
+mkWikiLinkFromRoute (R slugs) = WikiLink slugs
+
+mkWikiLinkFromUrl :: (Monad m, Alternative m) => Text -> m WikiLink
+mkWikiLinkFromUrl s = do
+  slugs <- maybe empty pure $ nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
+  pure $ WikiLink slugs
+
+mkWikiLinkFromInline :: B.Inline -> Maybe (WikiLink, [B.Inline])
+mkWikiLinkFromInline inl = do
+  B.Link (_id, _class, otherAttrs) is (url, tit) <- pure inl
+  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
+  pure (wl, is)
 
 -- | Given a Pandoc Link node, apparaise what kind of link it is.
 --
@@ -74,27 +92,23 @@ delineateLink (Map.fromList -> attrs) url = do
       guard $ not $ ":" `T.isInfixOf` url
       pure $ UE.decode (toString url)
 
-mkWikiLinkFromRoute :: R ext -> WikiLink
-mkWikiLinkFromRoute (R slugs) = WikiLink slugs
+-- ---------------------
+-- Converting wiki links
+-- ---------------------
 
-mkWikiLinkFromUrl :: (Monad m, Alternative m) => Text -> m WikiLink
-mkWikiLinkFromUrl s = do
-  slugs <- maybe empty pure $ nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
-  pure $ WikiLink slugs
-
+-- | [[Foo/Bar]] -> "Foo/Bar"
 wikilinkUrl :: WikiLink -> Text
 wikilinkUrl =
   T.intercalate "/" . fmap unSlug . toList . unWikiLink
 
-inlineToWikiLink :: B.Inline -> Maybe (WikiLink, [B.Inline])
-inlineToWikiLink inl = do
-  B.Link (_id, _class, otherAttrs) is (url, tit) <- pure inl
-  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
-  pure (wl, is)
+wikilinkInline :: WikiLinkType -> WikiLink -> B.Inlines -> B.Inlines
+wikilinkInline typ wl = B.linkWith attrs (wikilinkUrl wl) ""
+  where
+    attrs = ("", [], [(htmlAttr, show typ)])
 
 wikiLinkInlineRendered :: B.Inline -> Maybe Text
 wikiLinkInlineRendered x = do
-  (wl, inl) <- inlineToWikiLink x
+  (wl, inl) <- mkWikiLinkFromInline x
   pure $ case nonEmpty inl of
     Nothing -> show wl
     Just _ ->
@@ -103,20 +117,17 @@ wikiLinkInlineRendered x = do
             then show wl
             else "[[" <> wikilinkUrl wl <> "|" <> plainify inl <> "]]"
 
--- | Return the various ways to link to this model route
+-- | Return the various ways to link to a route (ignoring ext)
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --
 -- All possible combinations of Wikilink type use is automatically included.
-allowedWikiLinks :: HasCallStack => ModelRoute -> NonEmpty (WikiLinkType, WikiLink)
+allowedWikiLinks :: HasCallStack => R ext -> NonEmpty (WikiLinkType, WikiLink)
 allowedWikiLinks r =
-  let wls = fmap WikiLink $ tailsNE $ wlParts r
+  let wls = fmap WikiLink $ tailsNE $ unRoute r
       typs :: NonEmpty WikiLinkType = NE.fromList [minBound .. maxBound]
    in liftM2 (,) typs wls
   where
-    wlParts =
-      either (unRoute . lmlRouteCase) unRoute
-        . modelRouteCase
     tailsNE =
       NE.fromList . mapMaybe nonEmpty . tails . toList
 
@@ -156,11 +167,6 @@ class HasWikiLink il where
 instance HasWikiLink (CP.Cm b B.Inlines) where
   wikilink typ wl il =
     CP.Cm $ wikilinkInline typ wl $ maybe mempty CP.unCm il
-
-wikilinkInline :: WikiLinkType -> WikiLink -> B.Inlines -> B.Inlines
-wikilinkInline typ wl = B.linkWith attrs (wikilinkUrl wl) ""
-  where
-    attrs = ("", [], [(htmlAttr, show typ)])
 
 -- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
 --
