@@ -9,8 +9,11 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink,
     WikiLinkType (..),
     wikilinkSpec,
+    mkWikiLinkFromRoute,
     delineateLink,
-    inlineToWikiLink,
+    wikilinkInline,
+    wikiLinkInlineRendered,
+    mkWikiLinkFromInline,
     allowedWikiLinks,
   )
 where
@@ -25,7 +28,8 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
-import Emanote.Route (ModelRoute, R (unRoute), lmlRouteCase, modelRouteCase)
+import Ema.Helper.Markdown (plainify)
+import Emanote.Route.R (R (..))
 import qualified Network.URI.Encode as UE
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
@@ -41,8 +45,26 @@ newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data)
 
 instance Show WikiLink where
-  show (toList . fmap unSlug . unWikiLink -> slugs) =
-    toString $ "[[" <> T.intercalate "/" slugs <> "]]"
+  show wl =
+    toString $ "[[" <> wikilinkUrl wl <> "]]"
+
+-- -----------------
+-- Making wiki links
+-- -----------------
+
+mkWikiLinkFromRoute :: R ext -> WikiLink
+mkWikiLinkFromRoute (R slugs) = WikiLink slugs
+
+mkWikiLinkFromUrl :: (Monad m, Alternative m) => Text -> m WikiLink
+mkWikiLinkFromUrl s = do
+  slugs <- maybe empty pure $ nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
+  pure $ WikiLink slugs
+
+mkWikiLinkFromInline :: B.Inline -> Maybe (WikiLink, [B.Inline])
+mkWikiLinkFromInline inl = do
+  B.Link (_id, _class, otherAttrs) is (url, tit) <- pure inl
+  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
+  pure (wl, is)
 
 -- | Given a Pandoc Link node, apparaise what kind of link it is.
 --
@@ -61,11 +83,6 @@ delineateLink (Map.fromList -> attrs) url = do
       wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
       wl <- mkWikiLinkFromUrl url
       pure (wlType, wl)
-      where
-        mkWikiLinkFromUrl :: Text -> Maybe WikiLink
-        mkWikiLinkFromUrl s = do
-          slugs <- nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
-          pure $ WikiLink slugs
     hyperLinks = do
       -- Avoid links like "mailto:", "magnet:", etc.
       -- An easy way to parse them is to look for colon character.
@@ -75,29 +92,44 @@ delineateLink (Map.fromList -> attrs) url = do
       guard $ not $ ":" `T.isInfixOf` url
       pure $ UE.decode (toString url)
 
-inlineToWikiLink :: B.Inline -> Maybe WikiLink
-inlineToWikiLink inl = do
-  B.Link (_id, _class, otherAttrs) _is (url, tit) <- pure inl
-  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
-  pure wl
+-- ---------------------
+-- Converting wiki links
+-- ---------------------
 
--- | Return the various ways to link to this model route
+-- | [[Foo/Bar]] -> "Foo/Bar"
+wikilinkUrl :: WikiLink -> Text
+wikilinkUrl =
+  T.intercalate "/" . fmap unSlug . toList . unWikiLink
+
+wikilinkInline :: WikiLinkType -> WikiLink -> B.Inlines -> B.Inlines
+wikilinkInline typ wl = B.linkWith attrs (wikilinkUrl wl) ""
+  where
+    attrs = ("", [], [(htmlAttr, show typ)])
+
+wikiLinkInlineRendered :: B.Inline -> Maybe Text
+wikiLinkInlineRendered x = do
+  (wl, inl) <- mkWikiLinkFromInline x
+  pure $ case nonEmpty inl of
+    Nothing -> show wl
+    Just _ ->
+      let inlStr = plainify inl
+       in if inlStr == wikilinkUrl wl
+            then show wl
+            else "[[" <> wikilinkUrl wl <> "|" <> plainify inl <> "]]"
+
+-- | Return the various ways to link to a route (ignoring ext)
 --
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --
 -- All possible combinations of Wikilink type use is automatically included.
-allowedWikiLinks :: ModelRoute -> [(WikiLinkType, WikiLink)]
-allowedWikiLinks =
-  liftM2 (,) wlAllTypes
-    . mapMaybe (fmap WikiLink . nonEmpty)
-    . toList
-    . NE.tails
-    . wlParts
+allowedWikiLinks :: HasCallStack => R ext -> NonEmpty (WikiLinkType, WikiLink)
+allowedWikiLinks r =
+  let wls = fmap WikiLink $ tailsNE $ unRoute r
+      typs :: NonEmpty WikiLinkType = NE.fromList [minBound .. maxBound]
+   in liftM2 (,) typs wls
   where
-    wlAllTypes :: [WikiLinkType] = [minBound .. maxBound]
-    wlParts =
-      either (unRoute . lmlRouteCase) unRoute
-        . modelRouteCase
+    tailsNE =
+      NE.fromList . mapMaybe nonEmpty . tails . toList
 
 -------------------------
 -- Parser
@@ -130,12 +162,11 @@ htmlAttr :: Text
 htmlAttr = "data-wikilink-type"
 
 class HasWikiLink il where
-  wikilink :: WikiLinkType -> Text -> Maybe il -> il
+  wikilink :: WikiLinkType -> WikiLink -> Maybe il -> il
 
 instance HasWikiLink (CP.Cm b B.Inlines) where
-  wikilink typ t il = CP.Cm $ B.linkWith attrs t "" $ maybe mempty CP.unCm il
-    where
-      attrs = ("", [], [(htmlAttr, show typ)])
+  wikilink typ wl il =
+    CP.Cm $ wikilinkInline typ wl $ maybe mempty CP.unCm il
 
 -- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
 --
@@ -170,6 +201,7 @@ wikilinkSpec =
                     not (CT.hasType (CM.Symbol '|') t || CT.hasType (CM.Symbol ']') t)
                 )
             )
+      wl <- mkWikiLinkFromUrl url
       title <-
         M.optional $
           -- TODO: Should parse as inline so link text can be formatted?
@@ -178,4 +210,4 @@ wikilinkSpec =
                     *> many (CT.satisfyTok (not . CT.hasType (CM.Symbol ']')))
                 )
       replicateM_ 2 $ CT.symbol ']'
-      return $ wikilink typ url (fmap CM.str title)
+      return $ wikilink typ wl (fmap CM.str title)

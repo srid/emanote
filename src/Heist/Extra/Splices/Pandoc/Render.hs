@@ -284,7 +284,7 @@ plainify = W.query $ \case
   B.Math _mathTyp s -> s
   -- Wiki-links must be displayed using its show instance (which returns its
   -- human-readable representation)
-  (WL.inlineToWikiLink -> Just wl) ->
+  (WL.mkWikiLinkFromInline -> Just wl) ->
     show wl
   -- Ignore the rest of AST nodes, as they are recursively defined in terms of
   -- `Inline` which `W.query` will traverse again.

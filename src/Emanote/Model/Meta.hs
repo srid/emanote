@@ -5,14 +5,14 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Emanote.Model.Meta where
+module Emanote.Model.Meta (lookupRouteMeta, getEffectiveRouteMetaWith, getIndexYamlMeta) where
 
 import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import qualified Data.Aeson as Aeson
 import qualified Data.IxSet.Typed as Ix
 import Emanote.Model (Model, modelLookupNoteByRoute, modelSData)
-import Emanote.Model.Note (lookupAeson, noteMeta)
+import Emanote.Model.Note (lookupAeson, _noteMeta)
 import Emanote.Model.SData (sdataValue)
 import qualified Emanote.Model.SData as SData
 import qualified Emanote.Route as R
@@ -26,16 +26,17 @@ lookupRouteMeta x k r =
 -- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
+  let mNote = modelLookupNoteByRoute mr model
+   in getEffectiveRouteMetaWith (maybe Aeson.Null _noteMeta mNote) mr model
+
+getEffectiveRouteMetaWith :: Aeson.Value -> R.LMLRoute -> Model -> Aeson.Value
+getEffectiveRouteMetaWith frontmatter mr model =
   let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.lmlRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- getYamlMeta r model
         guard $ v /= Aeson.Null
         pure v
-      frontmatter = do
-        x <- (^. noteMeta) <$> modelLookupNoteByRoute mr model
-        guard $ x /= Aeson.Null
-        pure x
-      metas = defaults <> maybe mempty one frontmatter
+      metas = defaults <> maybe mempty one (guard (frontmatter /= Aeson.Null) >> pure frontmatter)
    in maybe Aeson.Null SData.mergeAesons $ nonEmpty metas
 
 getYamlMeta :: R.R 'R.Yaml -> Model -> Maybe Aeson.Value

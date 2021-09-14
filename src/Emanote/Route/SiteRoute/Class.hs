@@ -25,6 +25,7 @@ import Data.WorldPeace.Union
   )
 import Ema (Ema (..), UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Meta as Model
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Model.StaticFile as SF
@@ -37,18 +38,22 @@ import Emanote.Route.SiteRoute.Type
 import qualified Emanote.View.LiveServerFiles as LiveServerFile
 
 instance Ema Model SiteRoute where
-  encodeRoute model =
-    absurdUnion
+  encodeRoute model (SiteRoute r) =
+    r
+      & absurdUnion
       `h` ( \(MissingR _fp) ->
               error "emanote: attempt to encode a 404 route"
+          )
+      `h` ( \(AmbiguousR _) ->
+              error "emanote: attempt to encode an ambiguous route"
           )
       `h` encodeResourceRoute model
       `h` encodeVirtualRoute
 
   decodeRoute model fp =
-    fmap openUnionLift (decodeVirtualRoute fp)
+    fmap (SiteRoute . openUnionLift) (decodeVirtualRoute fp)
       <|> decodeGeneratedRoute model fp
-      <|> pure (openUnionLift $ MissingR fp)
+      <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
 
   allRoutes model =
     let htmlRoutes =
@@ -72,14 +77,15 @@ instance Ema Model SiteRoute where
               (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
           <> staticRoutes
-          <> fmap openUnionLift virtualRoutes
+          <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
-encodeResourceRoute :: Model -> ResourceRoute -> FilePath
+encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
   absurdUnion
     `h` ( \(r :: LMLRoute) ->
             R.encodeRoute $
-              maybe (coerce . R.lmlRouteCase $ r) N.noteHtmlRoute $
+              -- This should never fail.
+              maybe (error $ "attempt to encode a non-existance note route: " <> show r) N.noteHtmlRoute $
                 M.modelLookupNoteByRoute r model
         )
     `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
@@ -92,9 +98,20 @@ decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
     (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
-    <|> fmap
-      noteFileSiteRoute
+    <|> noteHtmlSiteRoute
       (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
+  where
+    noteHtmlSiteRoute :: Rel.ResolvedRelTarget N.Note -> Maybe SiteRoute
+    noteHtmlSiteRoute = \case
+      Rel.RRTMissing ->
+        Nothing
+      Rel.RRTFound note ->
+        Just $ noteFileSiteRoute note
+      Rel.RRTAmbiguous notes ->
+        Just $ ambiguousNoteURLsRoute notes
+    ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
+    ambiguousNoteURLsRoute ns =
+      SiteRoute $ openUnionLift $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
@@ -102,7 +119,7 @@ noteFileSiteRoute =
 
 lmlSiteRoute :: LMLRoute -> SiteRoute
 lmlSiteRoute =
-  openUnionLift . lmlResourceRoute
+  SiteRoute . openUnionLift . lmlResourceRoute
 
 lmlResourceRoute :: LMLRoute -> ResourceRoute
 lmlResourceRoute =
@@ -110,7 +127,7 @@ lmlResourceRoute =
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-  (openUnionLift . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
+  (SiteRoute . openUnionLift . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
   where
     staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
     staticResourceRoute =
@@ -136,9 +153,9 @@ urlStrategy =
 indexRoute :: SiteRoute
 indexRoute =
   let virtR :: VirtualRoute = openUnionLift IndexR
-   in openUnionLift virtR
+   in SiteRoute $ openUnionLift virtR
 
 tagIndexRoute :: [HT.TagNode] -> SiteRoute
 tagIndexRoute (TagIndexR -> tagR) =
   let virtR :: VirtualRoute = openUnionLift tagR
-   in openUnionLift virtR
+   in SiteRoute $ openUnionLift virtR

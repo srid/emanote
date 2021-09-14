@@ -30,13 +30,12 @@ instance Indexable StaticFileIxs StaticFile where
   indices =
     ixList
       (ixFun $ one . _staticFileRoute)
-      (ixFun staticFileSelfRefs)
+      (ixFun $ toList . staticFileSelfRefs)
 
-staticFileSelfRefs :: StaticFile -> [WL.WikiLink]
+staticFileSelfRefs :: StaticFile -> NonEmpty WL.WikiLink
 staticFileSelfRefs =
   fmap snd
     . WL.allowedWikiLinks
-    . R.liftModelRoute
     . _staticFileRoute
 
 makeLenses ''StaticFile
