@@ -28,6 +28,8 @@ mkdir /tmp/output
 emanote -C /path/to/notebook gen /tmp/output
 ```
 
+For other installation methods, see [here](https://note.ema.srid.ca/start/install).
+
 ### Examples
 
 Emanote is suitable for creating ...
