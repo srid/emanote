@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -38,6 +39,7 @@ import Emanote.Route.SiteRoute.Type
 import qualified Emanote.View.LiveServerFiles as LiveServerFile
 
 instance Ema Model SiteRoute where
+  encodeRoute :: HasCallStack => Model -> SiteRoute -> FilePath
   encodeRoute model (SiteRoute r) =
     r
       & absurdUnion
@@ -84,7 +86,7 @@ encodeResourceRoute model =
   absurdUnion
     `h` ( \(r :: LMLRoute) ->
             R.encodeRoute $
-              -- This should never fail.
+              -- HACK: This should never fail.
               maybe (error $ "attempt to encode a non-existance note route: " <> show r) N.noteHtmlRoute $
                 M.modelLookupNoteByRoute r model
         )
@@ -133,7 +135,7 @@ staticFileSiteRoute =
     staticResourceRoute =
       openUnionLift
 
-siteRouteUrl :: Model -> SiteRoute -> Text
+siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrl model =
   Ema.routeUrlWith (urlStrategy model) model
 
