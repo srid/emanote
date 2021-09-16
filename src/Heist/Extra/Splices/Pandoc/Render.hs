@@ -10,6 +10,7 @@ module Heist.Extra.Splices.Pandoc.Render
   )
 where
 
+import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import qualified Data.Text as T
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
@@ -126,11 +127,13 @@ rpBlock' ctx@RenderCtx {..} b = case b of
                 one . X.Element "td" cellStyle <$> foldMapM (rpBlock ctx) blks
       pure $ thead <> tbody
   B.Div attr bs ->
-    one . X.Element "div" (rpAttr $ rewriteClass ctx attr)
+    one . X.Element (getTag "div" attr) (rpAttr $ rewriteClass ctx attr)
       <$> foldMapM (rpBlock ctx) bs
   B.Null ->
     pure []
   where
+    getTag defaultTag (_, _, Map.fromList -> attrs) =
+      Map.lookup "tag" attrs & fromMaybe defaultTag
     mkLangClass classes' =
       -- Tag code block with "foo language-foo" classes, if the user specified
       -- "foo" as the language identifier. This enables external syntax
