@@ -1,43 +1,43 @@
 ---
 page:
   headHtml: |
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({startOnLoad:false});
-      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
-    </script>
+    <snippet var="js.mermaid" />
 ---
 
 # Mermaid Diagrams
 
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks. 
 
+1. Add the following to your `page.headHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]])
+    :::{.code-block}
+    ```yaml
+    page:
+      headHtml: |
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+        <script>
+          mermaid.initialize({startOnLoad:false});
+          mermaid.init(undefined,document.querySelectorAll(".mermaid"));
+        </script>
+    ```
+    :::
 1. Add a code block with `mermaid` language
-2. Add the following to your `page.headHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]])
+    :::{.code-block}
+    ~~~markdown
+    ```mermaid
+    %%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
+    graph TD;
+        A-->B;
+        A-->C;
+        B-->D;
+        C-->D;
+    ```
+    ~~~
+    :::
 
-```yaml
-page:
-  headHtml: |
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({startOnLoad:false});
-      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
-    </script>
-```
-
-Then, in the Markdown note, add the following:
-
-~~~markdown
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-~~~
+The result will be:
 
 ```mermaid
+%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
 graph TD;
     A-->B;
     A-->C;

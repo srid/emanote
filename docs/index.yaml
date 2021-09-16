@@ -5,5 +5,9 @@ page:
   siteName: Emanote
   siteTitle: Emanote
   headHtml: |
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <snippet var="js.prism" />
+
+pandoc:
+  rewriteClass:
+    # For use in notes with Prism.JS disabled
+    code-block: border-2 p-1 overflow-auto my-1 bg-gray-50
