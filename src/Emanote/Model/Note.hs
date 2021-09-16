@@ -144,6 +144,8 @@ ancestorPlaceholderNote :: R.LMLRoute -> Note
 ancestorPlaceholderNote r =
   let placeHolder =
         [ folderListingQuery,
+          -- TODO: Ideally, we should use semantic tags, like <aside> (rather
+          -- than <div>), to render these non-relevant content.
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
                 "Note: To override the auto-generated content here, create a file named: ",
