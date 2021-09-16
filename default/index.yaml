@@ -56,5 +56,23 @@ page:
   # HACK: We are setting it to empty here, because Heist doesn't work well otherwise.
   description: ""
   # Put anything that should go in <head> of these routes here:
+  # You can reference other metadata keys using <snippet var=".." />
+  # Or use the JS behaviour library below.
   headHtml: |
     <meta name="generator" content="Emanote" />
+
+# Builtin JS behaviour library. Use them in `page.headHtml`
+js:
+  # Syntax highlighting using prism.js
+  prism: |
+    <!-- Prism.js -->
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  # Diagrams using mermaid.js
+  mermaid: |
+    <!-- mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad:false});
+      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
+    </script>
