@@ -1,5 +1,4 @@
 ---
-tags: [markdown-ext]
 page:
   headHtml: |
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
@@ -46,7 +45,7 @@ graph TD;
     C-->D;
 ```
 
-Note that mermaid.js will have trouble operating with PrismJS syntax highlighting.
+Note that mermaid.js will have trouble operating with PrismJS [[syntax-highlighting]].
 
 ## More examples
 
