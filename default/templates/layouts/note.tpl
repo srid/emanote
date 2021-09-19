@@ -20,6 +20,7 @@
               <apply template="components/timeline" />
               <apply template="components/backlinks" />
               <apply template="components/metadata" />
+              <apply template="/templates/hooks/note-end" />
             </main>
           </div>
         </div>
