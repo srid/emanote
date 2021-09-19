@@ -68,6 +68,7 @@
               <apply template="components/backlinks" />
             </div>
             <apply template="components/metadata" />
+            <apply template="/templates/hooks/note-end" />
           </main>
         </div>
       </div>
