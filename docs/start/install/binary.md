@@ -14,11 +14,11 @@ You may try the self-contained executable bundle on Linux or Windows Subsystem f
 Due to a limitation in nix-bundle you must *always* pass the absolute path to your notebook in the command line. Instead of running `emanote` (ie. without arguments), run:
 
 ```
-emanote --layers=$(pwd)
+emanote -L=$(pwd)
 ```
 
 Likewise, instead of running `emanote gen /tmp/output`, run:
 
 ```
-emanote --layers=$(pwd) gen /tmp/output
+emanote -L=$(pwd) gen /tmp/output
 ```
