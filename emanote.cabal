@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.59.0
+version:            0.1.60.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -85,7 +85,7 @@ executable emanote
     relude
 
   ghc-options:
-    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns -threaded -rtsopts -with-rtsopts=-N
 
   default-extensions:
     FlexibleContexts
