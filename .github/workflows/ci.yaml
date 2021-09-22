@@ -82,7 +82,7 @@ jobs:
         run: |
           mkdir -p ./.ci/output
           chmod u+x ./emanote
-          ./emanote --layers $(pwd)/docs gen $(pwd)/.ci/output
+          ./emanote -L $(pwd)/docs gen $(pwd)/.ci/output
           bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3

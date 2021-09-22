@@ -29,6 +29,7 @@ cliParser cwd = do
       option pathListReader $
         mconcat
           [ long "layers",
+            short 'L',
             metavar "LAYERS",
             value defaultPath,
             help "List of notebook folders to 'union mount', with the right-side folders taking priority."
