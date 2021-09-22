@@ -25,7 +25,7 @@ PORT=8001 emanote
 
 # Generate static files
 mkdir /tmp/output
-emanote -C /path/to/notebook gen /tmp/output
+emanote --layers /path/to/notebook gen /tmp/output
 ```
 
 For other installation methods, see [here](https://note.ema.srid.ca/start/install).
