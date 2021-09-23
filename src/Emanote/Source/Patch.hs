@@ -28,6 +28,7 @@ import Emanote.Model.Type (Model)
 import Emanote.Prelude
   ( BadInput (BadInput),
     chainM,
+    log,
     logD,
   )
 import Emanote.Route (liftLMLRoute)
@@ -75,7 +76,7 @@ transformAction src fps = do
               Right note ->
                 pure $ M.modelInsertNote note
           EmaFS.Delete -> do
-            logD $ "Removing note: " <> toText fp
+            log $ "Removing note: " <> toText fp
             pure $ M.modelDeleteNote r
     R.Yaml ->
       case R.mkRouteFromFilePath fp of
@@ -91,7 +92,7 @@ transformAction src fps = do
                 SD.parseSDataCascading r yamlContents
             pure $ M.modelInsertData sData
           EmaFS.Delete -> do
-            logD $ "Removing data: " <> toText fp
+            log $ "Removing data: " <> toText fp
             pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
@@ -102,7 +103,7 @@ transformAction src fps = do
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
         EmaFS.Delete -> do
-          logD $ "Removing template: " <> toText fp
+          log $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
     R.AnyExt -> do
       case R.mkRouteFromFilePath fp of
@@ -116,10 +117,10 @@ transformAction src fps = do
                 -- A directory got added; this is not a static 'file'
                 pure id
               False -> do
-                let verb = case refreshAction of
-                      EmaFS.Existing -> "Registering"
-                      _ -> "Re-registering"
-                logD $ verb <> " file: " <> toText fpAbs <> " " <> show r
+                let logF = case refreshAction of
+                      EmaFS.Existing -> logD . ("Registering" <>)
+                      _ -> log . ("Re-registering" <>)
+                logF $ " file: " <> toText fpAbs <> " " <> show r
                 t <- liftIO getCurrentTime
                 pure $ M.modelInsertStaticFile t r fpAbs
           EmaFS.Delete -> do
@@ -147,7 +148,7 @@ readRefreshedFile refreshAction fp =
 -- non-empty contents will come through. 'tis a bit of a HACK though.
 readFileFollowingFsnotify :: (MonadIO m, MonadLogger m) => FilePath -> m ByteString
 readFileFollowingFsnotify fp = do
-  logD $ "Reading file: " <> toText fp
+  log $ "Reading file: " <> toText fp
   readFileBS fp >>= \case
     "" ->
       reReadFileBS 100 fp >>= \case
@@ -161,5 +162,5 @@ readFileFollowingFsnotify fp = do
     -- Wait before reading, logging the given delay.
     reReadFileBS ms filePath = do
       threadDelay $ 1000 * ms
-      logD $ "Re-reading (" <> show ms <> "ms" <> ") file: " <> toText filePath
+      log $ "Re-reading (" <> show ms <> "ms" <> ") file: " <> toText filePath
       readFileBS filePath
