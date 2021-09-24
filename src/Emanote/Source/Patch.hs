@@ -98,10 +98,15 @@ transformAction src fps = do
       case action of
         EmaFS.Refresh refreshAction overlays -> do
           let fpAbs = locResolve $ head overlays
-          fmap (M.modelHeistTemplate %~) $ do
+              -- Once we start loading HTML templates, mark the model as "ready"
+              -- so Ema will begin rendering content in place of "Loading..."
+              -- indicator
+              readyOnTemplates = bool id M.modelReadyForView (refreshAction == EmaFS.Existing)
+          act <- fmap (M.modelHeistTemplate %~) $ do
             s <- readRefreshedFile refreshAction fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ T.addTemplateFile fpAbs fp s
+          pure $ readyOnTemplates >>> act
         EmaFS.Delete -> do
           log $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp

@@ -43,7 +43,13 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-render emaAction m (SR.SiteRoute sr) =
+render emaAction m sr =
+  if m ^. M.modelStatus == M.Status_Loading
+    then Ema.AssetGenerated Ema.Html "<strong style='font-size: 200%;' title='Union mounting your Emanote notebook layers...'>Loading...</strong>"
+    else renderLoadedModel emaAction m sr
+
+renderLoadedModel :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
+renderLoadedModel emaAction m (SR.SiteRoute sr) =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in sr
