@@ -7,7 +7,7 @@
 
 module Emanote.Model.Type where
 
-import Control.Lens.Operators as Lens ((%~), (^.))
+import Control.Lens.Operators as Lens ((%~), (.~), (^.))
 import Control.Lens.TH (makeLenses)
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
@@ -35,8 +35,12 @@ import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState)
 
+data Status = Status_Loading | Status_Ready
+  deriving (Eq, Show)
+
 data Model = Model
-  { _modelNotes :: IxNote,
+  { _modelStatus :: Status,
+    _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
@@ -53,7 +57,11 @@ makeLenses ''Model
 
 emptyModel :: Model
 emptyModel =
-  Model Ix.empty Ix.empty Ix.empty mempty mempty def
+  Model Status_Loading Ix.empty Ix.empty Ix.empty mempty mempty def
+
+modelReadyForView :: Model -> Model
+modelReadyForView =
+  modelStatus .~ Status_Ready
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
