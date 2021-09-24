@@ -90,7 +90,7 @@ modelDeleteNote k model =
            >>> maybe id restoreFolderPlaceholder mFolderR
        )
       & modelRels
-    %~ Ix.deleteIx k
+    %~ deleteIxMulti k
       & modelNav
     %~ maybe (PathTree.treeDeletePath (R.unRoute . R.lmlRouteCase $ k)) (const id) mFolderR
   where
@@ -102,6 +102,10 @@ modelDeleteNote k model =
       pure folderR
     restoreFolderPlaceholder =
       injectAncestor . N.RAncestor
+    deleteIxMulti :: LMLRoute -> IxRel -> IxRel
+    deleteIxMulti r rels =
+      let candidates = Ix.toList $ Ix.getEQ r rels
+       in foldl' (flip Ix.delete) rels candidates
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
