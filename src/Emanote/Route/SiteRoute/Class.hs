@@ -85,10 +85,9 @@ encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
   absurdUnion
     `h` ( \(r :: LMLRoute) ->
-            R.encodeRoute $
-              -- HACK: This should never fail.
-              maybe (error $ "attempt to encode a non-existance note route: " <> show r) N.noteHtmlRoute $
-                M.modelLookupNoteByRoute r model
+            -- HACK: This should never fail, but it does; see https://github.com/srid/emanote/issues/148
+            maybe "/-/emanote/bug/148" (R.encodeRoute . N.noteHtmlRoute) $
+              M.modelLookupNoteByRoute r model
         )
     `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
             R.encodeRoute r
