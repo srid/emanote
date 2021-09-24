@@ -136,6 +136,7 @@ lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
+-- Return Nothing if zero or multiple notes.
 lookupNotesByRoute :: R.LMLRoute -> IxNote -> Maybe Note
 lookupNotesByRoute r =
   Ix.getOne . Ix.getEQ r
