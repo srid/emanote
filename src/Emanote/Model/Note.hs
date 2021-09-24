@@ -136,10 +136,12 @@ lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
 
--- Return Nothing if zero or multiple notes.
-lookupNotesByRoute :: R.LMLRoute -> IxNote -> Maybe Note
-lookupNotesByRoute r =
-  Ix.getOne . Ix.getEQ r
+lookupNotesByRoute :: HasCallStack => R.LMLRoute -> IxNote -> Maybe Note
+lookupNotesByRoute r ix = do
+  res <- nonEmpty $ Ix.toList $ Ix.getEQ r ix
+  case res of
+    note :| [] -> pure note
+    _ -> error $ "ambiguous notes for route " <> show r
 
 ancestorPlaceholderNote :: R.LMLRoute -> Note
 ancestorPlaceholderNote r =
