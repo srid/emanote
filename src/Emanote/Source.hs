@@ -9,6 +9,7 @@ where
 
 import Control.Monad.Logger (MonadLogger)
 import Data.LVar (LVar)
+import qualified Data.LVar as LVar
 import qualified Ema.Helper.FileSystem as EmaFS
 import Emanote.Model (Model)
 import Emanote.Prelude (log)
@@ -31,5 +32,6 @@ emanate paths modelLvar initialModel = do
       initialModel
       transformActions
   whenJust mcmd $ \EmaFS.Cmd_Remount -> do
-    log "!! Restart suggested !!"
+    log "!! Remount suggested !!"
+    LVar.set modelLvar initialModel -- Reset the model
     emanate paths modelLvar initialModel
