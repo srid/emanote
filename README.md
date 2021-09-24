@@ -23,9 +23,9 @@ nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz
 cd /path/to/notebook
 PORT=8001 emanote
 
-# Generate static files
+# Or, to generate static files
 mkdir /tmp/output
-emanote -L /path/to/notebook gen /tmp/output
+emanote /path/to/notebook gen /tmp/output
 ```
 
 For other installation methods, see [here](https://note.ema.srid.ca/start/install).
