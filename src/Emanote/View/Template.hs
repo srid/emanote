@@ -43,13 +43,7 @@ import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-render emaAction m sr =
-  if m ^. M.modelStatus == M.Status_Loading
-    then Ema.AssetGenerated Ema.Html "<strong style='font-size: 200%;' title='Union mounting your Emanote notebook layers...'>Loading...</strong>"
-    else renderLoadedModel emaAction m sr
-
-renderLoadedModel :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-renderLoadedModel emaAction m (SR.SiteRoute sr) =
+render emaAction m (SR.SiteRoute sr) =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in sr
@@ -107,6 +101,10 @@ renderSRIndex emaAction model = do
     commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
 
+loaderHead :: LByteString
+loaderHead =
+  "<em style='font-size: 400%; border-bottom: 1px solid; margin-bottom: 4em; '>Union mounting notebook layers; please wait ...</em>"
+
 renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
 renderLmlHtml emaAction model note = do
   let r = note ^. MN.noteRoute
@@ -119,7 +117,11 @@ renderLmlHtml emaAction model note = do
       withBlockCtx =
         withNoteRenderer noteRenderers () r
       templateName = lookupTemplateName meta
-  renderModelTemplate emaAction model templateName $ do
+      withLoadingMessage =
+        if emaAction == Ema.CLI.Run && model ^. M.modelStatus == M.Status_Loading
+          then (loaderHead <>)
+          else id
+  withLoadingMessage . renderModelTemplate emaAction model templateName $ do
     commonSplices withLinkInlineCtx emaAction model meta (note ^. MN.noteTitle)
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
