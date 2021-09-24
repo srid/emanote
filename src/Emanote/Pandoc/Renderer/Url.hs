@@ -27,6 +27,7 @@ import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.Walk as W
 

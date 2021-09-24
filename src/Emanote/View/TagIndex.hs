@@ -20,6 +20,7 @@ import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, 
 import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import qualified Heist.Interpreted as HI
+import Relude
 
 -- An index view into the notebook indexed by the given tag path.
 data TagIndex = TagIndex

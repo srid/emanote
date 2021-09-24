@@ -23,6 +23,7 @@ import qualified Heist.Extra as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice)
 import qualified Heist.Extra.Splices.Pandoc as HP
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Definition as B
 
 embedBlockWikiLinkResolvingSplice ::

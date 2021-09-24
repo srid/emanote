@@ -30,6 +30,7 @@ import Data.WorldPeace.Union
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 import Emanote.Route.R (R)
 import qualified Emanote.Route.R as R
+import Relude
 
 type LMLRoutes' =
   '[ R ('LMLType 'Md)

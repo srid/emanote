@@ -4,6 +4,7 @@ module Emanote.Pandoc.Link where
 
 import Ema.Helper.Markdown (plainify)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Relude
 import qualified Text.Pandoc.Definition as B
 
 -- | A Pandoc inline node that refers to something else.

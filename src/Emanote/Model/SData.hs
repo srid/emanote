@@ -15,6 +15,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Yaml as Yaml
 import qualified Emanote.Route as R
+import Relude
 
 -- | `S` for "structured". Refers to a per-route data file represented by Aeson
 -- value.  Example: /foo/bar.yaml file

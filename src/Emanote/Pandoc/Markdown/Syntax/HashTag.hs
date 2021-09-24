@@ -25,6 +25,7 @@ import qualified Commonmark.Pandoc as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
 import qualified Data.Map.Strict as Map
 import qualified Data.TagTree as TT
+import Relude
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Pandoc.Walk as W
 import qualified Text.Parsec as P

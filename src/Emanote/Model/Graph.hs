@@ -16,8 +16,8 @@ import Emanote.Model.Type (Model, modelRels)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Emanote.Route as R
 import Emanote.Route.ModelRoute (ModelRoute)
+import Relude hiding (empty)
 import qualified Text.Pandoc.Definition as B
-import Prelude hiding (empty)
 
 -- TODO: Do breadth-first instead of depth-first
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute

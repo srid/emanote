@@ -34,6 +34,7 @@ import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import qualified Emanote.Route as R
 import Heist.Extra.TemplateState (TemplateState)
+import Relude
 
 data Status = Status_Loading | Status_Ready
   deriving (Eq, Show)

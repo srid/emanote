@@ -31,6 +31,7 @@ import qualified Ema
 import Ema.Helper.Markdown (plainify)
 import Emanote.Route.R (R (..))
 import qualified Network.URI.Encode as UE
+import Relude
 import qualified Text.Megaparsec as M
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Parsec as P

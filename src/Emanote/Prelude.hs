@@ -14,6 +14,7 @@ import Data.WorldPeace.Union
     Remove,
     openUnionHandle,
   )
+import Relude
 
 -- | Monadic version of `chain`
 chainM :: Monad m => (b -> m (a -> a)) -> [b] -> m (a -> a)

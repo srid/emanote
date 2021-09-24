@@ -27,6 +27,7 @@ import Heist.Extra.Splices.Pandoc.Render
     rpInline,
   )
 import qualified Heist.Interpreted as HI
+import Relude
 import Text.Pandoc.Definition (Pandoc (..))
 
 -- | A splice to render a Pandoc AST

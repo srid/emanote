@@ -37,6 +37,7 @@ import qualified Emanote.Route as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
 import qualified Emanote.View.LiveServerFiles as LiveServerFile
+import Relude
 
 instance Ema Model SiteRoute where
   encodeRoute :: HasCallStack => Model -> SiteRoute -> FilePath

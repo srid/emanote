@@ -16,6 +16,7 @@ import Emanote.Prelude (log)
 import Emanote.Source.Loc
 import Emanote.Source.Patch (transformActions)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
+import Relude
 import UnliftIO (MonadUnliftIO)
 
 -- | Emanate on-disk sources onto an in-memory `Model` (stored in a LVar)

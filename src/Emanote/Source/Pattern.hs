@@ -4,6 +4,7 @@
 module Emanote.Source.Pattern where
 
 import qualified Emanote.Route as R
+import Relude
 import System.FilePattern (FilePattern)
 
 filePattern :: HasCallStack => R.FileType -> FilePath

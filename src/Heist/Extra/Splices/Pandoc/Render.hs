@@ -22,6 +22,7 @@ import Heist.Extra.Splices.Pandoc.Ctx
     rewriteClass,
   )
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W

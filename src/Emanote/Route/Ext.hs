@@ -9,8 +9,8 @@ module Emanote.Route.Ext where
 
 import Data.Aeson (ToJSON)
 import Data.Data (Data)
+import Relude hiding (show)
 import qualified System.FilePath as FP
-import Prelude hiding (show)
 
 data FileType
   = LMLType LML

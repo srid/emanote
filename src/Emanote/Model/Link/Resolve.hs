@@ -11,6 +11,7 @@ import qualified Emanote.Model.Type as M
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
+import Relude
 
 resolveUnresolvedRelTarget ::
   Model ->

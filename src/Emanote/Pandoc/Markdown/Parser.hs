@@ -12,6 +12,7 @@ import Ema.Helper.Markdown (parseMarkdownWithFrontMatter)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as IT
 import qualified Emanote.Pandoc.Markdown.Syntax.Highlight as IH
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Relude
 import Text.Pandoc.Definition (Pandoc)
 
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, Pandoc)

@@ -15,6 +15,7 @@ import qualified Data.Text as T
 import qualified Heist as H
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Builder as B
 import qualified Text.XmlHtml as X
 
