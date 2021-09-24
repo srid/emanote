@@ -11,6 +11,7 @@ import Control.Monad.Logger (MonadLogger)
 import Data.LVar (LVar)
 import qualified Ema.Helper.FileSystem as EmaFS
 import Emanote.Model (Model)
+import Emanote.Prelude (log)
 import Emanote.Source.Loc
 import Emanote.Source.Patch (transformActions)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -21,10 +22,14 @@ emanate :: (MonadUnliftIO m, MonadLogger m) => NonEmpty FilePath -> LVar Model -
 emanate paths modelLvar initialModel = do
   defaultLayer <- liftIO emanoteDefaultLayer
   let layers = one defaultLayer <> userLayers paths
-  EmaFS.unionMountOnLVar
-    layers
-    filePatterns
-    ignorePatterns
-    modelLvar
-    initialModel
-    transformActions
+  mcmd <-
+    EmaFS.unionMountOnLVar
+      layers
+      filePatterns
+      ignorePatterns
+      modelLvar
+      initialModel
+      transformActions
+  whenJust mcmd $ \EmaFS.Cmd_Remount -> do
+    log "!! Restart suggested !!"
+    emanate paths modelLvar initialModel
