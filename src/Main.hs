@@ -8,6 +8,7 @@ import qualified Emanote.Model as Model
 import qualified Emanote.Source as Source
 import qualified Emanote.View as View
 import Main.Utf8 (withUtf8)
+import Relude
 
 main :: IO ()
 main =

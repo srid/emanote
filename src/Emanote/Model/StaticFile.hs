@@ -13,6 +13,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Time (UTCTime)
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import qualified Emanote.Route as R
+import Relude
 
 data StaticFile = StaticFile
   { _staticFileRoute :: R.R 'R.AnyExt,

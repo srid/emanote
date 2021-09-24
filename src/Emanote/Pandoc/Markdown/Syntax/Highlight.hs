@@ -11,6 +11,7 @@ where
 import qualified Commonmark as CM
 import qualified Commonmark.Inlines as CM
 import qualified Commonmark.Pandoc as CP
+import Relude
 import qualified Text.Pandoc.Builder as B
 
 highlightSpec ::

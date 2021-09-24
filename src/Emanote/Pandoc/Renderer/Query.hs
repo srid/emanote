@@ -23,6 +23,7 @@ import qualified Heist.Extra as HE
 import Heist.Extra.Splices.Pandoc (RenderCtx)
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices.Json as HJ
+import Relude
 import qualified Text.Pandoc.Definition as B
 
 queryResolvingSplice :: forall n i. Monad n => PandocBlockRenderer n i LMLRoute

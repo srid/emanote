@@ -7,6 +7,7 @@ where
 import Emanote.Model.Type (Model)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route.SiteRoute.Class as SR
+import Relude
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.Walk as W
 

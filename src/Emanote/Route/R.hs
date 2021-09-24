@@ -13,6 +13,7 @@ import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
 import Emanote.Route.Ext (FileType (AnyExt, Folder, Html), HasExt (..))
+import Relude
 import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 

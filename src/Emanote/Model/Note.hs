@@ -24,6 +24,7 @@ import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (FileType (Folder), R)
 import qualified Emanote.Route as R
+import Relude
 import Relude.Extra.Map (StaticMap (lookup))
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))

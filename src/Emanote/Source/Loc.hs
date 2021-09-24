@@ -2,6 +2,7 @@
 module Emanote.Source.Loc where
 
 import qualified Paths_emanote
+import Relude
 import System.FilePath ((</>))
 
 -- | Location of the notebook, even if it contains a subset of files.

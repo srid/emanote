@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.1.64.1
+version:            0.3.0.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -15,8 +15,7 @@ category:           Web
 -- description:
 
 -- A URL where users can report bugs.
--- bug-reports:
-
+bug-reports:        https://github.com/srid/emanote/issues
 extra-source-files:
   LICENSE
   README.md
@@ -79,15 +78,12 @@ executable emanote
     , xmlhtml
     , yaml
 
-  mixins:
-    base hiding (Prelude),
-    relude (Relude as Prelude, Relude.Container.One),
-    relude
-
   ghc-options:
-    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns -threaded -rtsopts -with-rtsopts=-N
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -threaded -rtsopts -with-rtsopts=-N
 
   default-extensions:
+    NoImplicitPrelude
     FlexibleContexts
     FlexibleInstances
     KindSignatures

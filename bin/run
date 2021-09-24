@@ -2,8 +2,9 @@
 set -xe
 export PORT=9010
 
+nix flake lock
 # This will run ghcid, which uses `./.ghcid` to invoke your program main entry
 # point, with the specified args.
 #
 # If you change ./.ghcid, ghcid will automatically reload.
-exec nix develop -c ghcid
+exec nix-shell --run ghcid

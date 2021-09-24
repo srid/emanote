@@ -12,6 +12,7 @@ import Data.Version (showVersion)
 import qualified Ema.CLI
 import Options.Applicative hiding (action)
 import qualified Paths_emanote
+import Relude
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli

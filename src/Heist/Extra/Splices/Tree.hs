@@ -11,6 +11,7 @@ import Data.Tree (Tree (..))
 import qualified Heist as H
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
+import Relude
 
 treeSplice ::
   forall a n sortKey.

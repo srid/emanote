@@ -23,6 +23,7 @@ import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import qualified Heist.Extra.Splices.Pandoc.Ctx as Splices
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Definition as B
 
 -- | Custom Heist renderer function for specific Pandoc AST nodes

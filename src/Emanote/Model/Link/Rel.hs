@@ -18,6 +18,7 @@ import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute.Type as SR
+import Relude
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.LinkContext as LC
 

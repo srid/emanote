@@ -36,6 +36,7 @@ import qualified Emanote.Route as R
 import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
+import Relude
 import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)

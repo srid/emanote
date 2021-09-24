@@ -22,6 +22,7 @@ import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Definition as B
 import qualified Text.Pandoc.Walk as W
 

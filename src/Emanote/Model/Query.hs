@@ -14,6 +14,7 @@ import Emanote.Model.Type (Model, modelNotes, modelTags)
 import Emanote.Pandoc.Markdown.Syntax.HashTag (TagPattern)
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route as R
+import Relude
 import System.FilePattern (FilePattern, (?==))
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as M

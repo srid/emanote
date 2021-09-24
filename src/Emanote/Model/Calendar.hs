@@ -9,6 +9,7 @@ import Emanote.Model.Title (Title)
 import Emanote.Model.Type (Model, modelLookupTitle)
 import Emanote.Route (LMLRoute)
 import qualified Emanote.Route as R
+import Relude
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as M
 

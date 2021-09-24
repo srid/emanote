@@ -7,6 +7,7 @@ import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (rootNode))
 import Heist.Extra.Splices.Pandoc.Render (renderPandocWith)
 import qualified Heist.Interpreted as HI
+import Relude
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 import qualified Text.Pandoc.Walk as W

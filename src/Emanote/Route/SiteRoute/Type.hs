@@ -27,8 +27,8 @@ import Emanote.Prelude (h)
 import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
 import qualified Emanote.Route.R as R
+import Relude hiding (show)
 import Text.Show (show)
-import Prelude hiding (show)
 
 data IndexR = IndexR
   deriving (Eq, Show, Ord)

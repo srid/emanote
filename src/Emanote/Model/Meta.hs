@@ -16,6 +16,7 @@ import Emanote.Model.Note (lookupAeson, _noteMeta)
 import Emanote.Model.SData (sdataValue)
 import qualified Emanote.Model.SData as SData
 import qualified Emanote.Route as R
+import Relude
 
 -- | Look up a specific key in the meta for a given route.
 lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> Model -> a

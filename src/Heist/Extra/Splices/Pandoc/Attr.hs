@@ -1,6 +1,7 @@
 module Heist.Extra.Splices.Pandoc.Attr where
 
 import qualified Data.Text as T
+import Relude
 import qualified Text.Pandoc.Definition as B
 
 -- | Convert Pandoc attributes to XmlHtml attributes
