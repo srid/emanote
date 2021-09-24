@@ -124,6 +124,7 @@ inlinesWithWikiLinksPlainified = W.walk $ \case
   x -> x
 
 replaceLinkNodeWithRoute ::
+  HasCallStack =>
   Ema.CLI.Action ->
   Model ->
   (SR.SiteRoute, Maybe UTCTime) ->

@@ -121,6 +121,7 @@ modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
+-- Return Nothing if zero or multiple notes.
 modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.lookupNotesByRoute r notes
