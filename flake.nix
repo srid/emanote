@@ -63,7 +63,7 @@
       in
       flake // {
         # Used by `nix build` & `nix run`
-        defaultPackage = flake.packages.${system}."emanote:exe:emanote";
+        defaultPackage = flake.packages."emanote:exe:emanote";
 
         # Repl: nix run .#repl
         apps = {
