@@ -36,8 +36,12 @@ pandoc:
   # This feature is useful when managing a "library" of CSS styling to use on
   # Markdown text, especially when using Tailwind.
   rewriteClass:
-    # TODO: Should these be done instead on Heist (pandoc.tpl)?
+    # How to style inline tags. Tag-specific styles can be applied as well.
     emanote:inline-tag: font-bold bg-gray-100 py-0.5 px-2 rounded-lg
+    # This style is used by `#a/red/tag` in addition to the generic style above.
+    # As this class comes *after* the generic class, it can override the styles
+    # in the generic class.
+    emanote:inline-tag:a/red/tag: bg-red-100
     emanote:placeholder-message: text-gray-400 border-t-2 inline-block pt-0.5
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
     # You can also add your own class -> style mappings. We provide a sample below.
