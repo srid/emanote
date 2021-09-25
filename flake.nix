@@ -24,18 +24,14 @@
             emanote =
               final.haskell-nix.cabalProject'
                 {
-                  # src = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
-                  src = ./.;
+                  src = final.haskell-nix.haskellLib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
                   compiler-nix-name = "ghc8107";
                   shell.tools = {
                     cabal = { };
                     hlint = { };
                     ghcid = { };
-                    # cabal-fmt = {};
                     # ormolu = { }; -- this compiles ghc-lib-parser!
                     haskell-language-server = { };
-                    # nixpkgs-fmt??
-                    # windicss??
                   };
                   shell.buildInputs = [
                     pkgs.nixpkgs-fmt
