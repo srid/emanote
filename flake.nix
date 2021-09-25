@@ -1,7 +1,8 @@
 {
   description = "emanote";
   inputs = {
-    haskellNix.url = "github:input-output-hk/haskell.nix";
+    # Pick the succeeding rev from https://github.com/input-output-hk/haskell.nix/commits/master
+    haskellNix.url = "github:input-output-hk/haskell.nix/f5ec5311fa805b46f5276e2b4f574c8e7544a30b";
     nixpkgs.follows = "haskellNix/nixpkgs-unstable";
     ema.url = "github:srid/ema/master";
     windicss = {
@@ -31,7 +32,7 @@
                     hlint = { };
                     ghcid = { };
                     # ormolu = { }; -- this compiles ghc-lib-parser!
-                    # haskell-language-server = { };
+                    haskell-language-server = { };
                     # nixpkgs-fmt??
                     # windicss??
                   };
