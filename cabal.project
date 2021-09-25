@@ -1,5 +1,20 @@
+packages: ./*.cabal
+
+source-repository-package
+  type: git
+  location: https://github.com/srid/ema.git
+  tag: 22512991a8fb7a0f78b8b23891fea4898fb058e0
+  --sha256: 0bx4m8xnx439wmmhh7901dsvcc4mlkfbzjlixq42qpk3i6lmwn6s
+
 source-repository-package
   type: git
   location: https://github.com/srid/tagtree.git
   tag: 667c5a5073eddb8ddd875726b1fb6c41e09f0591
   --sha256: 0hd0z5dhqkw0z1xwjvn86zk2gb18qn0c44ww2hbr1lgs7lz2x0zy
+
+-- branch: emanote (just to expose Heist.Common)
+source-repository-package
+  type: git
+  location: https://github.com/srid/heist.git
+  tag: a8be6f93656f87199e03b9dfb9979dc061614108
+  --sha256: 10ys73igp4408qynckjlw9a4383hzwh9rbm30b8l1zn1m082pdzr

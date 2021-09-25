@@ -8,15 +8,6 @@
       url = "github:srid/windicss-nix";
       flake = false;
     };
-    tagtree = {
-      url = "github:srid/tagtree";
-      flake = false;
-    };
-    heist = {
-      url = "github:srid/heist/emanote";
-      flake = false;
-    };
-
     flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
       url = "github:edolstra/flake-compat";
@@ -29,22 +20,22 @@
         overlays = [
           haskellNix.overlay
           (final: prev: {
-            emanoteProject =
+            emanote =
               final.haskell-nix.cabalProject'
                 {
-                  src = final.haskell-nix.haskellLib.cleanGit {
-                    name = "emanoteProject";
-                    src = ./.;
-                  };
+                  # src = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
+                  src = ./.;
                   compiler-nix-name = "ghc8107";
                   shell.tools = {
                     cabal = { };
                     hlint = { };
                     ghcid = { };
-                    haskell-language-server = { };
+                    # ormolu = { }; -- this compiles ghc-lib-parser!
+                    # haskell-language-server = { };
+                    # nixpkgs-fmt??
+                    # windicss??
                   };
                 };
-            #tagtree = final.callCabal2nix "tagtree" inputs.tagtree { };
           })
         ];
         pkgs =
@@ -65,37 +56,23 @@
               sansPrefix == "/.github" ||
               sansPrefix == "/.vscode"
             );
-        flake = pkgs.emanoteProject.flake { };
-        project = returnShellEnv:
-          pkgs.haskellPackages.developPackage {
-            inherit returnShellEnv;
-            name = "emanote";
-            root = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
-            withHoogle = true;
-            overrides = self: super: with pkgs.haskell.lib; {
-              ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
-              tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
-              # Jailbreak heist to allow newer dlist
-              heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
-              # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
-            };
-            modifier = drv:
-              pkgs.haskell.lib.addBuildTools drv (with pkgs.haskellPackages;
-              [
-                cabal-fmt
-                cabal-install
-                ghcid
-                haskell-language-server
-                ormolu
-                pkgs.nixpkgs-fmt
-
-                windicss
-              ]);
-          };
+        flake = pkgs.emanote.flake { };
       in
       flake // {
         # Used by `nix build` & `nix run`
-        defaultPackage = flake.packages."emanote:exe:emanote";
+        defaultPackage = flake.packages.${system}."emanote:exe:emanote";
+
+        # Repl: nix run .#repl
+        apps = {
+          repl = flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "repl" ''
+              confnix=$(mktemp)
+              echo "builtins.getFlake (toString $(git rev-parse --show-toplevel))" >$confnix
+              trap "rm $confnix" EXIT
+              nix repl $confnix
+            '';
+          };
+        };
 
         inherit windicss;
       });
