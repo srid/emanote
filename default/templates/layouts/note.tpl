@@ -17,8 +17,10 @@
             <main class="px-4 py-4">
               <apply template="components/note-title" />
               <apply template="components/note-body" />
-              <apply template="components/timeline" />
-              <apply template="components/backlinks" />
+              <div class="flex flex-col lg:flex-row lg:space-x-2">
+                <apply template="components/timeline" />
+                <apply template="components/backlinks" />
+              </div>
               <apply template="components/metadata" />
               <apply template="/templates/hooks/note-end" />
             </main>
