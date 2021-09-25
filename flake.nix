@@ -31,11 +31,17 @@
                     cabal = { };
                     hlint = { };
                     ghcid = { };
+                    # cabal-fmt = {};
                     # ormolu = { }; -- this compiles ghc-lib-parser!
                     haskell-language-server = { };
                     # nixpkgs-fmt??
                     # windicss??
                   };
+                  shell.buildInputs = [
+                    pkgs.nixpkgs-fmt
+                    pkgs.haskellPackages.cabal-fmt
+                    pkgs.ormolu
+                  ];
                 };
           })
         ];
