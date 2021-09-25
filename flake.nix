@@ -30,9 +30,12 @@
           haskellNix.overlay
           (final: prev: {
             emanoteProject =
-              final.haskell-nix.project'
+              final.haskell-nix.cabalProject'
                 {
-                  src = ./.;
+                  src = final.haskell-nix.haskellLib.cleanGit {
+                    name = "emanoteProject";
+                    src = ./.;
+                  };
                   compiler-nix-name = "ghc8107";
                   shell.tools = {
                     cabal = { };
@@ -41,6 +44,7 @@
                     haskell-language-server = { };
                   };
                 };
+            #tagtree = final.callCabal2nix "tagtree" inputs.tagtree { };
           })
         ];
         pkgs =

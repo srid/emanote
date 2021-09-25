@@ -1,0 +1,5 @@
+source-repository-package
+  type: git
+  location: https://github.com/srid/tagtree.git
+  tag: 667c5a5073eddb8ddd875726b1fb6c41e09f0591
+  --sha256: 0hd0z5dhqkw0z1xwjvn86zk2gb18qn0c44ww2hbr1lgs7lz2x0zy
