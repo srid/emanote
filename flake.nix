@@ -1,9 +1,9 @@
 {
   description = "emanote";
   inputs = {
+    haskellNix.url = "github:input-output-hk/haskell.nix";
+    nixpkgs.follows = "haskellNix/nixpkgs-unstable";
     ema.url = "github:srid/ema/master";
-    # Use the nixpkgs used by the pinned ema.
-    nixpkgs.follows = "ema/nixpkgs";
     windicss = {
       url = "github:srid/windicss-nix";
       flake = false;
@@ -23,12 +23,28 @@
       flake = false;
     };
   };
-  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-utils, haskellNix, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
       let
-        overlays = [ ];
+        overlays = [
+          haskellNix.overlay
+          (final: prev: {
+            emanoteProject =
+              final.haskell-nix.project'
+                {
+                  src = ./.;
+                  compiler-nix-name = "ghc8107";
+                  shell.tools = {
+                    cabal = { };
+                    hlint = { };
+                    ghcid = { };
+                    haskell-language-server = { };
+                  };
+                };
+          })
+        ];
         pkgs =
-          import nixpkgs { inherit system overlays; config.allowBroken = true; };
+          import nixpkgs { inherit system overlays; inherit (haskellNix) config; };
         windicss =
           (import inputs.windicss { inherit pkgs; }).shell.nodeDependencies;
         # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
@@ -45,6 +61,7 @@
               sansPrefix == "/.github" ||
               sansPrefix == "/.vscode"
             );
+        flake = pkgs.emanoteProject.flake { };
         project = returnShellEnv:
           pkgs.haskellPackages.developPackage {
             inherit returnShellEnv;
@@ -72,13 +89,10 @@
               ]);
           };
       in
-      {
+      flake // {
         # Used by `nix build` & `nix run`
-        defaultPackage = project false;
+        defaultPackage = flake.packages."emanote:exe:emanote";
 
         inherit windicss;
-
-        # Used by `nix develop`
-        devShell = project true;
       });
 }
