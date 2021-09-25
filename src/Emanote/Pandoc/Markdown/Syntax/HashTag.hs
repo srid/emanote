@@ -49,7 +49,13 @@ instance HasHashTag (CP.Cm b B.Inlines) where
           [ ("title", "Tag"),
             (tagDataAttr, tag)
           ]
-     in CP.Cm $ B.spanWith ("", one "emanote:inline-tag", attrs) $ B.str $ "#" <> tag
+        classes =
+          [ "emanote:inline-tag",
+            -- This must be placed *after* the class above, to allow the user to
+            -- override generic styles (of the class above)
+            "emanote:inline-tag:" <> tag
+          ]
+     in CP.Cm $ B.spanWith ("", classes, attrs) $ B.str $ "#" <> tag
 
 tagDataAttr :: Text
 tagDataAttr = "data-tag"
