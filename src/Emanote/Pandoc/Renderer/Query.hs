@@ -27,7 +27,7 @@ import Relude
 import qualified Text.Pandoc.Definition as B
 
 queryResolvingSplice :: forall n i. Monad n => PandocBlockRenderer n i LMLRoute
-queryResolvingSplice _emaAction model _nr ctx noteRoute blk = do
+queryResolvingSplice model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)
     (Q.parseQuery -> Just q) <-
