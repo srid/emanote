@@ -187,10 +187,11 @@ mkRendererWith model classRules =
 
 renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
 renderModelTemplate model templateName =
-  let handleErr = case model ^. M.modelEmaCLIAction of
-        Ema.CLI.Run -> Ema.emaErrorHtmlResponse
-        -- When staticaly generating, we must fail asap on template errors.
-        _ -> error
+  let handleErr =
+        if M.inLiveServer model
+          then Ema.emaErrorHtmlResponse
+          else -- When staticaly generating, we must fail asap on template errors.
+            error
    in -- Until Ema's error handling improves ...
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)

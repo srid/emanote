@@ -66,6 +66,10 @@ modelReadyForView :: Model -> Model
 modelReadyForView =
   modelStatus .~ Status_Ready
 
+-- | Are we running in live server, or statically generated website?
+inLiveServer :: Model -> Bool
+inLiveServer = (== Ema.CLI.Run) . _modelEmaCLIAction
+
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes

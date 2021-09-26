@@ -43,7 +43,7 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
             -- in B.Para (so do this in block-level custom splice), then embed it.
             -- We don't do this here, as this inline splice can't embed block elements.
             let (newIs, (newUrl, isFileLink)) = replaceLinkNodeWithRoute model sr (is, url)
-                newAttr = (id', cls, otherAttrs <> bool mempty (fileLinkAttr $ model ^. M.modelEmaCLIAction) isFileLink)
+                newAttr = (id', cls, otherAttrs <> bool mempty [fileLinkAttr | M.inLiveServer model] isFileLink)
             pure $ HP.rpInline ctx $ B.Link newAttr newIs (newUrl, tit)
           Link.InlineImage -> do
             let (newIs, (newUrl, _)) =
@@ -53,9 +53,9 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
   let rRel = Resolve.resolveUnresolvedRelTarget model uRel
   renderSomeInlineRefWith f id (is, (url, tit)) rRel model ctx inl
 
-fileLinkAttr :: Ema.CLI.Action -> [(Text, Text)]
-fileLinkAttr emaAction =
-  [("target", "_blank") | emaAction == Ema.CLI.Run]
+fileLinkAttr :: (Text, Text)
+fileLinkAttr =
+  ("target", "_blank")
 
 renderSomeInlineRefWith ::
   Monad n =>
@@ -90,7 +90,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
                 tooltip "Find notes containing this broken link" $
                   one $
                     B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
-        if (model ^. M.modelEmaCLIAction) == Ema.CLI.Run
+        if M.inLiveServer model
           then pure $ raw <> details
           else pure raw
     Rel.RRTAmbiguous srs -> do
@@ -102,7 +102,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
               <&> \(getSr -> sr) -> do
                 let srRoute = toText $ Ema.encodeRoute model (fst sr)
                     (_newIs, (newUrl, isFileLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
-                    linkAttr = bool mempty (fileLinkAttr $ model ^. M.modelEmaCLIAction) isFileLink
+                    linkAttr = bool mempty [fileLinkAttr | M.inLiveServer model] isFileLink
                     newIs = one $ B.Str $ show $ fst sr
                 HP.rpInline ctx $
                   B.Span ("", ["emanote:error:aside"], []) $
@@ -110,7 +110,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
                       tooltip (show (fst sr) <> " -> " <> srRoute) $
                         one $
                           B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
-        if model ^. M.modelEmaCLIAction == Ema.CLI.Run
+        if M.inLiveServer model
           then pure $ raw <> candidates
           else pure raw
     Rel.RRTFound sr -> do
@@ -158,7 +158,7 @@ siteRouteUrlWithTime model (SR.siteRouteUrl model -> linkUrl, mUrlTime) =
   fromMaybe
     (linkUrl, False)
     ( do
-        guard $ (model ^. M.modelEmaCLIAction) == Ema.CLI.Run
+        guard $ M.inLiveServer model
         t <- mUrlTime
         let u = linkUrl <> toText ("?t=" <> formatTime defaultTimeLocale "%s" t)
         pure (u, True)
