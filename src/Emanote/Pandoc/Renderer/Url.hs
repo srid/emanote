@@ -139,21 +139,9 @@ replaceLinkNodeWithRoute ::
   ([B.Inline], (Text, Bool))
 replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
   ( inlinesWithWikiLinksPlainified $ nonEmptyLinkInlines model url (Just r) inner,
-    foldUrlTime (SR.siteRouteUrl model r) mTime
+    siteRouteUrlWithTime emaAction model (r, mTime)
   )
   where
-    foldUrlTime linkUrl mUrlTime =
-      -- In live server mode, append last modification time if any, such
-      -- that the browser is forced to refresh the inline image on hot
-      -- reload (Ema's DOM patch).
-      fromMaybe
-        (linkUrl, False)
-        ( do
-            guard $ emaAction == Ema.CLI.Run
-            t <- mUrlTime
-            let u = linkUrl <> toText ("?t=" <> formatTime defaultTimeLocale "%s" t)
-            pure (u, True)
-        )
     nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
     nonEmptyLinkInlines model' url' mr = \case
       [] ->
@@ -162,6 +150,20 @@ replaceLinkNodeWithRoute emaAction model (r, mTime) (inner, url) =
             fromMaybe [] $
               siteRouteDefaultInnerText model' url' =<< mr
       x -> x
+
+siteRouteUrlWithTime :: Ema.CLI.Action -> Model -> (SR.SiteRoute, Maybe UTCTime) -> (Text, Bool)
+siteRouteUrlWithTime emaAction model (SR.siteRouteUrl model -> linkUrl, mUrlTime) =
+  -- In live server mode, append last modification time if any, such
+  -- that the browser is forced to refresh the inline image on hot
+  -- reload (Ema's DOM patch).
+  fromMaybe
+    (linkUrl, False)
+    ( do
+        guard $ emaAction == Ema.CLI.Run
+        t <- mUrlTime
+        let u = linkUrl <> toText ("?t=" <> formatTime defaultTimeLocale "%s" t)
+        pure (u, True)
+    )
 
 -- | Ensure that inlines list is non-empty, using the provided singleton value if necessary.
 nonEmptyInlines :: Text -> [B.Inline] -> NonEmpty B.Inline
