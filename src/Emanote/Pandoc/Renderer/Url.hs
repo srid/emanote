@@ -42,7 +42,7 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
             -- in B.Para (so do this in block-level custom splice), then embed it.
             -- We don't do this here, as this inline splice can't embed block elements.
             let (newIs, (newUrl, isFileLink)) = replaceLinkNodeWithRoute emaAction model sr (is, url)
-                newAttr = (id', cls, otherAttrs <> [("target", "_blank") | isFileLink])
+                newAttr = (id', cls, otherAttrs <> bool mempty (fileLinkAttr emaAction) isFileLink)
             pure $ HP.rpInline ctx $ B.Link newAttr newIs (newUrl, tit)
           Link.InlineImage -> do
             let (newIs, (newUrl, _)) =
@@ -51,6 +51,10 @@ urlResolvingSplice emaAction model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
   uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model uRel
   renderSomeInlineRefWith f id (is, (url, tit)) rRel emaAction model ctx inl
+
+fileLinkAttr :: Ema.CLI.Action -> [(Text, Text)]
+fileLinkAttr emaAction =
+  [("target", "_blank") | emaAction == Ema.CLI.Run]
 
 renderSomeInlineRefWith ::
   Monad n =>
@@ -98,7 +102,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel emaAction model (ctxSansCu
               <&> \(getSr -> sr) -> do
                 let srRoute = toText $ Ema.encodeRoute model (fst sr)
                     (_newIs, (newUrl, isFileLink)) = replaceLinkNodeWithRoute emaAction model sr (is, srRoute)
-                    linkAttr = [("target", "_blank") | isFileLink]
+                    linkAttr = bool mempty (fileLinkAttr emaAction) isFileLink
                     newIs = one $ B.Str $ show $ fst sr
                 HP.rpInline ctx $
                   B.Span ("", ["emanote:error:aside"], []) $
