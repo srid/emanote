@@ -74,15 +74,15 @@ mkTagIndex model tagPath' =
           subForest <- Tree.subForest <$> List.find (\(Tree.Node lbl _) -> fst lbl == k) trees
           lookupForest ks subForest
 
-renderTagIndex :: Ema.CLI.Action -> Model -> [HT.TagNode] -> LByteString
-renderTagIndex emaAction model tagPath = do
+renderTagIndex :: Model -> [HT.TagNode] -> LByteString
+renderTagIndex model tagPath = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = mkRendererFromMeta emaAction model meta
+      withNoteRenderer = mkRendererFromMeta model meta
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
       tagIdx = mkTagIndex model tagPath
-  renderModelTemplate emaAction model "templates/special/tagindex" $ do
-    commonSplices ($ emptyRenderCtx) emaAction model meta $ fromString . toString $ tagIndexTitle tagIdx
+  renderModelTemplate model "templates/special/tagindex" $ do
+    commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
