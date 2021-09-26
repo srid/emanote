@@ -119,7 +119,7 @@ renderLmlHtml model note = do
         withNoteRenderer noteRenderers () r
       templateName = lookupTemplateName meta
       withLoadingMessage =
-        if (model ^. M.modelEmaCLIAction) == Ema.CLI.Run && model ^. M.modelStatus == M.Status_Loading
+        if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
   withLoadingMessage . renderModelTemplate model templateName $ do
