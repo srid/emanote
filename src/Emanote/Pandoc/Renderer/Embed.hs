@@ -16,7 +16,7 @@ import qualified Emanote.Pandoc.Link as Link
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import qualified Emanote.Pandoc.Renderer.Url as RenderedUrl
-import qualified Emanote.Route as R
+import qualified Emanote.Route.SiteRoute as SF
 import qualified Emanote.Route.SiteRoute as SR
 import qualified Heist as H
 import qualified Heist.Extra as HE
@@ -28,7 +28,7 @@ import qualified Text.Pandoc.Definition as B
 
 embedBlockWikiLinkResolvingSplice ::
   Monad n => PandocBlockRenderer n i b
-embedBlockWikiLinkResolvingSplice emaAction model _nf ctx _ = \case
+embedBlockWikiLinkResolvingSplice model _nf ctx _ = \case
   B.Para [inl] -> do
     (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
     guard $ inlRef == Link.InlineLink
@@ -36,25 +36,25 @@ embedBlockWikiLinkResolvingSplice emaAction model _nf ctx _ = \case
       Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
     let rRel = Resolve.resolveWikiLinkMustExist model wl
     let f = embedBlockSiteRoute model ctx
-    RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel emaAction model ctx inl
+    RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
   _ ->
     Nothing
 
 embedInlineWikiLinkResolvingSplice ::
   Monad n => PandocInlineRenderer n i b
-embedInlineWikiLinkResolvingSplice emaAction model _nf ctx _ inl = do
+embedInlineWikiLinkResolvingSplice model _nf ctx _ inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-      f = embedInlineSiteRoute wl
-  RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel emaAction model ctx inl
+      f = embedInlineSiteRoute model wl
+  RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
 
 embedBlockSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
 embedBlockSiteRoute model ctx = either (embedResourceRoute model ctx) (const Nothing)
 
-embedInlineSiteRoute :: Monad n => WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
-embedInlineSiteRoute wl = either (const Nothing) (embedStaticFileRoute wl)
+embedInlineSiteRoute :: Monad n => Model -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
+embedInlineSiteRoute model wl = either (const Nothing) (embedStaticFileRoute model wl)
 
 runEmbedTemplate :: Monad n => ByteString -> H.Splices (HI.Splice n) -> HI.Splice n
 runEmbedTemplate name splices = do
@@ -69,18 +69,18 @@ embedResourceRoute model ctx note = do
     "ema:note:pandoc"
       ## pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
 
-embedStaticFileRoute :: Monad n => WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice n)
-embedStaticFileRoute wl staticFile = do
-  let r = staticFile ^. SF.staticFileRoute
-      fp = staticFile ^. SF.staticFilePath
+embedStaticFileRoute :: Monad n => Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice n)
+embedStaticFileRoute model wl staticFile = do
+  let fp = staticFile ^. SF.staticFilePath
+      url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
   if
       | any (`T.isSuffixOf` toText fp) imageExts ->
         pure . runEmbedTemplate "image" $ do
-          "ema:url" ## HI.textSplice (toText $ R.encodeRoute r)
+          "ema:url" ## HI.textSplice url
           "ema:alt" ## HI.textSplice $ show wl
       | any (`T.isSuffixOf` toText fp) videoExts -> do
         pure . runEmbedTemplate "video" $ do
-          "ema:url" ## HI.textSplice (toText $ R.encodeRoute r)
+          "ema:url" ## HI.textSplice url
       | otherwise -> Nothing
 
 imageExts :: [Text]

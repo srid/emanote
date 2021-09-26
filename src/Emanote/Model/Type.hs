@@ -15,6 +15,7 @@ import qualified Data.IxSet.Typed as Ix
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
+import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model.Link.Rel (IxRel)
 import qualified Emanote.Model.Link.Rel as Rel
@@ -41,6 +42,7 @@ data Status = Status_Loading | Status_Ready
 
 data Model = Model
   { _modelStatus :: Status,
+    _modelEmaCLIAction :: Ema.CLI.Action,
     _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelSData :: IxSData,
@@ -56,13 +58,17 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Model
-emptyModel =
-  Model Status_Loading Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Ema.CLI.Action -> Model
+emptyModel act =
+  Model Status_Loading act Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =
   modelStatus .~ Status_Ready
+
+-- | Are we running in live server, or statically generated website?
+inLiveServer :: Model -> Bool
+inLiveServer = (== Ema.CLI.Run) . _modelEmaCLIAction
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =

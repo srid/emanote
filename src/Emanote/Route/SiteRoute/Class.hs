@@ -20,6 +20,7 @@ import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as Set
+import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
@@ -140,8 +141,36 @@ staticFileSiteRoute =
       openUnionLift
 
 siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
-siteRouteUrl model =
-  Ema.routeUrlWith (urlStrategy model) model
+siteRouteUrl model sr =
+  Ema.routeUrlWith (urlStrategy model) model sr
+    <> maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime
+  where
+    staticFileModifiedTime = do
+      -- In live server model, we append a ?t=.. to trigger the browser into
+      -- reloading (or invalidating its cache of) this embed static file.
+      guard $ M.inLiveServer model
+      sfRoute <- staticFileRouteCase sr
+      sf <- M.modelLookupStaticFileByRoute sfRoute model
+      pure $ sf ^. SF.staticFileTime
+    staticFileRouteCase :: SiteRoute -> Maybe StaticFileRoute
+    staticFileRouteCase (SiteRoute r) =
+      r & absurdUnion
+        `h` ( \(MissingR _fp) ->
+                Nothing
+            )
+        `h` ( \(AmbiguousR _) ->
+                Nothing
+            )
+        `h` ( \(r :: ResourceRoute) ->
+                r & absurdUnion
+                  `h` ( \(sfR :: StaticFileRoute, _fp :: FilePath) ->
+                          Just sfR
+                      )
+                  `h` ( \(_ :: LMLRoute) ->
+                          Nothing
+                      )
+            )
+        `h` (\(_ :: VirtualRoute) -> Nothing)
 
 urlStrategySuffix :: Model -> Text
 urlStrategySuffix model =

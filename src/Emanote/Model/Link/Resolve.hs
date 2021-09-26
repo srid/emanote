@@ -16,7 +16,7 @@ import Relude
 resolveUnresolvedRelTarget ::
   Model ->
   Rel.UnresolvedRelTarget ->
-  Rel.ResolvedRelTarget (SR.SiteRoute, Maybe UTCTime)
+  Rel.ResolvedRelTarget SR.SiteRoute
 resolveUnresolvedRelTarget model = \case
   Rel.URTWikiLink (_wlType, wl) -> do
     resolveWikiLinkMustExist model wl
@@ -29,7 +29,6 @@ resolveUnresolvedRelTarget model = \case
       SR.SiteRoute
         ( openUnionLift virtualRoute
         )
-        & (,Nothing)
 
 resolveWikiLinkMustExist ::
   Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
@@ -45,11 +44,6 @@ resolveModelRoute model lr =
     (R.modelRouteCase lr)
     & maybe Rel.RRTMissing Rel.RRTFound
 
-resourceSiteRoute :: Either MN.Note SF.StaticFile -> (SR.SiteRoute, Maybe UTCTime)
-resourceSiteRoute = \case
-  Left note ->
-    SR.noteFileSiteRoute note
-      & (,Nothing)
-  Right sf ->
-    SR.staticFileSiteRoute sf
-      & (,Just $ sf ^. SF.staticFileTime)
+resourceSiteRoute :: Either MN.Note SF.StaticFile -> SR.SiteRoute
+resourceSiteRoute =
+  either SR.noteFileSiteRoute SR.staticFileSiteRoute
