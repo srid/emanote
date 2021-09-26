@@ -43,8 +43,8 @@ import qualified Shower
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-render :: Ema.CLI.Action -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-render emaAction m (SR.SiteRoute sr) =
+render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
+render m (SR.SiteRoute sr) =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in sr
@@ -55,25 +55,25 @@ render emaAction m (SR.SiteRoute sr) =
                       MN.missingNote hereRoute (toText urlPath)
                         & setErrorPageMeta
                         & MN.noteTitle .~ "! Missing link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note404
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
             )
         `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
                 let noteAmb =
                       MN.ambiguousNoteURL urlPath notes
                         & setErrorPageMeta
                         & MN.noteTitle .~ "! Ambiguous link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m noteAmb
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
             )
-        `h` renderResourceRoute emaAction m
-        `h` renderVirtualRoute emaAction m
+        `h` renderResourceRoute m
+        `h` renderVirtualRoute m
 
-renderResourceRoute :: Ema.CLI.Action -> Model -> SR.ResourceRoute -> Ema.Asset LByteString
-renderResourceRoute emaAction m =
+renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
+renderResourceRoute m =
   absurdUnion
     `h` ( \(r :: R.LMLRoute) -> do
             case M.modelLookupNoteByRoute r m of
               Just note ->
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml emaAction m note
+                Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
               Nothing ->
                 -- This should never be reached because decodeRoute looks up the model.
                 error $ "Bad route: " <> show r
@@ -82,35 +82,35 @@ renderResourceRoute emaAction m =
             Ema.AssetStatic fpAbs
         )
 
-renderVirtualRoute :: Ema.CLI.Action -> Model -> SR.VirtualRoute -> Ema.Asset LByteString
-renderVirtualRoute emaAction m =
+renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
+renderVirtualRoute m =
   absurdUnion
     `h` ( \(SR.TagIndexR mtag) ->
-            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex emaAction m mtag
+            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
         )
     `h` ( \SR.IndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRIndex emaAction m
+            Ema.AssetGenerated Ema.Html $ renderSRIndex m
         )
 
-renderSRIndex :: Ema.CLI.Action -> Model -> LByteString
-renderSRIndex emaAction model = do
+renderSRIndex :: Model -> LByteString
+renderSRIndex model = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = mkRendererFromMeta emaAction model meta
+      withNoteRenderer = mkRendererFromMeta model meta
       withInlineCtx =
         withNoteRenderer linkInlineRenderers () ()
-  renderModelTemplate emaAction model "templates/special/index" $ do
-    commonSplices ($ emptyRenderCtx) emaAction model meta "Index"
+  renderModelTemplate model "templates/special/index" $ do
+    commonSplices ($ emptyRenderCtx) model meta "Index"
     routeTreeSplice withInlineCtx Nothing model
 
 loaderHead :: LByteString
 loaderHead =
   "<em style='font-size: 400%; border-bottom: 1px solid; margin-bottom: 4em; '>Union mounting notebook layers; please wait ...</em>"
 
-renderLmlHtml :: Ema.CLI.Action -> Model -> MN.Note -> LByteString
-renderLmlHtml emaAction model note = do
+renderLmlHtml :: Model -> MN.Note -> LByteString
+renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      withNoteRenderer = mkRendererFromMeta emaAction model meta
+      withNoteRenderer = mkRendererFromMeta model meta
       withInlineCtx =
         withNoteRenderer inlineRenderers () ()
       withLinkInlineCtx =
@@ -119,11 +119,11 @@ renderLmlHtml emaAction model note = do
         withNoteRenderer noteRenderers () r
       templateName = lookupTemplateName meta
       withLoadingMessage =
-        if emaAction == Ema.CLI.Run && model ^. M.modelStatus == M.Status_Loading
+        if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withLoadingMessage . renderModelTemplate emaAction model templateName $ do
-    commonSplices withLinkInlineCtx emaAction model meta (note ^. MN.noteTitle)
+  withLoadingMessage . renderModelTemplate model templateName $ do
+    commonSplices withLinkInlineCtx model meta (note ^. MN.noteTitle)
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
           Tit.titleSplice x (preparePandoc model) titleDoc

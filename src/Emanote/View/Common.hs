@@ -95,12 +95,11 @@ _pandocBlockRenderers =
 commonSplices ::
   Monad n =>
   ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
-  Ema.CLI.Action ->
   Model ->
   Aeson.Value ->
   Tit.Title ->
   H.Splices (HI.Splice n)
-commonSplices withCtx emaAction model meta routeTitle = do
+commonSplices withCtx model meta routeTitle = do
   let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
@@ -112,7 +111,7 @@ commonSplices withCtx emaAction model meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim"
     ## pure
-      (RX.renderHtmlNodes $ twindShim emaAction)
+      (RX.renderHtmlNodes $ twindShim $ model ^. M.modelEmaCLIAction)
   "ema:version"
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
@@ -152,7 +151,6 @@ commonSplices withCtx emaAction model meta routeTitle = do
 -- the associated data arguments.
 mkRendererFromMeta ::
   (Monad m, Monad n) =>
-  Ema.CLI.Action ->
   Model ->
   Aeson.Value ->
   ( PandocRenderers n i b ->
@@ -161,13 +159,12 @@ mkRendererFromMeta ::
     (RenderCtx n -> H.HeistT n m x) ->
     H.HeistT n m x
   )
-mkRendererFromMeta emaAction model routeMeta =
+mkRendererFromMeta model routeMeta =
   let classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) routeMeta
-   in mkRendererWith emaAction model classRules
+   in mkRendererWith model classRules
 
 mkRendererWith ::
   (Monad m, Monad n) =>
-  Ema.CLI.Action ->
   Model ->
   Map Text Text ->
   ( PandocRenderers n i b ->
@@ -176,25 +173,25 @@ mkRendererWith ::
     (RenderCtx n -> H.HeistT n m x) ->
     H.HeistT n m x
   )
-mkRendererWith emaAction model classRules =
+mkRendererWith model classRules =
   let withNoteRenderer nr i b f = do
         renderCtx <-
           Renderer.mkRenderCtxWithPandocRenderers
             nr
             classRules
-            emaAction
             model
             i
             b
         f renderCtx
    in withNoteRenderer
 
-renderModelTemplate :: Ema.CLI.Action -> Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
-renderModelTemplate emaAction model templateName =
-  let handleErr = case emaAction of
-        Ema.CLI.Run -> Ema.emaErrorHtmlResponse
-        -- When staticaly generating, we must fail asap on template errors.
-        _ -> error
+renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
+renderModelTemplate model templateName =
+  let handleErr =
+        if M.inLiveServer model
+          then Ema.emaErrorHtmlResponse
+          else -- When staticaly generating, we must fail asap on template errors.
+            error
    in -- Until Ema's error handling improves ...
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)

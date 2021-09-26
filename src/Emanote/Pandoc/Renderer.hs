@@ -17,7 +17,6 @@ module Emanote.Pandoc.Renderer
   )
 where
 
-import qualified Ema.CLI
 import Emanote.Model.Type (Model)
 import Heist (HeistT)
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -30,7 +29,6 @@ import qualified Text.Pandoc.Definition as B
 --
 -- The `x` selects between `i` (inline) and `b` (block) types.
 type PandocRenderF astType n i b x =
-  Ema.CLI.Action ->
   Model ->
   PandocRenderers n i b ->
   Splices.RenderCtx n ->
@@ -52,21 +50,20 @@ mkRenderCtxWithPandocRenderers ::
   (Monad m, Monad n) =>
   PandocRenderers n i b ->
   Map Text Text ->
-  Ema.CLI.Action ->
   Model ->
   i ->
   b ->
   HeistT n m (Splices.RenderCtx n)
-mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules emaAction model i b =
+mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model i b =
   Splices.mkRenderCtx
     classRules
     ( \ctx blk ->
         asum $
           pandocBlockRenderers <&> \f ->
-            f emaAction model nr ctx b blk
+            f model nr ctx b blk
     )
     ( \ctx blk ->
         asum $
           pandocInlineRenderers <&> \f ->
-            f emaAction model nr ctx i blk
+            f model nr ctx i blk
     )
