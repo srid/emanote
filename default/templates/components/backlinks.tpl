@@ -7,7 +7,7 @@
           <a class="text-${theme}-600 font-bold hover:bg-${theme}-50" href="${backlink:note:url}">
             <backlink:note:title />
           </a>
-          <div class="mb-4 overflow-auto text-sm text-gray-500">
+          <div class="mb-4 overflow-auto text-sm text-gray-500 border-l-2 pl-2">
             <!-- TODO: How to style the backlinks list item element? Or render each separately?
               Also, group contexts from same source.
             -->

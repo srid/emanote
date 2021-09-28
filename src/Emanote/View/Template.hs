@@ -14,7 +14,6 @@ import Data.WorldPeace.Union
   ( absurdUnion,
   )
 import qualified Ema
-import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
@@ -127,7 +126,7 @@ renderLmlHtml model note = do
     -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
     let titleSplice titleDoc = withLinkInlineCtx $ \x ->
           Tit.titleSplice x (preparePandoc model) titleDoc
-        backlinksSplice bs =
+        backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
             \(source, backlinkCtx) -> do
               -- TODO: reuse note splice
