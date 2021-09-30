@@ -9,19 +9,9 @@
             href="${backlink:note:url}">
             <backlink:note:title />
           </a>
-          <div class="mb-4 overflow-auto text-sm text-gray-500">
-            <!-- TODO: How to style the backlinks list item element? Or render each separately?
-              Also, group contexts from same source.
-            -->
-            <backlink:note:context>
-              <PandocLink class="text-gray-600">
-                <Internal class="font-bold hover:bg-gray-50" />
-                <External class="hover:underline" target="_blank" rel="noopener" />
-              </PandocLink>
-              <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-              <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
-            </backlink:note:context>
-          </div>
+          <backlink:note:contexts>
+            <apply template="context" />
+          </backlink:note:contexts>
         </li>
       </backlink>
     </ul>

@@ -6,6 +6,7 @@ module Emanote.Model.Graph where
 import Control.Lens.Operators as Lens ((^.))
 import Data.IxSet.Typed ((@+), (@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Tree (Forest, Tree (Node))
 import qualified Emanote.Model.Calendar as Calendar
@@ -74,11 +75,22 @@ modelFolgezettelAncestorTree r0 model =
       Rel.RRTFound x -> Just x
       _ -> Nothing
 
-modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, [B.Block])]
+modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   sortOn (Calendar.backlinkSortKey model . fst) $
-    backlinkRels r model <&> \rel ->
-      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+    groupNE $
+      backlinkRels r model <&> \rel ->
+        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+  where
+    groupNE :: forall a b. Ord a => [(a, b)] -> [(a, NonEmpty b)]
+    groupNE =
+      Map.toList . foldl' f Map.empty
+      where
+        f :: Map a (NonEmpty b) -> (a, b) -> Map a (NonEmpty b)
+        f m (x, y) =
+          case Map.lookup x m of
+            Nothing -> Map.insert x (one y) m
+            Just ys -> Map.insert x (ys <> one y) m
 
 backlinkRels :: ModelRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
