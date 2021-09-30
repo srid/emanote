@@ -14,6 +14,10 @@ template:
   name: /templates/layouts/book
   # Layout specific settings
   layout:
+    # For base.tpl
+    base:  
+      # The class to apply for <body> element when using base.tpl (used by note and book layouts)
+      bodyClass: bg-gray-400 overflow-y-scroll
     note:
       containerClass: container mx-auto max-w-prose
   error:
