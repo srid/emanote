@@ -1,7 +1,5 @@
 module Emanote.Model.Link.Resolve where
 
-import Control.Lens.Operators ((^.))
-import Data.Time (UTCTime)
 import Data.WorldPeace.Union (openUnionLift)
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Note as MN

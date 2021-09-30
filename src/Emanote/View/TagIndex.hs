@@ -8,7 +8,6 @@ import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import Data.Tree (Forest, Tree)
 import qualified Data.Tree as Tree
-import qualified Ema.CLI
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Meta as Meta
