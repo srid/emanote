@@ -128,15 +128,14 @@ renderLmlHtml model note = do
           Tit.titleSplice x (preparePandoc model) titleDoc
         backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
-            \(source, backlinkCtx) -> do
+            \(source, contexts) -> do
               -- TODO: reuse note splice
               "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
-              "backlink:note:context"
-                ## do
-                  let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                  withInlineCtx $ \ctx ->
-                    Splices.pandocSplice ctx ctxDoc
+              "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
+                let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                "context:body" ## withInlineCtx $ \ctx ->
+                  Splices.pandocSplice ctx ctxDoc
     -- Sidebar navigation
     routeTreeSplice withLinkInlineCtx (Just r) model
     "ema:breadcrumbs"
