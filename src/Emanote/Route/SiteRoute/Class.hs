@@ -161,8 +161,8 @@ siteRouteUrl model sr =
         `h` ( \(AmbiguousR _) ->
                 Nothing
             )
-        `h` ( \(r :: ResourceRoute) ->
-                r & absurdUnion
+        `h` ( \(rr :: ResourceRoute) ->
+                rr & absurdUnion
                   `h` ( \(sfR :: StaticFileRoute, _fp :: FilePath) ->
                           Just sfR
                       )
