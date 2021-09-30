@@ -22,6 +22,9 @@ template:
       containerClass: container mx-auto max-w-prose
   error:
     containerClass: container mx-auto max-w-prose
+  uptree:
+    # Class to apply for uptree's nodes
+    nodeClass: text-gray-900
   # List of available colors: https://tailwindcss.com/docs/customizing-colors
   theme: blue
   # Value of the <base> tag.

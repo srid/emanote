@@ -1,6 +1,6 @@
 <li>
 
-  <div class="forest-link text-gray-900">
+  <div class="${nodeClass} forest-link">
     <a href="${node:url}">
       <node:text />
     </a>
