@@ -19,11 +19,11 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz
 # Or, from the Git repo: nix-env -if ./default.nix
 
-# Run live server (PORT is optional)
+# Run live server (HOST and PORT are optional)
 cd /path/to/notebook
-PORT=8001 emanote
+HOST=0.0.0.0 PORT=8001 emanote
 
-# Generate static files
+# Generate static files (-L defaults to current directory)
 mkdir /tmp/output
 emanote -L /path/to/notebook gen /tmp/output
 ```
@@ -32,11 +32,7 @@ For other installation methods, see [here](https://note.ema.srid.ca/start/instal
 
 ### Examples
 
-Emanote is suitable for creating ...
-* ... **project** sites, such as: [ema.srid.ca](https://ema.srid.ca) (view [source](https://github.com/srid/emanote/tree/master/docs)).
-* ... **wiki** sites, such as: [Unofficial r/TheMotte Wiki](https://themotte.zettel.page/) (view [source](https://github.com/Kuratoro/TheMotte.zettel.page))
-* ... **personal website**/**blogs**, such as: [www.srid.ca](https://www.srid.ca/) (view [source](https://github.com/srid/www.srid.ca))
-* ... **Zettelkasten** sites ([Neuron-like](https://note.ema.srid.ca/demo/neuron-layout)), such as: [woke.zettel.page](https://woke.zettel.page/) (view [source](https://github.com/Kuratoro/woke.zettel.page))
+https://note.ema.srid.ca/examples
 
 ## Developing
 
