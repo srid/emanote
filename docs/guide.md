@@ -4,9 +4,13 @@ order: 2
 
 # Guide
 
-TODO Just a skeleton for now.
+:::{.sticky-note .text-lg}
+**TODO** Just a skeleton for now. You should learn from [[demo]] instead.
+:::
 
-Remember to document these
+
+:::{.text-gray-500 .border-2 .p-2}
+Note to self: Remember to document these
 
 - pandoc -> rewriteClass
 - Heist docs for Ema
@@ -41,3 +45,4 @@ Known limitations
 	- MathJS may not work in live-server (works, however, on the generated site)
 - Fsnotify limitations
   - If doing a directory move/rename, restart emanote.
+:::

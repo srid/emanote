@@ -5,7 +5,7 @@ tags: [emanote/dev]
 
 # Architecture
 
-Emanote is a Haskell program that transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website", and does so in a [reactive](https://en.wikipedia.org/wiki/Reactive_programming) manner such that as the source files change the resultant website updates in real-time (thanks to [Ema](https://ema.srid.ca/)'s hot-reload). 
+Emanote is a [Haskell](https://www.srid.ca/haskell) program that, at its essense, transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website". It does that in a [reactive](https://en.wikipedia.org/wiki/Reactive_programming) manner such that as the source files change the resultant website updates in real-time (thanks to [Ema](https://ema.srid.ca/)'s [hot-reload](https://ema.srid.ca/concepts/hot-reload) via websocket). 
 
 Emanote's high-level architecture is as follows,
 
