@@ -9,3 +9,5 @@ For example,
 - Of course, a custom link text may also be specified: [[Sample.txt|Some text file]]
 
 In the live server, links to static files will open in new browser tab.
+
+If a wikilink refers to a display-able resource like image or video, it will appear [[embed|embedded]] in the generated HTML.
