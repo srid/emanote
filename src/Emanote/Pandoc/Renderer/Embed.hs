@@ -90,7 +90,8 @@ imageExts =
     ".png",
     ".svg",
     ".gif",
-    ".bmp"
+    ".bmp",
+    ".webp"
   ]
 
 videoExts :: [Text]
