@@ -25,6 +25,7 @@ import qualified Commonmark.Pandoc as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
 import qualified Data.Map.Strict as Map
 import qualified Data.TagTree as TT
+import qualified Data.Text as T
 import Relude
 import qualified Text.Pandoc.Builder as B
 import qualified Text.Pandoc.Walk as W
@@ -76,7 +77,11 @@ hashTagSpec =
       tag <- CM.untokenize <$> tagP
       pure $ hashTag $ TT.Tag tag
     tagP :: Monad m => P.ParsecT [CM.Tok] s m [CM.Tok]
-    tagP =
-      some (noneOfToks $ [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation)
+    tagP = do
+      s <- some (noneOfToks disallowed)
+      -- A tag cannot end with a slash (which is a separator in hierarchical tags)
+      guard $ not $ "/" `T.isSuffixOf` CM.untokenize s
+      pure s
       where
+        disallowed = [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation
         punctuation = "[];:,.?!"
