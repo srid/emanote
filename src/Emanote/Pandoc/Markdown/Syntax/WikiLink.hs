@@ -195,20 +195,31 @@ wikilinkSpec =
       replicateM_ 2 $ CT.symbol '['
       P.notFollowedBy (CT.symbol '[')
       url <-
-        CM.untokenize
-          <$> many
-            ( CT.satisfyTok
-                ( \t ->
-                    not (CT.hasType (CM.Symbol '|') t || CT.hasType (CM.Symbol ']') t)
-                )
-            )
+        CM.untokenize <$> many (satisfyNoneOf [isPipe, isAnchor, isClose])
       wl <- mkWikiLinkFromUrl url
+      -- We ignore the anchor until https://github.com/srid/emanote/discussions/105
+      _anchor <-
+        M.optional $
+          CM.untokenize
+            <$> ( CT.symbol '#'
+                    *> many (satisfyNoneOf [isPipe, isClose])
+                )
       title <-
         M.optional $
           -- TODO: Should parse as inline so link text can be formatted?
           CM.untokenize
             <$> ( CT.symbol '|'
-                    *> many (CT.satisfyTok (not . CT.hasType (CM.Symbol ']')))
+                    *> many (satisfyNoneOf [isClose])
                 )
       replicateM_ 2 $ CT.symbol ']'
       return $ wikilink typ wl (fmap CM.str title)
+    satisfyNoneOf toks =
+      CT.satisfyTok $ \t -> not $ or $ toks <&> \tok -> tok t
+    isAnchor =
+      isSymbol '#'
+    isPipe =
+      isSymbol '|'
+    isClose =
+      isSymbol ']'
+    isSymbol c =
+      CT.hasType (CM.Symbol c)
