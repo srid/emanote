@@ -10,6 +10,7 @@ module Emanote.Model.Link.Rel where
 
 import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
+import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
@@ -94,7 +95,7 @@ data ResolvedRelTarget a
   = RRTMissing
   | RRTAmbiguous (NonEmpty a)
   | RRTFound a
-  deriving (Eq, Show, Ord, Functor)
+  deriving (Eq, Show, Ord, Functor, Generic, ToJSON)
 
 resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
 resolvedRelTargetFromCandidates xs =

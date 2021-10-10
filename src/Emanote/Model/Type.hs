@@ -167,3 +167,7 @@ modelLookupStaticFileByRoute r =
 modelTags :: Model -> [(HT.Tag, [Note])]
 modelTags =
   Ix.groupAscBy @HT.Tag . _modelNotes
+
+modelNoteRels :: Model -> [Rel.Rel]
+modelNoteRels =
+  Ix.toList . _modelRels

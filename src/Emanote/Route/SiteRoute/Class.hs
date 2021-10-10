@@ -78,6 +78,7 @@ instance Ema Model SiteRoute where
                       tags <&> \(HT.deconstructTag -> tagPath) ->
                         NE.filter (not . null) $ NE.inits tagPath
            in openUnionLift IndexR :
+              openUnionLift ExportR :
               (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
           <> staticRoutes
