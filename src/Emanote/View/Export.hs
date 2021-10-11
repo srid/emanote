@@ -20,10 +20,11 @@ import Relude
 
 -- TODO: index.yaml and other per-route data?
 -- TODO: Non-note files (static files)?
-data Export = Export
+data Graph = Graph
   { version :: Int,
-    notes :: Map Text Vertex,
-    rels :: Map Text [Link]
+    description :: Text,
+    vertices :: Map Text Vertex,
+    edges :: Map Text [Link]
   }
   deriving (Generic, ToJSON)
 
@@ -58,7 +59,8 @@ renderGraphExport model =
                     -- TODO: avoid query param, like in "favicon.svg?t=1633978084"
                     <&> SR.siteRouteUrl model
              in (from_, one $ Link to_ toTarget)
-      export = Export 1 notes_ rels_
+      description_ = "Emanote Graph of all files and links between them"
+      export = Graph 1 description_ notes_ rels_
    in Aeson.encode export
 
 -- URL of generated LML note
