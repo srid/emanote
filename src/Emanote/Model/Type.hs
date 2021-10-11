@@ -9,9 +9,11 @@ module Emanote.Model.Type where
 
 import Control.Lens.Operators as Lens ((%~), (.~), (^.))
 import Control.Lens.TH (makeLenses)
+import qualified Data.Aeson as Aeson
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.Map.Strict as Map
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -171,3 +173,9 @@ modelTags =
 modelNoteRels :: Model -> [Rel.Rel]
 modelNoteRels =
   Ix.toList . _modelRels
+
+modelNoteMetas :: Model -> Map LMLRoute (Tit.Title, LMLRoute, Aeson.Value)
+modelNoteMetas model =
+  Map.fromList $
+    Ix.toList (_modelNotes model) <&> \note ->
+      (note ^. N.noteRoute, (note ^. N.noteTitle, note ^. N.noteRoute, note ^. N.noteMeta))

@@ -14,6 +14,7 @@ module Emanote.Model.Title
     -- * Rendering a Title
     titleSplice,
     titleSpliceNoHtml,
+    toPlain,
   )
 where
 
