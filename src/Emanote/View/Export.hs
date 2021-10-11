@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Emanote.View.Export (renderExport) where
+module Emanote.View.Export (renderGraphExport) where
 
 import Control.Lens ((^.))
 import Data.Aeson (ToJSON)
@@ -40,8 +40,8 @@ data Link = Link
   }
   deriving (Generic, ToJSON)
 
-renderExport :: Model -> LByteString
-renderExport model =
+renderGraphExport :: Model -> LByteString
+renderGraphExport model =
   let notes_ =
         M.modelNoteMetas model & Map.mapKeys (lmlRouteUrl model)
           & Map.map

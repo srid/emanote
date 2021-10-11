@@ -24,7 +24,7 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Build docker img
+      - name: Build as docker img
         id: build
         run: |
           nix-build -j auto docker.nix --argstr tag latest -o docker-img
