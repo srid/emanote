@@ -1,4 +1,6 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -17,6 +19,7 @@ module Emanote.Route.SiteRoute.Type
   )
 where
 
+import Data.Aeson (ToJSON)
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
@@ -32,13 +35,13 @@ import Relude hiding (show)
 import Text.Show (show)
 
 data IndexR = IndexR
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 newtype TagIndexR = TagIndexR [HT.TagNode]
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 data ExportR = ExportR
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}

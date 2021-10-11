@@ -46,7 +46,7 @@ data UnresolvedRelTarget
   = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
   | URTResource ModelRoute
   | URTVirtual SR.VirtualRoute
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 type RelIxs = '[LMLRoute, UnresolvedRelTarget]
 

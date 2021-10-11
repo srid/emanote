@@ -6,7 +6,7 @@
 
 module Emanote.Route.R where
 
-import Data.Aeson (ToJSON)
+import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
@@ -20,7 +20,10 @@ import qualified Text.Show (Show (show))
 -- | Represents the relative path to some file (or its isomporphic URL
 -- represetation).
 newtype R (ext :: FileType) = R {unRoute :: NonEmpty Slug}
-  deriving (Eq, Ord, Typeable, Data, Generic, ToJSON)
+  deriving (Eq, Ord, Typeable, Data)
+
+instance HasExt ext => ToJSON (R ext) where
+  toJSON = toJSON . encodeRoute
 
 instance HasExt ext => Show (R ext) where
   show r =

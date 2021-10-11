@@ -14,7 +14,9 @@ renderExport :: Model -> LByteString
 renderExport model =
   Aeson.encode $
     M.modelNoteRels model <&> \rel ->
-      ( R.encodeRoute $ R.lmlRouteCase $ rel ^. Rel.relFrom,
-        Resolve.resolveUnresolvedRelTarget model (rel ^. Rel.relTo)
-          <&> SR.siteRouteUrl model
-      )
+      let from_ = R.encodeRoute $ R.lmlRouteCase $ rel ^. Rel.relFrom
+          to = rel ^. Rel.relTo
+          toTarget =
+            Resolve.resolveUnresolvedRelTarget model to
+              <&> SR.siteRouteUrl model
+       in (from_, (to, toTarget))
