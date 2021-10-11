@@ -137,6 +137,7 @@ executable emanote
     Emanote.Source.Pattern
     Emanote.View
     Emanote.View.Common
+    Emanote.View.Export
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
     Emanote.View.Template

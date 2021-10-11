@@ -19,8 +19,6 @@ import Emanote.Model (Model)
 import qualified Emanote.Model as M
 import qualified Emanote.Model.Calendar as Calendar
 import qualified Emanote.Model.Graph as G
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.SData as SData
@@ -31,6 +29,7 @@ import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
+import Emanote.View.Export (renderExport)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
@@ -95,15 +94,6 @@ renderVirtualRoute m =
     `h` ( \SR.ExportR ->
             Ema.AssetGenerated Ema.Other $ renderExport m
         )
-
-renderExport :: Model -> LByteString
-renderExport model =
-  Aeson.encode $
-    M.modelNoteRels model <&> \rel ->
-      ( R.encodeRoute $ R.lmlRouteCase $ rel ^. Rel.relFrom,
-        Resolve.resolveUnresolvedRelTarget model (rel ^. Rel.relTo)
-          <&> SR.siteRouteUrl model
-      )
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
