@@ -55,6 +55,7 @@ renderExport model =
                 to_ = rel ^. Rel.relTo
                 toTarget =
                   Resolve.resolveUnresolvedRelTarget model to_
+                    -- TODO: avoid query param, like in "favicon.svg?t=1633978084"
                     <&> SR.siteRouteUrl model
              in (from_, one $ Link to_ toTarget)
       export = Export 1 notes_ rels_

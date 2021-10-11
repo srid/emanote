@@ -6,7 +6,7 @@
 module Emanote.View.Template (render) where
 
 import Control.Lens ((.~), (^.))
-import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Types as Aeson
 import Data.List (partition)
 import qualified Data.List.NonEmpty as NE
 import Data.Map.Syntax ((##))
