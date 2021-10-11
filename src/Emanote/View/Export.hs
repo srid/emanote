@@ -18,8 +18,6 @@ import qualified Emanote.Route.SiteRoute as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Relude
 
--- TODO: index.yaml and other per-route data?
--- TODO: Non-note files (static files)?
 data Graph = Graph
   { version :: Int,
     description :: Text,
@@ -56,8 +54,7 @@ renderGraphExport model =
                 to_ = rel ^. Rel.relTo
                 toTarget =
                   Resolve.resolveUnresolvedRelTarget model to_
-                    -- TODO: avoid query param, like in "favicon.svg?t=1633978084"
-                    <&> SR.siteRouteUrl model
+                    <&> SR.siteRouteUrlStatic model
              in (from_, one $ Link to_ toTarget)
       description_ = "Emanote Graph of all files and links between them"
       export = Graph 1 description_ notes_ rels_
