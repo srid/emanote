@@ -7,6 +7,9 @@ page:
   headHtml: |
     <snippet var="js.prism" />
 
+site:
+  editBaseUrl: https://github.com/srid/emanote/edit/master/docs/
+
 pandoc:
   rewriteClass:
     # For use in notes with Prism.JS disabled

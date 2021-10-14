@@ -164,6 +164,8 @@ renderLmlHtml model note = do
         "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
     "ema:note:uptreeStr" ## HI.textSplice (toText . Shower.shower $ folgeAnc)
+    "ema:note:editUrl"
+      ## HI.textSplice (MN.lookupAeson @Text "edit/" ("site" :| ["editBaseUrl"]) meta <> toText (R.encodeRoute $ R.lmlRouteCase r))
     "ema:note:pandoc"
       ## withBlockCtx
       $ \ctx ->
