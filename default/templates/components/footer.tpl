@@ -30,13 +30,11 @@
   </div>
   <div>
     <a href="${ema:note:editUrl}" title="Edit this page" rel="edit">
-      <svg style="width: 1rem;" class="hover:text-${theme}-700" fill="none" stroke="currentColor"
-        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd"
-          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-          clip-rule="evenodd"></path>
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z">
+        </path>
       </svg>
     </a>
-
   </div>
 </footer>
