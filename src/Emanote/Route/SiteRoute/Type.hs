@@ -117,7 +117,7 @@ decodeIndexR fp = do
 
 decodeExportR :: FilePath -> Maybe ExportR
 decodeExportR fp = do
-  "-" :| "export" : ["graph.json"] <- R.unRoute <$> R.decodeAnyRoute fp
+  "-" :| ["export.json"] <- R.unRoute <$> R.decodeAnyRoute fp
   pure ExportR
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
@@ -138,7 +138,7 @@ encodeVirtualRoute =
             R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["all"]
         )
     `h` ( \ExportR ->
-            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| "export" : ["graph.json"]
+            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["graph.json"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
