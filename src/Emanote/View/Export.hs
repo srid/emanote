@@ -9,6 +9,7 @@ import qualified Data.Aeson as Aeson
 import qualified Data.Map.Strict as Map
 import Emanote.Model (Model)
 import qualified Emanote.Model as M
+import qualified Emanote.Model.Graph as G
 import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Title as Tit
@@ -38,6 +39,7 @@ data Graph = Graph
 data Vertex = Vertex
   { title :: Text,
     source :: Text,
+    parent :: Maybe Text,
     meta :: Aeson.Value
   }
   deriving (Generic, ToJSON)
@@ -54,7 +56,11 @@ renderGraphExport model =
         M.modelNoteMetas model & Map.mapKeys lmlRouteKey
           & Map.map
             ( \(tit, r, meta_) ->
-                Vertex (Tit.toPlain tit) (toText $ lmlSourcePath r) meta_
+                Vertex
+                  (Tit.toPlain tit)
+                  (toText $ lmlSourcePath r)
+                  (toText . lmlSourcePath <$> G.parentLmlRoute r)
+                  meta_
             )
       rels_ =
         Map.fromListWith (<>) $

@@ -35,20 +35,11 @@ modelFolgezettelAncestorTree r0 model =
           folgezettelFrontlinks =
             frontlinkRels r model
               & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
-          -- Folders are automatically made a folgezettel
-          parentFolderRoute = do
-            pr <- do
-              lmlR <- R.lmlRouteCase <$> leftToMaybe (R.modelRouteCase r)
-              -- Root index do not have a parent folder.
-              guard $ lmlR /= R.indexRoute
-              -- Consider the index route as parent folder for all
-              -- top-level notes.
-              pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
-            pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ pr
           folgezettelParents =
             folgezettelBacklinks
               <> folgezettelFrontlinks
-              <> maybeToList parentFolderRoute
+              -- Folders are automatically made a folgezettel
+              <> maybeToList (parentLmlRoute =<< leftToMaybe (R.modelRouteCase r))
       fmap catMaybes . forM folgezettelParents $ \parentR -> do
         let parentModelR = R.liftModelRoute . R.lmlRouteCase $ parentR
         gets (parentModelR `Set.member`) >>= \case
@@ -74,6 +65,17 @@ modelFolgezettelAncestorTree r0 model =
     getFound = \case
       Rel.RRTFound x -> Just x
       _ -> Nothing
+
+parentLmlRoute :: R.LMLRoute -> Maybe R.LMLRoute
+parentLmlRoute r = do
+  pr <- do
+    let lmlR = R.lmlRouteCase r
+    -- Root index do not have a parent folder.
+    guard $ lmlR /= R.indexRoute
+    -- Consider the index route as parent folder for all
+    -- top-level notes.
+    pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
+  pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
