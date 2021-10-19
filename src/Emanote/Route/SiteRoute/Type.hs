@@ -138,7 +138,7 @@ encodeVirtualRoute =
             R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["all"]
         )
     `h` ( \ExportR ->
-            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["graph.json"]
+            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["export.json"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
