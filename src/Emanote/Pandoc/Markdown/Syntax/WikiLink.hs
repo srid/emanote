@@ -2,6 +2,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
@@ -22,6 +25,7 @@ import qualified Commonmark as CM
 import qualified Commonmark.Pandoc as CP
 import qualified Commonmark.TokParsers as CT
 import Control.Monad (liftM2)
+import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
@@ -44,6 +48,9 @@ import qualified Text.Show (Show (show))
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data)
+
+instance ToJSON WikiLink where
+  toJSON = toJSON . wikilinkUrl
 
 instance Show WikiLink where
   show wl =
@@ -148,7 +155,7 @@ data WikiLinkType
     WikiLinkTag
   | -- | ![[Foo]]
     WikiLinkEmbed
-  deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded)
+  deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded, Generic, ToJSON)
 
 instance Read WikiLinkType where
   readsPrec _ s

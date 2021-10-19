@@ -1,10 +1,13 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Emanote.Route.SiteRoute.Type
   ( SiteRoute (..),
     IndexR (..),
+    ExportR (..),
     TagIndexR (..),
     MissingR (..),
     AmbiguousR (..),
@@ -16,6 +19,7 @@ module Emanote.Route.SiteRoute.Type
   )
 where
 
+import Data.Aeson (ToJSON)
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
@@ -31,10 +35,13 @@ import Relude hiding (show)
 import Text.Show (show)
 
 data IndexR = IndexR
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 newtype TagIndexR = TagIndexR [HT.TagNode]
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, ToJSON)
+
+data ExportR = ExportR
+  deriving (Eq, Show, Ord, Generic, ToJSON)
 
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}
@@ -46,7 +53,8 @@ newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
 
 type VirtualRoute' =
   '[ IndexR,
-     TagIndexR
+     TagIndexR,
+     ExportR
    ]
 
 -- | A route to a virtual resource (not in `Model`)
@@ -100,11 +108,17 @@ decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =
   fmap openUnionLift (decodeIndexR fp)
     <|> fmap openUnionLift (decodeTagIndexR fp)
+    <|> fmap openUnionLift (decodeExportR fp)
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
   "-" :| ["all"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure IndexR
+
+decodeExportR :: FilePath -> Maybe ExportR
+decodeExportR fp = do
+  "-" :| ["export.json"] <- R.unRoute <$> R.decodeAnyRoute fp
+  pure ExportR
 
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
@@ -112,6 +126,8 @@ decodeTagIndexR fp = do
   let tagNodes = fmap (HT.TagNode . Ema.unSlug) tagPath
   pure $ TagIndexR tagNodes
 
+-- NOTE: The sentinel route slugs in this function should match with those of
+-- the decoders above.
 encodeVirtualRoute :: VirtualRoute -> FilePath
 encodeVirtualRoute =
   absurdUnion
@@ -120,6 +136,9 @@ encodeVirtualRoute =
         )
     `h` ( \IndexR ->
             R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["all"]
+        )
+    `h` ( \ExportR ->
+            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["graph.json"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html

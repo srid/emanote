@@ -29,6 +29,7 @@ import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
+import Emanote.View.Export (renderGraphExport)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
@@ -89,6 +90,9 @@ renderVirtualRoute m =
         )
     `h` ( \SR.IndexR ->
             Ema.AssetGenerated Ema.Html $ renderSRIndex m
+        )
+    `h` ( \SR.ExportR ->
+            Ema.AssetGenerated Ema.Other $ renderGraphExport m
         )
 
 renderSRIndex :: Model -> LByteString
