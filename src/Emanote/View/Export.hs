@@ -21,20 +21,21 @@ import Relude
 
 data Export = Export
   { version :: Word,
-    files :: Map Text Vertex,
-    links :: Map Text [Link]
+    files :: Map Text SourceFile
   }
   deriving (Generic, ToJSON)
 
 currentVersion :: Word
 currentVersion = 1
 
-data Vertex = Vertex
+-- | A source file in `Model`
+data SourceFile = SourceFile
   { title :: Text,
-    source :: Text,
-    parent :: Maybe Text,
+    filePath :: Text,
+    parentNote :: Maybe Text,
     url :: Text,
-    meta :: Aeson.Value
+    meta :: Aeson.Value,
+    links :: [Link]
   }
   deriving (Generic, ToJSON)
 
@@ -50,14 +51,16 @@ renderGraphExport model =
         M.modelNoteMetas model & Map.mapKeys lmlRouteKey
           & Map.map
             ( \(tit, r, meta_) ->
-                Vertex
-                  (Tit.toPlain tit)
-                  (toText $ lmlSourcePath r)
-                  (toText . lmlSourcePath <$> G.parentLmlRoute r)
-                  (SR.siteRouteUrl model $ lmlSiteRoute r)
-                  meta_
+                let k = lmlRouteKey r
+                 in SourceFile
+                      (Tit.toPlain tit)
+                      k
+                      (toText . lmlSourcePath <$> G.parentLmlRoute r)
+                      (SR.siteRouteUrl model $ lmlSiteRoute r)
+                      meta_
+                      (fromMaybe [] $ Map.lookup k rels)
             )
-      rels_ =
+      rels =
         Map.fromListWith (<>) $
           M.modelNoteRels model <&> \rel ->
             let from_ = lmlRouteKey $ rel ^. Rel.relFrom
@@ -66,7 +69,7 @@ renderGraphExport model =
                   Resolve.resolveUnresolvedRelTarget model to_
                     <&> SR.siteRouteUrlStatic model
              in (from_, one $ Link to_ toTarget)
-      export = Export currentVersion notes_ rels_
+      export = Export currentVersion notes_
    in Aeson.encode export
 
 -- An unique key to represent this LMLRoute in the exported JSON
