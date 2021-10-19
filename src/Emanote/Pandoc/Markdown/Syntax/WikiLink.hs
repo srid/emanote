@@ -50,7 +50,7 @@ newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data)
 
 instance ToJSON WikiLink where
-  toJSON = toJSON . show @Text
+  toJSON = toJSON . wikilinkUrl
 
 instance Show WikiLink where
   show wl =
