@@ -13,14 +13,23 @@ import qualified Emanote.Model.Link.Rel as Rel
 import qualified Emanote.Model.Link.Resolve as Resolve
 import qualified Emanote.Model.Title as Tit
 import Emanote.Route (LMLRoute, lmlRouteCase)
-import qualified Emanote.Route.R as R
+import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Relude
 
+data Export = Export
+  { version :: Word,
+    linkGraph :: Graph,
+    urls :: Map Text Text
+  }
+  deriving (Generic, ToJSON)
+
+currentVersion :: Word
+currentVersion = 1
+
 data Graph = Graph
-  { version :: Int,
-    description :: Text,
+  { description :: Text,
     vertices :: Map Text Vertex,
     edges :: Map Text [Link]
   }
@@ -42,7 +51,7 @@ data Link = Link
 renderGraphExport :: Model -> LByteString
 renderGraphExport model =
   let notes_ =
-        M.modelNoteMetas model & Map.mapKeys (lmlRouteUrl model)
+        M.modelNoteMetas model & Map.mapKeys lmlRouteKey
           & Map.map
             ( \(tit, r, meta_) ->
                 Vertex (Tit.toPlain tit) (toText $ lmlSourcePath r) meta_
@@ -50,20 +59,25 @@ renderGraphExport model =
       rels_ =
         Map.fromListWith (<>) $
           M.modelNoteRels model <&> \rel ->
-            let from_ = lmlRouteUrl model $ rel ^. Rel.relFrom
+            let from_ = lmlRouteKey $ rel ^. Rel.relFrom
                 to_ = rel ^. Rel.relTo
                 toTarget =
                   Resolve.resolveUnresolvedRelTarget model to_
                     <&> SR.siteRouteUrlStatic model
              in (from_, one $ Link to_ toTarget)
       description_ = "Emanote Graph of all files and links between them"
-      export = Graph 1 description_ notes_ rels_
+      graph_ = Graph description_ notes_ rels_
+      urls_ =
+        Map.fromList $ M.modelNoteRoutes model <&> \r -> (lmlRouteKey r, SR.siteRouteUrl model $ lmlSiteRoute r)
+      export = Export currentVersion graph_ urls_
    in Aeson.encode export
 
--- URL of generated LML note
-lmlRouteUrl :: Model -> LMLRoute -> Text
-lmlRouteUrl model =
-  SR.siteRouteUrl model . lmlSiteRoute
+-- An unique key to represent this LMLRoute in the exported JSON
+--
+-- We use the source path consistently.
+lmlRouteKey :: LMLRoute -> Text
+lmlRouteKey =
+  toText . R.encodeRoute . R.lmlRouteCase
 
 -- Path of the LML note
 lmlSourcePath :: LMLRoute -> FilePath
