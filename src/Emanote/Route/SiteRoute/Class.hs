@@ -12,6 +12,7 @@ module Emanote.Route.SiteRoute.Class
     indexRoute,
     tagIndexRoute,
     siteRouteUrl,
+    siteRouteUrlStatic,
     urlStrategySuffix,
   )
 where
@@ -78,6 +79,7 @@ instance Ema Model SiteRoute where
                       tags <&> \(HT.deconstructTag -> tagPath) ->
                         NE.filter (not . null) $ NE.inits tagPath
            in openUnionLift IndexR :
+              openUnionLift ExportR :
               (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
           <> staticRoutes
@@ -140,11 +142,18 @@ staticFileSiteRoute =
     staticResourceRoute =
       openUnionLift
 
+-- | Like `siteRouteUrl` but avoids any dynamism in the URL
+siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
+siteRouteUrlStatic model =
+  Ema.routeUrlWith (urlStrategy model) model
+
 siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
-  Ema.routeUrlWith (urlStrategy model) model sr
-    <> maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime
+  siteRouteUrlStatic model sr
+    <> siteRouteQuery
   where
+    siteRouteQuery =
+      maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime
     staticFileModifiedTime = do
       -- In live server model, we append a ?t=.. to trigger the browser into
       -- reloading (or invalidating its cache of) this embed static file.

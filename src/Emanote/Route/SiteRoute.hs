@@ -5,6 +5,7 @@
 module Emanote.Route.SiteRoute
   ( SiteRoute (..),
     IndexR (..),
+    ExportR (..),
     TagIndexR (..),
     MissingR (..),
     AmbiguousR (..),
@@ -15,6 +16,7 @@ module Emanote.Route.SiteRoute
     staticFileSiteRoute,
     lmlSiteRoute,
     siteRouteUrl,
+    siteRouteUrlStatic,
   )
 where
 
