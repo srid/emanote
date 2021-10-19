@@ -21,19 +21,13 @@ import Relude
 
 data Export = Export
   { version :: Word,
-    linkGraph :: Graph
+    files :: Map Text Vertex,
+    links :: Map Text [Link]
   }
   deriving (Generic, ToJSON)
 
 currentVersion :: Word
 currentVersion = 1
-
-data Graph = Graph
-  { description :: Text,
-    vertices :: Map Text Vertex,
-    edges :: Map Text [Link]
-  }
-  deriving (Generic, ToJSON)
 
 data Vertex = Vertex
   { title :: Text,
@@ -72,9 +66,7 @@ renderGraphExport model =
                   Resolve.resolveUnresolvedRelTarget model to_
                     <&> SR.siteRouteUrlStatic model
              in (from_, one $ Link to_ toTarget)
-      description_ = "Emanote Graph of all files and links between them"
-      graph_ = Graph description_ notes_ rels_
-      export = Export currentVersion graph_
+      export = Export currentVersion notes_ rels_
    in Aeson.encode export
 
 -- An unique key to represent this LMLRoute in the exported JSON
