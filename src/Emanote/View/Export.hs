@@ -21,8 +21,7 @@ import Relude
 
 data Export = Export
   { version :: Word,
-    linkGraph :: Graph,
-    urls :: Map Text Text
+    linkGraph :: Graph
   }
   deriving (Generic, ToJSON)
 
@@ -40,6 +39,7 @@ data Vertex = Vertex
   { title :: Text,
     source :: Text,
     parent :: Maybe Text,
+    url :: Text,
     meta :: Aeson.Value
   }
   deriving (Generic, ToJSON)
@@ -60,6 +60,7 @@ renderGraphExport model =
                   (Tit.toPlain tit)
                   (toText $ lmlSourcePath r)
                   (toText . lmlSourcePath <$> G.parentLmlRoute r)
+                  (SR.siteRouteUrl model $ lmlSiteRoute r)
                   meta_
             )
       rels_ =
@@ -73,9 +74,7 @@ renderGraphExport model =
              in (from_, one $ Link to_ toTarget)
       description_ = "Emanote Graph of all files and links between them"
       graph_ = Graph description_ notes_ rels_
-      urls_ =
-        Map.fromList $ M.modelNoteRoutes model <&> \r -> (lmlRouteKey r, SR.siteRouteUrl model $ lmlSiteRoute r)
-      export = Export currentVersion graph_ urls_
+      export = Export currentVersion graph_
    in Aeson.encode export
 
 -- An unique key to represent this LMLRoute in the exported JSON

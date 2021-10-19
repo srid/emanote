@@ -179,8 +179,3 @@ modelNoteMetas model =
   Map.fromList $
     Ix.toList (_modelNotes model) <&> \note ->
       (note ^. N.noteRoute, (note ^. N.noteTitle, note ^. N.noteRoute, note ^. N.noteMeta))
-
-modelNoteRoutes :: Model -> [LMLRoute]
-modelNoteRoutes model =
-  Ix.toList (_modelNotes model) <&> \note ->
-    note ^. N.noteRoute
