@@ -150,6 +150,7 @@ executable emanote
     Heist.Extra.Splices.Pandoc.Ctx
     Heist.Extra.Splices.Pandoc.Footnotes
     Heist.Extra.Splices.Pandoc.Render
+    Heist.Extra.Splices.Pandoc.TaskList
     Heist.Extra.Splices.Tree
     Heist.Extra.TemplateState
     Paths_emanote
