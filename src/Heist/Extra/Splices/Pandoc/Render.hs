@@ -21,6 +21,7 @@ import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     rewriteClass,
   )
+import qualified Heist.Extra.Splices.Pandoc.TaskList as TaskList
 import qualified Heist.Interpreted as HI
 import Relude
 import qualified Text.Pandoc.Builder as B
@@ -46,12 +47,9 @@ withTplTag RenderCtx {..} name splices default_ =
 rpBlock' :: forall n. Monad n => RenderCtx n -> B.Block -> HI.Splice n
 rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
-    maybe
-      (rpInline ctx `foldMapM` is)
-      (rpTasks is)
-      (taskFromInlines is)
+    rpInlineWithTasks ctx is
   B.Para is -> do
-    let innerSplice = maybe (rpInline ctx `foldMapM` is) (rpTasks is) (taskFromInlines is)
+    let innerSplice = rpInlineWithTasks ctx is
     withTplTag ctx "Para" ("inlines" ## innerSplice) $
       one . X.Element "p" mempty <$> innerSplice
   B.LineBlock iss ->
@@ -162,19 +160,6 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         descListSplices :: Monad n => [B.Block] -> H.Splices (HI.Splice n)
         descListSplices bs = "DefinitionList:Item:Desc" ## rpBlock ctx `foldMapM` bs
 
-    taskFromInlines = \case
-      B.Str "[" : B.Space : B.Str "]" : B.Space : is ->
-        pure (False, is)
-      B.Str "[x]" : B.Space : is ->
-        pure (True, is)
-      _ ->
-        Nothing
-
-    rpTasks is' (checked, is) = do
-      let tag = bool "Task:Unchecked" "Task:Checked" checked
-      withTplTag ctx tag ("inlines" ## rpInline ctx `foldMapM` is) $
-        foldMapM (rpInline ctx) is'
-
     pandocListSplices :: Text -> [[B.Block]] -> H.Splices (HI.Splice n)
     pandocListSplices tagPrefix bss =
       (tagPrefix <> ":Items") ## (HI.runChildrenWith . itemsSplices) `foldMapM` bss
@@ -266,6 +251,24 @@ rpInline' ctx@RenderCtx {..} i = case i of
       B.DoubleQuote ->
         w <&> \nodes ->
           [X.TextNode "“"] <> nodes <> [X.TextNode "”"]
+
+-- | Like rpInline', but supports task checkbox in the given inlines.
+rpInlineWithTasks :: Monad n => RenderCtx n -> [B.Inline] -> HI.Splice n
+rpInlineWithTasks ctx is =
+  rpTask ctx is $
+    rpInline ctx `foldMapM` is
+
+rpTask :: Monad n => RenderCtx n -> [B.Inline] -> HI.Splice n -> HI.Splice n
+rpTask ctx is default_ =
+  maybe default_ render (TaskList.parseTaskFromInlines is)
+  where
+    render (checked, taskInlines) = do
+      let tag = bool "Task:Unchecked" "Task:Checked" checked
+      withTplTag
+        ctx
+        tag
+        ("inlines" ## rpInline ctx `foldMapM` taskInlines)
+        default_
 
 rawNode :: Text -> Text -> [X.Node]
 rawNode wrapperTag s =
