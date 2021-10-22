@@ -3,11 +3,13 @@
 -- GFM Task List, https://github.github.com/gfm/#task-list-items-extension-
 module Heist.Extra.Splices.Pandoc.TaskList
   ( parseTaskFromInlines,
+    queryTasks,
   )
 where
 
 import Relude
 import qualified Text.Pandoc.Builder as B
+import qualified Text.Pandoc.Walk as W
 
 parseTaskFromInlines :: [B.Inline] -> Maybe (Bool, [B.Inline])
 parseTaskFromInlines = \case
@@ -17,3 +19,13 @@ parseTaskFromInlines = \case
     pure (True, taskInlines)
   _ ->
     Nothing
+
+queryTasks :: W.Walkable B.Block b => b -> [(Bool, [B.Inline])]
+queryTasks =
+  W.query $ \case
+    B.Plain is ->
+      maybeToList $ parseTaskFromInlines is
+    B.Para is ->
+      maybeToList $ parseTaskFromInlines is
+    _ ->
+      mempty
