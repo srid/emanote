@@ -36,7 +36,7 @@ renderTasks model = do
         let r = task ^. Task.taskRoute
         -- TODO: reuse note splice
         "task:description" ## withInlineCtx $ \ctx ->
-          Splices.pandocSplice ctx $ B.Pandoc mempty $ task ^. Task.taskDescription
+          Splices.pandocSplice ctx $ B.Pandoc mempty $ one $ B.Plain $ task ^. Task.taskDescription
         "note:title" ## titleSplice (M.modelLookupTitle r model)
         "note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
 

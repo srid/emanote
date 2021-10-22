@@ -15,12 +15,14 @@ import Emanote.Model.Note (Note)
 import qualified Emanote.Model.Note as N
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route as R
+import qualified Heist.Extra.Splices.Pandoc.TaskList as TaskList
 import Relude
 import qualified Text.Pandoc.Builder as B
 
 data Task = Task
   { _taskRoute :: R.LMLRoute,
-    _taskDescription :: [B.Block],
+    _taskDescription :: [B.Inline],
+    _taskChecked :: Bool,
     _taskTags :: Set HT.Tag
     -- TODO: due-date, etc.
   }
@@ -40,7 +42,9 @@ instance Indexable TaskIxs Task where
 
 noteTasks :: Note -> IxTask
 noteTasks note =
-  -- TODO: implement it
-  Ix.fromList [Task (note ^. N.noteRoute) [B.Plain $ one $ B.Str "Some task, testing"] mempty]
+  let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
+   in Ix.fromList $
+        taskListItems <&> \(checked, doc) ->
+          Task (note ^. N.noteRoute) doc checked mempty
 
 makeLenses ''Task
