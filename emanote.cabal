@@ -141,7 +141,7 @@ executable emanote
     Emanote.View.Export
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
-    Emanote.View.Tasks
+    Emanote.View.TaskIndex
     Emanote.View.Template
     Heist.Extra
     Heist.Extra.Splices.List
