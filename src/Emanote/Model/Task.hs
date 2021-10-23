@@ -13,7 +13,6 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import qualified Data.IxSet.Typed as Ix
 import Emanote.Model.Note (Note)
 import qualified Emanote.Model.Note as N
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Route as R
 import qualified Heist.Extra.Splices.Pandoc.TaskList as TaskList
 import Relude
@@ -21,11 +20,16 @@ import qualified Text.Pandoc.Builder as B
 
 data Task = Task
   { _taskRoute :: R.LMLRoute,
+    -- Index of this task within the containing note. Used to sort tasks by
+    -- original user order.
+    _taskNum :: Word,
     _taskDescription :: [B.Inline],
-    _taskChecked :: Bool,
-    _taskTags :: Set HT.Tag
+    _taskChecked :: Bool
   }
-  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+  deriving (Eq, Show, Generic, Aeson.ToJSON)
+
+instance Ord Task where
+  (<=) = (<=) `on` (_taskRoute &&& _taskNum)
 
 type TaskIxs =
   '[ -- Route to the note containing this task
@@ -43,7 +47,7 @@ noteTasks :: Note -> IxTask
 noteTasks note =
   let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
    in Ix.fromList $
-        taskListItems <&> \(checked, doc) ->
-          Task (note ^. N.noteRoute) doc checked mempty
+        zip [1 ..] taskListItems <&> \(idx, (checked, doc)) ->
+          Task (note ^. N.noteRoute) idx doc checked
 
 makeLenses ''Task
