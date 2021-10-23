@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Emanote.View.Tasks (renderTasks) where
+module Emanote.View.TaskIndex (renderTasks) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
@@ -42,5 +42,6 @@ renderTasks model = do
 
   renderModelTemplate model "templates/special/tasks" $ do
     commonSplices ($ emptyRenderCtx) model meta "Task Tracker"
+    let uncheckedTasks = filter (not . Task._taskChecked) tasks
     "ema:tasks"
-      ## Splices.listSplice tasks "task" taskSplice
+      ## Splices.listSplice uncheckedTasks "task" taskSplice

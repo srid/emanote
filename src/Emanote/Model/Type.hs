@@ -31,7 +31,7 @@ import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
   )
-import Emanote.Model.Task (IxTask, Task)
+import Emanote.Model.Task (IxTask)
 import qualified Emanote.Model.Task as Task
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT

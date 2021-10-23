@@ -24,7 +24,6 @@ data Task = Task
     _taskDescription :: [B.Inline],
     _taskChecked :: Bool,
     _taskTags :: Set HT.Tag
-    -- TODO: due-date, etc.
   }
   deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
 

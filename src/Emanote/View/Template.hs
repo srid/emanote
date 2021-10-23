@@ -30,7 +30,7 @@ import qualified Emanote.Route.SiteRoute as SR
 import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
 import Emanote.View.Export (renderGraphExport)
 import qualified Emanote.View.TagIndex as TagIndex
-import qualified Emanote.View.Tasks as Tasks
+import qualified Emanote.View.TaskIndex as TaskIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -95,7 +95,7 @@ renderVirtualRoute m =
             Ema.AssetGenerated Ema.Other $ renderGraphExport m
         )
     `h` ( \SR.TasksR ->
-            Ema.AssetGenerated Ema.Html $ Tasks.renderTasks m
+            Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
         )
 
 renderSRIndex :: Model -> LByteString
