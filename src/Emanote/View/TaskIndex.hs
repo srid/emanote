@@ -4,6 +4,7 @@ module Emanote.View.TaskIndex (renderTasks) where
 
 import Control.Lens.Operators ((^.))
 import qualified Data.IxSet.Typed as Ix
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import Data.Map.Syntax ((##))
 import Emanote.Model (Model)
@@ -27,9 +28,10 @@ newtype TaskIndex = TaskIndex {unTaskIndex :: Map R.LMLRoute (NonEmpty Task)}
 
 mkTaskIndex :: Model -> TaskIndex
 mkTaskIndex model =
-  TaskIndex . Map.fromListWith (<>) $
-    filter (not . Task._taskChecked) (Ix.toList $ model ^. M.modelTasks) <&> \task ->
-      (task ^. Task.taskRoute, one task)
+  TaskIndex . Map.map NE.sort $
+    Map.fromListWith (<>) $
+      filter (not . Task._taskChecked) (Ix.toList $ model ^. M.modelTasks) <&> \task ->
+        (task ^. Task.taskRoute, one task)
 
 renderTasks :: Model -> LByteString
 renderTasks model = do
