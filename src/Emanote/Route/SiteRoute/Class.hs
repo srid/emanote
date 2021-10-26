@@ -10,6 +10,7 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     indexRoute,
+    indexLmlRoute,
     tagIndexRoute,
     siteRouteUrl,
     siteRouteUrlStatic,
@@ -60,6 +61,7 @@ instance Ema Model SiteRoute where
       <|> decodeGeneratedRoute model fp
       <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
 
+  -- Only these routes will be generated in static-site generation mode.
   allRoutes model =
     let htmlRoutes =
           model ^. M.modelNotes
@@ -80,6 +82,7 @@ instance Ema Model SiteRoute where
                         NE.filter (not . null) $ NE.inits tagPath
            in openUnionLift IndexR :
               openUnionLift ExportR :
+              openUnionLift TasksR :
               (openUnionLift . TagIndexR <$> toList tagPaths)
      in htmlRoutes
           <> staticRoutes
@@ -190,9 +193,10 @@ urlStrategySuffix model =
 urlStrategy :: Model -> UrlStrategy
 urlStrategy =
   Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute
-  where
-    indexLmlRoute =
-      R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+
+indexLmlRoute :: LMLRoute
+indexLmlRoute =
+  R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
 
 indexRoute :: SiteRoute
 indexRoute =

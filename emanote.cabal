@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.3.9.1
+version:            0.3.10.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -111,6 +111,7 @@ executable emanote
     Emanote.Model.Query
     Emanote.Model.SData
     Emanote.Model.StaticFile
+    Emanote.Model.Task
     Emanote.Model.Title
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
@@ -140,6 +141,7 @@ executable emanote
     Emanote.View.Export
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
+    Emanote.View.TaskIndex
     Emanote.View.Template
     Heist.Extra
     Heist.Extra.Splices.List
@@ -148,6 +150,7 @@ executable emanote
     Heist.Extra.Splices.Pandoc.Ctx
     Heist.Extra.Splices.Pandoc.Footnotes
     Heist.Extra.Splices.Pandoc.Render
+    Heist.Extra.Splices.Pandoc.TaskList
     Heist.Extra.Splices.Tree
     Heist.Extra.TemplateState
     Paths_emanote

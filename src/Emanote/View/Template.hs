@@ -2,7 +2,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
--- TODO: Split this sensibly.
 module Emanote.View.Template (render) where
 
 import Control.Lens ((.~), (^.))
@@ -23,14 +22,16 @@ import qualified Emanote.Model.Meta as Meta
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.SData as SData
 import qualified Emanote.Model.Title as Tit
-import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
+import Emanote.Route.SiteRoute.Class (indexLmlRoute)
+import qualified Emanote.View.Common as C
 import Emanote.View.Export (renderGraphExport)
 import qualified Emanote.View.TagIndex as TagIndex
+import qualified Emanote.View.TaskIndex as TaskIndex
 import qualified Heist as H
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
@@ -94,16 +95,17 @@ renderVirtualRoute m =
     `h` ( \SR.ExportR ->
             Ema.AssetGenerated Ema.Other $ renderGraphExport m
         )
+    `h` ( \SR.TasksR ->
+            Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
+        )
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = mkRendererFromMeta model meta
-      withInlineCtx =
-        withNoteRenderer linkInlineRenderers () ()
-  renderModelTemplate model "templates/special/index" $ do
-    commonSplices ($ emptyRenderCtx) model meta "Index"
-    routeTreeSplice withInlineCtx Nothing model
+      tCtx = C.mkTemplateRenderCtx model indexLmlRoute meta
+  C.renderModelTemplate model "templates/special/index" $ do
+    C.commonSplices ($ emptyRenderCtx) model meta "Index"
+    routeTreeSplice tCtx Nothing model
 
 loaderHead :: LByteString
 loaderHead =
@@ -113,43 +115,31 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      withNoteRenderer = mkRendererFromMeta model meta
-      withInlineCtx =
-        withNoteRenderer inlineRenderers () ()
-      withLinkInlineCtx =
-        withNoteRenderer linkInlineRenderers () ()
-      withBlockCtx =
-        withNoteRenderer noteRenderers () r
+      tCtx = C.mkTemplateRenderCtx model r meta
       templateName = lookupTemplateName meta
       withLoadingMessage =
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withLoadingMessage . renderModelTemplate model templateName $ do
-    commonSplices withLinkInlineCtx model meta (note ^. MN.noteTitle)
-    -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
-    let titleSplice titleDoc = withLinkInlineCtx $ \x ->
-          Tit.titleSplice x (preparePandoc model) titleDoc
-        backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
+  withLoadingMessage . C.renderModelTemplate model templateName $ do
+    C.commonSplices (C.withLinkInlineCtx tCtx) model meta (note ^. MN.noteTitle)
+    let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
             \(source, contexts) -> do
               -- TODO: reuse note splice
-              "backlink:note:title" ## titleSplice (M.modelLookupTitle source model)
+              "backlink:note:title" ## C.titleSplice tCtx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
               "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
                 let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                "context:body" ## withInlineCtx $ \ctx ->
+                "context:body" ## C.withInlineCtx tCtx $ \ctx ->
                   Splices.pandocSplice ctx ctxDoc
     -- Sidebar navigation
-    routeTreeSplice withLinkInlineCtx (Just r) model
+    routeTreeSplice tCtx (Just r) model
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
-      $ \(R.liftLMLRoute -> crumbR) -> do
-        "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
-        "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
+      ## C.routeBreadcrumbs tCtx model r
     -- Note stuff
     "ema:note:title"
-      ## titleSplice (note ^. MN.noteTitle)
+      ## C.titleSplice tCtx (note ^. MN.noteTitle)
     let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
     "ema:note:backlinks"
       ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
@@ -162,25 +152,24 @@ renderLmlHtml model note = do
     "ema:note:uptree"
       ## Splices.treeSplice (const ()) folgeAnc
       $ \(last -> nodeRoute) children -> do
-        "node:text" ## withInlineCtx $ \ctx ->
-          Tit.titleSplice ctx (preparePandoc model) $ M.modelLookupTitle nodeRoute model
+        "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
         "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
     "ema:note:uptreeStr" ## HI.textSplice (toText . Shower.shower $ folgeAnc)
     "ema:note:pandoc"
-      ## withBlockCtx
+      ## C.withBlockCtx tCtx
       $ \ctx ->
         Splices.pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
   Monad n =>
-  ((Splices.RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
+  C.TemplateRenderCtx n ->
   Maybe R.LMLRoute ->
   Model ->
   H.Splices (HI.Splice n)
-routeTreeSplice withCtx mr model = do
+routeTreeSplice tCtx mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
@@ -192,8 +181,7 @@ routeTreeSplice withCtx mr model = do
              mkLmlRoute = R.liftLMLRoute . R.R @('LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-               "node:text" ## withCtx $ \ctx ->
-                 Tit.titleSplice ctx (preparePandoc model) $ M.modelLookupTitle nodeRoute model
+               "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
                "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
                let isActiveNode = Just nodeRoute == mr
                    isActiveTree =
