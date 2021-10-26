@@ -134,7 +134,7 @@ decodeTagIndexR fp = do
 
 decodeTasksR :: FilePath -> Maybe TasksR
 decodeTasksR fp = do
-  "-" :| ["tasks"] <- R.unRoute <$> R.decodeAnyRoute fp
+  "-" :| ["tasks"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure TasksR
 
 -- NOTE: The sentinel route slugs in this function should match with those of
