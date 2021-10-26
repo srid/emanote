@@ -10,6 +10,7 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     indexRoute,
+    indexLmlRoute,
     tagIndexRoute,
     siteRouteUrl,
     siteRouteUrlStatic,
@@ -190,9 +191,10 @@ urlStrategySuffix model =
 urlStrategy :: Model -> UrlStrategy
 urlStrategy =
   Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute
-  where
-    indexLmlRoute =
-      R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+
+indexLmlRoute :: LMLRoute
+indexLmlRoute =
+  R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
 
 indexRoute :: SiteRoute
 indexRoute =

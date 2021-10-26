@@ -16,7 +16,9 @@ import qualified Emanote.Model.Type as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, renderModelTemplate, routeBreadcrumbs)
+import Emanote.Route.SiteRoute.Class (indexLmlRoute)
+import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, mkTemplateRenderCtx, renderModelTemplate, routeBreadcrumbs)
+import qualified Emanote.View.Common as Common
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
@@ -36,27 +38,20 @@ mkTaskIndex model =
 renderTasks :: Model -> LByteString
 renderTasks model = do
   let meta = Meta.getIndexYamlMeta model
-      -- TODO: Refactor with Template.hs for DRY
-      withNoteRenderer = mkRendererFromMeta model meta
-      withInlineCtx =
-        withNoteRenderer inlineRenderers () ()
-      withLinkInlineCtx =
-        withNoteRenderer linkInlineRenderers () ()
-      titleSplice titleDoc = withLinkInlineCtx $ \x ->
-        Title.titleSplice x (preparePandoc model) titleDoc
+      tCtx = mkTemplateRenderCtx model indexLmlRoute meta
       taskIndex = mkTaskIndex model
       taskGroupSplice r tasks = do
         "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
-        "t:note:title" ## titleSplice (M.modelLookupTitle r model)
+        "t:note:title" ## Common.titleSplice tCtx (M.modelLookupTitle r model)
         "t:note:breadcrumbs"
-          ## routeBreadcrumbs model r titleSplice
+          ## routeBreadcrumbs tCtx model r
         "t:tasks" ## Splices.listSplice (toList tasks) "task" taskSplice
       taskSplice task = do
         let r = task ^. Task.taskRoute
         -- TODO: reuse note splice
-        "task:description" ## withInlineCtx $ \ctx ->
+        "task:description" ## Common.withInlineCtx tCtx $ \ctx ->
           Splices.pandocSplice ctx $ B.Pandoc mempty $ one $ B.Plain $ task ^. Task.taskDescription
-        "note:title" ## titleSplice (M.modelLookupTitle r model)
+        "note:title" ## Common.titleSplice tCtx (M.modelLookupTitle r model)
         "note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
 
   renderModelTemplate model "templates/special/tasks" $ do
