@@ -17,7 +17,7 @@ template:
     # For base.tpl
     base:  
       # The class to apply for <body> element when using base.tpl (used by note and book layouts)
-      bodyClass: bg-gray-200 overflow-y-scroll
+      bodyClass: bg-gray-400 overflow-y-scroll
     note:
       containerClass: container mx-auto max-w-prose
   error:
