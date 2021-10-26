@@ -16,7 +16,7 @@ import qualified Emanote.Model.Type as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, renderModelTemplate)
+import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, renderModelTemplate, routeBreadcrumbs)
 import qualified Heist.Extra.Splices.List as Splices
 import qualified Heist.Extra.Splices.Pandoc as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
@@ -48,6 +48,8 @@ renderTasks model = do
       taskGroupSplice r tasks = do
         "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
         "t:note:title" ## titleSplice (M.modelLookupTitle r model)
+        "t:note:breadcrumbs"
+          ## routeBreadcrumbs model r titleSplice
         "t:tasks" ## Splices.listSplice (toList tasks) "task" taskSplice
       taskSplice task = do
         let r = task ^. Task.taskRoute
