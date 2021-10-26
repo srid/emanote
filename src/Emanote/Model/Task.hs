@@ -21,7 +21,7 @@ import qualified Text.Pandoc.Builder as B
 data Task = Task
   { _taskRoute :: R.LMLRoute,
     -- Index of this task within the containing note. Used to sort tasks by
-    -- original user order.
+    -- their original order of appearance in the Markdown file.
     _taskNum :: Word,
     _taskDescription :: [B.Inline],
     _taskChecked :: Bool
