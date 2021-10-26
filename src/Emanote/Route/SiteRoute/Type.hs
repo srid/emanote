@@ -152,7 +152,7 @@ encodeVirtualRoute =
             R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["export.json"]
         )
     `h` ( \TasksR ->
-            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["tasks"]
+            R.encodeRoute $ R.R @'Ext.Html $ "-" :| ["tasks"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
