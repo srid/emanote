@@ -1,6 +1,6 @@
 <apply template="/templates/special/base">
   <bind tag="special-main">
-    <div class="w-full bg-gray-200">
+    <div class="w-full bg-gray-300">
       <div class="w-full px-3 py-1">
         <ema:taskGroups>
           <taskGroup>
