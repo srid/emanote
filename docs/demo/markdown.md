@@ -39,6 +39,8 @@ Tasks can also be written outside of list context, such as paragraphs:
 
 [x] Here we have the next paragraph.
 
+Unchecked tasks will appear in the task index available at [/-/tasks](-/tasks).
+
 ## Definition lists
 
 https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md
