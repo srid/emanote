@@ -8,6 +8,7 @@ module Emanote.Route.SiteRoute.Type
   ( SiteRoute (..),
     IndexR (..),
     ExportR (..),
+    TasksR (..),
     TagIndexR (..),
     MissingR (..),
     AmbiguousR (..),
@@ -43,6 +44,9 @@ newtype TagIndexR = TagIndexR [HT.TagNode]
 data ExportR = ExportR
   deriving (Eq, Show, Ord, Generic, ToJSON)
 
+data TasksR = TasksR
+  deriving (Eq, Show, Ord, Generic, ToJSON)
+
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}
   deriving (Eq, Show, Ord)
@@ -54,7 +58,8 @@ newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
 type VirtualRoute' =
   '[ IndexR,
      TagIndexR,
-     ExportR
+     ExportR,
+     TasksR
    ]
 
 -- | A route to a virtual resource (not in `Model`)
@@ -109,6 +114,7 @@ decodeVirtualRoute fp =
   fmap openUnionLift (decodeIndexR fp)
     <|> fmap openUnionLift (decodeTagIndexR fp)
     <|> fmap openUnionLift (decodeExportR fp)
+    <|> fmap openUnionLift (decodeTasksR fp)
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
@@ -126,6 +132,11 @@ decodeTagIndexR fp = do
   let tagNodes = fmap (HT.TagNode . Ema.unSlug) tagPath
   pure $ TagIndexR tagNodes
 
+decodeTasksR :: FilePath -> Maybe TasksR
+decodeTasksR fp = do
+  "-" :| ["tasks"] <- R.unRoute <$> R.decodeAnyRoute fp
+  pure TasksR
+
 -- NOTE: The sentinel route slugs in this function should match with those of
 -- the decoders above.
 encodeVirtualRoute :: VirtualRoute -> FilePath
@@ -139,6 +150,9 @@ encodeVirtualRoute =
         )
     `h` ( \ExportR ->
             R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["export.json"]
+        )
+    `h` ( \TasksR ->
+            R.encodeRoute $ R.R @'Ext.AnyExt $ "-" :| ["tasks"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html

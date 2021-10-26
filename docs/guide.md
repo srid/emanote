@@ -10,7 +10,7 @@ order: 2
 
 
 :::{.text-gray-500 .border-2 .p-2}
-Note to self: Remember to document these
+[ ] Note to self: Remember to document these
 
 - pandoc -> rewriteClass
 - Heist docs for Ema

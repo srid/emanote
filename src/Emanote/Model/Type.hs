@@ -31,6 +31,8 @@ import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
   )
+import Emanote.Model.Task (IxTask)
+import qualified Emanote.Model.Task as Task
 import qualified Emanote.Model.Title as Tit
 import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
 import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
@@ -49,6 +51,7 @@ data Model = Model
     _modelRels :: IxRel,
     _modelSData :: IxSData,
     _modelStaticFiles :: IxStaticFile,
+    _modelTasks :: IxTask,
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
@@ -57,7 +60,7 @@ makeLenses ''Model
 
 emptyModel :: Ema.CLI.Action -> Model
 emptyModel act =
-  Model Status_Loading act Ix.empty Ix.empty Ix.empty mempty mempty def
+  Model Status_Loading act Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =
@@ -75,16 +78,13 @@ modelInsertNote note =
            >>> flip (foldr injectAncestor) (N.noteAncestors note)
        )
     >>> modelRels
-    %~ replaceNoteRels
+    %~ updateIxMulti r (Rel.noteRels note)
+    >>> modelTasks
+    %~ updateIxMulti r (Task.noteTasks note)
     >>> modelNav
     %~ PathTree.treeInsertPath (R.unRoute . R.lmlRouteCase $ r)
   where
     r = note ^. N.noteRoute
-    replaceNoteRels rels =
-      let old = rels @= r
-          new = Rel.noteRels note
-          deleteMany = foldr Ix.delete
-       in new `Ix.union` (rels `deleteMany` old)
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
@@ -101,9 +101,11 @@ modelDeleteNote k model =
            -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
            >>> maybe id restoreFolderPlaceholder mFolderR
        )
-      & modelRels
+    & modelRels
     %~ deleteIxMulti k
-      & modelNav
+    & modelTasks
+    %~ deleteIxMulti k
+    & modelNav
     %~ maybe (PathTree.treeDeletePath (R.unRoute . R.lmlRouteCase $ k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
@@ -114,10 +116,28 @@ modelDeleteNote k model =
       pure folderR
     restoreFolderPlaceholder =
       injectAncestor . N.RAncestor
-    deleteIxMulti :: LMLRoute -> IxRel -> IxRel
-    deleteIxMulti r rels =
-      let candidates = Ix.toList $ Ix.getEQ r rels
-       in foldl' (flip Ix.delete) rels candidates
+
+-- | Like `Ix.updateIx`, but works for multiple items.
+updateIxMulti ::
+  (Ix.IsIndexOf ix ixs, Ix.Indexable ixs a) =>
+  ix ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a
+updateIxMulti r new rels =
+  let old = rels @= r
+      deleteMany = foldr Ix.delete
+   in new `Ix.union` (rels `deleteMany` old)
+
+-- | Like `Ix.deleteIx`, but works for multiple items
+deleteIxMulti ::
+  (Ix.Indexable ixs a, Ix.IsIndexOf ix ixs) =>
+  ix ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a
+deleteIxMulti r rels =
+  let candidates = Ix.toList $ Ix.getEQ r rels
+   in foldl' (flip Ix.delete) rels candidates
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =

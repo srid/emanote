@@ -9,6 +9,9 @@ module Emanote.View.Common
     inlineRenderers,
     linkInlineRenderers,
     renderModelTemplate,
+    routeBreadcrumbs,
+    TemplateRenderCtx (..),
+    mkTemplateRenderCtx,
   )
 where
 
@@ -30,9 +33,11 @@ import qualified Emanote.Pandoc.Renderer.Embed as PF
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Pandoc.Renderer.Url as PF
 import Emanote.Route (LMLRoute)
+import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
+import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
@@ -91,6 +96,32 @@ _pandocBlockRenderers =
   [ PF.embedBlockWikiLinkResolvingSplice,
     PF.queryResolvingSplice
   ]
+
+data TemplateRenderCtx n = TemplateRenderCtx
+  { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    withBlockCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    withLinkInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    titleSplice :: Tit.Title -> HI.Splice n
+  }
+
+mkTemplateRenderCtx ::
+  Monad n =>
+  Model ->
+  R.LMLRoute ->
+  Aeson.Value ->
+  TemplateRenderCtx n
+mkTemplateRenderCtx model r meta =
+  let withNoteRenderer = mkRendererFromMeta model meta
+      withInlineCtx =
+        withNoteRenderer inlineRenderers () ()
+      withLinkInlineCtx =
+        withNoteRenderer linkInlineRenderers () ()
+      withBlockCtx =
+        withNoteRenderer noteRenderers () r
+      -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
+      titleSplice titleDoc = withLinkInlineCtx $ \x ->
+        Tit.titleSplice x (preparePandoc model) titleDoc
+   in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 commonSplices ::
   Monad n =>
@@ -195,3 +226,10 @@ renderModelTemplate model templateName =
    in -- Until Ema's error handling improves ...
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
+
+routeBreadcrumbs :: Monad n => TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice n
+routeBreadcrumbs TemplateRenderCtx {..} model r =
+  Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
+    \(R.liftLMLRoute -> crumbR) -> do
+      "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
+      "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)

@@ -7,6 +7,7 @@ module Emanote.Route.SiteRoute
     IndexR (..),
     ExportR (..),
     TagIndexR (..),
+    TasksR (..),
     MissingR (..),
     AmbiguousR (..),
     VirtualRoute,
