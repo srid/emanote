@@ -8,7 +8,7 @@
         <apply template="experimental">
           <bind tag="dnum">50</bind>
         </apply>
-        <div class="pb-2 mx-auto my-4 bg-gray-50 lg:max-w-screen-md ">
+        <div class="pb-2 mx-auto my-4 lg:max-w-screen-md ">
           <special-main />
         </div>
       </main>
