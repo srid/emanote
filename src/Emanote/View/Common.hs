@@ -10,6 +10,8 @@ module Emanote.View.Common
     linkInlineRenderers,
     renderModelTemplate,
     routeBreadcrumbs,
+    TemplateRenderCtx (..),
+    mkTemplateRenderCtx,
   )
 where
 
@@ -94,6 +96,32 @@ _pandocBlockRenderers =
   [ PF.embedBlockWikiLinkResolvingSplice,
     PF.queryResolvingSplice
   ]
+
+data TemplateRenderCtx n = TemplateRenderCtx
+  { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    withBlockCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    withLinkInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
+    titleSplice :: Tit.Title -> HI.Splice n
+  }
+
+mkTemplateRenderCtx ::
+  Monad n =>
+  Model ->
+  R.LMLRoute ->
+  Aeson.Value ->
+  TemplateRenderCtx n
+mkTemplateRenderCtx model r meta =
+  let withNoteRenderer = mkRendererFromMeta model meta
+      withInlineCtx =
+        withNoteRenderer inlineRenderers () ()
+      withLinkInlineCtx =
+        withNoteRenderer linkInlineRenderers () ()
+      withBlockCtx =
+        withNoteRenderer noteRenderers () r
+      -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
+      titleSplice titleDoc = withLinkInlineCtx $ \x ->
+        Tit.titleSplice x (preparePandoc model) titleDoc
+   in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 commonSplices ::
   Monad n =>
@@ -199,8 +227,8 @@ renderModelTemplate model templateName =
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
 
-routeBreadcrumbs :: Monad n => Model -> LMLRoute -> (Tit.Title -> HI.Splice n) -> HI.Splice n
-routeBreadcrumbs model r titleSplice =
+routeBreadcrumbs :: Monad n => TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice n
+routeBreadcrumbs TemplateRenderCtx {..} model r =
   Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
     \(R.liftLMLRoute -> crumbR) -> do
       "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)

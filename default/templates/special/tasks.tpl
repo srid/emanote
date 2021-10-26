@@ -1,4 +1,3 @@
-<!-- TODO: Parametrize experimental thingy -->
 <apply template="/templates/special/base">
   <bind tag="special-main">
     <div class="w-full">
@@ -17,12 +16,12 @@
                         <a class="text-gray-600 opacity-50 hover:opacity-100" href="${crumb:url}">
                           <crumb:title />
                         </a>
-                        <span class="text-gray-500 px-2">/</span>
+                        <span class="text-gray-500 px-2">\</span>
                       </li>
                     </each-crumb>
                   </t:note:breadcrumbs>
 
-                  <a class="flex-1 font-bold hover:bg-${theme}-50" href="${t:note:url}">
+                  <a class="flex-1 font-bold hover:bg-gray-100" href="${t:note:url}">
                     <t:note:title />
                   </a>
                 </div>
