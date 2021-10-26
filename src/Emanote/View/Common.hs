@@ -9,6 +9,7 @@ module Emanote.View.Common
     inlineRenderers,
     linkInlineRenderers,
     renderModelTemplate,
+    routeBreadcrumbs,
   )
 where
 
@@ -30,9 +31,11 @@ import qualified Emanote.Pandoc.Renderer.Embed as PF
 import qualified Emanote.Pandoc.Renderer.Query as PF
 import qualified Emanote.Pandoc.Renderer.Url as PF
 import Emanote.Route (LMLRoute)
+import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute.Class as SR
 import qualified Emanote.View.LiveServerFiles as LiveServerFiles
 import qualified Heist as H
+import qualified Heist.Extra.Splices.List as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
 import qualified Heist.Extra.TemplateState as Tmpl
 import qualified Heist.Interpreted as HI
@@ -195,3 +198,10 @@ renderModelTemplate model templateName =
    in -- Until Ema's error handling improves ...
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
+
+routeBreadcrumbs :: Monad n => Model -> LMLRoute -> (Tit.Title -> HI.Splice n) -> HI.Splice n
+routeBreadcrumbs model r titleSplice =
+  Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
+    \(R.liftLMLRoute -> crumbR) -> do
+      "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
+      "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)

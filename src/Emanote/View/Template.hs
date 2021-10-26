@@ -27,7 +27,7 @@ import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import qualified Emanote.Route as R
 import qualified Emanote.Route.SiteRoute as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate)
+import Emanote.View.Common (commonSplices, inlineRenderers, linkInlineRenderers, mkRendererFromMeta, noteRenderers, renderModelTemplate, routeBreadcrumbs)
 import Emanote.View.Export (renderGraphExport)
 import qualified Emanote.View.TagIndex as TagIndex
 import qualified Emanote.View.TaskIndex as TaskIndex
@@ -146,10 +146,7 @@ renderLmlHtml model note = do
     -- Sidebar navigation
     routeTreeSplice withLinkInlineCtx (Just r) model
     "ema:breadcrumbs"
-      ## Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb"
-      $ \(R.liftLMLRoute -> crumbR) -> do
-        "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
-        "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
+      ## routeBreadcrumbs model r titleSplice
     -- Note stuff
     "ema:note:title"
       ## titleSplice (note ^. MN.noteTitle)
@@ -165,8 +162,7 @@ renderLmlHtml model note = do
     "ema:note:uptree"
       ## Splices.treeSplice (const ()) folgeAnc
       $ \(last -> nodeRoute) children -> do
-        "node:text" ## withInlineCtx $ \ctx ->
-          Tit.titleSplice ctx (preparePandoc model) $ M.modelLookupTitle nodeRoute model
+        "node:text" ## titleSplice $ M.modelLookupTitle nodeRoute model
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
         "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
