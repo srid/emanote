@@ -10,7 +10,9 @@
   <ema:metadata>
     <with var="page">
       <meta property="og:description" content="${value:description}" />
-      <meta property="og:site_name" content="${value:siteName}" />
+      <meta property="og:site_name" content="${value:siteTitle}" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="${ema:title}" />
     </with>
     <with var="template">
       <base href="${value:baseUrl}" />
