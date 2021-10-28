@@ -61,7 +61,6 @@ pandoc:
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
 page:
-  siteName: MyEmanoteSite
   siteTitle: My Emanote Site
   # Desription is expected to be set on a per-page basis.
   # HACK: We are setting it to empty here, because Heist doesn't work well otherwise.

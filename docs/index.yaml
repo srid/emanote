@@ -2,7 +2,6 @@ template:
   urlStrategy: pretty
 
 page:
-  siteName: Emanote
   siteTitle: Emanote
   headHtml: |
     <snippet var="js.prism" />
