@@ -12,6 +12,7 @@ module Emanote.Route.SiteRoute.Class
     indexRoute,
     indexLmlRoute,
     tagIndexRoute,
+    taskIndexRoute,
     siteRouteUrl,
     siteRouteUrlStatic,
     urlStrategySuffix,
@@ -206,4 +207,9 @@ indexRoute =
 tagIndexRoute :: [HT.TagNode] -> SiteRoute
 tagIndexRoute (TagIndexR -> tagR) =
   let virtR :: VirtualRoute = openUnionLift tagR
+   in SiteRoute $ openUnionLift virtR
+
+taskIndexRoute :: SiteRoute
+taskIndexRoute =
+  let virtR :: VirtualRoute = openUnionLift TasksR
    in SiteRoute $ openUnionLift virtR
