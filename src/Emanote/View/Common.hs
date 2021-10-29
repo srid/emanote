@@ -156,6 +156,8 @@ commonSplices withCtx model meta routeTitle = do
     ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
   "ema:tagIndexUrl"
     ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
+  "ema:taskIndexUrl"
+    ## HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
