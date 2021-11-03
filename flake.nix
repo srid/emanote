@@ -80,5 +80,8 @@
 
         # Used by `nix develop`
         devShell = project true;
-      });
+      }) //
+    {
+      homeManagerModule = import ./home-manager-module.nix;
+    };
 }
