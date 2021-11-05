@@ -28,19 +28,16 @@
                   <task>
                     <div
                       class="bg-white py-1.5 px-2 my-1 rounded shadow border-2 hover:border-${theme}-600">
-                      <label class="inline-flex items-start space-x-2">
-                        <input type="checkbox" disabled class="flex-shrink-0 w-5 h-5">
-                        <span>
-                          <task:description>
-                            <PandocLink class="text-gray-600">
-                              <Internal class="font-bold hover:bg-gray-50" />
-                              <External class="hover:underline" target="_blank" rel="noopener" />
-                            </PandocLink>
-                            <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-                            <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
-                          </task:description>
-                        </span>
-                      </label>
+                      <apply template="/templates/components/checkbox-unchecked">
+                        <task:description>
+                          <PandocLink class="text-gray-600">
+                            <Internal class="font-bold hover:bg-gray-50" />
+                            <External class="hover:underline" target="_blank" rel="noopener" />
+                          </PandocLink>
+                          <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
+                          <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
+                        </task:description>
+                      </apply>
                     </div>
                   </task>
                 </t:tasks>
