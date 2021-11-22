@@ -1,4 +1,5 @@
-{ config, lib, pkgs, ... }: let
+{ config, lib, pkgs, ... }:
+let
 
   cfg = config.services.emanote;
 
@@ -18,9 +19,10 @@
     template.baseUrl = cfg.baseUrl;
   };
   configLayer = yamlFormat.generateDir "emanote-config" "/index.yaml" extraConfig;
-  layers = map toString ([configLayer] ++ cfg.notes);
+  layers = map toString ([ configLayer ] ++ cfg.notes);
 
-in {
+in
+{
   options = {
     services.emanote = with lib; {
       enable = mkEnableOption ''
