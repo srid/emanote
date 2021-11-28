@@ -11,8 +11,10 @@
 
   body {
     font-family: 'MavenPro', sans-serif;
-    /* font-variation-settings: 'wght'375; */
+  }
 
+  a[data-wikilink-type] {
+    /* font-variation-settings: 'wght'625; */
   }
 
   h1,
