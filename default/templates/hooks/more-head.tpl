@@ -14,7 +14,7 @@
   }
 
   a[data-wikilink-type] {
-    /* font-variation-settings: 'wght'625; */
+    font-variation-settings: 'wght'500;
   }
 
   h1,
