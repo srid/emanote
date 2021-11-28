@@ -141,6 +141,8 @@ renderLmlHtml model note = do
     "ema:note:title"
       ## C.titleSplice tCtx (note ^. MN.noteTitle)
     let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
+    "ema:note:source-path"
+      ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
     "ema:note:backlinks"
       ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
@@ -156,7 +158,6 @@ renderLmlHtml model note = do
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
         "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
-    "ema:note:uptreeStr" ## HI.textSplice (toText . Shower.shower $ folgeAnc)
     "ema:note:pandoc"
       ## C.withBlockCtx tCtx
       $ \ctx ->
