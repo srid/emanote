@@ -40,7 +40,6 @@ import qualified Heist.Extra.Splices.Tree as Splices
 import qualified Heist.Interpreted as HI
 import qualified Heist.Splices as Heist
 import Relude
-import qualified Shower
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.Definition (Pandoc (..))
 

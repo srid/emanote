@@ -11,7 +11,7 @@
             <value var="date" />
           </span>
         </ema:note:metadata>
-        <a class="flex-1 text-${theme}-600 font-bold border-l-2 pl-2 hover:underline"
+        <a class="flex-1 text-${theme}-600 font-semibold border-l-2 pl-2 hover:underline"
           href="${ema:note:url}">
           <ema:note:title />
         </a>
