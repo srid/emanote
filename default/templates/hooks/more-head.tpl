@@ -13,7 +13,7 @@
     font-family: 'MavenPro', sans-serif;
   }
 
-  a[data-wikilink-type] {
+  a.mavenLinkBold {
     font-variation-settings: 'wght'500;
   }
 
