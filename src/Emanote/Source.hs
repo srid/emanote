@@ -14,7 +14,7 @@ import qualified Ema.Helper.FileSystem as EmaFS
 import Emanote.Model (Model)
 import Emanote.Prelude (log)
 import Emanote.Source.Loc
-import Emanote.Source.Patch (transformActions)
+import qualified Emanote.Source.Patch as Patch
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Relude
 import UnliftIO (MonadUnliftIO)
@@ -31,7 +31,7 @@ emanate paths modelLvar initialModel = do
       ignorePatterns
       modelLvar
       initialModel
-      transformActions
+      Patch.mapFsChanges
   whenJust mcmd $ \EmaFS.Cmd_Remount -> do
     log "!! Remount suggested !!"
     LVar.set modelLvar initialModel -- Reset the model

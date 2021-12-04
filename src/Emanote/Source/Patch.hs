@@ -6,9 +6,11 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
--- | Patch model state depending on file change event.
+-- | Pattch model state depending on file change event.
+--
+-- See `mapFsChange` for more details.
 module Emanote.Source.Patch
-  ( transformActions,
+  ( mapFsChanges,
     filePatterns,
     ignorePatterns,
   )
@@ -43,11 +45,10 @@ import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
 
--- | Like `transformAction` but operates on multiple source types at a time
-transformActions :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc (R.FileType R.SourceExt) -> m (Model -> Model)
-transformActions ch = do
+mapFsChanges :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc (R.FileType R.SourceExt) -> m (Model -> Model)
+mapFsChanges ch = do
   withBlockBuffering $
-    uncurry transformAction `chainM` Map.toList ch
+    uncurry mapFsChangesOnExt `chainM` Map.toList ch
   where
     -- Temporarily use block buffering before calling an IO action that is
     -- known ahead to log rapidly, so as to not hamper serial processing speed.
@@ -56,14 +57,26 @@ transformActions ch = do
         *> f
         <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
 
--- | Transform a filesystem action (on a source) to model update
-transformAction ::
+mapFsChangesOnExt ::
   (MonadIO m, MonadLogger m) =>
   R.FileType R.SourceExt ->
   Map FilePath (EmaFS.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
-transformAction src fps = do
-  flip chainM (Map.toList fps) $ \(fp, action) -> case src of
+mapFsChangesOnExt fpType fps = do
+  uncurry (mapFsChange fpType) `chainM` Map.toList fps
+
+-- | Map a filesystem change to the corresponding model change.
+mapFsChange ::
+  (MonadIO m, MonadLogger m) =>
+  -- | Type of the file being changed
+  R.FileType R.SourceExt ->
+  -- | Path to the file being changed
+  FilePath ->
+  -- | Specific change to the file, along with its paths from other "layers"
+  EmaFS.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (Model -> Model)
+mapFsChange fpType fp action =
+  case fpType of
     R.LMLType R.Md ->
       case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of
         Nothing ->
