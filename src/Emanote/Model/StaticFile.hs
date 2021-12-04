@@ -16,7 +16,7 @@ import qualified Emanote.Route as R
 import Relude
 
 data StaticFile = StaticFile
-  { _staticFileRoute :: R.R 'R.AnyExt,
+  { _staticFileRoute :: R.R @R.SourceExt 'R.AnyExt,
     _staticFilePath :: FilePath,
     -- | Indicates that this file was updated no latter than the given time.
     _staticFileTime :: UTCTime

@@ -33,6 +33,7 @@ import qualified Data.Text as T
 import Ema (Slug (unSlug))
 import qualified Ema
 import Ema.Helper.Markdown (plainify)
+import qualified Emanote.Route.Ext as Ext
 import Emanote.Route.R (R (..))
 import qualified Network.URI.Encode as UE
 import Relude
@@ -130,7 +131,7 @@ wikiLinkInlineRendered x = do
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --
 -- All possible combinations of Wikilink type use is automatically included.
-allowedWikiLinks :: HasCallStack => R ext -> NonEmpty (WikiLinkType, WikiLink)
+allowedWikiLinks :: HasCallStack => R @Ext.SourceExt ext -> NonEmpty (WikiLinkType, WikiLink)
 allowedWikiLinks r =
   let wls = fmap WikiLink $ tailsNE $ unRoute r
       typs :: NonEmpty WikiLinkType = NE.fromList [minBound .. maxBound]

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -27,7 +28,7 @@ import Data.WorldPeace.Union
     openUnionHandle,
     openUnionLift,
   )
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
+import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md), SourceExt)
 import Emanote.Route.R (R)
 import qualified Emanote.Route.R as R
 import Relude
@@ -52,14 +53,14 @@ type LMLRoute = OpenUnion LMLRoutes'
 liftLMLRoute ::
   forall ext.
   IsMember (R ext) LMLRoutes' =>
-  R (ext :: FileType) ->
+  R (ext :: FileType SourceExt) ->
   LMLRoute
 liftLMLRoute =
   openUnionLift
 
 liftModelRoute ::
   IsMember (R ext) ModelRoutes' =>
-  R (ext :: FileType) ->
+  R (ext :: FileType a) ->
   ModelRoute
 liftModelRoute =
   openUnionLift
@@ -83,5 +84,5 @@ modelRouteCase =
 
 mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
 mkModelRouteFromFilePath fp =
-  fmap liftModelRoute (R.mkRouteFromFilePath @('LMLType 'Md) fp)
-    <|> fmap liftModelRoute (R.mkRouteFromFilePath @'AnyExt fp)
+  fmap liftModelRoute (R.mkRouteFromFilePath @SourceExt @('LMLType 'Md) fp)
+    <|> fmap liftModelRoute (R.mkRouteFromFilePath @SourceExt @'AnyExt fp)

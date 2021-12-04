@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -43,7 +44,7 @@ import UnliftIO.Directory (doesDirectoryExist)
 import UnliftIO.IO (hFlush)
 
 -- | Like `transformAction` but operates on multiple source types at a time
-transformActions :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc R.FileType -> m (Model -> Model)
+transformActions :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc (R.FileType R.SourceExt) -> m (Model -> Model)
 transformActions ch = do
   withBlockBuffering $
     uncurry transformAction `chainM` Map.toList ch
@@ -58,13 +59,13 @@ transformActions ch = do
 -- | Transform a filesystem action (on a source) to model update
 transformAction ::
   (MonadIO m, MonadLogger m) =>
-  R.FileType ->
+  R.FileType R.SourceExt ->
   Map FilePath (EmaFS.FileAction (NonEmpty (Loc, FilePath))) ->
   m (Model -> Model)
 transformAction src fps = do
   flip chainM (Map.toList fps) $ \(fp, action) -> case src of
     R.LMLType R.Md ->
-      case fmap liftLMLRoute . R.mkRouteFromFilePath @('R.LMLType 'R.Md) $ fp of
+      case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of
         Nothing ->
           pure id
         Just r -> case action of
@@ -131,12 +132,6 @@ transformAction src fps = do
                 pure $ M.modelInsertStaticFile t r fpAbs
           EmaFS.Delete -> do
             pure $ M.modelDeleteStaticFile r
-    R.Html -> do
-      -- HTML is handled by AnyExt above, beause we are not passing this to `unionMount`
-      pure id
-    R.Folder -> do
-      -- Unused! But maybe we should ... TODO:
-      pure id
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => EmaFS.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =

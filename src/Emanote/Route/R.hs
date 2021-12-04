@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Route.R where
@@ -12,14 +13,14 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import Ema (Slug)
 import qualified Ema
-import Emanote.Route.Ext (FileType (AnyExt, Folder, Html), HasExt (..))
+import Emanote.Route.Ext (FileType (..), HasExt (..), SourceExt (SourceExt))
 import Relude
 import System.FilePath (splitPath)
 import qualified Text.Show (Show (show))
 
 -- | Represents the relative path to some file (or its isomporphic URL
 -- represetation).
-newtype R (ext :: FileType) = R {unRoute :: NonEmpty Slug}
+newtype R (ext :: FileType a) = R {unRoute :: NonEmpty Slug}
   deriving (Eq, Ord, Typeable, Data)
 
 instance HasExt ext => ToJSON (R ext) where
@@ -31,9 +32,9 @@ instance HasExt ext => Show (R ext) where
       "R[/" <> encodeRoute r <> "]"
 
 -- | Convert foo/bar.<ext> to a @R@
-mkRouteFromFilePath :: forall ext. HasExt ext => FilePath -> Maybe (R ext)
+mkRouteFromFilePath :: forall a (ext :: FileType a). HasExt ext => FilePath -> Maybe (R ext)
 mkRouteFromFilePath fp = do
-  base <- withoutKnownExt @ext fp
+  base <- withoutKnownExt @a @ext fp
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   R <$> nonEmpty slugs
 
@@ -92,10 +93,10 @@ indexRoute :: R ext
 indexRoute = R $ "index" :| []
 
 -- | Convert a route to filepath
-encodeRoute :: forall ft. HasExt ft => R ft -> FilePath
+encodeRoute :: forall a (ft :: FileType a). HasExt ft => R ft -> FilePath
 encodeRoute (R slugs) =
   let parts = Ema.unSlug <$> slugs
-   in withExt @ft $ toString $ T.intercalate "/" (toList parts)
+   in withExt @a @ft $ toString $ T.intercalate "/" (toList parts)
 
 -- | Parse our route from html file path
 decodeHtmlRoute :: FilePath -> R 'Html
@@ -116,4 +117,4 @@ decodeHtmlRoute fp = do
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =
-  mkRouteFromFilePath @'AnyExt
+  mkRouteFromFilePath @SourceExt @'AnyExt

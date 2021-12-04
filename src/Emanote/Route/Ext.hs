@@ -3,6 +3,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Route.Ext where
@@ -12,16 +15,23 @@ import Data.Data (Data)
 import Relude hiding (show)
 import qualified System.FilePath as FP
 
-data FileType
-  = LMLType LML
-  | Yaml
-  | HeistTpl
-  | Html
-  | Folder
-  | -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
-    -- "catch all" type to capture files using an arbitrary.
-    AnyExt
-  deriving (Generic, Eq, Ord, Typeable, Data, ToJSON)
+data SourceExt = SourceExt
+  deriving (Eq, Ord, Show, Read, Data, Generic, ToJSON)
+
+data FileType a where
+  LMLType :: LML -> FileType SourceExt
+  Yaml :: FileType SourceExt
+  HeistTpl :: FileType SourceExt
+  Html :: FileType ()
+  Folder :: FileType ()
+  -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
+  -- "catch all" type to capture files using an arbitrary.
+  AnyExt :: FileType SourceExt
+  deriving (Typeable)
+
+deriving instance Eq a => Eq (FileType a)
+
+deriving instance Ord a => Ord (FileType a)
 
 -- | A lightweight markup language
 --
@@ -31,8 +41,8 @@ data LML = Md
 
 -- | The `HasExt` class's responsibility is to allow dealing with basepath sans
 -- extension (and vice-versa).
-class HasExt (ext :: FileType) where
-  fileType :: FileType
+class HasExt (ext :: FileType a) where
+  fileType :: FileType a
 
   -- | Return the filepath with the known extension.
   withExt :: FilePath -> FilePath

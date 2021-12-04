@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Emanote.Source.Pattern where
@@ -7,26 +8,21 @@ import qualified Emanote.Route as R
 import Relude
 import System.FilePattern (FilePattern)
 
-filePattern :: HasCallStack => R.FileType -> FilePath
+filePattern :: HasCallStack => R.FileType R.SourceExt -> FilePath
 filePattern = \case
   R.LMLType R.Md ->
-    R.withExt @('R.LMLType 'R.Md) $
+    R.withExt @R.SourceExt @('R.LMLType 'R.Md) $
       "**/*"
   R.Yaml ->
-    R.withExt @'R.Yaml $
-      "**/*"
-  R.Html ->
-    R.withExt @'R.Html $
+    R.withExt @R.SourceExt @'R.Yaml $
       "**/*"
   R.HeistTpl ->
-    R.withExt @'R.HeistTpl $
+    R.withExt @R.SourceExt @'R.HeistTpl $
       "**/*"
   R.AnyExt ->
     "**"
-  R.Folder ->
-    error "Unsupported"
 
-filePatterns :: [(R.FileType, FilePattern)]
+filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
   (id &&& filePattern)
     <$> [ R.LMLType R.Md,
