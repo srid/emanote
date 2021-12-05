@@ -14,21 +14,7 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 
 ## Installing and using
 
-```bash
-# Install (`cachix use srid` for cached binaries)
-nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz
-# Or, from the Git repo: nix-env -if ./default.nix
-
-# Run live server (HOST and PORT are optional)
-cd /path/to/notebook
-HOST=0.0.0.0 PORT=8001 emanote
-
-# Generate static files (-L defaults to current directory)
-mkdir /tmp/output
-emanote -L /path/to/notebook gen /tmp/output
-```
-
-For other installation methods, see [here](https://note.ema.srid.ca/start/install).
+https://note.ema.srid.ca/start/install
 
 ### Examples
 
