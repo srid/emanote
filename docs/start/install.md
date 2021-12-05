@@ -6,9 +6,24 @@ order: 1
 
 ## Official method
 
-Follow the [README on GitHub](https://github.com/srid/emanote#emanote) to install Emanote using [Nix](https://nixos.org/download.html). This is the recommended approach. 
+Emanote is supported on all popular operating systems through [Nix].
 
-For Windows, see [[wsl]].
+1. Install [Nix] (for Windows, see [[wsl]])
+2. Run `nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz` to install Emanote
+
+To test your Emanote install,
+
+```sh
+# Run live server (HOST and PORT are optional)
+cd /path/to/notebook
+HOST=0.0.0.0 PORT=8001 emanote
+
+# Generate static files (-L defaults to current directory)
+mkdir /tmp/output
+emanote -L /path/to/notebook gen /tmp/output
+```
+
+[Nix]: https://nixos.org/download.html
 
 ## Non-nix methods
 
