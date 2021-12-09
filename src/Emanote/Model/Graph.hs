@@ -45,8 +45,8 @@ modelFolgezettelAncestorTree r0 model =
         gets (parentModelR `Set.member`) >>= \case
           True -> pure Nothing
           False -> do
-            sub <- go parentModelR
             modify $ Set.insert parentModelR
+            sub <- go parentModelR
             pure $ Just $ Node parentR sub
     isFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, _wl) ->
