@@ -9,10 +9,17 @@ import qualified Emanote.Source as Source
 import qualified Emanote.View as View
 import Main.Utf8 (withUtf8)
 import Relude
+import qualified Spec
+import qualified System.Environment as Env
 
 main :: IO ()
 main =
   withUtf8 $ do
     cli <- CLI.parseCli
-    Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m ->
-      Source.emanate (CLI.layers cli) m (Model.emptyModel act)
+    if CLI.test cli
+      then
+        Env.withArgs
+          mempty --Discard emanote's arguments
+          Spec.main
+      else Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m ->
+        Source.emanate (CLI.layers cli) m (Model.emptyModel act)
