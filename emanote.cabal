@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.1.0
+version:            0.4.2.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -32,7 +32,26 @@ data-files:
   index.yaml
   templates/**/*.tpl
 
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -threaded -rtsopts -with-rtsopts=-N
+
+  default-extensions:
+    NoImplicitPrelude
+    FlexibleContexts
+    FlexibleInstances
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    OverloadedStrings
+    ScopedTypeVariables
+    TupleSections
+    ViewPatterns
+
 executable emanote
+  import:           haskell-common
   build-depends:
     , aeson
     , aeson-extra
@@ -50,6 +69,7 @@ executable emanote
     , filepath
     , filepattern
     , fsnotify
+    , hedgehog
     , heist                  >=1.1.0.1
     , ixset-typed
     , lens
@@ -69,6 +89,9 @@ executable emanote
     , shower
     , tagged
     , tagtree
+    , tasty
+    , tasty-hedgehog
+    , tasty-quickcheck
     , text
     , time
     , unliftio
@@ -79,27 +102,10 @@ executable emanote
     , xmlhtml
     , yaml
 
-  ghc-options:
-    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
-    -threaded -rtsopts -with-rtsopts=-N
-
-  default-extensions:
-    NoImplicitPrelude
-    FlexibleContexts
-    FlexibleInstances
-    KindSignatures
-    LambdaCase
-    MultiParamTypeClasses
-    MultiWayIf
-    OverloadedStrings
-    ScopedTypeVariables
-    TupleSections
-    ViewPatterns
-
-  main-is:            Main.hs
-  hs-source-dirs:     src
-  default-language:   Haskell2010
-  autogen-modules:    Paths_emanote
+  main-is:          Main.hs
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  autogen-modules:  Paths_emanote
   other-modules:
     Emanote.CLI
     Emanote.Model
@@ -110,6 +116,7 @@ executable emanote
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Query
+    Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Model.Task
@@ -155,3 +162,4 @@ executable emanote
     Heist.Extra.Splices.Tree
     Heist.Extra.TemplateState
     Paths_emanote
+    Spec

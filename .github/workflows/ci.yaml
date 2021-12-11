@@ -6,7 +6,6 @@ on:
       - master
   pull_request:
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -24,6 +23,10 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Tests
+        id: test
+        run: |
+          nix develop -c cabal run -- emanote --test
       - name: Build as docker img
         id: build
         run: |
