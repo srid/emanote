@@ -33,7 +33,9 @@ cliParser cwd = do
             short 'L',
             metavar "LAYERS",
             value defaultPath,
-            help "List of notebook folders to 'union mount', with the right-side folders taking priority."
+            help
+              "List of notebook folders to 'union mount', semicolon delimited and overlayed from right to left. Take care to escape semicolons and avoid \"~\".\n\
+              \Example: \"$HOME/notebook;$HOME/underlay_notebook\""
           ]
     pathListReader :: ReadM (NonEmpty FilePath)
     pathListReader =
