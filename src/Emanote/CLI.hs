@@ -17,12 +17,14 @@ import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
   { layers :: NonEmpty FilePath,
+    test :: Bool,
     emaCli :: Ema.CLI.Cli
   }
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- pathList (one cwd)
+  test <- switch (long "test" <> help "Run tests")
   emaCli <- Ema.CLI.cliParser
   pure Cli {..}
   where

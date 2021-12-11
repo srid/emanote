@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -xe
+export PORT=9010
+
+exec nix develop -c ghcid --warnings -T ":main --test"
