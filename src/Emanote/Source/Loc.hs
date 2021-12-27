@@ -1,25 +1,33 @@
 -- | Notebook location
-module Emanote.Source.Loc where
+module Emanote.Source.Loc
+  ( -- * Type
+    Loc (..),
 
-import qualified Paths_emanote
+    -- * Making a `Loc`
+    defaultLayer,
+    userLayers,
+
+    -- * Using a `Loc`
+    locResolve,
+  )
+where
+
 import Relude
 import System.FilePath ((</>))
 
--- | Location of the notebook, even if it contains a subset of files.
+-- | Location of the notebook
 --
 -- The order here matters. Top = higher precedence.
 data Loc
-  = -- | The Int argument specifies the precedence (large value = higher precedence)
+  = -- | The Int argument specifies the precedence (larger value = higher precedence)
     LocUser Int FilePath
-  | -- | The location of the emanote's default files directory containing
-    -- templates, data, etc.
-    LocEmanoteDefault FilePath
+  | -- | The default location (ie., emanote default layer)
+    LocDefault FilePath
   deriving (Eq, Ord, Show)
 
-emanoteDefaultLayer :: MonadIO m => m (Loc, FilePath)
-emanoteDefaultLayer = do
-  defaultFiles <- liftIO Paths_emanote.getDataDir
-  pure (LocEmanoteDefault defaultFiles, defaultFiles)
+defaultLayer :: FilePath -> (Loc, FilePath)
+defaultLayer fp =
+  (LocDefault fp, fp)
 
 userLayers :: NonEmpty FilePath -> Set (Loc, FilePath)
 userLayers paths =
@@ -29,6 +37,9 @@ userLayers paths =
 
 -- | Return the effective path of a file.
 locResolve :: (Loc, FilePath) -> FilePath
-locResolve (loc, fp) = case loc of
-  LocUser _idx base -> base </> fp
-  LocEmanoteDefault base -> base </> fp
+locResolve (loc, fp) = locPath loc </> fp
+
+locPath :: Loc -> FilePath
+locPath = \case
+  LocUser _ fp -> fp
+  LocDefault fp -> fp
