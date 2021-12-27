@@ -106,10 +106,11 @@ common library-common
     , xmlhtml
     , yaml
 
-  main-is:          Main.hs
   hs-source-dirs:   src
   default-language: Haskell2010
-  other-modules:
+library
+  import: library-common
+  exposed-modules:
     Emanote
     Emanote.CLI
     Emanote.Model
@@ -166,12 +167,8 @@ common library-common
     Heist.Extra.TemplateState
     Paths_emanote
     Spec
-
   autogen-modules:  Paths_emanote
-  other-modules:    Paths_emanote
 
-library
-  import: library-common
 
 executable emanote
   import:  library-common
