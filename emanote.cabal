@@ -50,8 +50,12 @@ common haskell-common
     TupleSections
     ViewPatterns
 
-executable emanote
+common library-common
   import:           haskell-common
+  default-language: Haskell2010
+
+  -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
+  hs-source-dirs:   src
   build-depends:
     , aeson
     , aeson-extra
@@ -105,7 +109,6 @@ executable emanote
   main-is:          Main.hs
   hs-source-dirs:   src
   default-language: Haskell2010
-  autogen-modules:  Paths_emanote
   other-modules:
     Emanote
     Emanote.CLI
@@ -163,3 +166,13 @@ executable emanote
     Heist.Extra.TemplateState
     Paths_emanote
     Spec
+
+  autogen-modules:  Paths_emanote
+  other-modules:    Paths_emanote
+
+library
+  import: library-common
+
+executable emanote
+  import:  library-common
+  main-is: Main.hs
