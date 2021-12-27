@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.2.0
+version:            0.4.3.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -50,8 +50,12 @@ common haskell-common
     TupleSections
     ViewPatterns
 
-executable emanote
+common library-common
   import:           haskell-common
+  default-language: Haskell2010
+
+  -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
+  hs-source-dirs:   src
   build-depends:
     , aeson
     , aeson-extra
@@ -102,11 +106,12 @@ executable emanote
     , xmlhtml
     , yaml
 
-  main-is:          Main.hs
   hs-source-dirs:   src
   default-language: Haskell2010
-  autogen-modules:  Paths_emanote
-  other-modules:
+library
+  import: library-common
+  exposed-modules:
+    Emanote
     Emanote.CLI
     Emanote.Model
     Emanote.Model.Calendar
@@ -140,7 +145,6 @@ executable emanote
     Emanote.Route.SiteRoute
     Emanote.Route.SiteRoute.Class
     Emanote.Route.SiteRoute.Type
-    Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern
@@ -163,3 +167,9 @@ executable emanote
     Heist.Extra.TemplateState
     Paths_emanote
     Spec
+  autogen-modules:  Paths_emanote
+
+
+executable emanote
+  import:  library-common
+  main-is: Main.hs
