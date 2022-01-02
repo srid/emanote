@@ -8,10 +8,10 @@
       url = "github:srid/windicss-nix";
       flake = false;
     };
-    tagtree = {
-      url = "github:srid/tagtree";
-      flake = false;
-    };
+    #tagtree = {
+    #  url = "github:srid/tagtree";
+    #  flake = false;
+    #};
     heist = {
       url = "github:srid/heist/emanote";
       flake = false;
@@ -69,7 +69,7 @@
               withHoogle = true;
               overrides = self: super: with pkgs.haskell.lib; {
                 ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
-                tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
+                # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
                 # Jailbreak heist to allow newer dlist
                 heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
                 # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs

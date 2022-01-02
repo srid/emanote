@@ -5,15 +5,14 @@
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "pre-commit-hooks": "pre-commit-hooks",
-        "unionmount": "unionmount"
+        "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1640306509,
-        "narHash": "sha256-iSDvYbTuudsjBNU2CeeDLC0WRsU/sg/pYBd1EMRcYtA=",
+        "lastModified": 1641143838,
+        "narHash": "sha256-cdas/83wVFJvp8L5DPv1rm/5TNGVT36LyPpowCbkNoA=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "06402ea7f368e161d9865038cdcb4d4ef2a4ec86",
+        "rev": "d773da4a13dbc568d3c82824b553d524d17d188f",
         "type": "github"
       },
       "original": {
@@ -119,17 +118,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1639895371,
-        "narHash": "sha256-eAUPDd7YODbYbQ+sya3vS3TH9SavHV/2o46FZCqRRsE=",
+        "lastModified": 1641104204,
+        "narHash": "sha256-mCjEJNKaeS/BhQQFNSxHfA0/XtujbTAAJpustt1hIxI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "3e4c1337b93152e42f53c8fcd2e0d9077c6523b1",
+        "rev": "28d58b979250ef33f049fe1c74daa50b7515126b",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "3e4c1337b93152e42f53c8fcd2e0d9077c6523b1",
+        "rev": "28d58b979250ef33f049fe1c74daa50b7515126b",
         "type": "github"
       }
     },
@@ -176,40 +175,7 @@
           "ema",
           "nixpkgs"
         ],
-        "tagtree": "tagtree",
         "windicss": "windicss"
-      }
-    },
-    "tagtree": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1624654230,
-        "narHash": "sha256-/oMuPj360ZAXFJwTwoDFKKwn5jfIbsl7+IBPDFv5oEE=",
-        "owner": "srid",
-        "repo": "tagtree",
-        "rev": "667c5a5073eddb8ddd875726b1fb6c41e09f0591",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "tagtree",
-        "type": "github"
-      }
-    },
-    "unionmount": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1637534484,
-        "narHash": "sha256-EZt8lPv3BgTT7gYHKStOYd6PK2vAk8DeSFoZfJ7O/U4=",
-        "owner": "srid",
-        "repo": "unionmount",
-        "rev": "e1840972d2cccc5e4ce2619d235f690316f2c992",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "unionmount",
-        "type": "github"
       }
     },
     "windicss": {
