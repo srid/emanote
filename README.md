@@ -14,11 +14,11 @@ Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten,
 
 ## Installing and using
 
-https://note.ema.srid.ca/start/install
+https://emanote.srid.ca/start/install
 
 ### Examples
 
-https://note.ema.srid.ca/examples
+https://emanote.srid.ca/examples
 
 ## Developing
 

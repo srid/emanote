@@ -78,7 +78,7 @@ in
         description = ''
           Config that will be layered over the default notes configs.
 
-          See https://note.ema.srid.ca/demo/yaml-config for
+          See https://emanote.srid.ca/demo/yaml-config for
           information about the format.
         '';
       };
