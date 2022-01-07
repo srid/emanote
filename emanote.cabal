@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.3.2
+version:            0.4.3.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -108,8 +108,9 @@ common library-common
 
   hs-source-dirs:   src
   default-language: Haskell2010
+
 library
-  import: library-common
+  import:          library-common
   exposed-modules:
     Emanote
     Emanote.CLI
@@ -167,8 +168,8 @@ library
     Heist.Extra.TemplateState
     Paths_emanote
     Spec
-  autogen-modules:  Paths_emanote
 
+  autogen-modules: Paths_emanote
 
 executable emanote
   import:  library-common
