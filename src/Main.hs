@@ -32,13 +32,14 @@ test = do
 
 run :: CLI.Cli -> IO ()
 run cli = do
-  Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m -> do
-    defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-    let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
-    Emanote.emanate
-      layers
-      Pattern.filePatterns
-      Pattern.ignorePatterns
-      m
-      (Model.emptyModel act)
-      Patch.patchModel
+  void $
+    Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m -> do
+      defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+      let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
+      Emanote.emanate
+        layers
+        Pattern.filePatterns
+        Pattern.ignorePatterns
+        m
+        (Model.emptyModel act)
+        Patch.patchModel
