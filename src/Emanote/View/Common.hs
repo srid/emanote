@@ -12,6 +12,7 @@ module Emanote.View.Common
     routeBreadcrumbs,
     TemplateRenderCtx (..),
     mkTemplateRenderCtx,
+    generatedCssFile,
   )
 where
 
@@ -123,6 +124,9 @@ mkTemplateRenderCtx model r meta =
         Tit.titleSplice x (preparePandoc model) titleDoc
    in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
+generatedCssFile :: FilePath
+generatedCssFile = "emanote-windicss-generated.css"
+
 commonSplices ::
   Monad n =>
   ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
@@ -141,8 +145,16 @@ commonSplices withCtx model meta routeTitle = do
   "apply" ## HA.applyImpl
   -- Add tailwind css shim
   "tailwindCssShim"
-    ## pure
-      (RX.renderHtmlNodes $ twindShim $ model ^. M.modelEmaCLIAction)
+    ## do
+      -- TODO: Use ?md5 to prevent stale browser caching of CSS.
+      pure . RX.renderHtmlNodes $
+        if M.inLiveServer model
+          then twindShim $ model ^. M.modelEmaCLIAction
+          else
+            H.link
+              ! A.href (H.toValue generatedCssFile)
+              ! A.rel "stylesheet"
+              ! A.type_ "text/css"
   "ema:version"
     ## HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata"
