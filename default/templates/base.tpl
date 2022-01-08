@@ -20,9 +20,7 @@
     </with>
     <snippet var="page.headHtml" />
   </ema:metadata>
-  <!-- CSSSTART -->
   <tailwindCssShim />
-  <!-- CSSEND -->
 
   <!-- Heist error element -->
   <style type="text/css">
