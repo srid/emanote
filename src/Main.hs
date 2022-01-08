@@ -1,8 +1,10 @@
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Main where
 
 import qualified Ema
+import qualified Ema.CLI
 import qualified Emanote
 import qualified Emanote.CLI as CLI
 import qualified Emanote.Model as Model
@@ -10,11 +12,18 @@ import qualified Emanote.Source.Loc as Loc
 import qualified Emanote.Source.Patch as Patch
 import qualified Emanote.Source.Pattern as Pattern
 import qualified Emanote.View as View
+import Emanote.View.Common (generatedCssFile)
 import Main.Utf8 (withUtf8)
 import qualified Paths_emanote
 import Relude
 import qualified Spec
 import qualified System.Environment as Env
+import System.FilePath ((</>))
+import System.Which
+import UnliftIO.Process (callProcess)
+
+windicss :: FilePath
+windicss = $(staticWhich "windicss")
 
 main :: IO ()
 main =
@@ -32,7 +41,7 @@ test = do
 
 run :: CLI.Cli -> IO ()
 run cli = do
-  void $
+  res <-
     Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m -> do
       defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
       let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
@@ -43,3 +52,10 @@ run cli = do
         m
         (Model.emptyModel act)
         Patch.patchModel
+  case (Ema.CLI.action (CLI.emaCli cli), res) of
+    (Ema.CLI.Generate outPath, Right (Just genPaths)) -> do
+      let cssPath = outPath </> generatedCssFile
+      putStrLn $ "Compiling CSS using windicss: " <> cssPath
+      callProcess windicss $ ["-t", "-o", cssPath] <> genPaths
+    _ ->
+      pure ()

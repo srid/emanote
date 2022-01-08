@@ -1,28 +1,4 @@
 #!/usr/bin/env bash
 set -xe
 
-# This script will migrate a Emanote-generated static site from using twind shim
-# (dynamic) to windicss compiled CSS (static).
-
-OUTPUTDIR="$(dirname "$(dirname "$(readlink -fm "$0")")")"
-
-# Produce a CSS file that contains only the Tailwind styles in use by the
-# generated HTML files.
-echo "Compiling CSS ..."
-pushd ${OUTPUTDIR}/
-find . -name \*.html -print0 | xargs -0 \
-  docker run -v ${OUTPUTDIR}:/data sridca/windicss -t -o emanote-compiled.css
-
-# Rename to invalidate cache on deploy if the CSS has changed
-MD5=$(md5sum emanote-compiled.css | cut -f1 -d' ')
-CSSFILE="emanote-compiled-${MD5}.css"
-mv emanote-compiled.css $CSSFILE
-
-# Then, replace the twind shim with our generated CSS in all HTML files.
-# 
-# The `sed` hack is from https://fahdshariff.blogspot.com/2012/12/sed-mutli-line-replacement-between-two.html
-echo "Patching HTML ..."
-find . -name \*.html -print0 | xargs -0 \
-	sed -i -n '/CSSSTART/{p;:a;N;/CSSEND/!ba;s/.*\n/\t<link rel="stylesheet" href="'"${CSSFILE}"'" \/>\n/};p'
-
-popd 
+echo "Deprecation Warning: this script should not be used anymore"
