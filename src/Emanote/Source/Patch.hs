@@ -1,16 +1,12 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 
 -- | Pattch model state depending on file change event.
 --
 -- See `mapFsChange` for more details.
 module Emanote.Source.Patch
-  ( mapFsChanges,
+  ( patchModel,
     filePatterns,
     ignorePatterns,
   )
@@ -21,7 +17,6 @@ import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
 import qualified Data.ByteString as BS
 import qualified Data.List.NonEmpty as NEL
-import qualified Data.Map.Strict as Map
 import Data.Time (getCurrentTime)
 import qualified Ema.Helper.FileSystem as EmaFS
 import qualified Emanote.Model as M
@@ -30,7 +25,6 @@ import qualified Emanote.Model.SData as SD
 import Emanote.Model.Type (Model)
 import Emanote.Prelude
   ( BadInput (BadInput),
-    chainM,
     log,
     logD,
   )
@@ -40,33 +34,11 @@ import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import qualified Heist.Extra.TemplateState as T
 import Relude
-import UnliftIO (BufferMode (..), hSetBuffering)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
-import UnliftIO.IO (hFlush)
-
-mapFsChanges :: (MonadIO m, MonadLogger m) => EmaFS.Change Loc (R.FileType R.SourceExt) -> m (Model -> Model)
-mapFsChanges ch = do
-  withBlockBuffering $
-    uncurry mapFsChangesOnExt `chainM` Map.toList ch
-  where
-    -- Temporarily use block buffering before calling an IO action that is
-    -- known ahead to log rapidly, so as to not hamper serial processing speed.
-    withBlockBuffering f =
-      hSetBuffering stdout (BlockBuffering Nothing)
-        *> f
-        <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
-
-mapFsChangesOnExt ::
-  (MonadIO m, MonadLogger m) =>
-  R.FileType R.SourceExt ->
-  Map FilePath (EmaFS.FileAction (NonEmpty (Loc, FilePath))) ->
-  m (Model -> Model)
-mapFsChangesOnExt fpType fps = do
-  uncurry (mapFsChange fpType) `chainM` Map.toList fps
 
 -- | Map a filesystem change to the corresponding model change.
-mapFsChange ::
+patchModel ::
   (MonadIO m, MonadLogger m) =>
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
@@ -75,7 +47,7 @@ mapFsChange ::
   -- | Specific change to the file, along with its paths from other "layers"
   EmaFS.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-mapFsChange fpType fp action =
+patchModel fpType fp action =
   case fpType of
     R.LMLType R.Md ->
       case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of

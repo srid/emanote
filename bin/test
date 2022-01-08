@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -xe
+export PORT=9010
+
+exec nix develop -c ghcid -c "cabal repl exe:emanote" --warnings -T ":main --test"

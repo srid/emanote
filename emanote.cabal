@@ -32,7 +32,30 @@ data-files:
   index.yaml
   templates/**/*.tpl
 
-executable emanote
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -threaded -rtsopts -with-rtsopts=-N
+
+  default-extensions:
+    NoImplicitPrelude
+    FlexibleContexts
+    FlexibleInstances
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    OverloadedStrings
+    ScopedTypeVariables
+    TupleSections
+    ViewPatterns
+
+common library-common
+  import:           haskell-common
+  default-language: Haskell2010
+
+  -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
+  hs-source-dirs:   src
   build-depends:
     , aeson
     , aeson-extra
@@ -50,6 +73,7 @@ executable emanote
     , filepath
     , filepattern
     , fsnotify
+    , hedgehog
     , heist                  >=1.1.0.1
     , ixset-typed
     , lens
@@ -69,6 +93,9 @@ executable emanote
     , shower
     , tagged
     , tagtree
+    , tasty
+    , tasty-hedgehog
+    , tasty-quickcheck
     , text
     , time
     , unliftio
@@ -79,28 +106,13 @@ executable emanote
     , xmlhtml
     , yaml
 
-  ghc-options:
-    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
-    -threaded -rtsopts -with-rtsopts=-N
+  hs-source-dirs:   src
+  default-language: Haskell2010
 
-  default-extensions:
-    NoImplicitPrelude
-    FlexibleContexts
-    FlexibleInstances
-    KindSignatures
-    LambdaCase
-    MultiParamTypeClasses
-    MultiWayIf
-    OverloadedStrings
-    ScopedTypeVariables
-    TupleSections
-    ViewPatterns
-
-  main-is:            Main.hs
-  hs-source-dirs:     src
-  default-language:   Haskell2010
-  autogen-modules:    Paths_emanote
-  other-modules:
+library
+  import:          library-common
+  exposed-modules:
+    Emanote
     Emanote.CLI
     Emanote.Model
     Emanote.Model.Calendar
@@ -110,6 +122,7 @@ executable emanote
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Query
+    Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Model.Task
@@ -133,7 +146,6 @@ executable emanote
     Emanote.Route.SiteRoute
     Emanote.Route.SiteRoute.Class
     Emanote.Route.SiteRoute.Type
-    Emanote.Source
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern
@@ -155,3 +167,10 @@ executable emanote
     Heist.Extra.Splices.Tree
     Heist.Extra.TemplateState
     Paths_emanote
+    Spec
+
+  autogen-modules: Paths_emanote
+
+executable emanote
+  import:  library-common
+  main-is: Main.hs
