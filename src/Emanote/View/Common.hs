@@ -20,11 +20,8 @@ where
 import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
 import Data.Map.Syntax ((##))
-import Data.Some (Some (Some))
 import Data.Version (showVersion)
 import qualified Ema
-import qualified Ema.CLI
-import qualified Ema.Helper.Tailwind as Tailwind
 import qualified Emanote.Model.Note as MN
 import qualified Emanote.Model.Title as Tit
 import Emanote.Model.Type (Model)
@@ -126,7 +123,7 @@ mkTemplateRenderCtx model r meta =
    in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 generatedCssFile :: FilePath
-generatedCssFile = "emanote-windicss-generated.css"
+generatedCssFile = "tailwind.css"
 
 commonSplices ::
   Monad n =>
@@ -150,7 +147,9 @@ commonSplices withCtx model meta routeTitle = do
       -- TODO: Use ?md5 to prevent stale browser caching of CSS.
       pure . RX.renderHtmlNodes $
         if M.inLiveServer model
-          then twindShim $ model ^. M.modelEmaCLIAction
+          then -- Twind shim doesn't reliably work in dev server mode. Let's just use the
+          -- tailwind CDN.
+            cachedTailwindCdn
           else
             H.link
               ! A.href (H.toValue generatedCssFile)
@@ -175,15 +174,6 @@ commonSplices withCtx model meta routeTitle = do
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
   where
-    twindShim :: Some Ema.CLI.Action -> H.Html
-    twindShim action =
-      case action of
-        Some (Ema.CLI.Generate _) ->
-          Tailwind.twindShimUnofficial
-        _ ->
-          -- Twind shim doesn't reliably work in dev server mode. Let's just use the
-          -- tailwind CDN.
-          cachedTailwindCdn
     cachedTailwindCdn =
       H.link
         ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)

@@ -77,7 +77,6 @@ jobs:
           docker load -i *docker-image-emanote.tar.gz
           docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -v $PWD/docs:/data sridca/emanote emanote --layers /data gen /data/.ci/output
           cp -r ./docs/.ci .
-          bash ./.ci/output/_emanote-bin/compile-css
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
