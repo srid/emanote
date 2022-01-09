@@ -4,10 +4,7 @@
     ema.url = "github:srid/ema/master";
     # Use the nixpkgs used by the pinned ema.
     nixpkgs.follows = "ema/nixpkgs";
-    windicss = {
-      url = "github:srid/windicss-nix";
-      flake = false;
-    };
+    tailwind-haskell.url = "github:srid/tailwind-haskell";
     #tagtree = {
     #  url = "github:srid/tagtree";
     #  flake = false;
@@ -30,8 +27,6 @@
           overlays = [ ];
           pkgs =
             import nixpkgs { inherit system overlays; config.allowBroken = true; };
-          windicss =
-            (import inputs.windicss { inherit pkgs; }).shell.nodeDependencies;
           # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
           filter = name: type:
             let
@@ -69,6 +64,7 @@
               withHoogle = true;
               overrides = self: super: with pkgs.haskell.lib; {
                 ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
+                tailwind = inputs.tailwind-haskell.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
                 # Jailbreak heist to allow newer dlist
                 heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
@@ -87,15 +83,13 @@
                     ormolu
                     pkgs.nixpkgs-fmt
 
-                    windicss
+                    inputs.tailwind-haskell.defaultPackage.${system}
                   ]);
             };
         in
         {
           # Used by `nix build` & `nix run`
           defaultPackage = project false;
-
-          inherit windicss;
 
           # Used by `nix develop`
           devShell = project true;
