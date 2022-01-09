@@ -126,7 +126,7 @@ mkTemplateRenderCtx model r meta =
    in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 generatedCssFile :: FilePath
-generatedCssFile = "emanote-windicss-generated.css"
+generatedCssFile = "tailwind.css"
 
 commonSplices ::
   Monad n =>
