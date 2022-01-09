@@ -7,6 +7,10 @@
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.flake-utils.follows = "flake-utils";
+    tailwind-haskell.inputs.flake-compat.follows = "flake-compat";
+    ema.inputs.flake-utils.follows = "flake-utils";
+    ema.inputs.flake-compat.follows = "flake-compat";
+
     #tagtree = {
     #  url = "github:srid/tagtree";
     #  flake = false;
