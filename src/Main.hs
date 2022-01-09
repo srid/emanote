@@ -23,7 +23,6 @@ import qualified Spec
 import System.Directory (renameFile)
 import qualified System.Environment as Env
 import System.FilePath ((</>))
-import UnliftIO.Process (callProcess)
 import qualified Web.Tailwind as Tailwind
 
 main :: IO ()
