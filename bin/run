@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -xe
-export PORT=9010
+export PORT=${PORT:-9010}
 
-exec nix develop -c ghcid -c 'cabal repl exe:emanote' --warnings -T ":main -L ./docs"
+exec nix develop -c ghcid -c 'cabal repl exe:emanote' --warnings -T ":main -L ./docs run --port $PORT"

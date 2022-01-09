@@ -105,12 +105,10 @@ in
       };
       Install.WantedBy = [ cfg.systemdTarget ];
       Service = {
-        Environment = [
-          "PORT=${builtins.toString cfg.port}"
-          "HOST=${cfg.host}"
-        ];
         ExecStart = ''
-          ${cfg.package}/bin/emanote --layers "${lib.concatStringsSep ";" layers}"
+          ${cfg.package}/bin/emanote \
+            --layers "${lib.concatStringsSep ";" layers}"
+            run --host=${cfg.host} --port=${builtins.toString cfg.port}
         '';
       };
     };

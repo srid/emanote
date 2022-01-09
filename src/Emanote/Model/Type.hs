@@ -14,7 +14,7 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
-import Data.Some (Some (Some))
+import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -69,7 +69,7 @@ modelReadyForView =
 
 -- | Are we running in live server, or statically generated website?
 inLiveServer :: Model -> Bool
-inLiveServer = (== Some Ema.CLI.Run) . _modelEmaCLIAction
+inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
