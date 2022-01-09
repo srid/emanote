@@ -20,7 +20,6 @@ import Main.Utf8 (withUtf8)
 import qualified Paths_emanote
 import Relude
 import qualified Spec
-import System.Directory (renameFile)
 import qualified System.Environment as Env
 import System.FilePath ((</>))
 import qualified Web.Tailwind as Tailwind
@@ -59,7 +58,7 @@ run cli = do
       runStdoutLoggingT . Tailwind.runTailwind $
         def
           & Tailwind.tailwindConfig . Tailwind.tailwindConfigContent .~ genPaths
+          & Tailwind.tailwindOutput .~ cssPath
           & Tailwind.tailwindMode .~ Tailwind.Production
-      renameFile "tailwind.css" cssPath
     _ ->
       pure ()
