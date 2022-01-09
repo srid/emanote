@@ -1,8 +1,10 @@
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
 module Main where
 
+import Data.Dependent.Sum (DSum ((:=>)))
 import qualified Ema
 import qualified Ema.CLI
 import qualified Emanote
@@ -19,7 +21,7 @@ import Relude
 import qualified Spec
 import qualified System.Environment as Env
 import System.FilePath ((</>))
-import System.Which
+import System.Which (staticWhich)
 import UnliftIO.Process (callProcess)
 
 windicss :: FilePath
@@ -52,8 +54,8 @@ run cli = do
         m
         (Model.emptyModel act)
         Patch.patchModel
-  case (Ema.CLI.action (CLI.emaCli cli), res) of
-    (Ema.CLI.Generate outPath, Right (Just genPaths)) -> do
+  case res of
+    Right (Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       let cssPath = outPath </> generatedCssFile
       putStrLn $ "Compiling CSS using windicss: " <> cssPath
       callProcess windicss $ ["-t", "-o", cssPath] <> genPaths

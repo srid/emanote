@@ -14,6 +14,7 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import qualified Data.IxSet.Typed as Ix
 import qualified Data.Map.Strict as Map
+import Data.Some (Some (Some))
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Ema (Slug)
@@ -46,7 +47,7 @@ data Status = Status_Loading | Status_Ready
 
 data Model = Model
   { _modelStatus :: Status,
-    _modelEmaCLIAction :: Ema.CLI.Action,
+    _modelEmaCLIAction :: Some Ema.CLI.Action,
     _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelSData :: IxSData,
@@ -58,7 +59,7 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Ema.CLI.Action -> Model
+emptyModel :: Some Ema.CLI.Action -> Model
 emptyModel act =
   Model Status_Loading act Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
@@ -68,7 +69,7 @@ modelReadyForView =
 
 -- | Are we running in live server, or statically generated website?
 inLiveServer :: Model -> Bool
-inLiveServer = (== Ema.CLI.Run) . _modelEmaCLIAction
+inLiveServer = (== Some Ema.CLI.Run) . _modelEmaCLIAction
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =

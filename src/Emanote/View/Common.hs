@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Emanote.View.Common
   ( commonSplices,
@@ -19,6 +20,7 @@ where
 import Control.Lens.Operators ((^.))
 import qualified Data.Aeson.Types as Aeson
 import Data.Map.Syntax ((##))
+import Data.Some (Some (Some))
 import Data.Version (showVersion)
 import qualified Ema
 import qualified Ema.CLI
@@ -112,13 +114,12 @@ mkTemplateRenderCtx ::
   Aeson.Value ->
   TemplateRenderCtx n
 mkTemplateRenderCtx model r meta =
-  let withNoteRenderer = mkRendererFromMeta model meta
-      withInlineCtx =
-        withNoteRenderer inlineRenderers () ()
+  let withInlineCtx =
+        mkRendererFromMeta model meta inlineRenderers () ()
       withLinkInlineCtx =
-        withNoteRenderer linkInlineRenderers () ()
+        mkRendererFromMeta model meta linkInlineRenderers () ()
       withBlockCtx =
-        withNoteRenderer noteRenderers () r
+        mkRendererFromMeta model meta noteRenderers () r
       -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \x ->
         Tit.titleSplice x (preparePandoc model) titleDoc
@@ -174,10 +175,10 @@ commonSplices withCtx model meta routeTitle = do
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
   where
-    twindShim :: Ema.CLI.Action -> H.Html
+    twindShim :: Some Ema.CLI.Action -> H.Html
     twindShim action =
       case action of
-        Ema.CLI.Generate _ ->
+        Some (Ema.CLI.Generate _) ->
           Tailwind.twindShimUnofficial
         _ ->
           -- Twind shim doesn't reliably work in dev server mode. Let's just use the
