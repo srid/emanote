@@ -13,7 +13,7 @@ Emanote is supported on all popular operating systems through [Nix].
 
 To test your Emanote install,
 
-```sh
+```bash
 # Run live server (host and port are optional)
 cd /path/to/notebook
 emanote --host=0.0.0.0 --port=8001

@@ -2,7 +2,7 @@
 
 The official Docker image, which is built in CI, can be used as follows:
 
-```sh
+```bash
 cd /path/to/notebook
 mkdir output.docker
 docker run \
