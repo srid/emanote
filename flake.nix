@@ -6,6 +6,7 @@
     tailwind-haskell.url = "github:srid/tailwind-haskell";
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
+    tailwind-haskell.inputs.flake-utils.follows = "flake-utils";
     #tagtree = {
     #  url = "github:srid/tagtree";
     #  flake = false;
