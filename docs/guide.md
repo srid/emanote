@@ -35,6 +35,7 @@ Mega features,
 - mdBook like search (emanote should provide the index)
 - Ref: [top requested neuron features](https://github.com/srid/neuron/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions)
 - Tailwind styling in Markdown
+  - note: 2.2 (cdn) in liveserver, but 3.x in gen.
 - HTML template system
   - template hooks (see [here](https://github.com/srid/emanote/discussions/131))
 - compiled css: via _emanote-bin/compile-css script

@@ -1,9 +1,10 @@
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Main where
 
+import Control.Lens.Operators
+import Control.Monad.Logger (runStdoutLoggingT)
+import Data.Default (Default (def))
 import Data.Dependent.Sum (DSum ((:=>)))
 import qualified Ema
 import qualified Ema.CLI
@@ -19,13 +20,11 @@ import Main.Utf8 (withUtf8)
 import qualified Paths_emanote
 import Relude
 import qualified Spec
+import System.Directory (renameFile)
 import qualified System.Environment as Env
 import System.FilePath ((</>))
-import System.Which (staticWhich)
 import UnliftIO.Process (callProcess)
-
-windicss :: FilePath
-windicss = $(staticWhich "windicss")
+import qualified Web.Tailwind as Tailwind
 
 main :: IO ()
 main =
@@ -57,7 +56,11 @@ run cli = do
   case res of
     Right (Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       let cssPath = outPath </> generatedCssFile
-      putStrLn $ "Compiling CSS using windicss: " <> cssPath
-      callProcess windicss $ ["-t", "-o", cssPath] <> genPaths
+      putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
+      runStdoutLoggingT . Tailwind.runTailwind $
+        def
+          & Tailwind.tailwindConfig . Tailwind.tailwindConfigContent .~ genPaths
+          & Tailwind.tailwindMode .~ Tailwind.Production
+      renameFile "tailwind.css" cssPath
     _ ->
       pure ()
