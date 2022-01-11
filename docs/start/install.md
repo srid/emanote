@@ -8,7 +8,7 @@ order: 1
 
 Emanote is supported on all popular operating systems through [Nix].
 
-1. Install [Nix] (for Windows, see [[wsl]])
+1. Install [Nix] (for Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230))
 2. Run `nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz` to install Emanote
 
 To test your Emanote install,
