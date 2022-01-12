@@ -3,7 +3,7 @@
   inputs = {
     ema.url = "github:srid/ema/master";
     # Use the nixpkgs used by the pinned ema.
-    tailwind-haskell.url = "github:srid/tailwind-haskell";
+    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.flake-utils.follows = "flake-utils";
