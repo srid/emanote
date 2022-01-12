@@ -107,7 +107,7 @@ in
       Service = {
         ExecStart = ''
           ${cfg.package}/bin/emanote \
-            --layers "${lib.concatStringsSep ";" layers}"
+            --layers "${lib.concatStringsSep ";" layers}" \
             run --host=${cfg.host} --port=${builtins.toString cfg.port}
         '';
       };
