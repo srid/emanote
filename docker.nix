@@ -37,6 +37,9 @@ in
     Volumes = {
       "/data" = { };
     };
+    Tmpfs = {
+      "/tmp" = { };
+    };
     Cmd = [ "${emanote}/bin/emanote" ];
   };
 }
