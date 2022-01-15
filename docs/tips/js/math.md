@@ -15,15 +15,10 @@ page:
     page:
       headHtml: |
         <script>
-          window.mathjaxInitialTypesetDone = false;
           window.MathJax = {
             startup: {
               ready: () => {
                 MathJax.startup.defaultReady();
-                MathJax.startup.promise.then(() => {
-                  console.log('MathJax typesetting complete');
-                  window.mathjaxInitialTypesetDone = true;
-                });
               }
             }
           };
