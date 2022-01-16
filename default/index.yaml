@@ -89,18 +89,14 @@ js:
     </script>
   mathjax: |
     <script>
-      window.mathjaxInitialTypesetDone = false;
       window.MathJax = {
         startup: {
           ready: () => {
             MathJax.startup.defaultReady();
-            MathJax.startup.promise.then(() => {
-              console.log('MathJax typesetting complete');
-              window.mathjaxInitialTypesetDone = true;
-            });
           }
         }
       };
     </script>
     <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 
