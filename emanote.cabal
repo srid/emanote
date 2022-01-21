@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.8.2
+version:            0.4.8.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -70,7 +70,7 @@ common library-common
     , data-default
     , dependent-sum
     , directory
-    , ema                    >=0.2
+    , ema                    >=0.4
     , filepath
     , filepattern
     , fsnotify
