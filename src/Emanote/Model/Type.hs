@@ -17,6 +17,7 @@ import qualified Data.Map.Strict as Map
 import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
+import Data.UUID
 import Ema (Slug)
 import qualified Ema.CLI
 import qualified Ema.Helper.PathTree as PathTree
@@ -48,6 +49,8 @@ data Status = Status_Loading | Status_Ready
 data Model = Model
   { _modelStatus :: Status,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
+    -- | An unique ID for this process's model. ID changes across processes.
+    _modelInstanceID :: UUID,
     _modelNotes :: IxNote,
     _modelRels :: IxRel,
     _modelSData :: IxSData,
@@ -59,9 +62,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Some Ema.CLI.Action -> Model
-emptyModel act =
-  Model Status_Loading act Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Some Ema.CLI.Action -> UUID -> Model
+emptyModel act instanceId =
+  Model Status_Loading act instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =

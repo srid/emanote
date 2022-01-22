@@ -6,6 +6,7 @@ import Control.Lens.Operators
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.Default (Default (def))
 import Data.Dependent.Sum (DSum ((:=>)))
+import qualified Data.UUID.V4 as UUID
 import qualified Ema
 import qualified Ema.CLI
 import qualified Emanote
@@ -43,13 +44,14 @@ run cli = do
   res <-
     Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m -> do
       defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+      instanceId <- liftIO UUID.nextRandom
       let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
       Emanote.emanate
         layers
         Pattern.filePatterns
         Pattern.ignorePatterns
         m
-        (Model.emptyModel act)
+        (Model.emptyModel act instanceId)
         Patch.patchModel
   case res of
     Right (Ema.CLI.Generate outPath :=> Identity genPaths) -> do
