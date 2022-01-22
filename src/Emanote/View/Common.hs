@@ -144,15 +144,16 @@ commonSplices withCtx model meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim"
     ## do
-      -- TODO: Use ?md5 to prevent stale browser caching of CSS.
       pure . RX.renderHtmlNodes $
         if M.inLiveServer model
-          then -- Twind shim doesn't reliably work in dev server mode. Let's just use the
-          -- tailwind CDN.
+          then do
+            -- Twind shim doesn't reliably work in dev server mode. Let's just use the
+            -- tailwind CDN.
             cachedTailwindCdn
-          else
+          else do
             H.link
-              ! A.href (H.toValue generatedCssFile)
+              -- TODO: Use ?md5 to prevent stale browser caching of CSS.
+              ! A.href (H.toValue $ cannotBeCached generatedCssFile)
               ! A.rel "stylesheet"
               ! A.type_ "text/css"
   "ema:version"
@@ -174,6 +175,11 @@ commonSplices withCtx model meta routeTitle = do
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
   where
+    -- A hack to force the browser not to cache the CSS, because we are not md5
+    -- hashing the CSS yet (because the CSS is generated *after* the HTML files
+    -- are generated.)
+    -- For a proper way to do this, see: https://github.com/srid/ema/issues/20
+    cannotBeCached url = url <> "?instanceId=" <> show (model ^. M.modelInstanceID)
     cachedTailwindCdn =
       H.link
         ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
