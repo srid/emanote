@@ -22,11 +22,7 @@ jobs:
           name: srid
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-      - name: Tests
-        id: test
-        run: |
-          nix develop -c cabal run -- emanote --test
+          # authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build as docker img
         id: build
         run: |
@@ -54,7 +50,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-img
-      - name: Build & Publish Docker image to Docker Hub
+      - name: Publish Docker image to Docker Hub
         run: |
           docker load -i *docker-image-emanote.tar.gz
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
