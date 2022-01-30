@@ -1,8 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 
 module Emanote.Route.SiteRoute.Type
   ( SiteRoute (..),
@@ -27,33 +23,37 @@ import Data.WorldPeace.Union
     openUnionLift,
   )
 import Ema (Slug (unSlug))
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
-import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
-import qualified Emanote.Route.R as R
+import Emanote.Route.R qualified as R
 import Relude hiding (show)
 import Text.Show (show)
 
 data IndexR = IndexR
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 newtype TagIndexR = TagIndexR [HT.TagNode]
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 data ExportR = ExportR
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 data TasksR = TasksR
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}
-  deriving (Eq, Show, Ord)
+  deriving stock (Eq, Show, Ord)
 
 -- | An ambiguous route
 newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
-  deriving (Eq, Show, Ord)
+  deriving stock (Eq, Show, Ord)
 
 type VirtualRoute' =
   '[ IndexR,
@@ -84,7 +84,7 @@ type SiteRoute' =
    ]
 
 newtype SiteRoute = SiteRoute {unSiteRoute :: OpenUnion SiteRoute'}
-  deriving (Eq)
+  deriving stock (Eq)
 
 instance Show SiteRoute where
   show (SiteRoute sr) =

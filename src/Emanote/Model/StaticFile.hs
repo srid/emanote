@@ -1,18 +1,14 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.StaticFile where
 
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
+import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Time (UTCTime)
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import qualified Emanote.Route as R
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Emanote.Route qualified as R
 import Relude
 
 data StaticFile = StaticFile
@@ -21,7 +17,8 @@ data StaticFile = StaticFile
     -- | Indicates that this file was updated no latter than the given time.
     _staticFileTime :: UTCTime
   }
-  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON)
 
 type StaticFileIxs = '[R.R 'R.AnyExt, WL.WikiLink]
 

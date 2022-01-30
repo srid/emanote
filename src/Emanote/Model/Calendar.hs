@@ -1,17 +1,15 @@
-{-# LANGUAGE TypeApplications #-}
-
 -- | A primitive module to eventually pave way towards first-class "calendar"
 -- (daily notes, etc.) support in Emanote; either built-in or as plugin.
 module Emanote.Model.Calendar where
 
-import qualified Emanote.Model.Note as N
+import Emanote.Model.Note qualified as N
 import Emanote.Model.Title (Title)
 import Emanote.Model.Type (Model, modelLookupTitle)
 import Emanote.Route (LMLRoute)
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Relude
-import qualified Text.Megaparsec as M
-import qualified Text.Megaparsec.Char as M
+import Text.Megaparsec qualified as M
+import Text.Megaparsec.Char qualified as M
 
 -- HACK: This is so that calendar backlinks are sorted properly.
 backlinkSortKey :: Model -> LMLRoute -> Down Title

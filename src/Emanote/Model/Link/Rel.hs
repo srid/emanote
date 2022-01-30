@@ -1,10 +1,5 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Link.Rel where
 
@@ -12,16 +7,16 @@ import Control.Lens.Operators as Lens ((^.))
 import Control.Lens.TH (makeLenses)
 import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.Map.Strict as Map
+import Data.IxSet.Typed qualified as Ix
+import Data.Map.Strict qualified as Map
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (LMLRoute, ModelRoute)
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute.Type as SR
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute.Type qualified as SR
 import Relude
-import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.LinkContext as LC
+import Text.Pandoc.Definition qualified as B
+import Text.Pandoc.LinkContext qualified as LC
 
 -- | A relation from one note to anywhere in the model.
 --
@@ -35,7 +30,7 @@ data Rel = Rel
     -- | The relation context in LML
     _relCtx :: [B.Block]
   }
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show)
 
 -- | A link target that has not been resolved (using model) yet.
 --
@@ -46,7 +41,8 @@ data UnresolvedRelTarget
   = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
   | URTResource ModelRoute
   | URTVirtual SR.VirtualRoute
-  deriving (Eq, Show, Ord, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 type RelIxs = '[LMLRoute, UnresolvedRelTarget]
 
@@ -95,7 +91,8 @@ data ResolvedRelTarget a
   = RRTMissing
   | RRTAmbiguous (NonEmpty a)
   | RRTFound a
-  deriving (Eq, Show, Ord, Functor, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Functor, Generic)
+  deriving anyclass (ToJSON)
 
 resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
 resolvedRelTargetFromCandidates xs =

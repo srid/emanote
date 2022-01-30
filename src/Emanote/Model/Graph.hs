@@ -1,24 +1,21 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Model.Graph where
 
 import Control.Lens.Operators as Lens ((^.))
 import Data.IxSet.Typed ((@+), (@=))
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
+import Data.IxSet.Typed qualified as Ix
+import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Data.Tree (Forest, Tree (Node))
-import qualified Emanote.Model.Calendar as Calendar
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.Resolve as Resolve
-import qualified Emanote.Model.Note as MN
+import Emanote.Model.Calendar qualified as Calendar
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type (Model, modelRels)
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import qualified Emanote.Route as R
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
 import Relude hiding (empty)
-import qualified Text.Pandoc.Definition as B
+import Text.Pandoc.Definition qualified as B
 
 -- TODO: Do breadth-first instead of depth-first
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute

@@ -1,21 +1,16 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE StandaloneDeriving #-}
 
 module Emanote.Route.Ext where
 
 import Data.Aeson (ToJSON)
 import Data.Data (Data)
 import Relude hiding (show)
-import qualified System.FilePath as FP
+import System.FilePath qualified as FP
 
 data SourceExt = SourceExt
-  deriving (Eq, Ord, Show, Read, Data, Generic, ToJSON)
+  deriving stock (Eq, Ord, Show, Read, Data, Generic)
+  deriving anyclass (ToJSON)
 
 data FileType a where
   LMLType :: LML -> FileType SourceExt
@@ -26,17 +21,18 @@ data FileType a where
   -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
   -- "catch all" type to capture files using an arbitrary.
   AnyExt :: FileType SourceExt
-  deriving (Typeable)
+  deriving stock (Typeable)
 
-deriving instance Eq a => Eq (FileType a)
+deriving stock instance Eq a => Eq (FileType a)
 
-deriving instance Ord a => Ord (FileType a)
+deriving stock instance Ord a => Ord (FileType a)
 
 -- | A lightweight markup language
 --
 -- https://en.wikipedia.org/wiki/Lightweight_markup_language
 data LML = Md
-  deriving (Generic, Eq, Ord, Typeable, Data, ToJSON)
+  deriving stock (Generic, Eq, Ord, Typeable, Data)
+  deriving anyclass (ToJSON)
 
 -- | The `HasExt` class's responsibility is to allow dealing with basepath sans
 -- extension (and vice-versa).

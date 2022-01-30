@@ -1,21 +1,20 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module Emanote.View.Export (renderGraphExport) where
 
 import Control.Lens ((^.))
 import Data.Aeson (ToJSON)
-import qualified Data.Aeson as Aeson
-import qualified Data.Map.Strict as Map
+import Data.Aeson qualified as Aeson
+import Data.Map.Strict qualified as Map
 import Emanote.Model (Model)
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Graph as G
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.Resolve as Resolve
-import qualified Emanote.Model.Title as Tit
+import Emanote.Model qualified as M
+import Emanote.Model.Graph qualified as G
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Title qualified as Tit
 import Emanote.Route (LMLRoute, lmlRouteCase)
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute as SR
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Relude
 
@@ -23,7 +22,8 @@ data Export = Export
   { version :: Word,
     files :: Map Text SourceFile
   }
-  deriving (Generic, ToJSON)
+  deriving stock (Generic)
+  deriving anyclass (ToJSON)
 
 currentVersion :: Word
 currentVersion = 1
@@ -37,13 +37,15 @@ data SourceFile = SourceFile
     meta :: Aeson.Value,
     links :: [Link]
   }
-  deriving (Generic, ToJSON)
+  deriving stock (Generic)
+  deriving anyclass (ToJSON)
 
 data Link = Link
   { unresolvedRelTarget :: Rel.UnresolvedRelTarget,
     resolvedRelTarget :: Rel.ResolvedRelTarget Text
   }
-  deriving (Generic, ToJSON)
+  deriving stock (Generic)
+  deriving anyclass (ToJSON)
 
 renderGraphExport :: Model -> LByteString
 renderGraphExport model =

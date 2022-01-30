@@ -1,10 +1,6 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Source.Pattern where
 
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Relude
 import System.FilePattern (FilePattern)
 

@@ -1,30 +1,28 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Emanote.Pandoc.Renderer.Embed where
 
 import Control.Lens.Operators ((^.))
 import Data.Map.Syntax ((##))
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Emanote.Model (Model)
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.Resolve as Resolve
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.StaticFile as SF
-import qualified Emanote.Model.Title as Tit
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.StaticFile qualified as SF
+import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
-import qualified Emanote.Pandoc.Link as Link
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Pandoc.Link qualified as Link
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
-import qualified Emanote.Pandoc.Renderer.Url as RenderedUrl
-import qualified Emanote.Route.SiteRoute as SF
-import qualified Emanote.Route.SiteRoute as SR
-import qualified Heist as H
-import qualified Heist.Extra as HE
+import Emanote.Pandoc.Renderer.Url qualified as RenderedUrl
+import Emanote.Route.SiteRoute qualified as SF
+import Emanote.Route.SiteRoute qualified as SR
+import Heist qualified as H
+import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice)
-import qualified Heist.Extra.Splices.Pandoc as HP
-import qualified Heist.Interpreted as HI
+import Heist.Extra.Splices.Pandoc qualified as HP
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Definition as B
+import Text.Pandoc.Definition qualified as B
 
 embedBlockWikiLinkResolvingSplice ::
   Monad n => PandocBlockRenderer n i b

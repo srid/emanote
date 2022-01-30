@@ -23,7 +23,7 @@ data Loc
     LocUser Int FilePath
   | -- | The default location (ie., emanote default layer)
     LocDefault FilePath
-  deriving (Eq, Ord, Show)
+  deriving stock (Eq, Ord, Show)
 
 defaultLayer :: FilePath -> (Loc, FilePath)
 defaultLayer fp =

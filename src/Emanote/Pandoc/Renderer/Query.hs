@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Emanote.Pandoc.Renderer.Query
   ( queryResolvingSplice,
     noteSpliceMap,
@@ -7,24 +5,24 @@ module Emanote.Pandoc.Renderer.Query
 where
 
 import Control.Lens.Operators ((^.))
-import qualified Data.List as List
+import Data.List qualified as List
 import Data.Map.Syntax ((##))
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Emanote.Model (Model)
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.Query as Q
-import qualified Emanote.Model.Title as Tit
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.Query qualified as Q
+import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
 import Emanote.Route (LMLRoute)
-import qualified Emanote.Route.SiteRoute as SR
-import qualified Heist as H
-import qualified Heist.Extra as HE
+import Emanote.Route.SiteRoute qualified as SR
+import Heist qualified as H
+import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (RenderCtx)
-import qualified Heist.Interpreted as HI
-import qualified Heist.Splices.Json as HJ
+import Heist.Interpreted qualified as HI
+import Heist.Splices.Json qualified as HJ
 import Relude
-import qualified Text.Pandoc.Definition as B
+import Text.Pandoc.Definition qualified as B
 
 queryResolvingSplice :: forall n i. Monad n => PandocBlockRenderer n i LMLRoute
 queryResolvingSplice model _nr ctx noteRoute blk = do

@@ -1,50 +1,46 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 
 module Emanote.Model.Type where
 
 import Control.Lens.Operators as Lens ((%~), (.~), (^.))
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
+import Data.Aeson qualified as Aeson
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.Map.Strict as Map
+import Data.IxSet.Typed qualified as Ix
+import Data.Map.Strict qualified as Map
 import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Data.UUID
 import Ema (Slug)
-import qualified Ema.CLI
-import qualified Ema.Helper.PathTree as PathTree
+import Ema.CLI qualified
+import Ema.Helper.PathTree qualified as PathTree
 import Emanote.Model.Link.Rel (IxRel)
-import qualified Emanote.Model.Link.Rel as Rel
+import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note
   ( IxNote,
     Note,
   )
-import qualified Emanote.Model.Note as N
+import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
   )
 import Emanote.Model.Task (IxTask)
-import qualified Emanote.Model.Task as Task
-import qualified Emanote.Model.Title as Tit
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Model.Task qualified as Task
+import Emanote.Model.Title qualified as Tit
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Heist.Extra.TemplateState (TemplateState)
 import Relude
 
 data Status = Status_Loading | Status_Ready
-  deriving (Eq, Show)
+  deriving stock (Eq, Show)
 
 data Model = Model
   { _modelStatus :: Status,

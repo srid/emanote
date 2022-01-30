@@ -1,11 +1,9 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Pandoc.Link where
 
 import Ema.Helper.Markdown (plainify)
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Relude
-import qualified Text.Pandoc.Definition as B
+import Text.Pandoc.Definition qualified as B
 
 -- | A Pandoc inline node that refers to something else.
 --
@@ -13,7 +11,7 @@ import qualified Text.Pandoc.Definition as B
 data InlineRef
   = InlineLink
   | InlineImage
-  deriving (Eq, Show)
+  deriving stock (Eq, Show)
 
 parseInlineRef :: B.Inline -> Maybe (InlineRef, B.Attr, [B.Inline], (Text, Text))
 parseInlineRef = \case

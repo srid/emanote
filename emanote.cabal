@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.10.1
+version:            0.4.10.2
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -35,19 +35,49 @@ data-files:
 common haskell-common
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
-    -threaded -rtsopts -with-rtsopts=-N
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
 
   default-extensions:
     NoImplicitPrelude
+    NoStarIsType
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
     FlexibleContexts
     FlexibleInstances
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    ImportQualifiedPost
     KindSignatures
     LambdaCase
     MultiParamTypeClasses
     MultiWayIf
+    NumericUnderscores
     OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    RankNTypes
     ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
     TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
     ViewPatterns
 
 common library-common

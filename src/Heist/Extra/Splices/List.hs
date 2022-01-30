@@ -1,10 +1,8 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Heist.Extra.Splices.List where
 
 import Data.Map.Syntax ((##))
-import qualified Heist as H
-import qualified Heist.Interpreted as HI
+import Heist qualified as H
+import Heist.Interpreted qualified as HI
 import Relude
 
 -- | A splice that applies a non-empty list

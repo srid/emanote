@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
-
 module Emanote.Route.SiteRoute
   ( SiteRoute (..),
     IndexR (..),

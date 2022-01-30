@@ -4,7 +4,7 @@ module Emanote.View.LiveServerFiles
   )
 where
 
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Relude
 
 -- TODO: Check this compile-time using TH?

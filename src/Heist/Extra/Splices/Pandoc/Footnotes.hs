@@ -1,17 +1,17 @@
 module Heist.Extra.Splices.Pandoc.Footnotes where
 
-import qualified Data.List as List
+import Data.List qualified as List
 import Data.Map.Syntax ((##))
-import qualified Heist as H
+import Heist qualified as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx (rootNode))
 import Heist.Extra.Splices.Pandoc.Render (renderPandocWith)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.Pandoc.Walk as W
-import qualified Text.XmlHtml as X
+import Text.Pandoc.Walk qualified as W
+import Text.XmlHtml qualified as X
 
 type Footnotes = [[B.Block]]
 

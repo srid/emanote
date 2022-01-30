@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE TypeApplications #-}
-
 -- | Pattch model state depending on file change event.
 --
 -- See `mapFsChange` for more details.
@@ -15,13 +11,13 @@ where
 import Control.Exception (throw)
 import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (MonadLogger)
-import qualified Data.ByteString as BS
-import qualified Data.List.NonEmpty as NEL
+import Data.ByteString qualified as BS
+import Data.List.NonEmpty qualified as NEL
 import Data.Time (getCurrentTime)
-import qualified Ema.Helper.FileSystem as EmaFS
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Note as N
-import qualified Emanote.Model.SData as SD
+import Ema.Helper.FileSystem qualified as EmaFS
+import Emanote.Model qualified as M
+import Emanote.Model.Note qualified as N
+import Emanote.Model.SData qualified as SD
 import Emanote.Model.Type (Model)
 import Emanote.Prelude
   ( BadInput (BadInput),
@@ -29,10 +25,10 @@ import Emanote.Prelude
     logD,
   )
 import Emanote.Route (liftLMLRoute)
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
-import qualified Heist.Extra.TemplateState as T
+import Heist.Extra.TemplateState qualified as T
 import Relude
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)

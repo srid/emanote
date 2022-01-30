@@ -6,28 +6,18 @@
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.inputs.flake-utils.follows = "flake-utils";
-    tailwind-haskell.inputs.flake-compat.follows = "flake-compat";
-    ema.inputs.flake-utils.follows = "flake-utils";
-    ema.inputs.flake-compat.follows = "flake-compat";
+    tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
+    tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
+    flake-utils.follows = "ema/flake-utils";
+    flake-compat.follows = "ema/flake-compat";
 
-    #tagtree = {
-    #  url = "github:srid/tagtree";
-    #  flake = false;
-    #};
     heist = {
       url = "github:srid/heist/emanote";
       flake = false;
     };
-
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
-    };
   };
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" "aarch64-linux" ]
+    flake-utils.lib.eachDefaultSystem
       (system:
         let
           overlays = [ ];

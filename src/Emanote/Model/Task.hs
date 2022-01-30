@@ -1,22 +1,19 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Task where
 
 import Control.Lens.Operators ((^.))
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
+import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import qualified Data.IxSet.Typed as Ix
+import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Note (Note)
-import qualified Emanote.Model.Note as N
-import qualified Emanote.Route as R
-import qualified Heist.Extra.Splices.Pandoc.TaskList as TaskList
+import Emanote.Model.Note qualified as N
+import Emanote.Route qualified as R
+import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
 import Relude
-import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.Builder qualified as B
 
 data Task = Task
   { _taskRoute :: R.LMLRoute,
@@ -26,7 +23,8 @@ data Task = Task
     _taskDescription :: [B.Inline],
     _taskChecked :: Bool
   }
-  deriving (Eq, Show, Generic, Aeson.ToJSON)
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Aeson.ToJSON)
 
 instance Ord Task where
   (<=) = (<=) `on` (_taskRoute &&& _taskNum)

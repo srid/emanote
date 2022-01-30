@@ -1,29 +1,27 @@
-{-# LANGUAGE GADTs #-}
-
 module Main where
 
 import Control.Lens.Operators
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.Default (Default (def))
 import Data.Dependent.Sum (DSum ((:=>)))
-import qualified Data.UUID.V4 as UUID
-import qualified Ema
-import qualified Ema.CLI
-import qualified Emanote
-import qualified Emanote.CLI as CLI
-import qualified Emanote.Model as Model
-import qualified Emanote.Source.Loc as Loc
-import qualified Emanote.Source.Patch as Patch
-import qualified Emanote.Source.Pattern as Pattern
-import qualified Emanote.View as View
+import Data.UUID.V4 qualified as UUID
+import Ema qualified
+import Ema.CLI qualified
+import Emanote qualified
+import Emanote.CLI qualified as CLI
+import Emanote.Model qualified as Model
+import Emanote.Source.Loc qualified as Loc
+import Emanote.Source.Patch qualified as Patch
+import Emanote.Source.Pattern qualified as Pattern
+import Emanote.View qualified as View
 import Emanote.View.Common (generatedCssFile)
 import Main.Utf8 (withUtf8)
-import qualified Paths_emanote
+import Paths_emanote qualified
 import Relude
-import qualified Spec
-import qualified System.Environment as Env
+import Spec qualified
+import System.Environment qualified as Env
 import System.FilePath ((</>))
-import qualified Web.Tailwind as Tailwind
+import Web.Tailwind qualified as Tailwind
 
 main :: IO ()
 main =

@@ -1,14 +1,14 @@
 module Emanote.Model.Link.Resolve where
 
 import Data.WorldPeace.Union (openUnionLift)
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.StaticFile as SF
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Type (Model)
-import qualified Emanote.Model.Type as M
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute as SR
+import Emanote.Model.Type qualified as M
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Relude
 
 resolveUnresolvedRelTarget ::

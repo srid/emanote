@@ -1,24 +1,22 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.View.TagIndex (renderTagIndex) where
 
-import qualified Data.List as List
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
+import Data.List qualified as List
+import Data.List.NonEmpty qualified as NE
+import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Data.Tree (Forest, Tree)
-import qualified Data.Tree as Tree
+import Data.Tree qualified as Tree
 import Emanote.Model (Model)
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Meta as Meta
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Pandoc.Renderer.Query as PF
-import qualified Emanote.Route.SiteRoute.Class as SR
+import Emanote.Model qualified as M
+import Emanote.Model.Meta qualified as Meta
+import Emanote.Model.Note qualified as MN
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Pandoc.Renderer.Query qualified as PF
+import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, renderModelTemplate)
-import qualified Heist.Extra.Splices.List as Splices
+import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
 
 -- An index view into the notebook indexed by the given tag path.
@@ -34,7 +32,7 @@ data TagIndex = TagIndex
     -- If the tag path being index is "foo/bar", this will contain "foo/bar/qux".
     tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
   }
-  deriving (Eq)
+  deriving stock (Eq)
 
 mkTagIndex :: Model -> [HT.TagNode] -> TagIndex
 mkTagIndex model tagPath' =

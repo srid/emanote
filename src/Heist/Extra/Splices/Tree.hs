@@ -1,16 +1,10 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Heist.Extra.Splices.Tree (treeSplice) where
 
 import Data.Map.Syntax ((##))
 import Data.Tree (Tree (..))
-import qualified Heist as H
-import qualified Heist.Interpreted as HI
-import qualified Heist.Splices as Heist
+import Heist qualified as H
+import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as Heist
 import Relude
 
 treeSplice ::

@@ -1,8 +1,8 @@
+{-# LANGUAGE RecordWildCards #-}
+
 -- TODO: Eventually move `Heist.Extra` to its own library
 -- Consider first the full practical range of template patterns,
 -- https://softwaresimply.blogspot.com/2011/04/looping-and-control-flow-in-heist.html
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Heist.Extra.TemplateState
   ( TemplateState,
@@ -17,17 +17,17 @@ import Control.Lens.Operators ((.~))
 import Control.Monad.Except (MonadError (throwError), runExcept)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
-import qualified Data.HashMap.Strict as HM
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
+import Data.HashMap.Strict qualified as HM
+import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import GHC.IO.Unsafe (unsafePerformIO)
-import qualified Heist as H
-import qualified Heist.Common as H
-import qualified Heist.Internal.Types as HT
-import qualified Heist.Interpreted as HI
+import Heist qualified as H
+import Heist.Common qualified as H
+import Heist.Internal.Types qualified as HT
+import Heist.Interpreted qualified as HI
 import Relude
 import System.FilePath (splitExtension)
-import qualified Text.XmlHtml as XmlHtml
+import Text.XmlHtml qualified as XmlHtml
 
 type TemplateName = ByteString
 

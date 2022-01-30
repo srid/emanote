@@ -1,21 +1,14 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-
 module Emanote.Model.Meta (lookupRouteMeta, getEffectiveRouteMetaWith, getIndexYamlMeta) where
 
 import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
-import qualified Data.Aeson as Aeson
-import qualified Data.IxSet.Typed as Ix
+import Data.Aeson qualified as Aeson
+import Data.IxSet.Typed qualified as Ix
 import Emanote.Model (Model, modelLookupNoteByRoute, modelSData)
 import Emanote.Model.Note (lookupAeson, _noteMeta)
 import Emanote.Model.SData (sdataValue)
-import qualified Emanote.Model.SData as SData
-import qualified Emanote.Route as R
+import Emanote.Model.SData qualified as SData
+import Emanote.Route qualified as R
 import Relude
 
 -- | Look up a specific key in the meta for a given route.

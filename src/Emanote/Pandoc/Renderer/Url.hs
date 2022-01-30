@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Pandoc.Renderer.Url
   ( urlResolvingSplice,
     plainifyWikiLinkSplice,
@@ -7,28 +5,28 @@ module Emanote.Pandoc.Renderer.Url
   )
 where
 
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Data.WorldPeace.Union (absurdUnion)
-import qualified Ema
+import Ema qualified
 import Emanote.Model (Model)
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Link.Resolve as Resolve
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.Title as Tit
-import qualified Emanote.Pandoc.Link as Link
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Model qualified as M
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.Title qualified as Tit
+import Emanote.Pandoc.Link qualified as Link
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Prelude (h)
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute as SR
-import qualified Heist.Extra.Splices.Pandoc as HP
-import qualified Heist.Extra.Splices.Pandoc as Splices
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
+import Heist.Extra.Splices.Pandoc qualified as HP
+import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.Walk as W
+import Text.Pandoc.Definition qualified as B
+import Text.Pandoc.Walk qualified as W
 
 -- | Resolve all URLs in inlines (<a> and <img>)
 urlResolvingSplice :: Monad n => PandocInlineRenderer n i b

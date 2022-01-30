@@ -1,46 +1,42 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.View.Template (render) where
 
 import Control.Lens ((.~), (^.))
-import qualified Data.Aeson.Types as Aeson
+import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
-import qualified Data.List.NonEmpty as NE
+import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
 import Data.WorldPeace.Union
   ( absurdUnion,
   )
-import qualified Ema
-import qualified Ema.Helper.PathTree as PathTree
+import Ema qualified
+import Ema.Helper.PathTree qualified as PathTree
 import Emanote.Model (Model)
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Calendar as Calendar
-import qualified Emanote.Model.Graph as G
-import qualified Emanote.Model.Meta as Meta
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.SData as SData
-import qualified Emanote.Model.Title as Tit
+import Emanote.Model qualified as M
+import Emanote.Model.Calendar qualified as Calendar
+import Emanote.Model.Graph qualified as G
+import Emanote.Model.Meta qualified as Meta
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.SData qualified as SData
+import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute as SR
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexLmlRoute)
-import qualified Emanote.View.Common as C
+import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
-import qualified Emanote.View.TagIndex as TagIndex
-import qualified Emanote.View.TaskIndex as TaskIndex
-import qualified Heist as H
-import qualified Heist.Extra.Splices.List as Splices
-import qualified Heist.Extra.Splices.Pandoc as Splices
+import Emanote.View.TagIndex qualified as TagIndex
+import Emanote.View.TaskIndex qualified as TaskIndex
+import Heist qualified as H
+import Heist.Extra.Splices.List qualified as Splices
+import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
-import qualified Heist.Extra.Splices.Tree as Splices
-import qualified Heist.Interpreted as HI
-import qualified Heist.Splices as Heist
+import Heist.Extra.Splices.Tree qualified as Splices
+import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as Heist
 import Relude
-import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString

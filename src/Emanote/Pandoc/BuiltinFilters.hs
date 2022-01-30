@@ -5,11 +5,11 @@ module Emanote.Pandoc.BuiltinFilters
 where
 
 import Emanote.Model.Type (Model)
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Route.SiteRoute.Class as SR
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Route.SiteRoute.Class qualified as SR
 import Relude
-import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.Walk as W
+import Text.Pandoc.Definition qualified as B
+import Text.Pandoc.Walk qualified as W
 
 prepareNoteDoc :: Model -> B.Pandoc -> B.Pandoc
 prepareNoteDoc model =
