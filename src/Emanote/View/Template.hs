@@ -26,6 +26,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexLmlRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
+import Emanote.View.QueryView qualified as QueryView
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
 import Heist qualified as H
@@ -92,6 +93,9 @@ renderVirtualRoute m =
         )
     `h` ( \SR.TasksR ->
             Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
+        )
+    `h` ( \(SR.QueryR q) ->
+            Ema.AssetGenerated Ema.Html $ QueryView.render m q
         )
 
 renderSRIndex :: Model -> LByteString

@@ -1,5 +1,5 @@
 {
-  description = "emanote";
+  description = "Emanote: Spiritual successor to neuron, based on Ema.";
   inputs = {
     ema.url = "github:srid/ema/master";
     # Use the nixpkgs used by the pinned ema.

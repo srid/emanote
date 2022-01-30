@@ -5,6 +5,7 @@ module Emanote.Route.SiteRoute.Type
     IndexR (..),
     ExportR (..),
     TasksR (..),
+    QueryR (..),
     TagIndexR (..),
     MissingR (..),
     AmbiguousR (..),
@@ -22,7 +23,7 @@ import Data.WorldPeace.Union
     absurdUnion,
     openUnionLift,
   )
-import Ema (Slug (unSlug))
+import Ema (Slug (unSlug), encodeSlug)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
 import Emanote.Route.Ext qualified as Ext
@@ -47,6 +48,10 @@ data TasksR = TasksR
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
+data QueryR = QueryR Text
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
+
 -- | A 404 route
 newtype MissingR = MissingR {unMissingR :: FilePath}
   deriving stock (Eq, Show, Ord)
@@ -59,7 +64,8 @@ type VirtualRoute' =
   '[ IndexR,
      TagIndexR,
      ExportR,
-     TasksR
+     TasksR,
+     QueryR
    ]
 
 -- | A route to a virtual resource (not in `Model`)
@@ -115,6 +121,7 @@ decodeVirtualRoute fp =
     <|> fmap openUnionLift (decodeTagIndexR fp)
     <|> fmap openUnionLift (decodeExportR fp)
     <|> fmap openUnionLift (decodeTasksR fp)
+    <|> fmap openUnionLift (decodeQueryR fp)
 
 decodeIndexR :: FilePath -> Maybe IndexR
 decodeIndexR fp = do
@@ -137,6 +144,11 @@ decodeTasksR fp = do
   "-" :| ["tasks"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure TasksR
 
+decodeQueryR :: FilePath -> Maybe QueryR
+decodeQueryR fp = do
+  "-" :| ["query", q] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
+  pure $ QueryR $ unSlug q
+
 -- NOTE: The sentinel route slugs in this function should match with those of
 -- the decoders above.
 encodeVirtualRoute :: VirtualRoute -> FilePath
@@ -153,6 +165,9 @@ encodeVirtualRoute =
         )
     `h` ( \TasksR ->
             R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
+        )
+    `h` ( \(QueryR q) ->
+            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["query", fromString . toString $ q]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html

@@ -1,6 +1,7 @@
 module Emanote.Pandoc.Renderer.Query
   ( queryResolvingSplice,
     noteSpliceMap,
+    querySplice,
   )
 where
 
@@ -33,13 +34,26 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
   guard $ List.elem "query" classes
   let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
       queryTpl = encodeUtf8 $ "/templates/filters/query-" <> fromMaybe "default" mOtherCls
-  pure $ do
-    tpl <- HE.lookupHtmlTemplateMust queryTpl
-    HE.runCustomTemplate tpl $ do
-      "query"
-        ## HI.textSplice (show q)
-      "result"
-        ## (HI.runChildrenWith . noteSpliceMap ($ ctx) model) `foldMapM` Q.runQuery noteRoute model q
+  pure $ runQuerySplice queryTpl ctx noteRoute model q
+
+runQuerySplice :: forall n. Monad n => ByteString -> RenderCtx n -> LMLRoute -> Model -> Q.Query -> HI.Splice n
+runQuerySplice queryTpl ctx noteRoute model q = do
+  tpl <- HE.lookupHtmlTemplateMust queryTpl
+  HE.runCustomTemplate tpl $ querySplice ($ ctx) noteRoute model q
+
+querySplice ::
+  forall m.
+  (Monad m) =>
+  ((RenderCtx m -> HI.Splice m) -> HI.Splice m) ->
+  LMLRoute ->
+  Model ->
+  Q.Query ->
+  H.Splices (HI.Splice m)
+querySplice withCtx noteRoute model q = do
+  "query"
+    ## HI.textSplice (show q)
+  "result"
+    ## (HI.runChildrenWith . noteSpliceMap withCtx model) `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
