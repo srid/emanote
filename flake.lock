@@ -215,11 +215,11 @@
         "tailwind-nix": "tailwind-nix"
       },
       "locked": {
-        "lastModified": 1643497207,
-        "narHash": "sha256-BBR1iMiCGVwUMdb4q49jOekHhdE2DkQg29JRYVTU2tg=",
+        "lastModified": 1643563858,
+        "narHash": "sha256-/zq3z9IN+jxgPClQI/o5rHDKFTq6IBOCYSp+du7OwYk=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "a924dd89f542cb07b4ed65580a0eaf2cef79c366",
+        "rev": "324b4f3c02cd8fe470b5ed5a6265db22e75eb89c",
         "type": "github"
       },
       "original": {
@@ -236,11 +236,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1641667991,
-        "narHash": "sha256-c49tfYdq3rztwJuQ6/GT4QdQh0fN/vEH75Ny0/+9Mvw=",
+        "lastModified": 1643563783,
+        "narHash": "sha256-aFCT2NexGIgxeW32vfQcPuLlG2GhxkhIpSEuk3sXmOU=",
         "owner": "srid",
         "repo": "tailwind-nix",
-        "rev": "e27e11a66ae26533b265eb826eec357fbf481c92",
+        "rev": "f199f8cf6855ad5ab0a56bbac90f07860fb400d7",
         "type": "github"
       },
       "original": {
