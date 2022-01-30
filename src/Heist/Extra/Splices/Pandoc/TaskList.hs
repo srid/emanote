@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 -- GFM Task List, https://github.github.com/gfm/#task-list-items-extension-
 module Heist.Extra.Splices.Pandoc.TaskList
   ( parseTaskFromInlines,
@@ -8,8 +6,8 @@ module Heist.Extra.Splices.Pandoc.TaskList
 where
 
 import Relude
-import qualified Text.Pandoc.Builder as B
-import qualified Text.Pandoc.Walk as W
+import Text.Pandoc.Builder qualified as B
+import Text.Pandoc.Walk qualified as W
 
 parseTaskFromInlines :: [B.Inline] -> Maybe (Bool, [B.Inline])
 parseTaskFromInlines = \case

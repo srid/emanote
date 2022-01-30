@@ -1,25 +1,20 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Route.R where
 
 import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Text as T
+import Data.List.NonEmpty qualified as NE
+import Data.Text qualified as T
 import Ema (Slug)
-import qualified Ema
+import Ema qualified
 import Emanote.Route.Ext (FileType (..), HasExt (..), SourceExt)
 import Relude
 import System.FilePath (splitPath)
-import qualified Text.Show (Show (show))
+import Text.Show qualified (Show (show))
 
 -- | Represents the relative path to some file (or its isomporphic URL
 -- represetation).
 newtype R (ext :: FileType a) = R {unRoute :: NonEmpty Slug}
-  deriving (Eq, Ord, Typeable, Data)
+  deriving stock (Eq, Ord, Typeable, Data)
 
 instance HasExt ext => ToJSON (R ext) where
   toJSON = toJSON . encodeRoute

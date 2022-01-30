@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
 
 -- | We use `relude` as our prelude; any extra Prelude-like functionality is put
 -- here.
@@ -29,7 +26,8 @@ chainM f =
 
 -- | User-provided input is malformed.
 newtype BadInput = BadInput Text
-  deriving (Show, Exception)
+  deriving stock (Show)
+  deriving anyclass (Exception)
 
 -------------
 -- Logging
@@ -47,5 +45,5 @@ logE = logErrorNS "emanote"
 -- OpenUnion
 
 -- Just an alias to avoid having to write this repeatedly.
-h :: forall a (as :: [*]) b. ElemRemove a as => (OpenUnion (Remove a as) -> b) -> (a -> b) -> OpenUnion as -> b
+h :: forall a (as :: [Type]) b. ElemRemove a as => (OpenUnion (Remove a as) -> b) -> (a -> b) -> OpenUnion as -> b
 h = openUnionHandle

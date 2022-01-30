@@ -1,7 +1,4 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Title
   ( Title,
@@ -19,18 +16,19 @@ module Emanote.Model.Title
 where
 
 import Data.Aeson (ToJSON)
-import qualified Emanote.Route as R
-import qualified Heist.Extra.Splices.Pandoc as HP
+import Emanote.Route qualified as R
+import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc.Render (plainify)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Definition as B
-import qualified Text.Pandoc.Walk as W
+import Text.Pandoc.Definition qualified as B
+import Text.Pandoc.Walk qualified as W
 
 data Title
   = TitlePlain Text
   | TitlePandoc [B.Inline]
-  deriving (Show, Generic, ToJSON)
+  deriving stock (Show, Generic)
+  deriving anyclass (ToJSON)
 
 instance Eq Title where
   (==) =

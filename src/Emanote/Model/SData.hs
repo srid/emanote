@@ -1,20 +1,16 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.SData where
 
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
-import qualified Data.Aeson.Extra.Merge as AesonMerge
+import Data.Aeson qualified as Aeson
+import Data.Aeson.Extra.Merge qualified as AesonMerge
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Yaml as Yaml
-import qualified Emanote.Route as R
+import Data.List.NonEmpty qualified as NE
+import Data.Yaml qualified as Yaml
+import Emanote.Route qualified as R
 import Relude
 
 -- | `S` for "structured". Refers to a per-route data file represented by Aeson
@@ -24,7 +20,8 @@ data SData = SData
     -- | Location of this data file
     _sdataRoute :: R.R 'R.Yaml
   }
-  deriving (Eq, Ord, Data, Show, Generic, Aeson.ToJSON)
+  deriving stock (Eq, Ord, Data, Show, Generic)
+  deriving anyclass (Aeson.ToJSON)
 
 type SDataIxs = '[R.R 'R.Yaml]
 

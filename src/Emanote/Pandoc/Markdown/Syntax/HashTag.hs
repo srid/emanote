@@ -1,8 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 module Emanote.Pandoc.Markdown.Syntax.HashTag
   ( hashTagSpec,
     inlineTagsInPandoc,
@@ -19,17 +14,17 @@ module Emanote.Pandoc.Markdown.Syntax.HashTag
 where
 
 import Commonmark (TokType (..))
-import qualified Commonmark as CM
-import qualified Commonmark.Inlines as CM
-import qualified Commonmark.Pandoc as CP
+import Commonmark qualified as CM
+import Commonmark.Inlines qualified as CM
+import Commonmark.Pandoc qualified as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
-import qualified Data.Map.Strict as Map
-import qualified Data.TagTree as TT
-import qualified Data.Text as T
+import Data.Map.Strict qualified as Map
+import Data.TagTree qualified as TT
+import Data.Text qualified as T
 import Relude
-import qualified Text.Pandoc.Builder as B
-import qualified Text.Pandoc.Walk as W
-import qualified Text.Parsec as P
+import Text.Pandoc.Builder qualified as B
+import Text.Pandoc.Walk qualified as W
+import Text.Parsec qualified as P
 
 inlineTagsInPandoc :: B.Pandoc -> [TT.Tag]
 inlineTagsInPandoc = W.query $ maybeToList . getTagFromInline

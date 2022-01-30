@@ -1,17 +1,15 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Pandoc.Markdown.Parser
   ( parseMarkdown,
   )
 where
 
-import qualified Commonmark as CM
-import qualified Commonmark.Extensions as CE
-import qualified Data.Aeson as Aeson
+import Commonmark qualified as CM
+import Commonmark.Extensions qualified as CE
+import Data.Aeson qualified as Aeson
 import Ema.Helper.Markdown (parseMarkdownWithFrontMatter)
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as IT
-import qualified Emanote.Pandoc.Markdown.Syntax.Highlight as IH
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as IT
+import Emanote.Pandoc.Markdown.Syntax.Highlight qualified as IH
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Relude
 import Text.Pandoc.Definition (Pandoc)
 

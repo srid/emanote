@@ -1,8 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
-
 -- | Route types representing the resources in our `Model`.
 --
 -- See also: `Emanote.Route.SiteRoute`.
@@ -30,7 +25,7 @@ import Data.WorldPeace.Union
   )
 import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md), SourceExt)
 import Emanote.Route.R (R)
-import qualified Emanote.Route.R as R
+import Emanote.Route.R qualified as R
 import Relude
 
 type LMLRoutes' =

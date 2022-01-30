@@ -7,11 +7,11 @@ module Emanote.CLI
   )
 where
 
-import qualified Data.Text as T
+import Data.Text qualified as T
 import Data.Version (showVersion)
-import qualified Ema.CLI
+import Ema.CLI qualified
 import Options.Applicative hiding (action)
-import qualified Paths_emanote
+import Paths_emanote qualified
 import Relude
 import UnliftIO.Directory (getCurrentDirectory)
 

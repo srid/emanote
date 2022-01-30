@@ -1,32 +1,29 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 module Emanote.Model.Note where
 
 import Control.Lens.Operators ((.~))
 import Control.Lens.TH (makeLenses)
-import qualified Data.Aeson as Aeson
-import qualified Data.Aeson.Lens as A
+import Data.Aeson qualified as Aeson
+import Data.Aeson.Lens qualified as A
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import qualified Data.IxSet.Typed as Ix
+import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
-import qualified Data.Map.Strict as Map
+import Data.Map.Strict qualified as Map
 import Ema (Slug)
-import qualified Emanote.Model.SData as SData
-import qualified Emanote.Model.Title as Tit
-import qualified Emanote.Pandoc.Markdown.Parser as Markdown
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
+import Emanote.Model.SData qualified as SData
+import Emanote.Model.Title qualified as Tit
+import Emanote.Pandoc.Markdown.Parser qualified as Markdown
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Relude
 import Relude.Extra.Map (StaticMap (lookup))
-import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 data Note = Note
@@ -35,10 +32,12 @@ data Note = Note
     _noteMeta :: Aeson.Value,
     _noteTitle :: Tit.Title
   }
-  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON)
 
 newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
-  deriving (Eq, Ord, Show, Generic, Aeson.ToJSON)
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON)
 
 type NoteIxs =
   '[ -- Route to this note

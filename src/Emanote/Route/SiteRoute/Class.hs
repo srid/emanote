@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emanote.Route.SiteRoute.Class
@@ -20,27 +17,27 @@ module Emanote.Route.SiteRoute.Class
 where
 
 import Control.Lens.Operators ((^.))
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Set as Set
+import Data.IxSet.Typed qualified as Ix
+import Data.List.NonEmpty qualified as NE
+import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
   )
 import Ema (Ema (..), UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
-import qualified Emanote.Model as M
-import qualified Emanote.Model.Link.Rel as Rel
-import qualified Emanote.Model.Meta as Model
-import qualified Emanote.Model.Note as N
-import qualified Emanote.Model.StaticFile as SF
+import Emanote.Model qualified as M
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Meta qualified as Model
+import Emanote.Model.Note qualified as N
+import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Type (Model)
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
-import qualified Emanote.Route as R
+import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
-import qualified Emanote.View.LiveServerFiles as LiveServerFile
+import Emanote.View.LiveServerFiles qualified as LiveServerFile
 import Relude
 
 instance Ema Model SiteRoute where

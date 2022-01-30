@@ -1,12 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE UndecidableInstances #-}
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
   ( WikiLink,
@@ -21,34 +13,34 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
   )
 where
 
-import qualified Commonmark as CM
-import qualified Commonmark.Pandoc as CP
-import qualified Commonmark.TokParsers as CT
+import Commonmark qualified as CM
+import Commonmark.Pandoc qualified as CP
+import Commonmark.TokParsers qualified as CT
 import Control.Monad (liftM2)
 import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
+import Data.List.NonEmpty qualified as NE
+import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Ema (Slug (unSlug))
-import qualified Ema
+import Ema qualified
 import Ema.Helper.Markdown (plainify)
-import qualified Emanote.Route.Ext as Ext
+import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.R (R (..))
-import qualified Network.URI.Encode as UE
+import Network.URI.Encode qualified as UE
 import Relude
-import qualified Text.Megaparsec as M
-import qualified Text.Pandoc.Builder as B
-import qualified Text.Parsec as P
+import Text.Megaparsec qualified as M
+import Text.Pandoc.Builder qualified as B
+import Text.Parsec qualified as P
 import Text.Read (Read (readsPrec))
-import qualified Text.Show (Show (show))
+import Text.Show qualified (Show (show))
 
 -- | Represents the "Foo" in [[Foo]]
 --
 -- As wiki links may contain multiple path components, it can also represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
-  deriving (Eq, Ord, Typeable, Data)
+  deriving stock (Eq, Ord, Typeable, Data)
 
 instance ToJSON WikiLink where
   toJSON = toJSON . wikilinkUrl
@@ -156,7 +148,8 @@ data WikiLinkType
     WikiLinkTag
   | -- | ![[Foo]]
     WikiLinkEmbed
-  deriving (Eq, Show, Ord, Typeable, Data, Enum, Bounded, Generic, ToJSON)
+  deriving stock (Eq, Show, Ord, Typeable, Data, Enum, Bounded, Generic)
+  deriving anyclass (ToJSON)
 
 instance Read WikiLinkType where
   readsPrec _ s

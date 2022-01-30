@@ -1,27 +1,25 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.View.TaskIndex (renderTasks) where
 
 import Control.Lens.Operators ((^.))
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
+import Data.IxSet.Typed qualified as Ix
+import Data.List.NonEmpty qualified as NE
+import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Emanote.Model (Model)
-import qualified Emanote.Model.Meta as Meta
+import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Task (Task)
-import qualified Emanote.Model.Task as Task
-import qualified Emanote.Model.Type as M
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute as SR
+import Emanote.Model.Task qualified as Task
+import Emanote.Model.Type qualified as M
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexLmlRoute)
-import qualified Emanote.View.Common as Common
-import qualified Heist.Extra.Splices.List as Splices
-import qualified Heist.Extra.Splices.Pandoc as Splices
+import Emanote.View.Common qualified as Common
+import Heist.Extra.Splices.List qualified as Splices
+import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Definition as B
+import Text.Pandoc.Definition qualified as B
 
 newtype TaskIndex = TaskIndex {unTaskIndex :: Map R.LMLRoute (NonEmpty Task)}
 

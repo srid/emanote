@@ -10,14 +10,14 @@ module Heist.Extra.Splices.Pandoc.Ctx
   )
 where
 
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
-import qualified Heist as H
+import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
+import Heist qualified as H
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Builder as B
-import qualified Text.XmlHtml as X
+import Text.Pandoc.Builder qualified as B
+import Text.XmlHtml qualified as X
 
 data RenderCtx n = RenderCtx
   { -- The XML node which contains individual AST rendering definitions

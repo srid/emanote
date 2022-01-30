@@ -1,8 +1,3 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Heist.Extra.Splices.Pandoc
   ( RenderCtx (..),
     pandocSplice,
@@ -26,7 +21,7 @@ import Heist.Extra.Splices.Pandoc.Render
     rpBlock,
     rpInline,
   )
-import qualified Heist.Interpreted as HI
+import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition (Pandoc (..))
 

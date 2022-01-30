@@ -3,8 +3,8 @@ module Emanote.Model.QuerySpec where
 import Data.TagTree (Tag (Tag))
 import Emanote.Model.Query
 import Hedgehog
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
+import Hedgehog.Gen qualified as Gen
+import Hedgehog.Range qualified as Range
 import Relude
 import Test.Tasty
 import Test.Tasty.Hedgehog

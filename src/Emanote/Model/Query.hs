@@ -1,31 +1,28 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote.Model.Query where
 
 import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed ((@+), (@=))
-import qualified Data.IxSet.Typed as Ix
-import qualified Data.Text as T
-import qualified Emanote.Model.Calendar as Calendar
+import Data.IxSet.Typed qualified as Ix
+import Data.Text qualified as T
+import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Note (Note)
-import qualified Emanote.Model.Note as N
+import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelNotes, modelTags)
 import Emanote.Pandoc.Markdown.Syntax.HashTag (TagPattern)
-import qualified Emanote.Pandoc.Markdown.Syntax.HashTag as HT
-import qualified Emanote.Route as R
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Route qualified as R
 import Relude
 import System.FilePattern (FilePattern, (?==))
-import qualified Text.Megaparsec as M
-import qualified Text.Megaparsec.Char as M
-import qualified Text.Show as Show
+import Text.Megaparsec qualified as M
+import Text.Megaparsec.Char qualified as M
+import Text.Show qualified as Show
 
 data Query
   = QueryByTag HT.Tag
   | QueryByTagPattern TagPattern
   | QueryByPath FilePath
   | QueryByPathPattern FilePattern
-  deriving (Eq)
+  deriving stock (Eq)
 
 instance Show.Show Query where
   show = \case

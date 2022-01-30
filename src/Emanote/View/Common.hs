@@ -1,7 +1,4 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 
 module Emanote.View.Common
   ( commonSplices,
@@ -18,38 +15,38 @@ module Emanote.View.Common
 where
 
 import Control.Lens.Operators ((^.))
-import qualified Data.Aeson.Types as Aeson
+import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
 import Data.Version (showVersion)
-import qualified Ema
-import qualified Emanote.Model.Note as MN
-import qualified Emanote.Model.Title as Tit
+import Ema qualified
+import Emanote.Model.Note qualified as MN
+import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
-import qualified Emanote.Model.Type as M
+import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers (..))
-import qualified Emanote.Pandoc.Renderer as Renderer
-import qualified Emanote.Pandoc.Renderer.Embed as PF
-import qualified Emanote.Pandoc.Renderer.Query as PF
-import qualified Emanote.Pandoc.Renderer.Url as PF
+import Emanote.Pandoc.Renderer qualified as Renderer
+import Emanote.Pandoc.Renderer.Embed qualified as PF
+import Emanote.Pandoc.Renderer.Query qualified as PF
+import Emanote.Pandoc.Renderer.Url qualified as PF
 import Emanote.Route (LMLRoute)
-import qualified Emanote.Route as R
-import qualified Emanote.Route.SiteRoute.Class as SR
-import qualified Emanote.View.LiveServerFiles as LiveServerFiles
-import qualified Heist as H
-import qualified Heist.Extra.Splices.List as Splices
+import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.View.LiveServerFiles qualified as LiveServerFiles
+import Heist qualified as H
+import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
-import qualified Heist.Extra.TemplateState as Tmpl
-import qualified Heist.Interpreted as HI
-import qualified Heist.Splices.Apply as HA
-import qualified Heist.Splices.Bind as HB
-import qualified Heist.Splices.Json as HJ
-import qualified Paths_emanote
+import Heist.Extra.TemplateState qualified as Tmpl
+import Heist.Interpreted qualified as HI
+import Heist.Splices.Apply qualified as HA
+import Heist.Splices.Bind qualified as HB
+import Heist.Splices.Json qualified as HJ
+import Paths_emanote qualified
 import Relude
 import Text.Blaze.Html ((!))
-import qualified Text.Blaze.Html5 as H
-import qualified Text.Blaze.Html5.Attributes as A
-import qualified Text.Blaze.Renderer.XmlHtml as RX
+import Text.Blaze.Html5 qualified as H
+import Text.Blaze.Html5.Attributes qualified as A
+import Text.Blaze.Renderer.XmlHtml qualified as RX
 
 noteRenderers :: Monad n => PandocRenderers n i LMLRoute
 noteRenderers =

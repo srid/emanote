@@ -1,6 +1,6 @@
 module Spec (main) where
 
-import qualified Emanote.Model.QuerySpec as QuerySpec
+import Emanote.Model.QuerySpec qualified as QuerySpec
 import Relude
 import Test.Tasty
 import Test.Tasty.Hedgehog

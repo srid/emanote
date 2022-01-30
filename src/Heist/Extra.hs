@@ -1,14 +1,12 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Heist.Extra where
 
-import qualified Data.Text as T
-import qualified Heist as H
-import qualified Heist.Common as H
-import qualified Heist.Internal.Types as HT
-import qualified Heist.Interpreted as HI
+import Data.Text qualified as T
+import Heist qualified as H
+import Heist.Common qualified as H
+import Heist.Internal.Types qualified as HT
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.XmlHtml as X
+import Text.XmlHtml qualified as X
 
 -- | Useful for running a splice against an arbitrary node (such as that pulled from pandoc.tpl)
 runCustomNode :: Monad n => X.Node -> H.Splices (HI.Splice n) -> HI.Splice n

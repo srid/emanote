@@ -10,24 +10,24 @@ module Heist.Extra.Splices.Pandoc.Render
   )
 where
 
-import qualified Data.Map.Strict as Map
+import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
-import qualified Data.Text as T
-import qualified Emanote.Pandoc.Markdown.Syntax.WikiLink as WL
-import qualified Heist as H
+import Data.Text qualified as T
+import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Heist qualified as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
     rewriteClass,
   )
-import qualified Heist.Extra.Splices.Pandoc.TaskList as TaskList
-import qualified Heist.Interpreted as HI
+import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
+import Heist.Interpreted qualified as HI
 import Relude
-import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
-import qualified Text.Pandoc.Walk as W
-import qualified Text.XmlHtml as X
+import Text.Pandoc.Walk qualified as W
+import Text.XmlHtml qualified as X
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
 renderPandocWith ctx (Pandoc _meta blocks) =

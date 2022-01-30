@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Emanote
   ( emanate,
     ChangeHandler,
@@ -8,9 +6,9 @@ where
 
 import Control.Monad.Logger (MonadLogger)
 import Data.LVar (LVar)
-import qualified Data.LVar as LVar
-import qualified Data.Map.Strict as Map
-import qualified Ema.Helper.FileSystem as EmaFS
+import Data.LVar qualified as LVar
+import Data.Map.Strict qualified as Map
+import Ema.Helper.FileSystem qualified as EmaFS
 import Emanote.Prelude (chainM, log)
 import Emanote.Source.Loc (Loc)
 import Relude
