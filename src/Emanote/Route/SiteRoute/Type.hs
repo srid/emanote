@@ -18,12 +18,14 @@ module Emanote.Route.SiteRoute.Type
 where
 
 import Data.Aeson (ToJSON)
+import Data.Text qualified as T
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
     openUnionLift,
   )
-import Ema (Slug (unSlug), encodeSlug)
+import Ema (Slug (unSlug))
+import Emanote.Model.Query.Type (Query, parseQuery)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
 import Emanote.Route.Ext qualified as Ext
@@ -48,7 +50,7 @@ data TasksR = TasksR
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
-data QueryR = QueryR Text
+data QueryR = QueryR Query
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
@@ -146,8 +148,9 @@ decodeTasksR fp = do
 
 decodeQueryR :: FilePath -> Maybe QueryR
 decodeQueryR fp = do
-  "-" :| ["query", q] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
-  pure $ QueryR $ unSlug q
+  "-" :| "query" : x : xs <- pure $ R.unRoute $ R.decodeHtmlRoute fp
+  q <- parseQuery $ T.intercalate "/" . fmap unSlug $ x : xs
+  pure $ QueryR q
 
 -- NOTE: The sentinel route slugs in this function should match with those of
 -- the decoders above.
@@ -167,7 +170,7 @@ encodeVirtualRoute =
             R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
         )
     `h` ( \(QueryR q) ->
-            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["query", fromString . toString $ q]
+            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| "query" : undefined -- TODO
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html

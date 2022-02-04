@@ -12,6 +12,7 @@ import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Query qualified as Q
+import Emanote.Model.Query.Type qualified as Q
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)

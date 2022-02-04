@@ -125,7 +125,7 @@ common library-common
     , some
     , tagged
     , tagtree
-    , tailwind
+    , tailwind               >=0.2
     , tasty
     , tasty-hedgehog
     , tasty-quickcheck
@@ -157,6 +157,7 @@ library
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Query
+    Emanote.Model.Query.Type
     Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile

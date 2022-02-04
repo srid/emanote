@@ -1,7 +1,7 @@
 module Emanote.Model.QuerySpec where
 
 import Data.TagTree (Tag (Tag))
-import Emanote.Model.Query
+import Emanote.Model.Query.Type (Query (QueryByTag), parseQuery)
 import Hedgehog
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
