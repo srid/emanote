@@ -215,11 +215,11 @@
         "tailwind-nix": "tailwind-nix"
       },
       "locked": {
-        "lastModified": 1643563858,
-        "narHash": "sha256-/zq3z9IN+jxgPClQI/o5rHDKFTq6IBOCYSp+du7OwYk=",
+        "lastModified": 1643931884,
+        "narHash": "sha256-qOFzT+Go5SGCGo5kBmLHNLgKAiJgnUcwe3NrS4TaZ0Q=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "324b4f3c02cd8fe470b5ed5a6265db22e75eb89c",
+        "rev": "f5463f639f403751fb4701dd2aeadac32f90f65d",
         "type": "github"
       },
       "original": {
