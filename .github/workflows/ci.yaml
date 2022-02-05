@@ -22,7 +22,7 @@ jobs:
           name: srid
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
-          # authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build as docker img
         id: build
         run: |
