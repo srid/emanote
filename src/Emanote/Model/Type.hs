@@ -13,10 +13,10 @@ import Data.Map.Strict qualified as Map
 import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
+import Data.Tree.Path qualified as PathTree
 import Data.UUID
 import Ema (Slug)
 import Ema.CLI qualified
-import Ema.Helper.PathTree qualified as PathTree
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note

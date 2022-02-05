@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.10.2
+version:            0.4.10.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -96,6 +96,7 @@ common library-common
     , commonmark
     , commonmark-extensions
     , commonmark-pandoc
+    , commonmark-simple
     , containers
     , data-default
     , dependent-sum
@@ -119,6 +120,7 @@ common library-common
     , pandoc-link-context    >=1.2.0
     , pandoc-types
     , parsec
+    , pathtree
     , profunctors
     , relude
     , shower
@@ -131,6 +133,7 @@ common library-common
     , tasty-quickcheck
     , text
     , time
+    , unionmount
     , unliftio
     , unordered-containers
     , uri-encode

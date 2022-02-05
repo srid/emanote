@@ -1,6 +1,5 @@
 module Emanote.Pandoc.Link where
 
-import Ema.Helper.Markdown (plainify)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Relude
 import Text.Pandoc.Definition qualified as B
@@ -32,7 +31,7 @@ unParseLink inl =
     Nothing ->
       let (inlRef, _, is, (url, _tit)) = parseInlineRefMust inl
           prefix = if inlRef == InlineImage then "![" else "["
-       in prefix <> plainify is <> "](" <> url <> ")"
+       in prefix <> WL.plainify is <> "](" <> url <> ")"
   where
     parseInlineRefMust =
       fromMaybe (error "Non-InlineRef Inline") . parseInlineRef

@@ -6,7 +6,6 @@ module Heist.Extra.Splices.Pandoc.Render
     rpInline,
     rpBlock',
     rpInline',
-    plainify,
   )
 where
 
@@ -26,7 +25,6 @@ import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
-import Text.Pandoc.Walk qualified as W
 import Text.XmlHtml qualified as X
 
 renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
@@ -228,7 +226,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
     one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
   B.Image attr is (url, tit) -> do
     let attrs =
-          catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", plainify is)]
+          catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", WL.plainify is)]
             <> rpAttr (rewriteClass ctx attr)
     pure $ one . X.Element "img" attrs $ mempty
   B.Note _bs -> do
@@ -274,25 +272,3 @@ rawNode :: Text -> Text -> [X.Node]
 rawNode wrapperTag s =
   one . X.Element wrapperTag (one ("xmlhtmlRaw", "")) $
     one . X.TextNode $ s
-
--- | Convert Pandoc AST inlines to raw text.
-plainify :: [B.Inline] -> Text
-plainify = W.query $ \case
-  B.Str x -> x
-  B.Code _attr x -> x
-  B.Space -> " "
-  B.SoftBreak -> " "
-  B.LineBreak -> " "
-  -- TODO: if fmt is html, we should strip the html tags
-  B.RawInline _fmt s -> s
-  -- Ignore "wrapper" inlines like span.
-  B.Span _ _ -> ""
-  -- TODO: How to wrap math stuff here?
-  B.Math _mathTyp s -> s
-  -- Wiki-links must be displayed using its show instance (which returns its
-  -- human-readable representation)
-  (WL.mkWikiLinkFromInline -> Just wl) ->
-    show wl
-  -- Ignore the rest of AST nodes, as they are recursively defined in terms of
-  -- `Inline` which `W.query` will traverse again.
-  _ -> ""

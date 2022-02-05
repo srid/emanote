@@ -10,6 +10,9 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
     wikiLinkInlineRendered,
     mkWikiLinkFromInline,
     allowedWikiLinks,
+
+    -- * Pandoc helper, which use wikilink somehow
+    plainify,
   )
 where
 
@@ -24,13 +27,13 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Ema (Slug (unSlug))
 import Ema qualified
-import Ema.Helper.Markdown (plainify)
 import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.R (R (..))
 import Network.URI.Encode qualified as UE
 import Relude
 import Text.Megaparsec qualified as M
 import Text.Pandoc.Builder qualified as B
+import Text.Pandoc.Walk qualified as W
 import Text.Parsec qualified as P
 import Text.Read (Read (readsPrec))
 import Text.Show qualified (Show (show))
@@ -224,3 +227,25 @@ wikilinkSpec =
       isSymbol ']'
     isSymbol c =
       CT.hasType (CM.Symbol c)
+
+-- | Convert Pandoc AST inlines to raw text.
+plainify :: [B.Inline] -> Text
+plainify = W.query $ \case
+  B.Str x -> x
+  B.Code _attr x -> x
+  B.Space -> " "
+  B.SoftBreak -> " "
+  B.LineBreak -> " "
+  -- TODO: if fmt is html, we should strip the html tags
+  B.RawInline _fmt s -> s
+  -- Ignore "wrapper" inlines like span.
+  B.Span _ _ -> ""
+  -- TODO: How to wrap math stuff here?
+  B.Math _mathTyp s -> s
+  -- Wiki-links must be displayed using its show instance (which returns its
+  -- human-readable representation)
+  (mkWikiLinkFromInline -> Just wl) ->
+    show wl
+  -- Ignore the rest of AST nodes, as they are recursively defined in terms of
+  -- `Inline` which `W.query` will traverse again.
+  _ -> ""
