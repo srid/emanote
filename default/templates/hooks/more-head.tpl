@@ -11,9 +11,14 @@
 
   body {
     font-family: 'MavenPro', sans-serif;
+    /* font-variation-settings: 'wght'300; */
   }
 
   a.mavenLinkBold {
+    font-variation-settings: 'wght'500;
+  }
+
+  strong {
     font-variation-settings: 'wght'500;
   }
 
