@@ -16,9 +16,9 @@ module Emanote.Model.Title
 where
 
 import Data.Aeson (ToJSON)
+import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)
 import Emanote.Route qualified as R
 import Heist.Extra.Splices.Pandoc qualified as HP
-import Heist.Extra.Splices.Pandoc.Render (plainify)
 import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition qualified as B

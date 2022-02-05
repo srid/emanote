@@ -11,6 +11,11 @@
     flake-utils.follows = "ema/flake-utils";
     flake-compat.follows = "ema/flake-compat";
 
+    pathtree.url = "github:srid/pathtree";
+    pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
+    commonmark-simple.url = "github:srid/commonmark-simple";
+    commonmark-simple.inputs.nixpkgs.follows = "ema/nixpkgs";
+
     heist = {
       url = "github:srid/heist/emanote";
       flake = false;
@@ -59,8 +64,10 @@
               root = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
               withHoogle = true;
               overrides = self: super: with pkgs.haskell.lib; {
-                ema = disableCabalFlag inputs.ema.defaultPackage.${system} "with-examples";
+                ema = inputs.ema.defaultPackage.${system};
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
+                pathtree = inputs.pathtree.defaultPackage.${system};
+                commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
                 # Jailbreak heist to allow newer dlist
                 heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));

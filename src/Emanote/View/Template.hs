@@ -5,11 +5,11 @@ import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
+import Data.Tree.Path qualified as PathTree
 import Data.WorldPeace.Union
   ( absurdUnion,
   )
 import Ema qualified
-import Ema.Helper.PathTree qualified as PathTree
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar

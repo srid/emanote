@@ -5,8 +5,8 @@ where
 
 import Commonmark qualified as CM
 import Commonmark.Extensions qualified as CE
+import Commonmark.Simple (parseMarkdownWithFrontMatter)
 import Data.Aeson qualified as Aeson
-import Ema.Helper.Markdown (parseMarkdownWithFrontMatter)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as IT
 import Emanote.Pandoc.Markdown.Syntax.Highlight qualified as IH
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
