@@ -22,12 +22,12 @@ import Data.WorldPeace.Union
     absurdUnion,
     openUnionLift,
   )
-import Ema (Slug (unSlug))
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
 import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
 import Emanote.Route.R qualified as R
+import Network.URI.Slug qualified as Slug
 import Relude hiding (show)
 import Text.Show (show)
 
@@ -129,7 +129,7 @@ decodeExportR fp = do
 decodeTagIndexR :: FilePath -> Maybe TagIndexR
 decodeTagIndexR fp = do
   "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
-  let tagNodes = fmap (HT.TagNode . Ema.unSlug) tagPath
+  let tagNodes = fmap (HT.TagNode . Slug.unSlug) tagPath
   pure $ TagIndexR tagNodes
 
 decodeTasksR :: FilePath -> Maybe TasksR

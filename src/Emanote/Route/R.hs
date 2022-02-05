@@ -4,9 +4,9 @@ import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
 import Data.List.NonEmpty qualified as NE
 import Data.Text qualified as T
-import Ema (Slug)
-import Ema qualified
 import Emanote.Route.Ext (FileType (..), HasExt (..), SourceExt)
+import Network.URI.Slug (Slug)
+import Network.URI.Slug qualified as Slug
 import Relude
 import System.FilePath (splitPath)
 import Text.Show qualified (Show (show))
@@ -55,7 +55,7 @@ routeSlugWithPrefix prefix r = do
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text
 routeBaseName =
-  Ema.unSlug . head . NE.reverse . unRoute
+  Slug.unSlug . head . NE.reverse . unRoute
 
 routeParent :: R ext -> Maybe (R 'Folder)
 routeParent =
@@ -88,7 +88,7 @@ indexRoute = R $ "index" :| []
 -- | Convert a route to filepath
 encodeRoute :: forall a (ft :: FileType a). HasExt ft => R ft -> FilePath
 encodeRoute (R slugs) =
-  let parts = Ema.unSlug <$> slugs
+  let parts = Slug.unSlug <$> slugs
    in withExt @a @ft $ toString $ T.intercalate "/" (toList parts)
 
 -- | Parse our route from html file path
@@ -99,7 +99,7 @@ decodeHtmlRoute fp = do
     Nothing ->
       one "index"
     Just parts ->
-      fmap Ema.decodeSlug parts
+      fmap Slug.decodeSlug parts
   where
     -- Like `T.splitOn` but returns a NonEmpty list with sensible semantics
     splitOnNE k s =

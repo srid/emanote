@@ -1,6 +1,6 @@
 cabal-version:      2.4
-name:               emanote
-version:            0.4.10.3
+name:               emanot4
+version:            0.4.10.4
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -101,7 +101,7 @@ common library-common
     , data-default
     , dependent-sum
     , directory
-    , ema                    >=0.5
+    , ema                    >=0.6
     , filepath
     , filepattern
     , fsnotify
@@ -137,6 +137,7 @@ common library-common
     , unliftio
     , unordered-containers
     , uri-encode
+    , url-slug
     , uuid
     , which
     , with-utf8

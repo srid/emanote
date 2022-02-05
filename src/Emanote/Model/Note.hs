@@ -13,7 +13,6 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
 import Data.Map.Strict qualified as Map
-import Ema (Slug)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
@@ -21,6 +20,7 @@ import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
+import Network.URI.Slug (Slug)
 import Relude
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Builder qualified as B
