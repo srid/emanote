@@ -15,7 +15,6 @@ import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID
-import Ema (Slug)
 import Ema.CLI qualified
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
@@ -37,6 +36,7 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
 import Heist.Extra.TemplateState (TemplateState)
+import Network.URI.Slug (Slug)
 import Relude
 
 data Status = Status_Loading | Status_Ready

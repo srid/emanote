@@ -25,11 +25,11 @@ import Data.Data (Data)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Ema (Slug (unSlug))
-import Ema qualified
 import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.R (R (..))
 import Network.URI.Encode qualified as UE
+import Network.URI.Slug (Slug)
+import Network.URI.Slug qualified as Slug
 import Relude
 import Text.Megaparsec qualified as M
 import Text.Pandoc.Builder qualified as B
@@ -61,7 +61,7 @@ mkWikiLinkFromRoute (R slugs) = WikiLink slugs
 
 mkWikiLinkFromUrl :: (Monad m, Alternative m) => Text -> m WikiLink
 mkWikiLinkFromUrl s = do
-  slugs <- maybe empty pure $ nonEmpty $ Ema.decodeSlug <$> T.splitOn "/" s
+  slugs <- maybe empty pure $ nonEmpty $ Slug.decodeSlug <$> T.splitOn "/" s
   pure $ WikiLink slugs
 
 mkWikiLinkFromInline :: B.Inline -> Maybe (WikiLink, [B.Inline])
@@ -103,7 +103,7 @@ delineateLink (Map.fromList -> attrs) url = do
 -- | [[Foo/Bar]] -> "Foo/Bar"
 wikilinkUrl :: WikiLink -> Text
 wikilinkUrl =
-  T.intercalate "/" . fmap unSlug . toList . unWikiLink
+  T.intercalate "/" . fmap Slug.unSlug . toList . unWikiLink
 
 wikilinkInline :: WikiLinkType -> WikiLink -> B.Inlines -> B.Inlines
 wikilinkInline typ wl = B.linkWith attrs (wikilinkUrl wl) ""
