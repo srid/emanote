@@ -40,7 +40,8 @@ import Emanote.Route.SiteRoute.Type
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
 import Relude
 
-instance Ema Model SiteRoute where
+instance Ema SiteRoute where
+  type ModelFor SiteRoute = Model
   encodeRoute :: HasCallStack => Model -> SiteRoute -> FilePath
   encodeRoute model (SiteRoute r) =
     r
