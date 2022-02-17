@@ -1,4 +1,4 @@
--- | Pattch model state depending on file change event.
+-- | Patch model state depending on file change event.
 --
 -- See `mapFsChange` for more details.
 module Emanote.Source.Patch
