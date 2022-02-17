@@ -13,10 +13,6 @@
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
-    commonmark-simple.url = "github:srid/commonmark-simple";
-    commonmark-simple.inputs.nixpkgs.follows = "ema/nixpkgs";
-    url-slug.url = "github:srid/url-slug";
-    url-slug.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {
       url = "github:srid/heist/emanote";
@@ -68,13 +64,15 @@
               overrides = self: super: with pkgs.haskell.lib; {
                 ema = inputs.ema.defaultPackage.${system};
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
+
                 pathtree = inputs.pathtree.defaultPackage.${system};
-                commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
-                url-slug = inputs.url-slug.defaultPackage.${system};
+                # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
+                # url-slug = inputs.url-slug.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
+                # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
+
                 # Jailbreak heist to allow newer dlist
                 heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
-                # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
               };
               modifier = drv:
                 pkgs.haskell.lib.addBuildTools drv
