@@ -8,16 +8,16 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1645057852,
-        "narHash": "sha256-2T8Lc9BINdaWXAS3oHFjDnSI+VBs1LWJ0b7Y3AogTSQ=",
+        "lastModified": 1645655754,
+        "narHash": "sha256-JDqLFa930Q+a0gLbnwhAO6o4s8Nckj0IpJlEsnVf/1M=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "602002a1fde982308008d52820497019e9e1447f",
+        "rev": "88c6bd0b9b0e544783fddcd753e32a3a3e9d7c44",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "master",
+        "ref": "multisite",
         "repo": "ema",
         "type": "github"
       }
@@ -62,6 +62,22 @@
         "owner": "edolstra",
         "repo": "flake-compat",
         "rev": "b7547d3eed6f32d06102ead8991ec52ab0a4f1a7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-compat_4": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1627913399,
+        "narHash": "sha256-hY8g6H2KFL8ownSiFeMOjwPC8P0ueXpCVEbxgda3pko=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "12c64ca55c1014cdc1b16ed5a804aa8576601ff2",
         "type": "github"
       },
       "original": {
@@ -122,6 +138,21 @@
         "owner": "numtide",
         "repo": "flake-utils",
         "rev": "74f7e4319258e287b0f9cb95426c9853b282730b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_5": {
+      "locked": {
+        "lastModified": 1631561581,
+        "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "7e5bf3925f6fbdfaf50a2a7ca0be2879c4261d19",
         "type": "github"
       },
       "original": {
@@ -250,7 +281,8 @@
           "nixpkgs"
         ],
         "pathtree": "pathtree",
-        "tailwind-haskell": "tailwind-haskell"
+        "tailwind-haskell": "tailwind-haskell",
+        "unionmount": "unionmount"
       }
     },
     "tailwind-haskell": {
@@ -301,6 +333,30 @@
       "original": {
         "owner": "srid",
         "repo": "tailwind-nix",
+        "type": "github"
+      }
+    },
+    "unionmount": {
+      "inputs": {
+        "flake-compat": "flake-compat_4",
+        "flake-utils": "flake-utils_5",
+        "nixpkgs": [
+          "ema",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1645225415,
+        "narHash": "sha256-tKlUxn2TmkNIsKLZDfFS9c48byTv9zh+V2gcPiWniDI=",
+        "owner": "srid",
+        "repo": "unionmount",
+        "rev": "992420fc131c034511018e9a27733238fc9c8e5b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "ref": "multisite",
+        "repo": "unionmount",
         "type": "github"
       }
     }

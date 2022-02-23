@@ -16,6 +16,7 @@ import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID
 import Ema.CLI qualified
+import Ema.Route (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note
@@ -35,6 +36,7 @@ import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute.Type
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
 import Relude
@@ -45,6 +47,7 @@ data Status = Status_Loading | Status_Ready
 data Model = Model
   { _modelStatus :: Status,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
+    _modelRouteEncoder :: RouteEncoder Model SiteRoute,
     -- | An unique ID for this process's model. ID changes across processes.
     _modelInstanceID :: UUID,
     _modelNotes :: IxNote,
@@ -58,9 +61,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Some Ema.CLI.Action -> UUID -> Model
-emptyModel act instanceId =
-  Model Status_Loading act instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> UUID -> Model
+emptyModel act enc instanceId =
+  Model Status_Loading act enc instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =

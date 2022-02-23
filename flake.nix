@@ -1,7 +1,7 @@
 {
   description = "emanote";
   inputs = {
-    ema.url = "github:srid/ema/master";
+    ema.url = "github:srid/ema/multisite";
     # Use the nixpkgs used by the pinned ema.
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     nixpkgs.follows = "ema/nixpkgs";
@@ -13,6 +13,8 @@
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
+    unionmount.url = "github:srid/unionmount/multisite";
+    unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {
       url = "github:srid/heist/emanote";
@@ -66,6 +68,7 @@
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
                 pathtree = inputs.pathtree.defaultPackage.${system};
+                unionmount = inputs.unionmount.defaultPackage.${system};
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # url-slug = inputs.url-slug.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };

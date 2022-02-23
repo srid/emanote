@@ -4,12 +4,15 @@ import Control.Lens.Operators
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.Default (Default (def))
 import Data.Dependent.Sum (DSum ((:=>)))
+import Data.Some
 import Data.UUID.V4 qualified as UUID
+import Ema
 import Ema qualified
 import Ema.CLI qualified
 import Emanote qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model qualified as Model
+import Emanote.Route.SiteRoute.Class (routeEncoder)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
@@ -39,20 +42,31 @@ test = do
 
 run :: CLI.Cli -> IO ()
 run cli = do
-  res <-
-    Ema.runEmaWithCli (CLI.emaCli cli) (const View.render) $ \act m -> do
-      defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-      instanceId <- liftIO UUID.nextRandom
-      let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
-      Emanote.emanate
-        layers
-        Pattern.filePatterns
-        Pattern.ignorePatterns
-        m
-        (Model.emptyModel act instanceId)
-        Patch.patchModel
-  case res of
-    Right (Ema.CLI.Generate outPath :=> Identity genPaths) -> do
+  let emaCli = CLI.emaCli cli
+  genPaths <-
+    Ema.runSiteWithCli emaCli $
+      Site
+        { siteName = "emanote",
+          siteRender = SiteRender $ \m r -> do
+            pure $ View.render m r,
+          siteRouteEncoder = routeEncoder,
+          siteModelManager =
+            ModelManager $ do
+              cliAct <- askCLIAction
+              enc <- askRouteEncoder
+              defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+              instanceId <- liftIO UUID.nextRandom
+              let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
+              lift $
+                Emanote.emanate
+                  layers
+                  Pattern.filePatterns
+                  Pattern.ignorePatterns
+                  (Model.emptyModel cliAct enc instanceId)
+                  Patch.patchModel
+        }
+  case Ema.CLI.action emaCli of
+    Some (Ema.CLI.Generate outPath) -> do
       let cssPath = outPath </> generatedCssFile
       putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
       runStdoutLoggingT . Tailwind.runTailwind $

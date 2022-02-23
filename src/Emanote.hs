@@ -18,6 +18,14 @@ import UnliftIO.IO (hFlush)
 
 type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
 
+-- TODO: import from ... unionmount?
+type NonEmptyLVar m a =
+  ( -- Initial value
+    a,
+    -- Generator for subsequent values
+    LVar a -> m ()
+  )
+
 -- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
 --
 -- This is a generic extension to unionMountOnLVar for operating Emanote like
@@ -29,23 +37,22 @@ emanate ::
   [(tag, FilePattern)] ->
   -- | Ignore patterns
   [FilePattern] ->
-  LVar model ->
   model ->
   ChangeHandler tag model m ->
-  m ()
-emanate layers filePatterns ignorePatterns modelLvar initialModel f = do
-  mcmd <-
-    UM.unionMountOnLVar
-      layers
-      filePatterns
-      ignorePatterns
-      modelLvar
-      initialModel
-      (mapFsChanges f)
-  whenJust mcmd $ \UM.Cmd_Remount -> do
-    log "!! Remount suggested !!"
-    LVar.set modelLvar initialModel -- Reset the model
-    emanate layers filePatterns ignorePatterns modelLvar initialModel f
+  m (NonEmptyLVar m model)
+emanate layers filePatterns ignorePatterns initialModel f = do
+  UM.unionMountOnLVar
+    layers
+    filePatterns
+    ignorePatterns
+    initialModel
+    (mapFsChanges f)
+
+{- TODO: support this:
+log "!! Remounting !!"
+LVar.set modelLvar initialModel -- Reset the model
+emanate layers filePatterns ignorePatterns modelLvar initialModel f
+-}
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
 mapFsChanges h ch = do

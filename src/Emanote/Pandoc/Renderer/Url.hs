@@ -5,9 +5,11 @@ module Emanote.Pandoc.Renderer.Url
   )
 where
 
+import Control.Lens.Operators ((^.))
 import Data.Text qualified as T
 import Data.WorldPeace.Union (absurdUnion)
-import Ema qualified
+import Ema qualified as Ema
+import Ema.Route qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
@@ -96,7 +98,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
           fmap mconcat . sequence $
             toList srs
               <&> \(getSr -> sr) -> do
-                let srRoute = toText $ Ema.encodeRoute model sr
+                let srRoute = toText $ Ema.encodeRoute (model ^. M.modelRouteEncoder) model sr
                     (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
                     linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
                     newIs = one $ B.Str $ show sr
