@@ -35,21 +35,23 @@ mkEmanoteSite cli =
       siteRender = SiteRender $ \m r -> do
         pure $ View.render m r,
       siteRouteEncoder = routeEncoder,
-      siteModelManager =
-        ModelManager $ do
-          cliAct <- askCLIAction
-          enc <- askRouteEncoder
-          defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-          instanceId <- liftIO UUID.nextRandom
-          let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
-          lift $
-            Emanote.emanate
-              layers
-              Pattern.filePatterns
-              Pattern.ignorePatterns
-              (Model.emptyModel cliAct enc instanceId)
-              Patch.patchModel
+      siteModelManager = modelManager cli
     }
+
+modelManager :: CLI.Cli -> ModelManager Model.Model SiteRoute
+modelManager cli = ModelManager $ do
+  cliAct <- askCLIAction
+  enc <- askRouteEncoder
+  defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+  instanceId <- liftIO UUID.nextRandom
+  let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
+  lift $
+    Emanote.emanate
+      layers
+      Pattern.filePatterns
+      Pattern.ignorePatterns
+      (Model.emptyModel cliAct enc instanceId)
+      Patch.patchModel
 
 type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
 
