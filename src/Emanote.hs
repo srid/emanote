@@ -32,11 +32,15 @@ mkEmanoteSite :: CLI.Cli -> Site Model.Model SiteRoute
 mkEmanoteSite cli =
   Site
     { siteName = "emanote",
-      siteRender = SiteRender $ \m r -> do
-        pure $ View.render m r,
+      siteRender = render,
       siteRouteEncoder = routeEncoder,
       siteModelManager = modelManager cli
     }
+
+render :: SiteRender Model.Model SiteRoute
+render =
+  SiteRender $ \m r -> do
+    pure $ View.render m r
 
 modelManager :: CLI.Cli -> ModelManager Model.Model SiteRoute
 modelManager cli = ModelManager $ do
