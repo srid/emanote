@@ -3,11 +3,13 @@ module Main where
 import Control.Lens.Operators
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.Default (Default (def))
+import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Some
 import Ema
 import Ema.CLI qualified
 import Emanote (mkEmanoteSite)
 import Emanote.CLI qualified as CLI
+import Emanote.Prelude (log)
 import Emanote.View.Common (generatedCssFile)
 import Main.Utf8 (withUtf8)
 import Relude
@@ -33,10 +35,10 @@ test = do
 run :: CLI.Cli -> IO ()
 run cli = do
   let emaCli = CLI.emaCli cli
-  genPaths <-
+  ret <-
     Ema.runSiteWithCli emaCli $ mkEmanoteSite cli
-  case Ema.CLI.action emaCli of
-    Some (Ema.CLI.Generate outPath) -> do
+  case ret of
+    Ema.CLI.Generate outPath :=> Identity genPaths -> do
       let cssPath = outPath </> generatedCssFile
       putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
       runStdoutLoggingT . Tailwind.runTailwind $
@@ -44,5 +46,5 @@ run cli = do
           & Tailwind.tailwindConfig . Tailwind.tailwindConfigContent .~ genPaths
           & Tailwind.tailwindOutput .~ cssPath
           & Tailwind.tailwindMode .~ Tailwind.Production
-    _ ->
+    _ -> do
       pure ()
