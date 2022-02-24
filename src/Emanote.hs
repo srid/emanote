@@ -1,5 +1,10 @@
 module Emanote
-  ( mkEmanoteSite,
+  ( -- * Ema composition exports
+    mkEmanoteSite,
+    modelManager,
+    render,
+
+    -- * Other
     emanate,
     ChangeHandler,
   )
