@@ -142,6 +142,11 @@ deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in foldl' (flip Ix.delete) rels candidates
 
+modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
+modelLookupStaticFile fp m = do
+  r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
+  Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
+
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
   modelStaticFiles %~ Ix.updateIx r staticFile

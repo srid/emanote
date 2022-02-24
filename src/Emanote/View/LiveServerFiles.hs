@@ -1,5 +1,5 @@
 module Emanote.View.LiveServerFiles
-  ( tailwindFullCssUrl,
+  ( tailwindFullCssPath,
     isLiveServerFile,
   )
 where
@@ -12,8 +12,8 @@ import Relude
 baseDir :: FilePath
 baseDir = "_emanote-live-server"
 
-tailwindFullCssUrl :: Text
-tailwindFullCssUrl = toText baseDir <> "/tailwind/2.2.2/tailwind.min.css"
+tailwindFullCssPath :: FilePath
+tailwindFullCssPath = baseDir <> "/tailwind/2.2.2/tailwind.min.css"
 
 isLiveServerFile :: FilePath -> Bool
 isLiveServerFile (toText -> fp) =

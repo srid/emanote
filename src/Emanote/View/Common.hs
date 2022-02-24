@@ -123,6 +123,7 @@ generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
 
 commonSplices ::
+  HasCallStack =>
   Monad n =>
   ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
   Model ->
@@ -178,10 +179,11 @@ commonSplices withCtx model meta routeTitle = do
     -- For a proper way to do this, see: https://github.com/srid/ema/issues/20
     cannotBeCached url = url <> "?instanceId=" <> show (model ^. M.modelInstanceID)
     cachedTailwindCdn =
-      H.link
-        ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
-        ! A.rel "stylesheet"
-        ! A.type_ "text/css"
+      let localCdnUrl = SR.siteRouteUrl model $ SR.staticFileSiteRoute $ fromMaybe (error "model not ready?") $ M.modelLookupStaticFile LiveServerFiles.tailwindFullCssPath model
+       in H.link
+            ! A.href (H.toValue localCdnUrl)
+            ! A.rel "stylesheet"
+            ! A.type_ "text/css"
 
 -- | Given a route metadata, return the context generating function that can be
 -- used to render an arbitrary Pandoc AST
