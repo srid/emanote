@@ -18,6 +18,7 @@ import Ema
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (chainM)
+import Emanote.Route.Ext
 import Emanote.Route.SiteRoute.Class (routeEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
@@ -64,20 +65,18 @@ modelManager cli = ModelManager $ do
 
 type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
 
--- TODO: import from ... unionmount?
-type NonEmptyLVar m a =
-  ( -- Initial value
-    a,
-    -- Generator for subsequent values
-    LVar a -> m ()
-  )
-
 -- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
 --
 -- This is a generic extension to unionMountOnLVar for operating Emanote like
 -- apps.
 emanate ::
-  (MonadUnliftIO m, MonadLogger m, Ord tag) =>
+  forall m tag model.
+  ( MonadLogger m,
+    MonadUnliftIO m,
+    Ord tag,
+    model ~ Model.Model,
+    tag ~ FileType SourceExt
+  ) =>
   -- Layers to mount
   Set (Loc, FilePath) ->
   [(tag, FilePattern)] ->
@@ -85,14 +84,15 @@ emanate ::
   [FilePattern] ->
   model ->
   ChangeHandler tag model m ->
-  m (NonEmptyLVar m model)
+  m (X m model)
 emanate layers filePatterns ignorePatterns initialModel f = do
-  UM.unionMountOnLVar
-    layers
-    filePatterns
-    ignorePatterns
-    initialModel
-    (mapFsChanges f)
+  X
+    <$> UM.unionMount1
+      layers
+      filePatterns
+      ignorePatterns
+      initialModel
+      (mapFsChanges f)
 
 {- TODO: support this:
 log "!! Remounting !!"
