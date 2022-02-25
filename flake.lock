@@ -346,11 +346,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1645832833,
-        "narHash": "sha256-wiarzozvQhPviWjqjNw2R94FbsXAN/jcyRjGOvkPxxI=",
+        "lastModified": 1645833480,
+        "narHash": "sha256-z2ene6TFcZUQnI7JB7gqbgn2ld022BLyOrnBtJqxl/Q=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "42ac94f81467be5bbea91e61a2619323dc63c21f",
+        "rev": "b7e2fcc50eb04938fa8229d160830bbb63757274",
         "type": "github"
       },
       "original": {
