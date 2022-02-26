@@ -1,11 +1,13 @@
 <!-- What goes in this file will appear on near the end of <head>-->
-<link rel="preload" href="_emanote-static/fonts/Maven_Pro/MavenPro-VariableFont_wght.ttf" as="font"
+<link rel="preload"
+  href="${ema:emanoteStaticLayerUrl}/fonts/Maven_Pro/MavenPro-VariableFont_wght.ttf" as="font"
   type="font/ttf" crossorigin>
 
 <style>
   @font-face {
     font-family: 'MavenPro';
-    src: url('_emanote-static/fonts/Maven_Pro/MavenPro-VariableFont_wght.ttf') format("truetype");
+    /* FIXME: Can't use tempaltes in CSS? (${ema:emanoteStaticLayerUrl}/fonts/Maven_Pro/MavenPro-VariableFont_wght.ttf */
+    src: url(_emanote-static/fonts/Maven_Pro/MavenPro-VariableFont_wght.ttf) format("truetype");
     font-display: swap;
   }
 

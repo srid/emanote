@@ -17,6 +17,7 @@ where
 import Control.Lens.Operators ((^.))
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema qualified
 import Emanote.Model.Note qualified as MN
@@ -173,6 +174,16 @@ commonSplices withCtx model meta routeTitle = do
     ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
   "ema:taskIndexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
+  "ema:emanoteStaticLayerUrl"
+    ## HI.textSplice
+      ( -- HACK
+        -- Also: more-head.tpl is the one place where this is hardcoded.
+        let itUrl =
+              SR.siteRouteUrl model $
+                SR.staticFileSiteRoute $
+                  fromMaybe (error "no _emanote-static?") $ M.modelLookupStaticFile "_emanote-static/inverted-tree.css" model
+         in fst $ T.breakOn "/inverted-tree.css" itUrl
+      )
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
