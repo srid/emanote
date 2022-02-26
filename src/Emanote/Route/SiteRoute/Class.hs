@@ -51,8 +51,8 @@ routeEncoder =
     enc model (SiteRoute r) =
       r
         & absurdUnion
-        `h` ( \(MissingR _fp) ->
-                error "emanote: attempt to encode a 404 route"
+        `h` ( \(MissingR s) ->
+                error $ toText $ "emanote: attempt to encode a 404 route: " <> s
             )
         `h` ( \(AmbiguousR _) ->
                 error "emanote: attempt to encode an ambiguous route"
