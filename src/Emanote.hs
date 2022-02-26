@@ -11,7 +11,6 @@ module Emanote
 where
 
 import Control.Monad.Logger (MonadLogger)
-import Data.LVar (LVar)
 import Data.Map.Strict qualified as Map
 import Data.UUID.V4 qualified as UUID
 import Ema

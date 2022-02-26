@@ -163,6 +163,10 @@ commonSplices withCtx model meta routeTitle = do
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull
+  "ema:homeUrl"
+    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @('R.LMLType 'R.Md) R.indexRoute
+          in HI.textSplice (SR.siteRouteUrl model homeR)
+       )
   "ema:indexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
   "ema:tagIndexUrl"

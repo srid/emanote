@@ -32,7 +32,7 @@
 
             <div id="site-logo" class="pl-2">
               <div class="flex items-center my-2 space-x-2 justify-left">
-                <a href="" title="Go to Home">
+                <a href="${ema:homeUrl}" title="Go to Home">
                   <ema:metadata>
                     <with var="template">
                       <!-- The style width attribute here is to prevent huge
@@ -45,7 +45,7 @@
                     </with>
                   </ema:metadata>
                 </a>
-                <a class="font-bold truncate" title="Go to Home" href="">
+                <a class="font-bold truncate" title="Go to Home" href="${ema:homeUrl}">
                   Home
                 </a>
               </div>
