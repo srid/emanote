@@ -44,6 +44,10 @@ import Relude
 
 type EmanoteRouteEncoder = RouteEncoder Model SiteRoute
 
+instance IsRoute SiteRoute where
+  type RouteModel SiteRoute = Model
+  mkRouteEncoder = routeEncoder
+
 routeEncoder :: EmanoteRouteEncoder
 routeEncoder =
   unsafeMkRouteEncoder enc dec all_
