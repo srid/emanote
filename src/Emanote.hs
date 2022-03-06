@@ -83,9 +83,9 @@ emanate ::
   [FilePattern] ->
   model ->
   ChangeHandler tag model m ->
-  m (X m model)
+  m (Dynamic m model)
 emanate layers filePatterns ignorePatterns initialModel f = do
-  X
+  Dynamic
     <$> UM.unionMount1
       layers
       filePatterns
