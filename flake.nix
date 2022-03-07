@@ -1,18 +1,16 @@
 {
   description = "emanote";
   inputs = {
+    nixpkgs.follows = "ema/nixpkgs"; # Use the nixpkgs used by the pinned ema.
     ema.url = "github:srid/ema/master";
-    # Use the nixpkgs used by the pinned ema.
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
-    tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
-    flake-utils.follows = "ema/flake-utils";
-    flake-compat.follows = "ema/flake-compat";
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
+    #commonmark-simple.url = "github:srid/commonmark-simple";
+    #commonmark-simple.inputs.nixpkgs.follows = "ema/nixpkgs";
+    #url-slug.url = "github:srid/url-slug";
+    #url-slug.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {
       url = "github:srid/heist/emanote";
