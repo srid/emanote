@@ -16,7 +16,7 @@ import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID
 import Ema.CLI qualified
-import Ema.Route (RouteEncoder)
+import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note

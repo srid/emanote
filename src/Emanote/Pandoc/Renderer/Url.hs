@@ -8,7 +8,7 @@ where
 import Control.Lens.Operators ((^.))
 import Data.Text qualified as T
 import Data.WorldPeace.Union (absurdUnion)
-import Ema.Route qualified as Ema
+import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel

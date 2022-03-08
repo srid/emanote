@@ -27,7 +27,7 @@ import Data.WorldPeace.Union
     openUnionLift,
   )
 import Ema (UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
-import Ema.Route
+import Ema.Route.Encoder
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
