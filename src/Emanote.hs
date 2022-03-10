@@ -2,7 +2,6 @@ module Emanote
   ( -- * Ema composition exports
     mkEmanoteSite,
     modelManager,
-    render,
 
     -- * Other
     emanate,
@@ -37,15 +36,12 @@ mkEmanoteSite :: CLI.Cli -> Site Model.Model SiteRoute
 mkEmanoteSite cli =
   Site
     { siteName = "emanote",
-      siteRender = render,
-      siteRouteEncoder = routeEncoder,
       siteModelManager = modelManager cli
     }
 
-render :: SiteRender Model.Model SiteRoute
-render =
-  SiteRender $ \m r -> do
-    pure $ View.render m r
+instance RenderAsset SiteRoute where
+  renderAsset _enc m r = do
+    View.render m r
 
 modelManager :: CLI.Cli -> ModelManager Model.Model SiteRoute
 modelManager cli = ModelManager $ do
