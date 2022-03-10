@@ -6,8 +6,9 @@ import Data.Default (Default (def))
 import Data.Dependent.Sum (DSum ((:=>)))
 import Ema
 import Ema.CLI qualified
-import Emanote (mkEmanoteSite)
+import Emanote ()
 import Emanote.CLI qualified as CLI
+import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.View.Common (generatedCssFile)
 import Main.Utf8 (withUtf8)
 import Relude
@@ -34,7 +35,7 @@ run :: CLI.Cli -> IO ()
 run cli = do
   let emaCli = CLI.emaCli cli
   ret <-
-    Ema.runSiteWithCli emaCli $ mkEmanoteSite cli
+    Ema.runSiteWithCli @SiteRoute emaCli cli
   case ret of
     Ema.CLI.Generate outPath :=> Identity genPaths -> do
       let cssPath = outPath </> generatedCssFile

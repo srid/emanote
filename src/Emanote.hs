@@ -1,10 +1,5 @@
 module Emanote
-  ( -- * Ema composition exports
-    mkEmanoteSite,
-    modelManager,
-
-    -- * Other
-    emanate,
+  ( emanate,
     ChangeHandler,
   )
 where
@@ -31,26 +26,16 @@ import System.UnionMount qualified as UM
 import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
 import UnliftIO.IO (hFlush)
 
--- | Create an Emanote Ema site.
-mkEmanoteSite :: CLI.Cli -> Site Model.Model SiteRoute
-mkEmanoteSite cli =
-  Site
-    { siteName = "emanote",
-      siteModelManager = modelManager cli
-    }
-
 instance RenderAsset SiteRoute where
   renderAsset _enc m r = do
     View.render m r
 
-modelManager :: CLI.Cli -> ModelManager Model.Model SiteRoute
-modelManager cli = ModelManager $ do
-  cliAct <- askCLIAction
-  enc <- askRouteEncoder
-  defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-  instanceId <- liftIO UUID.nextRandom
-  let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
-  lift $
+instance HasModel SiteRoute where
+  type ModelInput SiteRoute = CLI.Cli
+  runModel cliAct enc cli = do
+    defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+    instanceId <- liftIO UUID.nextRandom
+    let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
     Emanote.emanate
       layers
       Pattern.filePatterns
