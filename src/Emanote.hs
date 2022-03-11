@@ -11,8 +11,7 @@ import Ema
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (chainM)
-import Emanote.Route.Ext
-import Emanote.Route.SiteRoute.Class (routeEncoder)
+import Emanote.Route.Ext (FileType, SourceExt)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
