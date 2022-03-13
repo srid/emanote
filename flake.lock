@@ -8,11 +8,11 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1647041995,
-        "narHash": "sha256-S2ysEAsfBjfc1pwyK8msgEKkIglKYc3KQEoG9FSvjvk=",
+        "lastModified": 1647118945,
+        "narHash": "sha256-AeBwsGeN1kp1sD70IZSQmhPBdcYjWXt4c/MVi/xeuYQ=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "aea64d32cba4c969cde89e802180a8fc966c05c3",
+        "rev": "c0f1c8080aaead7c106130dde12c0cdf64f967c0",
         "type": "github"
       },
       "original": {
@@ -346,11 +346,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1645833480,
-        "narHash": "sha256-z2ene6TFcZUQnI7JB7gqbgn2ld022BLyOrnBtJqxl/Q=",
+        "lastModified": 1647181548,
+        "narHash": "sha256-y++p8hypNMcTyPOgevWyQKniD+ZQNnRInQ9MvScwjFc=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "b7e2fcc50eb04938fa8229d160830bbb63757274",
+        "rev": "6703e5edb654fe50ff82298916efd752c211d870",
         "type": "github"
       },
       "original": {
