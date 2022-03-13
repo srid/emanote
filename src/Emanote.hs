@@ -6,12 +6,15 @@ where
 
 import Control.Monad.Logger (MonadLogger)
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Data.UUID.V4 qualified as UUID
 import Ema
+import Ema.Route.Encoder (encodeRoute)
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (chainM)
 import Emanote.Route.Ext (FileType, SourceExt)
+import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
@@ -26,8 +29,23 @@ import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
 import UnliftIO.IO (hFlush)
 
 instance HasAsset SiteRoute where
-  routeAsset _enc m r = do
+  routeAsset enc m r = do
     View.render m r
+      <&> fixStaticUrl
+    where
+      -- See the FIXME in more-head.tpl. This is a workaround for that.
+      fixStaticUrl s =
+        case findPrefix of
+          Nothing -> s
+          Just prefix ->
+            encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
+        where
+          findPrefix :: Maybe Text
+          findPrefix = do
+            let indexR = toText $ encodeRoute enc m $ indexRoute
+            prefix <- T.stripSuffix "-/all.html" indexR
+            guard $ not $ T.null prefix
+            pure prefix
 
 instance HasModel SiteRoute where
   type ModelInput SiteRoute = CLI.Cli
