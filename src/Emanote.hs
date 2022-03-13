@@ -25,13 +25,13 @@ import System.UnionMount qualified as UM
 import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
 import UnliftIO.IO (hFlush)
 
-instance RenderAsset SiteRoute where
-  renderAsset _enc m r = do
+instance HasAsset SiteRoute where
+  routeAsset _enc m r = do
     View.render m r
 
 instance HasModel SiteRoute where
   type ModelInput SiteRoute = CLI.Cli
-  runModel cliAct enc cli = do
+  modelDynamic cliAct enc cli = do
     defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
     instanceId <- liftIO UUID.nextRandom
     let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
