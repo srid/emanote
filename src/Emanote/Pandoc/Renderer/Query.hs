@@ -49,6 +49,6 @@ noteSpliceMap ::
   MN.Note ->
   H.Splices (HI.Splice n)
 noteSpliceMap withCtx model note = do
-  "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx (preparePandoc model) (MN._noteTitle note)
+  "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
   "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

@@ -117,7 +117,7 @@ mkTemplateRenderCtx model r meta =
         mkRendererFromMeta model meta noteRenderers () r
       -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \x ->
-        Tit.titleSplice x (preparePandoc model) titleDoc
+        Tit.titleSplice x preparePandoc titleDoc
    in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 generatedCssFile :: FilePath
@@ -160,7 +160,7 @@ commonSplices withCtx model meta routeTitle = do
   "ema:metadata"
     ## HJ.bindJson meta
   "ema:title" ## withCtx $ \ctx ->
-    Tit.titleSplice ctx (preparePandoc model) routeTitle
+    Tit.titleSplice ctx preparePandoc routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull

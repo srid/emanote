@@ -62,10 +62,10 @@ runEmbedTemplate name splices = do
 embedResourceRoute :: Monad n => Model -> HP.RenderCtx n -> MN.Note -> Maybe (HI.Splice n)
 embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
-    "ema:note:title" ## Tit.titleSplice ctx (preparePandoc model) (MN._noteTitle note)
+    "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
     "ema:note:pandoc"
-      ## pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
+      ## pandocSplice ctx (prepareNoteDoc $ MN._noteDoc note)
 
 embedStaticFileRoute :: Monad n => Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice n)
 embedStaticFileRoute model wl staticFile = do
