@@ -24,6 +24,7 @@ cabal.project.local~
 result
 result-*
 .ci
+.direnv
 
 # nix bundle
 emanote
