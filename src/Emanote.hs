@@ -28,7 +28,7 @@ import System.UnionMount qualified as UM
 import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
 import UnliftIO.IO (hFlush)
 
-instance HasAsset SiteRoute where
+instance CanRender SiteRoute where
   routeAsset enc m r = do
     View.render m r
       <&> fixStaticUrl
@@ -38,6 +38,8 @@ instance HasAsset SiteRoute where
         case findPrefix of
           Nothing -> s
           Just prefix ->
+            -- TODO: This should be limited to more-head.tpl only, though. Do it in Patch.hs
+            -- Perhaps do it in all .tpl files.
             encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
         where
           findPrefix :: Maybe Text

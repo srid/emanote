@@ -48,9 +48,36 @@ instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model
   mkRouteEncoder = routeEncoder
 
+instance CanGenerate SiteRoute where
+  generatableRoutes model =
+    let htmlRoutes =
+          model ^. M.modelNotes
+            & Ix.toList
+            <&> noteFileSiteRoute
+        staticRoutes =
+          model ^. M.modelStaticFiles
+            & Ix.toList
+            & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
+            <&> staticFileSiteRoute
+        virtualRoutes :: [VirtualRoute] =
+          let tags = fst <$> M.modelTags model
+              tagPaths =
+                Set.fromList $
+                  ([] :) $ -- [] Triggers generation of main tag index.
+                    concat $
+                      tags <&> \(HT.deconstructTag -> tagPath) ->
+                        NE.filter (not . null) $ NE.inits tagPath
+           in openUnionLift IndexR :
+              openUnionLift ExportR :
+              openUnionLift TasksR :
+              (openUnionLift . TagIndexR <$> toList tagPaths)
+     in htmlRoutes
+          <> staticRoutes
+          <> fmap (SiteRoute . openUnionLift) virtualRoutes
+
 routeEncoder :: EmanoteRouteEncoder
 routeEncoder =
-  unsafeMkRouteEncoder enc dec all_
+  unsafeMkRouteEncoder enc dec
   where
     enc model (SiteRoute r) =
       r
@@ -68,33 +95,6 @@ routeEncoder =
       fmap (SiteRoute . openUnionLift) (decodeVirtualRoute fp)
         <|> decodeGeneratedRoute model fp
         <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
-
-    -- Only these routes will be generated in static-site generation mode.
-    all_ model =
-      let htmlRoutes =
-            model ^. M.modelNotes
-              & Ix.toList
-              <&> noteFileSiteRoute
-          staticRoutes =
-            model ^. M.modelStaticFiles
-              & Ix.toList
-              & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
-              <&> staticFileSiteRoute
-          virtualRoutes :: [VirtualRoute] =
-            let tags = fst <$> M.modelTags model
-                tagPaths =
-                  Set.fromList $
-                    ([] :) $ -- [] Triggers generation of main tag index.
-                      concat $
-                        tags <&> \(HT.deconstructTag -> tagPath) ->
-                          NE.filter (not . null) $ NE.inits tagPath
-             in openUnionLift IndexR :
-                openUnionLift ExportR :
-                openUnionLift TasksR :
-                (openUnionLift . TagIndexR <$> toList tagPaths)
-       in htmlRoutes
-            <> staticRoutes
-            <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
 encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
