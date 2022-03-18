@@ -25,9 +25,7 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          overlays = [ ];
-          pkgs =
-            import nixpkgs { inherit system overlays; config.allowBroken = true; };
+          pkgs = nixpkgs.legacyPackages.${system};
           # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
           filter = name: type:
             let
@@ -42,21 +40,6 @@
                 sansPrefix == "/.github" ||
                 sansPrefix == "/.vscode"
               );
-          # https://github.com/NixOS/nixpkgs/issues/140774#issuecomment-976899227
-          m1MacHsBuildTools =
-            pkgs.haskellPackages.override {
-              overrides = self: super:
-                let
-                  workaround140774 = hpkg: with pkgs.haskell.lib;
-                    overrideCabal hpkg (drv: {
-                      enableSeparateBinOutput = false;
-                    });
-                in
-                {
-                  ghcid = workaround140774 super.ghcid;
-                  ormolu = workaround140774 super.ormolu;
-                };
-            };
           project = returnShellEnv:
             pkgs.haskellPackages.developPackage {
               inherit returnShellEnv;
@@ -79,9 +62,7 @@
               };
               modifier = drv:
                 pkgs.haskell.lib.addBuildTools drv
-                  (with (if system == "aarch64-darwin"
-                  then m1MacHsBuildTools
-                  else pkgs.haskellPackages); [
+                  (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
                     # Specify your build/dev dependencies here. 
                     cabal-fmt
                     cabal-install

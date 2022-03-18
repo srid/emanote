@@ -18,10 +18,5 @@
   "tailwindCSS.colorDecorators": true,
   "html.format.contentUnformatted": "pre,code,textarea",
   "html.format.wrapLineLength": 100,
-  "html.format.unformattedContentDelimiter": "<!-- DoNotFormat -->",
-  "workbench.colorCustomizations": {
-    "activityBar.background": "#093427",
-    "titleBar.activeBackground": "#0C4937",
-    "titleBar.activeForeground": "#F0FCF9"
-  }
+  "html.format.unformattedContentDelimiter": "<!-- DoNotFormat -->"
 }
