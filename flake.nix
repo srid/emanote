@@ -52,6 +52,7 @@
 
                 pathtree = inputs.pathtree.defaultPackage.${system};
                 unionmount = inputs.unionmount.defaultPackage.${system};
+                relude = self.callHackage "relude" "1.0.0.1" { };  # Not on nixpkgs, for some reason.
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # url-slug = inputs.url-slug.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };

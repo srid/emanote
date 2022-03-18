@@ -25,8 +25,7 @@ import Paths_emanote qualified
 import Relude
 import System.FilePattern (FilePattern)
 import System.UnionMount qualified as UM
-import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
-import UnliftIO.IO (hFlush)
+import UnliftIO (MonadUnliftIO)
 
 instance CanRender SiteRoute where
   routeAsset enc m r = do
