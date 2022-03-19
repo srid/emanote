@@ -8,10 +8,10 @@ where
 
 import Control.Exception (throw)
 import Control.Lens.Operators ((%~))
-import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
-import Data.Time (getCurrentTime)
+import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
@@ -33,6 +33,24 @@ import UnliftIO.Directory (doesDirectoryExist)
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
+  (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
+  -- | Type of the file being changed
+  R.FileType R.SourceExt ->
+  -- | Path to the file being changed
+  FilePath ->
+  -- | Specific change to the file, along with its paths from other "layers"
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (Model -> Model)
+patchModel fpType fp action = do
+  logger <- askLoggerIO
+  now <- liftIO getCurrentTime
+  -- Prefix all patch logging with timestamp.
+  let newLogger loc src lvl s =
+        logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
+  runLoggingT (patchModel' fpType fp action) newLogger
+
+-- | Map a filesystem change to the corresponding model change.
+patchModel' ::
   (MonadIO m, MonadLogger m) =>
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
@@ -41,7 +59,7 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-patchModel fpType fp action =
+patchModel' fpType fp action = do
   case fpType of
     R.LMLType R.Md ->
       case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of

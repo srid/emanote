@@ -27,7 +27,7 @@ import Data.WorldPeace.Union
     openUnionLift,
   )
 import Ema
-import Ema.Route.Encoder (RouteEncoder, unsafeMkRouteEncoder)
+import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
@@ -40,13 +40,14 @@ import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
+import Optics.Core (prism')
 import Relude
 
 type EmanoteRouteEncoder = RouteEncoder Model SiteRoute
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model
-  mkRouteEncoder = routeEncoder
+  routeEncoder = emanoteRouteEncoder
 
 instance CanGenerate SiteRoute where
   generatableRoutes model =
@@ -75,9 +76,10 @@ instance CanGenerate SiteRoute where
           <> staticRoutes
           <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
-routeEncoder :: EmanoteRouteEncoder
-routeEncoder =
-  unsafeMkRouteEncoder enc dec
+emanoteRouteEncoder :: EmanoteRouteEncoder
+emanoteRouteEncoder =
+  -- TODO: replace lens with optics-core??
+  mkRouteEncoder $ \m -> prism' (enc m) (dec m)
   where
     enc model (SiteRoute r) =
       r

@@ -109,6 +109,7 @@ common library-common
     , heist                  >=1.1.0.1
     , ixset-typed
     , lens
+    , optics-core
     , lens-aeson
     , lvar
     , map-syntax
