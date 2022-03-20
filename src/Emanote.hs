@@ -6,6 +6,7 @@ where
 
 import Control.Monad.Logger (MonadLogger)
 import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Data.Text qualified as T
 import Data.UUID.V4 qualified as UUID
 import Ema
@@ -58,7 +59,7 @@ instance HasModel SiteRoute where
       layers
       Pattern.filePatterns
       Pattern.ignorePatterns
-      (Model.emptyModel cliAct enc instanceId)
+      (Model.emptyModel layers cliAct enc instanceId)
       Patch.patchModel
 
 type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
@@ -76,7 +77,7 @@ emanate ::
     tag ~ FileType SourceExt
   ) =>
   -- Layers to mount
-  Set (Loc, FilePath) ->
+  Set Loc ->
   [(tag, FilePattern)] ->
   -- | Ignore patterns
   [FilePattern] ->
@@ -86,17 +87,11 @@ emanate ::
 emanate layers filePatterns ignorePatterns initialModel f = do
   Dynamic
     <$> UM.unionMount1
-      layers
+      (layers & Set.map (\layer -> (layer, Loc.locPath layer)))
       filePatterns
       ignorePatterns
       initialModel
       (mapFsChanges f)
-
-{- TODO: support this:
-log "!! Remounting !!"
-LVar.set modelLvar initialModel -- Reset the model
-emanate layers filePatterns ignorePatterns modelLvar initialModel f
--}
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
 mapFsChanges h ch = do

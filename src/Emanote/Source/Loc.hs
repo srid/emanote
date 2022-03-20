@@ -9,6 +9,7 @@ module Emanote.Source.Loc
 
     -- * Using a `Loc`
     locResolve,
+    locPath,
   )
 where
 
@@ -25,15 +26,13 @@ data Loc
     LocDefault FilePath
   deriving stock (Eq, Ord, Show)
 
-defaultLayer :: FilePath -> (Loc, FilePath)
-defaultLayer fp =
-  (LocDefault fp, fp)
+defaultLayer :: FilePath -> Loc
+defaultLayer = LocDefault
 
-userLayers :: NonEmpty FilePath -> Set (Loc, FilePath)
+userLayers :: NonEmpty FilePath -> Set Loc
 userLayers paths =
   fromList $
-    zip [1 ..] (toList paths) <&> \(idx, path) ->
-      (LocUser idx path, path)
+    zip [1 ..] (toList paths) <&> uncurry LocUser
 
 -- | Return the effective path of a file.
 locResolve :: (Loc, FilePath) -> FilePath

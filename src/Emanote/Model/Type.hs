@@ -37,6 +37,7 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type
+import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
 import Relude
@@ -47,6 +48,8 @@ data Status = Status_Loading | Status_Ready
 -- TODO: Add base directory here (for top-site to use)
 data Model = Model
   { _modelStatus :: Status,
+    -- | Absolute
+    _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
     _modelRouteEncoder :: RouteEncoder Model SiteRoute,
     -- | An unique ID for this process's model. ID changes across processes.
@@ -62,9 +65,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> UUID -> Model
-emptyModel act enc instanceId =
-  Model Status_Loading act enc instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> UUID -> Model
+emptyModel layers act enc instanceId =
+  Model Status_Loading layers act enc instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =

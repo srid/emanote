@@ -1,6 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 module Emanote.Route.SiteRoute.Class
   ( decodeVirtualRoute,
     noteFileSiteRoute,
@@ -13,7 +10,7 @@ module Emanote.Route.SiteRoute.Class
     siteRouteUrl,
     siteRouteUrlStatic,
     urlStrategySuffix,
-    routeEncoder,
+    emanoteRouteEncoder,
   )
 where
 
