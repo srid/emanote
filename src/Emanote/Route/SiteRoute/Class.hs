@@ -25,7 +25,7 @@ import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
   )
-import Ema
+import Ema (UrlStrategy (..), routeUrlWith)
 import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
@@ -74,7 +74,6 @@ emanoteGeneratableRoutes model =
 
 emanoteRouteEncoder :: EmanoteRouteEncoder
 emanoteRouteEncoder =
-  -- TODO: replace lens with optics-core??
   mkRouteEncoder $ \m -> prism' (enc m) (dec m)
   where
     enc model (SiteRoute r) =

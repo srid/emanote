@@ -4,8 +4,14 @@ module Emanote (run) where
 
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.Default (def)
-import Data.Dependent.Sum
+import Data.Dependent.Sum (DSum ((:=>)))
 import Ema
+  ( CanGenerate (..),
+    CanRender (..),
+    HasModel (..),
+    IsRoute (..),
+    runSiteWithCli,
+  )
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Type qualified as Model

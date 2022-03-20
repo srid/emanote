@@ -45,10 +45,8 @@ import Relude
 data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
 
--- TODO: Add base directory here (for top-site to use)
 data Model = Model
   { _modelStatus :: Status,
-    -- | Absolute
     _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
     _modelRouteEncoder :: RouteEncoder Model SiteRoute,

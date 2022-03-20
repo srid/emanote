@@ -13,7 +13,7 @@
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
-    unionmount.url = "github:srid/unionmount/multisite";
+    unionmount.url = "github:srid/unionmount/master";
     unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {

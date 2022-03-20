@@ -280,16 +280,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1647644124,
-        "narHash": "sha256-qtyVvw0JUM560RqOIONBqbckEQcr9K595goBfaYiQeM=",
+        "lastModified": 1647795307,
+        "narHash": "sha256-olb4o0+l8XXtdQ8NKLtwjI5A9/4CPMgRdBVtZVvsLlY=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "06dd3d3b9db5c7cc98816a5eed19b4f6fcee9d5e",
+        "rev": "ccd5049de67bfd7f042deda00a41659ec4e36f3c",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "multisite",
+        "ref": "master",
         "repo": "unionmount",
         "type": "github"
       }

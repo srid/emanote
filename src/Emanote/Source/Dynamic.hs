@@ -63,7 +63,7 @@ emanate ::
   m (Dynamic m model)
 emanate layers filePatterns ignorePatterns initialModel f = do
   Dynamic
-    <$> UM.unionMount1
+    <$> UM.unionMount
       (layers & Set.map (\layer -> (layer, Loc.locPath layer)))
       filePatterns
       ignorePatterns
