@@ -10,7 +10,10 @@ module Emanote.Route.SiteRoute.Class
     siteRouteUrl,
     siteRouteUrlStatic,
     urlStrategySuffix,
+
+    -- * Ema stuff
     emanoteRouteEncoder,
+    emanoteGeneratableRoutes,
   )
 where
 
@@ -42,36 +45,32 @@ import Relude
 
 type EmanoteRouteEncoder = RouteEncoder Model SiteRoute
 
-instance IsRoute SiteRoute where
-  type RouteModel SiteRoute = Model
-  routeEncoder = emanoteRouteEncoder
-
-instance CanGenerate SiteRoute where
-  generatableRoutes model =
-    let htmlRoutes =
-          model ^. M.modelNotes
-            & Ix.toList
-            <&> noteFileSiteRoute
-        staticRoutes =
-          model ^. M.modelStaticFiles
-            & Ix.toList
-            & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
-            <&> staticFileSiteRoute
-        virtualRoutes :: [VirtualRoute] =
-          let tags = fst <$> M.modelTags model
-              tagPaths =
-                Set.fromList $
-                  ([] :) $ -- [] Triggers generation of main tag index.
-                    concat $
-                      tags <&> \(HT.deconstructTag -> tagPath) ->
-                        NE.filter (not . null) $ NE.inits tagPath
-           in openUnionLift IndexR :
-              openUnionLift ExportR :
-              openUnionLift TasksR :
-              (openUnionLift . TagIndexR <$> toList tagPaths)
-     in htmlRoutes
-          <> staticRoutes
-          <> fmap (SiteRoute . openUnionLift) virtualRoutes
+emanoteGeneratableRoutes :: Model -> [SiteRoute]
+emanoteGeneratableRoutes model =
+  let htmlRoutes =
+        model ^. M.modelNotes
+          & Ix.toList
+          <&> noteFileSiteRoute
+      staticRoutes =
+        model ^. M.modelStaticFiles
+          & Ix.toList
+          & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
+          <&> staticFileSiteRoute
+      virtualRoutes :: [VirtualRoute] =
+        let tags = fst <$> M.modelTags model
+            tagPaths =
+              Set.fromList $
+                ([] :) $ -- [] Triggers generation of main tag index.
+                  concat $
+                    tags <&> \(HT.deconstructTag -> tagPath) ->
+                      NE.filter (not . null) $ NE.inits tagPath
+         in openUnionLift IndexR :
+            openUnionLift ExportR :
+            openUnionLift TasksR :
+            (openUnionLift . TagIndexR <$> toList tagPaths)
+   in htmlRoutes
+        <> staticRoutes
+        <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
 emanoteRouteEncoder :: EmanoteRouteEncoder
 emanoteRouteEncoder =

@@ -1,14 +1,16 @@
-module Emanote.View.Template (render) where
+module Emanote.View.Template (emanoteRouteAsset, render) where
 
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Data.Tree.Path qualified as PathTree
 import Data.WorldPeace.Union
   ( absurdUnion,
   )
 import Ema qualified
+import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
@@ -21,8 +23,9 @@ import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
-import Emanote.Route.SiteRoute.Class (indexLmlRoute)
+import Emanote.Route.SiteRoute.Class (indexLmlRoute, indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
 import Emanote.View.TagIndex qualified as TagIndex
@@ -38,6 +41,27 @@ import Optics.Operators ((.~), (^.))
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+
+emanoteRouteAsset :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
+emanoteRouteAsset enc m r = do
+  render m r
+    <&> fixStaticUrl
+  where
+    -- See the FIXME in more-head.tpl. This is a workaround for that.
+    fixStaticUrl s =
+      case findPrefix of
+        Nothing -> s
+        Just prefix ->
+          -- TODO: This should be limited to more-head.tpl only, though. Do it in Patch.hs
+          -- Perhaps do it in all .tpl files.
+          encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
+      where
+        findPrefix :: Maybe Text
+        findPrefix = do
+          let indexR = toText $ Ema.encodeRoute enc m indexRoute
+          prefix <- T.stripSuffix "-/all.html" indexR
+          guard $ not $ T.null prefix
+          pure prefix
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m (SR.SiteRoute sr) =

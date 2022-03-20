@@ -1,115 +1,53 @@
-module Emanote
-  ( emanate,
-    ChangeHandler,
-  )
-where
+{-# OPTIONS_GHC -Wno-orphans #-}
 
-import Control.Monad.Logger (MonadLogger)
-import Data.Map.Strict qualified as Map
-import Data.Set qualified as Set
-import Data.Text qualified as T
-import Data.UUID.V4 qualified as UUID
+module Emanote (run) where
+
+import Control.Monad.Logger (runStdoutLoggingT)
+import Data.Default (def)
+import Data.Dependent.Sum
 import Ema
-import Ema.Route.Encoder (encodeRoute)
+import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Type qualified as Model
-import Emanote.Prelude (chainM)
-import Emanote.Route.Ext (FileType, SourceExt)
-import Emanote.Route.SiteRoute.Class (indexRoute)
+import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
-import Emanote.Source.Loc (Loc)
-import Emanote.Source.Loc qualified as Loc
-import Emanote.Source.Patch qualified as Patch
-import Emanote.Source.Pattern qualified as Pattern
-import Emanote.View qualified as View
-import Paths_emanote qualified
+import Emanote.Source.Dynamic (emanoteModelDynamic)
+import Emanote.View.Common (generatedCssFile)
+import Emanote.View.Template qualified as View
+import Optics.Core ((%), (.~))
 import Relude
-import System.FilePattern (FilePattern)
-import System.UnionMount qualified as UM
+import System.FilePath ((</>))
 import UnliftIO (MonadUnliftIO)
+import Web.Tailwind qualified as Tailwind
+
+instance IsRoute SiteRoute where
+  type RouteModel SiteRoute = Model.Model
+  routeEncoder = emanoteRouteEncoder
+
+instance CanGenerate SiteRoute where
+  generatableRoutes = emanoteGeneratableRoutes
 
 instance CanRender SiteRoute where
-  routeAsset enc m r = do
-    View.render m r
-      <&> fixStaticUrl
-    where
-      -- See the FIXME in more-head.tpl. This is a workaround for that.
-      fixStaticUrl s =
-        case findPrefix of
-          Nothing -> s
-          Just prefix ->
-            -- TODO: This should be limited to more-head.tpl only, though. Do it in Patch.hs
-            -- Perhaps do it in all .tpl files.
-            encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
-        where
-          findPrefix :: Maybe Text
-          findPrefix = do
-            let indexR = toText $ encodeRoute enc m $ indexRoute
-            prefix <- T.stripSuffix "-/all.html" indexR
-            guard $ not $ T.null prefix
-            pure prefix
+  routeAsset = View.emanoteRouteAsset
 
 instance HasModel SiteRoute where
   type ModelInput SiteRoute = CLI.Cli
-  modelDynamic cliAct enc cli = do
-    defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-    instanceId <- liftIO UUID.nextRandom
-    let layers = one defaultLayer <> Loc.userLayers (CLI.layers cli)
-    Emanote.emanate
-      layers
-      Pattern.filePatterns
-      Pattern.ignorePatterns
-      (Model.emptyModel layers cliAct enc instanceId)
-      Patch.patchModel
+  modelDynamic = emanoteModelDynamic
 
-type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
+run :: CLI.Cli -> IO ()
+run cli = do
+  Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
+    Ema.CLI.Generate outPath :=> Identity genPaths ->
+      compileTailwindCss outPath genPaths
+    _ ->
+      pure ()
 
--- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
---
--- This is a generic extension to unionMountOnLVar for operating Emanote like
--- apps.
-emanate ::
-  forall m tag model.
-  ( MonadLogger m,
-    MonadUnliftIO m,
-    Ord tag,
-    model ~ Model.Model,
-    tag ~ FileType SourceExt
-  ) =>
-  -- Layers to mount
-  Set Loc ->
-  [(tag, FilePattern)] ->
-  -- | Ignore patterns
-  [FilePattern] ->
-  model ->
-  ChangeHandler tag model m ->
-  m (Dynamic m model)
-emanate layers filePatterns ignorePatterns initialModel f = do
-  Dynamic
-    <$> UM.unionMount1
-      (layers & Set.map (\layer -> (layer, Loc.locPath layer)))
-      filePatterns
-      ignorePatterns
-      initialModel
-      (mapFsChanges f)
-
-mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
-mapFsChanges h ch = do
-  withBlockBuffering $
-    uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
-  where
-    -- Temporarily use block buffering before calling an IO action that is
-    -- known ahead to log rapidly, so as to not hamper serial processing speed.
-    withBlockBuffering f =
-      hSetBuffering stdout (BlockBuffering Nothing)
-        *> f
-        <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
-
-mapFsChangesOnExt ::
-  (MonadIO m, MonadLogger m) =>
-  ChangeHandler tag model m ->
-  tag ->
-  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
-  m (model -> model)
-mapFsChangesOnExt h fpType fps = do
-  uncurry (h fpType) `chainM` Map.toList fps
+compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
+compileTailwindCss outPath genPaths = do
+  let cssPath = outPath </> generatedCssFile
+  putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
+  runStdoutLoggingT . Tailwind.runTailwind $
+    def
+      & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
+      & Tailwind.tailwindOutput .~ cssPath
+      & Tailwind.tailwindMode .~ Tailwind.Production
