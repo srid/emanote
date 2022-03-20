@@ -3,8 +3,6 @@
 
 module Emanote.Model.Type where
 
-import Control.Lens.Operators as Lens ((%~), (.~), (^.))
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
@@ -40,6 +38,8 @@ import Emanote.Route.SiteRoute.Type
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
+import Optics.Operators ((%~), (.~), (^.))
+import Optics.TH (makeLenses)
 import Relude
 
 data Status = Status_Loading | Status_Ready

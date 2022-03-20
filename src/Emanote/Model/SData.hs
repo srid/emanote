@@ -3,7 +3,6 @@
 
 module Emanote.Model.SData where
 
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Extra.Merge qualified as AesonMerge
 import Data.Data (Data)
@@ -11,6 +10,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import Data.List.NonEmpty qualified as NE
 import Data.Yaml qualified as Yaml
 import Emanote.Route qualified as R
+import Optics.TH (makeLenses)
 import Relude
 
 -- | `S` for "structured". Refers to a per-route data file represented by Aeson

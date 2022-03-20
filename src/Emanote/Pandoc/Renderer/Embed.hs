@@ -1,6 +1,5 @@
 module Emanote.Pandoc.Renderer.Embed where
 
-import Control.Lens.Operators ((^.))
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Model (Model)
@@ -21,6 +20,7 @@ import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice)
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 

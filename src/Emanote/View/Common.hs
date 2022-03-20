@@ -14,7 +14,6 @@ module Emanote.View.Common
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
@@ -42,6 +41,7 @@ import Heist.Interpreted qualified as HI
 import Heist.Splices.Apply qualified as HA
 import Heist.Splices.Bind qualified as HB
 import Heist.Splices.Json qualified as HJ
+import Optics.Operators ((^.))
 import Paths_emanote qualified
 import Relude
 import Text.Blaze.Html ((!))

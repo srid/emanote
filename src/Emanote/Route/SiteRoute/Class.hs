@@ -14,7 +14,6 @@ module Emanote.Route.SiteRoute.Class
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
@@ -38,6 +37,7 @@ import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
 import Optics.Core (prism')
+import Optics.Operators ((^.))
 import Relude
 
 type EmanoteRouteEncoder = RouteEncoder Model SiteRoute

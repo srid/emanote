@@ -4,7 +4,6 @@ module Emanote.Pandoc.Renderer.Query
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.List qualified as List
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
@@ -21,6 +20,7 @@ import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (RenderCtx)
 import Heist.Interpreted qualified as HI
 import Heist.Splices.Json qualified as HJ
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 

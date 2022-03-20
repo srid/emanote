@@ -256,11 +256,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1647644446,
-        "narHash": "sha256-mADPKimmUayNSSYGTeVlkbtUH3hSwsOsQwfsWLoI86Q=",
+        "lastModified": 1647792199,
+        "narHash": "sha256-QndGcDf2ySiA+1CSo05lSE9qBCcV18hBCgw8qH9PfEo=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "7627d4098898a814fd185d5e98851b5de163d949",
+        "rev": "9deb377835f9035a658c694dd82cb772afeb2d36",
         "type": "github"
       },
       "original": {

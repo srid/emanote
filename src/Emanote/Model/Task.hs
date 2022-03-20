@@ -3,8 +3,6 @@
 
 module Emanote.Model.Task where
 
-import Control.Lens.Operators ((^.))
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
@@ -12,6 +10,8 @@ import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
 import Emanote.Route qualified as R
 import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
+import Optics.Operators ((^.))
+import Optics.TH (makeLenses)
 import Relude
 import Text.Pandoc.Builder qualified as B
 

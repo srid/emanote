@@ -7,7 +7,6 @@ module Emanote.Source.Patch
 where
 
 import Control.Exception (throw)
-import Control.Lens.Operators ((%~))
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
@@ -26,6 +25,7 @@ import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
+import Optics.Operators ((%~))
 import Relude
 import System.UnionMount qualified as UM
 import UnliftIO.Concurrent (threadDelay)

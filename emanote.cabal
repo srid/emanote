@@ -89,6 +89,7 @@ common library-common
   build-depends:
     , aeson
     , aeson-extra
+    , aeson-optics
     , async
     , base
     , blaze-html
@@ -108,22 +109,21 @@ common library-common
     , hedgehog
     , heist                  >=1.1.0.1
     , ixset-typed
-    , lens
-    , optics-core
-    , lens-aeson
     , lvar
     , map-syntax
     , megaparsec
     , monad-logger
     , mtl
     , neat-interpolation
+    , optics-core
+    , optics-th
     , optparse-applicative
     , pandoc-link-context    >=1.2.0
     , pandoc-types
     , parsec
     , pathtree
     , profunctors
-    , relude >= 1.0
+    , relude                 >=1.0
     , shower
     , some
     , tagged

@@ -5,7 +5,6 @@ module Emanote.Pandoc.Renderer.Url
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.Text qualified as T
 import Data.WorldPeace.Union (absurdUnion)
 import Ema.Route.Encoder qualified as Ema
@@ -25,6 +24,7 @@ import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W

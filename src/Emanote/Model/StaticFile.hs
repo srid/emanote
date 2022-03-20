@@ -3,12 +3,12 @@
 
 module Emanote.Model.StaticFile where
 
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Time (UTCTime)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
+import Optics.TH (makeLenses)
 import Relude
 
 data StaticFile = StaticFile
