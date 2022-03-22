@@ -109,6 +109,7 @@ patchModel' fpType fp action = do
             s' <- readRefreshedFile refreshAction fpAbs
             logD $ "Read " <> show (BS.length s') <> " bytes of template"
             pure $ \m ->
+              -- HACK
               let s = bool s' (fixStaticUrl m s') $ takeFileName fpAbs == "more-head.tpl"
                in m & M.modelHeistTemplate %~ T.addTemplateFile fpAbs fp s
           pure $ readyOnTemplates >>> act
@@ -142,8 +143,6 @@ fixStaticUrl m s =
   case findPrefix of
     Nothing -> s
     Just prefix ->
-      -- TODO: This should be limited to more-head.tpl only, though. Do it in Patch.hs
-      -- Perhaps do it in all .tpl files.
       encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
   where
     findPrefix :: Maybe Text
