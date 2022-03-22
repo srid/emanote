@@ -3,8 +3,6 @@
 
 module Emanote.Model.Link.Rel where
 
-import Control.Lens.Operators as Lens ((^.))
-import Control.Lens.TH (makeLenses)
 import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
@@ -14,6 +12,8 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
+import Optics.Operators as Lens ((^.))
+import Optics.TH (makeLenses)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.LinkContext qualified as LC

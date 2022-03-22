@@ -1,6 +1,5 @@
 module Emanote.Model.Query where
 
-import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Text qualified as T
@@ -11,6 +10,7 @@ import Emanote.Model.Type (Model, modelNotes, modelTags)
 import Emanote.Pandoc.Markdown.Syntax.HashTag (TagPattern)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
+import Optics.Operators ((^.))
 import Relude
 import System.FilePattern (FilePattern, (?==))
 import Text.Megaparsec qualified as M

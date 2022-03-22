@@ -5,10 +5,8 @@
 
 module Emanote.Model.Note where
 
-import Control.Lens.Operators ((.~))
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
-import Data.Aeson.Lens qualified as A
+import Data.Aeson.Optics qualified as AO
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
@@ -21,6 +19,8 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
 import Network.URI.Slug (Slug)
+import Optics.Core ((%), (.~))
+import Optics.TH (makeLenses)
 import Relude
 import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Builder qualified as B
@@ -204,7 +204,7 @@ parseNote r fp s = do
   let meta =
         frontmatter
           -- Merge frontmatter tags with inline tags in Pandoc document.
-          & A.key "tags" . A._Array
+          & AO.key "tags" % AO._Array
             .~ ( fromList . fmap Aeson.toJSON $
                    nub $
                      lookupAeson @[HT.Tag] mempty (one "tags") frontmatter

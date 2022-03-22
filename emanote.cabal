@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.4.11.3
+version:            0.5.0.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -89,6 +89,7 @@ common library-common
   build-depends:
     , aeson
     , aeson-extra
+    , aeson-optics
     , async
     , base
     , blaze-html
@@ -108,21 +109,21 @@ common library-common
     , hedgehog
     , heist                  >=1.1.0.1
     , ixset-typed
-    , lens
-    , lens-aeson
     , lvar
     , map-syntax
     , megaparsec
     , monad-logger
     , mtl
     , neat-interpolation
+    , optics-core
+    , optics-th
     , optparse-applicative
     , pandoc-link-context    >=1.2.0
     , pandoc-types
     , parsec
     , pathtree
     , profunctors
-    , relude
+    , relude                 >=1.0
     , shower
     , some
     , tagged
@@ -185,6 +186,7 @@ library
     Emanote.Route.SiteRoute
     Emanote.Route.SiteRoute.Class
     Emanote.Route.SiteRoute.Type
+    Emanote.Source.Dynamic
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern

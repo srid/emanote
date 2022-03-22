@@ -1,6 +1,5 @@
-module Emanote.View.Template (render) where
+module Emanote.View.Template (emanoteRouteAsset, render) where
 
-import Control.Lens ((.~), (^.))
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
@@ -10,6 +9,7 @@ import Data.WorldPeace.Union
   ( absurdUnion,
   )
 import Ema qualified
+import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
@@ -22,6 +22,7 @@ import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexLmlRoute)
 import Emanote.View.Common qualified as C
@@ -35,9 +36,14 @@ import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
+import Optics.Operators ((.~), (^.))
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+
+emanoteRouteAsset :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
+emanoteRouteAsset _enc m r = do
+  render m r
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m (SR.SiteRoute sr) =
@@ -156,7 +162,7 @@ renderLmlHtml model note = do
     "ema:note:pandoc"
       ## C.withBlockCtx tCtx
       $ \ctx ->
-        Splices.pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
+        Splices.pandocSplice ctx (prepareNoteDoc $ MN._noteDoc note)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::

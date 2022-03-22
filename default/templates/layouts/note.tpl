@@ -6,7 +6,7 @@
 
 <apply template="base">
   <bind tag="head-main">
-    <link rel="stylesheet" href="_emanote-static/inverted-tree.css" />
+    <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/inverted-tree.css" />
   </bind>
   <bind tag="body-main">
     <div class="${containerClass}">

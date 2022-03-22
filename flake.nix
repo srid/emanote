@@ -1,16 +1,20 @@
 {
   description = "emanote";
   inputs = {
-    nixpkgs.follows = "ema/nixpkgs"; # Use the nixpkgs used by the pinned ema.
-    ema.url = "github:srid/ema/master";
+    ema.url = "github:srid/ema/multisite";
+    # Use the nixpkgs used by the pinned ema.
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
+    nixpkgs.follows = "ema/nixpkgs";
+    tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
+    tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
+    tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
+    flake-utils.follows = "/ema/flake-utils";
+    flake-compat.follows = "/ema/flake-compat";
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
-    #commonmark-simple.url = "github:srid/commonmark-simple";
-    #commonmark-simple.inputs.nixpkgs.follows = "ema/nixpkgs";
-    #url-slug.url = "github:srid/url-slug";
-    #url-slug.inputs.nixpkgs.follows = "ema/nixpkgs";
+    unionmount.url = "github:srid/unionmount/master";
+    unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {
       url = "github:srid/heist/emanote";
@@ -27,9 +31,7 @@
     flake-utils.lib.eachDefaultSystem
       (system:
         let
-          overlays = [ ];
-          pkgs =
-            import nixpkgs { inherit system overlays; config.allowBroken = true; };
+          pkgs = nixpkgs.legacyPackages.${system};
           # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
           filter = name: type:
             let
@@ -44,21 +46,6 @@
                 sansPrefix == "/.github" ||
                 sansPrefix == "/.vscode"
               );
-          # https://github.com/NixOS/nixpkgs/issues/140774#issuecomment-976899227
-          m1MacHsBuildTools =
-            pkgs.haskellPackages.override {
-              overrides = self: super:
-                let
-                  workaround140774 = hpkg: with pkgs.haskell.lib;
-                    overrideCabal hpkg (drv: {
-                      enableSeparateBinOutput = false;
-                    });
-                in
-                {
-                  ghcid = workaround140774 super.ghcid;
-                  ormolu = workaround140774 super.ormolu;
-                };
-            };
           project = returnShellEnv:
             pkgs.haskellPackages.developPackage {
               inherit returnShellEnv;
@@ -70,6 +57,8 @@
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
                 pathtree = inputs.pathtree.defaultPackage.${system};
+                unionmount = inputs.unionmount.defaultPackage.${system};
+                relude = self.callHackage "relude" "1.0.0.1" { }; # Not on nixpkgs, for some reason.
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # url-slug = inputs.url-slug.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
@@ -80,9 +69,7 @@
               };
               modifier = drv:
                 pkgs.haskell.lib.addBuildTools drv
-                  (with (if system == "aarch64-darwin"
-                  then m1MacHsBuildTools
-                  else pkgs.haskellPackages); [
+                  (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
                     # Specify your build/dev dependencies here. 
                     cabal-fmt
                     cabal-install

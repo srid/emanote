@@ -13,7 +13,6 @@ module Heist.Extra.TemplateState
   )
 where
 
-import Control.Lens.Operators ((.~))
 import Control.Monad.Except (MonadError (throwError), runExcept)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.Default (Default (..))
@@ -40,7 +39,8 @@ emptyTemplateState :: MonadIO m => m TemplateState
 emptyTemplateState = do
   let heistCfg :: H.HeistConfig Identity =
         H.emptyHeistConfig
-          & H.hcNamespace .~ ""
+          & H.hcNamespace (const $ Identity "")
+          & runIdentity
   eSt <- liftIO $ H.initHeist heistCfg
   let st = either (error . T.intercalate "," . fmap toText) id eSt
   pure $ TemplateState st mempty
