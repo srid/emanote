@@ -1,69 +1,59 @@
-module Emanote
-  ( emanate,
-    ChangeHandler,
+{-# OPTIONS_GHC -Wno-orphans #-}
+
+module Emanote (run) where
+
+import Control.Monad.Logger (runStdoutLoggingT)
+import Data.Default (def)
+import Data.Dependent.Sum (DSum ((:=>)))
+import Ema
+  ( CanGenerate (..),
+    CanRender (..),
+    HasModel (..),
+    IsRoute (..),
+    runSiteWithCli,
   )
-where
-
-import Control.Monad.Logger (MonadLogger)
-import Data.LVar (LVar)
-import Data.LVar qualified as LVar
-import Data.Map.Strict qualified as Map
-import Emanote.Prelude (chainM, log)
-import Emanote.Source.Loc (Loc)
+import Ema.CLI qualified
+import Emanote.CLI qualified as CLI
+import Emanote.Model.Type qualified as Model
+import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
+import Emanote.Route.SiteRoute.Type (SiteRoute)
+import Emanote.Source.Dynamic (emanoteModelDynamic)
+import Emanote.View.Common (generatedCssFile)
+import Emanote.View.Template qualified as View
+import Optics.Core ((%), (.~))
 import Relude
-import System.FilePattern (FilePattern)
-import System.UnionMount qualified as UM
-import UnliftIO (BufferMode (..), MonadUnliftIO, hSetBuffering)
-import UnliftIO.IO (hFlush)
+import System.FilePath ((</>))
+import UnliftIO (MonadUnliftIO)
+import Web.Tailwind qualified as Tailwind
 
-type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
+instance IsRoute SiteRoute where
+  type RouteModel SiteRoute = Model.Model
+  routeEncoder = emanoteRouteEncoder
 
--- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
---
--- This is a generic extension to unionMountOnLVar for operating Emanote like
--- apps.
-emanate ::
-  (MonadUnliftIO m, MonadLogger m, Ord tag) =>
-  -- Layers to mount
-  Set (Loc, FilePath) ->
-  [(tag, FilePattern)] ->
-  -- | Ignore patterns
-  [FilePattern] ->
-  LVar model ->
-  model ->
-  ChangeHandler tag model m ->
-  m ()
-emanate layers filePatterns ignorePatterns modelLvar initialModel f = do
-  mcmd <-
-    UM.unionMountOnLVar
-      layers
-      filePatterns
-      ignorePatterns
-      modelLvar
-      initialModel
-      (mapFsChanges f)
-  whenJust mcmd $ \UM.Cmd_Remount -> do
-    log "!! Remount suggested !!"
-    LVar.set modelLvar initialModel -- Reset the model
-    emanate layers filePatterns ignorePatterns modelLvar initialModel f
+instance CanGenerate SiteRoute where
+  generatableRoutes = emanoteGeneratableRoutes
 
-mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
-mapFsChanges h ch = do
-  withBlockBuffering $
-    uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
-  where
-    -- Temporarily use block buffering before calling an IO action that is
-    -- known ahead to log rapidly, so as to not hamper serial processing speed.
-    withBlockBuffering f =
-      hSetBuffering stdout (BlockBuffering Nothing)
-        *> f
-        <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
+instance CanRender SiteRoute where
+  routeAsset = View.emanoteRouteAsset
 
-mapFsChangesOnExt ::
-  (MonadIO m, MonadLogger m) =>
-  ChangeHandler tag model m ->
-  tag ->
-  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
-  m (model -> model)
-mapFsChangesOnExt h fpType fps = do
-  uncurry (h fpType) `chainM` Map.toList fps
+instance HasModel SiteRoute where
+  type ModelInput SiteRoute = CLI.Cli
+  modelDynamic = emanoteModelDynamic
+
+run :: CLI.Cli -> IO ()
+run cli = do
+  Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
+    Ema.CLI.Generate outPath :=> Identity genPaths ->
+      compileTailwindCss outPath genPaths
+    _ ->
+      pure ()
+
+compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
+compileTailwindCss outPath genPaths = do
+  let cssPath = outPath </> generatedCssFile
+  putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
+  runStdoutLoggingT . Tailwind.runTailwind $
+    def
+      & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
+      & Tailwind.tailwindOutput .~ cssPath
+      & Tailwind.tailwindMode .~ Tailwind.Production

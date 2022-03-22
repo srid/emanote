@@ -14,9 +14,9 @@ module Emanote.View.Common
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema qualified
 import Emanote.Model.Note qualified as MN
@@ -41,6 +41,7 @@ import Heist.Interpreted qualified as HI
 import Heist.Splices.Apply qualified as HA
 import Heist.Splices.Bind qualified as HB
 import Heist.Splices.Json qualified as HJ
+import Optics.Operators ((^.))
 import Paths_emanote qualified
 import Relude
 import Text.Blaze.Html ((!))
@@ -116,13 +117,14 @@ mkTemplateRenderCtx model r meta =
         mkRendererFromMeta model meta noteRenderers () r
       -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \x ->
-        Tit.titleSplice x (preparePandoc model) titleDoc
+        Tit.titleSplice x preparePandoc titleDoc
    in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
 
 generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
 
 commonSplices ::
+  HasCallStack =>
   Monad n =>
   ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
   Model ->
@@ -158,16 +160,30 @@ commonSplices withCtx model meta routeTitle = do
   "ema:metadata"
     ## HJ.bindJson meta
   "ema:title" ## withCtx $ \ctx ->
-    Tit.titleSplice ctx (preparePandoc model) routeTitle
+    Tit.titleSplice ctx preparePandoc routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull
+  "ema:homeUrl"
+    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @('R.LMLType 'R.Md) R.indexRoute
+          in HI.textSplice (SR.siteRouteUrl model homeR)
+       )
   "ema:indexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
   "ema:tagIndexUrl"
     ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
   "ema:taskIndexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
+  "ema:emanoteStaticLayerUrl"
+    ## HI.textSplice
+      ( -- HACK
+        -- Also: more-head.tpl is the one place where this is hardcoded.
+        let itUrl =
+              SR.siteRouteUrl model $
+                SR.staticFileSiteRoute $
+                  fromMaybe (error "no _emanote-static?") $ M.modelLookupStaticFile "_emanote-static/inverted-tree.css" model
+         in fst $ T.breakOn "/inverted-tree.css" itUrl
+      )
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix"
     ## HI.textSplice (SR.urlStrategySuffix model)
@@ -177,9 +193,12 @@ commonSplices withCtx model meta routeTitle = do
     -- are generated.)
     -- For a proper way to do this, see: https://github.com/srid/ema/issues/20
     cannotBeCached url = url <> "?instanceId=" <> show (model ^. M.modelInstanceID)
-    cachedTailwindCdn =
+    cachedTailwindCdn = do
+      let localCdnUrl =
+            SR.siteRouteUrl model $
+              SR.staticFileSiteRoute $ LiveServerFiles.tailwindCssFile model
       H.link
-        ! A.href (H.toValue LiveServerFiles.tailwindFullCssUrl)
+        ! A.href (H.toValue localCdnUrl)
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
 

@@ -1,6 +1,5 @@
 module Emanote.Pandoc.Renderer.Embed where
 
-import Control.Lens.Operators ((^.))
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Model (Model)
@@ -21,6 +20,7 @@ import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice)
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 
@@ -62,10 +62,10 @@ runEmbedTemplate name splices = do
 embedResourceRoute :: Monad n => Model -> HP.RenderCtx n -> MN.Note -> Maybe (HI.Splice n)
 embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
-    "ema:note:title" ## Tit.titleSplice ctx (preparePandoc model) (MN._noteTitle note)
+    "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
     "ema:note:pandoc"
-      ## pandocSplice ctx (prepareNoteDoc model $ MN._noteDoc note)
+      ## pandocSplice ctx (prepareNoteDoc $ MN._noteDoc note)
 
 embedStaticFileRoute :: Monad n => Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice n)
 embedStaticFileRoute model wl staticFile = do

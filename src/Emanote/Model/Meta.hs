@@ -1,6 +1,5 @@
 module Emanote.Model.Meta (lookupRouteMeta, getEffectiveRouteMetaWith, getIndexYamlMeta) where
 
-import Control.Lens.Operators as Lens ((^.))
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
@@ -9,6 +8,7 @@ import Emanote.Model.Note (lookupAeson, _noteMeta)
 import Emanote.Model.SData (sdataValue)
 import Emanote.Model.SData qualified as SData
 import Emanote.Route qualified as R
+import Optics.Operators as Lens ((^.))
 import Relude
 
 -- | Look up a specific key in the meta for a given route.

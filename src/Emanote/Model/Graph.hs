@@ -1,6 +1,5 @@
 module Emanote.Model.Graph where
 
-import Control.Lens.Operators as Lens ((^.))
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
@@ -14,6 +13,7 @@ import Emanote.Model.Type (Model, modelRels)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
+import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
 import Text.Pandoc.Definition qualified as B
 

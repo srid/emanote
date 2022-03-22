@@ -1,10 +1,12 @@
 module Emanote.View.LiveServerFiles
-  ( tailwindFullCssUrl,
-    isLiveServerFile,
+  ( isLiveServerFile,
+    tailwindCssFile,
   )
 where
 
 import Data.Text qualified as T
+import Emanote.Model.StaticFile (StaticFile)
+import Emanote.Model.Type qualified as M
 import Relude
 
 -- TODO: Check this compile-time using TH?
@@ -12,9 +14,13 @@ import Relude
 baseDir :: FilePath
 baseDir = "_emanote-live-server"
 
-tailwindFullCssUrl :: Text
-tailwindFullCssUrl = toText baseDir <> "/tailwind/2.2.2/tailwind.min.css"
+tailwindFullCssPath :: FilePath
+tailwindFullCssPath = baseDir <> "/tailwind/2.2.2/tailwind.min.css"
 
 isLiveServerFile :: FilePath -> Bool
 isLiveServerFile (toText -> fp) =
   toText baseDir `T.isPrefixOf` fp
+
+tailwindCssFile :: M.Model -> StaticFile
+tailwindCssFile model =
+  fromMaybe (error "model not ready?") $ M.modelLookupStaticFile tailwindFullCssPath model

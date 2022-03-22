@@ -4,27 +4,27 @@ module Emanote.Pandoc.BuiltinFilters
   )
 where
 
-import Emanote.Model.Type (Model)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.Route (encodeRoute)
+import Emanote.Route.SiteRoute.Type (TagIndexR (TagIndexR), encodeTagIndexR)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
-prepareNoteDoc :: Model -> B.Pandoc -> B.Pandoc
-prepareNoteDoc model =
-  preparePandoc model
+prepareNoteDoc :: B.Pandoc -> B.Pandoc
+prepareNoteDoc =
+  preparePandoc
     >>> withoutH1 -- Because, handling note title separately
 
-preparePandoc :: W.Walkable B.Inline b => Model -> b -> b
-preparePandoc model =
-  linkifyInlineTags model
+preparePandoc :: W.Walkable B.Inline b => b -> b
+preparePandoc =
+  linkifyInlineTags
     >>> fixEmojiFontFamily
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
-linkifyInlineTags :: W.Walkable B.Inline b => Model -> b -> b
-linkifyInlineTags model =
+linkifyInlineTags :: W.Walkable B.Inline b => b -> b
+linkifyInlineTags =
   W.walk $ \case
     inline@(B.Span attr is) ->
       if
@@ -36,7 +36,7 @@ linkifyInlineTags model =
       x
   where
     tagUrl =
-      SR.siteRouteUrl model . SR.tagIndexRoute . toList . HT.deconstructTag
+      toText . encodeRoute . encodeTagIndexR . TagIndexR . toList . HT.deconstructTag
 
 withoutH1 :: B.Pandoc -> B.Pandoc
 withoutH1 (B.Pandoc meta (B.Header 1 _ _ : rest)) =

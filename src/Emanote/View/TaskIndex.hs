@@ -1,6 +1,5 @@
 module Emanote.View.TaskIndex (renderTasks) where
 
-import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
@@ -18,6 +17,7 @@ import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Interpreted qualified as HI
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 

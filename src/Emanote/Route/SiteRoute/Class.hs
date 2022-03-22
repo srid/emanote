@@ -1,6 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 module Emanote.Route.SiteRoute.Class
   ( decodeVirtualRoute,
     noteFileSiteRoute,
@@ -13,10 +10,13 @@ module Emanote.Route.SiteRoute.Class
     siteRouteUrl,
     siteRouteUrlStatic,
     urlStrategySuffix,
+
+    -- * Ema stuff
+    emanoteRouteEncoder,
+    emanoteGeneratableRoutes,
   )
 where
 
-import Control.Lens.Operators ((^.))
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
@@ -25,7 +25,8 @@ import Data.WorldPeace.Union
   ( absurdUnion,
     openUnionLift,
   )
-import Ema (Ema (..), UrlStrategy (UrlDirect, UrlPretty), routeUrlWith)
+import Ema (UrlStrategy (..), routeUrlWith)
+import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
@@ -38,54 +39,59 @@ import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
+import Optics.Core (prism')
+import Optics.Operators ((^.))
 import Relude
 
-instance Ema SiteRoute where
-  type ModelFor SiteRoute = Model
-  encodeRoute :: HasCallStack => Model -> SiteRoute -> FilePath
-  encodeRoute model (SiteRoute r) =
-    r
-      & absurdUnion
-      `h` ( \(MissingR _fp) ->
-              error "emanote: attempt to encode a 404 route"
-          )
-      `h` ( \(AmbiguousR _) ->
-              error "emanote: attempt to encode an ambiguous route"
-          )
-      `h` encodeResourceRoute model
-      `h` encodeVirtualRoute
+type EmanoteRouteEncoder = RouteEncoder Model SiteRoute
 
-  decodeRoute model fp =
-    fmap (SiteRoute . openUnionLift) (decodeVirtualRoute fp)
-      <|> decodeGeneratedRoute model fp
-      <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
+emanoteGeneratableRoutes :: Model -> [SiteRoute]
+emanoteGeneratableRoutes model =
+  let htmlRoutes =
+        model ^. M.modelNotes
+          & Ix.toList
+          <&> noteFileSiteRoute
+      staticRoutes =
+        model ^. M.modelStaticFiles
+          & Ix.toList
+          & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
+          <&> staticFileSiteRoute
+      virtualRoutes :: [VirtualRoute] =
+        let tags = fst <$> M.modelTags model
+            tagPaths =
+              Set.fromList $
+                ([] :) $ -- [] Triggers generation of main tag index.
+                  concat $
+                    tags <&> \(HT.deconstructTag -> tagPath) ->
+                      NE.filter (not . null) $ NE.inits tagPath
+         in openUnionLift IndexR :
+            openUnionLift ExportR :
+            openUnionLift TasksR :
+            (openUnionLift . TagIndexR <$> toList tagPaths)
+   in htmlRoutes
+        <> staticRoutes
+        <> fmap (SiteRoute . openUnionLift) virtualRoutes
 
-  -- Only these routes will be generated in static-site generation mode.
-  allRoutes model =
-    let htmlRoutes =
-          model ^. M.modelNotes
-            & Ix.toList
-            <&> noteFileSiteRoute
-        staticRoutes =
-          model ^. M.modelStaticFiles
-            & Ix.toList
-            & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
-            <&> staticFileSiteRoute
-        virtualRoutes :: [VirtualRoute] =
-          let tags = fst <$> M.modelTags model
-              tagPaths =
-                Set.fromList $
-                  ([] :) $ -- [] Triggers generation of main tag index.
-                    concat $
-                      tags <&> \(HT.deconstructTag -> tagPath) ->
-                        NE.filter (not . null) $ NE.inits tagPath
-           in openUnionLift IndexR :
-              openUnionLift ExportR :
-              openUnionLift TasksR :
-              (openUnionLift . TagIndexR <$> toList tagPaths)
-     in htmlRoutes
-          <> staticRoutes
-          <> fmap (SiteRoute . openUnionLift) virtualRoutes
+emanoteRouteEncoder :: EmanoteRouteEncoder
+emanoteRouteEncoder =
+  mkRouteEncoder $ \m -> prism' (enc m) (dec m)
+  where
+    enc model (SiteRoute r) =
+      r
+        & absurdUnion
+        `h` ( \(MissingR s) ->
+                error $ toText $ "emanote: attempt to encode a 404 route: " <> s
+            )
+        `h` ( \(AmbiguousR _) ->
+                error "emanote: attempt to encode an ambiguous route"
+            )
+        `h` encodeResourceRoute model
+        `h` encodeVirtualRoute
+
+    dec model fp =
+      fmap (SiteRoute . openUnionLift) (decodeVirtualRoute fp)
+        <|> decodeGeneratedRoute model fp
+        <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
 
 encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
@@ -147,7 +153,7 @@ staticFileSiteRoute =
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
 siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrlStatic model =
-  Ema.routeUrlWith (urlStrategy model) model
+  Ema.routeUrlWith (urlStrategy model) (model ^. M.modelRouteEncoder) model
 
 siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrl model sr =

@@ -2,7 +2,6 @@
 
 module Emanote.View.Export (renderGraphExport) where
 
-import Control.Lens ((^.))
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
@@ -16,6 +15,7 @@ import Emanote.Route (LMLRoute, lmlRouteCase)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
+import Optics.Operators ((^.))
 import Relude
 
 data Export = Export

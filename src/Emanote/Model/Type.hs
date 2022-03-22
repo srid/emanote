@@ -3,8 +3,6 @@
 
 module Emanote.Model.Type where
 
-import Control.Lens.Operators as Lens ((%~), (.~), (^.))
-import Control.Lens.TH (makeLenses)
 import Data.Aeson qualified as Aeson
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
@@ -16,6 +14,7 @@ import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID
 import Ema.CLI qualified
+import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note
@@ -35,8 +34,12 @@ import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute.Type
+import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
+import Optics.Operators ((%~), (.~), (^.))
+import Optics.TH (makeLenses)
 import Relude
 
 data Status = Status_Loading | Status_Ready
@@ -44,7 +47,9 @@ data Status = Status_Loading | Status_Ready
 
 data Model = Model
   { _modelStatus :: Status,
+    _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
+    _modelRouteEncoder :: RouteEncoder Model SiteRoute,
     -- | An unique ID for this process's model. ID changes across processes.
     _modelInstanceID :: UUID,
     _modelNotes :: IxNote,
@@ -58,9 +63,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Some Ema.CLI.Action -> UUID -> Model
-emptyModel act instanceId =
-  Model Status_Loading act instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> UUID -> Model
+emptyModel layers act enc instanceId =
+  Model Status_Loading layers act enc instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =
@@ -138,6 +143,11 @@ deleteIxMulti ::
 deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in foldl' (flip Ix.delete) rels candidates
+
+modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
+modelLookupStaticFile fp m = do
+  r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
+  Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
 modelInsertStaticFile t r fp =
