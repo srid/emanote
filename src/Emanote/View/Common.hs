@@ -193,14 +193,14 @@ commonSplices withCtx model meta routeTitle = do
     -- are generated.)
     -- For a proper way to do this, see: https://github.com/srid/ema/issues/20
     cannotBeCached url = url <> "?instanceId=" <> show (model ^. M.modelInstanceID)
-    cachedTailwindCdn =
-      -- TODO: abstract this out, and use it to fetch favicon logo (iconUrl)
-      -- But this comes from index.yaml, and used .tpl files. No Haskell involved. Perhaps we can patch index.yaml meta accordingly ...
-      let localCdnUrl = SR.siteRouteUrl model $ SR.staticFileSiteRoute $ fromMaybe (error "model not ready?") $ M.modelLookupStaticFile LiveServerFiles.tailwindFullCssPath model
-       in H.link
-            ! A.href (H.toValue localCdnUrl)
-            ! A.rel "stylesheet"
-            ! A.type_ "text/css"
+    cachedTailwindCdn = do
+      let localCdnUrl =
+            SR.siteRouteUrl model $
+              SR.staticFileSiteRoute $ LiveServerFiles.tailwindCssFile model
+      H.link
+        ! A.href (H.toValue localCdnUrl)
+        ! A.rel "stylesheet"
+        ! A.type_ "text/css"
 
 -- | Given a route metadata, return the context generating function that can be
 -- used to render an arbitrary Pandoc AST

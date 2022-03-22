@@ -24,7 +24,6 @@ import Heist qualified as H
 import Heist.Common qualified as H
 import Heist.Internal.Types qualified as HT
 import Heist.Interpreted qualified as HI
-import Optics.Operators ((.~))
 import Relude
 import System.FilePath (splitExtension)
 import Text.XmlHtml qualified as XmlHtml
