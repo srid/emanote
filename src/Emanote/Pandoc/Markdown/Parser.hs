@@ -24,6 +24,8 @@ parseMarkdown =
       <> gfmExtensionsSansPipeTable
       <> CE.pipeTableSpec
       <> WL.wikilinkSpec
+      -- ASK: Can we conditionally disable this?
+      -- cf. https://github.com/srid/emanote/issues/167
       <> IT.hashTagSpec
       <> IH.highlightSpec
   where

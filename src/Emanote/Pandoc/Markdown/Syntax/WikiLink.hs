@@ -11,6 +11,10 @@ module Emanote.Pandoc.Markdown.Syntax.WikiLink
     mkWikiLinkFromInline,
     allowedWikiLinks,
 
+    -- * Anchors in URLs
+    Anchor,
+    anchorSuffix,
+
     -- * Pandoc helper, which use wikilink somehow
     plainify,
   )
@@ -67,34 +71,49 @@ mkWikiLinkFromUrl s = do
 mkWikiLinkFromInline :: B.Inline -> Maybe (WikiLink, [B.Inline])
 mkWikiLinkFromInline inl = do
   B.Link (_id, _class, otherAttrs) is (url, tit) <- pure inl
-  Left (_, wl) <- delineateLink (otherAttrs <> one ("title", tit)) url
+  (Left (_, wl), _manchor) <- delineateLink (otherAttrs <> one ("title", tit)) url
   pure (wl, is)
+
+-- | An URL anchor without the '#'
+newtype Anchor = Anchor Text
+  deriving newtype (Eq, Show, Ord)
+
+mkAnchor :: String -> Maybe Anchor
+mkAnchor ('#' : name) = pure $ Anchor $ toText name
+mkAnchor _ = Nothing
+
+anchorSuffix :: Maybe Anchor -> Text
+anchorSuffix = maybe "" (\(Anchor a) -> "#" <> a)
+
+dropUrlAnchor :: Text -> (Text, Maybe Anchor)
+dropUrlAnchor = second (mkAnchor . toString) . T.breakOn "#"
 
 -- | Given a Pandoc Link node, apparaise what kind of link it is.
 --
 -- * Nothing, if the link is an absolute URL
 -- * Just (Left wl), if a wiki-link
 -- * Just (Right fp), if a relative path (not a wiki-link)
-delineateLink :: [(Text, Text)] -> Text -> Maybe (Either (WikiLinkType, WikiLink) FilePath)
+delineateLink :: [(Text, Text)] -> Text -> Maybe (Either (WikiLinkType, WikiLink) FilePath, Maybe Anchor)
 delineateLink (Map.fromList -> attrs) url = do
-  -- Let absolute URLs pass through
+  -- Must be relative
   guard $ not $ "://" `T.isInfixOf` url
-  -- URLs with anchors are ignored (such as in -/tags#foo).
-  guard $ not $ "#" `T.isInfixOf` url
-  fmap Left wikiLink <|> fmap Right hyperLinks
+  wikiLink <|> internalLink
   where
     wikiLink = do
       wlType :: WikiLinkType <- readMaybe . toString <=< Map.lookup htmlAttr $ attrs
-      wl <- mkWikiLinkFromUrl url
-      pure (wlType, wl)
-    hyperLinks = do
+      -- Ignore anchors until https://github.com/srid/emanote/discussions/105
+      let (s, manc) = dropUrlAnchor url
+      wl <- mkWikiLinkFromUrl s
+      pure (Left (wlType, wl), manc)
+    internalLink = do
       -- Avoid links like "mailto:", "magnet:", etc.
       -- An easy way to parse them is to look for colon character.
       --
       -- This does mean that "Foo: Bar.md" cannot be linked to this way, however
       -- the user can do it using wiki-links.
       guard $ not $ ":" `T.isInfixOf` url
-      pure $ UE.decode (toString url)
+      let (s, manc) = dropUrlAnchor url
+      pure (Right $ UE.decode (toString s), manc)
 
 -- ---------------------
 -- Converting wiki links
