@@ -113,6 +113,7 @@ delineateLink (Map.fromList -> attrs) url = do
       -- the user can do it using wiki-links.
       guard $ not $ ":" `T.isInfixOf` url
       let (s, manc) = dropUrlAnchor url
+      guard $ not $ T.null s -- Same page anchors
       pure (Right $ UE.decode (toString s), manc)
 
 -- ---------------------
