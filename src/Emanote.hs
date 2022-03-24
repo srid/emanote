@@ -18,7 +18,7 @@ import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
-import Emanote.Prelude (logE, logW)
+import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (emanoteModelDynamic)
@@ -50,12 +50,12 @@ run cli = do
   Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
     (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       compileTailwindCss outPath genPaths
-      checkBrokenLinks model0
+      checkBrokenLinks cli model0
     _ ->
       pure ()
 
-checkBrokenLinks :: Model.Model -> IO ()
-checkBrokenLinks model = runStderrLoggingT $ do
+checkBrokenLinks :: CLI.Cli -> Model.Model -> IO ()
+checkBrokenLinks cli model = runStderrLoggingT $ do
   ((), res :: Sum Int) <- runWriterT $
     forM_ (Map.toList $ Export.modelRels model) $ \(noteRoute, rels) ->
       forM_ rels $ \(Export.Link urt rrt) ->
@@ -67,8 +67,9 @@ checkBrokenLinks model = runStderrLoggingT $ do
           RRTAmbiguous _ -> do
             logW $ "Ambiguous link: " <> show noteRoute <> " -> " <> show urt
             tell 1
-  unless (res == 0) $ do
+  unless (res == 0 || CLI.allowBrokenLinks cli) $ do
     logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
+    log "(Tip: use `--allow-broken-links` to ignore this check.)"
     exitFailure
 
 compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
