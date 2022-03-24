@@ -78,11 +78,10 @@ unresolvedRelsTo r =
         <> [URTResource r]
 
 -- | Parse a relative URL string for later resolution.
+--
+-- TODO: Need tests for this function.
 parseUnresolvedRelTarget :: Maybe (R.R 'R.Folder) -> [(Text, Text)] -> Text -> Maybe (UnresolvedRelTarget, Maybe WL.Anchor)
 parseUnresolvedRelTarget baseDir attrs url = do
-  -- FIXME: Dropping anchors is necessary to resolve correctly.
-  -- But we want to inject it back in HTML url for correct navigation.
-  -- Also see: https://github.com/srid/emanote/discussions/105
   (wlRes, manchor) <- WL.delineateLink attrs url
   res <- case wlRes of
     Left wl ->
