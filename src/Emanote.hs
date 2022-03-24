@@ -7,6 +7,7 @@ import Control.Monad.Writer.Strict
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Ema
   ( CanGenerate (..),
     CanRender (..),
@@ -19,6 +20,7 @@ import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (log, logE, logW)
+import Emanote.Route.ModelRoute (lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (emanoteModelDynamic)
@@ -58,14 +60,14 @@ checkBrokenLinks :: CLI.Cli -> Model.Model -> IO ()
 checkBrokenLinks cli model = runStderrLoggingT $ do
   ((), res :: Sum Int) <- runWriterT $
     forM_ (Map.toList $ Export.modelRels model) $ \(noteRoute, rels) ->
-      forM_ rels $ \(Export.Link urt rrt) ->
+      forM_ (Set.toList $ Set.fromList rels) $ \(Export.Link urt rrt) ->
         case rrt of
           RRTFound _ -> pure ()
           RRTMissing -> do
-            logW $ "Broken link: " <> show noteRoute <> " -> " <> show urt
+            logW $ "Broken link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
             tell 1
           RRTAmbiguous _ -> do
-            logW $ "Ambiguous link: " <> show noteRoute <> " -> " <> show urt
+            logW $ "Ambiguous link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
             tell 1
   unless (res == 0 || CLI.allowBrokenLinks cli) $ do
     logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."

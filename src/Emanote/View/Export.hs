@@ -49,7 +49,7 @@ data Link = Link
   { unresolvedRelTarget :: Rel.UnresolvedRelTarget,
     resolvedRelTarget :: Rel.ResolvedRelTarget Text
   }
-  deriving stock (Generic)
+  deriving stock (Generic, Eq, Ord)
   deriving anyclass (ToJSON)
 
 renderGraphExport :: Model -> LByteString
