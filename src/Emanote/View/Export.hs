@@ -1,6 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.View.Export (renderGraphExport) where
+module Emanote.View.Export
+  ( renderGraphExport,
+    Link (..),
+    modelRels,
+  )
+where
 
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
@@ -62,17 +67,20 @@ renderGraphExport model =
                       meta_
                       (fromMaybe [] $ Map.lookup k rels)
             )
-      rels =
-        Map.fromListWith (<>) $
-          M.modelNoteRels model <&> \rel ->
-            let from_ = lmlRouteKey $ rel ^. Rel.relFrom
-                to_ = rel ^. Rel.relTo
-                toTarget =
-                  Resolve.resolveUnresolvedRelTarget model to_
-                    <&> SR.siteRouteUrlStatic model
-             in (from_, one $ Link to_ toTarget)
+      rels = modelRels model & Map.mapKeys lmlRouteKey
       export = Export currentVersion notes_
    in Aeson.encode export
+
+modelRels :: Model -> Map LMLRoute [Link]
+modelRels model =
+  Map.fromListWith (<>) $
+    M.modelNoteRels model <&> \rel ->
+      let from_ = rel ^. Rel.relFrom
+          to_ = rel ^. Rel.relTo
+          toTarget =
+            Resolve.resolveUnresolvedRelTarget model to_
+              <&> SR.siteRouteUrlStatic model
+       in (from_, one $ Link to_ toTarget)
 
 -- An unique key to represent this LMLRoute in the exported JSON
 --
