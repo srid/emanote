@@ -6,6 +6,7 @@ module Emanote.Model.Link.Rel where
 import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
+import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
@@ -102,18 +103,18 @@ relocateRelUrlUnder mbase fp =
     case mbase of
       Nothing -> fp
       Just x -> x </> fp
-  where
-    -- Remove '..' from path component.
-    -- We don't care about these, as there are no symlinks involved.
-    -- https://github.com/haskell/filepath/issues/87
-    dropDotDot :: FilePath -> FilePath
-    dropDotDot =
-      let go :: NonEmpty Text -> [Text]
-          go = \case
-            x :| [] -> [x]
-            (_ :| ".." : xs) -> maybe [] go $ nonEmpty xs
-            x -> toList x
-       in toString . T.intercalate "/" . maybe [] go . nonEmpty . T.splitOn "/" . toText
+
+-- Remove '..' from path component.
+-- We don't care about these, as there are no symlinks involved.
+-- https://github.com/haskell/filepath/issues/87
+dropDotDot :: FilePath -> FilePath
+dropDotDot =
+  let go :: Int -> NonEmpty Text -> [Text]
+      go n = \case
+        (".." :| xs) -> maybe [] (go $ n + 1) $ nonEmpty xs
+        (x :| xs) | n == 0 -> x : maybe [] (go 0) (nonEmpty xs)
+        x -> maybe [] (go 0) $ nonEmpty $ NEL.drop n x
+   in toString . T.intercalate "/" . maybe [] (reverse . go 0 . NEL.reverse) . nonEmpty . T.splitOn "/" . toText
 
 -- | An `UnresolvedRelTarget` that has been resolved.
 --
