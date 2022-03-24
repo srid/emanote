@@ -4,7 +4,7 @@
 -- here.
 module Emanote.Prelude where
 
-import Control.Monad.Logger (MonadLogger, logDebugNS, logErrorNS, logInfoNS)
+import Control.Monad.Logger (MonadLogger, logDebugNS, logErrorNS, logInfoNS, logWarnNS)
 import Data.WorldPeace.Union
   ( ElemRemove,
     OpenUnion,
@@ -41,6 +41,9 @@ logD = logDebugNS "emanote"
 
 logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
+
+logW :: MonadLogger m => Text -> m ()
+logW = logWarnNS "emanote"
 
 -- OpenUnion
 

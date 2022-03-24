@@ -8,11 +8,11 @@
         "pre-commit-hooks": "pre-commit-hooks"
       },
       "locked": {
-        "lastModified": 1648148690,
-        "narHash": "sha256-/YkF86lduofUG/3vvmYn06lWEPgFcptf6vM4JaiUUUo=",
+        "lastModified": 1648150821,
+        "narHash": "sha256-AGwZRHD2Gcn2kuT3FQCaQOoBhH1D+Blk0WXuEXWyr2c=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "3686a8079fded5ca6586291c101cf2a8aefd87d1",
+        "rev": "624bcd5103e847fbbb9c59e39dab507424dd8299",
         "type": "github"
       },
       "original": {
