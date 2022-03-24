@@ -7,6 +7,7 @@ import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (LMLRoute, ModelRoute)
@@ -15,6 +16,7 @@ import Emanote.Route.SiteRoute.Type qualified as SR
 import Optics.Operators as Lens ((^.))
 import Optics.TH (makeLenses)
 import Relude
+import System.FilePath (normalise, (</>))
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.LinkContext qualified as LC
 
@@ -65,7 +67,8 @@ noteRels note =
       Ix.fromList $
         flip concatMap (Map.toList m) $ \(url, instances) -> do
           flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            target <- parseUnresolvedRelTarget attrs url
+            let parentR = R.routeParent $ R.lmlRouteCase $ note ^. noteRoute
+            (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
@@ -75,14 +78,43 @@ unresolvedRelsTo r =
         <> [URTResource r]
 
 -- | Parse a relative URL string for later resolution.
-parseUnresolvedRelTarget :: [(Text, Text)] -> Text -> Maybe UnresolvedRelTarget
-parseUnresolvedRelTarget attrs url = do
-  WL.delineateLink attrs url >>= \case
+parseUnresolvedRelTarget :: Maybe (R.R 'R.Folder) -> [(Text, Text)] -> Text -> Maybe (UnresolvedRelTarget, Maybe WL.Anchor)
+parseUnresolvedRelTarget baseDir attrs url = do
+  -- FIXME: Dropping anchors is necessary to resolve correctly.
+  -- But we want to inject it back in HTML url for correct navigation.
+  -- Also see: https://github.com/srid/emanote/discussions/105
+  (wlRes, manchor) <- WL.delineateLink attrs url
+  res <- case wlRes of
     Left wl ->
       pure $ URTWikiLink wl
     Right fp ->
       fmap URTVirtual (SR.decodeVirtualRoute fp)
-        <|> fmap URTResource (R.mkModelRouteFromFilePath fp)
+        <|> fmap
+          URTResource
+          ( fp
+              & relocateRelUrlUnder (R.encodeRoute <$> baseDir)
+              & R.mkModelRouteFromFilePath
+          )
+  pure (res, manchor)
+
+relocateRelUrlUnder :: Maybe FilePath -> FilePath -> FilePath
+relocateRelUrlUnder mbase fp =
+  dropDotDot . normalise $
+    case mbase of
+      Nothing -> fp
+      Just x -> x </> fp
+  where
+    -- Remove '..' from path component.
+    -- We don't care about these, as there are no symlinks involved.
+    -- https://github.com/haskell/filepath/issues/87
+    dropDotDot :: FilePath -> FilePath
+    dropDotDot =
+      let go :: NonEmpty Text -> [Text]
+          go = \case
+            x :| [] -> [x]
+            (_ :| ".." : xs) -> maybe [] go $ nonEmpty xs
+            x -> toList x
+       in toString . T.intercalate "/" . maybe [] go . nonEmpty . T.splitOn "/" . toText
 
 -- | An `UnresolvedRelTarget` that has been resolved.
 --
