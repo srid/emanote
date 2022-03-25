@@ -3,7 +3,7 @@
 module Emanote (run) where
 
 import Control.Monad.Logger (runStderrLoggingT, runStdoutLoggingT)
-import Control.Monad.Writer.Strict
+import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
