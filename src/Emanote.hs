@@ -2,9 +2,12 @@
 
 module Emanote (run) where
 
-import Control.Monad.Logger (runStdoutLoggingT)
+import Control.Monad.Logger (runStderrLoggingT, runStdoutLoggingT)
+import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
+import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Ema
   ( CanGenerate (..),
     CanRender (..),
@@ -14,11 +17,15 @@ import Ema
   )
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
+import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
+import Emanote.Prelude (log, logE, logW)
+import Emanote.Route.ModelRoute (lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (emanoteModelDynamic)
 import Emanote.View.Common (generatedCssFile)
+import Emanote.View.Export qualified as Export
 import Emanote.View.Template qualified as View
 import Optics.Core ((%), (.~))
 import Relude
@@ -43,10 +50,29 @@ instance HasModel SiteRoute where
 run :: CLI.Cli -> IO ()
 run cli = do
   Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
-    Ema.CLI.Generate outPath :=> Identity genPaths ->
+    (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       compileTailwindCss outPath genPaths
+      checkBrokenLinks cli model0
     _ ->
       pure ()
+
+checkBrokenLinks :: CLI.Cli -> Model.Model -> IO ()
+checkBrokenLinks cli model = runStderrLoggingT $ do
+  ((), res :: Sum Int) <- runWriterT $
+    forM_ (Map.toList $ Export.modelRels model) $ \(noteRoute, rels) ->
+      forM_ (Set.toList $ Set.fromList rels) $ \(Export.Link urt rrt) ->
+        case rrt of
+          RRTFound _ -> pure ()
+          RRTMissing -> do
+            logW $ "Broken link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
+            tell 1
+          RRTAmbiguous _ -> do
+            logW $ "Ambiguous link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
+            tell 1
+  unless (res == 0 || CLI.allowBrokenLinks cli) $ do
+    logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
+    log "(Tip: use `--allow-broken-links` to ignore this check.)"
+    exitFailure
 
 compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
 compileTailwindCss outPath genPaths = do

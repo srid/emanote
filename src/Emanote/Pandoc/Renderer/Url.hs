@@ -30,10 +30,10 @@ import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
 -- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice :: Monad n => PandocInlineRenderer n i b
-urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
+urlResolvingSplice :: Monad n => PandocInlineRenderer n R.LMLRoute b
+urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
-  let f = \sr -> do
+  let f mAnchor = \sr -> do
         case inlRef of
           Link.InlineLink -> do
             -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
@@ -41,14 +41,15 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
             -- We don't do this here, as this inline splice can't embed block elements.
             let (newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, url)
                 newAttr = (id', cls, otherAttrs <> [openInNewTabAttr | M.inLiveServer model && isNotEmaLink])
-            pure $ HP.rpInline ctx $ B.Link newAttr newIs (newUrl, tit)
+            pure $ HP.rpInline ctx $ B.Link newAttr newIs (newUrl <> WL.anchorSuffix mAnchor, tit)
           Link.InlineImage -> do
             let (newIs, (newUrl, _)) =
                   replaceLinkNodeWithRoute model sr (toList $ nonEmptyInlines url is, url)
             pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
-  uRel <- Rel.parseUnresolvedRelTarget (otherAttrs <> one ("title", tit)) url
+  let parentR = R.routeParent $ R.lmlRouteCase noteRoute
+  (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model uRel
-  renderSomeInlineRefWith f id (is, (url, tit)) rRel model ctx inl
+  renderSomeInlineRefWith (f mAnchor) id (is, (url, tit)) rRel model ctx inl
 
 openInNewTabAttr :: (Text, Text)
 openInNewTabAttr =

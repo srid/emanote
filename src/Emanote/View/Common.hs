@@ -49,7 +49,7 @@ import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 
-noteRenderers :: Monad n => PandocRenderers n i LMLRoute
+noteRenderers :: Monad n => PandocRenderers n LMLRoute LMLRoute
 noteRenderers =
   PandocRenderers
     _pandocInlineRenderers
@@ -59,7 +59,7 @@ noteRenderers =
 --
 -- Backlinks and titles constitute an example of inline context, where we don't
 -- care about block elements.
-inlineRenderers :: Monad n => PandocRenderers n i b
+inlineRenderers :: Monad n => PandocRenderers n LMLRoute b
 inlineRenderers =
   PandocRenderers
     _pandocInlineRenderers
@@ -72,7 +72,7 @@ linkInlineRenderers =
     _pandocLinkInlineRenderers
     mempty
 
-_pandocInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
+_pandocInlineRenderers :: Monad n => [PandocInlineRenderer n LMLRoute b]
 _pandocInlineRenderers =
   [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
     PF.urlResolvingSplice
@@ -110,11 +110,11 @@ mkTemplateRenderCtx ::
   TemplateRenderCtx n
 mkTemplateRenderCtx model r meta =
   let withInlineCtx =
-        mkRendererFromMeta model meta inlineRenderers () ()
+        mkRendererFromMeta model meta inlineRenderers r ()
       withLinkInlineCtx =
         mkRendererFromMeta model meta linkInlineRenderers () ()
       withBlockCtx =
-        mkRendererFromMeta model meta noteRenderers () r
+        mkRendererFromMeta model meta noteRenderers r r
       -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \x ->
         Tit.titleSplice x preparePandoc titleDoc

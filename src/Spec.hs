@@ -1,5 +1,6 @@
 module Spec (main) where
 
+import Emanote.Model.Link.RelSpec qualified as RelSpec
 import Emanote.Model.QuerySpec qualified as QuerySpec
 import Relude
 import Test.Tasty
@@ -21,5 +22,6 @@ tests =
   localOption limit . localOption (HedgehogShrinkLimit (Just 2)) $
     testGroup
       "Tests"
-      [ QuerySpec.spec
+      [ QuerySpec.spec,
+        RelSpec.spec
       ]
