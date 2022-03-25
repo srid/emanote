@@ -71,11 +71,11 @@ jobs:
         run: |
           mkdir -p ./docs/.ci/output
           docker load -i *docker-image-emanote.tar.gz
+          # demo.md has broken links for demo
           docker run \
             -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 \
             -v $PWD/docs:/data \
             --tmpfs /tmp \
-            # demo.md has broken links for demo
             sridca/emanote emanote --layers /data --allow-broken-links gen /data/.ci/output
           cp -r ./docs/.ci .
       - name: Deploy to website to gh-pages 🚀
