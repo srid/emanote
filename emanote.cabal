@@ -131,6 +131,7 @@ common library-common
     , tailwind
     , tasty
     , tasty-hedgehog
+    , tasty-hunit
     , tasty-quickcheck
     , text
     , time

@@ -99,14 +99,21 @@ parseUnresolvedRelTarget baseDir attrs url = do
 
 relocateRelUrlUnder :: Maybe FilePath -> FilePath -> FilePath
 relocateRelUrlUnder mbase fp =
-  dropDotDot . normalise $
+  normalizeIgnoringSymlinks $
     case mbase of
       Nothing -> fp
       Just x -> x </> fp
 
+-- | Like `System.FilePath.normalise` but also normalises '..'
+normalizeIgnoringSymlinks :: FilePath -> FilePath
+normalizeIgnoringSymlinks = dropDotDot . normalise
+
 -- Remove '..' from path component.
--- We don't care about these, as there are no symlinks involved.
--- https://github.com/haskell/filepath/issues/87
+--
+-- `System.FilePath.normalize` ought to do this already, but it doesn't due to
+-- symlinks (which we don't use anyway.)
+--
+-- See https://github.com/haskell/filepath/issues/87
 dropDotDot :: FilePath -> FilePath
 dropDotDot =
   let go :: Int -> NonEmpty Text -> [Text]
