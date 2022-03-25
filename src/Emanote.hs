@@ -66,8 +66,8 @@ checkBrokenLinks cli model = runStderrLoggingT $ do
           RRTMissing -> do
             logW $ "Broken link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
             tell 1
-          RRTAmbiguous _ -> do
-            logW $ "Ambiguous link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
+          RRTAmbiguous ls -> do
+            logW $ "Ambiguous link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt <> " ambiguities: " <> show ls
             tell 1
   unless (res == 0 || CLI.allowBrokenLinks cli) $ do
     logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
