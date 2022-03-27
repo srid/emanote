@@ -30,7 +30,7 @@ template:
   # Value of the <base> tag.
   baseUrl: /
   urlStrategy: direct
-  iconUrl: ${ema:homeUrl}/favicon.svg
+  iconUrl: ${ema:homeUrl}favicon.svg
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)

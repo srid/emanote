@@ -164,9 +164,16 @@ commonSplices withCtx model meta routeTitle = do
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull"
     ## Tit.titleSpliceNoHtml routeTitleFull
+  -- `ema:homeUrl` is normally `""`; but if Emanote is being served from an URL
+  -- prefix, it would be "/foo/" (with a slash at the end). This allows you to
+  -- just concatanate homeUrl with a relative URL path (no slash in between), to
+  -- get the full URL. The reason there is no slash in between is to account for
+  -- the usual case of homeUrl being an empty string.
   "ema:homeUrl"
     ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @('R.LMLType 'R.Md) R.indexRoute
-          in HI.textSplice (SR.siteRouteUrl model homeR)
+             homeUrl' = SR.siteRouteUrl model homeR
+             homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
+          in HI.textSplice homeUrl
        )
   "ema:indexUrl"
     ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
