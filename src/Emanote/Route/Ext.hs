@@ -27,15 +27,17 @@ deriving stock instance Eq a => Eq (FileType a)
 
 deriving stock instance Ord a => Ord (FileType a)
 
--- | A lightweight markup language
---
--- https://en.wikipedia.org/wiki/Lightweight_markup_language
+{- | A lightweight markup language
+
+ https://en.wikipedia.org/wiki/Lightweight_markup_language
+-}
 data LML = Md
   deriving stock (Generic, Eq, Ord, Typeable, Data)
   deriving anyclass (ToJSON)
 
--- | The `HasExt` class's responsibility is to allow dealing with basepath sans
--- extension (and vice-versa).
+{- | The `HasExt` class's responsibility is to allow dealing with basepath sans
+ extension (and vice-versa).
+-}
 class HasExt (ext :: FileType a) where
   fileType :: FileType a
 
@@ -45,7 +47,7 @@ class HasExt (ext :: FileType a) where
   -- | Return the filepath without the known extension.
   withoutKnownExt :: FilePath -> Maybe FilePath
 
-instance HasExt ('LMLType 'Md) where
+instance HasExt ( 'LMLType 'Md) where
   fileType = LMLType Md
   withExt = flip FP.addExtension ".md"
   withoutKnownExt = fpWithoutExt ".md"
@@ -70,8 +72,9 @@ instance HasExt 'Folder where
   withExt = id
   withoutKnownExt = pure
 
--- | The AnyExt instance ignores explicitly dealing with extensions, expecting
--- the user to explicitly encode the extension in their value tpye.
+{- | The AnyExt instance ignores explicitly dealing with extensions, expecting
+ the user to explicitly encode the extension in their value tpye.
+-}
 instance HasExt 'AnyExt where
   fileType = AnyExt
   withExt = id

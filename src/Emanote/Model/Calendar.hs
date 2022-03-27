@@ -1,5 +1,6 @@
--- | A primitive module to eventually pave way towards first-class "calendar"
--- (daily notes, etc.) support in Emanote; either built-in or as plugin.
+{- | A primitive module to eventually pave way towards first-class "calendar"
+ (daily notes, etc.) support in Emanote; either built-in or as plugin.
+-}
 module Emanote.Model.Calendar where
 
 import Emanote.Model.Note qualified as N

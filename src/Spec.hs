@@ -4,10 +4,10 @@ import Emanote.Model.Link.RelSpec qualified as RelSpec
 import Emanote.Model.QuerySpec qualified as QuerySpec
 import Relude
 import Test.Tasty
-import Test.Tasty.Hedgehog
-  ( HedgehogShrinkLimit (..),
-    HedgehogTestLimit (..),
-  )
+import Test.Tasty.Hedgehog (
+  HedgehogShrinkLimit (..),
+  HedgehogTestLimit (..),
+ )
 
 main :: IO ()
 main = do
@@ -22,6 +22,6 @@ tests =
   localOption limit . localOption (HedgehogShrinkLimit (Just 2)) $
     testGroup
       "Tests"
-      [ QuerySpec.spec,
-        RelSpec.spec
+      [ QuerySpec.spec
+      , RelSpec.spec
       ]

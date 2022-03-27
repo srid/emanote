@@ -1,24 +1,23 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.Pandoc.Markdown.Syntax.WikiLink
-  ( WikiLink,
-    WikiLinkType (..),
-    wikilinkSpec,
-    mkWikiLinkFromRoute,
-    delineateLink,
-    wikilinkInline,
-    wikiLinkInlineRendered,
-    mkWikiLinkFromInline,
-    allowedWikiLinks,
+module Emanote.Pandoc.Markdown.Syntax.WikiLink (
+  WikiLink,
+  WikiLinkType (..),
+  wikilinkSpec,
+  mkWikiLinkFromRoute,
+  delineateLink,
+  wikilinkInline,
+  wikiLinkInlineRendered,
+  mkWikiLinkFromInline,
+  allowedWikiLinks,
 
-    -- * Anchors in URLs
-    Anchor,
-    anchorSuffix,
+  -- * Anchors in URLs
+  Anchor,
+  anchorSuffix,
 
-    -- * Pandoc helper, which use wikilink somehow
-    plainify,
-  )
-where
+  -- * Pandoc helper, which use wikilink somehow
+  plainify,
+) where
 
 import Commonmark qualified as CM
 import Commonmark.Pandoc qualified as CP
@@ -42,10 +41,11 @@ import Text.Parsec qualified as P
 import Text.Read (Read (readsPrec))
 import Text.Show qualified (Show (show))
 
--- | Represents the "Foo" in [[Foo]]
---
--- As wiki links may contain multiple path components, it can also represent
--- [[Foo/Bar]], hence we use nonempty slug list.
+{- | Represents the "Foo" in [[Foo]]
+
+ As wiki links may contain multiple path components, it can also represent
+ [[Foo/Bar]], hence we use nonempty slug list.
+-}
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving stock (Eq, Ord, Typeable, Data)
 
@@ -88,11 +88,12 @@ anchorSuffix = maybe "" (\(Anchor a) -> "#" <> a)
 dropUrlAnchor :: Text -> (Text, Maybe Anchor)
 dropUrlAnchor = second (mkAnchor . toString) . T.breakOn "#"
 
--- | Given a Pandoc Link node, apparaise what kind of link it is.
---
--- * Nothing, if the link is an absolute URL
--- * Just (Left wl), if a wiki-link
--- * Just (Right fp), if a relative path (not a wiki-link)
+{- | Given a Pandoc Link node, apparaise what kind of link it is.
+
+ * Nothing, if the link is an absolute URL
+ * Just (Left wl), if a wiki-link
+ * Just (Right fp), if a relative path (not a wiki-link)
+-}
 delineateLink :: [(Text, Text)] -> Text -> Maybe (Either (WikiLinkType, WikiLink) FilePath, Maybe Anchor)
 delineateLink (Map.fromList -> attrs) url = do
   -- Must be relative
@@ -141,11 +142,12 @@ wikiLinkInlineRendered x = do
             then show wl
             else "[[" <> wikilinkUrl wl <> "|" <> plainify inl <> "]]"
 
--- | Return the various ways to link to a route (ignoring ext)
---
--- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
---
--- All possible combinations of Wikilink type use is automatically included.
+{- | Return the various ways to link to a route (ignoring ext)
+
+ Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
+
+ All possible combinations of Wikilink type use is automatically included.
+-}
 allowedWikiLinks :: HasCallStack => R @Ext.SourceExt ext -> NonEmpty (WikiLinkType, WikiLink)
 allowedWikiLinks r =
   let wls = fmap WikiLink $ tailsNE $ unRoute r
@@ -159,9 +161,10 @@ allowedWikiLinks r =
 -- Parser
 --------------------------
 
--- | A # prefix or suffix allows semantically distinct wikilinks
---
--- Typically called branching link or a tag link, when used with #.
+{- | A # prefix or suffix allows semantically distinct wikilinks
+
+ Typically called branching link or a tag link, when used with #.
+-}
 data WikiLinkType
   = -- | [[Foo]]
     WikiLinkNormal
@@ -193,12 +196,13 @@ instance HasWikiLink (CP.Cm b B.Inlines) where
   wikilink typ wl il =
     CP.Cm $ wikilinkInline typ wl $ maybe mempty CP.unCm il
 
--- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
---
--- Compared with the official extension, this has two differences:
---
--- - Supports flipped inner text, eg: `[[Foo | some inner text]]`
--- - Supports neuron folgezettel, i.e.: #[[Foo]] or [[Foo]]#
+{- | Like `Commonmark.Extensions.Wikilinks.wikilinkSpec` but Zettelkasten-friendly.
+
+ Compared with the official extension, this has two differences:
+
+ - Supports flipped inner text, eg: `[[Foo | some inner text]]`
+ - Supports neuron folgezettel, i.e.: #[[Foo]] or [[Foo]]#
+-}
 wikilinkSpec ::
   (Monad m, CM.IsInline il, HasWikiLink il) =>
   CM.SyntaxSpec m il bl
@@ -207,10 +211,10 @@ wikilinkSpec =
     { CM.syntaxInlineParsers =
         [ P.try $
             P.choice
-              [ P.try (CT.symbol '#' *> pWikilink WikiLinkTag),
-                P.try (CT.symbol '!' *> pWikilink WikiLinkEmbed),
-                P.try (pWikilink WikiLinkBranch <* CT.symbol '#'),
-                P.try (pWikilink WikiLinkNormal)
+              [ P.try (CT.symbol '#' *> pWikilink WikiLinkTag)
+              , P.try (CT.symbol '!' *> pWikilink WikiLinkEmbed)
+              , P.try (pWikilink WikiLinkBranch <* CT.symbol '#')
+              , P.try (pWikilink WikiLinkNormal)
               ]
         ]
     }

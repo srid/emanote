@@ -1,13 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Heist.Extra.Splices.Pandoc.Render
-  ( renderPandocWith,
-    rpBlock,
-    rpInline,
-    rpBlock',
-    rpInline',
-  )
-where
+module Heist.Extra.Splices.Pandoc.Render (
+  renderPandocWith,
+  rpBlock,
+  rpInline,
+  rpBlock',
+  rpInline',
+) where
 
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
@@ -16,10 +15,10 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Heist qualified as H
 import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
-import Heist.Extra.Splices.Pandoc.Ctx
-  ( RenderCtx (..),
-    rewriteClass,
-  )
+import Heist.Extra.Splices.Pandoc.Ctx (
+  RenderCtx (..),
+  rewriteClass,
+ )
 import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
 import Heist.Interpreted qualified as HI
 import Relude
@@ -68,10 +67,10 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         one . X.Element "video" [("autoplay", ""), ("loop", ""), ("muted", "")] $
           one . X.Element "source" [("src", T.strip s)] $
             one . X.Element "p" mempty $
-              [ X.TextNode "Your browser doesn't support HTML5 video. Here is a ",
-                X.Element "a" [("href", T.strip s)] $
-                  one . X.TextNode $ "link to the video",
-                X.TextNode " instead."
+              [ X.TextNode "Your browser doesn't support HTML5 video. Here is a "
+              , X.Element "a" [("href", T.strip s)] $
+                  one . X.TextNode $ "link to the video"
+              , X.TextNode " instead."
               ]
       _ ->
         one . X.Element "pre" [("class", "pandoc-raw-" <> show fmt)] $ one . X.TextNode $ s

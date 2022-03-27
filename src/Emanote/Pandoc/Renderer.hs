@@ -1,21 +1,21 @@
 {-# LANGUAGE RecordWildCards #-}
 
--- | Types for custom render extensions to Pandoc AST nodes.
---
--- Note that unlike Pandoc *filters* (which operate on entire document), these
--- are modeled based on Text.Pandoc.Walk, ie. fine-grained on individual inline
--- and block processing. We do this only so as to render a specific node during
--- recursion (cf. `rpBlock` and `rpInline` in Render.hs).
---
--- So we expect the extensions to be in Haskell, however external script may be
--- supported using a traditional whole-AST extension API.
-module Emanote.Pandoc.Renderer
-  ( PandocRenderers (PandocRenderers),
-    PandocInlineRenderer,
-    PandocBlockRenderer,
-    mkRenderCtxWithPandocRenderers,
-  )
-where
+{- | Types for custom render extensions to Pandoc AST nodes.
+
+ Note that unlike Pandoc *filters* (which operate on entire document), these
+ are modeled based on Text.Pandoc.Walk, ie. fine-grained on individual inline
+ and block processing. We do this only so as to render a specific node during
+ recursion (cf. `rpBlock` and `rpInline` in Render.hs).
+
+ So we expect the extensions to be in Haskell, however external script may be
+ supported using a traditional whole-AST extension API.
+-}
+module Emanote.Pandoc.Renderer (
+  PandocRenderers (PandocRenderers),
+  PandocInlineRenderer,
+  PandocBlockRenderer,
+  mkRenderCtxWithPandocRenderers,
+) where
 
 import Emanote.Model.Type (Model)
 import Heist (HeistT)
@@ -25,9 +25,10 @@ import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition qualified as B
 
--- | Custom Heist renderer function for specific Pandoc AST nodes
---
--- The `x` selects between `i` (inline) and `b` (block) types.
+{- | Custom Heist renderer function for specific Pandoc AST nodes
+
+ The `x` selects between `i` (inline) and `b` (block) types.
+-}
 type PandocRenderF astType n i b x =
   Model ->
   PandocRenderers n i b ->
@@ -41,8 +42,8 @@ type PandocInlineRenderer n i b = PandocRenderF B.Inline n i b i
 type PandocBlockRenderer n i b = PandocRenderF B.Block n i b b
 
 data PandocRenderers n i b = PandocRenderers
-  { pandocInlineRenderers :: [PandocInlineRenderer n i b],
-    pandocBlockRenderers :: [PandocBlockRenderer n i b]
+  { pandocInlineRenderers :: [PandocInlineRenderer n i b]
+  , pandocBlockRenderers :: [PandocBlockRenderer n i b]
   }
 
 mkRenderCtxWithPandocRenderers ::

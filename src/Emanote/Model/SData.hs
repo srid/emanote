@@ -13,11 +13,12 @@ import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
 import Relude
 
--- | `S` for "structured". Refers to a per-route data file represented by Aeson
--- value.  Example: /foo/bar.yaml file
+{- | `S` for "structured". Refers to a per-route data file represented by Aeson
+ value.  Example: /foo/bar.yaml file
+-}
 data SData = SData
-  { _sdataValue :: Aeson.Value,
-    -- | Location of this data file
+  { _sdataValue :: Aeson.Value
+  , -- | Location of this data file
     _sdataRoute :: R.R 'R.Yaml
   }
   deriving stock (Eq, Ord, Data, Show, Generic)

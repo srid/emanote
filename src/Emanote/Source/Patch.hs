@@ -1,10 +1,9 @@
 -- | Patch model state depending on file change event.
-module Emanote.Source.Patch
-  ( patchModel,
-    filePatterns,
-    ignorePatterns,
-  )
-where
+module Emanote.Source.Patch (
+  patchModel,
+  filePatterns,
+  ignorePatterns,
+) where
 
 import Control.Exception (throw)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
@@ -17,11 +16,11 @@ import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.Type (Model)
-import Emanote.Prelude
-  ( BadInput (BadInput),
-    log,
-    logD,
-  )
+import Emanote.Prelude (
+  BadInput (BadInput),
+  log,
+  logD,
+ )
 import Emanote.Route (liftLMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class (indexRoute)
@@ -66,7 +65,7 @@ patchModel' ::
 patchModel' fpType fp action = do
   case fpType of
     R.LMLType R.Md ->
-      case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of
+      case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @( 'R.LMLType 'R.Md) $ fp of
         Nothing ->
           pure id
         Just r -> case action of
@@ -161,11 +160,12 @@ readRefreshedFile refreshAction fp =
     _ ->
       readFileFollowingFsnotify fp
 
--- | Like `readFileBS` but accounts for file truncation due to us responding
--- *immediately* to a fsnotify modify event (which is triggered even before the
--- writer *finishes* writing the new contents). We solve this "glitch" by
--- delaying the read retry, expecting (hoping really) that *this time* the new
--- non-empty contents will come through. 'tis a bit of a HACK though.
+{- | Like `readFileBS` but accounts for file truncation due to us responding
+ *immediately* to a fsnotify modify event (which is triggered even before the
+ writer *finishes* writing the new contents). We solve this "glitch" by
+ delaying the read retry, expecting (hoping really) that *this time* the new
+ non-empty contents will come through. 'tis a bit of a HACK though.
+-}
 readFileFollowingFsnotify :: (MonadIO m, MonadLogger m) => FilePath -> m ByteString
 readFileFollowingFsnotify fp = do
   log $ "Reading file: " <> toText fp

@@ -1,14 +1,13 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Heist.Extra.Splices.Pandoc.Ctx
-  ( RenderCtx (..),
-    mkRenderCtx,
-    emptyRenderCtx,
-    rewriteClass,
-    ctxSansCustomSplicing,
-    concatSpliceFunc,
-  )
-where
+module Heist.Extra.Splices.Pandoc.Ctx (
+  RenderCtx (..),
+  mkRenderCtx,
+  emptyRenderCtx,
+  rewriteClass,
+  ctxSansCustomSplicing,
+  concatSpliceFunc,
+) where
 
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
@@ -22,15 +21,15 @@ import Text.XmlHtml qualified as X
 data RenderCtx n = RenderCtx
   { -- The XML node which contains individual AST rendering definitions
     -- This corresponds to pandoc.tpl
-    rootNode :: Maybe X.Node,
-    -- Attributes for a given AST node.
-    bAttr :: B.Block -> B.Attr,
-    iAttr :: B.Inline -> B.Attr,
-    -- Class attribute rewrite rules
-    classMap :: Map Text Text,
-    -- Custom render functions for AST nodes.
-    blockSplice :: B.Block -> Maybe (HI.Splice n),
-    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
+    rootNode :: Maybe X.Node
+  , -- Attributes for a given AST node.
+    bAttr :: B.Block -> B.Attr
+  , iAttr :: B.Inline -> B.Attr
+  , -- Class attribute rewrite rules
+    classMap :: Map Text Text
+  , -- Custom render functions for AST nodes.
+    blockSplice :: B.Block -> Maybe (HI.Splice n)
+  , inlineSplice :: B.Inline -> Maybe (HI.Splice n)
   }
 
 mkRenderCtx ::
@@ -77,15 +76,15 @@ emptyRenderCtx =
 ctxSansCustomSplicing :: RenderCtx n -> RenderCtx n
 ctxSansCustomSplicing ctx =
   ctx
-    { blockSplice = const Nothing,
-      inlineSplice = const Nothing
+    { blockSplice = const Nothing
+    , inlineSplice = const Nothing
     }
 
 concatSpliceFunc :: Alternative f => (t -> f a) -> (t -> f a) -> t -> f a
 concatSpliceFunc f g x =
   asum
-    [ f x,
-      g x
+    [ f x
+    , g x
     ]
 
 rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
