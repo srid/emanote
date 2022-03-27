@@ -20,7 +20,7 @@ import System.FilePath ((</>))
 --
 -- The order here matters. Top = higher precedence.
 data Loc
-  = -- | The Int argument specifies the precedence (larger value = higher precedence)
+  = -- | The Int argument specifies the precedence (lower value = higher precedence)
     LocUser Int FilePath
   | -- | The default location (ie., emanote default layer)
     LocDefault FilePath

@@ -37,7 +37,7 @@ cliParser cwd = do
             short 'L',
             metavar "LAYERS",
             value defaultPath,
-            help "List of notebook folders to 'union mount', with the right-side folders taking priority."
+            help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
           ]
     pathListReader :: ReadM (NonEmpty FilePath)
     pathListReader =

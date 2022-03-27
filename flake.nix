@@ -8,8 +8,8 @@
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
     tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
-    flake-utils.follows = "/ema/flake-utils";
-    flake-compat.follows = "/ema/flake-compat";
+    flake-utils.follows = "ema/flake-utils";
+    flake-compat.follows = "ema/flake-compat";
 
     pathtree.url = "github:srid/pathtree";
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
