@@ -1,19 +1,18 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.Model.Title
-  ( Title,
+module Emanote.Model.Title (
+  Title,
 
-    -- * Title conversion
-    fromRoute,
-    fromInlines,
-    toInlines,
+  -- * Title conversion
+  fromRoute,
+  fromInlines,
+  toInlines,
 
-    -- * Rendering a Title
-    titleSplice,
-    titleSpliceNoHtml,
-    toPlain,
-  )
-where
+  -- * Rendering a Title
+  titleSplice,
+  titleSpliceNoHtml,
+  toPlain,
+) where
 
 import Data.Aeson (ToJSON)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)

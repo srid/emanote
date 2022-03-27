@@ -17,16 +17,16 @@ import Ema.CLI qualified
 import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
-import Emanote.Model.Note
-  ( IxNote,
-    Note,
-  )
+import Emanote.Model.Note (
+  IxNote,
+  Note,
+ )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
-import Emanote.Model.StaticFile
-  ( IxStaticFile,
-    StaticFile (StaticFile),
-  )
+import Emanote.Model.StaticFile (
+  IxStaticFile,
+  StaticFile (StaticFile),
+ )
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
@@ -46,19 +46,19 @@ data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
 
 data Model = Model
-  { _modelStatus :: Status,
-    _modelLayers :: Set Loc,
-    _modelEmaCLIAction :: Some Ema.CLI.Action,
-    _modelRouteEncoder :: RouteEncoder Model SiteRoute,
-    -- | An unique ID for this process's model. ID changes across processes.
-    _modelInstanceID :: UUID,
-    _modelNotes :: IxNote,
-    _modelRels :: IxRel,
-    _modelSData :: IxSData,
-    _modelStaticFiles :: IxStaticFile,
-    _modelTasks :: IxTask,
-    _modelNav :: [Tree Slug],
-    _modelHeistTemplate :: TemplateState
+  { _modelStatus :: Status
+  , _modelLayers :: Set Loc
+  , _modelEmaCLIAction :: Some Ema.CLI.Action
+  , _modelRouteEncoder :: RouteEncoder Model SiteRoute
+  , -- | An unique ID for this process's model. ID changes across processes.
+    _modelInstanceID :: UUID
+  , _modelNotes :: IxNote
+  , _modelRels :: IxRel
+  , _modelSData :: IxSData
+  , _modelStaticFiles :: IxStaticFile
+  , _modelTasks :: IxTask
+  , _modelNav :: [Tree Slug]
+  , _modelHeistTemplate :: TemplateState
   }
 
 makeLenses ''Model
@@ -79,8 +79,8 @@ modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
-           -- Insert folder placeholder automatically for ancestor paths
-           >>> flip (foldr injectAncestor) (N.noteAncestors note)
+          -- Insert folder placeholder automatically for ancestor paths
+          >>> flip (foldr injectAncestor) (N.noteAncestors note)
        )
     >>> modelRels
     %~ updateIxMulti r (Rel.noteRels note)
@@ -93,7 +93,7 @@ modelInsertNote note =
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
-  let lmlR = R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
+  let lmlR = R.liftLMLRoute @( 'R.LMLType 'R.Md) . coerce $ N.unRAncestor ancestor
    in case N.lookupNotesByRoute lmlR ns of
         Just _ -> ns
         Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
@@ -102,9 +102,9 @@ modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
   model & modelNotes
     %~ ( Ix.deleteIx k
-           -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
-           -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
-           >>> maybe id restoreFolderPlaceholder mFolderR
+          -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+          -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
+          >>> maybe id restoreFolderPlaceholder mFolderR
        )
     & modelRels
     %~ deleteIxMulti k

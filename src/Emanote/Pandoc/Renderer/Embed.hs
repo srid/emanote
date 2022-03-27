@@ -89,18 +89,18 @@ embedStaticFileRoute model wl staticFile = do
 
 imageExts :: [Text]
 imageExts =
-  [ ".jpg",
-    ".jpeg",
-    ".png",
-    ".svg",
-    ".gif",
-    ".bmp",
-    ".webp"
+  [ ".jpg"
+  , ".jpeg"
+  , ".png"
+  , ".svg"
+  , ".gif"
+  , ".bmp"
+  , ".webp"
   ]
 
 videoExts :: [Text]
 videoExts =
-  [ ".mp4",
-    ".webm",
-    ".ogv"
+  [ ".mp4"
+  , ".webm"
+  , ".ogv"
   ]

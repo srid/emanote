@@ -4,14 +4,15 @@
       "inputs": {
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
+        "lint-utils": "lint-utils",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1648394491,
-        "narHash": "sha256-w6PAs/DnspiphqZr51pVgE9crn4AAfb5TvzPntZuuzE=",
+        "lastModified": 1648411303,
+        "narHash": "sha256-OhAbDxl+AaTQDvPUEVYn9xnW7iP++bZ3dCJEOLM29fk=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "ed66ca49cb09aa867d652c19cd5cdac922c655c9",
+        "rev": "976590c6cb7836cc4caeeaf2ca65d84a6c2502e3",
         "type": "github"
       },
       "original": {
@@ -86,6 +87,36 @@
     },
     "flake-utils_2": {
       "locked": {
+        "lastModified": 1644229661,
+        "narHash": "sha256-1YdnJAsNy69bpcjuoKdOYQX0YxZBiCYZo4Twxerqv7k=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "3cecb5b042f7f209c56ffd8371b2711a290ec797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_3": {
+      "locked": {
+        "lastModified": 1644229661,
+        "narHash": "sha256-1YdnJAsNy69bpcjuoKdOYQX0YxZBiCYZo4Twxerqv7k=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "3cecb5b042f7f209c56ffd8371b2711a290ec797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_4": {
+      "locked": {
         "lastModified": 1642700792,
         "narHash": "sha256-XqHrk7hFb+zBvRg6Ghl+AZDq03ov6OshJLiSWOoX5es=",
         "owner": "numtide",
@@ -99,7 +130,7 @@
         "type": "github"
       }
     },
-    "flake-utils_3": {
+    "flake-utils_5": {
       "locked": {
         "lastModified": 1631561581,
         "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
@@ -131,6 +162,51 @@
         "type": "github"
       }
     },
+    "lint-utils": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": [
+          "ema",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1648405819,
+        "narHash": "sha256-Rv9QsHg5a3OurGxbC0Y2aERAZ0sFXYQyaxGYXdDPiZ4=",
+        "ref": "parameterized",
+        "rev": "9ba45de1fc3dbbe65c39d7d0107b99a8046a8081",
+        "revCount": 21,
+        "type": "git",
+        "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
+      },
+      "original": {
+        "ref": "parameterized",
+        "type": "git",
+        "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
+      }
+    },
+    "lint-utils_2": {
+      "inputs": {
+        "flake-utils": "flake-utils_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1648405819,
+        "narHash": "sha256-Rv9QsHg5a3OurGxbC0Y2aERAZ0sFXYQyaxGYXdDPiZ4=",
+        "ref": "parameterized",
+        "rev": "9ba45de1fc3dbbe65c39d7d0107b99a8046a8081",
+        "revCount": 21,
+        "type": "git",
+        "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
+      },
+      "original": {
+        "ref": "parameterized",
+        "type": "git",
+        "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1648219316,
@@ -150,7 +226,7 @@
     "pathtree": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "flake-utils": "flake-utils_2",
+        "flake-utils": "flake-utils_4",
         "nixpkgs": [
           "ema",
           "nixpkgs"
@@ -182,6 +258,7 @@
           "flake-utils"
         ],
         "heist": "heist",
+        "lint-utils": "lint-utils_2",
         "nixpkgs": [
           "ema",
           "nixpkgs"
@@ -224,7 +301,7 @@
     "unionmount": {
       "inputs": {
         "flake-compat": "flake-compat_3",
-        "flake-utils": "flake-utils_3",
+        "flake-utils": "flake-utils_5",
         "nixpkgs": [
           "ema",
           "nixpkgs"

@@ -1,8 +1,7 @@
-module Emanote.Source.Dynamic
-  ( emanoteModelDynamic,
-    ChangeHandler,
-  )
-where
+module Emanote.Source.Dynamic (
+  emanoteModelDynamic,
+  ChangeHandler,
+) where
 
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Data.Map.Strict qualified as Map
@@ -41,17 +40,18 @@ emanoteModelDynamic cliAct enc cli = do
 
 type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
 
--- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
---
--- This is a generic extension to unionMountOnLVar for operating Emanote like
--- apps.
+{- | Emanate on-disk sources onto an in-memory `model` (stored in a LVar)
+
+ This is a generic extension to unionMountOnLVar for operating Emanote like
+ apps.
+-}
 emanate ::
   forall m tag model.
-  ( MonadLogger m,
-    MonadUnliftIO m,
-    Ord tag,
-    model ~ Model.Model,
-    tag ~ FileType SourceExt
+  ( MonadLogger m
+  , MonadUnliftIO m
+  , Ord tag
+  , model ~ Model.Model
+  , tag ~ FileType SourceExt
   ) =>
   -- Layers to mount
   Set Loc ->

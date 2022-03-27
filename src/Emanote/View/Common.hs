@@ -1,18 +1,17 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.View.Common
-  ( commonSplices,
-    mkRendererFromMeta,
-    noteRenderers,
-    inlineRenderers,
-    linkInlineRenderers,
-    renderModelTemplate,
-    routeBreadcrumbs,
-    TemplateRenderCtx (..),
-    mkTemplateRenderCtx,
-    generatedCssFile,
-  )
-where
+module Emanote.View.Common (
+  commonSplices,
+  mkRendererFromMeta,
+  noteRenderers,
+  inlineRenderers,
+  linkInlineRenderers,
+  renderModelTemplate,
+  routeBreadcrumbs,
+  TemplateRenderCtx (..),
+  mkTemplateRenderCtx,
+  generatedCssFile,
+) where
 
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
@@ -55,10 +54,11 @@ noteRenderers =
     _pandocInlineRenderers
     _pandocBlockRenderers
 
--- | Like `noteRenderers` but for use in inline contexts.
---
--- Backlinks and titles constitute an example of inline context, where we don't
--- care about block elements.
+{- | Like `noteRenderers` but for use in inline contexts.
+
+ Backlinks and titles constitute an example of inline context, where we don't
+ care about block elements.
+-}
 inlineRenderers :: Monad n => PandocRenderers n LMLRoute b
 inlineRenderers =
   PandocRenderers
@@ -74,8 +74,8 @@ linkInlineRenderers =
 
 _pandocInlineRenderers :: Monad n => [PandocInlineRenderer n LMLRoute b]
 _pandocInlineRenderers =
-  [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-    PF.urlResolvingSplice
+  [ PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+  , PF.urlResolvingSplice
   ]
     <> _pandocInlineRenderersCommon
 
@@ -91,15 +91,15 @@ _pandocInlineRenderersCommon =
 
 _pandocBlockRenderers :: Monad n => [PandocBlockRenderer n i LMLRoute]
 _pandocBlockRenderers =
-  [ PF.embedBlockWikiLinkResolvingSplice,
-    PF.queryResolvingSplice
+  [ PF.embedBlockWikiLinkResolvingSplice
+  , PF.queryResolvingSplice
   ]
 
 data TemplateRenderCtx n = TemplateRenderCtx
-  { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    withBlockCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    withLinkInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    titleSplice :: Tit.Title -> HI.Splice n
+  { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n
+  , withBlockCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n
+  , withLinkInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n
+  , titleSplice :: Tit.Title -> HI.Splice n
   }
 
 mkTemplateRenderCtx ::
@@ -170,7 +170,7 @@ commonSplices withCtx model meta routeTitle = do
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
   "ema:homeUrl"
-    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @('R.LMLType 'R.Md) R.indexRoute
+    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @( 'R.LMLType 'R.Md) R.indexRoute
              homeUrl' = SR.siteRouteUrl model homeR
              homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
           in HI.textSplice homeUrl
@@ -209,11 +209,12 @@ commonSplices withCtx model meta routeTitle = do
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
 
--- | Given a route metadata, return the context generating function that can be
--- used to render an arbitrary Pandoc AST
---
--- The returned function allows specifing a `PandocRenderers` type, along with
--- the associated data arguments.
+{- | Given a route metadata, return the context generating function that can be
+ used to render an arbitrary Pandoc AST
+
+ The returned function allows specifing a `PandocRenderers` type, along with
+ the associated data arguments.
+-}
 mkRendererFromMeta ::
   (Monad m, Monad n) =>
   Model ->

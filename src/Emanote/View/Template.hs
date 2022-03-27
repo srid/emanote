@@ -5,9 +5,9 @@ import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
 import Data.Tree.Path qualified as PathTree
-import Data.WorldPeace.Union
-  ( absurdUnion,
-  )
+import Data.WorldPeace.Union (
+  absurdUnion,
+ )
 import Ema qualified
 import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
@@ -52,7 +52,7 @@ render m (SR.SiteRoute sr) =
    in sr
         & absurdUnion
         `h` ( \(SR.MissingR urlPath) -> do
-                let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+                let hereRoute = R.liftLMLRoute @( 'LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
                     note404 =
                       MN.missingNote hereRoute (toText urlPath)
                         & setErrorPageMeta
@@ -178,29 +178,29 @@ routeTreeSplice tCtx mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
-               ( Meta.lookupRouteMeta @Int 0 (one "order") tr model,
-                 maybe (Tit.fromRoute tr) MN._noteTitle $ M.modelLookupNoteByRoute tr model
-               )
+              ( Meta.lookupRouteMeta @Int 0 (one "order") tr model
+              , maybe (Tit.fromRoute tr) MN._noteTitle $ M.modelLookupNoteByRoute tr model
+              )
              getCollapsed tr =
-               Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute = R.liftLMLRoute . R.R @R.SourceExt @('LMLType 'Md)
+              Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+             mkLmlRoute = R.liftLMLRoute . R.R @R.SourceExt @( 'LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-               "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
-               "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
-               let isActiveNode = Just nodeRoute == mr
-                   isActiveTree =
-                     -- Active tree checking is applicable only when there is an
-                     -- active route (i.e., mr is a Just)
-                     flip (maybe True) mr $ \r ->
-                       toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
-                   openTree =
-                     isActiveTree -- Active tree is always open
-                       || not (getCollapsed nodeRoute)
-               "node:active" ## Heist.ifElseISplice isActiveNode
-               "node:terminal" ## Heist.ifElseISplice (null children)
-               "tree:childrenCount" ## HI.textSplice (show $ length children)
-               "tree:open" ## Heist.ifElseISplice openTree
+              "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
+              "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
+              let isActiveNode = Just nodeRoute == mr
+                  isActiveTree =
+                    -- Active tree checking is applicable only when there is an
+                    -- active route (i.e., mr is a Just)
+                    flip (maybe True) mr $ \r ->
+                      toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
+                  openTree =
+                    isActiveTree -- Active tree is always open
+                      || not (getCollapsed nodeRoute)
+              "node:active" ## Heist.ifElseISplice isActiveNode
+              "node:terminal" ## Heist.ifElseISplice (null children)
+              "tree:childrenCount" ## HI.textSplice (show $ length children)
+              "tree:open" ## Heist.ifElseISplice openTree
        )
 
 lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b

@@ -2,9 +2,8 @@
   description = "emanote";
   inputs = {
     ema.url = "github:srid/ema/multisite";
-    # Use the nixpkgs used by the pinned ema.
-    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     nixpkgs.follows = "ema/nixpkgs";
+    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
     tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
@@ -20,11 +19,11 @@
       url = "github:srid/heist/emanote";
       flake = false;
     };
-
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
+    lint-utils = {
+      type = "git";
+      url = "https://gitlab.homotopic.tech/nix/lint-utils.git";
+      ref = "parameterized";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
@@ -33,6 +32,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           # Based on https://github.com/input-output-hk/daedalus/blob/develop/yarn2nix.nix#L58-L71
+          fourmoluOpts = "-o-XTypeApplications -o-XImportQualifiedPost";
           filter = name: type:
             let
               baseName = baseNameOf (toString name);
@@ -58,7 +58,7 @@
 
                 pathtree = inputs.pathtree.defaultPackage.${system};
                 unionmount = inputs.unionmount.defaultPackage.${system};
-                relude = self.callHackage "relude" "1.0.0.1" { }; # Not on nixpkgs, for some reason.
+                relude = self.relude_1_0_0_1;
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # url-slug = inputs.url-slug.defaultPackage.${system};
                 # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
@@ -81,15 +81,52 @@
                     inputs.tailwind-haskell.defaultPackage.${system}
                   ]);
             };
+          # Checks the shell script using ShellCheck
+          checkedShellScript = name: text:
+            (pkgs.writeShellApplication {
+              inherit name text;
+            }) + "/bin/${name}";
+
+          # Concat a list of Flake apps to produce a new app that runs all of them
+          # in sequence.
+          concatApps = apps:
+            {
+              type = "app";
+              program = checkedShellScript "concatApps"
+                (pkgs.lib.strings.concatMapStringsSep
+                  "\n"
+                  (app: app.program)
+                  apps);
+            };
         in
-        {
+        rec {
+          defaultPackage = packages.default;
+
           # Used by `nix build` & `nix run`
-          defaultPackage = project false;
+          packages.default = project false;
 
           # Used by `nix develop`
           devShell = project true;
+
+
+          # Used by `nix run ...`
+          apps = {
+            format = concatApps [
+              (inputs.lint-utils.apps.${system}.fourmolu fourmoluOpts)
+              inputs.lint-utils.apps.${system}.cabal-fmt
+              inputs.lint-utils.apps.${system}.nixpkgs-fmt
+            ];
+          };
+
+          # Used by `nix flake check` (but see next attribute)
+          checks = {
+            format-haskell = inputs.lint-utils.linters.${system}.fourmolu ./. fourmoluOpts;
+            format-cabal = inputs.lint-utils.linters.${system}.cabal-fmt ./.;
+            format-nix = inputs.lint-utils.linters.${system}.nixpkgs-fmt ./.;
+          };
         }) //
     {
       homeManagerModule = import ./home-manager-module.nix;
+      herculesCI.ciSystems = [ "x86_64-linux" ];
     };
 }

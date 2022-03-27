@@ -1,8 +1,7 @@
-module Emanote.Pandoc.BuiltinFilters
-  ( prepareNoteDoc,
-    preparePandoc,
-  )
-where
+module Emanote.Pandoc.BuiltinFilters (
+  prepareNoteDoc,
+  preparePandoc,
+) where
 
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)

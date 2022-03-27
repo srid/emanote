@@ -1,30 +1,29 @@
-module Emanote.Route.SiteRoute.Class
-  ( decodeVirtualRoute,
-    noteFileSiteRoute,
-    staticFileSiteRoute,
-    lmlSiteRoute,
-    indexRoute,
-    indexLmlRoute,
-    tagIndexRoute,
-    taskIndexRoute,
-    siteRouteUrl,
-    siteRouteUrlStatic,
-    urlStrategySuffix,
+module Emanote.Route.SiteRoute.Class (
+  decodeVirtualRoute,
+  noteFileSiteRoute,
+  staticFileSiteRoute,
+  lmlSiteRoute,
+  indexRoute,
+  indexLmlRoute,
+  tagIndexRoute,
+  taskIndexRoute,
+  siteRouteUrl,
+  siteRouteUrlStatic,
+  urlStrategySuffix,
 
-    -- * Ema stuff
-    emanoteRouteEncoder,
-    emanoteGeneratableRoutes,
-  )
-where
+  -- * Ema stuff
+  emanoteRouteEncoder,
+  emanoteGeneratableRoutes,
+) where
 
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
-import Data.WorldPeace.Union
-  ( absurdUnion,
-    openUnionLift,
-  )
+import Data.WorldPeace.Union (
+  absurdUnion,
+  openUnionLift,
+ )
 import Ema (UrlStrategy (..), routeUrlWith)
 import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
@@ -201,7 +200,7 @@ urlStrategy =
 
 indexLmlRoute :: LMLRoute
 indexLmlRoute =
-  R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+  R.liftLMLRoute @( 'R.LMLType 'R.Md) $ R.indexRoute
 
 indexRoute :: SiteRoute
 indexRoute =

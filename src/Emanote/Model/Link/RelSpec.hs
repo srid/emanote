@@ -20,16 +20,16 @@ dropDotDot_spec =
         dropDotDot "foo/bar/qux" @?= "foo/bar/qux"
         dropDotDot "foo/../qux" @?= "qux"
         dropDotDot "bar/foo/../qux" @?= "bar/qux"
-        dropDotDot "bar/foo/.." @?= "bar",
-      testCase "complex" $ do
+        dropDotDot "bar/foo/.." @?= "bar"
+    , testCase "complex" $ do
         dropDotDot "bar/foo/../../qux" @?= "qux"
-        dropDotDot "bar/foo/../../qux/../foo" @?= "foo",
-      testCase "beginning" $ do
+        dropDotDot "bar/foo/../../qux/../foo" @?= "foo"
+    , testCase "beginning" $ do
         dropDotDot "../../foo" @?= "foo"
         dropDotDot "../foo" @?= "foo"
         dropDotDot "./../foo" @?= "foo"
-        dropDotDot "./foo" @?= "./foo",
-      testCase "end" $ do
+        dropDotDot "./foo" @?= "./foo"
+    , testCase "end" $ do
         dropDotDot "foo/.." @?= ""
         dropDotDot "foo/bar/.." @?= "foo"
         dropDotDot "foo/bar/../.." @?= ""

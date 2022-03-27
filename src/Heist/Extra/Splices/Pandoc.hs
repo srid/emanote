@@ -1,26 +1,25 @@
-module Heist.Extra.Splices.Pandoc
-  ( RenderCtx (..),
-    pandocSplice,
-    -- | To delegate rendering of blocks and inlines from a custom splice.
-    rpBlock,
-    rpInline,
-  )
-where
+module Heist.Extra.Splices.Pandoc (
+  RenderCtx (..),
+  pandocSplice,
+  -- | To delegate rendering of blocks and inlines from a custom splice.
+  rpBlock,
+  rpInline,
+) where
 
-import Heist.Extra.Splices.Pandoc.Ctx
-  ( RenderCtx (..),
-    concatSpliceFunc,
-  )
-import Heist.Extra.Splices.Pandoc.Footnotes
-  ( footnoteRefSplice,
-    gatherFootnotes,
-    renderFootnotesWith,
-  )
-import Heist.Extra.Splices.Pandoc.Render
-  ( renderPandocWith,
-    rpBlock,
-    rpInline,
-  )
+import Heist.Extra.Splices.Pandoc.Ctx (
+  RenderCtx (..),
+  concatSpliceFunc,
+ )
+import Heist.Extra.Splices.Pandoc.Footnotes (
+  footnoteRefSplice,
+  gatherFootnotes,
+  renderFootnotesWith,
+ )
+import Heist.Extra.Splices.Pandoc.Render (
+  renderPandocWith,
+  rpBlock,
+  rpInline,
+ )
 import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition (Pandoc (..))

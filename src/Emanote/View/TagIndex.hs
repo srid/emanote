@@ -22,12 +22,12 @@ import Relude
 -- An index view into the notebook indexed by the given tag path.
 data TagIndex = TagIndex
   { -- | The tag path under which this index is creatd
-    tagIndexPath :: [HT.TagNode],
-    -- | User descriptive title of this index
-    tagIndexTitle :: Text,
-    -- | All notes tagged precisely with this tag path
-    tagIndexNotes :: [MN.Note],
-    -- | Tags immediately under this tag path.
+    tagIndexPath :: [HT.TagNode]
+  , -- | User descriptive title of this index
+    tagIndexTitle :: Text
+  , -- | All notes tagged precisely with this tag path
+    tagIndexNotes :: [MN.Note]
+  , -- | Tags immediately under this tag path.
     --
     -- If the tag path being index is "foo/bar", this will contain "foo/bar/qux".
     tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
