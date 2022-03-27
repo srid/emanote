@@ -1,6 +1,9 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Emanote (run) where
+module Emanote
+  ( run,
+  )
+where
 
 import Control.Monad.Logger (runStderrLoggingT, runStdoutLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))

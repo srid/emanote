@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.5.4.0
+version:            0.5.5.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -36,8 +36,8 @@ common haskell-common
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
-    -fprint-explicit-foralls -fprint-explicit-kinds
-    -threaded -rtsopts -with-rtsopts=-N
+    -fprint-explicit-foralls -fprint-explicit-kinds -threaded -rtsopts
+    -with-rtsopts=-N
 
   default-extensions:
     NoImplicitPrelude
