@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Emanote.Model.QuerySpec where
 
 import Data.TagTree (Tag (Tag))
@@ -6,15 +8,10 @@ import Hedgehog
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
 import Relude
-import Test.Tasty
-import Test.Tasty.Hedgehog
 
-spec :: TestTree
-spec =
-  testGroup
-    "Tag query"
-    [ testProperty "tags with #" prop_tagsCanBeginWithHash
-    ]
+tests :: IO Bool
+tests =
+  checkParallel $$(discover)
 
 prop_tagsCanBeginWithHash :: Property
 prop_tagsCanBeginWithHash =

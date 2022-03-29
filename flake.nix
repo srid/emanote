@@ -108,7 +108,6 @@
           # Used by `nix develop`
           devShell = project true;
 
-
           # Used by `nix run ...`
           apps = {
             format = concatApps [
