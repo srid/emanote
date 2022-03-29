@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.5.5.2
+version:            0.5.5.3
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -130,10 +130,6 @@ common library-common
     , tagged
     , tagtree
     , tailwind
-    , tasty
-    , tasty-hedgehog
-    , tasty-hunit
-    , tasty-quickcheck
     , text
     , time
     , unionmount
