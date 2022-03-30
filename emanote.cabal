@@ -109,6 +109,8 @@ common library-common
     , fsnotify
     , hedgehog
     , heist                  >=1.1.0.1
+    , hspec
+    , hspec-hedgehog
     , ixset-typed
     , lvar
     , map-syntax
