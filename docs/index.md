@@ -16,8 +16,4 @@ page:
 Start from [[start]]. [[guide]] will eventually contain documentation, but for now checkout the [[demo]]. If you are interested in contributing, see [[architecture]].
 :::
 
-:::{.flex .justify-center .items-center}
-[![FAIR](https://img.shields.io/badge/FAIR-pledge-blue)](https://www.fairforall.org/about/)
-:::
-
 [gh]: https://github.com/srid/emanote
