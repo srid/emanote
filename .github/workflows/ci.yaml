@@ -23,6 +23,10 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Build Nix
+        id: build-nix
+        run: |
+          nix-build -j auto --no-out-link
       - name: Build as docker img
         id: build
         run: |
