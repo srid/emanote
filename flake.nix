@@ -73,11 +73,13 @@
                 pkgs.haskell.lib.addBuildTools drv
                   (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
                     # Specify your build/dev dependencies here. 
-                    cabal-fmt
                     cabal-install
                     ghcid
                     haskell-language-server
-                    ormolu
+
+                    # Auto-formatters (used by editors, in nix-shell)
+                    cabal-fmt
+                    fourmolu
                     pkgs.nixpkgs-fmt
 
                     inputs.tailwind-haskell.defaultPackage.${system}
