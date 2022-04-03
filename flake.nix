@@ -20,7 +20,7 @@
     unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
 
     heist = {
-      url = "github:srid/heist/emanote";
+      url = "github:srid/heist/emanote-release";
       flake = false;
     };
     lint-utils = {
@@ -58,7 +58,7 @@
                 ema = inputs.ema.defaultPackage.${system};
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
-                pathtree = inputs.pathtree.defaultPackage.${system};
+                path-tree = inputs.pathtree.defaultPackage.${system};
                 unionmount = inputs.unionmount.defaultPackage.${system};
                 relude = self.relude_1_0_0_1;
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
@@ -67,7 +67,7 @@
                 # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
 
                 # Jailbreak heist to allow newer dlist
-                heist = doJailbreak (dontCheck (self.callCabal2nix "heist" inputs.heist { }));
+                heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));
               };
               modifier = drv:
                 pkgs.haskell.lib.addBuildTools drv

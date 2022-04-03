@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.5.5.4
+version:            0.5.5.6
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -108,7 +108,7 @@ common library-common
     , filepattern
     , fsnotify
     , hedgehog
-    , heist                  >=1.1.0.1
+    , heist-emanote          >=1.2
     , hspec
     , hspec-hedgehog
     , ixset-typed
@@ -124,17 +124,17 @@ common library-common
     , pandoc-link-context    >=1.2.0
     , pandoc-types
     , parsec
-    , pathtree
+    , path-tree              >=0.2
     , profunctors
     , relude                 >=1.0
     , shower
     , some
     , tagged
     , tagtree
-    , tailwind
+    , tailwind               >=0.3
     , text
     , time
-    , unionmount
+    , unionmount             >=0.2
     , unliftio
     , unordered-containers
     , uri-encode

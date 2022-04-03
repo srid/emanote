@@ -148,16 +148,16 @@
     "heist": {
       "flake": false,
       "locked": {
-        "lastModified": 1624205223,
-        "narHash": "sha256-+bcrEKjB/kDRAqOunCD/cKBBVOJUTmY9RoCQ++I42oM=",
+        "lastModified": 1649013405,
+        "narHash": "sha256-4NK8ZLHm4iHWU+LCu3M0jnALCnQCa7lEu72NIOQ1YI8=",
         "owner": "srid",
         "repo": "heist",
-        "rev": "a8be6f93656f87199e03b9dfb9979dc061614108",
+        "rev": "a4b3d6d5573a4ba9c410b382fa3771e8ae53fcfa",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "emanote",
+        "ref": "emanote-release",
         "repo": "heist",
         "type": "github"
       }
@@ -233,11 +233,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1647644631,
-        "narHash": "sha256-aRuyBXjUrva7RNSWIIbB+HefowF8wZepCkkaCDm8Qn4=",
+        "lastModified": 1649011952,
+        "narHash": "sha256-RuNIoPXx0xy5TZ81JH33V8EqXWX5erv8gepM0Aaeat8=",
         "owner": "srid",
         "repo": "pathtree",
-        "rev": "8619aada5b0cd76dff37a2e90b47eecbb3fb7d23",
+        "rev": "d60f22b356f79663aca3f5fde9f23bb4a1412963",
         "type": "github"
       },
       "original": {
@@ -284,11 +284,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1647792199,
-        "narHash": "sha256-QndGcDf2ySiA+1CSo05lSE9qBCcV18hBCgw8qH9PfEo=",
+        "lastModified": 1649012698,
+        "narHash": "sha256-Kosm6SyTjbyD869o+qM4Zg7IUKdqRXq4FN/HCpXcflk=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "9deb377835f9035a658c694dd82cb772afeb2d36",
+        "rev": "f17cea75ad6a27976e9445eba9f77fa8d323885c",
         "type": "github"
       },
       "original": {
@@ -308,11 +308,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1647795307,
-        "narHash": "sha256-olb4o0+l8XXtdQ8NKLtwjI5A9/4CPMgRdBVtZVvsLlY=",
+        "lastModified": 1649012450,
+        "narHash": "sha256-m0qlPd3jxjyDEkd7cQKLX0GT9a00qnvygec9GCBZ1hc=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "ccd5049de67bfd7f042deda00a41659ec4e36f3c",
+        "rev": "27584567d9182c12018f988db899593a896f86ff",
         "type": "github"
       },
       "original": {
