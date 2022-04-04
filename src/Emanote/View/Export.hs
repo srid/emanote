@@ -26,7 +26,7 @@ data Export = Export
   { version :: Word
   , files :: Map Text SourceFile
   }
-  deriving stock (Generic)
+  deriving stock (Generic, Show)
   deriving anyclass (ToJSON)
 
 currentVersion :: Word
@@ -41,14 +41,14 @@ data SourceFile = SourceFile
   , meta :: Aeson.Value
   , links :: [Link]
   }
-  deriving stock (Generic)
+  deriving stock (Generic, Show)
   deriving anyclass (ToJSON)
 
 data Link = Link
   { unresolvedRelTarget :: Rel.UnresolvedRelTarget
   , resolvedRelTarget :: Rel.ResolvedRelTarget Text
   }
-  deriving stock (Generic, Eq, Ord)
+  deriving stock (Generic, Eq, Ord, Show)
   deriving anyclass (ToJSON)
 
 renderGraphExport :: Model -> LByteString
