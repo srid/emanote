@@ -18,6 +18,8 @@
     pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
     unionmount.url = "github:srid/unionmount/master";
     unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
+    pandoc-link-context.url = "github:srid/pandoc-link-context/no-dl";
+    pandoc-link-context.flake = false;
 
     heist = {
       url = "github:srid/heist/emanote-release";
@@ -60,6 +62,7 @@
 
                 path-tree = inputs.pathtree.defaultPackage.${system};
                 unionmount = inputs.unionmount.defaultPackage.${system};
+                pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
                 relude = self.relude_1_0_0_1;
                 # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
                 # url-slug = inputs.url-slug.defaultPackage.${system};

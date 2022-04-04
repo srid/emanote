@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.5.5.6
+version:            0.5.6.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -121,7 +121,7 @@ common library-common
     , optics-core
     , optics-th
     , optparse-applicative
-    , pandoc-link-context    >=1.2.0
+    , pandoc-link-context    >=1.4.0
     , pandoc-types
     , parsec
     , path-tree              >=0.2
