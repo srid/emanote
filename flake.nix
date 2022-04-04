@@ -37,24 +37,11 @@
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          filter = name: type:
-            let
-              baseName = baseNameOf (toString name);
-              sansPrefix = pkgs.lib.removePrefix (toString ./.) name;
-            in
-            # Ignore these files when building emanote source package
-              !(
-                baseName == "README.md" ||
-                sansPrefix == "/bin" ||
-                sansPrefix == "/docs" ||
-                sansPrefix == "/.github" ||
-                sansPrefix == "/.vscode"
-              );
           project = returnShellEnv:
             pkgs.haskellPackages.developPackage {
               inherit returnShellEnv;
               name = "emanote";
-              root = pkgs.lib.cleanSourceWith { inherit filter; src = ./.; name = "emanote"; };
+              root = ./.;
               withHoogle = true;
               overrides = self: super: with pkgs.haskell.lib; {
                 ema = inputs.ema.defaultPackage.${system};
