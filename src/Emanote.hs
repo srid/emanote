@@ -71,10 +71,13 @@ checkBrokenLinks cli model = runStderrLoggingT $ do
           RRTAmbiguous ls -> do
             logW $ "Ambiguous link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt <> " ambiguities: " <> show ls
             tell 1
-  unless (res == 0 || CLI.allowBrokenLinks cli) $ do
-    logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
-    log "(Tip: use `--allow-broken-links` to ignore this check.)"
-    exitFailure
+  if res == 0
+    then do
+      log "No broken links detected."
+    else unless (CLI.allowBrokenLinks cli) $ do
+      logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
+      log "(Tip: use `--allow-broken-links` to ignore this check.)"
+      exitFailure
 
 compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
 compileTailwindCss outPath genPaths = do
