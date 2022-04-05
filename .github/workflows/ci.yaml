@@ -26,6 +26,7 @@ jobs:
       - name: Build Nix
         id: build-nix
         run: |
+          [[ -n $(git status -s) ]] && echo 'modified and/or untracked'
           nix-build -j auto --no-out-link
       - name: Build as docker img
         id: build
