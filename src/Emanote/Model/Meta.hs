@@ -16,9 +16,8 @@ lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> Model -> a
 lookupRouteMeta x k r =
   lookupAeson x k . getEffectiveRouteMeta r
 
-{- | Get the (final) metadata of a note at the given route, by merging it with
- the defaults specified in parent routes all the way upto index.yaml.
--}
+-- | Get the (final) metadata of a note at the given route, by merging it with
+-- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
   let mNote = modelLookupNoteByRoute mr model
@@ -26,7 +25,7 @@ getEffectiveRouteMeta mr model =
 
 getEffectiveRouteMetaWith :: Aeson.Value -> R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMetaWith frontmatter mr model =
-  let defaultFiles = R.routeInits @ 'R.Yaml (coerce $ R.lmlRouteCase mr)
+  let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.lmlRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- getYamlMeta r model
         guard $ v /= Aeson.Null

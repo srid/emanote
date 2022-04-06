@@ -1,7 +1,8 @@
-module Emanote.Pandoc.Renderer.Query (
-  queryResolvingSplice,
-  noteSpliceMap,
-) where
+module Emanote.Pandoc.Renderer.Query
+  ( queryResolvingSplice,
+    noteSpliceMap,
+  )
+where
 
 import Data.List qualified as List
 import Data.Map.Syntax ((##))

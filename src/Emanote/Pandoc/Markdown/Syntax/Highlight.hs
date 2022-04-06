@@ -1,6 +1,7 @@
-module Emanote.Pandoc.Markdown.Syntax.Highlight (
-  highlightSpec,
-) where
+module Emanote.Pandoc.Markdown.Syntax.Highlight
+  ( highlightSpec,
+  )
+where
 
 import Commonmark qualified as CM
 import Commonmark.Inlines qualified as CM

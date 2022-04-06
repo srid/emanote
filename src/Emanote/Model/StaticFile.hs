@@ -12,9 +12,9 @@ import Optics.TH (makeLenses)
 import Relude
 
 data StaticFile = StaticFile
-  { _staticFileRoute :: R.R @R.SourceExt 'R.AnyExt
-  , _staticFilePath :: FilePath
-  , -- | Indicates that this file was updated no latter than the given time.
+  { _staticFileRoute :: R.R @R.SourceExt 'R.AnyExt,
+    _staticFilePath :: FilePath,
+    -- | Indicates that this file was updated no latter than the given time.
     _staticFileTime :: UTCTime
   }
   deriving stock (Eq, Ord, Show, Generic)

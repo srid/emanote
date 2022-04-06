@@ -21,27 +21,25 @@ import System.FilePath (normalise, (</>))
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.LinkContext qualified as LC
 
-{- | A relation from one note to anywhere in the model.
-
- Target will remain unresolved in the `Rel`, and can be resolved at a latter
- time (eg: during rendering).
--}
+-- | A relation from one note to anywhere in the model.
+--
+-- Target will remain unresolved in the `Rel`, and can be resolved at a latter
+-- time (eg: during rendering).
 data Rel = Rel
   { -- The note containing this relation
-    _relFrom :: LMLRoute
-  , -- The target of the relation (can be a note or anything)
-    _relTo :: UnresolvedRelTarget
-  , -- | The relation context in LML
+    _relFrom :: LMLRoute,
+    -- The target of the relation (can be a note or anything)
+    _relTo :: UnresolvedRelTarget,
+    -- | The relation context in LML
     _relCtx :: [B.Block]
   }
   deriving stock (Eq, Ord, Show)
 
-{- | A link target that has not been resolved (using model) yet.
-
- Resolving this may or may not result in a resource in the model. The ADT
- constructors capture the different possible types of links the user is
- allowed to link to.
--}
+-- | A link target that has not been resolved (using model) yet.
+--
+-- Resolving this may or may not result in a resource in the model. The ADT
+-- constructors capture the different possible types of links the user is
+-- allowed to link to.
 data UnresolvedRelTarget
   = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
   | URTResource ModelRoute
@@ -80,10 +78,9 @@ unresolvedRelsTo r =
    in (URTWikiLink <$> toList wls)
         <> [URTResource r]
 
-{- | Parse a relative URL string for later resolution.
-
- TODO: Need tests for this function.
--}
+-- | Parse a relative URL string for later resolution.
+--
+-- TODO: Need tests for this function.
 parseUnresolvedRelTarget :: Maybe (R.R 'R.Folder) -> [(Text, Text)] -> Text -> Maybe (UnresolvedRelTarget, Maybe WL.Anchor)
 parseUnresolvedRelTarget baseDir attrs url = do
   (wlRes, manchor) <- WL.delineateLink attrs url
@@ -126,10 +123,9 @@ dropDotDot =
         x -> maybe [] (go 0) $ nonEmpty $ NEL.drop n x
    in toString . T.intercalate "/" . maybe [] (reverse . go 0 . NEL.reverse) . nonEmpty . T.splitOn "/" . toText
 
-{- | An `UnresolvedRelTarget` that has been resolved.
-
- See @Model.Link.Resolve@ for actual resolution logic.
--}
+-- | An `UnresolvedRelTarget` that has been resolved.
+--
+-- See @Model.Link.Resolve@ for actual resolution logic.
 data ResolvedRelTarget a
   = RRTMissing
   | RRTAmbiguous (NonEmpty a)

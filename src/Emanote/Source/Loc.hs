@@ -1,24 +1,24 @@
 -- | Notebook location
-module Emanote.Source.Loc (
-  -- * Type
-  Loc (..),
+module Emanote.Source.Loc
+  ( -- * Type
+    Loc (..),
 
-  -- * Making a `Loc`
-  defaultLayer,
-  userLayers,
+    -- * Making a `Loc`
+    defaultLayer,
+    userLayers,
 
-  -- * Using a `Loc`
-  locResolve,
-  locPath,
-) where
+    -- * Using a `Loc`
+    locResolve,
+    locPath,
+  )
+where
 
 import Relude
 import System.FilePath ((</>))
 
-{- | Location of the notebook
-
- The order here matters. Top = higher precedence.
--}
+-- | Location of the notebook
+--
+-- The order here matters. Top = higher precedence.
 data Loc
   = -- | The Int argument specifies the precedence (lower value = higher precedence)
     LocUser Int FilePath

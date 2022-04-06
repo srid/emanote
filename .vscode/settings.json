@@ -19,5 +19,5 @@
   "html.format.contentUnformatted": "pre,code,textarea",
   "html.format.wrapLineLength": 100,
   "html.format.unformattedContentDelimiter": "<!-- DoNotFormat -->",
-  "haskell.formattingProvider": "fourmolu"
+  "haskell.formattingProvider": "ormolu"
 }

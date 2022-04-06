@@ -1,7 +1,8 @@
-module Emanote.View.LiveServerFiles (
-  isLiveServerFile,
-  tailwindCssFile,
-) where
+module Emanote.View.LiveServerFiles
+  ( isLiveServerFile,
+    tailwindCssFile,
+  )
+where
 
 import Data.Text qualified as T
 import Emanote.Model.StaticFile (StaticFile)

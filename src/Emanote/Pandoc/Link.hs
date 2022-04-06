@@ -4,10 +4,9 @@ import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Relude
 import Text.Pandoc.Definition qualified as B
 
-{- | A Pandoc inline node that refers to something else.
-
- There are, currently, only two possible nodes: link & image.
--}
+-- | A Pandoc inline node that refers to something else.
+--
+-- There are, currently, only two possible nodes: link & image.
 data InlineRef
   = InlineLink
   | InlineImage
@@ -22,9 +21,8 @@ parseInlineRef = \case
   _ ->
     Nothing
 
-{- | Given an inline that is known to be an InlineRef, reconstruct and return
- its orginal Markdown source.
--}
+-- | Given an inline that is known to be an InlineRef, reconstruct and return
+-- its orginal Markdown source.
 unParseLink :: HasCallStack => B.Inline -> Text
 unParseLink inl =
   case WL.wikiLinkInlineRendered inl of
