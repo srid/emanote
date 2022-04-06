@@ -16,9 +16,8 @@ lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> Model -> a
 lookupRouteMeta x k r =
   lookupAeson x k . getEffectiveRouteMeta r
 
-{- | Get the (final) metadata of a note at the given route, by merging it with
- the defaults specified in parent routes all the way upto index.yaml.
--}
+-- | Get the (final) metadata of a note at the given route, by merging it with
+-- the defaults specified in parent routes all the way upto index.yaml.
 getEffectiveRouteMeta :: R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMeta mr model =
   let mNote = modelLookupNoteByRoute mr model

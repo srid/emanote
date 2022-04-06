@@ -236,6 +236,7 @@
       "inputs": {
         "flake-utils": "flake-utils_3",
         "nixpkgs": [
+          "ema",
           "nixpkgs"
         ]
       },

@@ -1,8 +1,9 @@
 -- GFM Task List, https://github.github.com/gfm/#task-list-items-extension-
-module Heist.Extra.Splices.Pandoc.TaskList (
-  parseTaskFromInlines,
-  queryTasks,
-) where
+module Heist.Extra.Splices.Pandoc.TaskList
+  ( parseTaskFromInlines,
+    queryTasks,
+  )
+where
 
 import Relude
 import Text.Pandoc.Builder qualified as B

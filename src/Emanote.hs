@@ -1,8 +1,9 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Emanote (
-  run,
-) where
+module Emanote
+  ( run,
+  )
+where
 
 import Control.Monad.Logger (runStderrLoggingT, runStdoutLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
@@ -10,13 +11,13 @@ import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
-import Ema (
-  CanGenerate (..),
-  CanRender (..),
-  HasModel (..),
-  IsRoute (..),
-  runSiteWithCli,
- )
+import Ema
+  ( CanGenerate (..),
+    CanRender (..),
+    HasModel (..),
+    IsRoute (..),
+    runSiteWithCli,
+  )
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
