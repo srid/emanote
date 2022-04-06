@@ -10,10 +10,10 @@ filePattern = \case
     R.withExt @R.SourceExt @( 'R.LMLType 'R.Md) $
       "**/*"
   R.Yaml ->
-    R.withExt @R.SourceExt @ 'R.Yaml $
+    R.withExt @R.SourceExt @'R.Yaml $
       "**/*"
   R.HeistTpl ->
-    R.withExt @R.SourceExt @ 'R.HeistTpl $
+    R.withExt @R.SourceExt @'R.HeistTpl $
       "**/*"
   R.AnyExt ->
     "**"

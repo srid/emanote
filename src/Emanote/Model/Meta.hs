@@ -26,7 +26,7 @@ getEffectiveRouteMeta mr model =
 
 getEffectiveRouteMetaWith :: Aeson.Value -> R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMetaWith frontmatter mr model =
-  let defaultFiles = R.routeInits @ 'R.Yaml (coerce $ R.lmlRouteCase mr)
+  let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.lmlRouteCase mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- getYamlMeta r model
         guard $ v /= Aeson.Null
