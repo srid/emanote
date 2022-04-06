@@ -1,8 +1,9 @@
-module Emanote.Pandoc.Renderer.Url (
-  urlResolvingSplice,
-  plainifyWikiLinkSplice,
-  renderSomeInlineRefWith,
-) where
+module Emanote.Pandoc.Renderer.Url
+  ( urlResolvingSplice,
+    plainifyWikiLinkSplice,
+    renderSomeInlineRefWith,
+  )
+where
 
 import Data.Text qualified as T
 import Data.WorldPeace.Union (absurdUnion)
@@ -74,8 +75,8 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
             ctx
             ( tooltip
                 "Link is broken"
-                [ B.Strikeout $ one $ B.Str $ Link.unParseLink origInl
-                , B.Str "❌"
+                [ B.Strikeout $ one $ B.Str $ Link.unParseLink origInl,
+                  B.Str "❌"
                 ]
             )
         details <-
@@ -134,8 +135,8 @@ replaceLinkNodeWithRoute ::
   ([B.Inline], Text) ->
   ([B.Inline], (Text, Bool))
 replaceLinkNodeWithRoute model r (inner, url) =
-  ( inlinesWithWikiLinksPlainified $ nonEmptyLinkInlines model url (Just r) inner
-  , let linkUrl = SR.siteRouteUrl model r
+  ( inlinesWithWikiLinksPlainified $ nonEmptyLinkInlines model url (Just r) inner,
+    let linkUrl = SR.siteRouteUrl model r
      in (linkUrl, "?" `T.isInfixOf` linkUrl)
   )
   where

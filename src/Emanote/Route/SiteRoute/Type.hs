@@ -1,26 +1,27 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.Route.SiteRoute.Type (
-  SiteRoute (..),
-  IndexR (..),
-  ExportR (..),
-  TasksR (..),
-  TagIndexR (..),
-  MissingR (..),
-  AmbiguousR (..),
-  VirtualRoute,
-  ResourceRoute,
-  decodeVirtualRoute,
-  encodeVirtualRoute,
-  encodeTagIndexR,
-) where
+module Emanote.Route.SiteRoute.Type
+  ( SiteRoute (..),
+    IndexR (..),
+    ExportR (..),
+    TasksR (..),
+    TagIndexR (..),
+    MissingR (..),
+    AmbiguousR (..),
+    VirtualRoute,
+    ResourceRoute,
+    decodeVirtualRoute,
+    encodeVirtualRoute,
+    encodeTagIndexR,
+  )
+where
 
 import Data.Aeson (ToJSON)
-import Data.WorldPeace.Union (
-  OpenUnion,
-  absurdUnion,
-  openUnionLift,
- )
+import Data.WorldPeace.Union
+  ( OpenUnion,
+    absurdUnion,
+    openUnionLift,
+  )
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
 import Emanote.Route.Ext qualified as Ext
@@ -55,32 +56,31 @@ newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
   deriving stock (Eq, Show, Ord)
 
 type VirtualRoute' =
-  '[ IndexR
-   , TagIndexR
-   , ExportR
-   , TasksR
+  '[ IndexR,
+     TagIndexR,
+     ExportR,
+     TasksR
    ]
 
 -- | A route to a virtual resource (not in `Model`)
 type VirtualRoute = OpenUnion VirtualRoute'
 
 type ResourceRoute' =
-  '[ (StaticFileRoute, FilePath)
-   , LMLRoute
+  '[ (StaticFileRoute, FilePath),
+     LMLRoute
    ]
 
-{- | A route to a resource in `Model`
-
- This is *mostly isomorphic* to `ModelRoute`, except for containing the
- absolute path to the static file.
--}
+-- | A route to a resource in `Model`
+--
+-- This is *mostly isomorphic* to `ModelRoute`, except for containing the
+-- absolute path to the static file.
 type ResourceRoute = OpenUnion ResourceRoute'
 
 type SiteRoute' =
-  '[ VirtualRoute
-   , ResourceRoute
-   , MissingR
-   , AmbiguousR
+  '[ VirtualRoute,
+     ResourceRoute,
+     MissingR,
+     AmbiguousR
    ]
 
 newtype SiteRoute = SiteRoute {unSiteRoute :: OpenUnion SiteRoute'}
@@ -146,13 +146,13 @@ encodeVirtualRoute =
             R.encodeRoute $ encodeTagIndexR tr
         )
     `h` ( \IndexR ->
-            R.encodeRoute $ R.R @() @ 'Ext.Html $ "-" :| ["all"]
+            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
         )
     `h` ( \ExportR ->
-            R.encodeRoute $ R.R @Ext.SourceExt @ 'Ext.AnyExt $ "-" :| ["export.json"]
+            R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
         )
     `h` ( \TasksR ->
-            R.encodeRoute $ R.R @() @ 'Ext.Html $ "-" :| ["tasks"]
+            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
         )
 
 encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html

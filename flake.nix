@@ -29,7 +29,7 @@
       type = "git";
       url = "https://gitlab.homotopic.tech/nix/lint-utils.git";
       ref = "spec-type";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "ema/nixpkgs";
     };
   };
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
@@ -69,7 +69,7 @@
 
                     # Auto-formatters (used by editors, in nix-shell)
                     cabal-fmt
-                    fourmolu
+                    ormolu
                     pkgs.nixpkgs-fmt
 
                     inputs.tailwind-haskell.defaultPackage.${system}
@@ -78,7 +78,7 @@
           lintSpec = {
             nixpkgs-fmt = { };
             cabal-fmt = { };
-            fourmolu = {
+            ormolu = {
               ghcOpts = "-o-XTypeApplications -o-XImportQualifiedPost";
             };
           };

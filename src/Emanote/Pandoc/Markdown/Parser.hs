@@ -1,6 +1,7 @@
-module Emanote.Pandoc.Markdown.Parser (
-  parseMarkdown,
-) where
+module Emanote.Pandoc.Markdown.Parser
+  ( parseMarkdown,
+  )
+where
 
 import Commonmark qualified as CM
 import Commonmark.Extensions qualified as CE
@@ -30,17 +31,17 @@ parseMarkdown =
   where
     baseExtsSansPipeTable =
       mconcat
-        [ CE.fancyListSpec
-        , CE.footnoteSpec
-        , CE.mathSpec
-        , CE.smartPunctuationSpec
-        , CE.definitionListSpec
-        , CE.attributesSpec
-        , CE.rawAttributeSpec
-        , CE.fencedDivSpec
-        , CE.bracketedSpanSpec
-        , CE.autolinkSpec
-        , CM.defaultSyntaxSpec
+        [ CE.fancyListSpec,
+          CE.footnoteSpec,
+          CE.mathSpec,
+          CE.smartPunctuationSpec,
+          CE.definitionListSpec,
+          CE.attributesSpec,
+          CE.rawAttributeSpec,
+          CE.fencedDivSpec,
+          CE.bracketedSpanSpec,
+          CE.autolinkSpec,
+          CM.defaultSyntaxSpec
         ]
     gfmExtensionsSansPipeTable =
       CE.emojiSpec <> CE.strikethroughSpec <> CE.autolinkSpec
