@@ -8,16 +8,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1649279039,
-        "narHash": "sha256-p66N1yoWJn01oVI6B8TZf/uNU9OrytZtDEZQlajcXE0=",
+        "lastModified": 1649349384,
+        "narHash": "sha256-9dOA80MPqK3rFJbzzNVlHqMMIsGqqb1C/GDdDkGizEY=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "f44c40006721ba83054a0eff73256ee4808cbe9e",
+        "rev": "d5831fd1b3c84dc19da792e28e774c76266ce77e",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "multisite--ghc9",
+        "ref": "multisite",
         "repo": "ema",
         "type": "github"
       }
@@ -385,16 +385,16 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1649279281,
-        "narHash": "sha256-7dr9HevJT/8W+OwNjzfJ/hKFaIZCguRxmHJ/q+x9ImU=",
+        "lastModified": 1649349506,
+        "narHash": "sha256-MaDO7QI/FCVP5/F0A9q8b0/0J1vcKiuuATZT23+OvkQ=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "7716db47b75a32ccc60f8c1ea8668618f46fc6d8",
+        "rev": "45f0b4a2b55ef64ac9d52da14b9a1125bdf35419",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "ghc9",
+        "ref": "master",
         "repo": "tailwind-haskell",
         "type": "github"
       }

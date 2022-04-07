@@ -5,9 +5,9 @@
     extra-trusted-public-keys = "srid.cachix.org-1:MTQ6ksbfz3LBMmjyPh0PLmos+1x+CdtJxA/J2W+PQxI=";
   };
   inputs = {
-    ema.url = "github:srid/ema/multisite--ghc9";
+    ema.url = "github:srid/ema/multisite";
     nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.url = "github:srid/tailwind-haskell/ghc9";
+    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     flake-utils.follows = "ema/flake-utils";
     flake-compat.follows = "ema/flake-compat";
 
@@ -49,13 +49,8 @@
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
                 path-tree = self.callCabal2nix "path-tree" inputs.pathtree { };
-                # tailwind = self.callCabal2nix "tailwind" inputs.tailwind-haskell { };
                 unionmount = self.callCabal2nix "unionmount" inputs.unionmount { };
                 pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
-                # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
-                # url-slug = inputs.url-slug.defaultPackage.${system};
-                # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
-                # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
 
                 # Jailbreak heist to allow newer dlist
                 heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));

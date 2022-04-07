@@ -103,7 +103,7 @@ common library-common
     , data-default
     , dependent-sum
     , directory
-    , ema                    >=0.7
+    , ema                    >=0.7.2
     , filepath
     , filepattern
     , fsnotify
