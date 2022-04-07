@@ -6,6 +6,7 @@
 module Emanote.Model.Note where
 
 import Data.Aeson qualified as Aeson
+import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
@@ -22,7 +23,6 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import Relude.Extra.Map (StaticMap (lookup))
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -223,7 +223,7 @@ lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -
 lookupAeson x (k :| ks) meta =
   fromMaybe x $ do
     Aeson.Object obj <- pure meta
-    val <- lookup k obj
+    val <- KM.lookup (fromString . toString $ k) obj
     case nonEmpty ks of
       Nothing -> resultToMaybe $ Aeson.fromJSON val
       Just ks' -> pure $ lookupAeson x ks' val
@@ -239,6 +239,6 @@ oneAesonText k v =
     Nothing ->
       Aeson.String v
     Just (x :| xs) ->
-      Aeson.object [x Aeson..= oneAesonText (toList xs) v]
+      Aeson.object [(fromString . toString) x Aeson..= oneAesonText (toList xs) v]
 
 makeLenses ''Note
