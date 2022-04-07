@@ -8,21 +8,22 @@
     ema.url = "github:srid/ema/multisite";
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.inputs.flake-utils.follows = "ema/flake-utils";
-    tailwind-haskell.inputs.flake-compat.follows = "ema/flake-compat";
     flake-utils.follows = "ema/flake-utils";
     flake-compat.follows = "ema/flake-compat";
 
     pathtree.url = "github:srid/pathtree";
-    pathtree.inputs.nixpkgs.follows = "ema/nixpkgs";
+    pathtree.flake = false;
     unionmount.url = "github:srid/unionmount/master";
-    unionmount.inputs.nixpkgs.follows = "ema/nixpkgs";
+    unionmount.flake = false;
     pandoc-link-context.url = "github:srid/pandoc-link-context/no-dl";
     pandoc-link-context.flake = false;
 
+    # https://github.com/well-typed/ixset-typed/pull/16
+    ixset-typed.url = "github:well-typed/ixset-typed";
+    ixset-typed.flake = false;
+
     heist = {
-      url = "github:srid/heist/emanote-release";
+      url = "github:srid/heist/emanote-release--ghc9";
       flake = false;
     };
     lint-utils = {
@@ -47,17 +48,13 @@
                 ema = inputs.ema.defaultPackage.${system};
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
-                path-tree = inputs.pathtree.defaultPackage.${system};
-                unionmount = inputs.unionmount.defaultPackage.${system};
+                path-tree = self.callCabal2nix "path-tree" inputs.pathtree { };
+                unionmount = self.callCabal2nix "unionmount" inputs.unionmount { };
                 pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
-                relude = self.relude_1_0_0_1;
-                # commonmark-simple = inputs.commonmark-simple.defaultPackage.${system};
-                # url-slug = inputs.url-slug.defaultPackage.${system};
-                # tagtree = self.callCabal2nix "tagtree" inputs.tagtree { };
-                # lvar = self.callCabal2nix "lvar" inputs.ema.inputs.lvar { }; # Until lvar gets into nixpkgs
 
                 # Jailbreak heist to allow newer dlist
                 heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));
+                ixset-typed = doJailbreak (dontCheck (self.callCabal2nix "ixset-typed" inputs.ixset-typed { }));
               };
               modifier = drv:
                 pkgs.haskell.lib.addBuildTools drv
