@@ -32,6 +32,7 @@ import Optics.Operators ((%~))
 import Relude
 import System.FilePath (takeFileName)
 import System.UnionMount qualified as UM
+import Text.Pandoc.Filter qualified as PF
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
@@ -72,8 +73,9 @@ patchModel' fpType fp action = do
         Just r -> case action of
           UM.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
+                filters = [PF.LuaFilter "default/pandoc/lua-filters/list-table/list-table.lua"]
             s <- readRefreshedFile refreshAction fpAbs
-            case N.parseNote r fpAbs (decodeUtf8 s) of
+            runExceptT (N.parseNote r fpAbs (decodeUtf8 s) filters) >>= \case
               Left e ->
                 throw $ BadInput e
               Right note ->

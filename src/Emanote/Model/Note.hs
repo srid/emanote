@@ -5,9 +5,11 @@
 
 module Emanote.Model.Note where
 
+import Control.Monad.Except (MonadError, liftEither)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
+import Data.Default (def)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
@@ -23,8 +25,10 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
+import Text.Pandoc (PandocPure, runIO, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Filter qualified as PF
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -197,10 +201,17 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   where
     meta = Aeson.Null
 
-parseNote :: R.LMLRoute -> FilePath -> Text -> Either Text Note
-parseNote r fp s = do
-  (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
-    Markdown.parseMarkdown fp s
+parseNote ::
+  (MonadError Text m, MonadIO m) =>
+  R.LMLRoute ->
+  FilePath ->
+  Text ->
+  -- | List of Pandoc filters to apply. This is an impure action; requires IO.
+  [PF.Filter] ->
+  m Note
+parseNote r fp s filters = do
+  (withAesonDefault defaultFrontMatter -> frontmatter, doc') <- liftEither $ Markdown.parseMarkdown fp s
+  doc <- liftEither . first show =<< liftIO (runIO (PF.applyFilters def filters ["markdown"] doc'))
   let meta =
         frontmatter
           -- Merge frontmatter tags with inline tags in Pandoc document.
