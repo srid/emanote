@@ -84,7 +84,7 @@ type SiteRoute' =
    ]
 
 newtype SiteRoute = SiteRoute {unSiteRoute :: OpenUnion SiteRoute'}
-  deriving stock (Eq)
+  deriving stock (Eq, Ord, Generic)
 
 instance Show SiteRoute where
   show (SiteRoute sr) =
