@@ -12,8 +12,7 @@ import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Ema
-  ( CanGenerate (..),
-    CanRender (..),
+  ( CanRender (..),
     HasModel (..),
     IsRoute (..),
     runSiteWithCli,
@@ -39,9 +38,7 @@ import Web.Tailwind qualified as Tailwind
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.Model
   routeEncoder = emanoteRouteEncoder
-
-instance CanGenerate SiteRoute where
-  generatableRoutes = emanoteGeneratableRoutes
+  allRoutes = emanoteGeneratableRoutes
 
 instance CanRender SiteRoute where
   routeAsset = View.emanoteRouteAsset
