@@ -204,6 +204,7 @@ parseNote r fp s = do
   let meta =
         frontmatter
           -- Merge frontmatter tags with inline tags in Pandoc document.
+          -- DESIGN: In retrospect, this is like a Pandoc lua filter?
           & AO.key "tags" % AO._Array
             .~ ( fromList . fmap Aeson.toJSON $
                    nub $
