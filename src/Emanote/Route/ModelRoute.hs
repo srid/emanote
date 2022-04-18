@@ -79,5 +79,5 @@ modelRouteCase =
 
 mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
 mkModelRouteFromFilePath fp =
-  fmap liftModelRoute (R.mkRouteFromFilePath @SourceExt @('LMLType 'Md) fp)
-    <|> fmap liftModelRoute (R.mkRouteFromFilePath @SourceExt @'AnyExt fp)
+  fmap liftModelRoute (R.mkRouteFromFilePath @_ @('LMLType 'Md) fp)
+    <|> fmap liftModelRoute (R.mkRouteFromFilePath @_ @'AnyExt fp)

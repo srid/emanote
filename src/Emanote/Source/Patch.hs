@@ -66,7 +66,7 @@ patchModel' ::
 patchModel' fpType fp action = do
   case fpType of
     R.LMLType R.Md ->
-      case fmap liftLMLRoute . R.mkRouteFromFilePath @R.SourceExt @('R.LMLType 'R.Md) $ fp of
+      case fmap liftLMLRoute . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Md) $ fp of
         Nothing ->
           pure id
         Just r -> case action of
