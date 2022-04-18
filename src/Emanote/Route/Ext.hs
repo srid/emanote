@@ -30,6 +30,9 @@ deriving stock instance Ord a => Ord (FileType a)
 -- | A lightweight markup language
 --
 -- https://en.wikipedia.org/wiki/Lightweight_markup_language
+--
+-- This type exists simply because we may support more formats (eg: org-mode) in
+-- the future.
 data LML = Md
   deriving stock (Generic, Eq, Ord, Typeable, Data)
   deriving anyclass (ToJSON)

@@ -27,7 +27,7 @@ instance HasExt ext => Show (R ext) where
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall a (ext :: FileType a). HasExt ext => FilePath -> Maybe (R ext)
 mkRouteFromFilePath fp = do
-  base <- withoutKnownExt @a @ext fp
+  base <- withoutKnownExt @_ @ext fp
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   R <$> nonEmpty slugs
 
@@ -110,4 +110,4 @@ decodeHtmlRoute fp = do
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =
-  mkRouteFromFilePath @SourceExt @'AnyExt
+  mkRouteFromFilePath @_ @'AnyExt

@@ -183,7 +183,7 @@ routeTreeSplice tCtx mr model = do
                )
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute = R.liftLMLRoute . R.R @R.SourceExt @('LMLType 'Md)
+             mkLmlRoute = R.liftLMLRoute . R.R @_ @('LMLType 'Md)
              lmlRouteSlugs = R.unRoute . R.lmlRouteCase
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
