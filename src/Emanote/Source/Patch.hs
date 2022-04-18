@@ -73,9 +73,9 @@ patchModel' fpType fp action = do
           UM.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
             s <- readRefreshedFile refreshAction fpAbs
-            case N.parseNote r fpAbs (decodeUtf8 s) of
-              Left e ->
-                throw $ BadInput e
+            runExceptT (N.parseNote r fpAbs (decodeUtf8 s)) >>= \case
+              Left e -> do
+                throw e
               Right note ->
                 pure $ M.modelInsertNote note
           UM.Delete -> do

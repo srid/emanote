@@ -5,9 +5,11 @@
 
 module Emanote.Model.Note where
 
+import Control.Monad.Except
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
+import Data.Default (def)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
@@ -23,8 +25,12 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
+import System.Directory (doesFileExist)
+import System.FilePath (takeExtension)
+import Text.Pandoc (PandocError, runIO)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Filter qualified as PF
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -197,27 +203,51 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   where
     meta = Aeson.Null
 
-parseNote :: R.LMLRoute -> FilePath -> Text -> Either Text Note
+data NoteParseError = NPEParse Text | NPEPandoc PandocError | NPEFilter Text
+  deriving stock (Show, Generic)
+  deriving anyclass (Exception)
+
+parseNote ::
+  forall m.
+  (MonadError NoteParseError m, MonadIO m) =>
+  R.LMLRoute ->
+  FilePath ->
+  Text ->
+  m Note
 parseNote r fp s = do
-  (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
-    Markdown.parseMarkdown fp s
-  let meta =
-        frontmatter
-          -- Merge frontmatter tags with inline tags in Pandoc document.
-          -- DESIGN: In retrospect, this is like a Pandoc lua filter?
-          & AO.key "tags" % AO._Array
-            .~ ( fromList . fmap Aeson.toJSON $
-                   nub $
-                     lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                       <> HT.inlineTagsInPandoc doc
-               )
+  (withAesonDefault defaultFrontMatter -> frontmatter, doc') <-
+    liftEither . first NPEParse $ Markdown.parseMarkdown fp s
+  filters <-
+    fmap catMaybes . traverse mkLuaFilter $
+      lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+  doc <- if null filters then pure doc' else runPandocFilters filters doc'
+  let meta = addTagsFromBody doc frontmatter
   pure $ Note r doc meta (queryNoteTitle r doc meta)
   where
-    withAesonDefault def mv =
-      fromMaybe def mv
-        `SData.mergeAeson` def
+    withAesonDefault default_ mv =
+      fromMaybe default_ mv
+        `SData.mergeAeson` default_
     defaultFrontMatter =
       Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
+    -- Merge frontmatter tags with inline tags in Pandoc document.
+    -- DESIGN: In retrospect, this is like a Pandoc lua filter?
+    addTagsFromBody doc frontmatter =
+      frontmatter
+        & AO.key "tags" % AO._Array
+        .~ ( fromList . fmap Aeson.toJSON $
+               nub $
+                 lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                   <> HT.inlineTagsInPandoc doc
+           )
+    mkLuaFilter relPath = do
+      if takeExtension relPath == ".lua"
+        then do
+          liftIO (doesFileExist relPath) >>= \case
+            True -> pure $ Just $ PF.LuaFilter relPath
+            False -> throwError $ NPEFilter $ toText $ relPath <> " is missing"
+        else pure Nothing
+    runPandocFilters filters doc = do
+      liftEither . first NPEPandoc =<< liftIO (runIO $ PF.applyFilters def filters ["markdown"] doc)
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
