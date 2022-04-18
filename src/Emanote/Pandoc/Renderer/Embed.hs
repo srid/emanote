@@ -13,7 +13,6 @@ import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import Emanote.Pandoc.Renderer.Url qualified as RenderedUrl
-import Emanote.Route.ModelRoute (LMLRoute)
 import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.R qualified as R
 import Emanote.Route.SiteRoute qualified as SF
@@ -28,7 +27,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 embedBlockWikiLinkResolvingSplice ::
-  Monad n => PandocBlockRenderer n i LMLRoute
+  Monad n => PandocBlockRenderer n
 embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
   B.Para [inl] -> do
     (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
@@ -44,7 +43,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
     Nothing
 
 embedInlineWikiLinkResolvingSplice ::
-  Monad n => PandocInlineRenderer n LMLRoute b
+  Monad n => PandocInlineRenderer n
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink

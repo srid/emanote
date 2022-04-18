@@ -76,7 +76,7 @@ renderTagIndex model tagPath = do
   let meta = Meta.getIndexYamlMeta model
       withNoteRenderer = mkRendererFromMeta model meta
       withInlineCtx =
-        withNoteRenderer inlineRenderers SR.indexLmlRoute SR.indexLmlRoute
+        withNoteRenderer inlineRenderers SR.indexLmlRoute
       tagIdx = mkTagIndex model tagPath
   renderModelTemplate model "templates/special/tagindex" $ do
     commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx

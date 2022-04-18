@@ -3,9 +3,7 @@
 module Emanote.View.Common
   ( commonSplices,
     mkRendererFromMeta,
-    noteRenderers,
     inlineRenderers,
-    linkInlineRenderers,
     renderModelTemplate,
     routeBreadcrumbs,
     TemplateRenderCtx (..),
@@ -24,7 +22,7 @@ import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
-import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers (..))
+import Emanote.Pandoc.Renderer (PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Pandoc.Renderer.Embed qualified as PF
 import Emanote.Pandoc.Renderer.Query qualified as PF
@@ -49,51 +47,35 @@ import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 
-noteRenderers :: Monad n => PandocRenderers n LMLRoute LMLRoute
-noteRenderers =
+blockRenderers :: Monad n => PandocRenderers n
+blockRenderers =
   PandocRenderers
-    _pandocInlineRenderers
-    _pandocBlockRenderers
+    [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+      PF.urlResolvingSplice
+    ]
+    [ PF.embedBlockWikiLinkResolvingSplice,
+      PF.queryResolvingSplice
+    ]
 
--- | Like `noteRenderers` but for use in inline contexts.
+-- | Like `blockRenderers` but for use in inline contexts.
 --
 -- Backlinks and titles constitute an example of inline context, where we don't
 -- care about block elements.
-inlineRenderers :: Monad n => PandocRenderers n LMLRoute b
+inlineRenderers :: Monad n => PandocRenderers n
 inlineRenderers =
   PandocRenderers
-    _pandocInlineRenderers
+    [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+      PF.urlResolvingSplice
+    ]
     mempty
 
 -- | Like `inlineRenderers` but suitable for use inside links (<a> tags).
-linkInlineRenderers :: Monad n => PandocRenderers n i b
+linkInlineRenderers :: Monad n => PandocRenderers n
 linkInlineRenderers =
   PandocRenderers
-    _pandocLinkInlineRenderers
+    [ PF.plainifyWikiLinkSplice
+    ]
     mempty
-
-_pandocInlineRenderers :: Monad n => [PandocInlineRenderer n LMLRoute b]
-_pandocInlineRenderers =
-  [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-    PF.urlResolvingSplice
-  ]
-    <> _pandocInlineRenderersCommon
-
-_pandocLinkInlineRenderers :: Monad n => [PandocInlineRenderer n i b]
-_pandocLinkInlineRenderers =
-  [ PF.plainifyWikiLinkSplice
-  ]
-    <> _pandocInlineRenderersCommon
-
-_pandocInlineRenderersCommon :: Monad n => [PandocInlineRenderer n i b]
-_pandocInlineRenderersCommon =
-  []
-
-_pandocBlockRenderers :: Monad n => [PandocBlockRenderer n i LMLRoute]
-_pandocBlockRenderers =
-  [ PF.embedBlockWikiLinkResolvingSplice,
-    PF.queryResolvingSplice
-  ]
 
 data TemplateRenderCtx n = TemplateRenderCtx
   { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
@@ -110,11 +92,11 @@ mkTemplateRenderCtx ::
   TemplateRenderCtx n
 mkTemplateRenderCtx model r meta =
   let withInlineCtx =
-        mkRendererFromMeta model meta inlineRenderers r ()
+        mkRendererFromMeta model meta inlineRenderers r
       withLinkInlineCtx =
-        mkRendererFromMeta model meta linkInlineRenderers () ()
+        mkRendererFromMeta model meta linkInlineRenderers r
       withBlockCtx =
-        mkRendererFromMeta model meta noteRenderers r r
+        mkRendererFromMeta model meta blockRenderers r
       -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \x ->
         Tit.titleSplice x preparePandoc titleDoc
@@ -218,9 +200,8 @@ mkRendererFromMeta ::
   (Monad m, Monad n) =>
   Model ->
   Aeson.Value ->
-  ( PandocRenderers n i b ->
-    i ->
-    b ->
+  ( PandocRenderers n ->
+    LMLRoute ->
     (RenderCtx n -> H.HeistT n m x) ->
     H.HeistT n m x
   )
@@ -232,21 +213,19 @@ mkRendererWith ::
   (Monad m, Monad n) =>
   Model ->
   Map Text Text ->
-  ( PandocRenderers n i b ->
-    i ->
-    b ->
+  ( PandocRenderers n ->
+    LMLRoute ->
     (RenderCtx n -> H.HeistT n m x) ->
     H.HeistT n m x
   )
 mkRendererWith model classRules =
-  let withNoteRenderer nr i b f = do
+  let withNoteRenderer nr r f = do
         renderCtx <-
           Renderer.mkRenderCtxWithPandocRenderers
             nr
             classRules
             model
-            i
-            b
+            r
         f renderCtx
    in withNoteRenderer
 

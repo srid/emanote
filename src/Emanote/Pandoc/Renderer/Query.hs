@@ -13,7 +13,6 @@ import Emanote.Model.Query qualified as Q
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
-import Emanote.Route (LMLRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Heist qualified as H
 import Heist.Extra qualified as HE
@@ -24,7 +23,7 @@ import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 
-queryResolvingSplice :: forall n i. Monad n => PandocBlockRenderer n i LMLRoute
+queryResolvingSplice :: forall n. Monad n => PandocBlockRenderer n
 queryResolvingSplice model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)

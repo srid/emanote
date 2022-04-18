@@ -4,7 +4,7 @@ import Data.Aeson (ToJSON (toJSON))
 import Data.Data (Data)
 import Data.List.NonEmpty qualified as NE
 import Data.Text qualified as T
-import Emanote.Route.Ext (FileType (..), HasExt (..), SourceExt)
+import Emanote.Route.Ext (FileType (..), HasExt (..))
 import Network.URI.Slug (Slug)
 import Network.URI.Slug qualified as Slug
 import Relude
