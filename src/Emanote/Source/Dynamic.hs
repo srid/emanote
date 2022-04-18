@@ -45,15 +45,16 @@ type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
 mapFsChanges h ch = do
-  withBlockBuffering $
-    uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
+  uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
   where
     -- Temporarily use block buffering before calling an IO action that is
     -- known ahead to log rapidly, so as to not hamper serial processing speed.
-    withBlockBuffering f =
-      hSetBuffering stdout (BlockBuffering Nothing)
+    -- FIXME: This buffers warnings and errors (when parsing .md file) without
+    -- dumping them to console. So disabling for now. But we need a proper fix.
+    _withBlockBuffering f =
+      (hSetBuffering stdout (BlockBuffering Nothing) >> hSetBuffering stderr LineBuffering)
         *> f
-        <* (hSetBuffering stdout LineBuffering >> hFlush stdout)
+        <* (hFlush stdout >> hFlush stderr >> hSetBuffering stdout LineBuffering)
 
 mapFsChangesOnExt ::
   (MonadIO m, MonadLogger m) =>
