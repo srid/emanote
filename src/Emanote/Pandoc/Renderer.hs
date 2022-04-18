@@ -18,6 +18,7 @@ module Emanote.Pandoc.Renderer
 where
 
 import Emanote.Model.Type (Model)
+import Emanote.Route.ModelRoute (LMLRoute)
 import Heist (HeistT)
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx qualified as Splices
@@ -26,44 +27,41 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 -- | Custom Heist renderer function for specific Pandoc AST nodes
---
--- The `x` selects between `i` (inline) and `b` (block) types.
-type PandocRenderF astType n i b x =
+type PandocRenderF astNode n =
   Model ->
-  PandocRenderers n i b ->
+  PandocRenderers n ->
   Splices.RenderCtx n ->
-  x ->
-  astType ->
+  LMLRoute ->
+  astNode ->
   Maybe (HI.Splice n)
 
-type PandocInlineRenderer n i b = PandocRenderF B.Inline n i b i
+type PandocInlineRenderer n = PandocRenderF B.Inline n
 
-type PandocBlockRenderer n i b = PandocRenderF B.Block n i b b
+type PandocBlockRenderer n = PandocRenderF B.Block n
 
-data PandocRenderers n i b = PandocRenderers
-  { pandocInlineRenderers :: [PandocInlineRenderer n i b],
-    pandocBlockRenderers :: [PandocBlockRenderer n i b]
+data PandocRenderers n = PandocRenderers
+  { pandocInlineRenderers :: [PandocInlineRenderer n],
+    pandocBlockRenderers :: [PandocBlockRenderer n]
   }
 
 mkRenderCtxWithPandocRenderers ::
-  forall i b m n.
+  forall m n.
   (Monad m, Monad n) =>
-  PandocRenderers n i b ->
+  PandocRenderers n ->
   Map Text Text ->
   Model ->
-  i ->
-  b ->
+  LMLRoute ->
   HeistT n m (Splices.RenderCtx n)
-mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model i b =
+mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
   Splices.mkRenderCtx
     classRules
     ( \ctx blk ->
         asum $
           pandocBlockRenderers <&> \f ->
-            f model nr ctx b blk
+            f model nr ctx x blk
     )
     ( \ctx blk ->
         asum $
           pandocInlineRenderers <&> \f ->
-            f model nr ctx i blk
+            f model nr ctx x blk
     )
