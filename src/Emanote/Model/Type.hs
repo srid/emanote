@@ -12,7 +12,7 @@ import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
-import Data.UUID
+import Data.UUID hiding (null)
 import Ema.CLI qualified
 import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
@@ -209,3 +209,11 @@ modelNoteMetas model =
   Map.fromList $
     Ix.toList (_modelNotes model) <&> \note ->
       (note ^. N.noteRoute, (note ^. N.noteTitle, note ^. N.noteRoute, note ^. N.noteMeta))
+
+modelNoteErrors :: Model -> Map LMLRoute [Text]
+modelNoteErrors model =
+  Map.fromList $
+    flip mapMaybe (Ix.toList (_modelNotes model)) $ \note -> do
+      let errs = note ^. N.noteErrors
+      guard $ not $ null errs
+      pure (note ^. N.noteRoute, errs)
