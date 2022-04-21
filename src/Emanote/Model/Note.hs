@@ -6,14 +6,15 @@
 module Emanote.Model.Note where
 
 import Control.Monad.Except
+import Control.Monad.Writer.Strict
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
-import Data.Default (def)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
 import Data.Map.Strict qualified as Map
+import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
@@ -25,12 +26,9 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import System.Directory (doesFileExist)
-import System.FilePath (takeExtension, (</>))
-import Text.Pandoc (PandocError, runIO)
+import System.FilePath ((</>))
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
-import Text.Pandoc.Filter qualified as PF
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -203,13 +201,9 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   where
     meta = Aeson.Null
 
-data NoteParseError = NPEParse Text | NPEPandoc PandocError | NPEFilter Text
-  deriving stock (Show, Generic)
-  deriving anyclass (Exception)
-
 parseNote ::
   forall m.
-  (MonadError NoteParseError m, MonadIO m) =>
+  (MonadError Text m, MonadIO m) =>
   FilePath ->
   R.LMLRoute ->
   FilePath ->
@@ -217,11 +211,9 @@ parseNote ::
   m Note
 parseNote pluginBaseDir r fp s = do
   (withAesonDefault defaultFrontMatter -> frontmatter, doc') <-
-    liftEither . first NPEParse $ Markdown.parseMarkdown fp s
-  filters <-
-    fmap catMaybes . traverse mkLuaFilter $
-      lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-  doc <- if null filters then pure doc' else runPandocFilters filters doc'
+    liftEither $ Markdown.parseMarkdown fp s
+  let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+  doc <- applyPandocFilters filterPaths doc'
   let meta = addTagsFromBody doc frontmatter
   pure $ Note r doc meta (queryNoteTitle r doc meta)
   where
@@ -240,15 +232,6 @@ parseNote pluginBaseDir r fp s = do
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
-    mkLuaFilter ((pluginBaseDir </>) -> relPath) = do
-      if takeExtension relPath == ".lua"
-        then do
-          liftIO (doesFileExist relPath) >>= \case
-            True -> pure $ Just $ PF.LuaFilter relPath
-            False -> throwError $ NPEFilter $ toText $ relPath <> " is missing"
-        else pure Nothing
-    runPandocFilters filters doc = do
-      liftEither . first NPEPandoc =<< liftIO (runIO $ PF.applyFilters def filters ["markdown"] doc)
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
