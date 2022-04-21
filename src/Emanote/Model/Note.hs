@@ -6,6 +6,7 @@
 module Emanote.Model.Note where
 
 import Control.Monad.Except
+import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer.Strict
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
@@ -204,15 +205,15 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
 
 parseNote ::
   forall m.
-  (MonadError Text m, MonadIO m) =>
+  (MonadError Text m, MonadIO m, MonadLogger m) =>
   FilePath ->
   R.LMLRoute ->
   FilePath ->
   Text ->
   m Note
-parseNote pluginBaseDir r fp s = do
+parseNote pluginBaseDir r fp md = do
   ((doc', meta), errs) <- runWriterT $ do
-    case Markdown.parseMarkdown fp s of
+    case Markdown.parseMarkdown fp md of
       Left err -> do
         tell [err]
         pure (Pandoc mempty [], defaultFrontMatter)
@@ -238,21 +239,19 @@ parseNote pluginBaseDir r fp s = do
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
-
--- | Prepend to block to the beginning of a Pandoc document (never before H1)
-pandocPrepend :: B.Block -> Pandoc -> Pandoc
-pandocPrepend prefix (Pandoc meta blocks) =
-  let blocks' = case blocks of
-        (h1@(B.Header 1 _ _) : rest) ->
-          h1 : prefix : rest
-        _ -> prefix : blocks
-   in Pandoc meta blocks'
-
-errorDiv :: [Text] -> B.Block
-errorDiv s =
-  B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
-  where
-    cls x = ("", one x, mempty) :: B.Attr
+    -- Prepend to block to the beginning of a Pandoc document (never before H1)
+    pandocPrepend :: B.Block -> Pandoc -> Pandoc
+    pandocPrepend prefix (Pandoc meta blocks) =
+      let blocks' = case blocks of
+            (h1@(B.Header 1 _ _) : rest) ->
+              h1 : prefix : rest
+            _ -> prefix : blocks
+       in Pandoc meta blocks'
+    errorDiv :: [Text] -> B.Block
+    errorDiv s =
+      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
+      where
+        cls x = ("", one x, mempty) :: B.Attr
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
