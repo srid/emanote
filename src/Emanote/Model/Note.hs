@@ -5,6 +5,9 @@
 
 module Emanote.Model.Note where
 
+import Control.Monad.Except
+import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Writer.Strict
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
@@ -12,6 +15,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List (nub)
 import Data.Map.Strict qualified as Map
+import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
@@ -23,6 +27,7 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
+import System.FilePath ((</>))
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -30,7 +35,8 @@ data Note = Note
   { _noteRoute :: R.LMLRoute,
     _noteDoc :: Pandoc,
     _noteMeta :: Aeson.Value,
-    _noteTitle :: Tit.Title
+    _noteTitle :: Tit.Title,
+    _noteErrors :: [Text]
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -193,31 +199,59 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  Note someR doc meta (queryNoteTitle someR doc meta)
+  Note someR doc meta (queryNoteTitle someR doc meta) []
   where
     meta = Aeson.Null
 
-parseNote :: R.LMLRoute -> FilePath -> Text -> Either Text Note
-parseNote r fp s = do
-  (withAesonDefault defaultFrontMatter -> frontmatter, doc) <-
-    Markdown.parseMarkdown fp s
-  let meta =
-        frontmatter
-          -- Merge frontmatter tags with inline tags in Pandoc document.
-          -- DESIGN: In retrospect, this is like a Pandoc lua filter?
-          & AO.key "tags" % AO._Array
-            .~ ( fromList . fmap Aeson.toJSON $
-                   nub $
-                     lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                       <> HT.inlineTagsInPandoc doc
-               )
-  pure $ Note r doc meta (queryNoteTitle r doc meta)
+parseNote ::
+  forall m.
+  (MonadError Text m, MonadIO m, MonadLogger m) =>
+  FilePath ->
+  R.LMLRoute ->
+  FilePath ->
+  Text ->
+  m Note
+parseNote pluginBaseDir r fp md = do
+  ((doc', meta), errs) <- runWriterT $ do
+    case Markdown.parseMarkdown fp md of
+      Left err -> do
+        tell [err]
+        pure (Pandoc mempty [], defaultFrontMatter)
+      Right (withAesonDefault defaultFrontMatter -> frontmatter, doc) -> do
+        let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+        doc' <- applyPandocFilters filterPaths doc
+        pure (doc', addTagsFromBody doc' frontmatter)
+  let doc = if null errs then doc' else pandocPrepend (errorDiv errs) doc'
+  pure $ Note r doc meta (queryNoteTitle r doc meta) errs
   where
-    withAesonDefault def mv =
-      fromMaybe def mv
-        `SData.mergeAeson` def
+    withAesonDefault default_ mv =
+      fromMaybe default_ mv
+        `SData.mergeAeson` default_
     defaultFrontMatter =
       Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
+    -- Merge frontmatter tags with inline tags in Pandoc document.
+    -- DESIGN: In retrospect, this is like a Pandoc lua filter?
+    addTagsFromBody doc frontmatter =
+      frontmatter
+        & AO.key "tags" % AO._Array
+        .~ ( fromList . fmap Aeson.toJSON $
+               nub $
+                 lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                   <> HT.inlineTagsInPandoc doc
+           )
+    -- Prepend to block to the beginning of a Pandoc document (never before H1)
+    pandocPrepend :: B.Block -> Pandoc -> Pandoc
+    pandocPrepend prefix (Pandoc meta blocks) =
+      let blocks' = case blocks of
+            (h1@(B.Header 1 _ _) : rest) ->
+              h1 : prefix : rest
+            _ -> prefix : blocks
+       in Pandoc meta blocks'
+    errorDiv :: [Text] -> B.Block
+    errorDiv s =
+      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
+      where
+        cls x = ("", one x, mempty) :: B.Attr
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
