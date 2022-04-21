@@ -39,9 +39,13 @@ emanoteModelDynamic cliAct enc cli = do
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges Patch.patchModel)
+      (mapFsChanges $ Patch.patchModel layers)
 
-type ChangeHandler tag model m = tag -> FilePath -> UM.FileAction (NonEmpty (Loc, FilePath)) -> m (model -> model)
+type ChangeHandler tag model m =
+  tag ->
+  FilePath ->
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (model -> model)
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
 mapFsChanges h ch = do

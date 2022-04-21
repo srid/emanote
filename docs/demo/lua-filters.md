@@ -1,7 +1,7 @@
 ---
 pandoc:
   filters:
-    - docs/filters/list-table.lua
+    - filters/list-table.lua
 ---
 
 # Pandoc Lua filters
