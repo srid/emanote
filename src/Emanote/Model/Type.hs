@@ -12,7 +12,7 @@ import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
-import Data.UUID hiding (null)
+import Data.UUID (UUID)
 import Ema.CLI qualified
 import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)

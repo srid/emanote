@@ -12,8 +12,6 @@ import Text.Pandoc (runIO)
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Filter qualified as PF
 
--- TODO: The inline errors should be gathered in model, and reported during
--- static site generation.
 applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => [FilePath] -> Pandoc -> m Pandoc
 applyPandocFilters paths doc = do
   res <- traverse mkLuaFilter paths
@@ -39,6 +37,7 @@ mkLuaFilter relPath = do
 applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
 applyPandocLuaFilters filters x = do
   logW $ "[Experimental feature] Applying pandoc filters: " <> show filters
+  -- TODO: Can we constrain this to run Lua code purely (embedded) without using IO?
   liftIO (runIO $ PF.applyFilters def filters ["markdown"] x) >>= \case
     Left err -> pure $ Left (show err)
     Right x' -> pure $ Right x'
