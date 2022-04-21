@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.6.1.1
+version:            0.6.2.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -121,6 +121,7 @@ common library-common
     , optics-core
     , optics-th
     , optparse-applicative
+    , pandoc
     , pandoc-link-context    >=1.4.0
     , pandoc-types
     , parsec
@@ -162,6 +163,7 @@ library
     Emanote.Model.Link.Resolve
     Emanote.Model.Meta
     Emanote.Model.Note
+    Emanote.Model.Note.Filter
     Emanote.Model.Query
     Emanote.Model.QuerySpec
     Emanote.Model.SData

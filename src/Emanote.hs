@@ -22,7 +22,7 @@ import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (log, logE, logW)
-import Emanote.Route.ModelRoute (lmlRouteCase)
+import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (emanoteModelDynamic)
@@ -52,14 +52,25 @@ run cli = do
   Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
     (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       compileTailwindCss outPath genPaths
-      checkBrokenLinks cli model0
+      checkBrokenLinks cli $ Export.modelRels model0
+      checkBadMarkdownFiles $ Model.modelNoteErrors model0
     _ ->
       pure ()
 
-checkBrokenLinks :: CLI.Cli -> Model.Model -> IO ()
-checkBrokenLinks cli model = runStderrLoggingT $ do
+checkBadMarkdownFiles :: Map LMLRoute [Text] -> IO ()
+checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
+  forM_ (Map.toList noteErrs) $ \(noteRoute, errs) -> do
+    logW $ "Bad markdown file: " <> show noteRoute
+    forM_ errs $ \err -> do
+      logE $ "  - " <> err
+  unless (null noteErrs) $ do
+    logE "Errors found."
+    exitFailure
+
+checkBrokenLinks :: CLI.Cli -> Map LMLRoute [Export.Link] -> IO ()
+checkBrokenLinks cli modelRels = runStderrLoggingT $ do
   ((), res :: Sum Int) <- runWriterT $
-    forM_ (Map.toList $ Export.modelRels model) $ \(noteRoute, rels) ->
+    forM_ (Map.toList modelRels) $ \(noteRoute, rels) ->
       forM_ (Set.toList $ Set.fromList rels) $ \(Export.Link urt rrt) ->
         case rrt of
           RRTFound _ -> pure ()

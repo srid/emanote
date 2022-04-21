@@ -25,7 +25,7 @@ import Emanote.Prelude
 import Emanote.Route (liftLMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class (indexRoute)
-import Emanote.Source.Loc (Loc, locResolve)
+import Emanote.Source.Loc (Loc, LocLayers, immediateLayer, locPath, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~))
@@ -38,6 +38,7 @@ import UnliftIO.Directory (doesDirectoryExist)
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
+  LocLayers ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -45,17 +46,18 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-patchModel fpType fp action = do
+patchModel layers fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' fpType fp action) newLogger
+  runLoggingT (patchModel' layers fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
+  LocLayers ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -63,7 +65,7 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-patchModel' fpType fp action = do
+patchModel' layers fpType fp action = do
   case fpType of
     R.LMLType R.Md ->
       case fmap liftLMLRoute . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Md) $ fp of
@@ -72,9 +74,13 @@ patchModel' fpType fp action = do
         Just r -> case action of
           UM.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
+                -- TODO: This should automatically be computed, instead of being passed.
+                -- We need to access to the model though! With dependency management to boot.
+                -- Until this, `layers` is threaded through as a hack.
+                currentLayerPath = locPath $ immediateLayer layers
             s <- readRefreshedFile refreshAction fpAbs
-            case N.parseNote r fpAbs (decodeUtf8 s) of
-              Left e ->
+            runExceptT (N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)) >>= \case
+              Left e -> do
                 throw $ BadInput e
               Right note ->
                 pure $ M.modelInsertNote note
