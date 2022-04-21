@@ -81,7 +81,7 @@ patchModel' layers fpType fp action = do
             s <- readRefreshedFile refreshAction fpAbs
             runExceptT (N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)) >>= \case
               Left e -> do
-                throw e
+                throw $ BadInput e
               Right note ->
                 pure $ M.modelInsertNote note
           UM.Delete -> do
