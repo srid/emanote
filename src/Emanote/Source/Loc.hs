@@ -10,9 +10,14 @@ module Emanote.Source.Loc
     -- * Using a `Loc`
     locResolve,
     locPath,
+
+    -- * Dealing with layers of locs
+    LocLayers,
+    immediateLayer,
   )
 where
 
+import Data.Set qualified as Set
 import Relude
 import System.FilePath ((</>))
 
@@ -25,6 +30,12 @@ data Loc
   | -- | The default location (ie., emanote default layer)
     LocDefault FilePath
   deriving stock (Eq, Ord, Show)
+
+type LocLayers = Set Loc
+
+-- | Return the `Loc` with highest precedence.
+immediateLayer :: HasCallStack => LocLayers -> Loc
+immediateLayer = Set.findMin
 
 defaultLayer :: FilePath -> Loc
 defaultLayer = LocDefault

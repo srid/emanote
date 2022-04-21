@@ -26,7 +26,7 @@ import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
 import System.Directory (doesFileExist)
-import System.FilePath (takeExtension)
+import System.FilePath (takeExtension, (</>))
 import Text.Pandoc (PandocError, runIO)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -210,11 +210,12 @@ data NoteParseError = NPEParse Text | NPEPandoc PandocError | NPEFilter Text
 parseNote ::
   forall m.
   (MonadError NoteParseError m, MonadIO m) =>
+  FilePath ->
   R.LMLRoute ->
   FilePath ->
   Text ->
   m Note
-parseNote r fp s = do
+parseNote pluginBaseDir r fp s = do
   (withAesonDefault defaultFrontMatter -> frontmatter, doc') <-
     liftEither . first NPEParse $ Markdown.parseMarkdown fp s
   filters <-
@@ -239,7 +240,7 @@ parseNote r fp s = do
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
-    mkLuaFilter relPath = do
+    mkLuaFilter ((pluginBaseDir </>) -> relPath) = do
       if takeExtension relPath == ".lua"
         then do
           liftIO (doesFileExist relPath) >>= \case
