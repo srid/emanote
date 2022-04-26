@@ -8,11 +8,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1649899800,
-        "narHash": "sha256-MmmG1Gn+RohDnZzzHEKQxks9Q5Jz6rSziEdCm6l5tGo=",
+        "lastModified": 1650932571,
+        "narHash": "sha256-rdpfJ+10a1uBPtHMNoAcpDE183RzpILRpsMgxj/YJek=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "d53dad29fbacad97916057382528bc49b542e4bb",
+        "rev": "05c8a2127391ee4b593fa6541bc9078eb44ad10f",
         "type": "github"
       },
       "original": {
@@ -218,16 +218,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1648405819,
-        "narHash": "sha256-Rv9QsHg5a3OurGxbC0Y2aERAZ0sFXYQyaxGYXdDPiZ4=",
-        "ref": "parameterized",
-        "rev": "9ba45de1fc3dbbe65c39d7d0107b99a8046a8081",
-        "revCount": 21,
+        "lastModified": 1650427214,
+        "narHash": "sha256-9m66rRSSM614ocRXNPAArwnrS6zzCQYYhd3nw8g4QUg=",
+        "ref": "overengineered",
+        "rev": "5555def5a25c5437834c06cbe79b3945916ec59f",
+        "revCount": 28,
         "type": "git",
         "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
       },
       "original": {
-        "ref": "parameterized",
+        "ref": "overengineered",
         "type": "git",
         "url": "https://gitlab.homotopic.tech/nix/lint-utils.git"
       }
@@ -257,17 +257,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1649456639,
-        "narHash": "sha256-rZCjaEAZgOtT9kYTBigksof64SqKAXOuoHhlzHvfl0E=",
+        "lastModified": 1650882267,
+        "narHash": "sha256-BFKiz8srATQIBuFEN2HgS2EHisK29EjZ/HV34wSr2lU=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c48167590e3258daac6ab12a41bc2b7341e9b2ec",
+        "rev": "2ea2f7b6d0cb7ce0712f2aa80303cda08deb0de2",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c48167590e3258daac6ab12a41bc2b7341e9b2ec",
+        "rev": "2ea2f7b6d0cb7ce0712f2aa80303cda08deb0de2",
         "type": "github"
       }
     },
@@ -320,16 +320,16 @@
     "pandoc-link-context": {
       "flake": false,
       "locked": {
-        "lastModified": 1649279446,
+        "lastModified": 1650932770,
         "narHash": "sha256-/WzE4O23B1OcL3WF8Saz5TRQj0tGH7FtbgRLRson2Mc=",
         "owner": "srid",
         "repo": "pandoc-link-context",
-        "rev": "3bffff3776c791686711d26c98c432983272d1ef",
+        "rev": "85bd204339aafd309b8a3dd99ebffa6a50776cb6",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "no-dl",
+        "ref": "master",
         "repo": "pandoc-link-context",
         "type": "github"
       }

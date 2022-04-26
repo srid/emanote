@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.6.2.0
+version:            0.6.2.1
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
