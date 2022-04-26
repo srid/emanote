@@ -15,7 +15,7 @@
     pathtree.flake = false;
     unionmount.url = "github:srid/unionmount/master";
     unionmount.flake = false;
-    pandoc-link-context.url = "github:srid/pandoc-link-context/no-dl";
+    pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
 
     # https://github.com/well-typed/ixset-typed/pull/16
@@ -48,8 +48,8 @@
                 ema = inputs.ema.defaultPackage.${system};
                 tailwind = inputs.tailwind-haskell.defaultPackage.${system};
 
-                path-tree = self.callCabal2nix "path-tree" inputs.pathtree { };
-                unionmount = self.callCabal2nix "unionmount" inputs.unionmount { };
+                # path-tree = self.callCabal2nix "path-tree" inputs.pathtree { };
+                # unionmount = self.callCabal2nix "unionmount" inputs.unionmount { };
                 pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
 
                 # Jailbreak heist to allow newer dlist
