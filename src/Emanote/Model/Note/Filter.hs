@@ -4,13 +4,14 @@ import Control.Monad.Except
 import Control.Monad.Logger
 import Control.Monad.Writer.Strict
 import Data.Default (def)
-import Emanote.Prelude (logW)
+import Emanote.Prelude (logE, logW)
 import Relude
 import System.Directory (doesFileExist)
 import System.FilePath (takeExtension)
 import Text.Pandoc (runIO)
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Filter qualified as PF
+import UnliftIO.Exception (handle)
 
 applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => [FilePath] -> Pandoc -> m Pandoc
 applyPandocFilters paths doc = do
@@ -38,6 +39,13 @@ applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => [PF.Filter] -> Pandoc -> 
 applyPandocLuaFilters filters x = do
   logW $ "[Experimental feature] Applying pandoc filters: " <> show filters
   -- TODO: Can we constrain this to run Lua code purely (embedded) without using IO?
-  liftIO (runIO $ PF.applyFilters def filters ["markdown"] x) >>= \case
-    Left err -> pure $ Left (show err)
+  liftIO (runIOCatchingErrors $ PF.applyFilters def filters ["markdown"] x) >>= \case
+    Left err -> do
+      logE $ "Error applying pandoc filters: " <> show err
+      pure $ Left (show err)
     Right x' -> pure $ Right x'
+  where
+    -- `runIO` can throw `PandocError`. Fix this nonsense behaviour, by catching
+    -- it and returning a `Left`.
+    runIOCatchingErrors =
+      handle (pure . Left) . runIO
