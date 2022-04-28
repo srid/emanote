@@ -80,9 +80,13 @@ emanoteRouteEncoder =
       r
         & absurdUnion
         `h` ( \(MissingR s) ->
-                error $ toText $ "emanote: attempt to encode a 404 route: " <> s
+                -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
+                -- Unfortunately, since ema:multisite does isomorphism check of
+                -- encoder, we can't just error out here.
+                s
             )
         `h` ( \(AmbiguousR _) ->
+                -- FIXME: See note above.
                 error "emanote: attempt to encode an ambiguous route"
             )
         `h` encodeResourceRoute model
@@ -101,6 +105,7 @@ encodeResourceRoute model =
               -- HACK: This should never fail ... but *if* it does, consult
               -- https://github.com/srid/emanote/issues/148
               maybe
+                -- FIXME: See note above.
                 (error "emanote: attempt to encode missing note")
                 N.noteHtmlRoute
                 $ M.modelLookupNoteByRoute r model
