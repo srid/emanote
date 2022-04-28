@@ -79,11 +79,8 @@ patchModel' layers fpType fp action = do
                 -- Until this, `layers` is threaded through as a hack.
                 currentLayerPath = locPath $ immediateLayer layers
             s <- readRefreshedFile refreshAction fpAbs
-            runExceptT (N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)) >>= \case
-              Left e -> do
-                throw $ BadInput e
-              Right note ->
-                pure $ M.modelInsertNote note
+            note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
+            pure $ M.modelInsertNote note
           UM.Delete -> do
             log $ "Removing note: " <> toText fp
             pure $ M.modelDeleteNote r

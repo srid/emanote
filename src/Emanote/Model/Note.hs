@@ -205,7 +205,7 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
 
 parseNote ::
   forall m.
-  (MonadError Text m, MonadIO m, MonadLogger m) =>
+  (MonadIO m, MonadLogger m) =>
   FilePath ->
   R.LMLRoute ->
   FilePath ->
