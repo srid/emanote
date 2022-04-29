@@ -39,6 +39,7 @@ import UnliftIO.Directory (doesDirectoryExist)
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   LocLayers ->
+  (N.Note -> N.Note) ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -46,18 +47,19 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-patchModel layers fpType fp action = do
+patchModel layers noteF fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
   LocLayers ->
+  (N.Note -> N.Note) ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -65,7 +67,7 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (Model -> Model)
-patchModel' layers fpType fp action = do
+patchModel' layers noteF fpType fp action = do
   case fpType of
     R.LMLType R.Md ->
       case fmap liftLMLRoute . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Md) $ fp of
@@ -80,7 +82,7 @@ patchModel' layers fpType fp action = do
                 currentLayerPath = locPath $ immediateLayer layers
             s <- readRefreshedFile refreshAction fpAbs
             note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
-            pure $ M.modelInsertNote note
+            pure $ M.modelInsertNote $ noteF note
           UM.Delete -> do
             log $ "Removing note: " <> toText fp
             pure $ M.modelDeleteNote r
