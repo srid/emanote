@@ -12,6 +12,7 @@ import Ema (Dynamic (..))
 import Ema.CLI qualified
 import Ema.Route.Encoder (RouteEncoder)
 import Emanote.CLI qualified as CLI
+import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (chainM)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
@@ -27,8 +28,8 @@ import UnliftIO (MonadUnliftIO)
 -- | Make an Ema `Dynamic` for the Emanote model.
 --
 -- The bulk of logic for building the Dynamic is in `Patch.hs`.
-emanoteModelDynamic :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.Model SiteRoute -> CLI.Cli -> m (Dynamic m Model.Model)
-emanoteModelDynamic cliAct enc cli = do
+emanoteModelDynamic :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.Model SiteRoute -> (CLI.Cli, Note -> Note) -> m (Dynamic m Model.Model)
+emanoteModelDynamic cliAct enc (cli, noteF) = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   let layers = Loc.userLayers (CLI.layers cli) <> one defaultLayer
@@ -39,7 +40,7 @@ emanoteModelDynamic cliAct enc cli = do
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers)
+      (mapFsChanges $ Patch.patchModel layers noteF)
 
 type ChangeHandler tag model m =
   tag ->

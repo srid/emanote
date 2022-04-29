@@ -20,6 +20,7 @@ import Ema
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
+import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
@@ -44,12 +45,12 @@ instance CanRender SiteRoute where
   routeAsset = View.emanoteRouteAsset
 
 instance HasModel SiteRoute where
-  type ModelInput SiteRoute = CLI.Cli
+  type ModelInput SiteRoute = (CLI.Cli, Note -> Note)
   modelDynamic = emanoteModelDynamic
 
 run :: CLI.Cli -> IO ()
 run cli = do
-  Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) cli >>= \case
+  Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) (cli, id) >>= \case
     (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       compileTailwindCss outPath genPaths
       checkBrokenLinks cli $ Export.modelRels model0
