@@ -1,5 +1,8 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Emanote.Source.Dynamic
   ( emanoteModelDynamic,
+    EmanoteConfig (..),
   )
 where
 
@@ -15,32 +18,40 @@ import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (chainM)
+import Emanote.Route (LMLRoute)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
+import Emanote.View.Common
 import Paths_emanote qualified
 import Relude
 import System.UnionMount qualified as UM
 import UnliftIO (MonadUnliftIO)
 
+data EmanoteConfig = EmanoteConfig
+  { _emanoteConfigCli :: CLI.Cli,
+    _emanoteConfigNoteFn :: Note -> Note,
+    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+  }
+
 -- | Make an Ema `Dynamic` for the Emanote model.
 --
 -- The bulk of logic for building the Dynamic is in `Patch.hs`.
-emanoteModelDynamic :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.Model SiteRoute -> (CLI.Cli, Note -> Note) -> m (Dynamic m Model.Model)
-emanoteModelDynamic cliAct enc (cli, noteF) = do
+emanoteModelDynamic :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.Model SiteRoute -> EmanoteConfig -> m (Dynamic m Model.Model)
+emanoteModelDynamic cliAct enc EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
-  let layers = Loc.userLayers (CLI.layers cli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct enc instanceId
+  let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
+      initialModel = Model.emptyModel layers cliAct enc _emanoteConfigPandocRenderers instanceId
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers noteF)
+      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn)
 
 type ChangeHandler tag model m =
   tag ->

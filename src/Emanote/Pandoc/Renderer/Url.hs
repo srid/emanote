@@ -30,7 +30,7 @@ import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
 -- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice :: Monad n => PandocInlineRenderer n
+urlResolvingSplice :: Monad n => PandocInlineRenderer Model R.LMLRoute n
 urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   let f mAnchor sr = do
@@ -117,7 +117,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
     tooltip :: Text -> [B.Inline] -> B.Inline
     tooltip s = B.Span ("", [], one ("title", s))
 
-plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer n
+plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer Model R.LMLRoute n
 plainifyWikiLinkSplice _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
   s <- WL.wikiLinkInlineRendered inl
   pure $ HP.rpInline ctx $ B.Str s

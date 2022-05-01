@@ -14,11 +14,10 @@ module Emanote.Pandoc.Renderer
     PandocInlineRenderer,
     PandocBlockRenderer,
     mkRenderCtxWithPandocRenderers,
+    EmanotePandocRenderers (..),
   )
 where
 
-import Emanote.Model.Type (Model)
-import Emanote.Route.ModelRoute (LMLRoute)
 import Heist (HeistT)
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx qualified as Splices
@@ -27,30 +26,30 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 -- | Custom Heist renderer function for specific Pandoc AST nodes
-type PandocRenderF astNode n =
-  Model ->
-  PandocRenderers n ->
+type PandocRenderF model route astNode n =
+  model ->
+  PandocRenderers model route n ->
   Splices.RenderCtx n ->
-  LMLRoute ->
+  route ->
   astNode ->
   Maybe (HI.Splice n)
 
-type PandocInlineRenderer n = PandocRenderF B.Inline n
+type PandocInlineRenderer model route n = PandocRenderF model route B.Inline n
 
-type PandocBlockRenderer n = PandocRenderF B.Block n
+type PandocBlockRenderer model route n = PandocRenderF model route B.Block n
 
-data PandocRenderers n = PandocRenderers
-  { pandocInlineRenderers :: [PandocInlineRenderer n],
-    pandocBlockRenderers :: [PandocBlockRenderer n]
+data PandocRenderers model route n = PandocRenderers
+  { pandocInlineRenderers :: [PandocInlineRenderer model route n],
+    pandocBlockRenderers :: [PandocBlockRenderer model route n]
   }
 
 mkRenderCtxWithPandocRenderers ::
-  forall m n.
+  forall model route m n.
   (Monad m, Monad n) =>
-  PandocRenderers n ->
+  PandocRenderers model route n ->
   Map Text Text ->
-  Model ->
-  LMLRoute ->
+  model ->
+  route ->
   HeistT n m (Splices.RenderCtx n)
 mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
   Splices.mkRenderCtx
@@ -65,3 +64,14 @@ mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
           pandocInlineRenderers <&> \f ->
             f model nr ctx x blk
     )
+
+data EmanotePandocRenderers a r = EmanotePandocRenderers
+  { blockRenderers :: PandocRenderers a r Identity,
+    -- | Like `blockRenderers` but for use in inline contexts.
+    --
+    -- Backlinks and titles constitute an example of inline context, where we don't
+    -- care about block elements.
+    inlineRenderers :: PandocRenderers a r Identity,
+    -- | Like `inlineRenderers` but suitable for use inside links (<a> tags).
+    linkInlineRenderers :: PandocRenderers a r Identity
+  }
