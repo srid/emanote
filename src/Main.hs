@@ -2,6 +2,8 @@ module Main where
 
 import Emanote
 import Emanote.CLI qualified as CLI
+import Emanote.Source.Dynamic (EmanoteConfig (EmanoteConfig))
+import Emanote.View.Common (defaultEmanotePandocRenderers)
 import Main.Utf8 (withUtf8)
 import Relude
 import Spec qualified
@@ -13,7 +15,7 @@ main =
     cli <- CLI.parseCli
     if CLI.test cli
       then test
-      else run cli
+      else run $ EmanoteConfig cli id defaultEmanotePandocRenderers
 
 test :: IO ()
 test = do

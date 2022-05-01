@@ -79,6 +79,7 @@ mkTagIndex model tagPath' =
 renderTagIndex :: Model -> [HT.TagNode] -> LByteString
 renderTagIndex model tagPath = do
   let meta = Meta.getIndexYamlMeta model
+      -- TODO: not def, but get from model
       tCtx = mkTemplateRenderCtx model SR.indexLmlRoute meta
       tagIdx = mkTagIndex model tagPath
   renderModelTemplate model "templates/special/tagindex" $ do

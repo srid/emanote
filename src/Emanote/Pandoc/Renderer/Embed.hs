@@ -27,7 +27,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 embedBlockWikiLinkResolvingSplice ::
-  Monad n => PandocBlockRenderer n
+  Monad n => PandocBlockRenderer Model R.LMLRoute n
 embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
   B.Para [inl] -> do
     (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
@@ -43,7 +43,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
     Nothing
 
 embedInlineWikiLinkResolvingSplice ::
-  Monad n => PandocInlineRenderer n
+  Monad n => PandocInlineRenderer Model R.LMLRoute n
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink

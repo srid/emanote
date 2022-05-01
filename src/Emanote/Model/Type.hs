@@ -32,6 +32,7 @@ import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Emanote.Pandoc.Renderer
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type
@@ -50,6 +51,8 @@ data Model = Model
     _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
     _modelRouteEncoder :: RouteEncoder Model SiteRoute,
+    -- | Dictates how exactly to render `Pandoc` to Heist nodes.
+    _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
     -- | An unique ID for this process's model. ID changes across processes.
     _modelInstanceID :: UUID,
     _modelNotes :: IxNote,
@@ -63,9 +66,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> UUID -> Model
-emptyModel layers act enc instanceId =
-  Model Status_Loading layers act enc instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> EmanotePandocRenderers Model LMLRoute -> UUID -> Model
+emptyModel layers act enc ren instanceId =
+  Model Status_Loading layers act enc ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =

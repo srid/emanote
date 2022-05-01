@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emanote
@@ -20,13 +21,12 @@ import Ema
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
-import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
 import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
-import Emanote.Source.Dynamic (emanoteModelDynamic)
+import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteModelDynamic)
 import Emanote.View.Common (generatedCssFile)
 import Emanote.View.Export qualified as Export
 import Emanote.View.Template qualified as View
@@ -45,15 +45,15 @@ instance CanRender SiteRoute where
   routeAsset = View.emanoteRouteAsset
 
 instance HasModel SiteRoute where
-  type ModelInput SiteRoute = (CLI.Cli, Note -> Note)
+  type ModelInput SiteRoute = EmanoteConfig
   modelDynamic = emanoteModelDynamic
 
-run :: CLI.Cli -> IO ()
-run cli = do
-  Ema.runSiteWithCli @SiteRoute (CLI.emaCli cli) (cli, id) >>= \case
+run :: EmanoteConfig -> IO ()
+run cfg@EmanoteConfig {..} = do
+  Ema.runSiteWithCli @SiteRoute (CLI.emaCli _emanoteConfigCli) cfg >>= \case
     (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
       compileTailwindCss outPath genPaths
-      checkBrokenLinks cli $ Export.modelRels model0
+      checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
       checkBadMarkdownFiles $ Model.modelNoteErrors model0
     _ ->
       pure ()

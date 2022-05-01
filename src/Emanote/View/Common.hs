@@ -2,12 +2,15 @@
 
 module Emanote.View.Common
   ( commonSplices,
-    inlineRenderers,
     renderModelTemplate,
     routeBreadcrumbs,
+    generatedCssFile,
+
+    -- * Render context
+    EmanotePandocRenderers (..),
     TemplateRenderCtx (..),
     mkTemplateRenderCtx,
-    generatedCssFile,
+    defaultEmanotePandocRenderers,
   )
 where
 
@@ -21,7 +24,7 @@ import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
-import Emanote.Pandoc.Renderer (PandocRenderers (..))
+import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Pandoc.Renderer.Embed qualified as PF
 import Emanote.Pandoc.Renderer.Query qualified as PF
@@ -46,35 +49,28 @@ import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 
-blockRenderers :: Monad n => PandocRenderers n
-blockRenderers =
-  PandocRenderers
-    [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-      PF.urlResolvingSplice
-    ]
-    [ PF.embedBlockWikiLinkResolvingSplice,
-      PF.queryResolvingSplice
-    ]
-
--- | Like `blockRenderers` but for use in inline contexts.
---
--- Backlinks and titles constitute an example of inline context, where we don't
--- care about block elements.
-inlineRenderers :: Monad n => PandocRenderers n
-inlineRenderers =
-  PandocRenderers
-    [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-      PF.urlResolvingSplice
-    ]
-    mempty
-
--- | Like `inlineRenderers` but suitable for use inside links (<a> tags).
-linkInlineRenderers :: Monad n => PandocRenderers n
-linkInlineRenderers =
-  PandocRenderers
-    [ PF.plainifyWikiLinkSplice
-    ]
-    mempty
+defaultEmanotePandocRenderers :: EmanotePandocRenderers Model LMLRoute
+defaultEmanotePandocRenderers =
+  let blockRenderers =
+        PandocRenderers
+          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+            PF.urlResolvingSplice
+          ]
+          [ PF.embedBlockWikiLinkResolvingSplice,
+            PF.queryResolvingSplice
+          ]
+      inlineRenderers =
+        PandocRenderers
+          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+            PF.urlResolvingSplice
+          ]
+          mempty
+      linkInlineRenderers =
+        PandocRenderers
+          [ PF.plainifyWikiLinkSplice
+          ]
+          mempty
+   in EmanotePandocRenderers {..}
 
 data TemplateRenderCtx n = TemplateRenderCtx
   { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
@@ -86,16 +82,16 @@ data TemplateRenderCtx n = TemplateRenderCtx
 -- | Create the context in which Heist templates (notably `pandoc.tpl`) will be
 -- rendered.
 mkTemplateRenderCtx ::
-  Monad n =>
   -- | Current model.
   Model ->
   -- | Current route.
   R.LMLRoute ->
   -- | Associated metadata.
   Aeson.Value ->
-  TemplateRenderCtx n
+  TemplateRenderCtx Identity
 mkTemplateRenderCtx model r meta =
-  let withInlineCtx =
+  let EmanotePandocRenderers {..} = M._modelPandocRenderers model
+      withInlineCtx =
         withRenderCtx inlineRenderers
       withLinkInlineCtx =
         withRenderCtx linkInlineRenderers
@@ -109,7 +105,7 @@ mkTemplateRenderCtx model r meta =
   where
     withRenderCtx ::
       (Monad m, Monad n) =>
-      PandocRenderers n ->
+      PandocRenderers Model LMLRoute n ->
       (RenderCtx n -> H.HeistT n m x) ->
       H.HeistT n m x
     withRenderCtx pandocRenderers f =
