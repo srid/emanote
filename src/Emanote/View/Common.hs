@@ -73,10 +73,10 @@ defaultEmanotePandocRenderers =
    in EmanotePandocRenderers {..}
 
 data TemplateRenderCtx n = TemplateRenderCtx
-  { withInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    withBlockCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    withLinkInlineCtx :: (RenderCtx n -> HI.Splice n) -> HI.Splice n,
-    titleSplice :: Tit.Title -> HI.Splice n
+  { withInlineCtx :: (RenderCtx -> HI.Splice Identity) -> HI.Splice Identity,
+    withBlockCtx :: (RenderCtx -> HI.Splice Identity) -> HI.Splice Identity,
+    withLinkInlineCtx :: (RenderCtx -> HI.Splice Identity) -> HI.Splice Identity,
+    titleSplice :: Tit.Title -> HI.Splice Identity
   }
 
 -- | Create the context in which Heist templates (notably `pandoc.tpl`) will be
@@ -104,10 +104,10 @@ mkTemplateRenderCtx model r meta =
    in TemplateRenderCtx {..}
   where
     withRenderCtx ::
-      (Monad m, Monad n) =>
-      PandocRenderers Model LMLRoute n ->
-      (RenderCtx n -> H.HeistT n m x) ->
-      H.HeistT n m x
+      (Monad m) =>
+      PandocRenderers Model LMLRoute ->
+      (RenderCtx -> H.HeistT Identity m x) ->
+      H.HeistT Identity m x
     withRenderCtx pandocRenderers f =
       f
         =<< Renderer.mkRenderCtxWithPandocRenderers
@@ -124,12 +124,11 @@ generatedCssFile = "tailwind.css"
 
 commonSplices ::
   HasCallStack =>
-  Monad n =>
-  ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
+  ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
   Model ->
   Aeson.Value ->
   Tit.Title ->
-  H.Splices (HI.Splice n)
+  H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
   let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
@@ -219,7 +218,7 @@ renderModelTemplate model templateName =
       either handleErr id
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
 
-routeBreadcrumbs :: Monad n => TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice n
+routeBreadcrumbs :: TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice Identity
 routeBreadcrumbs TemplateRenderCtx {..} model r =
   Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
     \(R.liftLMLRoute -> crumbR) -> do

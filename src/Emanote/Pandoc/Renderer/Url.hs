@@ -30,7 +30,7 @@ import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
 -- | Resolve all URLs in inlines (<a> and <img>)
-urlResolvingSplice :: Monad n => PandocInlineRenderer Model R.LMLRoute n
+urlResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   let f mAnchor sr = do
@@ -56,16 +56,15 @@ openInNewTabAttr =
   ("target", "_blank")
 
 renderSomeInlineRefWith ::
-  Monad n =>
-  (a -> Maybe (HI.Splice n)) ->
+  (a -> Maybe (HI.Splice Identity)) ->
   (a -> SR.SiteRoute) ->
   -- | AST Node attributes of @InlineRef@
   ([B.Inline], (Text, Text)) ->
   Rel.ResolvedRelTarget a ->
   Model ->
-  Splices.RenderCtx n ->
+  Splices.RenderCtx ->
   B.Inline ->
-  Maybe (HI.Splice n)
+  Maybe (HI.Splice Identity)
 renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing -> ctx) origInl = do
   case rRel of
     Rel.RRTMissing -> do
@@ -117,7 +116,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
     tooltip :: Text -> [B.Inline] -> B.Inline
     tooltip s = B.Span ("", [], one ("title", s))
 
-plainifyWikiLinkSplice :: Monad n => PandocInlineRenderer Model R.LMLRoute n
+plainifyWikiLinkSplice :: PandocInlineRenderer Model R.LMLRoute
 plainifyWikiLinkSplice _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do
   s <- WL.wikiLinkInlineRendered inl
   pure $ HP.rpInline ctx $ B.Str s

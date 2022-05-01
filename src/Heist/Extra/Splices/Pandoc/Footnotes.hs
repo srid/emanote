@@ -29,7 +29,7 @@ lookupFootnote note fs =
   fromMaybe (error $ "Missing footnote: " <> show note) $ do
     (+ 1) <$> List.elemIndex note fs
 
-renderFootnotesWith :: forall n. Monad n => RenderCtx n -> Footnotes -> HI.Splice n
+renderFootnotesWith :: RenderCtx -> Footnotes -> HI.Splice Identity
 renderFootnotesWith ctx fs' =
   fromMaybe (pure []) $ do
     fs <- toList <$> nonEmpty fs'
@@ -40,7 +40,7 @@ renderFootnotesWith ctx fs' =
         "footnote"
           ## (HI.runChildrenWith . uncurry (footnoteSplices ctx)) `foldMapM` footnotesWithIdx
 
-footnoteSplices :: Monad n => RenderCtx n -> Int -> [B.Block] -> H.Splices (HI.Splice n)
+footnoteSplices :: RenderCtx -> Int -> [B.Block] -> H.Splices (HI.Splice Identity)
 footnoteSplices ctx idx bs = do
   let footnoteDoc = Pandoc mempty $ case bs of
         [B.Para is] ->
@@ -52,7 +52,7 @@ footnoteSplices ctx idx bs = do
   "footnote:idx" ## HI.textSplice (show idx)
   "footnote:content" ## renderPandocWith ctx footnoteDoc
 
-footnoteRefSplice :: Monad n => RenderCtx n -> [[B.Block]] -> B.Inline -> Maybe (HI.Splice n)
+footnoteRefSplice :: RenderCtx -> [[B.Block]] -> B.Inline -> Maybe (HI.Splice Identity)
 footnoteRefSplice ctx footnotes inline = do
   B.Note bs <- pure inline
   let idx = lookupFootnote bs footnotes

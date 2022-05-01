@@ -173,7 +173,7 @@ routeTreeSplice ::
   C.TemplateRenderCtx n ->
   Maybe R.LMLRoute ->
   Model ->
-  H.Splices (HI.Splice n)
+  H.Splices (HI.Splice Identity)
 routeTreeSplice tCtx mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav

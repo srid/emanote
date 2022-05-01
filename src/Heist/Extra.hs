@@ -9,7 +9,7 @@ import Relude
 import Text.XmlHtml qualified as X
 
 -- | Useful for running a splice against an arbitrary node (such as that pulled from pandoc.tpl)
-runCustomNode :: Monad n => X.Node -> H.Splices (HI.Splice n) -> HI.Splice n
+runCustomNode :: X.Node -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
 runCustomNode node splices =
   H.localHS (HI.bindSplices splices) $ do
     HI.runNode node <&> \case
@@ -20,7 +20,7 @@ runCustomNode node splices =
       res ->
         res
 
-runCustomTemplate :: Monad n => HT.Template -> H.Splices (HI.Splice n) -> HI.Splice n
+runCustomTemplate :: HT.Template -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
 runCustomTemplate nodes splices =
   H.localHS (HI.bindSplices splices) $ do
     HI.runNodeList nodes

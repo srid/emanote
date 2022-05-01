@@ -70,12 +70,12 @@ toPlain = \case
   TitlePandoc is -> plainify is
 
 titleSplice ::
-  forall b n.
-  (Monad n, W.Walkable B.Inline b, b ~ [B.Inline]) =>
-  HP.RenderCtx n ->
+  forall b.
+  (W.Walkable B.Inline b, b ~ [B.Inline]) =>
+  HP.RenderCtx ->
   (b -> b) ->
   Title ->
-  HI.Splice n
+  HI.Splice Identity
 titleSplice ctx f = \case
   TitlePlain x ->
     HI.textSplice x
@@ -83,6 +83,6 @@ titleSplice ctx f = \case
     let titleDoc = B.Pandoc mempty $ one $ B.Plain $ f is
     HP.pandocSplice ctx titleDoc
 
-titleSpliceNoHtml :: Monad n => Title -> HI.Splice n
+titleSpliceNoHtml :: Title -> HI.Splice Identity
 titleSpliceNoHtml =
   HI.textSplice . toPlain

@@ -6,7 +6,7 @@ import Heist.Interpreted qualified as HI
 import Relude
 
 -- | A splice that applies a non-empty list
-listSplice :: Monad n => [a] -> Text -> (a -> H.Splices (HI.Splice n)) -> HI.Splice n
+listSplice :: [a] -> Text -> (a -> H.Splices (HI.Splice Identity)) -> HI.Splice Identity
 listSplice xs childTag childSplice = do
   if null xs
     then pure mempty
