@@ -5,9 +5,8 @@
 
 module Emanote.Model.Note where
 
-import Control.Monad.Except
 import Control.Monad.Logger (MonadLogger)
-import Control.Monad.Writer.Strict
+import Control.Monad.Writer (MonadWriter (tell), runWriterT)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO

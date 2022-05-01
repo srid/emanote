@@ -1,8 +1,7 @@
 module Emanote.Model.Note.Filter (applyPandocFilters) where
 
-import Control.Monad.Except
-import Control.Monad.Logger
-import Control.Monad.Writer.Strict
+import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Default (def)
 import Emanote.Prelude (logE, logW)
 import Relude
