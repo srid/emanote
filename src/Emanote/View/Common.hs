@@ -2,7 +2,6 @@
 
 module Emanote.View.Common
   ( commonSplices,
-    mkRendererFromMeta,
     inlineRenderers,
     renderModelTemplate,
     routeBreadcrumbs,
@@ -84,23 +83,45 @@ data TemplateRenderCtx n = TemplateRenderCtx
     titleSplice :: Tit.Title -> HI.Splice n
   }
 
+-- | Create the context in which Heist templates (notably `pandoc.tpl`) will be
+-- rendered.
 mkTemplateRenderCtx ::
   Monad n =>
+  -- | Current model.
   Model ->
+  -- | Current route.
   R.LMLRoute ->
+  -- | Associated metadata.
   Aeson.Value ->
   TemplateRenderCtx n
 mkTemplateRenderCtx model r meta =
   let withInlineCtx =
-        mkRendererFromMeta model meta inlineRenderers r
+        withRenderCtx inlineRenderers
       withLinkInlineCtx =
-        mkRendererFromMeta model meta linkInlineRenderers r
+        withRenderCtx linkInlineRenderers
       withBlockCtx =
-        mkRendererFromMeta model meta blockRenderers r
-      -- TODO: We should be using withInlineCtx, so as to make the wikilink render in note title.
-      titleSplice titleDoc = withLinkInlineCtx $ \x ->
-        Tit.titleSplice x preparePandoc titleDoc
-   in TemplateRenderCtx withInlineCtx withBlockCtx withLinkInlineCtx titleSplice
+        withRenderCtx blockRenderers
+      -- TODO: We should be using withInlineCtx, so as to make the wikilink
+      -- render in note title.
+      titleSplice titleDoc = withLinkInlineCtx $ \ctx ->
+        Tit.titleSplice ctx preparePandoc titleDoc
+   in TemplateRenderCtx {..}
+  where
+    withRenderCtx ::
+      (Monad m, Monad n) =>
+      PandocRenderers n ->
+      (RenderCtx n -> H.HeistT n m x) ->
+      H.HeistT n m x
+    withRenderCtx pandocRenderers f =
+      f
+        =<< Renderer.mkRenderCtxWithPandocRenderers
+          pandocRenderers
+          classRules
+          model
+          r
+    classRules :: Map Text Text
+    classRules =
+      MN.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
 
 generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
@@ -190,44 +211,6 @@ commonSplices withCtx model meta routeTitle = do
         ! A.href (H.toValue localCdnUrl)
         ! A.rel "stylesheet"
         ! A.type_ "text/css"
-
--- | Given a route metadata, return the context generating function that can be
--- used to render an arbitrary Pandoc AST
---
--- The returned function allows specifing a `PandocRenderers` type, along with
--- the associated data arguments.
-mkRendererFromMeta ::
-  (Monad m, Monad n) =>
-  Model ->
-  Aeson.Value ->
-  ( PandocRenderers n ->
-    LMLRoute ->
-    (RenderCtx n -> H.HeistT n m x) ->
-    H.HeistT n m x
-  )
-mkRendererFromMeta model routeMeta =
-  let classRules = MN.lookupAeson @(Map Text Text) mempty ("pandoc" :| ["rewriteClass"]) routeMeta
-   in mkRendererWith model classRules
-
-mkRendererWith ::
-  (Monad m, Monad n) =>
-  Model ->
-  Map Text Text ->
-  ( PandocRenderers n ->
-    LMLRoute ->
-    (RenderCtx n -> H.HeistT n m x) ->
-    H.HeistT n m x
-  )
-mkRendererWith model classRules =
-  let withNoteRenderer nr r f = do
-        renderCtx <-
-          Renderer.mkRenderCtxWithPandocRenderers
-            nr
-            classRules
-            model
-            r
-        f renderCtx
-   in withNoteRenderer
 
 renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
 renderModelTemplate model templateName =

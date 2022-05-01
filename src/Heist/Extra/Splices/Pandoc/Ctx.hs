@@ -19,6 +19,8 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.XmlHtml qualified as X
 
+-- | The configuration context under which we must render a `Pandoc` document
+-- using the given Heist template.
 data RenderCtx n = RenderCtx
   { -- The XML node which contains individual AST rendering definitions
     -- This corresponds to pandoc.tpl
