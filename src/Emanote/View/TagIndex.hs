@@ -13,7 +13,12 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer.Query qualified as PF
 import Emanote.Route.SiteRoute.Class qualified as SR
-import Emanote.View.Common (commonSplices, inlineRenderers, mkRendererFromMeta, renderModelTemplate)
+import Emanote.View.Common
+  ( TemplateRenderCtx (withInlineCtx),
+    commonSplices,
+    mkTemplateRenderCtx,
+    renderModelTemplate,
+  )
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Interpreted qualified as HI
@@ -74,9 +79,7 @@ mkTagIndex model tagPath' =
 renderTagIndex :: Model -> [HT.TagNode] -> LByteString
 renderTagIndex model tagPath = do
   let meta = Meta.getIndexYamlMeta model
-      withNoteRenderer = mkRendererFromMeta model meta
-      withInlineCtx =
-        withNoteRenderer inlineRenderers SR.indexLmlRoute
+      tCtx = mkTemplateRenderCtx model SR.indexLmlRoute meta
       tagIdx = mkTagIndex model tagPath
   renderModelTemplate model "templates/special/tagindex" $ do
     commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx
@@ -100,7 +103,7 @@ renderTagIndex model tagPath = do
     "ema:notes"
       ## Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
       $ \note ->
-        PF.noteSpliceMap withInlineCtx model note
+        PF.noteSpliceMap (withInlineCtx tCtx) model note
 
 tagNodesText :: NonEmpty HT.TagNode -> Text
 tagNodesText =
