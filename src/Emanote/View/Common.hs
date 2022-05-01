@@ -7,10 +7,8 @@ module Emanote.View.Common
     generatedCssFile,
 
     -- * Render context
-    EmanotePandocRenderers (..),
     TemplateRenderCtx (..),
     mkTemplateRenderCtx,
-    defaultEmanotePandocRenderers,
   )
 where
 
@@ -26,9 +24,6 @@ import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
-import Emanote.Pandoc.Renderer.Embed qualified as PF
-import Emanote.Pandoc.Renderer.Query qualified as PF
-import Emanote.Pandoc.Renderer.Url qualified as PF
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
@@ -48,29 +43,6 @@ import Text.Blaze.Html ((!))
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
 import Text.Blaze.Renderer.XmlHtml qualified as RX
-
-defaultEmanotePandocRenderers :: EmanotePandocRenderers Model LMLRoute
-defaultEmanotePandocRenderers =
-  let blockRenderers =
-        PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-            PF.urlResolvingSplice
-          ]
-          [ PF.embedBlockWikiLinkResolvingSplice,
-            PF.queryResolvingSplice
-          ]
-      inlineRenderers =
-        PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-            PF.urlResolvingSplice
-          ]
-          mempty
-      linkInlineRenderers =
-        PandocRenderers
-          [ PF.plainifyWikiLinkSplice
-          ]
-          mempty
-   in EmanotePandocRenderers {..}
 
 data TemplateRenderCtx n = TemplateRenderCtx
   { withInlineCtx :: (RenderCtx -> HI.Splice Identity) -> HI.Splice Identity,

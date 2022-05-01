@@ -3,6 +3,7 @@
 
 module Emanote
   ( run,
+    defaultEmanoteConfig,
   )
 where
 
@@ -22,6 +23,10 @@ import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
+import Emanote.Pandoc.Renderer
+import Emanote.Pandoc.Renderer.Embed qualified as PF
+import Emanote.Pandoc.Renderer.Query qualified as PF
+import Emanote.Pandoc.Renderer.Url qualified as PF
 import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
@@ -48,15 +53,23 @@ instance HasModel SiteRoute where
   type ModelInput SiteRoute = EmanoteConfig
   modelDynamic = emanoteModelDynamic
 
+defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
+defaultEmanoteConfig cli =
+  EmanoteConfig cli id defaultEmanotePandocRenderers
+
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
-  Ema.runSiteWithCli @SiteRoute (CLI.emaCli _emanoteConfigCli) cfg >>= \case
-    (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-      compileTailwindCss outPath genPaths
-      checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
-      checkBadMarkdownFiles $ Model.modelNoteErrors model0
-    _ ->
-      pure ()
+  Ema.runSiteWithCli @SiteRoute (CLI.emaCli _emanoteConfigCli) cfg
+    >>= postRun cfg
+
+postRun :: EmanoteConfig -> (Model.Model, DSum Ema.CLI.Action Identity) -> IO ()
+postRun EmanoteConfig {..} = \case
+  (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
+    compileTailwindCss outPath genPaths
+    checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
+    checkBadMarkdownFiles $ Model.modelNoteErrors model0
+  _ ->
+    pure ()
 
 checkBadMarkdownFiles :: Map LMLRoute [Text] -> IO ()
 checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
@@ -98,3 +111,26 @@ compileTailwindCss outPath genPaths = do
       & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
       & Tailwind.tailwindOutput .~ cssPath
       & Tailwind.tailwindMode .~ Tailwind.Production
+
+defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+defaultEmanotePandocRenderers =
+  let blockRenderers =
+        PandocRenderers
+          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+            PF.urlResolvingSplice
+          ]
+          [ PF.embedBlockWikiLinkResolvingSplice,
+            PF.queryResolvingSplice
+          ]
+      inlineRenderers =
+        PandocRenderers
+          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+            PF.urlResolvingSplice
+          ]
+          mempty
+      linkInlineRenderers =
+        PandocRenderers
+          [ PF.plainifyWikiLinkSplice
+          ]
+          mempty
+   in EmanotePandocRenderers {..}
