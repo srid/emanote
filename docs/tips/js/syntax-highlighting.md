@@ -9,7 +9,27 @@ page:
     <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
 ```
 
-Example using PrismJS:
+Or, using the alias from the default layer's `index.yaml`:
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.prism" />
+```
+
+An alias for highlight.js also exists, especially as highlight.js works better with [[mermaid]] than PrismJS:
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.highlightjs" />
+```
+
+Bear in mind that when using highlight.js you must manually add language support. Prism.js in contrast provides an autoload feature.
+
+## Example using PrismJS:
+
+### Python
 
 ```python
 def fib(n):
@@ -20,3 +40,12 @@ def fib(n):
     print()
 fib(1000)
 ```
+
+### Haskell
+
+```haskell
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
+```
+

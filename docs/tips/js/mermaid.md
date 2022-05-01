@@ -1,6 +1,7 @@
 ---
 page:
   headHtml: |
+    <snippet var="js.highlightjs" />
     <snippet var="js.mermaid" />
 ---
 
@@ -9,7 +10,6 @@ page:
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks. 
 
 1. Add the following to your `page.headHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]])
-    :::{.code-block}
     ```yaml
     page:
       headHtml: |
@@ -19,9 +19,7 @@ page:
           mermaid.init(undefined,document.querySelectorAll(".mermaid"));
         </script>
     ```
-    :::
 1. Add a code block with `mermaid` language
-    :::{.code-block}
     ~~~markdown
     ```mermaid
     %%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
@@ -32,11 +30,10 @@ page:
         C-->D;
     ```
     ~~~
-    :::
 
 The result will be:
 
-```mermaid
+```mermaid {.nohighlight}
 %%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
 graph TD;
     A-->B;
@@ -45,11 +42,11 @@ graph TD;
     C-->D;
 ```
 
-Note that mermaid.js will have trouble operating with PrismJS [[syntax-highlighting]].
+Note that mermaid.js will have trouble operating with PrismJS [[syntax-highlighting]], but it works well with highlight.js (which this note uses).
 
 ## More examples
 
-```mermaid
+```mermaid {.nohighlight}
 stateDiagram
     direction LR
     [*] --> A
@@ -62,7 +59,7 @@ stateDiagram
     B --> D
 ```
 
-```mermaid
+```mermaid {.nohighlight}
 gantt
     dateFormat  YYYY-MM-DD
     title       Adding GANTT diagram functionality to mermaid
