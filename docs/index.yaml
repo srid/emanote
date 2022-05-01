@@ -5,9 +5,3 @@ page:
   siteTitle: Emanote
   headHtml: |
     <snippet var="js.prism" />
-
-pandoc:
-  rewriteClass:
-    # For use in notes with Prism.JS disabled (specifically code-block using
-    # pages like Mermaid)
-    code-block: border-2 p-1 overflow-auto my-1 bg-gray-50
