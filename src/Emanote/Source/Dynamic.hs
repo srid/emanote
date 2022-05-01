@@ -17,6 +17,7 @@ import Ema.Route.Encoder (RouteEncoder)
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
+import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Prelude (chainM)
 import Emanote.Route (LMLRoute)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
@@ -24,15 +25,18 @@ import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
-import Emanote.View.Common
 import Paths_emanote qualified
 import Relude
 import System.UnionMount qualified as UM
 import UnliftIO (MonadUnliftIO)
 
+-- | Everything that's required to run an Emanote site.
 data EmanoteConfig = EmanoteConfig
-  { _emanoteConfigCli :: CLI.Cli,
+  { -- | CLI arguments (includes layers)
+    _emanoteConfigCli :: CLI.Cli,
+    -- | A function to filter the `Note` before it gets added to the model.
     _emanoteConfigNoteFn :: Note -> Note,
+    -- | How to render Pandoc to Heist HTML.
     _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
   }
 
