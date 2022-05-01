@@ -8,19 +8,19 @@ import Heist.Splices qualified as Heist
 import Relude
 
 treeSplice ::
-  forall a n sortKey.
-  (Monad n, Ord sortKey) =>
+  forall a sortKey.
+  (Ord sortKey) =>
   -- | How to sort children
   (NonEmpty a -> sortKey) ->
   -- | Input tree
   [Tree a] ->
   -- | How to render a (sub-)tree root
-  (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice n)) ->
-  HI.Splice n
+  (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice Identity)) ->
+  HI.Splice Identity
 treeSplice =
   go []
   where
-    go :: [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice n)) -> HI.Splice n
+    go :: [a] -> (NonEmpty a -> sortKey) -> [Tree a] -> (NonEmpty a -> [Tree a] -> H.Splices (HI.Splice Identity)) -> HI.Splice Identity
     go pars sortKey trees childSplice = do
       let extendPars x = maybe (one x) (<> one x) $ nonEmpty pars
       flip foldMapM (sortOn (sortKey . extendPars . rootLabel) trees) $ \(Node lbl children) -> do

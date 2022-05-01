@@ -24,7 +24,7 @@ import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 
-queryResolvingSplice :: forall n. Monad n => PandocBlockRenderer Model LMLRoute n
+queryResolvingSplice :: PandocBlockRenderer Model LMLRoute
 queryResolvingSplice model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)
@@ -43,11 +43,10 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
-  Monad n =>
-  ((RenderCtx n -> HI.Splice n) -> HI.Splice n) ->
+  ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
   Model ->
   MN.Note ->
-  H.Splices (HI.Splice n)
+  H.Splices (HI.Splice Identity)
 noteSpliceMap withCtx model note = do
   "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
   "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)

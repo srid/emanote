@@ -26,8 +26,7 @@ import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 
-embedBlockWikiLinkResolvingSplice ::
-  Monad n => PandocBlockRenderer Model R.LMLRoute n
+embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
   B.Para [inl] -> do
     (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
@@ -42,8 +41,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
   _ ->
     Nothing
 
-embedInlineWikiLinkResolvingSplice ::
-  Monad n => PandocInlineRenderer Model R.LMLRoute n
+embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
@@ -53,18 +51,18 @@ embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
       f = embedInlineSiteRoute model wl
   RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
 
-embedBlockSiteRoute :: Monad n => Model -> HP.RenderCtx n -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
+embedBlockSiteRoute :: Model -> HP.RenderCtx -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice Identity)
 embedBlockSiteRoute model ctx = either (embedResourceRoute model ctx) (const Nothing)
 
-embedInlineSiteRoute :: Monad n => Model -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice n)
+embedInlineSiteRoute :: Model -> WL.WikiLink -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice Identity)
 embedInlineSiteRoute model wl = either (const Nothing) (embedStaticFileRoute model wl)
 
-runEmbedTemplate :: Monad n => ByteString -> H.Splices (HI.Splice n) -> HI.Splice n
+runEmbedTemplate :: ByteString -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
 runEmbedTemplate name splices = do
   tpl <- HE.lookupHtmlTemplateMust $ "/templates/filters/embed-" <> name
   HE.runCustomTemplate tpl splices
 
-embedResourceRoute :: Monad n => Model -> HP.RenderCtx n -> MN.Note -> Maybe (HI.Splice n)
+embedResourceRoute :: Model -> HP.RenderCtx -> MN.Note -> Maybe (HI.Splice Identity)
 embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
@@ -72,7 +70,7 @@ embedResourceRoute model ctx note = do
     "ema:note:pandoc"
       ## pandocSplice ctx (prepareNoteDoc $ MN._noteDoc note)
 
-embedStaticFileRoute :: Monad n => Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice n)
+embedStaticFileRoute :: Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model wl staticFile = do
   let fp = staticFile ^. SF.staticFilePath
       url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile

@@ -21,7 +21,7 @@ import Text.XmlHtml qualified as X
 
 -- | The configuration context under which we must render a `Pandoc` document
 -- using the given Heist template.
-data RenderCtx n = RenderCtx
+data RenderCtx = RenderCtx
   { -- The XML node which contains individual AST rendering definitions
     -- This corresponds to pandoc.tpl
     rootNode :: Maybe X.Node,
@@ -31,16 +31,16 @@ data RenderCtx n = RenderCtx
     -- Class attribute rewrite rules
     classMap :: Map Text Text,
     -- Custom render functions for AST nodes.
-    blockSplice :: B.Block -> Maybe (HI.Splice n),
-    inlineSplice :: B.Inline -> Maybe (HI.Splice n)
+    blockSplice :: B.Block -> Maybe (HI.Splice Identity),
+    inlineSplice :: B.Inline -> Maybe (HI.Splice Identity)
   }
 
 mkRenderCtx ::
-  (Monad m, Monad n) =>
+  (Monad m) =>
   Map Text Text ->
-  (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
-  (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
-  H.HeistT n m (RenderCtx n)
+  (RenderCtx -> B.Block -> Maybe (HI.Splice Identity)) ->
+  (RenderCtx -> B.Inline -> Maybe (HI.Splice Identity)) ->
+  H.HeistT Identity m RenderCtx
 mkRenderCtx classMap bS iS = do
   node <- H.getParamNode
   pure $
@@ -51,15 +51,14 @@ mkRenderCtx classMap bS iS = do
       iS
 
 mkRenderCtxWith ::
-  Monad n =>
   X.Node ->
   -- | How to replace classes in Div and Span nodes.
   Map Text Text ->
   -- | Custom handling of AST block nodes
-  (RenderCtx n -> B.Block -> Maybe (HI.Splice n)) ->
+  (RenderCtx -> B.Block -> Maybe (HI.Splice Identity)) ->
   -- | Custom handling of AST inline nodes
-  (RenderCtx n -> B.Inline -> Maybe (HI.Splice n)) ->
-  RenderCtx n
+  (RenderCtx -> B.Inline -> Maybe (HI.Splice Identity)) ->
+  RenderCtx
 mkRenderCtxWith node classMap bS iS = do
   let ctx =
         RenderCtx
@@ -71,12 +70,12 @@ mkRenderCtxWith node classMap bS iS = do
           (iS ctx)
    in ctx
 
-emptyRenderCtx :: RenderCtx n
+emptyRenderCtx :: RenderCtx
 emptyRenderCtx =
   RenderCtx Nothing (const B.nullAttr) (const B.nullAttr) mempty (const Nothing) (const Nothing)
 
 -- | Strip any custom splicing out of the given render context
-ctxSansCustomSplicing :: RenderCtx n -> RenderCtx n
+ctxSansCustomSplicing :: RenderCtx -> RenderCtx
 ctxSansCustomSplicing ctx =
   ctx
     { blockSplice = const Nothing,
@@ -90,7 +89,7 @@ concatSpliceFunc f g x =
       g x
     ]
 
-rewriteClass :: Monad n => RenderCtx n -> B.Attr -> B.Attr
+rewriteClass :: RenderCtx -> B.Attr -> B.Attr
 rewriteClass RenderCtx {..} (id', classes, attr) =
   (id', rewrite classMap <$> classes, attr)
   where

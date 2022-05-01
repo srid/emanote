@@ -27,22 +27,22 @@ import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.XmlHtml qualified as X
 
-renderPandocWith :: Monad n => RenderCtx n -> Pandoc -> HI.Splice n
+renderPandocWith :: RenderCtx -> Pandoc -> HI.Splice Identity
 renderPandocWith ctx (Pandoc _meta blocks) =
   foldMapM (rpBlock ctx) blocks
 
-rpBlock :: Monad n => RenderCtx n -> B.Block -> HI.Splice n
+rpBlock :: RenderCtx -> B.Block -> HI.Splice Identity
 rpBlock ctx@RenderCtx {..} b = do
   fromMaybe (rpBlock' ctx b) $ blockSplice b
 
 -- | Render using user override in pandoc.tpl, falling back to default HTML.
-withTplTag :: Monad n => RenderCtx n -> Text -> H.Splices (HI.Splice n) -> HI.Splice n -> HI.Splice n
+withTplTag :: RenderCtx -> Text -> H.Splices (HI.Splice Identity) -> HI.Splice Identity -> HI.Splice Identity
 withTplTag RenderCtx {..} name splices default_ =
   case X.childElementTag name =<< rootNode of
     Nothing -> default_
     Just node -> runCustomNode node splices
 
-rpBlock' :: forall n. Monad n => RenderCtx n -> B.Block -> HI.Splice n
+rpBlock' :: RenderCtx -> B.Block -> HI.Splice Identity
 rpBlock' ctx@RenderCtx {..} b = case b of
   B.Plain is ->
     rpInlineWithTasks ctx is
@@ -147,22 +147,22 @@ rpBlock' ctx@RenderCtx {..} b = case b of
         let lang = head classes
         pure $ lang : ("language-" <> lang) : tail classes
 
-    definitionListSplices :: Monad n => [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice n)
+    definitionListSplices :: [([B.Inline], [[B.Block]])] -> H.Splices (HI.Splice Identity)
     definitionListSplices defs = do
       "DefinitionList:Items" ## (HI.runChildrenWith . uncurry itemsSplices) `foldMapM` defs
       where
-        itemsSplices :: Monad n => [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice n)
+        itemsSplices :: [B.Inline] -> [[B.Block]] -> H.Splices (HI.Splice Identity)
         itemsSplices term descriptions = do
           "DefinitionList:Item:Term" ## foldMapM (rpInline ctx) term
           "DefinitionList:Item:DescList" ## (HI.runChildrenWith . descListSplices) `foldMapM` descriptions
-        descListSplices :: Monad n => [B.Block] -> H.Splices (HI.Splice n)
+        descListSplices :: [B.Block] -> H.Splices (HI.Splice Identity)
         descListSplices bs = "DefinitionList:Item:Desc" ## rpBlock ctx `foldMapM` bs
 
-    pandocListSplices :: Text -> [[B.Block]] -> H.Splices (HI.Splice n)
+    pandocListSplices :: Text -> [[B.Block]] -> H.Splices (HI.Splice Identity)
     pandocListSplices tagPrefix bss =
       (tagPrefix <> ":Items") ## (HI.runChildrenWith . itemsSplices) `foldMapM` bss
       where
-        itemsSplices :: [B.Block] -> H.Splices (HI.Splice n)
+        itemsSplices :: [B.Block] -> H.Splices (HI.Splice Identity)
         itemsSplices bs = do
           (tagPrefix <> ":Item") ## foldMapM (rpBlock ctx) bs
 
@@ -172,11 +172,11 @@ headerTag n =
     then "h" <> show n
     else error "Invalid pandoc header level"
 
-rpInline :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
+rpInline :: RenderCtx -> B.Inline -> HI.Splice Identity
 rpInline ctx@RenderCtx {..} i = do
   fromMaybe (rpInline' ctx i) $ inlineSplice i
 
-rpInline' :: Monad n => RenderCtx n -> B.Inline -> HI.Splice n
+rpInline' :: RenderCtx -> B.Inline -> HI.Splice Identity
 rpInline' ctx@RenderCtx {..} i = case i of
   B.Str s ->
     pure $ one . X.TextNode $ s
@@ -241,7 +241,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
     withTplTag ctx "Cite" ("inlines" ## rpInline ctx `foldMapM` is) $
       one . X.Element "cite" mempty <$> foldMapM (rpInline ctx) is
   where
-    inQuotes :: Monad n => HI.Splice n -> B.QuoteType -> HI.Splice n
+    inQuotes :: HI.Splice Identity -> B.QuoteType -> HI.Splice Identity
     inQuotes w = \case
       B.SingleQuote ->
         w <&> \nodes ->
@@ -251,12 +251,12 @@ rpInline' ctx@RenderCtx {..} i = case i of
           [X.TextNode "“"] <> nodes <> [X.TextNode "”"]
 
 -- | Like rpInline', but supports task checkbox in the given inlines.
-rpInlineWithTasks :: Monad n => RenderCtx n -> [B.Inline] -> HI.Splice n
+rpInlineWithTasks :: RenderCtx -> [B.Inline] -> HI.Splice Identity
 rpInlineWithTasks ctx is =
   rpTask ctx is $
     rpInline ctx `foldMapM` is
 
-rpTask :: Monad n => RenderCtx n -> [B.Inline] -> HI.Splice n -> HI.Splice n
+rpTask :: RenderCtx -> [B.Inline] -> HI.Splice Identity -> HI.Splice Identity
 rpTask ctx is default_ =
   maybe default_ render (TaskList.parseTaskFromInlines is)
   where

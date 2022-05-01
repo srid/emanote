@@ -27,10 +27,9 @@ import Text.Pandoc.Definition (Pandoc (..))
 
 -- | A splice to render a Pandoc AST
 pandocSplice ::
-  Monad n =>
-  RenderCtx n ->
+  RenderCtx ->
   Pandoc ->
-  HI.Splice n
+  HI.Splice Identity
 pandocSplice ctx doc = do
   -- Create a new context to render footnote references
   let footnotes = gatherFootnotes doc
