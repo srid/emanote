@@ -25,7 +25,7 @@ jobs:
           nix develop -j 4 -c echo
       - name: Format check
         run: |
-          nix develop -j auto -c treefmt -- --fail-on-change
+          nix develop -j auto -c treefmt --fail-on-change
       - name: Build Nix
         id: build-nix
         run: |
