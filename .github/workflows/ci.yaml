@@ -20,6 +20,9 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Format check
+        run: |
+          nix develop -c treefmt -- --fail-on-change
       - name: Build Nix
         id: build-nix
         run: |
