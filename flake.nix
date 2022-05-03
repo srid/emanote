@@ -68,6 +68,7 @@
                     cabal-fmt
                     ormolu
                     pkgs.nixpkgs-fmt
+                    pkgs.treefmt
 
                     inputs.tailwind-haskell.defaultPackage.${system}
                   ]);
