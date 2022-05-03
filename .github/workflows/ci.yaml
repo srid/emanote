@@ -20,13 +20,19 @@ jobs:
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
           # Only needed for private caches
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Cache Nix dependencies
+        run: |
+          nix develop -j 4 -c echo
+      - name: Format check
+        run: |
+          nix develop -j auto -c treefmt -- --fail-on-change
       - name: Build Nix
         id: build-nix
         run: |
           [[ -n $(git status -s) ]] && (echo 'modified and/or untracked'; exit 2)
           ls -la
           nix --version
-          nix build
+          nix build -j auto
       - name: Build as docker img
         id: build
         run: |
