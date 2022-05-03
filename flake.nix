@@ -26,12 +26,6 @@
       url = "github:srid/heist/emanote-release--ghc9";
       flake = false;
     };
-    lint-utils = {
-      type = "git";
-      url = "https://gitlab.homotopic.tech/nix/lint-utils.git";
-      ref = "overengineered";
-      inputs.nixpkgs.follows = "ema/nixpkgs";
-    };
   };
   outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem
@@ -68,17 +62,11 @@
                     cabal-fmt
                     ormolu
                     pkgs.nixpkgs-fmt
+                    pkgs.treefmt
 
                     inputs.tailwind-haskell.defaultPackage.${system}
                   ]);
             };
-          lintSpec = {
-            nixpkgs-fmt = { };
-            cabal-fmt = { };
-            ormolu = {
-              ghcOpts = "-o-XTypeApplications -o-XImportQualifiedPost";
-            };
-          };
         in
         rec {
           defaultPackage = packages.default;
@@ -88,16 +76,6 @@
 
           # Used by `nix develop`
           devShell = project true;
-
-          # Used by `nix run ...`
-          apps = {
-            format = inputs.lint-utils.mkApp.${system} lintSpec;
-          };
-
-          # Used by `nix flake check`
-          checks = {
-            format = inputs.lint-utils.mkChecks.${system} lintSpec;
-          };
         }) //
     {
       homeManagerModule = import ./home-manager-module.nix;
