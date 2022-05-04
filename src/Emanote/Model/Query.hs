@@ -69,7 +69,7 @@ runQuery currentRoute model =
           matchingTags = filter (HT.tagMatch pat) allTags
        in Ix.toList $ (model ^. modelNotes) @+ matchingTags
     QueryByPath path ->
-      fromMaybe mempty $ do
+      maybeToMonoid $ do
         r <- R.mkRouteFromFilePath path
         pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
     QueryByPathPattern (resolveDotInFilePattern -> pat) ->

@@ -1,5 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use camelCase" #-}
 
 module Emanote.Model.Type where
 
@@ -145,7 +148,7 @@ deleteIxMulti ::
   Ix.IxSet ixs a
 deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
-   in foldl' (flip Ix.delete) rels candidates
+   in flipfoldl' Ix.delete rels candidates
 
 modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
 modelLookupStaticFile fp m = do

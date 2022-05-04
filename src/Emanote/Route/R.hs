@@ -29,7 +29,7 @@ mkRouteFromFilePath :: forall a (ext :: FileType a). HasExt ext => FilePath -> M
 mkRouteFromFilePath fp = do
   base <- withoutKnownExt @_ @ext fp
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
-  R <$> nonEmpty slugs
+  viaNonEmpty R slugs
 
 mkRouteFromSlug :: forall ext. HasExt ext => Slug -> R ext
 mkRouteFromSlug =
@@ -59,7 +59,7 @@ routeBaseName =
 
 routeParent :: R ext -> Maybe (R 'Folder)
 routeParent =
-  fmap R . nonEmpty . NE.init . unRoute
+  viaNonEmpty R . init . unRoute
 
 -- | For use in breadcrumbs
 routeInits :: R ext -> NonEmpty (R ext)

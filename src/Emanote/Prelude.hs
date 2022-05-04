@@ -22,7 +22,7 @@ chainM f =
     --
     -- chain [f1, f2, ...] a = ... (f2 (f1 x))
     chain :: [a -> a] -> a -> a
-    chain = flip $ foldl' $ flip ($)
+    chain = flip $ flipfoldl' ($)
 
 -- | User-provided input is malformed.
 newtype BadInput = BadInput Text

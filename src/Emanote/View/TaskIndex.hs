@@ -53,5 +53,5 @@ renderTasks model = do
     Common.commonSplices ($ emptyRenderCtx) model meta "Task Index"
     let groups =
           Map.toList (unTaskIndex taskIndex)
-            & sortOn fst
+            & sortWith fst
     "ema:taskGroups" ## Splices.listSplice groups "taskGroup" (uncurry taskGroupSplice)

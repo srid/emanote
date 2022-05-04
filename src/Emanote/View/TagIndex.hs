@@ -52,7 +52,7 @@ mkTagIndex model tagPath' =
       childTags =
         childNodes <&> \childNode ->
           let t = NE.reverse $ childNode :| reverse tagPath'
-           in (t, fromMaybe mempty $ Map.lookup (HT.constructTag t) tagMap)
+           in (t, maybeToMonoid $ Map.lookup (HT.constructTag t) tagMap)
    in case mTagPath of
         Nothing ->
           -- The root index displays all top-level tags (no notes)
