@@ -6,7 +6,7 @@ module Emanote.Source.Patch
   )
 where
 
-import Control.Exception (throw)
+import Control.Exception (throwIO)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
@@ -96,8 +96,9 @@ patchModel' layers noteF fpType fp action = do
               let fpAbs = locResolve overlay
               readRefreshedFile refreshAction fpAbs
             sData <-
-              either (throw . BadInput) pure $
-                SD.parseSDataCascading r yamlContents
+              liftIO $
+                either (throwIO . BadInput) pure $
+                  SD.parseSDataCascading r yamlContents
             pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp

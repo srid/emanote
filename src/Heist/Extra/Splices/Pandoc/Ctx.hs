@@ -128,7 +128,7 @@ childTagAttr x name =
 
 attrFromNode :: X.Node -> B.Attr
 attrFromNode node =
-  let mClass = maybe mempty T.words $ X.getAttribute "class" node
+  let mClass = maybe mempty words $ X.getAttribute "class" node
       id' = fromMaybe "" $ X.getAttribute "id" node
       attrs = filter ((/= "class") . fst) $ X.elementAttrs node
    in (id', mClass, attrs)

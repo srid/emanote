@@ -120,7 +120,7 @@ showErrors :: TemplateErrors -> Text
 showErrors m =
   T.intercalate "\n" $
     Map.toList m <&> \(k, v) ->
-      decodeUtf8 k <> ":\n" <> T.unlines (indent <$> T.lines v)
+      decodeUtf8 k <> ":\n" <> unlines (indent <$> lines v)
   where
     indent :: Text -> Text
     indent s = "\t" <> s

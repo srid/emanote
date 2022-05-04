@@ -12,7 +12,6 @@ import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
-import Data.List (nub)
 import Data.Map.Strict qualified as Map
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
@@ -99,7 +98,7 @@ hasChildNotes r =
 
 noteTags :: Note -> [HT.Tag]
 noteTags =
-  fmap HT.Tag . fromMaybe mempty . lookupMeta (one "tags")
+  fmap HT.Tag . maybeToMonoid . lookupMeta (one "tags")
 
 noteSlug :: Note -> Maybe (NonEmpty Slug)
 noteSlug note = do
@@ -234,7 +233,7 @@ parseNote pluginBaseDir r fp md = do
       frontmatter
         & AO.key "tags" % AO._Array
         .~ ( fromList . fmap Aeson.toJSON $
-               nub $
+               ordNub $
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )

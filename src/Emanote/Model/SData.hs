@@ -43,7 +43,7 @@ parseSDataCascading r bs = do
 -- | Later values override former.
 mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
 mergeAesons =
-  NE.last . NE.scanl1 mergeAeson
+  last . NE.scanl1 mergeAeson
 
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson = AesonMerge.lodashMerge

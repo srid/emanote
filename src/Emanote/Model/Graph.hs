@@ -20,7 +20,7 @@ import Text.Pandoc.Definition qualified as B
 -- TODO: Do breadth-first instead of depth-first
 modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute
 modelFolgezettelAncestorTree r0 model =
-  fst $ flip runState mempty $ go r0
+  fst $ usingState mempty $ go r0
   where
     go :: MonadState (Set ModelRoute) m => ModelRoute -> m (Forest R.LMLRoute)
     go r = do
@@ -98,6 +98,6 @@ backlinkRels r model =
 
 frontlinkRels :: ModelRoute -> Model -> [Rel.Rel]
 frontlinkRels r model =
-  fromMaybe mempty $ do
+  maybeToMonoid $ do
     lmlR <- leftToMaybe $ R.modelRouteCase r
     pure $ Ix.toList $ (model ^. modelRels) @= lmlR

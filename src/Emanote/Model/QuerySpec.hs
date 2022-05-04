@@ -1,5 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Emanote.Model.QuerySpec where
 
 import Data.TagTree (Tag (Tag))
@@ -19,4 +17,3 @@ spec = do
       let q = "tag:#" <> s
           tag = Tag s
       parseQuery q === Just (QueryByTag tag)
-      pure ()

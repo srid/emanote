@@ -149,7 +149,7 @@ wikiLinkInlineRendered x = do
 allowedWikiLinks :: HasCallStack => R @Ext.SourceExt ext -> NonEmpty (WikiLinkType, WikiLink)
 allowedWikiLinks r =
   let wls = fmap WikiLink $ tailsNE $ unRoute r
-      typs :: NonEmpty WikiLinkType = NE.fromList [minBound .. maxBound]
+      typs :: NonEmpty WikiLinkType = NE.fromList universe
    in liftM2 (,) typs wls
   where
     tailsNE =

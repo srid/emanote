@@ -1,5 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Emanote.Model.Link.RelSpec where
 
 import Emanote.Model.Link.Rel

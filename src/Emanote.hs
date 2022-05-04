@@ -12,7 +12,6 @@ import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
-import Data.Set qualified as Set
 import Ema
   ( CanRender (..),
     HasModel (..),
@@ -69,7 +68,7 @@ postRun EmanoteConfig {..} = \case
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0
   _ ->
-    pure ()
+    pass
 
 checkBadMarkdownFiles :: Map LMLRoute [Text] -> IO ()
 checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
@@ -85,9 +84,9 @@ checkBrokenLinks :: CLI.Cli -> Map LMLRoute [Export.Link] -> IO ()
 checkBrokenLinks cli modelRels = runStderrLoggingT $ do
   ((), res :: Sum Int) <- runWriterT $
     forM_ (Map.toList modelRels) $ \(noteRoute, rels) ->
-      forM_ (Set.toList $ Set.fromList rels) $ \(Export.Link urt rrt) ->
+      forM_ (sortNub rels) $ \(Export.Link urt rrt) ->
         case rrt of
-          RRTFound _ -> pure ()
+          RRTFound _ -> pass
           RRTMissing -> do
             logW $ "Broken link: " <> show (lmlRouteCase noteRoute) <> " -> " <> show urt
             tell 1
