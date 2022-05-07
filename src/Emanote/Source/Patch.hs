@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 -- | Patch model state depending on file change event.
 module Emanote.Source.Patch
   ( patchModel,
@@ -28,10 +30,14 @@ import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.Source.Loc (Loc, LocLayers, immediateLayer, locPath, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
-import Optics.Operators ((%~))
+import Language.Haskell.Interpreter qualified as I
+import NeatInterpolation
+import Optics.Operators ((%~), (.~), (^.))
 import Relude
+import Shower qualified
 import System.FilePath (takeFileName)
 import System.UnionMount qualified as UM
+import Text.Pandoc.Definition
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
@@ -82,7 +88,8 @@ patchModel' layers noteF fpType fp action = do
                 currentLayerPath = locPath $ immediateLayer layers
             s <- readRefreshedFile refreshAction fpAbs
             note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
-            pure $ M.modelInsertNote $ noteF note
+            doc' <- liftIO $ hintDemo $ note ^. N.noteDoc
+            pure $ M.modelInsertNote $ noteF $ note & N.noteDoc .~ doc'
           UM.Delete -> do
             log $ "Removing note: " <> toText fp
             pure $ M.modelDeleteNote r
@@ -142,6 +149,52 @@ patchModel' layers noteF fpType fp action = do
                 pure $ M.modelInsertStaticFile t r fpAbs
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
+
+-- Must be a Haskell expression.
+--
+-- `where` unsupported. Use `let` to define "top-levels"
+theScript :: Text
+theScript =
+  [text|
+  let f s = "YES!! " <> s 
+  in walk $ \case 
+   (Header n _ xs) -> Para $ flip walk xs $ \case 
+    Str xs -> Str $ f xs
+    x -> x
+   x -> x
+  |]
+
+hintDemo :: Pandoc -> IO Pandoc
+hintDemo doc = do
+  x <- I.runInterpreter $ do
+    -- TODO: enable all of 'em
+    I.set
+      [ I.languageExtensions
+          I.:= [ I.LambdaCase,
+                 I.OverloadedStrings
+               ]
+      ]
+    -- TODO: This should be qualified, but that's not working now
+    I.setImportsQ
+      [ ("Text.Pandoc.Definition", Nothing),
+        ("Text.Pandoc.Walk", Nothing),
+        ("Data.Char", Nothing),
+        ("Relude", Nothing)
+      ]
+    -- TODO: pretty slow
+    -- probably a non-issue if moved under `applyPandocFilters` (it is already
+    -- an IO action)
+    liftIO $ putStrLn "! Running hint interpreter"
+    val <- I.interpret (toString theScript) (I.as :: Pandoc -> Pandoc)
+    liftIO $ putStrLn "Done."
+    pure val
+  case x of
+    Left e -> do
+      let Pandoc meta blocks = doc
+      pure $ Pandoc meta ([CodeBlock nullAttr $ "ERROR: " <> toText (Shower.shower e)] <> blocks)
+    Right f -> do
+      let doc' = f doc
+      pure doc'
 
 -- See the FIXME in more-head.tpl.
 fixStaticUrl :: Model -> ByteString -> ByteString

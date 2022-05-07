@@ -109,6 +109,7 @@ common library-common
     , fsnotify
     , hedgehog
     , heist-emanote          >=1.2
+    , hint
     , hspec
     , hspec-hedgehog
     , ixset-typed
