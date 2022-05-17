@@ -1,4 +1,4 @@
-module Emanote.View.Template (emanoteRouteAsset, render) where
+module Emanote.View.Template (emanoteSiteOutput, render) where
 
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
@@ -41,9 +41,8 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-emanoteRouteAsset :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteRouteAsset _enc m r = do
-  render m r
+emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
+emanoteSiteOutput _enc = render
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m (SR.SiteRoute sr) =
