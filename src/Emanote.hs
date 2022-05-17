@@ -13,8 +13,7 @@ import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
 import Ema
-  ( CanRender (..),
-    HasModel (..),
+  ( EmaSite (..),
     IsRoute (..),
     runSiteWithCli,
   )
@@ -45,12 +44,10 @@ instance IsRoute SiteRoute where
   routeEncoder = emanoteRouteEncoder
   allRoutes = emanoteGeneratableRoutes
 
-instance CanRender SiteRoute where
-  routeAsset = View.emanoteRouteAsset
-
-instance HasModel SiteRoute where
-  type ModelInput SiteRoute = EmanoteConfig
-  modelDynamic = emanoteModelDynamic
+instance EmaSite SiteRoute where
+  type SiteArg SiteRoute = EmanoteConfig
+  siteInput = emanoteModelDynamic
+  siteOutput = View.emanoteRouteAsset
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
