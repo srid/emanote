@@ -1,7 +1,0 @@
-builds:
-  include:
-    - 'packages.x86_64-linux.*'
-    - 'packages.aarch64-darwin.*'
-    - 'devShell.x86_64-linux'
-    - 'devShell.aarch64-darwin'
-  exclude: []
