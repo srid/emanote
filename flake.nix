@@ -18,7 +18,7 @@
     pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
 
-    # https://github.com/well-typed/ixset-typed/pull/16
+    # 0.5.1.0 is broken on nixpkgs
     ixset-typed.url = "github:well-typed/ixset-typed";
     ixset-typed.flake = false;
 
