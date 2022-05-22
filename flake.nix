@@ -8,7 +8,7 @@
     ema.url = "github:srid/ema/multisite";
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.nixpkgs.url = "nixpkgs";
+    tailwind-haskell.inputs.ema.follows = "ema";
     flake-utils.follows = "ema/flake-utils";
     flake-compat.follows = "ema/flake-compat";
 
