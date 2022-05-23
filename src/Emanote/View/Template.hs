@@ -121,7 +121,7 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withLoadingMessage . C.renderModelTemplate model templateName $ do
+  pure "<!DOCTYPE html>\n" <> withLoadingMessage . C.renderModelTemplate model templateName $ do
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
