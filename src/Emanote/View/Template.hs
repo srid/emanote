@@ -117,8 +117,8 @@ renderLmlHtml model note = do
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       ctx = C.mkTemplateRenderCtx model r meta
       templateName = lookupTemplateName meta
-      -- Force a doctype into the generated HTML. This should probably be done by Heist.
-      -- Issue tracker: https://github.com/srid/emanote/issues/216
+      -- Force a doctype into the generated HTML as a workaround for Heist
+      -- discarding it. See: https://github.com/srid/emanote/issues/216
       withDoctype = ("<!DOCTYPE html>\n" <>)
       withLoadingMessage =
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
