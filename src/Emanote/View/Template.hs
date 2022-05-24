@@ -117,54 +117,58 @@ renderLmlHtml model note = do
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       ctx = C.mkTemplateRenderCtx model r meta
       templateName = lookupTemplateName meta
+      -- Force a doctype into the generated HTML. This should probably be done by Heist.
+      -- Issue tracker: https://github.com/srid/emanote/issues/216
+      withDoctype = ("<!DOCTYPE html>\n" <>)
       withLoadingMessage =
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  pure "<!DOCTYPE html>\n" <> withLoadingMessage . C.renderModelTemplate model templateName $ do
-    C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
-    let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
-          Splices.listSplice bs "backlink" $
-            \(source, contexts) -> do
-              let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute source model
-                  bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
-                  bctx = C.mkTemplateRenderCtx model source bmeta
-              -- TODO: reuse note splice
-              "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
-              "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
-              "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                "context:body" ## C.withInlineCtx bctx $ \ctx' ->
-                  Splices.pandocSplice ctx' ctxDoc
-    -- Sidebar navigation
-    routeTreeSplice ctx (Just r) model
-    "ema:breadcrumbs"
-      ## C.routeBreadcrumbs ctx model r
-    -- Note stuff
-    "ema:note:title"
-      ## C.titleSplice ctx (note ^. MN.noteTitle)
-    let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
-    "ema:note:source-path"
-      ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
-    "ema:note:backlinks"
-      ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
-    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
-    "ema:note:backlinks:daily"
-      ## backlinksSplice backlinksDaily
-    "ema:note:backlinks:nodaily"
-      ## backlinksSplice backlinksNoDaily
-    let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
-    "ema:note:uptree"
-      ## Splices.treeSplice (const ()) folgeAnc
-      $ \(last -> nodeRoute) children -> do
-        "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
-        "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
-        "tree:open" ## Heist.ifElseISplice (not . null $ children)
-    "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
-    "ema:note:pandoc"
-      ## C.withBlockCtx ctx
-      $ \ctx' ->
-        Splices.pandocSplice ctx' (prepareNoteDoc $ MN._noteDoc note)
+  withDoctype $
+    withLoadingMessage . C.renderModelTemplate model templateName $ do
+      C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
+      let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
+            Splices.listSplice bs "backlink" $
+              \(source, contexts) -> do
+                let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute source model
+                    bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
+                    bctx = C.mkTemplateRenderCtx model source bmeta
+                -- TODO: reuse note splice
+                "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
+                "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
+                "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
+                  let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                  "context:body" ## C.withInlineCtx bctx $ \ctx' ->
+                    Splices.pandocSplice ctx' ctxDoc
+      -- Sidebar navigation
+      routeTreeSplice ctx (Just r) model
+      "ema:breadcrumbs"
+        ## C.routeBreadcrumbs ctx model r
+      -- Note stuff
+      "ema:note:title"
+        ## C.titleSplice ctx (note ^. MN.noteTitle)
+      let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
+      "ema:note:source-path"
+        ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
+      "ema:note:backlinks"
+        ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
+      let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
+      "ema:note:backlinks:daily"
+        ## backlinksSplice backlinksDaily
+      "ema:note:backlinks:nodaily"
+        ## backlinksSplice backlinksNoDaily
+      let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
+      "ema:note:uptree"
+        ## Splices.treeSplice (const ()) folgeAnc
+        $ \(last -> nodeRoute) children -> do
+          "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
+          "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
+          "tree:open" ## Heist.ifElseISplice (not . null $ children)
+      "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
+      "ema:note:pandoc"
+        ## C.withBlockCtx ctx
+        $ \ctx' ->
+          Splices.pandocSplice ctx' (prepareNoteDoc $ MN._noteDoc note)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
