@@ -117,11 +117,14 @@ renderLmlHtml model note = do
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       ctx = C.mkTemplateRenderCtx model r meta
       templateName = lookupTemplateName meta
+      -- Force a doctype into the generated HTML as a workaround for Heist
+      -- discarding it. See: https://github.com/srid/emanote/issues/216
+      withDoctype = ("<!DOCTYPE html>\n" <>)
       withLoadingMessage =
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withLoadingMessage . C.renderModelTemplate model templateName $ do
+  withDoctype . withLoadingMessage . C.renderModelTemplate model templateName $ do
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
