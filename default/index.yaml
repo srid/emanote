@@ -25,7 +25,7 @@ template:
   uptree:
     # Class to apply for uptree's nodes
     nodeClass: text-gray-900
-  # List of available colors: https://tailwindcss.com/docs/customizing-colors
+  # List of available colors: https://v2.tailwindcss.com/docs/customizing-colors#default-color-palette
   theme: blue
   # Value of the <base> tag.
   baseUrl: /
