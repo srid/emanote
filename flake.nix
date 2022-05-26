@@ -1,8 +1,8 @@
 {
   description = "emanote";
   nixConfig = {
-    extra-substituters = "https://srid.cachix.org";
-    extra-trusted-public-keys = "srid.cachix.org-1:MTQ6ksbfz3LBMmjyPh0PLmos+1x+CdtJxA/J2W+PQxI=";
+    extra-substituters = "https://cache.garnix.io";
+    extra-trusted-public-keys = "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=";
   };
   inputs = {
     ema.url = "github:srid/ema/multisite";
