@@ -51,7 +51,7 @@
           };
         };
         emanote = {
-          package = inputs.self.packages.${system}.emanote;
+          package = inputs.self.packages.${system}.default;
           sites = {
             "docs" = {
               path = ./docs;
