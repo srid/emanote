@@ -33,7 +33,18 @@ in
                       path = mkOption {
                         type = types.path;
                         description = ''Path to the main Emanote layer'';
-                        default = "${self}";
+                      };
+                      # HACK: I can't seem to be able to convert `path` to a
+                      # relative local path; so this is necessary.
+                      pathString = mkOption {
+                        type = types.str;
+                        description = ''Like `path` but local (not in Nix store)'';
+                      };
+                      port = mkOption {
+                        type = types.int;
+                        description = ''Port to listen on'';
+                        default = 0;
+                        defaultText = ''Random port'';
                       };
                       allowBrokenLinks = mkOption {
                         type = types.bool;
@@ -61,9 +72,8 @@ in
                   name = "emanoteRun.sh";
                   text = ''
                     set -xe
-                    # Use `emanote run --port=8081` if you want to run Emanote at
-                    # a particular port.
-                    cd ${cfg.path} && ${config.emanote.package}/bin/emanote
+                    cd ${cfg.pathString} 
+                    ${config.emanote.package}/bin/emanote ${if cfg.port == 0 then "" else "-p ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
               };
