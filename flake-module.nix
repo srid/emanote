@@ -91,22 +91,16 @@ in
                   '';
             })
             config.emanote.sites;
-        # Inject a 'default' attr if the attrset is a singleton set.
-        withDefault = attrs:
-          let xs = lib.attrValues attrs; in
-          if builtins.length xs == 1
-          then attrs // { default = mkDefault (builtins.head xs); }
-          else attrs;
       in
       {
         packages =
-          withDefault (lib.mapAttrs
+          lib.mapAttrs
             (_: site: site.package)
-            sites);
+            sites;
         apps =
-          withDefault (lib.mapAttrs
+          lib.mapAttrs
             (_: site: site.app)
-            sites);
+            sites;
       };
   };
 }
