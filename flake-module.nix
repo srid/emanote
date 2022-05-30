@@ -95,15 +95,15 @@ in
         packages =
           withDefault (lib.mapAttrs
             (_: project: project.package)
-            projects);
+            sites);
         apps =
           withDefault (lib.mapAttrs
             (_: project: project.app)
-            projects);
+            sites);
         devShells =
           withDefault (lib.mapAttrs
             (_: project: project.devShell)
-            projects);
+            sites);
       };
   };
 }
