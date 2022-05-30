@@ -19,7 +19,7 @@ let
         }
       )
       { };
-  emanote = (import ./.).defaultPackage.x86_64-linux;
+  emanote = (import ./.).packages.x86_64-linux.default;
 in
 { name ? "sridca/emanote"
 , tag ? "dev"
