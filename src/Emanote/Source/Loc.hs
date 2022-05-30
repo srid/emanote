@@ -13,7 +13,7 @@ module Emanote.Source.Loc
 
     -- * Dealing with layers of locs
     LocLayers,
-    immediateLayer,
+    primaryLayer,
   )
 where
 
@@ -33,9 +33,16 @@ data Loc
 
 type LocLayers = Set Loc
 
--- | Return the `Loc` with highest precedence.
-immediateLayer :: HasCallStack => LocLayers -> Loc
-immediateLayer = Set.findMin
+-- | Return the "primary" `LocUser` layer (that which are not overrides).
+--
+-- Assumes that the user has put it always by last; i.e, `-L foo;primary/layer`.
+primaryLayer :: HasCallStack => LocLayers -> Loc
+primaryLayer =
+  Set.findMax . Set.filter isUserLayer
+  where
+    isUserLayer = \case
+      LocUser _ _ -> True
+      _ -> False
 
 defaultLayer :: FilePath -> Loc
 defaultLayer = LocDefault

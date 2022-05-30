@@ -1,0 +1,118 @@
+# A flake-parts module for building and running Emanote sites
+{ self, config, lib, flake-parts-lib, ... }:
+
+let
+  inherit (flake-parts-lib)
+    mkSubmoduleOptions
+    mkPerSystemOption;
+  inherit (lib)
+    mkOption
+    mkDefault
+    types;
+  inherit (types)
+    functionTo
+    raw;
+in
+{
+  options = {
+    perSystem = mkPerSystemOption
+      ({ config, self', inputs', pkgs, system, ... }: {
+        options.emanote = mkOption
+          {
+            description = "Emanote sites config";
+            type = types.submodule {
+              options = {
+                package = mkOption {
+                  description = "Emanote package to use";
+                  type = types.package;
+                };
+                sites = mkOption {
+                  description = "Emanote sites";
+                  type = types.attrsOf (types.submodule {
+                    options = {
+                      path = mkOption {
+                        type = types.path;
+                        description = ''Path to the main Emanote layer'';
+                      };
+                      # HACK: I can't seem to be able to convert `path` to a
+                      # relative local path; so this is necessary.
+                      #
+                      # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
+                      pathString = mkOption {
+                        type = types.str;
+                        description = ''Like `path` but local (not in Nix store)'';
+                      };
+                      port = mkOption {
+                        type = types.int;
+                        description = ''Port to listen on'';
+                        default = 0;
+                        defaultText = ''Random port'';
+                      };
+                      allowBrokenLinks = mkOption {
+                        type = types.bool;
+                        description = ''Allow broken links in the static site'';
+                        default = false;
+                      };
+                    };
+                  });
+                };
+              };
+            };
+          };
+      });
+  };
+  config = {
+    perSystem = { config, self', inputs', pkgs, ... }:
+      let
+        sites =
+          lib.mapAttrs
+            (name: cfg: {
+              app = {
+                type = "app";
+                # '' is required for escaping ${} in nix
+                program = (pkgs.writeShellApplication {
+                  name = "emanoteRun.sh";
+                  text = ''
+                    set -xe
+                    cd ${cfg.pathString} 
+                    ${config.emanote.package}/bin/emanote ${if cfg.port == 0 then "" else "-p ${toString cfg.port}"}
+                  '';
+                }) + /bin/emanoteRun.sh;
+              };
+              package =
+                let
+                  # TODO: Make these options
+                  configFile = (pkgs.formats.yaml { }).generate "emanote-index.yaml" {
+                    template = {
+                      baseUrl = "/";
+                      urlStrategy = "direct";
+                    };
+                  };
+                  configDir = pkgs.runCommand "emanote-deploy-layer" { } ''
+                    mkdir -p $out
+                    cp ${configFile} $out/index.yaml
+                  '';
+                in
+                pkgs.runCommand "emanote-static-website" { }
+                  ''
+                    mkdir $out
+                    ${config.emanote.package}/bin/emanote \
+                    --layers "${configDir};${cfg.path}" \
+                    ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
+                      gen $out
+                  '';
+            })
+            config.emanote.sites;
+      in
+      {
+        packages =
+          lib.mapAttrs
+            (_: site: site.package)
+            sites;
+        apps =
+          lib.mapAttrs
+            (_: site: site.app)
+            sites;
+      };
+  };
+}

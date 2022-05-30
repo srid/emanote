@@ -26,8 +26,9 @@
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
+        ./flake-module.nix
       ];
-      perSystem = { pkgs, system, inputs', ... }: {
+      perSystem = { pkgs, system, inputs', self', ... }: {
         haskellProjects.emanote = {
           buildTools = hp: {
             inherit (pkgs)
@@ -36,7 +37,7 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            tailwind-haskell = inputs.tailwind-haskell.defaultPackage.${system};
+            tailwind-haskell = inputs'.tailwind-haskell.packages.tailwind;
           };
           overrides = self: super: with pkgs.haskell.lib; {
             ema = inputs'.ema.packages.default;
@@ -48,9 +49,20 @@
             pandoc-link-context = inputs.pandoc-link-context;
           };
         };
+        emanote = {
+          package = inputs.self.packages.${system}.emanote;
+          sites = {
+            "docs" = {
+              path = ./docs;
+              pathString = "./docs";
+              allowBrokenLinks = true; # A couple, by design, in demo.md
+            };
+          };
+        };
       };
       flake = {
         homeManagerModule = import ./home-manager-module.nix;
+        flakeModule = import ./flake-module.nix;
       };
     };
 }
