@@ -26,6 +26,7 @@
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
+        ./flake-module.nix
       ];
       perSystem = { pkgs, system, inputs', self', ... }: {
         haskellProjects.emanote = {
@@ -46,6 +47,15 @@
           };
           source-overrides = {
             pandoc-link-context = inputs.pandoc-link-context;
+          };
+        };
+        emanote = {
+          package = inputs.self.packages.${system}.emanote;
+          sites = {
+            "docs" = {
+              path = ./docs;
+              allowBrokenLinks = true; # A couple, by design, in demo.md
+            };
           };
         };
       };
