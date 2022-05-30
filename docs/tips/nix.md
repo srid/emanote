@@ -33,7 +33,7 @@ in {
     notes = [
       "/home/user/notes"  # add as many layers as you like
     ];
-    package = emanote.defaultPackage.${builtins.currentSystem};
+    package = emanote.packages.${builtins.currentSystem}.default;
   };
 }
 ```
