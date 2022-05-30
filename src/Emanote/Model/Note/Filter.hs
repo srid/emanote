@@ -31,7 +31,7 @@ mkLuaFilter relPath = do
     then do
       liftIO (doesFileExist relPath) >>= \case
         True -> pure $ Right $ PF.LuaFilter relPath
-        False -> pure $ Left $ toText $ relPath <> " is missing"
+        False -> pure $ Left $ toText $ "Lua filter missing: " <> relPath
     else pure $ Left $ "Unsupported filter: " <> toText relPath
 
 applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
