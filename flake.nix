@@ -13,7 +13,7 @@
     flake-compat.flake = false;
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs.follows = "nixpkgs";
-    haskell-flake.url = "github:srid/haskell-flake/overrides";
+    haskell-flake.url = "github:srid/haskell-flake";
 
     pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
@@ -47,12 +47,10 @@
           overrides = self: super: with pkgs.haskell.lib; {
             ema = inputs'.ema.packages.default;
             tailwind = inputs'.tailwind-haskell.packages.tailwind;
-            heist-emanote = dontCheck super.heist;
+            heist-emanote = dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { });
             ixset-typed = doJailbreak (dontCheck super.ixset-typed);
           };
           source-overrides = {
-            # Jailbreak heist to allow newer dlist
-            heist-emanote = inputs.heist;
             ixset-typed = inputs.ixset-typed;
             pandoc-link-context = inputs.pandoc-link-context;
           };
