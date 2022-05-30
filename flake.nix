@@ -27,7 +27,7 @@
       imports = [
         haskell-flake.flakeModule
       ];
-      perSystem = { pkgs, system, inputs', ... }: {
+      perSystem = { pkgs, system, inputs', self', ... }: {
         haskellProjects.emanote = {
           buildTools = hp: {
             inherit (pkgs)
@@ -36,7 +36,7 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            tailwind-haskell = inputs.tailwind-haskell.defaultPackage.${system};
+            tailwind-haskell = inputs'.tailwind-haskell.packages.tailwind;
           };
           overrides = self: super: with pkgs.haskell.lib; {
             ema = inputs'.ema.packages.default;
@@ -51,6 +51,7 @@
       };
       flake = {
         homeManagerModule = import ./home-manager-module.nix;
+        flakeModule = import ./flake-module.nix;
       };
     };
 }
