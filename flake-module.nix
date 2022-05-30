@@ -95,15 +95,11 @@ in
       {
         packages =
           withDefault (lib.mapAttrs
-            (_: project: project.package)
+            (_: site: site.package)
             sites);
         apps =
           withDefault (lib.mapAttrs
-            (_: project: project.app)
-            sites);
-        devShells =
-          withDefault (lib.mapAttrs
-            (_: project: project.devShell)
+            (_: site: site.app)
             sites);
       };
   };
