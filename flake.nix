@@ -9,8 +9,11 @@
     nixpkgs.follows = "ema/nixpkgs";
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.ema.follows = "ema";
-    flake-utils.follows = "ema/flake-utils";
-    flake-compat.follows = "ema/flake-compat";
+    flake-compat.url = "github:edolstra/flake-compat";
+    flake-compat.flake = false;
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs.follows = "nixpkgs";
+    haskell-flake.url = "github:srid/haskell-flake/overrides";
 
     pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
@@ -24,56 +27,33 @@
       flake = false;
     };
   };
-  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem
-      (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          project = returnShellEnv:
-            pkgs.haskellPackages.developPackage {
-              inherit returnShellEnv;
-              name = "emanote";
-              root = ./.;
-              withHoogle = true;
-              overrides = self: super: with pkgs.haskell.lib; {
-                ema = inputs.ema.defaultPackage.${system};
-                tailwind = inputs.tailwind-haskell.defaultPackage.${system};
-
-                pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
-
-                # Jailbreak heist to allow newer dlist
-                heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));
-                ixset-typed = doJailbreak (dontCheck (self.callCabal2nix "ixset-typed" inputs.ixset-typed { }));
-              };
-              modifier = drv:
-                pkgs.haskell.lib.addBuildTools drv
-                  (with pkgs.haskellPackages; pkgs.lib.lists.optionals returnShellEnv [
-                    # Specify your build/dev dependencies here. 
-                    cabal-install
-                    ghcid
-                    haskell-language-server
-
-                    # Auto-formatters (used by editors, in nix-shell)
-                    cabal-fmt
-                    ormolu
-                    pkgs.nixpkgs-fmt
-                    pkgs.treefmt
-
-                    inputs.tailwind-haskell.defaultPackage.${system}
-                  ]);
-            };
-        in
-        rec {
-          defaultPackage = packages.default;
-
-          # Used by `nix build` & `nix run`
-          packages.default = project false;
-
-          # Used by `nix develop`
-          devShell = project true;
-        }) //
-    {
-      homeManagerModule = import ./home-manager-module.nix;
-      herculesCI.ciSystems = [ "x86_64-linux" ];
+  outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
+    flake-parts.lib.mkFlake { inherit self; } {
+      systems = nixpkgs.lib.systems.flakeExposed;
+      imports = [
+        haskell-flake.flakeModule
+      ];
+      perSystem = { self', system, inputs', pkgs, ... }: {
+        haskellProjects.emanote = {
+          buildTools = hp: {
+            inherit (pkgs)
+              treefmt
+              nixpkgs-fmt;
+            inherit (hp)
+              cabal-fmt
+              ormolu;
+            tailwind-haskell = inputs'.tailwind-haskell.defaultPackage;
+          };
+          overrides = self: super: with pkgs.haskell.lib; {
+            ema = inputs'.ema.packages.default;
+            tailwind = inputs.tailwind-haskell.defaultPackage.${system};
+            # Jailbreak heist to allow newer dlist
+            heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));
+            ixset-typed = doJailbreak (dontCheck (self.callCabal2nix "ixset-typed" inputs.ixset-typed { }));
+            pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
+          };
+        };
+      };
     };
+
 }
