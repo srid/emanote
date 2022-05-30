@@ -56,5 +56,9 @@
           };
         };
       };
+
+      flake = {
+        homeManagerModule = import ./home-manager-module.nix;
+      };
     };
 }
