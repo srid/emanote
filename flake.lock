@@ -157,22 +157,6 @@
         "type": "github"
       }
     },
-    "ixset-typed": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1652177108,
-        "narHash": "sha256-g0N1jiumsxHzfo9SGVR+q9awRvHEehSRaoW89LXCCnY=",
-        "owner": "well-typed",
-        "repo": "ixset-typed",
-        "rev": "244d3b72fd051b8d78f2d4edb6208269f29d85b7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "well-typed",
-        "repo": "ixset-typed",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1653581809,
@@ -227,7 +211,6 @@
         "flake-parts": "flake-parts_2",
         "haskell-flake": "haskell-flake_2",
         "heist": "heist",
-        "ixset-typed": "ixset-typed",
         "nixpkgs": [
           "ema",
           "nixpkgs"

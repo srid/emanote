@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.6.7.1
+version:            0.6.7.2
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -108,7 +108,7 @@ common library-common
     , filepattern
     , fsnotify
     , hedgehog
-    , heist-emanote          >=1.2
+    , heist-emanote          >=1.2.1
     , hspec
     , hspec-hedgehog
     , ixset-typed >= 0.5.1.0

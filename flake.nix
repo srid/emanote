@@ -7,25 +7,19 @@
   inputs = {
     ema.url = "github:srid/ema/multisite";
     nixpkgs.follows = "ema/nixpkgs";
-    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.ema.follows = "ema";
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
 
+    # Haskell dependency overrides
+    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
+    tailwind-haskell.inputs.ema.follows = "ema";
     pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
-
-    # 0.5.1.0 is broken on nixpkgs
-    ixset-typed.url = "github:well-typed/ixset-typed";
-    ixset-typed.flake = false;
-
-    heist = {
-      url = "github:srid/heist/emanote";
-      flake = false;
-    };
+    heist.url = "github:srid/heist/emanote";
+    heist.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
@@ -48,10 +42,9 @@
             ema = inputs'.ema.packages.default;
             tailwind = inputs'.tailwind-haskell.packages.tailwind;
             heist-emanote = dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { });
-            ixset-typed = doJailbreak (dontCheck super.ixset-typed);
+            ixset-typed = doJailbreak (dontCheck (self.callHackage "ixset-typed" "0.5.1.0" { })); # Broken on nixpkgs
           };
           source-overrides = {
-            ixset-typed = inputs.ixset-typed;
             pandoc-link-context = inputs.pandoc-link-context;
           };
         };
