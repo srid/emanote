@@ -127,11 +127,11 @@
     },
     "haskell-flake_2": {
       "locked": {
-        "lastModified": 1653918548,
-        "narHash": "sha256-vmk0tmk+qdGlJ3SxMAmvH+d1+j5WsNlcVooblIwqyVI=",
+        "lastModified": 1653920522,
+        "narHash": "sha256-KJLh82lnYCznG2CeQYApw4QI38esdoE/v6a/cnZq7NQ=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "878c4de835d717a049dd8f7b09f23aebe7f01060",
+        "rev": "7131248f3449724b8752040e1ae439a1324af84d",
         "type": "github"
       },
       "original": {
@@ -144,11 +144,11 @@
     "heist": {
       "flake": false,
       "locked": {
-        "lastModified": 1653169917,
-        "narHash": "sha256-i52wi4nNC6ATx8gTtmpLnxQZEhKSM0LbpmSu57d5VqI=",
+        "lastModified": 1653920837,
+        "narHash": "sha256-GUHQy909iroTNSkrk15/f1Ht9eWB3A5rF//wfRzhGy8=",
         "owner": "srid",
         "repo": "heist",
-        "rev": "75533cade1a0d9859ff487cbf6f22e98711248d3",
+        "rev": "988692ea850b3cbe966c7dc4dd26ba1d49647706",
         "type": "github"
       },
       "original": {

@@ -33,7 +33,7 @@
       imports = [
         haskell-flake.flakeModule
       ];
-      perSystem = { self', system, inputs', pkgs, ... }: {
+      perSystem = { pkgs, system, inputs', ... }: {
         haskellProjects.emanote = {
           buildTools = hp: {
             inherit (pkgs)
@@ -42,15 +42,19 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            tailwind-haskell = inputs'.tailwind-haskell.defaultPackage;
+            tailwind-haskell = inputs.tailwind-haskell.defaultPackage.${system};
           };
           overrides = self: super: with pkgs.haskell.lib; {
             ema = inputs'.ema.packages.default;
-            tailwind = inputs.tailwind-haskell.defaultPackage.${system};
+            tailwind = inputs'.tailwind-haskell.packages.tailwind;
+            heist-emanote = dontCheck super.heist;
+            ixset-typed = doJailbreak (dontCheck super.ixset-typed);
+          };
+          source-overrides = {
             # Jailbreak heist to allow newer dlist
-            heist-emanote = doJailbreak (dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { }));
-            ixset-typed = doJailbreak (dontCheck (self.callCabal2nix "ixset-typed" inputs.ixset-typed { }));
-            pandoc-link-context = self.callCabal2nix "pandoc-link-context" inputs.pandoc-link-context { };
+            heist-emanote = inputs.heist;
+            ixset-typed = inputs.ixset-typed;
+            pandoc-link-context = inputs.pandoc-link-context;
           };
         };
       };
