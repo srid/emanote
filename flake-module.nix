@@ -58,12 +58,13 @@ in
                     set -xe
                     # Use `emanote run --port=8081` if you want to run Emanote at
                     # a particular port.
-                    cd ./content && ${config.emanote.package}/bin/emanote
+                    cd ${cfg.path} && ${config.emanote.package}/bin/emanote
                   '';
                 }) + /bin/emanoteRun.sh;
               };
               package =
                 let
+                  # TODO: Make these options
                   configFile = (pkgs.formats.yaml { }).generate "emanote-index.yaml" {
                     template = {
                       baseUrl = "/";
@@ -79,7 +80,7 @@ in
                   ''
                     mkdir $out
                     ${config.emanote.package}/bin/emanote \
-                    --layers "${configDir};${self}/content" \
+                    --layers "${configDir};${cfg.path}" \
                       gen $out
                   '';
             })
