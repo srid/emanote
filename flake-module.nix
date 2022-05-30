@@ -19,7 +19,7 @@ in
       ({ config, self', inputs', pkgs, system, ... }: {
         options.emanote = mkOption
           {
-            description "Emanote sites config";
+            description = "Emanote sites config";
             type = types.submodule {
               options = {
                 package = mkOption {
