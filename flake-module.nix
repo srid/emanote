@@ -35,6 +35,11 @@ in
                         description = ''Path to the main Emanote layer'';
                         default = "${self}";
                       };
+                      allowBrokenLinks = mkOption {
+                        type = types.bool;
+                        description = ''Allow broken links in the static site'';
+                        default = false;
+                      };
                     };
                   });
                 };
@@ -81,6 +86,7 @@ in
                     mkdir $out
                     ${config.emanote.package}/bin/emanote \
                     --layers "${configDir};${cfg.path}" \
+                    ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                       gen $out
                   '';
             })
