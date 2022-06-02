@@ -9,7 +9,7 @@
     flake-compat.flake = false;
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs.follows = "nixpkgs";
-    haskell-flake.url = "github:srid/haskell-flake";
+    haskell-flake.url = "github:srid/haskell-flake/expose-overrides";
 
     # Haskell dependency overrides
     ema.url = "github:srid/ema/multisite";
