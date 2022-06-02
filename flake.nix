@@ -16,10 +16,12 @@
     ema.flake = false;
     pandoc-link-context.url = "github:srid/pandoc-link-context/master";
     pandoc-link-context.flake = false;
-    heist.url = "github:srid/heist/emanote";
-    heist.flake = false;
+    heist-emanote.url = "github:srid/heist/emanote";
+    heist-emanote.flake = false;
+    ixset-typed.url = "github:well-typed/ixset-typed";
+    ixset-typed.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.ema.follows = "ema";
+    tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
@@ -38,16 +40,20 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            tailwind-haskell = inputs'.tailwind-haskell.packages.tailwind;
-          };
-          overrides = self: super: with pkgs.haskell.lib; {
-            tailwind = inputs'.tailwind-haskell.packages.tailwind;
-            heist-emanote = dontCheck (self.callCabal2nix "heist-emanote" inputs.heist { });
-            ixset-typed = doJailbreak (dontCheck (self.callHackage "ixset-typed" "0.5.1.0" { })); # Broken on nixpkgs
+            inherit (inputs'.tailwind-haskell.packages)
+              tailwind;
           };
           source-overrides = {
-            ema = inputs.ema;
-            pandoc-link-context = inputs.pandoc-link-context;
+            inherit (inputs)
+              ema
+              pandoc-link-context
+              heist-emanote
+              ixset-typed;
+          };
+          overrides = self: super: with pkgs.haskell.lib; {
+            heist-emanote = dontCheck super.heist-emanote; # Tests are broken.
+            inherit (inputs'.tailwind-haskell.packages)
+              tailwind;
           };
         };
         emanote = {
