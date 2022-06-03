@@ -17,4 +17,4 @@ For another example, notice how the demo section of this website has a different
 
 ## Examples
 
-- https://github.com/srid/www.srid.ca/blob/master/index.yaml
+- https://github.com/srid/srid/blob/master/content/index.yaml
