@@ -18,6 +18,7 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
@@ -28,6 +29,7 @@ import Relude
 import System.FilePath ((</>))
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Walk qualified as W
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -197,9 +199,29 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  Note someR doc meta (queryNoteTitle someR doc meta) []
+  mkNoteWith someR doc meta mempty
   where
     meta = Aeson.Null
+
+mkNoteWith :: R.LMLRoute -> Pandoc -> Aeson.Value -> [Text] -> Note
+mkNoteWith r doc' meta errs =
+  let doc = if null errs then doc' else pandocPrepend (errorDiv errs) doc'
+      tit = queryNoteTitle r doc' meta
+   in Note r doc meta tit errs
+  where
+    -- Prepend to block to the beginning of a Pandoc document (never before H1)
+    pandocPrepend :: B.Block -> Pandoc -> Pandoc
+    pandocPrepend prefix (Pandoc docMeta blocks) =
+      let blocks' = case blocks of
+            (h1@(B.Header 1 _ _) : rest) ->
+              h1 : prefix : rest
+            _ -> prefix : blocks
+       in Pandoc docMeta blocks'
+    errorDiv :: [Text] -> B.Block
+    errorDiv s =
+      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
+      where
+        cls x = ("", one x, mempty) :: B.Attr
 
 parseNote ::
   forall m.
@@ -210,26 +232,36 @@ parseNote ::
   Text ->
   m Note
 parseNote pluginBaseDir r fp md = do
-  ((doc', meta), errs) <- runWriterT $ do
+  ((doc, meta), errs) <- runWriterT $ do
     case Markdown.parseMarkdown fp md of
       Left err -> do
         tell [err]
-        pure (Pandoc mempty [], defaultFrontMatter)
-      Right (withAesonDefault defaultFrontMatter -> frontmatter, doc) -> do
+        pure (mempty, defaultFrontMatter)
+      Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
+        -- Apply the various transformation filters.
+        --
+        -- Some are user-defined; some builtin. They operate on Pandoc, or the
+        -- frontmatter meta.
         let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-        doc' <- applyPandocFilters filterPaths doc
-        pure (doc', addTagsFromBody doc' frontmatter)
-  let doc = if null errs then doc' else pandocPrepend (errorDiv errs) doc'
-  pure $ Note r doc meta (queryNoteTitle r doc meta) errs
+        doc <- applyPandocFilters filterPaths doc'
+        let meta = applyNoteMetaFilters doc frontmatter
+        pure (doc, meta)
+  pure $ mkNoteWith r doc meta errs
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv
         `SData.mergeAeson` default_
     defaultFrontMatter =
       Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
+
+applyNoteMetaFilters :: Pandoc -> Aeson.Value -> Aeson.Value
+applyNoteMetaFilters doc =
+  addTagsFromBody
+    >>> addDescriptionFromBody
+  where
     -- Merge frontmatter tags with inline tags in Pandoc document.
     -- DESIGN: In retrospect, this is like a Pandoc lua filter?
-    addTagsFromBody doc frontmatter =
+    addTagsFromBody frontmatter =
       frontmatter
         & AO.key "tags" % AO._Array
         .~ ( fromList . fmap Aeson.toJSON $
@@ -237,19 +269,18 @@ parseNote pluginBaseDir r fp md = do
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
-    -- Prepend to block to the beginning of a Pandoc document (never before H1)
-    pandocPrepend :: B.Block -> Pandoc -> Pandoc
-    pandocPrepend prefix (Pandoc meta blocks) =
-      let blocks' = case blocks of
-            (h1@(B.Header 1 _ _) : rest) ->
-              h1 : prefix : rest
-            _ -> prefix : blocks
-       in Pandoc meta blocks'
-    errorDiv :: [Text] -> B.Block
-    errorDiv s =
-      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
-      where
-        cls x = ("", one x, mempty) :: B.Attr
+    addDescriptionFromBody frontmatter =
+      SData.mergeAesons $
+        frontmatter
+          :| maybeToList
+            ( do
+                let k = "page" :| ["description"]
+                guard $ "" == lookupAeson @Text "" k frontmatter
+                firstPara <- viaNonEmpty head . flip W.query doc $ \case
+                  B.Para is -> [is]
+                  _ -> mempty
+                pure $ oneAesonText (toList k) $ plainify firstPara
+            )
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
