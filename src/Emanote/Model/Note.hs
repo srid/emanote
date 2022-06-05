@@ -18,6 +18,7 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
+import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
@@ -28,6 +29,7 @@ import Relude
 import System.FilePath ((</>))
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Walk qualified as W
 
 data Note = Note
   { _noteRoute :: R.LMLRoute,
@@ -255,6 +257,7 @@ parseNote pluginBaseDir r fp md = do
 applyNoteMetaFilters :: Pandoc -> Aeson.Value -> Aeson.Value
 applyNoteMetaFilters doc =
   addTagsFromBody
+    >>> addDescriptionFromBody
   where
     -- Merge frontmatter tags with inline tags in Pandoc document.
     -- DESIGN: In retrospect, this is like a Pandoc lua filter?
@@ -266,6 +269,18 @@ applyNoteMetaFilters doc =
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
+    addDescriptionFromBody frontmatter =
+      SData.mergeAesons $
+        frontmatter
+          :| maybeToList
+            ( do
+                let k = "page" :| ["description"]
+                guard $ "" == lookupAeson @Text "" k frontmatter
+                firstPara <- viaNonEmpty head . flip W.query doc $ \case
+                  B.Para is -> [is]
+                  _ -> mempty
+                pure $ oneAesonText (toList k) $ plainify firstPara
+            )
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
