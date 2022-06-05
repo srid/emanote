@@ -65,7 +65,14 @@ page:
   siteTitle: My Emanote Site
   # Desription is expected to be set on a per-page basis.
   # By default, the first paragraph is used for description.
+  # Used for https://ogp.me/
   description: ""
+
+  # Image URL for previews.
+  # By default, the first image URL is used. Note: wikilink are not yet
+  # supported.
+  # Used for https://ogp.me/
+  image: ""
 
   # Put anything that should go in <head> of these routes here:
   # You can reference other metadata keys using <snippet var=".." />

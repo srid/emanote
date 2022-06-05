@@ -11,6 +11,7 @@
     <with var="page">
       <meta property="og:description" content="${value:description}" />
       <meta property="og:site_name" content="${value:siteTitle}" />
+      <meta property="og:image" content="${value:image}" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="${ema:title}" />
     </with>

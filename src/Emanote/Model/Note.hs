@@ -258,6 +258,7 @@ applyNoteMetaFilters :: Pandoc -> Aeson.Value -> Aeson.Value
 applyNoteMetaFilters doc =
   addTagsFromBody
     >>> addDescriptionFromBody
+    >>> addImageFromBody
   where
     -- Merge frontmatter tags with inline tags in Pandoc document.
     -- DESIGN: In retrospect, this is like a Pandoc lua filter?
@@ -280,6 +281,20 @@ applyNoteMetaFilters doc =
                   B.Para is -> [is]
                   _ -> mempty
                 pure $ oneAesonText (toList k) $ plainify firstPara
+            )
+    -- FIXME this doesn't take splice rendering into account. Specifically,
+    -- `![[foo.jpeg]]` is not handled at all.
+    addImageFromBody frontmatter =
+      SData.mergeAesons $
+        frontmatter
+          :| maybeToList
+            ( do
+                let k = "page" :| ["image"]
+                guard $ "" == lookupAeson @Text "" k frontmatter
+                firstImage <- viaNonEmpty head . flip W.query doc $ \case
+                  B.Image _ _ (url, _) -> [url]
+                  _ -> mempty
+                pure $ oneAesonText (toList k) firstImage
             )
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
