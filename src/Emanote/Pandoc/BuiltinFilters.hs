@@ -11,6 +11,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
+-- TODO: Run this in `parseNote`?
 prepareNoteDoc :: B.Pandoc -> B.Pandoc
 prepareNoteDoc =
   preparePandoc
