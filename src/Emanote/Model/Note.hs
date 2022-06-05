@@ -270,31 +270,25 @@ applyNoteMetaFilters doc =
                  lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
-    addDescriptionFromBody frontmatter =
-      SData.mergeAesons $
-        frontmatter
-          :| maybeToList
-            ( do
-                let k = "page" :| ["description"]
-                guard $ "" == lookupAeson @Text "" k frontmatter
-                firstPara <- viaNonEmpty head . flip W.query doc $ \case
-                  B.Para is -> [is]
-                  _ -> mempty
-                pure $ oneAesonText (toList k) $ plainify firstPara
-            )
+    addDescriptionFromBody =
+      overrideAesonText ("page" :| ["description"]) $ \case
+        B.Para is -> [plainify is]
+        _ -> mempty
     -- FIXME this doesn't take splice rendering into account. Specifically,
     -- `![[foo.jpeg]]` is not handled at all.
-    addImageFromBody frontmatter =
+    addImageFromBody =
+      overrideAesonText ("page" :| ["image"]) $ \case
+        B.Image _ _ (url, _) -> [url]
+        _ -> mempty
+    overrideAesonText :: forall a. (W.Walkable a Pandoc) => NonEmpty Text -> (a -> [Text]) -> Aeson.Value -> Aeson.Value
+    overrideAesonText key f frontmatter =
       SData.mergeAesons $
         frontmatter
           :| maybeToList
             ( do
-                let k = "page" :| ["image"]
-                guard $ "" == lookupAeson @Text "" k frontmatter
-                firstImage <- viaNonEmpty head . flip W.query doc $ \case
-                  B.Image _ _ (url, _) -> [url]
-                  _ -> mempty
-                pure $ oneAesonText (toList k) firstImage
+                guard $ "" == lookupAeson @Text "" key frontmatter
+                val <- viaNonEmpty head $ W.query f doc
+                pure $ oneAesonText (toList key) val
             )
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
