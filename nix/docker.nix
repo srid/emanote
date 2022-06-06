@@ -2,7 +2,7 @@
 #
 # Run as:
 #   docker load -i $(
-#     nix-build docker.nix \
+#     nix-build nix/docker.nix \
 #       --argstr name <image-name> \
 #       --argstr tag <image-tag>
 #   )
