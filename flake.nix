@@ -5,8 +5,6 @@
     extra-trusted-public-keys = "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=";
   };
   inputs = {
-    flake-compat.url = "github:edolstra/flake-compat";
-    flake-compat.flake = false;
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
