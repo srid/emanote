@@ -42,6 +42,7 @@ in
                         type = types.str;
                         description = ''Like `path` but local (not in Nix store)'';
                       };
+                      # TODO: Consolidate all these options below with those of home-manager-module.nix
                       port = mkOption {
                         type = types.int;
                         description = ''Port to listen on'';

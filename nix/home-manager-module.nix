@@ -1,3 +1,4 @@
+# For use in home-manager; https://emanote.srid.ca/tips/nix
 { config, lib, pkgs, ... }:
 let
 
@@ -49,6 +50,8 @@ in
           paths in the list taking priority over later paths.
         '';
       };
+
+      # TODO: Consolidate all these options below with those of flake-module.nix
 
       host = mkOption {
         type = types.str;

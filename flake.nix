@@ -60,7 +60,7 @@
               dockerImage = import ./nix/docker.nix { inherit pkgs; emanote = self'.packages.default; };
             };
         emanote = {
-          package = inputs.self.packages.${system}.default;
+          package = self'.packages.default;
           sites = {
             "docs" = {
               path = ./docs;
