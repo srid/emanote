@@ -57,9 +57,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-img
-      - name: Publish Docker image to Docker Hub
+      - name: Load Docker img
         run: |
           docker load -i *docker-image-emanote.tar.gz
+      - name: Publish Docker image to Docker Hub
+        run: |
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
           docker push sridca/emanote:latest
