@@ -40,7 +40,7 @@ jobs:
       - name: Build as docker img
         id: build
         run: |
-          nix-build -j auto docker.nix --argstr tag latest -o docker-img
+          nix-build -j auto nix/docker.nix --argstr tag latest -o docker-img
           # docker
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"

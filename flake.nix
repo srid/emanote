@@ -26,7 +26,7 @@
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
-        ./flake-module.nix
+        ./nix/flake-module.nix
       ];
       perSystem = { pkgs, system, inputs', self', ... }: {
         haskellProjects.default = {
@@ -66,8 +66,8 @@
         };
       };
       flake = {
-        homeManagerModule = import ./home-manager-module.nix;
-        flakeModule = import ./flake-module.nix;
+        homeManagerModule = import ./nix/home-manager-module.nix;
+        flakeModule = import ./nix/flake-module.nix;
       };
     };
 }
