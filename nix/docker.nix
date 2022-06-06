@@ -1,16 +1,7 @@
 # Builds a docker image containing the emanote executable
-#
-# Run as:
-#   docker load -i $(
-#     nix-build nix/docker.nix \
-#       --argstr name <image-name> \
-#       --argstr tag <image-tag>
-#   )
-
 { pkgs, emanote }:
 
-pkgs.dockerTools.buildImage
-{
+pkgs.dockerTools.buildImage {
   name = "sridca/emanote";
   tag = "latest";
   contents = [
