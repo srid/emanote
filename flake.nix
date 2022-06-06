@@ -54,6 +54,11 @@
               tailwind;
           };
         };
+        packages =
+          pkgs.lib.optionalAttrs (system == "x86_64-linux")
+            {
+              dockerImage = import ./nix/docker.nix { inherit pkgs; emanote = self'.packages.default; };
+            };
         emanote = {
           package = inputs.self.packages.${system}.default;
           sites = {
