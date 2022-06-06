@@ -76,10 +76,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-img
+      - name: Load Docker image
+        run: |
+          docker load -i *docker-image-emanote.tar.gz
       - name: Generate website HTML 🔧
         run: |
           mkdir -p ./docs/.ci/output
-          docker load -i *docker-image-emanote.tar.gz
           # demo.md has broken links for demo
           docker run \
             -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 \
