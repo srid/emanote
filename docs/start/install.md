@@ -9,8 +9,8 @@ order: 1
 Emanote is supported on all popular operating systems through [Nix].
 
 1. Install [Nix] (for Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230))
-2. Optional: Use build cache[^cache]: `nix-env -if cachix && cachix use srid`
-3. Run `nix-env -if https://github.com/srid/emanote/archive/refs/heads/master.tar.gz` to install Emanote
+2. Optional: Use build cache[^cache]: `nix profile install nixpkgs#cachix && cachix use srid`
+3. Run `nix profile install github:srid/emanote` to install Emanote
 
 [^cache]: This cache works only on Linux. If you are on macOS, use the [garnix cache](https://garnix.io/docs/caching).
 
