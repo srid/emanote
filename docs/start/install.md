@@ -17,9 +17,9 @@ Emanote is supported on all popular operating systems through [Nix].
 To test your Emanote install,
 
 ```bash
-# Run live server (host and port are optional)
+# Run live server
 cd /path/to/notebook
-emanote --host=0.0.0.0 --port=8001
+emanote run
 
 # Generate static files (-L defaults to current directory)
 mkdir /tmp/output
