@@ -10,19 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v16
+      - uses: cachix/install-nix-action@v17
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      # TODO: Use garnix cache
-      - uses: cachix/cachix-action@v10
-        with:
-          name: srid
-          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
-          # Only needed for private caches
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+            trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+            substituters = https://cache.garnix.io https://cache.nixos.org/
       - name: Cache Nix dependencies
         run: |
+          nix --version
           nix develop -j 4 -c echo
       - name: Format check
         run: |
@@ -33,9 +29,6 @@ jobs:
       - name: Build Nix
         id: build-nix
         run: |
-          [[ -n $(git status -s) ]] && (echo 'modified and/or untracked'; exit 2)
-          ls -la
-          nix --version
           nix build -j auto
       - name: Build as docker img
         id: build
