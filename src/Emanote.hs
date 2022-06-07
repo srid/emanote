@@ -101,12 +101,13 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
 compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
 compileTailwindCss outPath genPaths = do
   let cssPath = outPath </> generatedCssFile
-  putStrLn $ "Compiling CSS using tailwindcss: " <> cssPath
-  runStdoutLoggingT . Tailwind.runTailwind $
-    def
-      & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
-      & Tailwind.tailwindOutput .~ cssPath
-      & Tailwind.tailwindMode .~ Tailwind.Production
+  runStdoutLoggingT $ do
+    log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
+    Tailwind.runTailwind $
+      def
+        & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
+        & Tailwind.tailwindOutput .~ cssPath
+        & Tailwind.tailwindMode .~ Tailwind.Production
 
 defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =
