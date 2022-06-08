@@ -61,7 +61,7 @@ run cfg@EmanoteConfig {..} = do
 postRun :: EmanoteConfig -> (Model.Model, DSum Ema.CLI.Action Identity) -> IO ()
 postRun EmanoteConfig {..} = \case
   (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-    compileTailwindCss outPath genPaths
+    compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0
   _ ->
@@ -99,8 +99,7 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
       exitFailure
 
 compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
-compileTailwindCss outPath genPaths = do
-  let cssPath = outPath </> generatedCssFile
+compileTailwindCss cssPath genPaths = do
   runStdoutLoggingT $ do
     log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
     Tailwind.runTailwind $
