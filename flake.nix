@@ -26,7 +26,7 @@
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
-        ./nix/flake-module.nix
+        ./nix/emanote.nix
         ./nix/docker.nix
       ];
       perSystem = { pkgs, inputs', self', ... }: {
@@ -55,12 +55,10 @@
               tailwind;
           };
         };
-        packages =
-          {
-            test = pkgs.runCommand "emanote-test" { } ''
-              ${pkgs.lib.getExe self'.packages.default} --test 2>&1 | tee $out
-            '';
-          };
+        packages.test =
+          pkgs.runCommand "emanote-test" { } ''
+            ${pkgs.lib.getExe self'.packages.default} --test 2>&1 | tee $out
+          '';
         emanote = {
           package = self'.packages.default;
           sites = {
@@ -74,7 +72,7 @@
       };
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
-        flakeModule = import ./nix/flake-module.nix;
+        flakeModule = import ./nix/emanote.nix;
       };
     };
 }
