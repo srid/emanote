@@ -109,7 +109,7 @@ in
       Install.WantedBy = [ cfg.systemdTarget ];
       Service = {
         ExecStart = ''
-          ${cfg.package}/bin/emanote \
+          ${pkgs.lib.getExe cfg.package} \
             --layers "${lib.concatStringsSep ";" layers}" \
             run --host=${cfg.host} --port=${builtins.toString cfg.port}
         '';

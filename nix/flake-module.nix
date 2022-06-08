@@ -97,7 +97,7 @@ in
                 pkgs.runCommand "emanote-static-website" { }
                   ''
                     mkdir $out
-                    ${config.emanote.package}/bin/emanote \
+                    ${pkgs.lib.getExe config.emanote.package} \
                     --layers "${configDir};${cfg.path}" \
                     ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                       gen $out
