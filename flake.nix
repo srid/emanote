@@ -55,6 +55,11 @@
           };
         };
         packages =
+          {
+            test = pkgs.runCommand "emanote-test" { } ''
+              ${pkgs.lib.getExe self'.packages.default} --test 2>&1 | tee $out
+            '';
+          } //
           pkgs.lib.optionalAttrs (system == "x86_64-linux")
             {
               dockerImage = import ./nix/docker.nix { inherit pkgs; emanote = self'.packages.default; };

@@ -29,10 +29,7 @@ jobs:
       - name: Build Nix
         id: build-nix
         run: |
-          nix build -j auto
-      - name: Test
-        run: |
-          ./result/bin/emanote --test
+          nix build -j auto --no-link
       - name: Build as docker img
         id: build
         run: |
