@@ -11,6 +11,10 @@ main :: IO ()
 main =
   withUtf8 $ do
     cli <- CLI.parseCli
+    -- Why is test part of executable?
+    -- Simply so that ghcid can reload both library and test at the same.
+    -- Once Multiple Home Units for GHC is implemented, we can go back to
+    -- using separate test stanza.
     if CLI.test cli
       then test
       else run (defaultEmanoteConfig cli)
