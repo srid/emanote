@@ -8,9 +8,12 @@ order: 1
 
 Emanote is supported on all popular operating systems through [Nix].
 
-1. Install [Nix] (for Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230))
-2. Optional: Use Nix cache provided [by garnix](https://garnix.io/docs/caching)
-3. Run `nix profile install github:srid/emanote` to install Emanote
+1. [Install Nix](https://nixos.org/download.html) & [enable Flakes](https://nixos.wiki/wiki/Flakes#Installing_flakes)
+   1. For Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230)
+1. Optional: Use Nix binary cache provided [by garnix](https://garnix.io/docs/caching)
+1. Run `nix profile install github:srid/emanote` to install Emanote[^try]
+
+[^try]: You may also "try before installing" by running `nix run github:srid/emanote`. This still downloads emanote to your nix store, `/nix`, but will not install it to the user profile like `nix profile install` does.
 
 To test your Emanote install,
 
