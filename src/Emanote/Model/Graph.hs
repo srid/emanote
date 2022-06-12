@@ -8,6 +8,7 @@ import Data.Tree (Forest, Tree (Node))
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type (Model, modelRels)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
@@ -36,7 +37,12 @@ modelFolgezettelAncestorTree r0 model =
             folgezettelBacklinks
               <> folgezettelFrontlinks
               -- Folders are automatically made a folgezettel
-              <> maybeToList (parentLmlRoute =<< leftToMaybe (R.modelRouteCase r))
+              <> maybeToList
+                ( do
+                    lmlR <- leftToMaybe (R.modelRouteCase r)
+                    guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
+                    parentLmlRoute lmlR
+                )
       fmap catMaybes . forM folgezettelParents $ \parentR -> do
         let parentModelR = R.ModelRoute_LML parentR
         gets (parentModelR `Set.member`) >>= \case
