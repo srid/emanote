@@ -154,19 +154,16 @@ nonEmptyInlines x =
   fromMaybe (one $ B.Str x) . nonEmpty
 
 siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
-siteRouteDefaultInnerText model url (SR.SiteRoute sr) =
-  sr
-    & absurdUnion
-    `h` (\(SR.MissingR _) -> Nothing)
-    `h` (\(SR.AmbiguousR _) -> Nothing)
-    `h` ( \(resR :: SR.ResourceRoute) ->
-            resR & absurdUnion
-              `h` ( \(lmlR :: R.LMLRoute) ->
-                      Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
-                  )
-              `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                      -- Just append a file: prefix, to existing wiki-link.
-                      pure $ B.Str "File:" : [B.Str url]
-                  )
-        )
-    `h` (\(_ :: SR.VirtualRoute) -> Nothing)
+siteRouteDefaultInnerText model url = \case
+  SR.SiteRoute_MissingR _ -> Nothing
+  SR.SiteRoute_AmbiguousR _ -> Nothing
+  SR.SiteRoute_VirtualRoute _ -> Nothing
+  SR.SiteRoute_ResourceRoute resR ->
+    resR & absurdUnion
+      `h` ( \(lmlR :: R.LMLRoute) ->
+              Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
+          )
+      `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
+              -- Just append a file: prefix, to existing wiki-link.
+              pure $ B.Str "File:" : [B.Str url]
+          )

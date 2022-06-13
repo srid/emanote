@@ -76,38 +76,29 @@ type ResourceRoute' =
 -- absolute path to the static file.
 type ResourceRoute = OpenUnion ResourceRoute'
 
-type SiteRoute' =
-  '[ VirtualRoute,
-     ResourceRoute,
-     MissingR,
-     AmbiguousR
-   ]
-
-newtype SiteRoute = SiteRoute {unSiteRoute :: OpenUnion SiteRoute'}
+data SiteRoute
+  = SiteRoute_VirtualRoute VirtualRoute
+  | SiteRoute_ResourceRoute ResourceRoute
+  | SiteRoute_MissingR MissingR
+  | SiteRoute_AmbiguousR AmbiguousR
   deriving stock (Eq, Ord, Generic)
 
 instance Show SiteRoute where
-  show (SiteRoute sr) =
-    sr
-      & absurdUnion
-      `h` ( \(MissingR urlPath) ->
-              "404: " <> urlPath
-          )
-      `h` ( \(AmbiguousR (urlPath, _notes)) -> do
-              "Amb: " <> urlPath
-          )
-      `h` ( \(x :: ResourceRoute) ->
-              x & absurdUnion
-                `h` ( \(r :: StaticFileRoute, _fp :: FilePath) ->
-                        show r
-                    )
-                `h` ( \(r :: LMLRoute) ->
-                        show $ lmlRouteCase r
-                    )
-          )
-      `h` ( \(x :: VirtualRoute) ->
-              show x
-          )
+  show = \case
+    SiteRoute_MissingR (MissingR urlPath) ->
+      "404: " <> urlPath
+    SiteRoute_AmbiguousR (AmbiguousR (urlPath, _notes)) ->
+      "Amb: " <> urlPath
+    SiteRoute_ResourceRoute x ->
+      x & absurdUnion
+        `h` ( \(r :: StaticFileRoute, _fp :: FilePath) ->
+                show r
+            )
+        `h` ( \(r :: LMLRoute) ->
+                show $ lmlRouteCase r
+            )
+    SiteRoute_VirtualRoute x ->
+      show x
 
 decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =

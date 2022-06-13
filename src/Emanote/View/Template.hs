@@ -45,28 +45,25 @@ emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -
 emanoteSiteOutput _enc = render
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
-render m (SR.SiteRoute sr) =
+render m sr =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
-   in sr
-        & absurdUnion
-        `h` ( \(SR.MissingR urlPath) -> do
-                let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                    note404 =
-                      MN.missingNote hereRoute (toText urlPath)
-                        & setErrorPageMeta
-                        & MN.noteTitle .~ "! Missing link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
-            )
-        `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
-                let noteAmb =
-                      MN.ambiguousNoteURL urlPath notes
-                        & setErrorPageMeta
-                        & MN.noteTitle .~ "! Ambiguous link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-            )
-        `h` renderResourceRoute m
-        `h` renderVirtualRoute m
+   in case sr of
+        SR.SiteRoute_MissingR (SR.MissingR urlPath) -> do
+          let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+              note404 =
+                MN.missingNote hereRoute (toText urlPath)
+                  & setErrorPageMeta
+                  & MN.noteTitle .~ "! Missing link"
+          Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+        SR.SiteRoute_AmbiguousR (SR.AmbiguousR (urlPath, notes)) -> do
+          let noteAmb =
+                MN.ambiguousNoteURL urlPath notes
+                  & setErrorPageMeta
+                  & MN.noteTitle .~ "! Ambiguous link"
+          Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
+        SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
+        SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute m =
