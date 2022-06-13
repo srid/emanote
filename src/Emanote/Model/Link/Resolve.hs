@@ -1,6 +1,5 @@
 module Emanote.Model.Link.Resolve where
 
-import Data.WorldPeace.Union (openUnionLift)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile qualified as SF
@@ -24,9 +23,8 @@ resolveUnresolvedRelTarget model = \case
       <&> resourceSiteRoute
   Rel.URTVirtual virtualRoute -> do
     Rel.RRTFound $
-      SR.SiteRoute
-        ( openUnionLift virtualRoute
-        )
+      SR.SiteRoute_VirtualRoute
+        virtualRoute
 
 resolveWikiLinkMustExist ::
   Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
