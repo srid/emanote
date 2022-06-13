@@ -6,7 +6,7 @@ module Emanote.Route.SiteRoute
     TasksR (..),
     MissingR (..),
     AmbiguousR (..),
-    VirtualRoute,
+    VirtualRoute (..),
     ResourceRoute,
     decodeVirtualRoute,
     noteFileSiteRoute,
