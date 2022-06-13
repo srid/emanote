@@ -81,20 +81,15 @@ renderResourceRoute m =
         )
 
 renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
-renderVirtualRoute m =
-  absurdUnion
-    `h` ( \(SR.TagIndexR mtag) ->
-            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
-        )
-    `h` ( \SR.IndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRIndex m
-        )
-    `h` ( \SR.ExportR ->
-            Ema.AssetGenerated Ema.Other $ renderGraphExport m
-        )
-    `h` ( \SR.TasksR ->
-            Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
-        )
+renderVirtualRoute m = \case
+  SR.VirtualRoute_TagIndexR mtag ->
+    Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
+  SR.VirtualRoute_IndexR ->
+    Ema.AssetGenerated Ema.Html $ renderSRIndex m
+  SR.VirtualRoute_ExportR ->
+    Ema.AssetGenerated Ema.Other $ renderGraphExport m
+  SR.VirtualRoute_TasksR ->
+    Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do

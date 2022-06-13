@@ -8,7 +8,7 @@ module Emanote.Route.SiteRoute.Type
     TagIndexR (..),
     MissingR (..),
     AmbiguousR (..),
-    VirtualRoute,
+    VirtualRoute (..),
     ResourceRoute,
     decodeVirtualRoute,
     encodeVirtualRoute,
@@ -20,7 +20,6 @@ import Data.Aeson (ToJSON)
 import Data.WorldPeace.Union
   ( OpenUnion,
     absurdUnion,
-    openUnionLift,
   )
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Prelude (h)
@@ -55,15 +54,14 @@ newtype MissingR = MissingR {unMissingR :: FilePath}
 newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
   deriving stock (Eq, Show, Ord)
 
-type VirtualRoute' =
-  '[ IndexR,
-     TagIndexR,
-     ExportR,
-     TasksR
-   ]
-
 -- | A route to a virtual resource (not in `Model`)
-type VirtualRoute = OpenUnion VirtualRoute'
+data VirtualRoute
+  = VirtualRoute_IndexR
+  | VirtualRoute_TagIndexR [HT.TagNode]
+  | VirtualRoute_ExportR
+  | VirtualRoute_TasksR
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON)
 
 type ResourceRoute' =
   '[ (StaticFileRoute, FilePath),
@@ -102,26 +100,25 @@ instance Show SiteRoute where
 
 decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =
-  fmap openUnionLift (decodeIndexR fp)
-    <|> fmap openUnionLift (decodeTagIndexR fp)
-    <|> fmap openUnionLift (decodeExportR fp)
-    <|> fmap openUnionLift (decodeTasksR fp)
+  (VirtualRoute_IndexR <$ decodeIndexR fp)
+    <|> (VirtualRoute_TagIndexR <$> decodeTagIndexR fp)
+    <|> (VirtualRoute_ExportR <$ decodeExportR fp)
+    <|> (VirtualRoute_TasksR <$ decodeTasksR fp)
 
-decodeIndexR :: FilePath -> Maybe IndexR
+decodeIndexR :: FilePath -> Maybe ()
 decodeIndexR fp = do
   "-" :| ["all"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
-  pure IndexR
+  pass
 
-decodeExportR :: FilePath -> Maybe ExportR
+decodeExportR :: FilePath -> Maybe ()
 decodeExportR fp = do
   "-" :| ["export.json"] <- R.unRoute <$> R.decodeAnyRoute fp
-  pure ExportR
+  pass
 
-decodeTagIndexR :: FilePath -> Maybe TagIndexR
+decodeTagIndexR :: FilePath -> Maybe [HT.TagNode]
 decodeTagIndexR fp = do
   "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
-  let tagNodes = fmap (HT.TagNode . Slug.unSlug) tagPath
-  pure $ TagIndexR tagNodes
+  pure $ fmap (HT.TagNode . Slug.unSlug) tagPath
 
 decodeTasksR :: FilePath -> Maybe TasksR
 decodeTasksR fp = do
@@ -131,21 +128,16 @@ decodeTasksR fp = do
 -- NOTE: The sentinel route slugs in this function should match with those of
 -- the decoders above.
 encodeVirtualRoute :: VirtualRoute -> FilePath
-encodeVirtualRoute =
-  absurdUnion
-    `h` ( \tr@(TagIndexR _) ->
-            R.encodeRoute $ encodeTagIndexR tr
-        )
-    `h` ( \IndexR ->
-            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
-        )
-    `h` ( \ExportR ->
-            R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
-        )
-    `h` ( \TasksR ->
-            R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
-        )
+encodeVirtualRoute = \case
+  VirtualRoute_TagIndexR tagNodes ->
+    R.encodeRoute $ encodeTagIndexR tagNodes
+  VirtualRoute_IndexR ->
+    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
+  VirtualRoute_ExportR ->
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
+  VirtualRoute_TasksR ->
+    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
 
-encodeTagIndexR :: TagIndexR -> R.R 'Ext.Html
-encodeTagIndexR (TagIndexR tagNodes) =
+encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
+encodeTagIndexR tagNodes =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
