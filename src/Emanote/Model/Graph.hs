@@ -72,7 +72,7 @@ parentLmlRoute r = do
     -- Consider the index route as parent folder for all
     -- top-level notes.
     pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
-  pure $ R.liftLMLRoute @('R.LMLType 'R.Md) . coerce $ pr
+  pure $ R.liftLMLRoute . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =

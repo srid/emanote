@@ -18,21 +18,10 @@ module Emanote.Route.ModelRoute
 where
 
 import Data.Aeson.Types (ToJSON)
-import Data.WorldPeace.Union
-  ( IsMember,
-    OpenUnion,
-    absurdUnion,
-    openUnionHandle,
-    openUnionLift,
-  )
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md), SourceExt)
+import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
-
-type LMLRoutes' =
-  '[ R ('LMLType 'Md)
-   ]
 
 type StaticFileRoute = R 'AnyExt
 
@@ -44,22 +33,23 @@ data ModelRoute
   deriving anyclass (ToJSON)
 
 -- | R to a note file in LML (lightweight markup language) format
-type LMLRoute = OpenUnion LMLRoutes'
+data LMLRoute
+  = LMLRoute_Md (R ('LMLType 'Md))
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
+-- TODO: Revamp this, and make it work with .org, etc.
 liftLMLRoute ::
-  forall ext.
-  IsMember (R ext) LMLRoutes' =>
-  R (ext :: FileType SourceExt) ->
+  R ('LMLType 'Md) ->
   LMLRoute
 liftLMLRoute =
-  openUnionLift
+  LMLRoute_Md
 
 lmlRouteCase ::
   LMLRoute ->
   R ('LMLType 'Md)
-lmlRouteCase =
-  absurdUnion
-    `openUnionHandle` id
+lmlRouteCase = \case
+  LMLRoute_Md r -> r
 
 modelRouteCase ::
   ModelRoute ->

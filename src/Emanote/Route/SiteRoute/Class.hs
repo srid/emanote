@@ -188,7 +188,7 @@ urlStrategy =
 
 indexLmlRoute :: LMLRoute
 indexLmlRoute =
-  R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+  R.liftLMLRoute R.indexRoute
 
 indexRoute :: SiteRoute
 indexRoute =
