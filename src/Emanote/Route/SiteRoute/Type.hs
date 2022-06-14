@@ -21,10 +21,10 @@ import Text.Show (show)
 
 -- | A route to a virtual resource (not in `Model`)
 data VirtualRoute
-  = VirtualRoute_IndexR
-  | VirtualRoute_TagIndexR [HT.TagNode]
-  | VirtualRoute_ExportR
-  | VirtualRoute_TasksR
+  = VirtualRoute_Index
+  | VirtualRoute_TagIndex [HT.TagNode]
+  | VirtualRoute_Export
+  | VirtualRoute_TaskIndex
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
@@ -62,10 +62,10 @@ instance Show SiteRoute where
 
 decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =
-  (VirtualRoute_IndexR <$ decodeIndexR fp)
-    <|> (VirtualRoute_TagIndexR <$> decodeTagIndexR fp)
-    <|> (VirtualRoute_ExportR <$ decodeExportR fp)
-    <|> (VirtualRoute_TasksR <$ decodeTasksR fp)
+  (VirtualRoute_Index <$ decodeIndexR fp)
+    <|> (VirtualRoute_TagIndex <$> decodeTagIndexR fp)
+    <|> (VirtualRoute_Export <$ decodeExportR fp)
+    <|> (VirtualRoute_TaskIndex <$ decodeTaskIndexR fp)
 
 decodeIndexR :: FilePath -> Maybe ()
 decodeIndexR fp = do
@@ -82,8 +82,8 @@ decodeTagIndexR fp = do
   "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure $ fmap (HT.TagNode . Slug.unSlug) tagPath
 
-decodeTasksR :: FilePath -> Maybe ()
-decodeTasksR fp = do
+decodeTaskIndexR :: FilePath -> Maybe ()
+decodeTaskIndexR fp = do
   "-" :| ["tasks"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pass
 
@@ -91,13 +91,13 @@ decodeTasksR fp = do
 -- the decoders above.
 encodeVirtualRoute :: VirtualRoute -> FilePath
 encodeVirtualRoute = \case
-  VirtualRoute_TagIndexR tagNodes ->
+  VirtualRoute_TagIndex tagNodes ->
     R.encodeRoute $ encodeTagIndexR tagNodes
-  VirtualRoute_IndexR ->
+  VirtualRoute_Index ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
-  VirtualRoute_ExportR ->
+  VirtualRoute_Export ->
     R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
-  VirtualRoute_TasksR ->
+  VirtualRoute_TaskIndex ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
 
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
