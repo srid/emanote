@@ -156,7 +156,7 @@ nonEmptyInlines x =
 siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
 siteRouteDefaultInnerText model url = \case
   SR.SiteRoute_MissingR _ -> Nothing
-  SR.SiteRoute_AmbiguousR _ -> Nothing
+  SR.SiteRoute_AmbiguousR _ _ -> Nothing
   SR.SiteRoute_VirtualRoute _ -> Nothing
   SR.SiteRoute_ResourceRoute resR ->
     resR & absurdUnion

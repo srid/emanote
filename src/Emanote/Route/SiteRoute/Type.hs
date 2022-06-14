@@ -2,12 +2,6 @@
 
 module Emanote.Route.SiteRoute.Type
   ( SiteRoute (..),
-    IndexR (..),
-    ExportR (..),
-    TasksR (..),
-    TagIndexR (..),
-    MissingR (..),
-    AmbiguousR (..),
     VirtualRoute (..),
     ResourceRoute,
     decodeVirtualRoute,
@@ -29,30 +23,6 @@ import Emanote.Route.R qualified as R
 import Network.URI.Slug qualified as Slug
 import Relude hiding (show)
 import Text.Show (show)
-
-data IndexR = IndexR
-  deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
-
-newtype TagIndexR = TagIndexR [HT.TagNode]
-  deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
-
-data ExportR = ExportR
-  deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
-
-data TasksR = TasksR
-  deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
-
--- | A 404 route
-newtype MissingR = MissingR {unMissingR :: FilePath}
-  deriving stock (Eq, Show, Ord)
-
--- | An ambiguous route
-newtype AmbiguousR = AmbiguousR {unAmbiguousR :: (FilePath, NonEmpty LMLRoute)}
-  deriving stock (Eq, Show, Ord)
 
 -- | A route to a virtual resource (not in `Model`)
 data VirtualRoute
@@ -77,15 +47,15 @@ type ResourceRoute = OpenUnion ResourceRoute'
 data SiteRoute
   = SiteRoute_VirtualRoute VirtualRoute
   | SiteRoute_ResourceRoute ResourceRoute
-  | SiteRoute_MissingR MissingR
-  | SiteRoute_AmbiguousR AmbiguousR
+  | SiteRoute_MissingR FilePath
+  | SiteRoute_AmbiguousR FilePath (NonEmpty LMLRoute)
   deriving stock (Eq, Ord, Generic)
 
 instance Show SiteRoute where
   show = \case
-    SiteRoute_MissingR (MissingR urlPath) ->
+    SiteRoute_MissingR urlPath ->
       "404: " <> urlPath
-    SiteRoute_AmbiguousR (AmbiguousR (urlPath, _notes)) ->
+    SiteRoute_AmbiguousR urlPath _notes ->
       "Amb: " <> urlPath
     SiteRoute_ResourceRoute x ->
       x & absurdUnion
@@ -120,10 +90,10 @@ decodeTagIndexR fp = do
   "-" :| "tags" : tagPath <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pure $ fmap (HT.TagNode . Slug.unSlug) tagPath
 
-decodeTasksR :: FilePath -> Maybe TasksR
+decodeTasksR :: FilePath -> Maybe ()
 decodeTasksR fp = do
   "-" :| ["tasks"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
-  pure TasksR
+  pass
 
 -- NOTE: The sentinel route slugs in this function should match with those of
 -- the decoders above.

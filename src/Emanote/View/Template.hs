@@ -49,14 +49,14 @@ render m sr =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in case sr of
-        SR.SiteRoute_MissingR (SR.MissingR urlPath) -> do
+        SR.SiteRoute_MissingR urlPath -> do
           let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
               note404 =
                 MN.missingNote hereRoute (toText urlPath)
                   & setErrorPageMeta
                   & MN.noteTitle .~ "! Missing link"
           Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
-        SR.SiteRoute_AmbiguousR (SR.AmbiguousR (urlPath, notes)) -> do
+        SR.SiteRoute_AmbiguousR urlPath notes -> do
           let noteAmb =
                 MN.ambiguousNoteURL urlPath notes
                   & setErrorPageMeta
