@@ -46,7 +46,7 @@ render m sr =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in case sr of
         SR.SiteRoute_MissingR urlPath -> do
-          let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
+          let hereRoute = R.liftLMLRoute . coerce $ R.decodeHtmlRoute urlPath
               note404 =
                 MN.missingNote hereRoute (toText urlPath)
                   & setErrorPageMeta
