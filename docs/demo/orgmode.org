@@ -1,0 +1,23 @@
+
+* OrgMode support
+** WIP
+'tis a /work in progress/.
+** Table
+| Name  | Phone | Age |
+|-------+-------+-----|
+| Peter |  1234 |  17 |
+| Anna  |  4321 |  25 |
+
+From https://orgmode.org/worg/org-tutorials/tables.html
+
+| <10>             | <15>                        |
+| A very wide cell | Another very very wide cell |
+
+
+|   |  N | N^2 | N^3 | N^4 | sqrt(n) | sqrt[4](N) |
+|---+----+-----+-----+-----+---------+------------|
+| / | <> |   < |     |   > |       < |          > |
+| # |  1 |   1 |   1 |   1 |       1 |          1 |
+| # |  2 |   4 |   8 |  16 |  1.4142 |     1.1892 |
+| # |  3 |   9 |  27 |  81 |  1.7321 |     1.3161 |
+|---+----+-----+-----+-----+---------+------------|

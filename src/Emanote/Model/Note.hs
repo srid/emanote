@@ -6,10 +6,11 @@
 module Emanote.Model.Note where
 
 import Control.Monad.Logger (MonadLogger)
-import Control.Monad.Writer (MonadWriter (tell), runWriterT)
+import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
+import Data.Default
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
@@ -27,8 +28,10 @@ import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath ((</>))
+import Text.Pandoc (runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Walk qualified as W
 
 data Note = Note
@@ -84,15 +87,14 @@ noteSelfRefs =
     routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
     routeSelfRefs =
       fmap snd
-        . WL.allowedWikiLinks
-        . R.lmlRouteCase
+        . R.withLmlRoute WL.allowedWikiLinks
 
 noteAncestors :: Note -> [RAncestor]
 noteAncestors =
   maybe [] (toList . fmap RAncestor . R.routeInits) . noteParent
 
 noteParent :: Note -> Maybe (R 'R.Folder)
-noteParent = R.routeParent . R.lmlRouteCase . _noteRoute
+noteParent = R.withLmlRoute R.routeParent . _noteRoute
 
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
@@ -134,7 +136,7 @@ noteHtmlRoute note@Note {..} =
   -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
     Nothing ->
-      coerce $ R.lmlRouteCase _noteRoute
+      R.withLmlRoute coerce _noteRoute
     Just slugs ->
       R.mkRouteFromSlugs slugs
 
@@ -158,7 +160,7 @@ ancestorPlaceholderNote r =
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
                 "Note: To override the auto-generated content here, create a file named: ",
-              B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.encodeRoute $ R.lmlRouteCase r)
+              B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.withLmlRoute R.encodeRoute r)
             ]
         ]
    in mkEmptyNoteWith r placeHolder
@@ -231,28 +233,43 @@ parseNote ::
   FilePath ->
   Text ->
   m Note
-parseNote pluginBaseDir r fp md = do
+parseNote pluginBaseDir r fp s = do
   ((doc, meta), errs) <- runWriterT $ do
-    case Markdown.parseMarkdown fp md of
-      Left err -> do
-        tell [err]
-        pure (mempty, defaultFrontMatter)
-      Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
-        -- Apply the various transformation filters.
-        --
-        -- Some are user-defined; some builtin. They operate on Pandoc, or the
-        -- frontmatter meta.
-        let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-        doc <- applyPandocFilters filterPaths doc'
-        let meta = applyNoteMetaFilters doc frontmatter
-        pure (doc, meta)
+    case r of
+      R.LMLRoute_Md _ ->
+        parseNoteMarkdown pluginBaseDir fp s
+      R.LMLRoute_Org _ -> do
+        case runPure $ readOrg def s of
+          Left err -> do
+            tell [show err]
+            pure (mempty, defaultFrontMatter)
+          Right doc ->
+            pure (doc, defaultFrontMatter)
   pure $ mkNoteWith r doc meta errs
+
+parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
+parseNoteMarkdown pluginBaseDir fp md = do
+  case Markdown.parseMarkdown fp md of
+    Left err -> do
+      tell [err]
+      pure (mempty, defaultFrontMatter)
+    Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
+      -- Apply the various transformation filters.
+      --
+      -- Some are user-defined; some builtin. They operate on Pandoc, or the
+      -- frontmatter meta.
+      let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+      doc <- applyPandocFilters filterPaths doc'
+      let meta = applyNoteMetaFilters doc frontmatter
+      pure (doc, meta)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv
         `SData.mergeAeson` default_
-    defaultFrontMatter =
-      Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
+
+defaultFrontMatter :: Aeson.Value
+defaultFrontMatter =
+  Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
 
 applyNoteMetaFilters :: Pandoc -> Aeson.Value -> Aeson.Value
 applyNoteMetaFilters doc =

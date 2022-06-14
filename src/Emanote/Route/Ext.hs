@@ -16,11 +16,11 @@ data FileType a where
   LMLType :: LML -> FileType SourceExt
   Yaml :: FileType SourceExt
   HeistTpl :: FileType SourceExt
-  Html :: FileType ()
-  Folder :: FileType ()
   -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
   -- "catch all" type to capture files using an arbitrary.
   AnyExt :: FileType SourceExt
+  Html :: FileType ()
+  Folder :: FileType ()
   deriving stock (Typeable)
 
 deriving stock instance Eq a => Eq (FileType a)
@@ -33,8 +33,8 @@ deriving stock instance Ord a => Ord (FileType a)
 --
 -- This type exists simply because we may support more formats (eg: org-mode) in
 -- the future.
-data LML = Md
-  deriving stock (Generic, Eq, Ord, Typeable, Data)
+data LML = Md | Org
+  deriving stock (Generic, Eq, Ord, Typeable, Data, Enum, Bounded)
   deriving anyclass (ToJSON)
 
 -- | The `HasExt` class's responsibility is to allow dealing with basepath sans
@@ -52,6 +52,11 @@ instance HasExt ('LMLType 'Md) where
   fileType = LMLType Md
   withExt = flip FP.addExtension ".md"
   withoutKnownExt = fpWithoutExt ".md"
+
+instance HasExt ('LMLType 'Org) where
+  fileType = LMLType Org
+  withExt = flip FP.addExtension ".org"
+  withoutKnownExt = fpWithoutExt ".org"
 
 instance HasExt 'Yaml where
   fileType = Yaml

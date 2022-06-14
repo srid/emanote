@@ -16,7 +16,7 @@ import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Title qualified as Tit
-import Emanote.Route (LMLRoute, lmlRouteCase)
+import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
@@ -87,9 +87,9 @@ modelRels model =
 -- We use the source path consistently.
 lmlRouteKey :: LMLRoute -> Text
 lmlRouteKey =
-  toText . R.encodeRoute . R.lmlRouteCase
+  toText . R.withLmlRoute R.encodeRoute
 
 -- Path of the LML note
 lmlSourcePath :: LMLRoute -> FilePath
 lmlSourcePath =
-  R.encodeRoute . lmlRouteCase
+  R.withLmlRoute R.encodeRoute

@@ -140,7 +140,7 @@ commonSplices withCtx model meta routeTitle = do
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
   "ema:homeUrl"
-    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute R.indexRoute
+    ## ( let homeR = SR.lmlSiteRoute $ R.LMLRoute_Md R.indexRoute -- TODO: why not org?
              homeUrl' = SR.siteRouteUrl model homeR
              homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
           in HI.textSplice homeUrl
@@ -192,7 +192,9 @@ renderModelTemplate model templateName =
 
 routeBreadcrumbs :: TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice Identity
 routeBreadcrumbs TemplateRenderCtx {..} model r =
-  Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
-    \(R.liftLMLRoute -> crumbR) -> do
+  -- TODO: Coercing org back to .md. Org support is weak.
+  Splices.listSplice (init $ either R.routeInits (R.routeInits . coerce) . R.lmlRouteCase $ r) "each-crumb" $
+    \(R.LMLRoute_Md -> crumbR) -> do
+      -- TODO: why not .org? ^
       "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
       "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)

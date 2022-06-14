@@ -93,13 +93,14 @@ modelInsertNote note =
     >>> modelTasks
     %~ updateIxMulti r (Task.noteTasks note)
     >>> modelNav
-    %~ PathTree.treeInsertPath (R.unRoute . R.lmlRouteCase $ r)
+    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute $ r)
   where
     r = note ^. N.noteRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor ancestor ns =
-  let lmlR = R.liftLMLRoute . coerce $ N.unRAncestor ancestor
+  -- FIXME: Md?
+  let lmlR = R.LMLRoute_Md . coerce $ N.unRAncestor ancestor
    in case N.lookupNotesByRoute lmlR ns of
         Just _ -> ns
         Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
@@ -117,12 +118,12 @@ modelDeleteNote k model =
     & modelTasks
     %~ deleteIxMulti k
     & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.unRoute . R.lmlRouteCase $ k)) (const id) mFolderR
+    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute $ k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
     mFolderR = do
-      let folderR = coerce $ R.lmlRouteCase k
+      let folderR = R.withLmlRoute coerce k
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
     restoreFolderPlaceholder =
