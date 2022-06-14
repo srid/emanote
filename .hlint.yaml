@@ -1,3 +1,7 @@
+# Ours
+- ignore: {name: Use camelCase }
+
+# Relude's hlint.yaml
 - arguments:
   - "-XConstraintKinds"
   - "-XDeriveGeneric"
