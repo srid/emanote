@@ -93,7 +93,7 @@ modelInsertNote note =
     >>> modelTasks
     %~ updateIxMulti r (Task.noteTasks note)
     >>> modelNav
-    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute $ r)
+    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
 
@@ -118,7 +118,7 @@ modelDeleteNote k model =
     & modelTasks
     %~ deleteIxMulti k
     & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute $ k)) (const id) mFolderR
+    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
