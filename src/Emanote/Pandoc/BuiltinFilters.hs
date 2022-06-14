@@ -6,7 +6,7 @@ where
 
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
-import Emanote.Route.SiteRoute.Type (TagIndexR (TagIndexR), encodeTagIndexR)
+import Emanote.Route.SiteRoute.Type (encodeTagIndexR)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
@@ -37,7 +37,7 @@ linkifyInlineTags =
       x
   where
     tagUrl =
-      toText . encodeRoute . encodeTagIndexR . TagIndexR . toList . HT.deconstructTag
+      toText . encodeRoute . encodeTagIndexR . toList . HT.deconstructTag
 
 withoutH1 :: B.Pandoc -> B.Pandoc
 withoutH1 (B.Pandoc meta (B.Header 1 _ _ : rest)) =

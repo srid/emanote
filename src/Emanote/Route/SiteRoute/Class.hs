@@ -21,10 +21,6 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
-import Data.WorldPeace.Union
-  ( absurdUnion,
-    openUnionLift,
-  )
 import Ema (UrlStrategy (..), routeUrlWith)
 import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
@@ -34,7 +30,6 @@ import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Type (Model)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Prelude (h)
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
@@ -64,55 +59,50 @@ emanoteGeneratableRoutes model =
                   concat $
                     tags <&> \(HT.deconstructTag -> tagPath) ->
                       NE.filter (not . null) $ NE.inits tagPath
-         in openUnionLift IndexR :
-            openUnionLift ExportR :
-            openUnionLift TasksR :
-            (openUnionLift . TagIndexR <$> toList tagPaths)
+         in VirtualRoute_Index :
+            VirtualRoute_Export :
+            VirtualRoute_TaskIndex :
+            (VirtualRoute_TagIndex <$> toList tagPaths)
    in htmlRoutes
         <> staticRoutes
-        <> fmap (SiteRoute . openUnionLift) virtualRoutes
+        <> fmap SiteRoute_VirtualRoute virtualRoutes
 
 emanoteRouteEncoder :: EmanoteRouteEncoder
 emanoteRouteEncoder =
   mkRouteEncoder $ \m -> prism' (enc m) (dec m)
   where
-    enc model (SiteRoute r) =
-      r
-        & absurdUnion
-        `h` ( \(MissingR s) ->
-                -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
-                -- Unfortunately, since ema:multisite does isomorphism check of
-                -- encoder, we can't just error out here.
-                s
-            )
-        `h` ( \(AmbiguousR _) ->
-                -- FIXME: See note above.
-                error "emanote: attempt to encode an ambiguous route"
-            )
-        `h` encodeResourceRoute model
-        `h` encodeVirtualRoute
+    enc model = \case
+      SiteRoute_MissingR s ->
+        -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
+        -- Unfortunately, since ema:multisite does isomorphism check of
+        -- encoder, we can't just error out here.
+        s
+      SiteRoute_AmbiguousR _ _ ->
+        -- FIXME: See note above.
+        error "emanote: attempt to encode an ambiguous route"
+      SiteRoute_ResourceRoute r ->
+        encodeResourceRoute model r
+      SiteRoute_VirtualRoute r ->
+        encodeVirtualRoute r
 
     dec model fp =
-      fmap (SiteRoute . openUnionLift) (decodeVirtualRoute fp)
+      fmap SiteRoute_VirtualRoute (decodeVirtualRoute fp)
         <|> decodeGeneratedRoute model fp
-        <|> pure (SiteRoute $ openUnionLift $ MissingR fp)
+        <|> pure (SiteRoute_MissingR fp)
 
 encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
-encodeResourceRoute model =
-  absurdUnion
-    `h` ( \(r :: LMLRoute) ->
-            R.encodeRoute $
-              -- HACK: This should never fail ... but *if* it does, consult
-              -- https://github.com/srid/emanote/issues/148
-              maybe
-                -- FIXME: See note above.
-                (error "emanote: attempt to encode missing note")
-                N.noteHtmlRoute
-                $ M.modelLookupNoteByRoute r model
-        )
-    `h` ( \(r :: StaticFileRoute, _fpAbs :: FilePath) ->
-            R.encodeRoute r
-        )
+encodeResourceRoute model = \case
+  ResourceRoute_LML r ->
+    R.encodeRoute $
+      -- HACK: This should never fail ... but *if* it does, consult
+      -- https://github.com/srid/emanote/issues/148
+      maybe
+        -- FIXME: See note above.
+        (error "emanote: attempt to encode missing note")
+        N.noteHtmlRoute
+        $ M.modelLookupNoteByRoute r model
+  ResourceRoute_StaticFile r _fpAbs ->
+    R.encodeRoute r
 
 -- | Decode a route that is known to refer to a resource in the model
 decodeGeneratedRoute :: Model -> FilePath -> Maybe SiteRoute
@@ -133,7 +123,7 @@ decodeGeneratedRoute model fp =
         Just $ ambiguousNoteURLsRoute notes
     ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
     ambiguousNoteURLsRoute ns =
-      SiteRoute $ openUnionLift $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)
+      SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
@@ -141,19 +131,17 @@ noteFileSiteRoute =
 
 lmlSiteRoute :: LMLRoute -> SiteRoute
 lmlSiteRoute =
-  SiteRoute . openUnionLift . lmlResourceRoute
+  SiteRoute_ResourceRoute . lmlResourceRoute
 
 lmlResourceRoute :: LMLRoute -> ResourceRoute
-lmlResourceRoute =
-  openUnionLift
+lmlResourceRoute = ResourceRoute_LML
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-  (SiteRoute . openUnionLift . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
+  (SiteRoute_ResourceRoute . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
   where
     staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
-    staticResourceRoute =
-      openUnionLift
+    staticResourceRoute = uncurry ResourceRoute_StaticFile
 
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
 siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
@@ -175,24 +163,18 @@ siteRouteUrl model sr =
       sf <- M.modelLookupStaticFileByRoute sfRoute model
       pure $ sf ^. SF.staticFileTime
     staticFileRouteCase :: SiteRoute -> Maybe StaticFileRoute
-    staticFileRouteCase (SiteRoute r) =
-      r & absurdUnion
-        `h` ( \(MissingR _fp) ->
-                Nothing
-            )
-        `h` ( \(AmbiguousR _) ->
-                Nothing
-            )
-        `h` ( \(rr :: ResourceRoute) ->
-                rr & absurdUnion
-                  `h` ( \(sfR :: StaticFileRoute, _fp :: FilePath) ->
-                          Just sfR
-                      )
-                  `h` ( \(_ :: LMLRoute) ->
-                          Nothing
-                      )
-            )
-        `h` (\(_ :: VirtualRoute) -> Nothing)
+    staticFileRouteCase = \case
+      SiteRoute_MissingR _fp ->
+        Nothing
+      SiteRoute_AmbiguousR _ _ ->
+        Nothing
+      SiteRoute_ResourceRoute rr ->
+        case rr of
+          ResourceRoute_StaticFile sfR _fp ->
+            Just sfR
+          ResourceRoute_LML _ ->
+            Nothing
+      SiteRoute_VirtualRoute _ -> Nothing
 
 urlStrategySuffix :: Model -> Text
 urlStrategySuffix model =
@@ -206,19 +188,16 @@ urlStrategy =
 
 indexLmlRoute :: LMLRoute
 indexLmlRoute =
-  R.liftLMLRoute @('R.LMLType 'R.Md) $ R.indexRoute
+  R.liftLMLRoute R.indexRoute
 
 indexRoute :: SiteRoute
 indexRoute =
-  let virtR :: VirtualRoute = openUnionLift IndexR
-   in SiteRoute $ openUnionLift virtR
+  SiteRoute_VirtualRoute VirtualRoute_Index
 
 tagIndexRoute :: [HT.TagNode] -> SiteRoute
-tagIndexRoute (TagIndexR -> tagR) =
-  let virtR :: VirtualRoute = openUnionLift tagR
-   in SiteRoute $ openUnionLift virtR
+tagIndexRoute =
+  SiteRoute_VirtualRoute . VirtualRoute_TagIndex
 
 taskIndexRoute :: SiteRoute
 taskIndexRoute =
-  let virtR :: VirtualRoute = openUnionLift TasksR
-   in SiteRoute $ openUnionLift virtR
+  SiteRoute_VirtualRoute VirtualRoute_TaskIndex

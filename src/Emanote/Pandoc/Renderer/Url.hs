@@ -6,7 +6,6 @@ module Emanote.Pandoc.Renderer.Url
 where
 
 import Data.Text qualified as T
-import Data.WorldPeace.Union (absurdUnion)
 import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
@@ -17,7 +16,6 @@ import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
-import Emanote.Prelude (h)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Heist.Extra.Splices.Pandoc qualified as HP
@@ -154,19 +152,14 @@ nonEmptyInlines x =
   fromMaybe (one $ B.Str x) . nonEmpty
 
 siteRouteDefaultInnerText :: Model -> Text -> SR.SiteRoute -> Maybe [B.Inline]
-siteRouteDefaultInnerText model url (SR.SiteRoute sr) =
-  sr
-    & absurdUnion
-    `h` (\(SR.MissingR _) -> Nothing)
-    `h` (\(SR.AmbiguousR _) -> Nothing)
-    `h` ( \(resR :: SR.ResourceRoute) ->
-            resR & absurdUnion
-              `h` ( \(lmlR :: R.LMLRoute) ->
-                      Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
-                  )
-              `h` ( \(_ :: R.StaticFileRoute, _ :: FilePath) ->
-                      -- Just append a file: prefix, to existing wiki-link.
-                      pure $ B.Str "File:" : [B.Str url]
-                  )
-        )
-    `h` (\(_ :: SR.VirtualRoute) -> Nothing)
+siteRouteDefaultInnerText model url = \case
+  SR.SiteRoute_MissingR _ -> Nothing
+  SR.SiteRoute_AmbiguousR _ _ -> Nothing
+  SR.SiteRoute_VirtualRoute _ -> Nothing
+  SR.SiteRoute_ResourceRoute resR ->
+    case resR of
+      SR.ResourceRoute_LML lmlR ->
+        Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
+      SR.ResourceRoute_StaticFile _ _ ->
+        -- Just append a file: prefix, to existing wiki-link.
+        pure $ B.Str "File:" : [B.Str url]

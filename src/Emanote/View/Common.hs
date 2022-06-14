@@ -140,7 +140,7 @@ commonSplices withCtx model meta routeTitle = do
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
   "ema:homeUrl"
-    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute @('R.LMLType 'R.Md) R.indexRoute
+    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute R.indexRoute
              homeUrl' = SR.siteRouteUrl model homeR
              homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
           in HI.textSplice homeUrl

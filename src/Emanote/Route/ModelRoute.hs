@@ -1,10 +1,11 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 -- | Route types representing the resources in our `Model`.
 --
 -- See also: `Emanote.Route.SiteRoute`.
 module Emanote.Route.ModelRoute
   ( -- Some route in a generated site
-    ModelRoute,
-    liftModelRoute,
+    ModelRoute (..),
     modelRouteCase,
     mkModelRouteFromFilePath,
     -- Only LML routes
@@ -16,68 +17,48 @@ module Emanote.Route.ModelRoute
   )
 where
 
-import Data.WorldPeace.Union
-  ( IsMember,
-    OpenUnion,
-    absurdUnion,
-    openUnionHandle,
-    openUnionLift,
-  )
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md), SourceExt)
+import Data.Aeson.Types (ToJSON)
+import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
 
-type LMLRoutes' =
-  '[ R ('LMLType 'Md)
-   ]
-
 type StaticFileRoute = R 'AnyExt
 
--- | A "route" into the `Model`.
-type ModelRoutes' =
-  StaticFileRoute
-    ': LMLRoutes'
-
 -- | A R to anywhere in `Model`
-type ModelRoute = OpenUnion ModelRoutes'
+data ModelRoute
+  = ModelRoute_StaticFile StaticFileRoute
+  | ModelRoute_LML LMLRoute
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 -- | R to a note file in LML (lightweight markup language) format
-type LMLRoute = OpenUnion LMLRoutes'
+newtype LMLRoute
+  = LMLRoute_Md (R ('LMLType 'Md))
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
+-- TODO: Revamp this, and make it work with .org, etc.
 liftLMLRoute ::
-  forall ext.
-  IsMember (R ext) LMLRoutes' =>
-  R (ext :: FileType SourceExt) ->
+  R ('LMLType 'Md) ->
   LMLRoute
 liftLMLRoute =
-  openUnionLift
-
-liftModelRoute ::
-  IsMember (R ext) ModelRoutes' =>
-  R (ext :: FileType a) ->
-  ModelRoute
-liftModelRoute =
-  openUnionLift
+  LMLRoute_Md
 
 lmlRouteCase ::
   LMLRoute ->
   R ('LMLType 'Md)
-lmlRouteCase =
-  absurdUnion
-    `openUnionHandle` id
+lmlRouteCase = \case
+  LMLRoute_Md r -> r
 
 modelRouteCase ::
   ModelRoute ->
   Either LMLRoute StaticFileRoute
-modelRouteCase =
-  first (liftLMLRoute @('LMLType 'Md))
-    . ( absurdUnion
-          `openUnionHandle` Left
-          `openUnionHandle` Right
-      )
+modelRouteCase = \case
+  ModelRoute_LML r -> Left r
+  ModelRoute_StaticFile r -> Right r
 
 mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
 mkModelRouteFromFilePath fp =
-  fmap liftModelRoute (R.mkRouteFromFilePath @_ @('LMLType 'Md) fp)
-    <|> fmap liftModelRoute (R.mkRouteFromFilePath @_ @'AnyExt fp)
+  fmap (ModelRoute_LML . liftLMLRoute) (R.mkRouteFromFilePath @_ @('LMLType 'Md) fp)
+    <|> fmap ModelRoute_StaticFile (R.mkRouteFromFilePath @_ @'AnyExt fp)
