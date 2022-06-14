@@ -5,9 +5,6 @@ import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
 import Data.Tree.Path qualified as PathTree
-import Data.WorldPeace.Union
-  ( absurdUnion,
-  )
 import Ema qualified
 import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
@@ -19,7 +16,6 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
-import Emanote.Prelude (h)
 import Emanote.Route (FileType (LMLType), LML (Md))
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
@@ -45,59 +41,48 @@ emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -
 emanoteSiteOutput _enc = render
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
-render m (SR.SiteRoute sr) =
+render m sr =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
-   in sr
-        & absurdUnion
-        `h` ( \(SR.MissingR urlPath) -> do
-                let hereRoute = R.liftLMLRoute @('LMLType 'Md) . coerce $ R.decodeHtmlRoute urlPath
-                    note404 =
-                      MN.missingNote hereRoute (toText urlPath)
-                        & setErrorPageMeta
-                        & MN.noteTitle .~ "! Missing link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
-            )
-        `h` ( \(SR.AmbiguousR (urlPath, notes)) -> do
-                let noteAmb =
-                      MN.ambiguousNoteURL urlPath notes
-                        & setErrorPageMeta
-                        & MN.noteTitle .~ "! Ambiguous link"
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-            )
-        `h` renderResourceRoute m
-        `h` renderVirtualRoute m
+   in case sr of
+        SR.SiteRoute_MissingR urlPath -> do
+          let hereRoute = R.liftLMLRoute . coerce $ R.decodeHtmlRoute urlPath
+              note404 =
+                MN.missingNote hereRoute (toText urlPath)
+                  & setErrorPageMeta
+                  & MN.noteTitle .~ "! Missing link"
+          Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+        SR.SiteRoute_AmbiguousR urlPath notes -> do
+          let noteAmb =
+                MN.ambiguousNoteURL urlPath notes
+                  & setErrorPageMeta
+                  & MN.noteTitle .~ "! Ambiguous link"
+          Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
+        SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
+        SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
-renderResourceRoute m =
-  absurdUnion
-    `h` ( \(r :: R.LMLRoute) -> do
-            case M.modelLookupNoteByRoute r m of
-              Just note ->
-                Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
-              Nothing ->
-                -- This should never be reached because decodeRoute looks up the model.
-                error $ "Bad route: " <> show r
-        )
-    `h` ( \(_ :: R.StaticFileRoute, fpAbs :: FilePath) -> do
-            Ema.AssetStatic fpAbs
-        )
+renderResourceRoute m = \case
+  SR.ResourceRoute_LML r -> do
+    case M.modelLookupNoteByRoute r m of
+      Just note ->
+        Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
+      Nothing ->
+        -- This should never be reached because decodeRoute looks up the model.
+        error $ "Bad route: " <> show r
+  SR.ResourceRoute_StaticFile _ fpAbs ->
+    Ema.AssetStatic fpAbs
 
 renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
-renderVirtualRoute m =
-  absurdUnion
-    `h` ( \(SR.TagIndexR mtag) ->
-            Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
-        )
-    `h` ( \SR.IndexR ->
-            Ema.AssetGenerated Ema.Html $ renderSRIndex m
-        )
-    `h` ( \SR.ExportR ->
-            Ema.AssetGenerated Ema.Other $ renderGraphExport m
-        )
-    `h` ( \SR.TasksR ->
-            Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
-        )
+renderVirtualRoute m = \case
+  SR.VirtualRoute_TagIndex mtag ->
+    Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
+  SR.VirtualRoute_Index ->
+    Ema.AssetGenerated Ema.Html $ renderSRIndex m
+  SR.VirtualRoute_Export ->
+    Ema.AssetGenerated Ema.Other $ renderGraphExport m
+  SR.VirtualRoute_TaskIndex ->
+    Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
@@ -146,7 +131,7 @@ renderLmlHtml model note = do
     -- Note stuff
     "ema:note:title"
       ## C.titleSplice ctx (note ^. MN.noteTitle)
-    let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
+    let modelRoute = R.ModelRoute_LML r
     "ema:note:source-path"
       ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
     "ema:note:backlinks"
