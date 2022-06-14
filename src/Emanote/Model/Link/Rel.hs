@@ -68,13 +68,13 @@ noteRels note =
       Ix.fromList $
         flip concatMap (Map.toList m) $ \(url, instances) -> do
           flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = R.routeParent $ R.lmlRouteCase $ note ^. noteRoute
+            let parentR = R.withLmlRoute R.routeParent $ note ^. noteRoute
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
-  let wls = either (WL.allowedWikiLinks . R.lmlRouteCase) WL.allowedWikiLinks $ R.modelRouteCase r
+  let wls = either (R.withLmlRoute WL.allowedWikiLinks) WL.allowedWikiLinks $ R.modelRouteCase r
    in (URTWikiLink <$> toList wls)
         <> [URTResource r]
 

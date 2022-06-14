@@ -5,7 +5,7 @@ page:
 
 # *Extended* Markdown :writing_hand:
 
-Emanote notes are written in **Markdown** format. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
+Emanote notes are primarily written in **Markdown** format, which has first-class support (even though other formats like [orgmode](./orgmode.org) are supported in a basic form). A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
 ## Wiki Links
 

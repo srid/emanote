@@ -9,16 +9,16 @@ module Emanote.Route.ModelRoute
     modelRouteCase,
     mkModelRouteFromFilePath,
     -- Only LML routes
-    LMLRoute,
-    liftLMLRoute,
+    LMLRoute (..),
     lmlRouteCase,
+    withLmlRoute,
     -- Static file routes
     StaticFileRoute,
   )
 where
 
 import Data.Aeson.Types (ToJSON)
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), LML (Md))
+import Emanote.Route.Ext (FileType (AnyExt, LMLType), HasExt, LML (Md, Org))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
@@ -33,23 +33,21 @@ data ModelRoute
   deriving anyclass (ToJSON)
 
 -- | R to a note file in LML (lightweight markup language) format
-newtype LMLRoute
+data LMLRoute
   = LMLRoute_Md (R ('LMLType 'Md))
+  | LMLRoute_Org (R ('LMLType 'Org))
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
--- TODO: Revamp this, and make it work with .org, etc.
-liftLMLRoute ::
-  R ('LMLType 'Md) ->
-  LMLRoute
-liftLMLRoute =
-  LMLRoute_Md
-
 lmlRouteCase ::
   LMLRoute ->
-  R ('LMLType 'Md)
+  Either (R ('LMLType 'Md)) (R ('LMLType 'Org))
 lmlRouteCase = \case
-  LMLRoute_Md r -> r
+  LMLRoute_Md r -> Left r
+  LMLRoute_Org r -> Right r
+
+withLmlRoute :: (forall lmlType. HasExt ('LMLType lmlType) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
+withLmlRoute f = either f f . lmlRouteCase
 
 modelRouteCase ::
   ModelRoute ->
@@ -60,5 +58,6 @@ modelRouteCase = \case
 
 mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
 mkModelRouteFromFilePath fp =
-  fmap (ModelRoute_LML . liftLMLRoute) (R.mkRouteFromFilePath @_ @('LMLType 'Md) fp)
+  fmap (ModelRoute_LML . LMLRoute_Md) (R.mkRouteFromFilePath @_ @('LMLType 'Md) fp)
+    <|> fmap (ModelRoute_LML . LMLRoute_Org) (R.mkRouteFromFilePath @_ @('LMLType 'Org) fp)
     <|> fmap ModelRoute_StaticFile (R.mkRouteFromFilePath @_ @'AnyExt fp)

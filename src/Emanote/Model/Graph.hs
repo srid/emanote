@@ -68,11 +68,12 @@ parentLmlRoute r = do
   pr <- do
     let lmlR = R.lmlRouteCase r
     -- Root index do not have a parent folder.
-    guard $ lmlR /= R.indexRoute
+    guard $ lmlR /= Left R.indexRoute && lmlR /= Right R.indexRoute
     -- Consider the index route as parent folder for all
     -- top-level notes.
-    pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
-  pure $ R.liftLMLRoute . coerce $ pr
+    pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
+  -- TODO: This should use .org of index.org exists (needs model)
+  pure $ R.LMLRoute_Md . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =

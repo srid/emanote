@@ -44,7 +44,7 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
             let (newIs, (newUrl, _)) =
                   replaceLinkNodeWithRoute model sr (toList $ nonEmptyInlines url is, url)
             pure $ HP.rpInline ctx $ B.Image attr newIs (newUrl, tit)
-  let parentR = R.routeParent $ R.lmlRouteCase noteRoute
+  let parentR = R.withLmlRoute R.routeParent noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model uRel
   renderSomeInlineRefWith (f mAnchor) id (is, (url, tit)) rRel model ctx inl
