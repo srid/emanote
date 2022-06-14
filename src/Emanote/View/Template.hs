@@ -75,13 +75,13 @@ renderResourceRoute m = \case
 
 renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
 renderVirtualRoute m = \case
-  SR.VirtualRoute_TagIndexR mtag ->
+  SR.VirtualRoute_TagIndex mtag ->
     Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
-  SR.VirtualRoute_IndexR ->
+  SR.VirtualRoute_Index ->
     Ema.AssetGenerated Ema.Html $ renderSRIndex m
-  SR.VirtualRoute_ExportR ->
+  SR.VirtualRoute_Export ->
     Ema.AssetGenerated Ema.Other $ renderGraphExport m
-  SR.VirtualRoute_TasksR ->
+  SR.VirtualRoute_TaskIndex ->
     Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
 
 renderSRIndex :: Model -> LByteString

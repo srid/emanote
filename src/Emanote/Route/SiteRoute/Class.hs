@@ -59,10 +59,10 @@ emanoteGeneratableRoutes model =
                   concat $
                     tags <&> \(HT.deconstructTag -> tagPath) ->
                       NE.filter (not . null) $ NE.inits tagPath
-         in VirtualRoute_IndexR :
-            VirtualRoute_ExportR :
-            VirtualRoute_TasksR :
-            (VirtualRoute_TagIndexR <$> toList tagPaths)
+         in VirtualRoute_Index :
+            VirtualRoute_Export :
+            VirtualRoute_TaskIndex :
+            (VirtualRoute_TagIndex <$> toList tagPaths)
    in htmlRoutes
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
@@ -192,12 +192,12 @@ indexLmlRoute =
 
 indexRoute :: SiteRoute
 indexRoute =
-  SiteRoute_VirtualRoute VirtualRoute_IndexR
+  SiteRoute_VirtualRoute VirtualRoute_Index
 
 tagIndexRoute :: [HT.TagNode] -> SiteRoute
 tagIndexRoute =
-  SiteRoute_VirtualRoute . VirtualRoute_TagIndexR
+  SiteRoute_VirtualRoute . VirtualRoute_TagIndex
 
 taskIndexRoute :: SiteRoute
 taskIndexRoute =
-  SiteRoute_VirtualRoute VirtualRoute_TasksR
+  SiteRoute_VirtualRoute VirtualRoute_TaskIndex
