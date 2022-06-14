@@ -68,13 +68,10 @@ patchModel' ::
   m (Model -> Model)
 patchModel' layers noteF fpType fp action = do
   case fpType of
-    R.LMLType lmlType -> do
-      let mr = case lmlType of
-            R.Md -> fmap R.LMLRoute_Md . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Md) $ fp
-            R.Org -> fmap R.LMLRoute_Org . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Org) $ fp
-      case mr of
+    R.LMLType _lmlType -> do
+      case R.mkLMLRouteFromFilePath fp of
         Nothing ->
-          pure id
+          pure id -- Impossible
         Just r -> case action of
           UM.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays
