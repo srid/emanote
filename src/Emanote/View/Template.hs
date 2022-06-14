@@ -131,7 +131,7 @@ renderLmlHtml model note = do
     -- Note stuff
     "ema:note:title"
       ## C.titleSplice ctx (note ^. MN.noteTitle)
-    let modelRoute = R.liftModelRoute . R.lmlRouteCase $ r
+    let modelRoute = R.ModelRoute_LML r
     "ema:note:source-path"
       ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
     "ema:note:backlinks"
