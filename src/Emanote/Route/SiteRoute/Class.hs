@@ -77,12 +77,12 @@ emanoteRouteEncoder =
   mkRouteEncoder $ \m -> prism' (enc m) (dec m)
   where
     enc model = \case
-      SiteRoute_MissingR (MissingR s) ->
+      SiteRoute_MissingR s ->
         -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
         -- Unfortunately, since ema:multisite does isomorphism check of
         -- encoder, we can't just error out here.
         s
-      SiteRoute_AmbiguousR (AmbiguousR _) ->
+      SiteRoute_AmbiguousR _ _ ->
         -- FIXME: See note above.
         error "emanote: attempt to encode an ambiguous route"
       SiteRoute_ResourceRoute r ->
@@ -93,7 +93,7 @@ emanoteRouteEncoder =
     dec model fp =
       fmap SiteRoute_VirtualRoute (decodeVirtualRoute fp)
         <|> decodeGeneratedRoute model fp
-        <|> pure (SiteRoute_MissingR $ MissingR fp)
+        <|> pure (SiteRoute_MissingR fp)
 
 encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
 encodeResourceRoute model =
@@ -131,7 +131,7 @@ decodeGeneratedRoute model fp =
         Just $ ambiguousNoteURLsRoute notes
     ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
     ambiguousNoteURLsRoute ns =
-      SiteRoute_AmbiguousR $ AmbiguousR ("/" <> fp, N._noteRoute <$> ns)
+      SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
@@ -174,9 +174,9 @@ siteRouteUrl model sr =
       pure $ sf ^. SF.staticFileTime
     staticFileRouteCase :: SiteRoute -> Maybe StaticFileRoute
     staticFileRouteCase = \case
-      SiteRoute_MissingR (MissingR _fp) ->
+      SiteRoute_MissingR _fp ->
         Nothing
-      SiteRoute_AmbiguousR (AmbiguousR _) ->
+      SiteRoute_AmbiguousR _ _ ->
         Nothing
       SiteRoute_ResourceRoute rr ->
         rr & absurdUnion
