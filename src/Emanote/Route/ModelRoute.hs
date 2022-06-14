@@ -33,7 +33,7 @@ data ModelRoute
   deriving anyclass (ToJSON)
 
 -- | R to a note file in LML (lightweight markup language) format
-data LMLRoute
+newtype LMLRoute
   = LMLRoute_Md (R ('LMLType 'Md))
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
