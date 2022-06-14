@@ -3,7 +3,7 @@
 module Emanote.Route.SiteRoute.Type
   ( SiteRoute (..),
     VirtualRoute (..),
-    ResourceRoute,
+    ResourceRoute (..),
     decodeVirtualRoute,
     encodeVirtualRoute,
     encodeTagIndexR,
@@ -11,12 +11,7 @@ module Emanote.Route.SiteRoute.Type
 where
 
 import Data.Aeson (ToJSON)
-import Data.WorldPeace.Union
-  ( OpenUnion,
-    absurdUnion,
-  )
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Prelude (h)
 import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
 import Emanote.Route.R qualified as R
@@ -33,16 +28,15 @@ data VirtualRoute
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
-type ResourceRoute' =
-  '[ (StaticFileRoute, FilePath),
-     LMLRoute
-   ]
-
 -- | A route to a resource in `Model`
 --
 -- This is *mostly isomorphic* to `ModelRoute`, except for containing the
 -- absolute path to the static file.
-type ResourceRoute = OpenUnion ResourceRoute'
+data ResourceRoute
+  = ResourceRoute_StaticFile StaticFileRoute FilePath
+  | ResourceRoute_LML LMLRoute
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
 
 data SiteRoute
   = SiteRoute_VirtualRoute VirtualRoute
@@ -57,14 +51,12 @@ instance Show SiteRoute where
       "404: " <> urlPath
     SiteRoute_AmbiguousR urlPath _notes ->
       "Amb: " <> urlPath
-    SiteRoute_ResourceRoute x ->
-      x & absurdUnion
-        `h` ( \(r :: StaticFileRoute, _fp :: FilePath) ->
-                show r
-            )
-        `h` ( \(r :: LMLRoute) ->
-                show $ lmlRouteCase r
-            )
+    SiteRoute_ResourceRoute rr ->
+      case rr of
+        ResourceRoute_StaticFile r _fp ->
+          show r
+        ResourceRoute_LML r ->
+          show $ lmlRouteCase r
     SiteRoute_VirtualRoute x ->
       show x
 
