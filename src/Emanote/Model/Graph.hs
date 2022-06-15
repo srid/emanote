@@ -33,14 +33,12 @@ modelFolgezettelAncestorTree r0 model =
           folgezettelFrontlinks =
             frontlinkRels r model
               & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
+          -- Folders are automatically made a folgezettel
           folgezettelFolder =
-            -- Folders are automatically made a folgezettel
-            maybeToList
-              ( do
-                  lmlR <- leftToMaybe (R.modelRouteCase r)
-                  guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
-                  parentLmlRoute lmlR
-              )
+            maybeToList $ do
+              lmlR <- leftToMaybe (R.modelRouteCase r)
+              guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
+              parentLmlRoute lmlR
           folgezettelParents =
             mconcat
               [ folgezettelBacklinks,
