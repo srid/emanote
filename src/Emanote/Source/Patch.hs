@@ -68,8 +68,8 @@ patchModel' ::
   m (Model -> Model)
 patchModel' layers noteF fpType fp action = do
   case fpType of
-    R.LMLType _lmlType -> do
-      case R.mkLMLRouteFromFilePath fp of
+    R.LMLType lmlType -> do
+      case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
           pure id -- Impossible
         Just r -> case action of

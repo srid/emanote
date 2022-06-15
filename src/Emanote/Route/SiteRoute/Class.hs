@@ -110,7 +110,7 @@ decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
     (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
-    <|> (traceShowId . noteHtmlSiteRoute)
+    <|> noteHtmlSiteRoute
       (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
   where
     noteHtmlSiteRoute :: Rel.ResolvedRelTarget N.Note -> Maybe SiteRoute
