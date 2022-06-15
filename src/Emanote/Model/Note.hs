@@ -239,13 +239,17 @@ parseNote pluginBaseDir r fp s = do
       R.LMLRoute_Md _ ->
         parseNoteMarkdown pluginBaseDir fp s
       R.LMLRoute_Org _ -> do
-        case runPure $ readOrg def s of
-          Left err -> do
-            tell [show err]
-            pure (mempty, defaultFrontMatter)
-          Right doc ->
-            pure (doc, defaultFrontMatter)
+        parseNoteOrg s
   pure $ mkNoteWith r doc meta errs
+
+parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
+parseNoteOrg s =
+  case runPure $ readOrg def s of
+    Left err -> do
+      tell [show err]
+      pure (mempty, defaultFrontMatter)
+    Right doc ->
+      pure (doc, defaultFrontMatter)
 
 parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
 parseNoteMarkdown pluginBaseDir fp md = do
