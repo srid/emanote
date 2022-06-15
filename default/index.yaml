@@ -116,4 +116,7 @@ js:
     </script>
     <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
+emanote:
+  # Whether to automatically treat folder notes as a folgezettel parent of its contents
+  folder-folgezettel: true
 
