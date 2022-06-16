@@ -13,6 +13,7 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
@@ -150,7 +151,7 @@ lookupNotesByRoute r ix = do
     note :| [] -> pure note
     _ -> error $ "ambiguous notes for route " <> show r
 
-ancestorPlaceholderNote :: R.LMLRoute -> Note
+ancestorPlaceholderNote :: R.R 'Folder -> Note
 ancestorPlaceholderNote r =
   let placeHolder =
         [ folderListingQuery,
@@ -158,28 +159,39 @@ ancestorPlaceholderNote r =
           -- than <div>), to render these non-relevant content.
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
-                "Note: To override the auto-generated content here, create a file named: ",
+                "Note: To override the auto-generated content here, create a file named one of: ",
               -- TODO: or, .org
-              B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.withLmlRoute R.encodeRoute r)
+              B.Span (cls "font-mono text-sm") $
+                one $
+                  B.Str $ oneOfLmlFilenames r
             ]
         ]
-   in mkEmptyNoteWith r placeHolder
+   in mkEmptyNoteWith (R.defaultLmlRoute r) placeHolder
   where
     folderListingQuery =
       B.CodeBlock (cls "query") "path:./*"
-    cls x =
-      ("", one x, mempty) :: B.Attr
 
-missingNote :: R.LMLRoute -> Text -> Note
+cls :: Text -> B.Attr
+cls x =
+  ("", one x, mempty) :: B.Attr
+
+missingNote :: R.R ext -> Text -> Note
 missingNote route404 urlPath =
-  mkEmptyNoteWith route404 $
+  mkEmptyNoteWith (R.defaultLmlRoute route404) $
     one $
       B.Para
         [ B.Str "No note has the URL ",
           B.Code B.nullAttr $ "/" <> urlPath,
           -- TODO: org
-          B.Str ". You may create a Markdown file with that name."
+          B.Span (cls "font-mono text-sm") $
+            one $ B.Str $ ". You may create a file with that name, ie. one of: " <> oneOfLmlFilenames route404
         ]
+
+oneOfLmlFilenames :: R ext -> Text
+oneOfLmlFilenames r =
+  T.intercalate
+    ", "
+    (toText . R.withLmlRoute R.encodeRoute <$> R.possibleLmlRoutes r)
 
 ambiguousNoteURL :: FilePath -> NonEmpty R.LMLRoute -> Note
 ambiguousNoteURL urlPath rs =
