@@ -169,7 +169,7 @@ routeTreeSplice tCtx mr model = do
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
              mkLmlRoute =
-               M.resolveLmlRoute model . R.R
+               M.resolveLmlRoute model . R.mkRouteFromSlugs
              lmlRouteSlugs = R.withLmlRoute R.unRoute
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
@@ -191,14 +191,14 @@ routeTreeSplice tCtx mr model = do
 
 lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
 lookupTemplateName meta =
-  encodeUtf8 $ MN.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
+  encodeUtf8 $ SData.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
   where
     defaultTemplate = "templates/layouts/book"
 
 withTemplateName :: Text -> Aeson.Value
 withTemplateName =
-  MN.oneAesonText (toList $ "template" :| ["name"])
+  SData.oneAesonText (toList $ "template" :| ["name"])
 
 withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
-  MN.oneAesonText (toList $ "page" :| ["siteTitle"])
+  SData.oneAesonText (toList $ "page" :| ["siteTitle"])

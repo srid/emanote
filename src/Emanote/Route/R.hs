@@ -31,11 +31,7 @@ mkRouteFromFilePath fp = do
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
   viaNonEmpty R slugs
 
-mkRouteFromSlug :: forall ext. HasExt ext => Slug -> R ext
-mkRouteFromSlug =
-  R . one
-
-mkRouteFromSlugs :: forall ext. HasExt ext => NonEmpty Slug -> R ext
+mkRouteFromSlugs :: NonEmpty Slug -> R ext
 mkRouteFromSlugs =
   R
 

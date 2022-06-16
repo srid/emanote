@@ -19,7 +19,7 @@ import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema qualified
 import Emanote.Model.Meta qualified as Meta
-import Emanote.Model.Note qualified as MN
+import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
@@ -91,7 +91,7 @@ mkTemplateRenderCtx model r meta =
           r
     classRules :: Map Text Text
     classRules =
-      MN.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
+      SData.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
 
 defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
 defaultRouteMeta model =
@@ -110,7 +110,7 @@ commonSplices ::
   Tit.Title ->
   H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
-  let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
