@@ -81,7 +81,7 @@ parentLmlRoute r = do
     -- Consider the index route as parent folder for all
     -- top-level notes.
     pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
-  -- TODO: This should use .org of index.org exists (needs model)
+  -- TODO: This should use .org if index.org exists (needs model)
   pure $ R.LMLRoute_Md . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]

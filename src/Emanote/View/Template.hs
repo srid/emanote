@@ -19,7 +19,6 @@ import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
-import Emanote.Route.SiteRoute.Class (indexLmlRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
 import Emanote.View.TagIndex qualified as TagIndex
@@ -85,8 +84,8 @@ renderVirtualRoute m = \case
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
-  let meta = Meta.getIndexYamlMeta model
-      tCtx = C.mkTemplateRenderCtx model indexLmlRoute meta
+  let (r, meta) = C.defaultRouteMeta model
+      tCtx = C.mkTemplateRenderCtx model r meta
   C.renderModelTemplate model "templates/special/index" $ do
     C.commonSplices ($ emptyRenderCtx) model meta "Index"
     routeTreeSplice tCtx Nothing model

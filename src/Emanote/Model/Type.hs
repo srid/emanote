@@ -1,8 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Use camelCase" #-}
 
 module Emanote.Model.Type where
 
@@ -224,3 +221,11 @@ modelNoteErrors model =
       let errs = note ^. N.noteErrors
       guard $ not $ null errs
       pure (note ^. N.noteRoute, errs)
+
+-- | Return the most suitable index LML route
+--
+--  If index.org exist, use that. Otherwise, fallback to index.md.
+modelIndexRoute :: Model -> LMLRoute
+modelIndexRoute model = do
+  fromMaybe (R.LMLRoute_Md R.indexRoute) $ do
+    N._noteRoute <$> modelLookupNoteByRoute (R.LMLRoute_Org R.indexRoute) model

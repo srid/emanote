@@ -4,7 +4,6 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     indexRoute,
-    indexLmlRoute,
     tagIndexRoute,
     taskIndexRoute,
     siteRouteUrl,
@@ -183,13 +182,8 @@ urlStrategySuffix model =
     Ema.UrlPretty -> ""
 
 urlStrategy :: Model -> UrlStrategy
-urlStrategy =
-  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute
-
-indexLmlRoute :: LMLRoute
-indexLmlRoute =
-  -- FIXME: why not index.org?
-  R.LMLRoute_Md R.indexRoute
+urlStrategy model =
+  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
 indexRoute :: SiteRoute
 indexRoute =

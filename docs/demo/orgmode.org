@@ -8,3 +8,4 @@ Emanote provides first-class support for [[file:markdown.md][Markdown]]. But it 
 Org Mode has no notion of wiki-links, but you can use =file:= [[https://orgmode.org/guide/Hyperlinks.html][hyperlinks]] to link to other files such as Markdown files. If you wish to link to a .org file from a Markdown file, however, regular wiki-links ought to work.
 ** Limitations
 WIP
+- =#+title= is not recognized
