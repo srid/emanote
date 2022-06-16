@@ -9,7 +9,7 @@ import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model (Model, modelLookupNoteByRoute, modelSData)
-import Emanote.Model.Note (lookupAeson, _noteMeta)
+import Emanote.Model.Note (_noteMeta)
 import Emanote.Model.SData (sdataValue)
 import Emanote.Model.SData qualified as SData
 import Emanote.Route qualified as R
@@ -19,7 +19,7 @@ import Relude
 -- | Look up a specific key in the meta for a given route.
 lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> Model -> a
 lookupRouteMeta x k r =
-  lookupAeson x k . getEffectiveRouteMeta r
+  SData.lookupAeson x k . getEffectiveRouteMeta r
 
 -- | Get the (final) metadata of a note at the given route, by merging it with
 -- the defaults specified in parent routes all the way upto index.yaml.

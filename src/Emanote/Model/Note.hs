@@ -8,9 +8,8 @@ module Emanote.Model.Note where
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
-import Data.Aeson.KeyMap qualified as KM
 import Data.Aeson.Optics qualified as AO
-import Data.Default
+import Data.Default (Default (def))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
@@ -111,11 +110,11 @@ noteSlug note = do
 
 lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
-  lookupAeson Nothing k . _noteMeta
+  SData.lookupAeson Nothing k . _noteMeta
 
 queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> Tit.Title
 queryNoteTitle r doc meta =
-  let yamlNoteTitle = fromString <$> lookupAeson Nothing (one "title") meta
+  let yamlNoteTitle = fromString <$> SData.lookupAeson Nothing (one "title") meta
       fileNameTitle = Tit.fromRoute r
       notePandocTitle = getPandocTitle doc
    in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
@@ -251,6 +250,8 @@ parseNoteOrg s =
       tell [show err]
       pure (mempty, defaultFrontMatter)
     Right doc ->
+      -- TODO: Merge Pandoc's Meta in here, so that properties like `#+title:`
+      -- work.
       pure (doc, defaultFrontMatter)
 
 parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
@@ -264,7 +265,7 @@ parseNoteMarkdown pluginBaseDir fp md = do
       --
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
-      let filterPaths = (pluginBaseDir </>) <$> lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+      let filterPaths = (pluginBaseDir </>) <$> SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
       doc <- applyPandocFilters filterPaths doc'
       let meta = applyNoteMetaFilters doc frontmatter
       pure (doc, meta)
@@ -290,7 +291,7 @@ applyNoteMetaFilters doc =
         & AO.key "tags" % AO._Array
         .~ ( fromList . fmap Aeson.toJSON $
                ordNub $
-                 lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                 SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
                    <> HT.inlineTagsInPandoc doc
            )
     addDescriptionFromBody =
@@ -309,32 +310,9 @@ applyNoteMetaFilters doc =
         frontmatter
           :| maybeToList
             ( do
-                guard $ "" == lookupAeson @Text "" key frontmatter
+                guard $ "" == SData.lookupAeson @Text "" key frontmatter
                 val <- viaNonEmpty head $ W.query f doc
-                pure $ oneAesonText (toList key) val
+                pure $ SData.oneAesonText (toList key) val
             )
-
--- TODO: Use https://hackage.haskell.org/package/lens-aeson
-lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
-lookupAeson x (k :| ks) meta =
-  fromMaybe x $ do
-    Aeson.Object obj <- pure meta
-    val <- KM.lookup (fromString . toString $ k) obj
-    case nonEmpty ks of
-      Nothing -> resultToMaybe $ Aeson.fromJSON val
-      Just ks' -> pure $ lookupAeson x ks' val
-  where
-    resultToMaybe :: Aeson.Result b -> Maybe b
-    resultToMaybe = \case
-      Aeson.Error _ -> Nothing
-      Aeson.Success b -> pure b
-
-oneAesonText :: [Text] -> Text -> Aeson.Value
-oneAesonText k v =
-  case nonEmpty k of
-    Nothing ->
-      Aeson.String v
-    Just (x :| xs) ->
-      Aeson.object [(fromString . toString) x Aeson..= oneAesonText (toList xs) v]
 
 makeLenses ''Note

@@ -5,6 +5,7 @@ module Emanote.Model.SData where
 
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Extra.Merge qualified as AesonMerge
+import Data.Aeson.KeyMap qualified as KM
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import Data.List.NonEmpty qualified as NE
@@ -47,3 +48,26 @@ mergeAesons =
 
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson = AesonMerge.lodashMerge
+
+-- TODO: Use https://hackage.haskell.org/package/lens-aeson
+lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
+lookupAeson x (k :| ks) meta =
+  fromMaybe x $ do
+    Aeson.Object obj <- pure meta
+    val <- KM.lookup (fromString . toString $ k) obj
+    case nonEmpty ks of
+      Nothing -> resultToMaybe $ Aeson.fromJSON val
+      Just ks' -> pure $ lookupAeson x ks' val
+  where
+    resultToMaybe :: Aeson.Result b -> Maybe b
+    resultToMaybe = \case
+      Aeson.Error _ -> Nothing
+      Aeson.Success b -> pure b
+
+oneAesonText :: [Text] -> Text -> Aeson.Value
+oneAesonText k v =
+  case nonEmpty k of
+    Nothing ->
+      Aeson.String v
+    Just (x :| xs) ->
+      Aeson.object [(fromString . toString) x Aeson..= oneAesonText (toList xs) v]
