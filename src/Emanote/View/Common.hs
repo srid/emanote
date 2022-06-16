@@ -9,6 +9,7 @@ module Emanote.View.Common
     -- * Render context
     TemplateRenderCtx (..),
     mkTemplateRenderCtx,
+    defaultRouteMeta,
   )
 where
 
@@ -17,6 +18,7 @@ import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema qualified
+import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
@@ -90,6 +92,12 @@ mkTemplateRenderCtx model r meta =
     classRules :: Map Text Text
     classRules =
       MN.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
+
+defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
+defaultRouteMeta model =
+  let r = M.modelIndexRoute model
+      meta = Meta.getEffectiveRouteMeta r model
+   in (r, meta)
 
 generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"

@@ -1,4 +1,9 @@
-module Emanote.Model.Meta (lookupRouteMeta, getEffectiveRouteMetaWith, getIndexYamlMeta) where
+module Emanote.Model.Meta
+  ( lookupRouteMeta,
+    getEffectiveRouteMeta,
+    getEffectiveRouteMetaWith,
+  )
+where
 
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
@@ -36,7 +41,3 @@ getEffectiveRouteMetaWith frontmatter mr model =
 getYamlMeta :: R.R 'R.Yaml -> Model -> Maybe Aeson.Value
 getYamlMeta r model =
   fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
-
-getIndexYamlMeta :: Model -> Aeson.Value
-getIndexYamlMeta =
-  fromMaybe Aeson.Null . getYamlMeta R.indexRoute
