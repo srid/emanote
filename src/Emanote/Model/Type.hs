@@ -100,7 +100,7 @@ injectAncestor (N.unRAncestor -> folderR) ns =
     Just _ -> ns
     Nothing ->
       let r = R.defaultLmlRoute folderR
-       in Ix.updateIx r (N.ancestorPlaceholderNote r) ns
+       in Ix.updateIx r (N.ancestorPlaceholderNote folderR) ns
 
 modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =

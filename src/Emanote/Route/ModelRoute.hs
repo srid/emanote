@@ -11,6 +11,7 @@ module Emanote.Route.ModelRoute
     -- Only LML routes
     LMLRoute (..),
     defaultLmlRoute,
+    possibleLmlRoutes,
     lmlRouteCase,
     withLmlRoute,
     mkLMLRouteFromFilePath,
@@ -45,6 +46,12 @@ data LMLRoute
 defaultLmlRoute :: R (ext :: FileType a) -> LMLRoute
 defaultLmlRoute =
   LMLRoute_Md . coerce
+
+possibleLmlRoutes :: R (ext :: FileType a) -> [LMLRoute]
+possibleLmlRoutes r =
+  [ LMLRoute_Md (coerce r),
+    LMLRoute_Org (coerce r)
+  ]
 
 lmlRouteCase ::
   LMLRoute ->
