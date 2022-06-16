@@ -32,10 +32,10 @@ import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
-import Emanote.Pandoc.Renderer
+import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
-import Emanote.Route.SiteRoute.Type
+import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
@@ -95,12 +95,12 @@ modelInsertNote note =
     r = note ^. N.noteRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
-injectAncestor ancestor ns =
-  -- FIXME: Md?
-  let lmlR = R.LMLRoute_Md . coerce $ N.unRAncestor ancestor
-   in case N.lookupNotesByRoute lmlR ns of
-        Just _ -> ns
-        Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
+injectAncestor (N.unRAncestor -> folderR) ns =
+  case resolveLmlRouteIfExists ns folderR of
+    Just _ -> ns
+    Nothing ->
+      let r = R.defaultLmlRoute folderR
+       in Ix.updateIx r (N.ancestorPlaceholderNote r) ns
 
 modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
@@ -230,7 +230,15 @@ modelIndexRoute model = do
   resolveLmlRoute model R.indexRoute
 
 resolveLmlRoute :: forall lmlType. Model -> R ('R.LMLType lmlType) -> LMLRoute
-resolveLmlRoute model r = do
-  fromMaybe (R.LMLRoute_Md $ coerce r) $ do
-    note <- modelLookupNoteByRoute (R.LMLRoute_Org $ coerce r) model
-    pure $ note ^. N.noteRoute
+resolveLmlRoute model r =
+  fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
+
+resolveLmlRouteIfExists :: forall ext. IxNote -> R ext -> Maybe LMLRoute
+resolveLmlRouteIfExists notes r = do
+  -- TODO: Refactor using `[minBound..maxBound] :: [LML]`
+  note <-
+    asum
+      [ N.lookupNotesByRoute (R.LMLRoute_Org $ coerce r) notes,
+        N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) notes
+      ]
+  pure $ note ^. N.noteRoute

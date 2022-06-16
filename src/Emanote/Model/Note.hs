@@ -160,6 +160,7 @@ ancestorPlaceholderNote r =
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
                 "Note: To override the auto-generated content here, create a file named: ",
+              -- TODO: or, .org
               B.Span (cls "font-mono text-sm") $ one $ B.Str $ toText (R.withLmlRoute R.encodeRoute r)
             ]
         ]
@@ -177,6 +178,7 @@ missingNote route404 urlPath =
       B.Para
         [ B.Str "No note has the URL ",
           B.Code B.nullAttr $ "/" <> urlPath,
+          -- TODO: org
           B.Str ". You may create a Markdown file with that name."
         ]
 
