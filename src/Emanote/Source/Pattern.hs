@@ -9,6 +9,9 @@ filePattern = \case
   R.LMLType R.Md ->
     R.withExt @_ @('R.LMLType 'R.Md) $
       "**/*"
+  R.LMLType R.Org ->
+    R.withExt @_ @('R.LMLType 'R.Org) $
+      "**/*"
   R.Yaml ->
     R.withExt @_ @'R.Yaml $
       "**/*"
@@ -22,6 +25,7 @@ filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
   (id &&& filePattern)
     <$> [ R.LMLType R.Md,
+          R.LMLType R.Org,
           R.Yaml,
           R.HeistTpl,
           R.AnyExt

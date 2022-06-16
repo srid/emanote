@@ -24,7 +24,7 @@ noteSortKey note =
 
 isDailyNote :: LMLRoute -> Bool
 isDailyNote =
-  isJust . M.parseMaybe parse . (R.routeBaseName . R.lmlRouteCase)
+  isJust . M.parseMaybe parse . R.withLmlRoute R.routeBaseName
   where
     parse :: M.Parsec Void Text ()
     parse = do

@@ -22,7 +22,6 @@ import Emanote.Prelude
     log,
     logD,
   )
-import Emanote.Route (liftLMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.Source.Loc (Loc, LocLayers, locPath, locResolve, primaryLayer)
@@ -69,10 +68,10 @@ patchModel' ::
   m (Model -> Model)
 patchModel' layers noteF fpType fp action = do
   case fpType of
-    R.LMLType R.Md ->
-      case fmap liftLMLRoute . R.mkRouteFromFilePath @_ @('R.LMLType 'R.Md) $ fp of
+    R.LMLType lmlType -> do
+      case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
-          pure id
+          pure id -- Impossible
         Just r -> case action of
           UM.Refresh refreshAction overlays -> do
             let fpAbs = locResolve $ head overlays

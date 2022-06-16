@@ -1,8 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Use camelCase" #-}
 
 module Emanote.Model.Type where
 
@@ -35,10 +32,10 @@ import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
-import Emanote.Pandoc.Renderer
+import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
-import Emanote.Route.SiteRoute.Type
+import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
@@ -93,16 +90,17 @@ modelInsertNote note =
     >>> modelTasks
     %~ updateIxMulti r (Task.noteTasks note)
     >>> modelNav
-    %~ PathTree.treeInsertPath (R.unRoute . R.lmlRouteCase $ r)
+    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
-injectAncestor ancestor ns =
-  let lmlR = R.liftLMLRoute . coerce $ N.unRAncestor ancestor
-   in case N.lookupNotesByRoute lmlR ns of
-        Just _ -> ns
-        Nothing -> Ix.updateIx lmlR (N.ancestorPlaceholderNote lmlR) ns
+injectAncestor (N.unRAncestor -> folderR) ns =
+  case resolveLmlRouteIfExists ns folderR of
+    Just _ -> ns
+    Nothing ->
+      let r = R.defaultLmlRoute folderR
+       in Ix.updateIx r (N.ancestorPlaceholderNote folderR) ns
 
 modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
@@ -117,12 +115,12 @@ modelDeleteNote k model =
     & modelTasks
     %~ deleteIxMulti k
     & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.unRoute . R.lmlRouteCase $ k)) (const id) mFolderR
+    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
     mFolderR = do
-      let folderR = coerce $ R.lmlRouteCase k
+      let folderR = R.withLmlRoute coerce k
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
     restoreFolderPlaceholder =
@@ -223,3 +221,24 @@ modelNoteErrors model =
       let errs = note ^. N.noteErrors
       guard $ not $ null errs
       pure (note ^. N.noteRoute, errs)
+
+-- | Return the most suitable index LML route
+--
+--  If index.org exist, use that. Otherwise, fallback to index.md.
+modelIndexRoute :: Model -> LMLRoute
+modelIndexRoute model = do
+  resolveLmlRoute model R.indexRoute
+
+resolveLmlRoute :: forall lmlType. Model -> R ('R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute model r =
+  fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
+
+resolveLmlRouteIfExists :: forall ext. IxNote -> R ext -> Maybe LMLRoute
+resolveLmlRouteIfExists notes r = do
+  -- TODO: Refactor using `[minBound..maxBound] :: [LML]`
+  note <-
+    asum
+      [ N.lookupNotesByRoute (R.LMLRoute_Org $ coerce r) notes,
+        N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) notes
+      ]
+  pure $ note ^. N.noteRoute

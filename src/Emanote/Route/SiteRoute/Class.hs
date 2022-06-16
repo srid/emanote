@@ -4,7 +4,6 @@ module Emanote.Route.SiteRoute.Class
     staticFileSiteRoute,
     lmlSiteRoute,
     indexRoute,
-    indexLmlRoute,
     tagIndexRoute,
     taskIndexRoute,
     siteRouteUrl,
@@ -67,7 +66,7 @@ emanoteGeneratableRoutes model =
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
 
-emanoteRouteEncoder :: EmanoteRouteEncoder
+emanoteRouteEncoder :: HasCallStack => EmanoteRouteEncoder
 emanoteRouteEncoder =
   mkRouteEncoder $ \m -> prism' (enc m) (dec m)
   where
@@ -77,9 +76,9 @@ emanoteRouteEncoder =
         -- Unfortunately, since ema:multisite does isomorphism check of
         -- encoder, we can't just error out here.
         s
-      SiteRoute_AmbiguousR _ _ ->
+      SiteRoute_AmbiguousR fp _ ->
         -- FIXME: See note above.
-        error "emanote: attempt to encode an ambiguous route"
+        error $ "emanote: attempt to encode an ambiguous route: " <> toText fp
       SiteRoute_ResourceRoute r ->
         encodeResourceRoute model r
       SiteRoute_VirtualRoute r ->
@@ -98,7 +97,7 @@ encodeResourceRoute model = \case
       -- https://github.com/srid/emanote/issues/148
       maybe
         -- FIXME: See note above.
-        (error "emanote: attempt to encode missing note")
+        (error $ "emanote: attempt to encode missing note: " <> show r)
         N.noteHtmlRoute
         $ M.modelLookupNoteByRoute r model
   ResourceRoute_StaticFile r _fpAbs ->
@@ -183,12 +182,8 @@ urlStrategySuffix model =
     Ema.UrlPretty -> ""
 
 urlStrategy :: Model -> UrlStrategy
-urlStrategy =
-  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") indexLmlRoute
-
-indexLmlRoute :: LMLRoute
-indexLmlRoute =
-  R.liftLMLRoute R.indexRoute
+urlStrategy model =
+  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
 indexRoute :: SiteRoute
 indexRoute =

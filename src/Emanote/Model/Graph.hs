@@ -10,7 +10,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelRels)
+import Emanote.Model.Type (Model, modelRels, resolveLmlRoute)
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
@@ -33,14 +33,12 @@ modelFolgezettelAncestorTree r0 model =
           folgezettelFrontlinks =
             frontlinkRels r model
               & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
+          -- Folders are automatically made a folgezettel
           folgezettelFolder =
-            -- Folders are automatically made a folgezettel
-            maybeToList
-              ( do
-                  lmlR <- leftToMaybe (R.modelRouteCase r)
-                  guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
-                  parentLmlRoute lmlR
-              )
+            maybeToList $ do
+              lmlR <- leftToMaybe (R.modelRouteCase r)
+              guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
+              parentLmlRoute model lmlR
           folgezettelParents =
             mconcat
               [ folgezettelBacklinks,
@@ -74,16 +72,19 @@ modelFolgezettelAncestorTree r0 model =
       _ -> Nothing
 
 -- | Return the route to parent folder (unless indexRoute is passed).
-parentLmlRoute :: R.LMLRoute -> Maybe R.LMLRoute
-parentLmlRoute r = do
+--
+--  This will return the existing note (.org or .md) if possible. Otherwise
+--  fallback to .md even if missing.
+parentLmlRoute :: Model -> R.LMLRoute -> Maybe R.LMLRoute
+parentLmlRoute model r = do
   pr <- do
     let lmlR = R.lmlRouteCase r
     -- Root index do not have a parent folder.
-    guard $ lmlR /= R.indexRoute
+    guard $ lmlR /= Left R.indexRoute && lmlR /= Right R.indexRoute
     -- Consider the index route as parent folder for all
     -- top-level notes.
-    pure $ fromMaybe R.indexRoute $ R.routeParent lmlR
-  pure $ R.liftLMLRoute . coerce $ pr
+    pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
+  pure $ resolveLmlRoute model . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =

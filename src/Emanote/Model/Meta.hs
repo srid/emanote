@@ -1,10 +1,15 @@
-module Emanote.Model.Meta (lookupRouteMeta, getEffectiveRouteMetaWith, getIndexYamlMeta) where
+module Emanote.Model.Meta
+  ( lookupRouteMeta,
+    getEffectiveRouteMeta,
+    getEffectiveRouteMetaWith,
+  )
+where
 
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model (Model, modelLookupNoteByRoute, modelSData)
-import Emanote.Model.Note (lookupAeson, _noteMeta)
+import Emanote.Model.Note (_noteMeta)
 import Emanote.Model.SData (sdataValue)
 import Emanote.Model.SData qualified as SData
 import Emanote.Route qualified as R
@@ -14,7 +19,7 @@ import Relude
 -- | Look up a specific key in the meta for a given route.
 lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> Model -> a
 lookupRouteMeta x k r =
-  lookupAeson x k . getEffectiveRouteMeta r
+  SData.lookupAeson x k . getEffectiveRouteMeta r
 
 -- | Get the (final) metadata of a note at the given route, by merging it with
 -- the defaults specified in parent routes all the way upto index.yaml.
@@ -25,7 +30,7 @@ getEffectiveRouteMeta mr model =
 
 getEffectiveRouteMetaWith :: Aeson.Value -> R.LMLRoute -> Model -> Aeson.Value
 getEffectiveRouteMetaWith frontmatter mr model =
-  let defaultFiles = R.routeInits @'R.Yaml (coerce $ R.lmlRouteCase mr)
+  let defaultFiles = R.routeInits @'R.Yaml (R.withLmlRoute coerce mr)
       defaults = flip mapMaybe (toList defaultFiles) $ \r -> do
         v <- getYamlMeta r model
         guard $ v /= Aeson.Null
@@ -36,7 +41,3 @@ getEffectiveRouteMetaWith frontmatter mr model =
 getYamlMeta :: R.R 'R.Yaml -> Model -> Maybe Aeson.Value
 getYamlMeta r model =
   fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
-
-getIndexYamlMeta :: Model -> Aeson.Value
-getIndexYamlMeta =
-  fromMaybe Aeson.Null . getYamlMeta R.indexRoute

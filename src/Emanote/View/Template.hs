@@ -16,11 +16,9 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
-import Emanote.Route (FileType (LMLType), LML (Md))
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
-import Emanote.Route.SiteRoute.Class (indexLmlRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
 import Emanote.View.TagIndex qualified as TagIndex
@@ -46,7 +44,7 @@ render m sr =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
    in case sr of
         SR.SiteRoute_MissingR urlPath -> do
-          let hereRoute = R.liftLMLRoute . coerce $ R.decodeHtmlRoute urlPath
+          let hereRoute = R.decodeHtmlRoute urlPath
               note404 =
                 MN.missingNote hereRoute (toText urlPath)
                   & setErrorPageMeta
@@ -86,8 +84,8 @@ renderVirtualRoute m = \case
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
-  let meta = Meta.getIndexYamlMeta model
-      tCtx = C.mkTemplateRenderCtx model indexLmlRoute meta
+  let (r, meta) = C.defaultRouteMeta model
+      tCtx = C.mkTemplateRenderCtx model r meta
   C.renderModelTemplate model "templates/special/index" $ do
     C.commonSplices ($ emptyRenderCtx) model meta "Index"
     routeTreeSplice tCtx Nothing model
@@ -133,7 +131,7 @@ renderLmlHtml model note = do
       ## C.titleSplice ctx (note ^. MN.noteTitle)
     let modelRoute = R.ModelRoute_LML r
     "ema:note:source-path"
-      ## HI.textSplice (toText . R.encodeRoute . R.lmlRouteCase $ r)
+      ## HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
     "ema:note:backlinks"
       ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
@@ -170,8 +168,9 @@ routeTreeSplice tCtx mr model = do
                )
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute = R.liftLMLRoute . R.R @_ @('LMLType 'Md)
-             lmlRouteSlugs = R.unRoute . R.lmlRouteCase
+             mkLmlRoute =
+               M.resolveLmlRoute model . R.mkRouteFromSlugs
+             lmlRouteSlugs = R.withLmlRoute R.unRoute
           in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
                "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
                "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
@@ -192,14 +191,14 @@ routeTreeSplice tCtx mr model = do
 
 lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
 lookupTemplateName meta =
-  encodeUtf8 $ MN.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
+  encodeUtf8 $ SData.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
   where
     defaultTemplate = "templates/layouts/book"
 
 withTemplateName :: Text -> Aeson.Value
 withTemplateName =
-  MN.oneAesonText (toList $ "template" :| ["name"])
+  SData.oneAesonText (toList $ "template" :| ["name"])
 
 withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
-  MN.oneAesonText (toList $ "page" :| ["siteTitle"])
+  SData.oneAesonText (toList $ "page" :| ["siteTitle"])
