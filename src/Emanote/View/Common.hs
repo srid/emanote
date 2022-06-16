@@ -9,6 +9,7 @@ module Emanote.View.Common
     -- * Render context
     TemplateRenderCtx (..),
     mkTemplateRenderCtx,
+    defaultRouteMeta,
   )
 where
 
@@ -17,7 +18,8 @@ import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema qualified
-import Emanote.Model.Note qualified as MN
+import Emanote.Model.Meta qualified as Meta
+import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
@@ -89,7 +91,13 @@ mkTemplateRenderCtx model r meta =
           r
     classRules :: Map Text Text
     classRules =
-      MN.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
+      SData.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
+
+defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
+defaultRouteMeta model =
+  let r = M.modelIndexRoute model
+      meta = Meta.getEffectiveRouteMeta r model
+   in (r, meta)
 
 generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
@@ -102,7 +110,7 @@ commonSplices ::
   Tit.Title ->
   H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
-  let siteTitle = fromString . toString $ MN.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
@@ -140,7 +148,7 @@ commonSplices withCtx model meta routeTitle = do
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
   "ema:homeUrl"
-    ## ( let homeR = SR.lmlSiteRoute $ R.liftLMLRoute R.indexRoute
+    ## ( let homeR = SR.lmlSiteRoute (M.modelIndexRoute model)
              homeUrl' = SR.siteRouteUrl model homeR
              homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
           in HI.textSplice homeUrl
@@ -191,8 +199,14 @@ renderModelTemplate model templateName =
         . flip (Tmpl.renderHeistTemplate templateName) (model ^. M.modelHeistTemplate)
 
 routeBreadcrumbs :: TemplateRenderCtx n -> Model -> LMLRoute -> HI.Splice Identity
-routeBreadcrumbs TemplateRenderCtx {..} model r =
-  Splices.listSplice (init $ R.routeInits . R.lmlRouteCase $ r) "each-crumb" $
-    \(R.liftLMLRoute -> crumbR) -> do
-      "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
-      "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
+routeBreadcrumbs TemplateRenderCtx {..} model r = do
+  let breadcrumbs =
+        r
+          & R.lmlRouteCase
+          -- Hardcode to 'Md, and resolve using resolveLmlRoute latter.
+          & either R.routeInits (R.routeInits . coerce)
+          & init
+          & fmap (M.resolveLmlRoute model)
+  Splices.listSplice breadcrumbs "each-crumb" $ \crumbR -> do
+    "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
+    "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)

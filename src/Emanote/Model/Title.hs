@@ -54,7 +54,7 @@ instance IsString Title where
 
 fromRoute :: R.LMLRoute -> Title
 fromRoute =
-  TitlePlain . R.routeBaseName . R.lmlRouteCase
+  TitlePlain . R.withLmlRoute R.routeBaseName
 
 fromInlines :: [B.Inline] -> Title
 fromInlines = TitlePandoc

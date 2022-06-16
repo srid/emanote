@@ -8,7 +8,6 @@ import Data.Tree (Forest, Tree)
 import Data.Tree qualified as Tree
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
-import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer.Query qualified as PF
@@ -16,6 +15,7 @@ import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.Common
   ( TemplateRenderCtx (withInlineCtx),
     commonSplices,
+    defaultRouteMeta,
     mkTemplateRenderCtx,
     renderModelTemplate,
   )
@@ -78,9 +78,8 @@ mkTagIndex model tagPath' =
 
 renderTagIndex :: Model -> [HT.TagNode] -> LByteString
 renderTagIndex model tagPath = do
-  let meta = Meta.getIndexYamlMeta model
-      -- TODO: not def, but get from model
-      tCtx = mkTemplateRenderCtx model SR.indexLmlRoute meta
+  let (r, meta) = defaultRouteMeta model
+      tCtx = mkTemplateRenderCtx model r meta
       tagIdx = mkTagIndex model tagPath
   renderModelTemplate model "templates/special/tagindex" $ do
     commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx

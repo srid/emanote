@@ -31,7 +31,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
   B.Para [inl] -> do
     (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
     guard $ inlRef == Link.InlineLink
-    let parentR = R.routeParent $ R.lmlRouteCase noteRoute
+    let parentR = R.withLmlRoute R.routeParent noteRoute
     -- TODO: Use anchor to embed a section?
     (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
       Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
@@ -45,7 +45,7 @@ embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
-  let parentR = R.routeParent $ R.lmlRouteCase noteRoute
+  let parentR = R.withLmlRoute R.routeParent noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
       f = embedInlineSiteRoute model wl

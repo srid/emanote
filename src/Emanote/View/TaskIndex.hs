@@ -5,13 +5,11 @@ import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Emanote.Model (Model)
-import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Task (Task)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Type qualified as M
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
-import Emanote.Route.SiteRoute.Class (indexLmlRoute)
 import Emanote.View.Common qualified as Common
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc qualified as Splices
@@ -32,8 +30,8 @@ mkTaskIndex model =
 
 renderTasks :: Model -> LByteString
 renderTasks model = do
-  let meta = Meta.getIndexYamlMeta model
-      tCtx = Common.mkTemplateRenderCtx model indexLmlRoute meta
+  let (defR, meta) = Common.defaultRouteMeta model
+      tCtx = Common.mkTemplateRenderCtx model defR meta
       taskIndex = mkTaskIndex model
       taskGroupSplice r tasks = do
         "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
