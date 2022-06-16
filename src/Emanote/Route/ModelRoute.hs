@@ -10,6 +10,7 @@ module Emanote.Route.ModelRoute
     mkModelRouteFromFilePath,
     -- Only LML routes
     LMLRoute (..),
+    defaultLmlRoute,
     lmlRouteCase,
     withLmlRoute,
     mkLMLRouteFromFilePath,
@@ -40,6 +41,10 @@ data LMLRoute
   | LMLRoute_Org (R ('LMLType 'Org))
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
+
+defaultLmlRoute :: R (ext :: FileType a) -> LMLRoute
+defaultLmlRoute =
+  LMLRoute_Md . coerce
 
 lmlRouteCase ::
   LMLRoute ->
