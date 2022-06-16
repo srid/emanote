@@ -62,7 +62,7 @@ renderGraphExport model =
                  in SourceFile
                       (Tit.toPlain tit)
                       k
-                      (toText . lmlSourcePath <$> G.parentLmlRoute r)
+                      (toText . lmlSourcePath <$> G.parentLmlRoute model r)
                       (SR.siteRouteUrl model $ lmlSiteRoute r)
                       meta_
                       (fromMaybe [] $ Map.lookup k rels)

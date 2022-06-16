@@ -227,5 +227,10 @@ modelNoteErrors model =
 --  If index.org exist, use that. Otherwise, fallback to index.md.
 modelIndexRoute :: Model -> LMLRoute
 modelIndexRoute model = do
-  fromMaybe (R.LMLRoute_Md R.indexRoute) $ do
-    N._noteRoute <$> modelLookupNoteByRoute (R.LMLRoute_Org R.indexRoute) model
+  resolveLmlRoute model R.indexRoute
+
+resolveLmlRoute :: forall lmlType. Model -> R ('R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute model r = do
+  fromMaybe (R.LMLRoute_Md $ coerce r) $ do
+    note <- modelLookupNoteByRoute (R.LMLRoute_Org $ coerce r) model
+    pure $ note ^. N.noteRoute
