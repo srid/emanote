@@ -150,7 +150,7 @@ renderLmlHtml model note = do
     "ema:note:pandoc"
       ## C.withBlockCtx ctx
       $ \ctx' ->
-        Splices.pandocSplice ctx' (prepareNoteDoc $ MN._noteDoc note)
+        Splices.pandocSplice ctx' (prepareNoteDoc note)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
