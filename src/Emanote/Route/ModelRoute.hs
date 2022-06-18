@@ -16,6 +16,7 @@ module Emanote.Route.ModelRoute
     withLmlRoute,
     mkLMLRouteFromFilePath,
     mkLMLRouteFromKnownFilePath,
+    isMdRoute,
     -- Static file routes
     StaticFileRoute,
   )
@@ -59,6 +60,11 @@ lmlRouteCase ::
 lmlRouteCase = \case
   LMLRoute_Md r -> Left r
   LMLRoute_Org r -> Right r
+
+isMdRoute :: LMLRoute -> Bool
+isMdRoute = \case
+  LMLRoute_Md _ -> True
+  _ -> False
 
 withLmlRoute :: (forall lmlType. HasExt ('LMLType lmlType) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
