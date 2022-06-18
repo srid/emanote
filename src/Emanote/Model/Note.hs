@@ -117,7 +117,12 @@ queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> Tit.Title
 queryNoteTitle r doc meta =
   let yamlNoteTitle = fromString <$> SData.lookupAeson Nothing (one "title") meta
       fileNameTitle = Tit.fromRoute r
-      notePandocTitle = getPandocTitle doc
+      notePandocTitle = do
+        case r of
+          R.LMLRoute_Md _ ->
+            getPandocTitle doc
+          R.LMLRoute_Org _ ->
+            getPandocMetaTitle doc
    in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Tit.Title
@@ -129,6 +134,10 @@ queryNoteTitle r doc meta =
           Just inlines
         getPandocH1 _ =
           Nothing
+    getPandocMetaTitle :: Pandoc -> Maybe Tit.Title
+    getPandocMetaTitle (Pandoc docMeta _) = do
+      B.MetaInlines inlines <- B.lookupMeta "title" docMeta
+      pure $ Tit.fromInlines inlines
 
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
@@ -235,8 +244,6 @@ mkNoteWith r doc' meta errs =
     errorDiv :: [Text] -> B.Block
     errorDiv s =
       B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
-      where
-        cls x = ("", one x, mempty) :: B.Attr
 
 parseNote ::
   forall m.
@@ -262,8 +269,7 @@ parseNoteOrg s =
       tell [show err]
       pure (mempty, defaultFrontMatter)
     Right doc ->
-      -- TODO: Merge Pandoc's Meta in here, so that properties like `#+title:`
-      -- work.
+      -- TODO: Merge Pandoc's Meta in here?
       pure (doc, defaultFrontMatter)
 
 parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)

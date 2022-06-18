@@ -1,4 +1,5 @@
-* Org Mode 
+#+TITLE: Org Mode
+
 Emanote provides first-class support for [[file:markdown.md][Markdown]]. But it also supports secondary formats (albeit not necessarily with the same level of support) beginning with [[https://orgmode.org/][Org Mode]]. See Pandoc's [[https://pandoc.org/org.html][Org section]] for information on controlling the parsing.
 
 **WARNING**: This is a =🧪 beta 🧪= feature.
@@ -34,4 +35,4 @@ If $a^2=b$ and \( b=2 \), then the solution must be
 either $$ a=+\sqrt{2} $$ or \[ a=-\sqrt{2} \]
 
 ** Limitations
-- =#+TITLE= and other metadata is not recognized (yet). Org Mode has no notion of a "frontmatter", therefore you must store file-associated metadata in a separate [[file:yaml-config.md][YAML file]].
+- While =#+TITLE= is recognized, other metadata are not recognized (yet). Org Mode has no notion of a "frontmatter", therefore you must store file-associated metadata in a separate [[file:yaml-config.md][YAML file]].

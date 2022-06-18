@@ -68,7 +68,7 @@ embedResourceRoute model ctx note = do
     "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
     "ema:note:pandoc"
-      ## pandocSplice ctx (prepareNoteDoc $ MN._noteDoc note)
+      ## pandocSplice ctx (prepareNoteDoc note)
 
 embedStaticFileRoute :: Model -> WL.WikiLink -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model wl staticFile = do

@@ -4,18 +4,23 @@ module Emanote.Pandoc.BuiltinFilters
   )
 where
 
+import Emanote.Model.Note qualified as N
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
+import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.SiteRoute.Type (encodeTagIndexR)
+import Optics.Core ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
 -- TODO: Run this in `parseNote`?
-prepareNoteDoc :: B.Pandoc -> B.Pandoc
-prepareNoteDoc =
-  preparePandoc
-    >>> withoutH1 -- Because, handling note title separately
+prepareNoteDoc :: N.Note -> B.Pandoc
+prepareNoteDoc note =
+  let doc' = preparePandoc $ note ^. N.noteDoc
+   in if R.isMdRoute (note ^. N.noteRoute)
+        then withoutH1 doc'
+        else doc'
 
 preparePandoc :: W.Walkable B.Inline b => b -> b
 preparePandoc =
