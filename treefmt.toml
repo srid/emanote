@@ -1,13 +1,21 @@
 [formatter.haskell]
 command = "ormolu"
 options = [
-    "--ghc-opt", "-XImportQualifiedPost",
-    "--ghc-opt", "-XTypeApplications",
-    "--mode", "inplace",
-    "--check-idempotence",
+  "--ghc-opt",
+  "-XImportQualifiedPost",
+  "--ghc-opt",
+  "-XTypeApplications",
+  "--mode",
+  "inplace",
+  "--check-idempotence",
 ]
 includes = ["*.hs"]
 
 [formatter.nix]
 command = "nixpkgs-fmt"
 includes = ["*.nix"]
+
+[formatter.cabal]
+command = "cabal-fmt"
+options = ["--inplace"]
+includes = ["*.cabal"]
