@@ -111,7 +111,7 @@ common library-common
     , heist-emanote          >=1.2.1
     , hspec
     , hspec-hedgehog
-    , ixset-typed >= 0.5.1.0
+    , ixset-typed            >=0.5.1.0
     , lvar
     , map-syntax
     , megaparsec
