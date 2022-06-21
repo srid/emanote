@@ -12,12 +12,6 @@
     # Haskell dependency overrides
     ema.url = "github:srid/ema/multisite";
     ema.flake = false;
-    pandoc-link-context.url = "github:srid/pandoc-link-context/master";
-    pandoc-link-context.flake = false;
-    heist-emanote.url = "github:srid/heist/emanote";
-    heist-emanote.flake = false;
-    ixset-typed.url = "github:well-typed/ixset-typed";
-    ixset-typed.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -44,13 +38,12 @@
           };
           source-overrides = {
             inherit (inputs)
-              ema
-              pandoc-link-context
-              heist-emanote
-              ixset-typed;
+              ema;
           };
           overrides = self: super: with pkgs.haskell.lib; {
-            heist-emanote = dontCheck super.heist-emanote; # Tests are broken.
+            heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
+            ixset-typed = unmarkBroken super.ixset-typed;
+            pandoc-link-context = unmarkBroken super.pandoc-link-context;
             inherit (inputs'.tailwind-haskell.packages)
               tailwind;
           };
