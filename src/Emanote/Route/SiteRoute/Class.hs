@@ -145,7 +145,7 @@ staticFileSiteRoute =
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
 siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrlStatic model =
-  Ema.routeUrlWith (urlStrategy model) (model ^. M.modelRouteEncoder) model
+  Ema.routeUrlWith (urlStrategy model) (M.modelRouteEncoderMust model) model
 
 siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrl model sr =

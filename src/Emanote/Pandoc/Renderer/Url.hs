@@ -22,7 +22,6 @@ import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
-import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
@@ -95,7 +94,7 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
           fmap mconcat . sequence $
             toList srs
               <&> \(getSr -> sr) -> do
-                let srRoute = toText $ Ema.encodeRoute (model ^. M.modelRouteEncoder) model sr
+                let srRoute = toText $ Ema.encodeRoute (M.modelRouteEncoderMust model) model sr
                     (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
                     linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
                     newIs = one $ B.Str $ show sr

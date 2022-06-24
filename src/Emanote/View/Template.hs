@@ -30,13 +30,14 @@ import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
-import Optics.Operators ((.~), (^.))
+import Optics.Operators ((.~), (?~), (^.))
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteSiteOutput _enc = render
+emanoteSiteOutput enc model =
+  render $ model & M.modelRouteEncoder ?~ enc
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m sr =

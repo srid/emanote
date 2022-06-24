@@ -152,7 +152,7 @@ fixStaticUrl m s =
   where
     findPrefix :: Maybe Text
     findPrefix = do
-      let indexR = toText $ Ema.encodeRoute (M._modelRouteEncoder m) m indexRoute
+      let indexR = toText $ Ema.encodeRoute (M.modelRouteEncoderMust m) m indexRoute
       prefix <- T.stripSuffix "-/all.html" indexR
       guard $ not $ T.null prefix
       pure prefix

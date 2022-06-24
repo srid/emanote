@@ -50,7 +50,7 @@ data Model = Model
   { _modelStatus :: Status,
     _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
-    _modelRouteEncoder :: RouteEncoder Model SiteRoute,
+    _modelRouteEncoder :: Maybe (RouteEncoder Model SiteRoute),
     -- | Dictates how exactly to render `Pandoc` to Heist nodes.
     _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
     -- | An unique ID for this process's model. ID changes across processes.
@@ -66,9 +66,9 @@ data Model = Model
 
 makeLenses ''Model
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> EmanotePandocRenderers Model LMLRoute -> UUID -> Model
-emptyModel layers act enc ren instanceId =
-  Model Status_Loading layers act enc ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> UUID -> Model
+emptyModel layers act ren instanceId =
+  Model Status_Loading layers act def ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: Model -> Model
 modelReadyForView =
@@ -77,6 +77,10 @@ modelReadyForView =
 -- | Are we running in live server, or statically generated website?
 inLiveServer :: Model -> Bool
 inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
+
+modelRouteEncoderMust :: HasCallStack => Model -> RouteEncoder Model SiteRoute
+modelRouteEncoderMust model =
+  fromMaybe (error "RouteEncoder not initialized") $ model ^. modelRouteEncoder
 
 modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
