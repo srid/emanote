@@ -4,6 +4,7 @@ import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Data.Tree.Path qualified as PathTree
 import Ema qualified
 import Ema.Route.Encoder qualified as Ema
@@ -19,6 +20,7 @@ import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
+import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
 import Emanote.View.TagIndex qualified as TagIndex
@@ -36,8 +38,29 @@ import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
 emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteSiteOutput enc model =
-  render $ model & M.modelRouteEncoder ?~ enc
+emanoteSiteOutput enc model' r =
+  let model = model' & M.modelRouteEncoder ?~ enc
+   in render model r <&> fixStaticUrl model
+  where
+    -- See the FIXME in more-head.tpl.
+    fixStaticUrl :: Model -> LByteString -> LByteString
+    fixStaticUrl m s =
+      case findPrefix of
+        Nothing -> s
+        Just prefix ->
+          -- Patch the URL in CSS's "src" attribute.
+          encodeUtf8
+            . T.replace "src: url(_emanote-static/" ("src: url(" <> prefix <> "_emanote-static/")
+            . decodeUtf8
+            $ s
+      where
+        -- Find the "prefix" in PrefixedRoute if Emanote is used as a library.
+        findPrefix :: Maybe Text
+        findPrefix = do
+          let indexR = toText $ Ema.encodeRoute (M.modelRouteEncoderMust m) m indexRoute
+          prefix <- T.stripSuffix "-/all.html" indexR
+          guard $ not $ T.null prefix
+          pure prefix
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m sr =
