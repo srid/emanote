@@ -27,7 +27,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
 import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
-import Emanote.Model.Type (Model, ModelEma, ModelF)
+import Emanote.Model.Type (Model, ModelEma, ModelT)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
@@ -104,7 +104,7 @@ encodeResourceRoute model = \case
     R.encodeRoute r
 
 -- | Decode a route that is known to refer to a resource in the model
-decodeGeneratedRoute :: ModelF x -> FilePath -> Maybe SiteRoute
+decodeGeneratedRoute :: ModelT f -> FilePath -> Maybe SiteRoute
 decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
@@ -183,7 +183,7 @@ urlStrategySuffix model =
     Ema.UrlDirect -> ".html"
     Ema.UrlPretty -> ""
 
-urlStrategy :: ModelF x -> UrlStrategy
+urlStrategy :: ModelT f -> UrlStrategy
 urlStrategy model =
   Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
