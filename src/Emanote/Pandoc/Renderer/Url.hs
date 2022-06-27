@@ -94,7 +94,8 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
           fmap mconcat . sequence $
             toList srs
               <&> \(getSr -> sr) -> do
-                let srRoute = toText $ Ema.encodeRoute (M.modelRouteEncoderMust model) model sr
+                let (enc, modelEma) = M.withoutRouteEncoder model
+                    srRoute = toText $ Ema.encodeRoute enc modelEma sr
                     (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
                     linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
                     newIs = one $ B.Str $ show sr

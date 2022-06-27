@@ -43,7 +43,7 @@ data EmanoteConfig = EmanoteConfig
 -- | Make an Ema `Dynamic` for the Emanote model.
 --
 -- The bulk of logic for building the Dynamic is in `Patch.hs`.
-emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.Model SiteRoute -> EmanoteConfig -> m (Dynamic m Model.Model)
+emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.ModelEma SiteRoute -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
 emanoteSiteInput cliAct _enc EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom

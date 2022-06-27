@@ -14,7 +14,7 @@ import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
-import Emanote.Model.Type (Model)
+import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude
   ( BadInput (BadInput),
     log,
@@ -41,7 +41,7 @@ patchModel ::
   FilePath ->
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
-  m (Model -> Model)
+  m (ModelEma -> ModelEma)
 patchModel layers noteF fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
@@ -61,7 +61,7 @@ patchModel' ::
   FilePath ->
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
-  m (Model -> Model)
+  m (ModelEma -> ModelEma)
 patchModel' layers noteF fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do

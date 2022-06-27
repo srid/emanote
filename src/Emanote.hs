@@ -40,7 +40,7 @@ import UnliftIO (MonadUnliftIO)
 import Web.Tailwind qualified as Tailwind
 
 instance IsRoute SiteRoute where
-  type RouteModel SiteRoute = Model.Model
+  type RouteModel SiteRoute = Model.ModelEma
   routeEncoder = emanoteRouteEncoder
   allRoutes = emanoteGeneratableRoutes
 
@@ -58,9 +58,10 @@ run cfg@EmanoteConfig {..} = do
   Ema.runSiteWithCli @SiteRoute (CLI.emaCli _emanoteConfigCli) cfg
     >>= postRun cfg
 
-postRun :: EmanoteConfig -> (Model.Model, DSum Ema.CLI.Action Identity) -> IO ()
+postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO ()
 postRun EmanoteConfig {..} = \case
-  (model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
+  (model0', Ema.CLI.Generate outPath :=> Identity genPaths) -> do
+    let model0 = Model.withRouteEncoder routeEncoder model0'
     compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0

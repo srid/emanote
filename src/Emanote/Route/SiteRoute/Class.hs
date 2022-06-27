@@ -27,7 +27,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
 import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
-import Emanote.Model.Type (Model)
+import Emanote.Model.Type (Model, ModelEma, ModelF)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
@@ -37,9 +37,9 @@ import Optics.Core (prism')
 import Optics.Operators ((^.))
 import Relude
 
-type EmanoteRouteEncoder = RouteEncoder Model SiteRoute
+type EmanoteRouteEncoder = RouteEncoder ModelEma SiteRoute
 
-emanoteGeneratableRoutes :: Model -> [SiteRoute]
+emanoteGeneratableRoutes :: ModelEma -> [SiteRoute]
 emanoteGeneratableRoutes model =
   let htmlRoutes =
         model ^. M.modelNotes
@@ -89,7 +89,7 @@ emanoteRouteEncoder =
         <|> decodeGeneratedRoute model fp
         <|> pure (SiteRoute_MissingR fp)
 
-encodeResourceRoute :: HasCallStack => Model -> ResourceRoute -> FilePath
+encodeResourceRoute :: HasCallStack => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
   ResourceRoute_LML r ->
     R.encodeRoute $
@@ -104,7 +104,7 @@ encodeResourceRoute model = \case
     R.encodeRoute r
 
 -- | Decode a route that is known to refer to a resource in the model
-decodeGeneratedRoute :: Model -> FilePath -> Maybe SiteRoute
+decodeGeneratedRoute :: ModelF x -> FilePath -> Maybe SiteRoute
 decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
@@ -145,7 +145,9 @@ staticFileSiteRoute =
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
 siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrlStatic model =
-  Ema.routeUrlWith (urlStrategy model) (M.modelRouteEncoderMust model) model
+  Ema.routeUrlWith (urlStrategy model) enc modelEma
+  where
+    (enc, modelEma) = M.withoutRouteEncoder model
 
 siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
@@ -181,7 +183,7 @@ urlStrategySuffix model =
     Ema.UrlDirect -> ".html"
     Ema.UrlPretty -> ""
 
-urlStrategy :: Model -> UrlStrategy
+urlStrategy :: ModelF x -> UrlStrategy
 urlStrategy model =
   Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
