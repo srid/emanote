@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Emanote.Model.Type where
@@ -14,7 +15,6 @@ import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID (UUID)
 import Ema.CLI qualified
-import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note
@@ -39,6 +39,7 @@ import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
+import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Relude
@@ -46,11 +47,11 @@ import Relude
 data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
 
-data Model = Model
+data ModelT encF = Model
   { _modelStatus :: Status,
     _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
-    _modelRouteEncoder :: RouteEncoder Model SiteRoute,
+    _modelRoutePrism :: encF (Prism' FilePath SiteRoute),
     -- | Dictates how exactly to render `Pandoc` to Heist nodes.
     _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
     -- | An unique ID for this process's model. ID changes across processes.
@@ -64,13 +65,30 @@ data Model = Model
     _modelHeistTemplate :: TemplateState
   }
 
-makeLenses ''Model
+type Model = ModelT Identity
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> RouteEncoder Model SiteRoute -> EmanotePandocRenderers Model LMLRoute -> UUID -> Model
-emptyModel layers act enc ren instanceId =
-  Model Status_Loading layers act enc ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+-- | A bare version of `Model` that is managed by the Ema app.
+--
+-- The only difference is that this one has no `RouteEncoder`.
+type ModelEma = ModelT (Const ())
 
-modelReadyForView :: Model -> Model
+makeLenses ''ModelT
+
+withoutRoutePrism :: Model -> (Prism' FilePath SiteRoute, ModelEma)
+withoutRoutePrism model@Model {..} =
+  let _modelRoutePrism = Const ()
+   in (runIdentity $ model ^. modelRoutePrism, Model {..})
+
+withRoutePrism :: Prism' FilePath SiteRoute -> ModelEma -> Model
+withRoutePrism enc Model {..} =
+  let _modelRoutePrism = Identity enc
+   in Model {..}
+
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> UUID -> ModelEma
+emptyModel layers act ren instanceId =
+  Model Status_Loading layers act (Const ()) ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+
+modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =
   modelStatus .~ Status_Ready
 
@@ -78,7 +96,7 @@ modelReadyForView =
 inLiveServer :: Model -> Bool
 inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
 
-modelInsertNote :: Note -> Model -> Model
+modelInsertNote :: Note -> ModelT f -> ModelT f
 modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
@@ -102,7 +120,7 @@ injectAncestor (N.unRAncestor -> folderR) ns =
       let r = R.defaultLmlRoute folderR
        in Ix.updateIx r (N.ancestorPlaceholderNote folderR) ns
 
-modelDeleteNote :: LMLRoute -> Model -> Model
+modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
 modelDeleteNote k model =
   model & modelNotes
     %~ ( Ix.deleteIx k
@@ -148,40 +166,40 @@ deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in flipfoldl' Ix.delete rels candidates
 
-modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
+modelLookupStaticFile :: FilePath -> ModelT f -> Maybe StaticFile
 modelLookupStaticFile fp m = do
   r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
   Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
-modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Model -> Model
+modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> ModelT f -> ModelT f
 modelInsertStaticFile t r fp =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
     staticFile = StaticFile r fp t
 
-modelDeleteStaticFile :: R.R 'AnyExt -> Model -> Model
+modelDeleteStaticFile :: R.R 'AnyExt -> ModelT f -> ModelT f
 modelDeleteStaticFile r =
   modelStaticFiles %~ Ix.deleteIx r
 
-modelInsertData :: SData -> Model -> Model
+modelInsertData :: SData -> ModelT f -> ModelT f
 modelInsertData v =
   modelSData %~ Ix.updateIx (v ^. sdataRoute) v
 
-modelDeleteData :: R.R 'R.Yaml -> Model -> Model
+modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNoteByRoute :: LMLRoute -> Model -> Maybe Note
+modelLookupNoteByRoute :: LMLRoute -> ModelT f -> Maybe Note
 modelLookupNoteByRoute r (_modelNotes -> notes) =
   N.lookupNotesByRoute r notes
 
-modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Rel.ResolvedRelTarget Note
+modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
   Rel.resolvedRelTargetFromCandidates
     . N.lookupNotesByHtmlRoute r
     . _modelNotes
 
-modelLookupTitle :: LMLRoute -> Model -> Tit.Title
+modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =
   maybe (Tit.fromRoute r) N._noteTitle . modelLookupNoteByRoute r
 
@@ -196,11 +214,11 @@ modelWikiLinkTargets wl model =
           (model ^. modelStaticFiles) @= wl
    in fmap Right staticFiles <> fmap Left notes
 
-modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
+modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
 modelLookupStaticFileByRoute r =
   Ix.getOne . Ix.getEQ r . _modelStaticFiles
 
-modelTags :: Model -> [(HT.Tag, [Note])]
+modelTags :: ModelT f -> [(HT.Tag, [Note])]
 modelTags =
   Ix.groupAscBy @HT.Tag . _modelNotes
 
@@ -225,11 +243,11 @@ modelNoteErrors model =
 -- | Return the most suitable index LML route
 --
 --  If index.org exist, use that. Otherwise, fallback to index.md.
-modelIndexRoute :: Model -> LMLRoute
+modelIndexRoute :: ModelT f -> LMLRoute
 modelIndexRoute model = do
   resolveLmlRoute model R.indexRoute
 
-resolveLmlRoute :: forall lmlType. Model -> R ('R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRoute
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 
