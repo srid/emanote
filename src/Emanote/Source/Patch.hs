@@ -10,26 +10,22 @@ import Control.Exception (throwIO)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
-import Data.Text qualified as T
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
-import Ema.Route.Encoder qualified as Ema
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
-import Emanote.Model.Type (Model)
+import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude
   ( BadInput (BadInput),
     log,
     logD,
   )
 import Emanote.Route qualified as R
-import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.Source.Loc (Loc, LocLayers, locPath, locResolve, primaryLayer)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~))
 import Relude
-import System.FilePath (takeFileName)
 import System.UnionMount qualified as UM
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
@@ -45,7 +41,7 @@ patchModel ::
   FilePath ->
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
-  m (Model -> Model)
+  m (ModelEma -> ModelEma)
 patchModel layers noteF fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
@@ -65,7 +61,7 @@ patchModel' ::
   FilePath ->
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
-  m (Model -> Model)
+  m (ModelEma -> ModelEma)
 patchModel' layers noteF fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do
@@ -111,12 +107,9 @@ patchModel' layers noteF fpType fp action = do
               -- indicator
               readyOnTemplates = bool id M.modelReadyForView (refreshAction == UM.Existing)
           act <- do
-            s' <- readRefreshedFile refreshAction fpAbs
-            logD $ "Read " <> show (BS.length s') <> " bytes of template"
-            pure $ \m ->
-              -- HACK
-              let s = bool s' (fixStaticUrl m s') $ takeFileName fpAbs == "more-head.tpl"
-               in m & M.modelHeistTemplate %~ T.addTemplateFile fpAbs fp s
+            s <- readRefreshedFile refreshAction fpAbs
+            logD $ "Read " <> show (BS.length s) <> " bytes of template"
+            pure $ M.modelHeistTemplate %~ T.addTemplateFile fpAbs fp s
           pure $ readyOnTemplates >>> act
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
@@ -141,21 +134,6 @@ patchModel' layers noteF fpType fp action = do
                 pure $ M.modelInsertStaticFile t r fpAbs
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
-
--- See the FIXME in more-head.tpl.
-fixStaticUrl :: Model -> ByteString -> ByteString
-fixStaticUrl m s =
-  case findPrefix of
-    Nothing -> s
-    Just prefix ->
-      encodeUtf8 . T.replace "(_emanote-static/" ("(" <> prefix <> "_emanote-static/") . decodeUtf8 $ s
-  where
-    findPrefix :: Maybe Text
-    findPrefix = do
-      let indexR = toText $ Ema.encodeRoute (M._modelRouteEncoder m) m indexRoute
-      prefix <- T.stripSuffix "-/all.html" indexR
-      guard $ not $ T.null prefix
-      pure prefix
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =

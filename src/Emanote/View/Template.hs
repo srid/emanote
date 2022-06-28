@@ -4,10 +4,10 @@ import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Data.Tree.Path qualified as PathTree
 import Ema qualified
-import Ema.Route.Encoder qualified as Ema
-import Emanote.Model (Model)
+import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
@@ -19,6 +19,7 @@ import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
+import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
 import Emanote.View.TagIndex qualified as TagIndex
@@ -30,13 +31,36 @@ import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
+import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-emanoteSiteOutput :: Ema.RouteEncoder Model SiteRoute -> Model -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteSiteOutput _enc = render
+emanoteSiteOutput :: Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> Ema.Asset LByteString
+emanoteSiteOutput rp model' r =
+  let model = M.withRoutePrism rp model'
+   in render model r <&> fixStaticUrl
+  where
+    -- See the FIXME in more-head.tpl.
+    fixStaticUrl :: LByteString -> LByteString
+    fixStaticUrl s =
+      case findPrefix of
+        Nothing -> s
+        Just prefix ->
+          -- Patch the URL in CSS's "src" attribute.
+          encodeUtf8
+            . T.replace "src: url(_emanote-static/" ("src: url(" <> prefix <> "_emanote-static/")
+            . decodeUtf8
+            $ s
+      where
+        -- Find the "prefix" in PrefixedRoute if Emanote is used as a library.
+        findPrefix :: Maybe Text
+        findPrefix = do
+          let indexR = toText $ review rp indexRoute
+          prefix <- T.stripSuffix "-/all.html" indexR
+          guard $ not $ T.null prefix
+          pure prefix
 
 render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
 render m sr =
