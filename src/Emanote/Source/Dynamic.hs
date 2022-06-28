@@ -13,14 +13,12 @@ import Data.Some (Some)
 import Data.UUID.V4 qualified as UUID
 import Ema (Dynamic (..))
 import Ema.CLI qualified
-import Ema.Route.Encoder (RouteEncoder)
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Prelude (chainM)
 import Emanote.Route (LMLRoute)
-import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
@@ -43,8 +41,8 @@ data EmanoteConfig = EmanoteConfig
 -- | Make an Ema `Dynamic` for the Emanote model.
 --
 -- The bulk of logic for building the Dynamic is in `Patch.hs`.
-emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> RouteEncoder Model.ModelEma SiteRoute -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
-emanoteSiteInput cliAct _enc EmanoteConfig {..} = do
+emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
+emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer

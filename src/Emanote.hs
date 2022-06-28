@@ -18,6 +18,7 @@ import Ema
     runSiteWithCli,
   )
 import Ema.CLI qualified
+import Ema.Route.Encoder (applyRouteEncoder)
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
@@ -61,7 +62,7 @@ run cfg@EmanoteConfig {..} = do
 postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO ()
 postRun EmanoteConfig {..} = \case
   (model0', Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-    let model0 = Model.withRouteEncoder routeEncoder model0'
+    let model0 = Model.withRoutePrism (applyRouteEncoder routeEncoder model0') model0'
     compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0

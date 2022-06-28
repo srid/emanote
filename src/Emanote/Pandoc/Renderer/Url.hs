@@ -6,7 +6,6 @@ module Emanote.Pandoc.Renderer.Url
 where
 
 import Data.Text qualified as T
-import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
@@ -22,6 +21,7 @@ import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
+import Optics.Core (review)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
@@ -94,8 +94,8 @@ renderSomeInlineRefWith f getSr (is, (url, tit)) rRel model (ctxSansCustomSplici
           fmap mconcat . sequence $
             toList srs
               <&> \(getSr -> sr) -> do
-                let (enc, modelEma) = M.withoutRouteEncoder model
-                    srRoute = toText $ Ema.encodeRoute enc modelEma sr
+                let (rp, _) = M.withoutRoutePrism model
+                    srRoute = toText $ review rp sr
                     (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
                     linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
                     newIs = one $ B.Str $ show sr

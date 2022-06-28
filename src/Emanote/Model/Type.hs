@@ -15,7 +15,6 @@ import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
 import Data.UUID (UUID)
 import Ema.CLI qualified
-import Ema.Route.Encoder (RouteEncoder)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note
@@ -40,6 +39,7 @@ import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
 import Network.URI.Slug (Slug)
+import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Relude
@@ -51,7 +51,7 @@ data ModelT encF = Model
   { _modelStatus :: Status,
     _modelLayers :: Set Loc,
     _modelEmaCLIAction :: Some Ema.CLI.Action,
-    _modelRouteEncoder :: encF (RouteEncoder ModelEma SiteRoute),
+    _modelRoutePrism :: encF (Prism' FilePath SiteRoute),
     -- | Dictates how exactly to render `Pandoc` to Heist nodes.
     _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
     -- | An unique ID for this process's model. ID changes across processes.
@@ -74,14 +74,14 @@ type ModelEma = ModelT (Const ())
 
 makeLenses ''ModelT
 
-withoutRouteEncoder :: Model -> (RouteEncoder ModelEma SiteRoute, ModelEma)
-withoutRouteEncoder model@Model {..} =
-  let _modelRouteEncoder = Const ()
-   in (runIdentity $ model ^. modelRouteEncoder, Model {..})
+withoutRoutePrism :: Model -> (Prism' FilePath SiteRoute, ModelEma)
+withoutRoutePrism model@Model {..} =
+  let _modelRoutePrism = Const ()
+   in (runIdentity $ model ^. modelRoutePrism, Model {..})
 
-withRouteEncoder :: RouteEncoder ModelEma SiteRoute -> ModelEma -> Model
-withRouteEncoder enc Model {..} =
-  let _modelRouteEncoder = Identity enc
+withRoutePrism :: Prism' FilePath SiteRoute -> ModelEma -> Model
+withRoutePrism enc Model {..} =
+  let _modelRoutePrism = Identity enc
    in Model {..}
 
 emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> UUID -> ModelEma

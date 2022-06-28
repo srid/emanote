@@ -7,7 +7,6 @@ import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Tree.Path qualified as PathTree
 import Ema qualified
-import Ema.Route.Encoder qualified as Ema
 import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
@@ -32,19 +31,20 @@ import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
+import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-emanoteSiteOutput :: Ema.RouteEncoder ModelEma SiteRoute -> ModelEma -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteSiteOutput enc model' r =
-  let model = M.withRouteEncoder enc model'
-   in render model r <&> fixStaticUrl model
+emanoteSiteOutput :: Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> Ema.Asset LByteString
+emanoteSiteOutput rp model' r =
+  let model = M.withRoutePrism rp model'
+   in render model r <&> fixStaticUrl
   where
     -- See the FIXME in more-head.tpl.
-    fixStaticUrl :: Model -> LByteString -> LByteString
-    fixStaticUrl m s =
+    fixStaticUrl :: LByteString -> LByteString
+    fixStaticUrl s =
       case findPrefix of
         Nothing -> s
         Just prefix ->
@@ -57,8 +57,7 @@ emanoteSiteOutput enc model' r =
         -- Find the "prefix" in PrefixedRoute if Emanote is used as a library.
         findPrefix :: Maybe Text
         findPrefix = do
-          let (_enc, modelEma) = M.withoutRouteEncoder m
-              indexR = toText $ Ema.encodeRoute enc modelEma indexRoute
+          let indexR = toText $ review rp indexRoute
           prefix <- T.stripSuffix "-/all.html" indexR
           guard $ not $ T.null prefix
           pure prefix
