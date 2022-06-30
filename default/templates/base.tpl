@@ -24,7 +24,7 @@
   <tailwindCssShim />
 
   <!-- Heist error element -->
-  <style type="text/css">
+  <style>
     strong.error {
       color: lightcoral;
       font-size: 90%;
