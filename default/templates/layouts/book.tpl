@@ -1,4 +1,5 @@
 <apply template="base">
+  <bind tag="head-main"></bind>
   <bind tag="body-main">
     <div class="container mx-auto">
 
