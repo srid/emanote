@@ -9,7 +9,7 @@ You will need [Nix](https://nixos.org/download.html) version 2.4 or greater.
 This will provide the `emanote` command in your environment.
 
 ```sh-session
-$ nix profile install github:srid/emanote
+$ nix profile install github:EmaApps/emanote
 ```
 
 ## Using Emanote as a Home Manager service
