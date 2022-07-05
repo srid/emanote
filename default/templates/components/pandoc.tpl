@@ -91,7 +91,9 @@
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600">
     <Internal class="mavenLinkBold hover:underline" />
-    <External class="hover:underline" target="_blank" rel="noopener" />
+    <External class="hover:underline emanote-external" target="_blank" rel="noopener">
+      <NoIcon class="emanote-external-no-icon" />
+    </External>
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm" />
   <Code class="py-0.5 px-0.5 bg-gray-100" />

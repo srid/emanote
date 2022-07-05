@@ -32,8 +32,7 @@
     }
 
     /* External link icon (see https://stackoverflow.com/a/66093928/5603549)*/
-    a.emanote-external:not(.emanote-contains-image)::after
-    {
+    a.emanote-external:not(.emanote-external-no-icon)::after {
       background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='rgb(156, 163, 175)' %3E%3Cpath d='M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z' /%3E%3Cpath d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z' /%3E%3C/svg%3E") 0 0 no-repeat;
       background-size: 100% 100%;
       display: inline-block;
@@ -41,8 +40,8 @@
       width: 1em;
       content: '';
     }
-    a.emanote-external:not(.emanote-contains-image):hover::after
-    {
+
+    a.emanote-external:not(.emanote-external-no-icon):hover::after {
       background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='rgba(75, 85, 99)' %3E%3Cpath d='M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z' /%3E%3Cpath d='M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z' /%3E%3C/svg%3E") 0 0 no-repeat;
       background-size: 100% 100%;
       display: inline-block;
@@ -64,10 +63,6 @@
 
 <body class="${bodyClass}">
   <body-main />
-
-  <script type="text/javascript">
-    document.querySelectorAll('a.emanote-external').forEach(x => {if (x.querySelector('img')){ x.classList.add('emanote-contains-image');}} );
-  </script>
 </body>
 
 </html>

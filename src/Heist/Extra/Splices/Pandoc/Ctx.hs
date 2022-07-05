@@ -17,6 +17,7 @@ import Heist.Extra.Splices.Pandoc.Attr (concatAttr)
 import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Builder qualified as B
+import Text.Pandoc.Walk qualified as W
 import Text.XmlHtml qualified as X
 
 -- | The configuration context under which we must render a `Pandoc` document
@@ -115,16 +116,34 @@ inlineLookupAttr node = \case
   B.Code {} -> childTagAttr node "Code"
   B.Note _ ->
     childTagAttr node "Note"
-  B.Link _ _ (url, _) ->
-    fromMaybe B.nullAttr $ do
-      link <- X.childElementTag "PandocLink" node
-      let innerTag = if "://" `T.isInfixOf` url then "External" else "Internal"
-      pure $ attrFromNode link `concatAttr` childTagAttr link innerTag
+  link@(B.Link _ _ (url, _)) ->
+    let isExternal = "://" `T.isInfixOf` url
+        containsImage = getAny $ W.query (\case B.Image {} -> Any True; _ -> Any False) link
+     in fromMaybe B.nullAttr $ do
+          linkNode <- X.childElementTag "PandocLink" node
+          let linkTypeNode =
+                X.childElementTag
+                  ( if isExternal
+                      then "External"
+                      else "Internal"
+                  )
+                  linkNode
+          let noIconNode =
+                if isExternal && containsImage
+                  then linkTypeNode >>= X.childElementTag "NoIcon"
+                  else Nothing
+          pure $
+            attrFromNode linkNode
+              `concatAttr` attrFromMaybeNode linkTypeNode
+              `concatAttr` attrFromMaybeNode noIconNode
   _ -> B.nullAttr
+
+attrFromMaybeNode :: Maybe X.Node -> B.Attr
+attrFromMaybeNode = maybe B.nullAttr attrFromNode
 
 childTagAttr :: X.Node -> Text -> B.Attr
 childTagAttr x name =
-  maybe B.nullAttr attrFromNode $ X.childElementTag name x
+  attrFromMaybeNode $ X.childElementTag name x
 
 attrFromNode :: X.Node -> B.Attr
 attrFromNode node =
