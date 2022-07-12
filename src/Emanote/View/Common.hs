@@ -110,7 +110,7 @@ commonSplices ::
   Tit.Title ->
   H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
-  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emanote Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
