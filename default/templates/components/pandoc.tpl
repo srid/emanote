@@ -87,7 +87,9 @@
       </OrderedList:Items>
     </ul>
   </OrderedList>
-
+  <HorizontalRule>
+    <hr class="mb-3" />
+  </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600">
     <Internal class="mavenLinkBold hover:underline" />
