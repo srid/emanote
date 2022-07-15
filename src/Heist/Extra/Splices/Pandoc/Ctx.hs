@@ -116,9 +116,17 @@ inlineLookupAttr node = \case
   B.Code {} -> childTagAttr node "Code"
   B.Note _ ->
     childTagAttr node "Note"
-  link@(B.Link _ _ (url, _)) ->
+  B.Link _ inlines (url, _) ->
     let isExternal = "://" `T.isInfixOf` url
-        containsImage = getAny $ W.query (\case B.Image {} -> Any True; _ -> Any False) link
+        disableIcon =
+          getAny $
+            W.query
+              ( \case
+                  B.Image {} -> Any True
+                  B.Link {} -> Any True -- this handles wikilinks
+                  _ -> Any False
+              )
+              inlines
      in fromMaybe B.nullAttr $ do
           linkNode <- X.childElementTag "PandocLink" node
           let linkTypeNode =
@@ -129,7 +137,7 @@ inlineLookupAttr node = \case
                   )
                   linkNode
           let noIconNode =
-                if isExternal && containsImage
+                if isExternal && disableIcon
                   then linkTypeNode >>= X.childElementTag "NoIcon"
                   else Nothing
           pure $
