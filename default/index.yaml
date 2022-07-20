@@ -29,6 +29,7 @@ template:
   theme: blue
   # Value of the <base> tag.
   baseUrl: /
+  # Change this to 'pretty' if you want URLs without the '.html' suffix.
   urlStrategy: direct
   iconUrl: ${ema:homeUrl}favicon.svg
   sidebar:
