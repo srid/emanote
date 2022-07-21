@@ -3,11 +3,11 @@
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1657035110,
-        "narHash": "sha256-5dEUMiLRJ8aEQ+dEfZsB/WwdY8KbYFMSovyiZd0j1FU=",
+        "lastModified": 1658331162,
+        "narHash": "sha256-13PYisWFUbrS+HOegqBMA1SRuG5fZNOVXccAlfOIylY=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "29f0c73d6ae81200a30e5147548be7ff28620fdd",
+        "rev": "67da7235a14e93e468112bb8d2217fb0e092304b",
         "type": "github"
       },
       "original": {
@@ -70,12 +70,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1657177452,
-        "narHash": "sha256-CojBqno3Zbw9/788+kCjRXXornpc4jJGC6RYvTYdVkg=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "5cbfadba693e0453f3a4090e83fbf845e18d184b",
-        "type": "github"
+        "lastModified": 1657447684,
+        "narHash": "sha256-FCP9AuU1q6PE3vOeM5SFf58f/UKPBAsoSGDUGamNBbo=",
+        "path": "/nix/store/a885zpv9ys2p2x7qnzqvxlsy321mclip-source",
+        "rev": "5f43d8b088d3771274bcfb69d3c7435b1121ac88",
+        "type": "path"
       },
       "original": {
         "id": "nixpkgs",
@@ -99,11 +98,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1656944117,
-        "narHash": "sha256-YEvUO7OrRV1FkIZKWNgp73VZqU0wbqC7B0Gb8s8LnGI=",
+        "lastModified": 1657796772,
+        "narHash": "sha256-4JD3a9frE26VjaJysyd+DIHUJUiWsx/bFrk8tsGMSpU=",
         "owner": "srid",
         "repo": "tailwind-haskell",
-        "rev": "d3b1e27aa384bf295d05d1d716425d32b90e3e79",
+        "rev": "96f4c7f8c59eb1103b75ff7d4a753d2d4b9c1ee7",
         "type": "github"
       },
       "original": {

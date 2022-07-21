@@ -21,7 +21,6 @@ import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Ema (UrlStrategy (..), routeUrlWith)
-import Ema.Route.Encoder (RouteEncoder, mkRouteEncoder)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Meta qualified as Model
@@ -33,11 +32,9 @@ import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
-import Optics.Core (prism')
+import Optics.Core (Prism', prism')
 import Optics.Operators ((^.))
 import Relude
-
-type EmanoteRouteEncoder = RouteEncoder ModelEma SiteRoute
 
 emanoteGeneratableRoutes :: ModelEma -> [SiteRoute]
 emanoteGeneratableRoutes model =
@@ -66,11 +63,11 @@ emanoteGeneratableRoutes model =
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
 
-emanoteRouteEncoder :: HasCallStack => EmanoteRouteEncoder
-emanoteRouteEncoder =
-  mkRouteEncoder $ \(m :: ModelEma) -> prism' (enc m) (dec m)
+emanoteRouteEncoder :: HasCallStack => ModelEma -> Prism' FilePath SiteRoute
+emanoteRouteEncoder model =
+  prism' enc dec
   where
-    enc model = \case
+    enc = \case
       SiteRoute_MissingR s ->
         -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
         -- Unfortunately, since ema:multisite does isomorphism check of
@@ -84,7 +81,7 @@ emanoteRouteEncoder =
       SiteRoute_VirtualRoute r ->
         encodeVirtualRoute r
 
-    dec model fp =
+    dec fp =
       fmap SiteRoute_VirtualRoute (decodeVirtualRoute fp)
         <|> decodeGeneratedRoute model fp
         <|> pure (SiteRoute_MissingR fp)
