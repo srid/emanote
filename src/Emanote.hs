@@ -15,10 +15,11 @@ import Data.Map.Strict qualified as Map
 import Ema
   ( EmaSite (..),
     IsRoute (..),
+    fromPrism_,
     runSiteWithCli,
+    toPrism_,
   )
 import Ema.CLI qualified
-import Ema.Route.Encoder (applyRouteEncoder)
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type qualified as Model
@@ -42,8 +43,8 @@ import Web.Tailwind qualified as Tailwind
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.ModelEma
-  routeEncoder = emanoteRouteEncoder
-  allRoutes = emanoteGeneratableRoutes
+  routePrism = toPrism_ . emanoteRouteEncoder
+  routeUniverse = emanoteGeneratableRoutes
 
 instance EmaSite SiteRoute where
   type SiteArg SiteRoute = EmanoteConfig
@@ -62,7 +63,7 @@ run cfg@EmanoteConfig {..} = do
 postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO ()
 postRun EmanoteConfig {..} = \case
   (model0', Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-    let model0 = Model.withRoutePrism (applyRouteEncoder routeEncoder model0') model0'
+    let model0 = Model.withRoutePrism (fromPrism_ $ routePrism @SiteRoute model0') model0'
     compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0
