@@ -54,6 +54,7 @@ data ModelT encF = Model
     _modelRoutePrism :: encF (Prism' FilePath SiteRoute),
     -- | Dictates how exactly to render `Pandoc` to Heist nodes.
     _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
+    _modelCompileTailwind :: Bool,
     -- | An unique ID for this process's model. ID changes across processes.
     _modelInstanceID :: UUID,
     _modelNotes :: IxNote,
@@ -73,6 +74,10 @@ type Model = ModelT Identity
 -- The only difference is that this one has no `RouteEncoder`.
 type ModelEma = ModelT (Const ())
 
+deriving stock instance Generic ModelEma
+
+deriving stock instance Generic Model
+
 makeLenses ''ModelT
 
 withoutRoutePrism :: Model -> (Prism' FilePath SiteRoute, ModelEma)
@@ -85,9 +90,9 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> UUID -> ModelEma
-emptyModel layers act ren instanceId =
-  Model Status_Loading layers act (Const ()) ren instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> ModelEma
+emptyModel layers act ren ctw instanceId =
+  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
 modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =
