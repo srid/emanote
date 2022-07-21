@@ -64,6 +64,7 @@ data ModelT encF = Model
     _modelNav :: [Tree Slug],
     _modelHeistTemplate :: TemplateState
   }
+  deriving stock (Generic)
 
 type Model = ModelT Identity
 
