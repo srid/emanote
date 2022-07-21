@@ -83,7 +83,6 @@ common haskell-common
 
 common library-common
   import:           haskell-common
-  default-language: Haskell2010
 
   -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
   hs-source-dirs:   src
