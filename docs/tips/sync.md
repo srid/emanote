@@ -4,7 +4,7 @@
 
 ## Mobile editing
 
-On Android you can use the [Obsidian](https://play.google.com/store/apps/details?id=md.obsidian&hl=en&gl=US) app to edit your notes synced by Syncthing. ==Changes made on desktop and mobile propagate both ways automatically.==
+On Android[^ios] you can use the [Obsidian](https://play.google.com/store/apps/details?id=md.obsidian&hl=en&gl=US) app to edit your notes synced by Syncthing. ==Changes made on desktop and mobile propagate both ways automatically.==
 
 ## Dealing with data loss
 
@@ -13,3 +13,5 @@ Data loss is not uncommon when working with syncthing. For this reason, it is re
 Git also acts as backup if you push your repository to a remote location (GitHub or a private server via SSH).
 
 [^sup]: "superior" ... because when using Dropbox, Android phones (unlike desktop computers) cannot have automatic full-sync of files on disk.
+
+[^ios]: Obsidian can also synchronize notes between iOS and macOS [via iCloud](https://help.obsidian.md/Getting+started/Sync+your+notes+across+devices).
