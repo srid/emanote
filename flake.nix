@@ -24,28 +24,48 @@
         ./nix/docker.nix
       ];
       perSystem = { pkgs, inputs', self', ... }: {
-        haskellProjects.default = {
-          root = ./.;
-          buildTools = hp: {
-            inherit (pkgs)
-              treefmt
-              nixpkgs-fmt;
-            inherit (hp)
-              cabal-fmt
-              ormolu;
-            inherit (inputs'.tailwind-haskell.packages)
-              tailwind;
+        haskellProjects = {
+          default = {
+            root = ./.;
+            buildTools = hp: {
+              inherit (pkgs)
+                treefmt
+                nixpkgs-fmt;
+              inherit (hp)
+                cabal-fmt
+                ormolu;
+              inherit (inputs'.tailwind-haskell.packages)
+                tailwind;
+            };
+            source-overrides = {
+              inherit (inputs)
+                ema;
+            };
+            overrides = self: super: with pkgs.haskell.lib; {
+              heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
+              ixset-typed = unmarkBroken super.ixset-typed;
+              pandoc-link-context = unmarkBroken super.pandoc-link-context;
+              inherit (inputs'.tailwind-haskell.packages)
+                tailwind;
+            };
           };
-          source-overrides = {
-            inherit (inputs)
-              ema;
-          };
-          overrides = self: super: with pkgs.haskell.lib; {
-            heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
-            ixset-typed = unmarkBroken super.ixset-typed;
-            pandoc-link-context = unmarkBroken super.pandoc-link-context;
-            inherit (inputs'.tailwind-haskell.packages)
-              tailwind;
+          ghc92 = {
+            root = ./.;
+            haskellPackages = pkgs.haskell.packages.ghc923;
+            source-overrides = {
+              inherit (inputs)
+                ema;
+            };
+            overrides = self: super: with pkgs.haskell.lib; {
+              heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
+              ixset-typed = unmarkBroken super.ixset-typed;
+              pandoc-link-context = unmarkBroken super.pandoc-link-context;
+              inherit (inputs'.tailwind-haskell.packages)
+                tailwind;
+              # Needed on GHC 9.2
+              generic-data = dontCheck super.generic-data;
+              type-errors-pretty = dontCheck (doJailbreak super.type-errors-pretty);
+            };
           };
         };
         packages.test =
