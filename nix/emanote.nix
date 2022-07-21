@@ -54,6 +54,16 @@ in
                         description = ''Allow broken links in the static site'';
                         default = false;
                       };
+                      baseUrl = mkOption {
+                        type = types.str;
+                        description = ''Base URL for relative links'';
+                        default = "/";
+                      };
+                      prettyUrls = mkOption {
+                        type = types.bool;
+                        description = ''Generate links without .html'';
+                        default = false;
+                      };
                     };
                   });
                 };
@@ -85,8 +95,8 @@ in
                   # TODO: Make these options
                   configFile = (pkgs.formats.yaml { }).generate "emanote-index.yaml" {
                     template = {
-                      baseUrl = "/";
-                      urlStrategy = "direct";
+                      baseUrl = cfg.baseUrl;
+                      urlStrategy = if cfg.prettyUrls then "pretty" else "direct";
                     };
                   };
                   configDir = pkgs.runCommand "emanote-deploy-layer" { } ''
