@@ -76,7 +76,7 @@ in
                   text = ''
                     set -xe
                     cd ${cfg.pathString} 
-                    ${config.emanote.package}/bin/emanote ${if cfg.port == 0 then "" else "-p ${toString cfg.port}"}
+                    ${config.emanote.package}/bin/emanote run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
               };
