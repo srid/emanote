@@ -62,7 +62,12 @@
               pandoc-link-context = unmarkBroken super.pandoc-link-context;
               inherit (inputs'.tailwind-haskell.packages)
                 tailwind;
+
               # Needed on GHC 9.2
+              relude = dontCheck (self.callHackage "relude" "1.1.0.0" { });
+              retry = dontCheck super.retry; # For GHC 9.2.
+              streaming-commons = dontCheck super.streaming-commons; # Fails on darwin
+              http2 = dontCheck super.http2; # Fails on darwin
               generic-data = dontCheck super.generic-data;
               type-errors-pretty = dontCheck (doJailbreak super.type-errors-pretty);
             };
