@@ -2,7 +2,9 @@ module Main where
 
 import Emanote (defaultEmanoteConfig, run)
 import Emanote.CLI qualified as CLI
+import Emanote.Source.Dynamic (emanoteCompileTailwind)
 import Main.Utf8 (withUtf8)
+import Optics.Core ((.~))
 import Relude
 import Spec qualified
 import System.Environment qualified as Env
@@ -17,7 +19,7 @@ main =
     -- using separate test stanza.
     if CLI.test cli
       then test
-      else run (defaultEmanoteConfig cli)
+      else run (defaultEmanoteConfig cli & emanoteCompileTailwind .~ True)
 
 test :: IO ()
 test = do

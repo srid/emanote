@@ -22,6 +22,7 @@ import Ema
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
+import Emanote.Model.Type (modelCompileTailwind)
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer
 import Emanote.Pandoc.Renderer.Embed qualified as PF
@@ -35,7 +36,7 @@ import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
 import Emanote.View.Common (generatedCssFile)
 import Emanote.View.Export qualified as Export
 import Emanote.View.Template qualified as View
-import Optics.Core ((%), (.~))
+import Optics.Core ((%), (.~), (^.))
 import Relude
 import System.FilePath ((</>))
 import UnliftIO (MonadUnliftIO)
@@ -53,7 +54,7 @@ instance EmaSite SiteRoute where
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
-  EmanoteConfig cli id defaultEmanotePandocRenderers
+  EmanoteConfig cli id defaultEmanotePandocRenderers False
 
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
@@ -64,7 +65,8 @@ postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO
 postRun EmanoteConfig {..} = \case
   (model0', Ema.CLI.Generate outPath :=> Identity genPaths) -> do
     let model0 = Model.withRoutePrism (fromPrism_ $ routePrism @SiteRoute model0') model0'
-    compileTailwindCss (outPath </> generatedCssFile) genPaths
+    when (model0 ^. modelCompileTailwind) $
+      compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0
   _ ->

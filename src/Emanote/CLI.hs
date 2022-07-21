@@ -4,6 +4,7 @@
 module Emanote.CLI
   ( Cli (..),
     parseCli,
+    cliParser,
   )
 where
 
