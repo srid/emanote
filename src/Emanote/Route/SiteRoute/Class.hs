@@ -43,10 +43,13 @@ emanoteGeneratableRoutes model =
           & Ix.toList
           <&> noteFileSiteRoute
       staticRoutes =
-        model ^. M.modelStaticFiles
-          & Ix.toList
-          & filter (not . LiveServerFile.isLiveServerFile . R.encodeRoute . SF._staticFileRoute)
-          <&> staticFileSiteRoute
+        let includeFile f =
+              not (LiveServerFile.isLiveServerFile f)
+                || (f == LiveServerFile.tailwindFullCssPath && not (model ^. M.modelCompileTailwind))
+         in model ^. M.modelStaticFiles
+              & Ix.toList
+              & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
+              <&> staticFileSiteRoute
       virtualRoutes :: [VirtualRoute] =
         let tags = fst <$> M.modelTags model
             tagPaths =
