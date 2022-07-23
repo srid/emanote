@@ -2,6 +2,7 @@
 -- (daily notes, etc.) support in Emanote; either built-in or as plugin.
 module Emanote.Model.Calendar where
 
+import Data.Time.Calendar (Day, fromGregorianValid)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Title (Title)
 import Emanote.Model.Type (Model, modelLookupTitle)
@@ -24,15 +25,22 @@ noteSortKey note =
 
 isDailyNote :: LMLRoute -> Bool
 isDailyNote =
-  isJust . M.parseMaybe parse . R.withLmlRoute R.routeBaseName
+  isJust . parseRouteDay
+
+parseRouteDay :: LMLRoute -> Maybe Day
+parseRouteDay =
+  M.parseMaybe parse . R.withLmlRoute R.routeBaseName
   where
-    parse :: M.Parsec Void Text ()
+    parse :: M.Parsec Void Text Day
     parse = do
+      let asInt = maybe (fail "Not an int") pure . readMaybe
       -- Year
-      replicateM_ 4 M.digitChar
+      year <- asInt =<< replicateM 4 M.digitChar
       void $ M.string "-"
       -- Month
-      replicateM_ 2 M.digitChar
+      month <- asInt =<< replicateM 2 M.digitChar
       void $ M.string "-"
       -- Day
-      replicateM_ 2 M.digitChar
+      day <- asInt =<< replicateM 2 M.digitChar
+      maybe (fail "Not a date") pure $
+        fromGregorianValid year (fromInteger month) (fromInteger day)

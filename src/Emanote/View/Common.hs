@@ -110,7 +110,7 @@ commonSplices ::
   Tit.Title ->
   H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
-  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emabook Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emanote Site" ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
@@ -122,7 +122,7 @@ commonSplices withCtx model meta routeTitle = do
   "tailwindCssShim"
     ## do
       pure . RX.renderHtmlNodes $
-        if M.inLiveServer model
+        if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
           then do
             -- Twind shim doesn't reliably work in dev server mode. Let's just use the
             -- tailwind CDN.
@@ -130,6 +130,7 @@ commonSplices withCtx model meta routeTitle = do
           else do
             H.link
               -- TODO: Use ?md5 to prevent stale browser caching of CSS.
+              -- TODO: This should go through Ema route encoder!
               ! A.href (H.toValue $ cannotBeCached generatedCssFile)
               ! A.rel "stylesheet"
               ! A.type_ "text/css"

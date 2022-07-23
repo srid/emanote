@@ -1,5 +1,6 @@
 module Emanote.View.LiveServerFiles
   ( isLiveServerFile,
+    tailwindFullCssPath,
     tailwindCssFile,
   )
 where

@@ -1,8 +1,13 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Emanote.Source.Dynamic
   ( emanoteSiteInput,
     EmanoteConfig (..),
+    emanoteCompileTailwind,
+    emanoteConfigCli,
+    emanoteConfigNoteFn,
+    emanoteConfigPandocRenderers,
   )
 where
 
@@ -23,6 +28,7 @@ import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
+import Optics.TH (makeLenses)
 import Paths_emanote qualified
 import Relude
 import System.UnionMount qualified as UM
@@ -35,7 +41,9 @@ data EmanoteConfig = EmanoteConfig
     -- | A function to filter the `Note` before it gets added to the model.
     _emanoteConfigNoteFn :: Note -> Note,
     -- | How to render Pandoc to Heist HTML.
-    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute,
+    -- | Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
+    _emanoteCompileTailwind :: Bool
   }
 
 -- | Make an Ema `Dynamic` for the Emanote model.
@@ -46,7 +54,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers instanceId
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
@@ -82,3 +90,5 @@ mapFsChangesOnExt ::
   m (model -> model)
 mapFsChangesOnExt h fpType fps = do
   uncurry (h fpType) `chainM` Map.toList fps
+
+makeLenses ''EmanoteConfig
