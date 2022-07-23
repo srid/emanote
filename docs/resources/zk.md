@@ -52,13 +52,6 @@ template = "default.md"
 # Emanote only needs the filename.
 link-format = "[[{{filename}}]]"
 
-[tool]
-
-# Default editor used to open notes. When not set, the EDITOR or VISUAL
-# environment variables are used.
-editor = "nvim"
-fzf-preview = "bat -p --color always {-1}"
-
 [lsp.diagnostics]
 # Each diagnostic can have for value: none, hint, info, warning, error
 
@@ -71,6 +64,20 @@ dead-link = "error"
 There are a lot more configs available. Above only focuses on the minimal for
 configs related to Emanote integration. Full documentation of the `zk` config
 file: <https://github.com/mickael-menu/zk/blob/main/docs/config.md>
+
+Such as the editor and FZF settings:
+
+```toml
+[tool]
+
+# Default editor used to open notes. When not set, the EDITOR or VISUAL
+# environment variables are used.
+editor = "code --wait"
+#editor = "nvim"
+
+# Syntax highlighting when in commands such as "zk edit -i"
+fzf-preview = "bat -p --color always {-1}"
+```
 
 ## Editor integration
 
