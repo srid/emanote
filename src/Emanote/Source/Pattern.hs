@@ -35,6 +35,8 @@ ignorePatterns :: [FilePattern]
 ignorePatterns =
   [ -- Ignore all dotfile directories (eg: .git, .vscode)
     "**/.*/**",
+    -- Ignore vi/vim/neovim writebackup files (see ":help writebackup")
+    "**/*~",
     -- /Top-level ./-/ directory is reserved by Emanote
     "-/**"
   ]
