@@ -117,34 +117,40 @@ inlineLookupAttr node = \case
   B.Note _ ->
     childTagAttr node "Note"
   B.Link _ inlines (url, _) ->
-    let isExternal = "://" `T.isInfixOf` url
-        disableIcon =
-          getAny $
-            W.query
-              ( \case
-                  B.Image {} -> Any True
-                  B.Link {} -> Any True -- this handles wikilinks
-                  _ -> Any False
-              )
-              inlines
-     in fromMaybe B.nullAttr $ do
-          linkNode <- X.childElementTag "PandocLink" node
-          let linkTypeNode =
-                X.childElementTag
-                  ( if isExternal
-                      then "External"
-                      else "Internal"
-                  )
-                  linkNode
-          let noIconNode =
-                if isExternal && disableIcon
-                  then linkTypeNode >>= X.childElementTag "NoIcon"
-                  else Nothing
-          pure $
-            attrFromNode linkNode
-              `concatAttr` attrFromMaybeNode linkTypeNode
-              `concatAttr` attrFromMaybeNode noIconNode
+    linkLookupAttr node inlines url
   _ -> B.nullAttr
+
+linkLookupAttr :: X.Node -> [B.Inline] -> Text -> B.Attr
+linkLookupAttr node inlines url =
+  fromMaybe B.nullAttr $ do
+    linkNode <- X.childElementTag "PandocLink" node
+    let baseAttr = attrFromNode linkNode
+    pure . maybe baseAttr (concatAttr baseAttr . attrFromNode) $ do
+      determineLinkType inlines url >>= \case
+        LinkType_Internal -> X.childElementTag "Internal" linkNode
+        LinkType_External -> X.childElementTag "External" linkNode
+
+data LinkType = LinkType_Internal | LinkType_External
+  deriving stock (Eq, Show)
+
+determineLinkType :: [B.Inline] -> Text -> Maybe LinkType
+determineLinkType inlines url = do
+  if "://" `T.isInfixOf` url
+    then
+      ( do
+          guard $ not $ linkTextIsImageOrLink inlines
+          pure LinkType_External
+      )
+    else pure LinkType_Internal
+  where
+    linkTextIsImageOrLink =
+      getAny
+        . W.query
+          ( \case
+              B.Image {} -> Any True
+              B.Link {} -> Any True -- this handles wikilinks
+              _ -> Any False
+          )
 
 attrFromMaybeNode :: Maybe X.Node -> B.Attr
 attrFromMaybeNode = maybe B.nullAttr attrFromNode

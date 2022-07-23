@@ -4,9 +4,7 @@
       <context:body>
         <PandocLink class="text-gray-600">
           <Internal class="font-bold hover:bg-gray-50" />
-          <External class="hover:underline emanote-external" target="_blank" rel="noopener">
-            <NoIcon class="emanote-external-no-icon" />
-          </External>
+          <External class="hover:underline emanote-external" target="_blank" rel="noopener" />
         </PandocLink>
         <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
         <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
