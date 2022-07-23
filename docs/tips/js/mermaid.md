@@ -1,7 +1,7 @@
 ---
 page:
   headHtml: |
-    <snippet var="js.highlightjs" />
+    <snippet var="js.prism" />
     <snippet var="js.mermaid" />
 ---
 
@@ -33,7 +33,7 @@ page:
 
 The result will be:
 
-```mermaid {.nohighlight}
+```mermaid
 %%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
 graph TD;
     A-->B;
@@ -42,11 +42,9 @@ graph TD;
     C-->D;
 ```
 
-Note that mermaid.js will have trouble operating with PrismJS [[syntax-highlighting]], but it works well with highlight.js (which this note uses).
-
 ## More examples
 
-```mermaid {.nohighlight}
+```mermaid
 stateDiagram
     direction LR
     [*] --> A
@@ -59,7 +57,7 @@ stateDiagram
     B --> D
 ```
 
-```mermaid {.nohighlight}
+```mermaid
 gantt
     dateFormat  YYYY-MM-DD
     title       Adding GANTT diagram functionality to mermaid

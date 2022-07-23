@@ -5,8 +5,14 @@ In order to enable syntax highlighting, you must use a client-side JavaScript hi
 ```yaml
 page:
   headHtml: |
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js" data-manual></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+    for (var element of document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)')) {
+        Prism.highlightElement(element, false);
+    }
+    </script>
 ```
 
 Or, using the alias from the default layer's `index.yaml`:
@@ -17,7 +23,9 @@ page:
     <snippet var="js.prism" />
 ```
 
-An alias for highlight.js also exists, especially as highlight.js works better with [[mermaid]] than PrismJS:
+PrismJS will by default collide with [[mermaid]], but both above snippets uses the [filter-highlight-all](https://prismjs.com/plugins/filter-highlight-all/) PrismJS plugin avoid this collision.
+
+An alias for [highlight.js](https://highlightjs.org/) also exists, which can be useful especially if PrismJS and Mermaid keep on being troublesome together. The highlight.js package works better with Mermaid out of the box.
 
 ```yaml
 page:
