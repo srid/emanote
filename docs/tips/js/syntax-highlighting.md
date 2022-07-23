@@ -6,26 +6,22 @@ In order to enable syntax highlighting, you must use a client-side JavaScript hi
 page:
   headHtml: |
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js" data-manual></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>
-    for (var element of document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)')) {
-        Prism.highlightElement(element, false);
-    }
-    </script>
-```
 
-Or, using the alias from the default layer's `index.yaml`:
-
-```yaml
+# Alternatively use the shorthand alias instead:
 page:
   headHtml: |
     <snippet var="js.prism" />
 ```
 
-PrismJS will by default collide with [[mermaid]], but both above snippets uses the [filter-highlight-all](https://prismjs.com/plugins/filter-highlight-all/) PrismJS plugin avoid this collision.
+:::{.sticky-note .text-lg}
+**Note:** If using PrismJS together with [[mermaid]] then you need to use the `<snippet var="js.prism" />`[^js.prism-source] alias as it contains additional code to prevent PrismJS from interfering with Mermaid.
+:::
 
-An alias for [highlight.js](https://highlightjs.org/) also exists, which can be useful especially if PrismJS and Mermaid keep on being troublesome together. The highlight.js package works better with Mermaid out of the box.
+[^js.prism-source]: Source code for the `<snippet var="js.prism" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
+
+An alias for [highlight.js](https://highlightjs.org/) also exists, which can be useful especially if PrismJS and Mermaid keep on being troublesome together. The highlight.js package works better with Mermaid out of the box compared to PrismJS.
 
 ```yaml
 page:
@@ -35,7 +31,7 @@ page:
 
 Bear in mind that when using highlight.js you must manually add language support. Prism.js in contrast provides an autoload feature.
 
-## Example using PrismJS:
+## Example using PrismJS
 
 ### Python
 

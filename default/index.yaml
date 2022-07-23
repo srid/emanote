@@ -91,12 +91,20 @@ js:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js" data-manual></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <script>
-    window.addEventListener('load', function() {
+    function highlightAllExceptMermaid() {
       var elements = document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)');
       for (var element of elements) {
         Prism.highlightElement(element, false);
       }
-    })
+    }
+    window.isHotReload = window.isHotReload !== undefined;
+    if (window.isHotReload) {
+      highlightAllExceptMermaid();
+    } else {
+      window.addEventListener('load', function() {
+        highlightAllExceptMermaid();
+      });
+    }
     </script>
   # Syntax highlighting using highlight.js
   highlightjs: |
