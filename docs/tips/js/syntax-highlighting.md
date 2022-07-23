@@ -9,7 +9,7 @@ page:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
-# Alternatively use the shorthand alias instead:
+# Alternatively use the shorthand snippet alias instead:
 page:
   headHtml: |
     <snippet var="js.prism" />

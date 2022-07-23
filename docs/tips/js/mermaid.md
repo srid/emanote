@@ -20,10 +20,10 @@ page:
       mermaid.init(undefined,document.querySelectorAll(".mermaid"));
     </script>
 
-# Alternatively use the shorthand alias instead:
+# Alternatively use the shorthand snippet alias instead:
 page:
   headHtml: |
-    <script var="js.mermaid" />
+    <snippet var="js.mermaid" />
 ```
 
 ## Example using Mermaid
