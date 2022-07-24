@@ -2,11 +2,7 @@
 
 [Vim](https://www.vim.org/), and its very popular fork
 [Neovim](https://neovim.io/), are [modal text editors](https://unix.stackexchange.com/a/57708)
-for editing plain text files, and a
-[great](https://fullstackfeed.com/how-i-learned-to-love-vim/)
-[source](https://turnoff.us/geek/escape-room/)
-[of](https://www.youtube.com/watch?v=9n1dtmzqnCU)
-[memes](https://me.me/i/when-you-finally-exit-vim-l-see-this-as-an-347fca98955d43e2a9b0c97c6f811e33).
+for editing plain text files. You can use it to edit Markdown files.
 
 ## Known issue: glitches when saving file
 
@@ -60,6 +56,6 @@ For more info about this feature, see
 [`:help backupcopy`](https://vimhelp.org/options.txt.html#%27backupcopy%27),
 and [`:help writebackup`](https://vimhelp.org/options.txt.html#%27writebackup%27).
 
-This actually also affects good 'ol [vi](http://ex-vi.sourceforge.net/).
+This also affects good 'ol [vi](http://ex-vi.sourceforge.net/).
 
 Reference discussion: <https://github.com/EmaApps/emanote/issues/180#issuecomment-945049455>
