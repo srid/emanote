@@ -5,19 +5,10 @@ In order to enable syntax highlighting, you must use a client-side JavaScript hi
 ```yaml
 page:
   headHtml: |
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
-# Alternatively use the shorthand snippet alias instead:
-page:
-  headHtml: |
     <snippet var="js.prism" />
 ```
 
-:::{.sticky-note .text-lg}
-**Note:** If using PrismJS together with [[mermaid]] then you need to use the `<snippet var="js.prism" />`[^js.prism-source] alias as it contains additional code to prevent PrismJS from interfering with Mermaid.
-:::
+The above alias will add PrismJS `<style>` and `<script>` tags, as well as additional script for supporting syntax highlighting updates after hot reload when running a live server via `emanote run`.[^js.prism-source]
 
 [^js.prism-source]: Source code for the `<snippet var="js.prism" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
 
