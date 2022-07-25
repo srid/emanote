@@ -14,17 +14,12 @@ To enable this, add the following to your `page.headHtml`, either in frontmatter
 ```yaml
 page:
   headHtml: |
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({startOnLoad:false});
-      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
-    </script>
-
-# Alternatively use the shorthand snippet alias instead:
-page:
-  headHtml: |
     <snippet var="js.mermaid" />
 ```
+
+The above alias will add Mermaid `<style>` and `<script>` tags based on Emanote's defaults.[^js.mermaid-source]
+
+[^js.mermaid-source]: Source code for the `<snippet var="js.mermaid" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
 
 ## Example using Mermaid
 
