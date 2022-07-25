@@ -81,7 +81,7 @@ when writing `[[wiki links]]` and `#tags`.
 
 Available plugins:
 
-- [`zk-nvim`](https://github.com/mickael-menu/zk-nvim) for Neovim 0.5+
+- [`zk-nvim`](https://github.com/mickael-menu/zk-nvim) for [[vim|Neovim]] 0.5+
 - [`zk-vscode`](https://github.com/mickael-menu/zk-vscode) for [[vscode]]
 
 If you're already using an editor plugin such as `coc.nvim`, or otherwise have
