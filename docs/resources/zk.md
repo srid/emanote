@@ -15,11 +15,6 @@ taking tool, which makes it useful for [Obsidian](https://obsidian.md/),
 
 ## Configuring repo
 
-```toml
-[root]
-foo = "bar"
-```
-
 Inside your notes root folder (such as your repository root if you're using Git),
 run the `zk init` command:
 
