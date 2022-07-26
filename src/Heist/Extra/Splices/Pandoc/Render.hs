@@ -101,8 +101,7 @@ rpBlock' ctx@RenderCtx {..} b = case b of
     one . X.Element (headerTag level) (rpAttr $ concatAttr attr $ bAttr b)
       <$> foldMapM (rpInline ctx) is
   B.HorizontalRule ->
-    -- TODO: Style in pandoc.tpl
-    pure $ one $ X.Element "hr" [("class", "mb-3")] mempty
+    withTplTag ctx "HorizontalRule" mempty (pure $ one $ X.Element "hr" mempty mempty)
   B.Table attr _captions _colSpec (B.TableHead _ hrows) tbodys _tfoot -> do
     -- TODO: Move tailwind styles to pandoc.tpl
     let borderStyle = "border-gray-300"
