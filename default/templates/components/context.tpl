@@ -8,6 +8,16 @@
         </PandocLink>
         <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
         <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
+        <Task:Checked>
+          <apply template="/templates/components/checkbox-checked">
+            <inlines />
+          </apply>
+        </Task:Checked>
+        <Task:Unchecked>
+          <apply template="/templates/components/checkbox-unchecked">
+            <inlines />
+          </apply>
+        </Task:Unchecked>
       </context:body>
     </div>
   </context>
