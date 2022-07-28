@@ -117,7 +117,7 @@ js:
         if (callNow) func();
       }
       // isHotReload is true when "emanote run" issued a hot reload
-      window.isHotReload = window.isHotReload !== undefined;
+      var isHotReload = document.readyState !== "loading";
       if (window.isHotReload) {
         debounce(highlightAllExceptMermaid, 1000);
       } else {
