@@ -9,7 +9,7 @@ cd result
 
 echo '[input]' > stork.toml
 echo 'files = [' >> stork.toml
-rg -g '!-/' '<title>' -A1 | grep html- | sed 's/\(.*\)-  *\(.*\)/  {path = "\1", url="\1", title = "\2"},/' >> stork.toml
+rg -g '!-/' '<title>' -A1 | grep html- | sed 's/\(.*.html\)-  *\(.*\)/  {path = "\1", url="\1", title = """\2"""},/' >> stork.toml
 echo ']' >> stork.toml
 
 stork build --input stork.toml --output stork.st
