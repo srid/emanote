@@ -41,6 +41,7 @@ Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You 
 
 - [x] A task that was done
 - [ ] A task that is to be done.
+- [ ] Task with *Markdown* and links (eg: [[lua-filters]])
 - A list item with no task marker
 
 Tasks can also be written outside of list context, such as paragraphs:
