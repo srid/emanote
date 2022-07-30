@@ -44,6 +44,7 @@
 
 <body class="${bodyClass}">
   <body-main />
+  <apply template="/templates/hooks/after-body" />
 </body>
 
 </html>

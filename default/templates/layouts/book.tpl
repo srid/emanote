@@ -1,21 +1,5 @@
 <apply template="base">
-  <bind tag="head-main">
-    <link rel="stylesheet" href="https://files.stork-search.net/releases/v1.5.0/basic.css" />
-    <style>
-    .stork-wrapper .stork-output {
-      margin-top: 0;
-      border-radius: 0;
-      position: sticky;
-    }
-    .stork-wrapper .stork-message {
-      padding: 0.5rem 1rem;
-      border-radius: 0;
-      margin-top: 1px;
-      margin-bottom: 1px;
-      border-color: rgba(99,102,241,var(--tw-border-opacity));
-    }
-    </style>
-  </bind>
+  <bind tag="head-main"></bind>
   <bind tag="body-main">
     <div class="container mx-auto">
 
@@ -26,9 +10,7 @@
         <!-- Sidebar column -->
         <nav id="sidebar"
           class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:w-48 xl:w-64">
-          <div class="stork-wrapper">
-            <input data-stork="federalist" class="px-4 py-2 block w-full rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none" placeholder="Search..." />
-          </div>
+          <apply template="hooks/before-nav-content" />
           <div class="px-2 py-2 text-gray-800">
 
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
@@ -76,13 +58,12 @@
             </ema:route-tree>
 
           </div>
+          <apply template="hooks/after-nav-content" />
         </nav>
 
         <!-- Main body column -->
         <div class="flex-1 w-full overflow-x-auto bg-white">
-          <div class="stork-wrapper md:sticky top-0">
-            <div data-stork="federalist-output" class="stork-output"></div>
-          </div>
+          <apply template="/templates/hooks/before-main" />
           <main class="px-4 py-4">
             <apply template="components/note-title" />
             <apply template="components/note-body" />
@@ -93,19 +74,10 @@
             <apply template="components/metadata" />
             <apply template="/templates/hooks/note-end" />
           </main>
+          <apply template="/templates/hooks/after-main" />
         </div>
       </div>
       <apply template="components/footer" />
     </div>
-    <script src="https://files.stork-search.net/releases/v1.5.0/stork.js"></script>
-    <script>
-      if (document.readyState == 'loading') {
-        stork.register(
-          'federalist',
-          //'https://files.stork-search.net/releases/v1.5.0/federalist.st'
-          '/stork.st'
-        );
-      }
-    </script>
   </bind>
 </apply>
