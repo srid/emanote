@@ -1,4 +1,4 @@
-<!-- Stork search styling, scripts are at end of <body> -->
+<!-- Stork search styling, scripts added in after-body.tpl -->
 <link rel="stylesheet" href="https://files.stork-search.net/releases/v1.5.0/basic.css" />
 <style>
 /* Applies changes to Stork search (https://stork-search.net/)
