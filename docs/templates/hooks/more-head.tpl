@@ -25,27 +25,18 @@
 
 @media (min-width: 1024px) {
   .stork-wrapper .stork-output {
-    top: 0;
-    left: 100%;
-    position: absolute;
     width: calc(1024px - 12rem);
   }
 }
 
 @media (min-width: 1280px) {
   .stork-wrapper .stork-output {
-    top: 0;
-    left: 100%;
-    position: absolute;
     width: calc(1280px - 16rem);
   }
 }
 
 @media (min-width: 1536px) {
   .stork-wrapper .stork-output {
-    top: 0;
-    left: 100%;
-    position: absolute;
     width: calc(1536px - 16rem);
   }
 }
