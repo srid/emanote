@@ -17,9 +17,13 @@
 @media (min-width: 768px) {
   .stork-wrapper .stork-output {
     top: 0;
-    left: 100%;
+    left: calc(100% - 1px);
     position: absolute;
     width: calc(768px - 12rem);
+  }
+
+  .stork-wrapper {
+    margin-right: -1px;
   }
 }
 
