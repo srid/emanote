@@ -5,3 +5,4 @@ page:
   siteTitle: Emanote
   headHtml: |
     <snippet var="js.prism" />
+    <snippet var="js.stork-search" />

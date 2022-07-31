@@ -1,6 +1,10 @@
 ---
 template:
   name: /templates/layouts/note
+page:
+  headHtml: |
+    <snippet var="js.prism" />
+    <snippet var="js.stork-search-note" />
 ---
 
 # Neuron-like layout
