@@ -12,7 +12,7 @@
     <div class="${containerClass}">
       <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
-        <apply template="hooks/search-box" />
+        <apply template="components/stork-search" />
         <div class="md:shadow-2xl md:mb-8">
           <div class="flex-1 w-full overflow-x-auto bg-white">
             <main class="px-4 py-4">

@@ -121,6 +121,11 @@ js:
     <link rel="stylesheet" href="https://files.stork-search.net/releases/v1.5.0/basic.css" />
     <!-- Stork-search styling base stylings -->
     <style>
+      .stork-wrapper.hidden {
+        /* undo the hidden styling, in effect enabling the search box */
+        display: block;
+      }
+
       .stork-wrapper .stork-output {
         margin-top: 0;
         border-radius: 0;
