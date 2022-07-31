@@ -10,7 +10,7 @@
         <!-- Sidebar column -->
         <nav id="sidebar"
           class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:w-48 xl:w-64">
-          <apply template="hooks/before-nav-content" />
+          <apply template="hooks/search-box" />
           <div class="px-2 py-2 text-gray-800">
 
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
@@ -58,12 +58,10 @@
             </ema:route-tree>
 
           </div>
-          <apply template="hooks/after-nav-content" />
         </nav>
 
         <!-- Main body column -->
         <div class="flex-1 w-full overflow-x-auto bg-white">
-          <apply template="/templates/hooks/before-main" />
           <main class="px-4 py-4">
             <apply template="components/note-title" />
             <apply template="components/note-body" />
@@ -74,7 +72,6 @@
             <apply template="components/metadata" />
             <apply template="/templates/hooks/note-end" />
           </main>
-          <apply template="/templates/hooks/after-main" />
         </div>
       </div>
       <apply template="components/footer" />
