@@ -94,11 +94,36 @@ js:
     <script>
     /*
       Custom code from Emanote to selectively skip class="language-mermaid"
+      and also supporting syntax highlighting after a hot-reload
+      when running live server via `emanote run`
     */
     (function() {
-      var elements = document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)');
-      for (var element of elements) {
-        Prism.highlightElement(element, false);
+      function highlightAllExceptMermaid() {
+        var elements = document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)');
+        for (var element of elements) {
+          Prism.highlightElement(element, false);
+        }
+      }
+      // using debounce to run syntax highlighting instantly
+      // on page load, but run again after a delay on hot-reload
+      function debounce(func, wait) {
+        var callNow = !window.highlightTimeout;
+        var later = function() {
+          window.highlightTimeout = null;
+          if (!callNow) func();
+        };
+        clearTimeout(window.highlightTimeout);
+        window.highlightTimeout = setTimeout(later, wait);
+        if (callNow) func();
+      }
+      // isHotReload is true when "emanote run" issued a hot reload
+      var isHotReload = document.readyState !== "loading";
+      if (window.isHotReload) {
+        debounce(highlightAllExceptMermaid, 1000);
+      } else {
+        window.addEventListener('load', function() {
+          debounce(highlightAllExceptMermaid, 1000);
+        });
       }
     })();
     </script>
