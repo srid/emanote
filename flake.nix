@@ -48,6 +48,8 @@
             inherit (inputs'.tailwind-haskell.packages)
               tailwind;
           };
+          modifier = drv: with pkgs.haskell.lib;
+            addBuildDepends drv [ pkgs.stork ];
         };
         packages.test =
           pkgs.runCommand "emanote-test" { } ''
