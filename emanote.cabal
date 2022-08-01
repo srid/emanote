@@ -126,6 +126,7 @@ common library-common
     , pandoc-types
     , parsec
     , path-tree              >=0.2
+    , process-extras
     , profunctors
     , relude                 >=1.0
     , shower
@@ -135,6 +136,7 @@ common library-common
     , tailwind               >=0.3
     , text
     , time
+    , tomland
     , unionmount             >=0.2
     , unliftio
     , unordered-containers
@@ -196,6 +198,7 @@ library
     Emanote.View.Common
     Emanote.View.Export
     Emanote.View.LiveServerFiles
+    Emanote.View.Stork
     Emanote.View.TagIndex
     Emanote.View.TaskIndex
     Emanote.View.Template

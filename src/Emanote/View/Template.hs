@@ -1,5 +1,6 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
+import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
@@ -22,6 +23,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
+import Emanote.View.Stork (renderStorkIndex)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
 import Heist qualified as H
@@ -37,10 +39,10 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
-emanoteSiteOutput :: Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> Ema.Asset LByteString
-emanoteSiteOutput rp model' r =
+emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
+emanoteSiteOutput rp model' r = do
   let model = M.withRoutePrism rp model'
-   in render model r <&> fixStaticUrl
+  render model r <&> fmap fixStaticUrl
   where
     -- See the FIXME in more-head.tpl.
     fixStaticUrl :: LByteString -> LByteString
@@ -62,7 +64,7 @@ emanoteSiteOutput rp model' r =
           guard $ not $ T.null prefix
           pure prefix
 
-render :: Model -> SR.SiteRoute -> Ema.Asset LByteString
+render :: (MonadIO m, MonadLoggerIO m) => Model -> SR.SiteRoute -> m (Ema.Asset LByteString)
 render m sr =
   let setErrorPageMeta =
         MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
@@ -73,14 +75,14 @@ render m sr =
                 MN.missingNote hereRoute (toText urlPath)
                   & setErrorPageMeta
                   & MN.noteTitle .~ "! Missing link"
-          Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+          pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
         SR.SiteRoute_AmbiguousR urlPath notes -> do
           let noteAmb =
                 MN.ambiguousNoteURL urlPath notes
                   & setErrorPageMeta
                   & MN.noteTitle .~ "! Ambiguous link"
-          Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-        SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
+          pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
+        SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
         SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
@@ -95,16 +97,18 @@ renderResourceRoute m = \case
   SR.ResourceRoute_StaticFile _ fpAbs ->
     Ema.AssetStatic fpAbs
 
-renderVirtualRoute :: Model -> SR.VirtualRoute -> Ema.Asset LByteString
+renderVirtualRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.VirtualRoute -> m (Ema.Asset LByteString)
 renderVirtualRoute m = \case
   SR.VirtualRoute_TagIndex mtag ->
-    Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
+    pure $ Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
   SR.VirtualRoute_Index ->
-    Ema.AssetGenerated Ema.Html $ renderSRIndex m
+    pure $ Ema.AssetGenerated Ema.Html $ renderSRIndex m
   SR.VirtualRoute_Export ->
-    Ema.AssetGenerated Ema.Other $ renderGraphExport m
+    pure $ Ema.AssetGenerated Ema.Other $ renderGraphExport m
+  SR.VirtualRoute_StorkIndex ->
+    Ema.AssetGenerated Ema.Other <$> renderStorkIndex m
   SR.VirtualRoute_TaskIndex ->
-    Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
+    pure $ Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
 
 renderSRIndex :: Model -> LByteString
 renderSRIndex model = do
