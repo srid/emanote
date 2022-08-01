@@ -25,7 +25,7 @@ import Toml (TomlCodec, encode, list, string, text, (.=))
 storkBin :: FilePath
 storkBin = $(staticWhich "stork")
 
-data Input = Input
+newtype Input = Input
   { inputFiles :: [File]
   }
   deriving stock (Eq, Show)
