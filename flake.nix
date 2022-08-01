@@ -29,7 +29,8 @@
           buildTools = hp: {
             inherit (pkgs)
               treefmt
-              nixpkgs-fmt;
+              nixpkgs-fmt
+              stork;
             inherit (hp)
               cabal-fmt
               ormolu;
