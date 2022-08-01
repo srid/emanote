@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Emanote.View.Stork
@@ -19,7 +20,7 @@ import Relude
 import System.FilePath ((</>))
 import System.Process.ByteString (readProcessWithExitCode)
 import System.Which (staticWhich)
-import Toml
+import Toml (TomlCodec, encode, list, string, text, (.=))
 
 storkBin :: FilePath
 storkBin = $(staticWhich "stork")
