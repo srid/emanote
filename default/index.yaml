@@ -15,7 +15,7 @@ template:
   # Layout specific settings
   layout:
     # For base.tpl
-    base:  
+    base:
       # The class to apply for <body> element when using base.tpl (used by note and book layouts)
       bodyClass: bg-gray-400 overflow-y-scroll
     note:
@@ -52,10 +52,10 @@ pandoc:
     emanote:inline-tag:a/red/tag: bg-red-100
     emanote:placeholder-message: text-gray-400 border-t-2 inline-block pt-0.5
     emanote:error: text-l bg-red-100 p-2 border-2 border-black m-2 font-mono
-    emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100 
+    emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
-    note: p-2 mb-3 rounded shadow bg-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both 
+    note: p-2 mb-3 rounded shadow bg-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both
     highlight-block: px-3 py-1 mb-3 rounded bg-${theme}-100 hover:border-${theme}-400 hover:shadow border-t-8 border-${theme}-200
     highlight-inline: bg-yellow-200 px-2 py-0.5 rounded-xl
     center: flex justify-center items-center mx-auto
@@ -160,7 +160,7 @@ js:
           (function() {
             const indexName = 'emanote-search'; // used to match input[data-stork] attribute value
             const baseUrl = document.currentScript.getAttribute('data-emanote-base-url') || '/';
-            const indexUrl = baseUrl + 'stork.st';
+            const indexUrl = baseUrl + '-/stork.st';
             if (document.readyState !== 'complete') {
               window.addEventListener('load', function() {
                 stork.register(indexName, indexUrl);
@@ -244,4 +244,3 @@ js:
 emanote:
   # Whether to automatically treat folder notes as a folgezettel parent of its contents
   folder-folgezettel: true
-

@@ -10,7 +10,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # Haskell dependency overrides
-    ema.url = "github:srid/ema/multisite";
+    ema.url = "github:srid/ema/multisite-siteOutputIO";
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
@@ -29,7 +29,8 @@
           buildTools = hp: {
             inherit (pkgs)
               treefmt
-              nixpkgs-fmt;
+              nixpkgs-fmt
+              stork;
             inherit (hp)
               cabal-fmt
               ormolu;
@@ -47,6 +48,8 @@
             inherit (inputs'.tailwind-haskell.packages)
               tailwind;
           };
+          modifier = drv: with pkgs.haskell.lib;
+            addBuildDepends drv [ pkgs.stork ];
         };
         packages.test =
           pkgs.runCommand "emanote-test" { } ''
