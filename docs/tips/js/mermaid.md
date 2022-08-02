@@ -3,6 +3,7 @@ page:
   headHtml: |
     <snippet var="js.highlightjs" />
     <snippet var="js.mermaid" />
+    <snippet var="js.stork-search" />
 ---
 
 # Mermaid Diagrams

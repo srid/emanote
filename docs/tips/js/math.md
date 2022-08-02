@@ -3,6 +3,7 @@ page:
   headHtml: |
     <snippet var="js.prism" />
     <snippet var="js.mathjax" />
+    <snippet var="js.stork-search" />
 
 ---
 
