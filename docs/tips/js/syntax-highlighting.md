@@ -5,19 +5,14 @@ In order to enable syntax highlighting, you must use a client-side JavaScript hi
 ```yaml
 page:
   headHtml: |
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-```
-
-Or, using the alias from the default layer's `index.yaml`:
-
-```yaml
-page:
-  headHtml: |
     <snippet var="js.prism" />
 ```
 
-An alias for highlight.js also exists, especially as highlight.js works better with [[mermaid]] than PrismJS:
+The above alias will add PrismJS `<style>` and `<script>` tags, as well as additional script for supporting syntax highlighting updates after hot reload when running a live server via `emanote run`.[^js.prism-source]
+
+[^js.prism-source]: Source code for the `<snippet var="js.prism" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
+
+An alias for [highlight.js](https://highlightjs.org/) also exists, which can be useful especially if PrismJS and Mermaid keep on being troublesome together. The highlight.js package works better with Mermaid out of the box compared to PrismJS.
 
 ```yaml
 page:
@@ -27,7 +22,7 @@ page:
 
 Bear in mind that when using highlight.js you must manually add language support. Prism.js in contrast provides an autoload feature.
 
-## Example using PrismJS:
+## Example using PrismJS
 
 ### Python
 
