@@ -7,7 +7,6 @@ where
 import Emanote.Model.Note qualified as N
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
-import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.SiteRoute.Type (encodeTagIndexR)
 import Optics.Core ((^.))
 import Relude
@@ -17,10 +16,7 @@ import Text.Pandoc.Walk qualified as W
 -- TODO: Run this in `parseNote`?
 prepareNoteDoc :: N.Note -> B.Pandoc
 prepareNoteDoc note =
-  let doc' = preparePandoc $ note ^. N.noteDoc
-   in if R.isMdRoute (note ^. N.noteRoute)
-        then withoutH1 doc'
-        else doc'
+  preparePandoc $ note ^. N.noteDoc
 
 preparePandoc :: W.Walkable B.Inline b => b -> b
 preparePandoc =
@@ -43,12 +39,6 @@ linkifyInlineTags =
   where
     tagUrl =
       toText . encodeRoute . encodeTagIndexR . toList . HT.deconstructTag
-
-withoutH1 :: B.Pandoc -> B.Pandoc
-withoutH1 (B.Pandoc meta (B.Header 1 _ _ : rest)) =
-  B.Pandoc meta rest
-withoutH1 doc =
-  doc
 
 -- Undo font-familly on emoji spans, so the browser uses an emoji font.
 -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33

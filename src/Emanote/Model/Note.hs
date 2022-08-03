@@ -113,7 +113,7 @@ lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
   SData.lookupAeson Nothing k . _noteMeta
 
-queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> Tit.Title
+queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> (Pandoc, Tit.Title)
 queryNoteTitle r doc meta =
   let yamlNoteTitle = fromString <$> SData.lookupAeson Nothing (one "title") meta
       fileNameTitle = Tit.fromRoute r
@@ -123,7 +123,8 @@ queryNoteTitle r doc meta =
             getPandocTitle doc
           R.LMLRoute_Org _ ->
             getPandocMetaTitle doc
-   in fromMaybe fileNameTitle $ yamlNoteTitle <|> notePandocTitle
+   in fromMaybe (doc, fileNameTitle) $
+        fmap (doc,) yamlNoteTitle <|> fmap (withoutH1 doc,) notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Tit.Title
     getPandocTitle =
@@ -138,6 +139,11 @@ queryNoteTitle r doc meta =
     getPandocMetaTitle (Pandoc docMeta _) = do
       B.MetaInlines inlines <- B.lookupMeta "title" docMeta
       pure $ Tit.fromInlines inlines
+    withoutH1 :: B.Pandoc -> B.Pandoc
+    withoutH1 (B.Pandoc m (B.Header 1 _ _ : rest)) =
+      B.Pandoc m rest
+    withoutH1 x =
+      x
 
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
@@ -229,8 +235,8 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
 
 mkNoteWith :: R.LMLRoute -> Pandoc -> Aeson.Value -> [Text] -> Note
 mkNoteWith r doc' meta errs =
-  let doc = if null errs then doc' else pandocPrepend (errorDiv errs) doc'
-      tit = queryNoteTitle r doc' meta
+  let (doc'', tit) = queryNoteTitle r doc' meta
+      doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
    in Note r doc meta tit errs
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
