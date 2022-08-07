@@ -10,7 +10,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # Haskell dependency overrides
-    ema.url = "github:srid/ema/multisite";
+    ema.url = "github:srid/ema/master";
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
@@ -41,6 +41,7 @@
               ema;
           };
           overrides = self: super: with pkgs.haskell.lib; {
+            ema = dontCheck super.ema;
             heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
             ixset-typed = unmarkBroken super.ixset-typed;
             pandoc-link-context = unmarkBroken super.pandoc-link-context;

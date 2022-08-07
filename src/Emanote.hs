@@ -50,7 +50,7 @@ instance IsRoute SiteRoute where
 instance EmaSite SiteRoute where
   type SiteArg SiteRoute = EmanoteConfig
   siteInput = emanoteSiteInput
-  siteOutput = View.emanoteSiteOutput
+  siteOutput rp m r = pure $ View.emanoteSiteOutput rp m r
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
