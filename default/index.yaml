@@ -105,10 +105,14 @@ js:
   # Syntax highlighting using highlight.js
   highlightjs: |
     <!-- highlight.js -->
+    <with var="js">
     <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/hybrid.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/styles/hybrid.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
     <script>hljs.highlightAll();</script>
+    </with>
+  highlightjs-ver: 11.6.0 # Ref: https://cdnjs.com/libraries/highlight.js
   # Diagrams using mermaid.js
   mermaid: |
     <!-- mermaid.js -->
