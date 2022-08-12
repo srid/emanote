@@ -23,9 +23,13 @@ in
             type = types.submodule {
               options = {
                 package = mkOption {
-                  description = "Emanote package to use";
                   type = types.package;
                   default = inputs'.emanote.packages.default;
+                  description = ''
+                  The emanote package to use. 
+
+                  By default, the 'emanote' flake input will be used.
+                  '';
                 };
                 sites = mkOption {
                   description = "Emanote sites";
