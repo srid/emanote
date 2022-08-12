@@ -26,9 +26,9 @@ in
                   type = types.package;
                   default = inputs'.emanote.packages.default;
                   description = ''
-                  The emanote package to use. 
+                    The emanote package to use. 
 
-                  By default, the 'emanote' flake input will be used.
+                    By default, the 'emanote' flake input will be used.
                   '';
                 };
                 sites = mkOption {
