@@ -25,6 +25,7 @@ in
                 package = mkOption {
                   description = "Emanote package to use";
                   type = types.package;
+                  default = inputs'.emanote.packages.default;
                 };
                 sites = mkOption {
                   description = "Emanote sites";
