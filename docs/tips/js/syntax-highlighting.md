@@ -1,3 +1,9 @@
+---
+page:
+  headHtml: |
+    <snippet var="js.highlightjs" />
+
+---
 # Syntax Highlighting
 
 In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [PrismJS](https://prismjs.com/), and add it to `page.headHtml` of [[yaml-config]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route):
