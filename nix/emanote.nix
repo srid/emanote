@@ -86,6 +86,7 @@ in
                   text = ''
                     set -xe
                     cd ${cfg.pathString} 
+                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${config.emanote.package}/bin/emanote run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
