@@ -86,25 +86,10 @@ page:
 js:
   # Syntax highlighting using prism.js
   prism: |
-    <!-- Prism.js
-
-    FIXME: This is broken: https://github.com/EmaApps/emanote/issues/330
-    -->
+    <!-- Prism.js (doesn't work great in live server) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <!-- Note: Having data-manual attribute so our custom code controls PrismJS, which allows support of Mermaid & Emanote hot-reloads -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js" data-manual></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>
-    /*
-      Custom code from Emanote to selectively skip class="language-mermaid"
-    */
-    (function() {
-      var elements = document.querySelectorAll('pre > code[class*="language"]:not(.language-mermaid)');
-      for (var element of elements) {
-        Prism.highlightElement(element, false);
-      }
-    })();
-    </script>
   # Syntax highlighting using highlight.js
   highlightjs: |
     <!-- highlight.js -->
