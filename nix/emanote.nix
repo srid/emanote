@@ -86,7 +86,6 @@ in
                   text = ''
                     set -xe
                     cd ${cfg.pathString} 
-                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${config.emanote.package}/bin/emanote run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
@@ -108,10 +107,11 @@ in
                 pkgs.runCommand "emanote-static-website" { }
                   ''
                     mkdir $out
+                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                    --layers "${configDir};${cfg.path}" \
-                    ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                      gen $out
+                      --layers "${configDir};${cfg.path}" \
+                      ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
+                        gen $out
                   '';
             })
             config.emanote.sites;
