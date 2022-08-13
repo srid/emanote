@@ -36,5 +36,5 @@ All but the final step need to be done only once. See [architecture.md](docs/arc
 
 To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discussions][ghdiscuss].
 
-[matrix]: https://matrix.to/#/#neuron:matrix.org
+[matrix]: https://matrix.to/#/#ema:matrix.org
 [ghdiscuss]: https://github.com/srid/emanote/discussions

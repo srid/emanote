@@ -23,8 +23,13 @@ in
             type = types.submodule {
               options = {
                 package = mkOption {
-                  description = "Emanote package to use";
                   type = types.package;
+                  default = inputs'.emanote.packages.default;
+                  description = ''
+                    The emanote package to use. 
+
+                    By default, the 'emanote' flake input will be used.
+                  '';
                 };
                 sites = mkOption {
                   description = "Emanote sites";
@@ -107,10 +112,11 @@ in
                 pkgs.runCommand "emanote-static-website" { }
                   ''
                     mkdir $out
+                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                    --layers "${configDir};${cfg.path}" \
-                    ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                      gen $out
+                      --layers "${configDir};${cfg.path}" \
+                      ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
+                        gen $out
                   '';
             })
             config.emanote.sites;

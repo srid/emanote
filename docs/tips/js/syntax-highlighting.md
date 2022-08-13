@@ -1,23 +1,12 @@
+---
+page:
+  headHtml: |
+    <snippet var="js.highlightjs" />
+
+---
 # Syntax Highlighting
 
-In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [PrismJS](https://prismjs.com/), and add it to `page.headHtml` of [[yaml-config]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route):
-
-```yaml
-page:
-  headHtml: |
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/themes/prism-tomorrow.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/combine/npm/prismjs@1.23.0/prism.min.js,npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-```
-
-Or, using the alias from the default layer's `index.yaml`:
-
-```yaml
-page:
-  headHtml: |
-    <snippet var="js.prism" />
-```
-
-An alias for highlight.js also exists, especially as highlight.js works better with [[mermaid]] than PrismJS:
+In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):
 
 ```yaml
 page:
@@ -25,9 +14,21 @@ page:
     <snippet var="js.highlightjs" />
 ```
 
-Bear in mind that when using highlight.js you must manually add language support. Prism.js in contrast provides an autoload feature.
+(Source code for the `<snippet var="js.highlightjs" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map)
 
-## Example using PrismJS:
+Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell by default; otherwise, it is normally added as:
+
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.highlightjs" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
+```
+
+(The `highlightjs-ver` variable also comes from the default `index.yaml`)
+
+## Example (highlight.js)
 
 ### Python
 
