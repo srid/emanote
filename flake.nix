@@ -10,7 +10,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # Haskell dependency overrides
-    ema.url = "github:srid/ema/master";
+    ema.url = "github:srid/ema/multisite";
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
