@@ -23,7 +23,9 @@ Bear in mind that when using highlight.js you must manually add language support
 page:
   headHtml: |
     <snippet var="js.highlightjs" />
+    <with var="js">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
+    </with>
 ```
 
 (The `highlightjs-ver` variable also comes from the default `index.yaml`)
