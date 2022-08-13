@@ -76,6 +76,6 @@
       </div>
       <apply template="components/footer" />
     </div>
+    <apply template="components/stork-search-js-book" />
   </bind>
-  <apply template="components/stork-search-js-book" />
 </apply>

@@ -1,4 +1,4 @@
-<apply template="components/stork-search-js" />
+<apply template="stork-search-js" />
 <!-- Stork-search styling, specific to Emanote's Neuron-like layout -->
 <style>
 	.stork-wrapper .stork-output {
