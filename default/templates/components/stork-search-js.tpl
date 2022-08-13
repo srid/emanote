@@ -23,6 +23,13 @@
 					window.addEventListener('load', function() {
 						stork.register(indexName, indexUrl);
 					});
+
+					document.addEventListener('keydown', event => {
+						if ((event.key == 'k' || event.key == 'K') && event.ctrlKey) {
+							toggleSearch();
+							event.preventDefault();
+						}
+					});
 				} else {
 					// Override existing on Ema's hot-reload
 					stork.register(indexName, indexUrl, {forceOverwrite: true});
