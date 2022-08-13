@@ -77,4 +77,5 @@
       <apply template="components/footer" />
     </div>
   </bind>
+  <apply template="components/stork-search-js-book" />
 </apply>
