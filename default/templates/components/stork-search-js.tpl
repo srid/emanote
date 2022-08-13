@@ -1,8 +1,20 @@
-<link rel="stylesheet" href="https://files.stork-search.net/releases/v1.5.0/basic.css" />
 <script src="https://files.stork-search.net/releases/v1.5.0/stork.js"></script>
 <ema:metadata>
 	<with var="template">
 		<script data-emanote-base-url="${value:baseUrl}">
+			function toggleSearch() {
+				document.getElementById('stork-search-container').classList.toggle('hidden');
+				const shown = document.body.classList.toggle('stork-overflow-hidden-important');
+				if (shown) {
+					document.getElementById('stork-search-input').focus();
+				}
+			}
+
+			function clearSearch() {
+				document.getElementById('stork-search-container').classList.add('hidden');
+				document.body.classList.remove('stork-overflow-hidden-important');
+			}
+
 			(function() {
 				const indexName = 'emanote-search'; // used to match input[data-stork] attribute value
 				const baseUrl = document.currentScript.getAttribute('data-emanote-base-url') || '/';
@@ -12,37 +24,10 @@
 						stork.register(indexName, indexUrl);
 					});
 				} else {
+					// Override existing on Ema's hot-reload
 					stork.register(indexName, indexUrl, {forceOverwrite: true});
 				}
 			})();
 		</script>
 	</with>
 </ema:metadata>
-<!-- Stork-search styling base stylings -->
-<style>
-	.stork-wrapper .stork-output {
-		margin-top: 0;
-		border-radius: 0;
-		position: sticky;
-		border-color: rgba(99,102,241,var(--tw-border-opacity));
-		--tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),0 4px 6px -2px rgba(0, 0, 0, 0.05);
-		box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
-	}
-
-	.stork-wrapper .stork-message {
-		padding: 0.5rem 1rem;
-		border-radius: 0;
-		border-color: rgba(99,102,241,var(--tw-border-opacity));
-	}
-
-	.stork-wrapper .stork-close-button {
-		top: 0;
-		margin: 0.8em 0.6em;
-	}
-
-	.stork-wrapper .stork-close-button svg {
-		top: unset;
-		margin-left: auto;
-		margin-right: auto;
-	}
-</style>

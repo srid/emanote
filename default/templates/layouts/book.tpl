@@ -10,7 +10,7 @@
         <!-- Sidebar column -->
         <nav id="sidebar"
           class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:h-full md:w-48 xl:w-64">
-          <apply template="components/stork-search" />
+          <apply template="components/stork-search-nav" />
           <div class="px-2 py-2 text-gray-800">
 
             <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
@@ -76,6 +76,5 @@
       </div>
       <apply template="components/footer" />
     </div>
-    <apply template="components/stork-search-js-book" />
   </bind>
 </apply>

@@ -44,6 +44,7 @@
 
 <body class="${bodyClass}">
   <body-main />
+  <apply template="components/stork-search" />
 </body>
 
 </html>
