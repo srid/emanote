@@ -2,10 +2,11 @@
 <ema:metadata>
 	<with var="template">
 		<script data-emanote-base-url="${value:baseUrl}">
+			window.searchShown = false;
 			function toggleSearch() {
 				document.getElementById('stork-search-container').classList.toggle('hidden');
-				const shown = document.body.classList.toggle('stork-overflow-hidden-important');
-				if (shown) {
+				window.searchShown = document.body.classList.toggle('stork-overflow-hidden-important');
+				if (window.searchShown) {
 					document.getElementById('stork-search-input').focus();
 				}
 			}
@@ -13,6 +14,7 @@
 			function clearSearch() {
 				document.getElementById('stork-search-container').classList.add('hidden');
 				document.body.classList.remove('stork-overflow-hidden-important');
+				window.searchShown = false;
 			}
 
 			(function() {
@@ -25,7 +27,10 @@
 					});
 
 					document.addEventListener('keydown', event => {
-						if ((event.key == 'k' || event.key == 'K') && event.ctrlKey) {
+						if (window.searchShown && event.key === 'Escape') {
+							clearSearch();
+							event.preventDefault();
+						} else if ((event.key == 'k' || event.key == 'K') && (event.ctrlKey || event.metaKey)) {
 							toggleSearch();
 							event.preventDefault();
 						}
