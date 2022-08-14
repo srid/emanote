@@ -54,7 +54,9 @@ renderStorkIndex model = do
   -- TODO: this should retrieve from cache if model hasn't changed
   logW "Generating search index using Stork (this may be expensive)"
   let storkToml = Toml.encode inputCodec $ Input $ storkFiles model
-  (_, !index, _) <- liftIO $ readProcessWithExitCode storkBin ["build", "-t", "--input", "-", "--output", "-"] (encodeUtf8 storkToml)
+  -- NOTE: Cannot use "--output -" due to bug in Rust or Stork:
+  -- https://github.com/jameslittle230/stork/issues/262
+  (_, !index, _) <- liftIO $ readProcessWithExitCode storkBin ["build", "-t", "--input", "-", "--output", "/dev/stdout"] (encodeUtf8 storkToml)
   log "Done generating Stork index"
   pure $ toLazy index
 
