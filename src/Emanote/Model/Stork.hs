@@ -1,7 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Emanote.View.Stork
+module Emanote.Model.Stork
   ( renderStorkIndex,
   )
 where

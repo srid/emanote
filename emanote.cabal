@@ -169,6 +169,7 @@ library
     Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile
+    Emanote.Model.Stork
     Emanote.Model.Task
     Emanote.Model.Title
     Emanote.Model.Type
@@ -198,7 +199,6 @@ library
     Emanote.View.Common
     Emanote.View.Export
     Emanote.View.LiveServerFiles
-    Emanote.View.Stork
     Emanote.View.TagIndex
     Emanote.View.TaskIndex
     Emanote.View.Template

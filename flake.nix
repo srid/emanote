@@ -24,7 +24,7 @@
         ./nix/docker.nix
         ./nix/stork.nix
       ];
-      perSystem = { system, pkgs, inputs', self', ... }: {
+      perSystem = { pkgs, inputs', self', ... }: {
         haskellProjects.default = {
           root = ./.;
           buildTools = hp: {
