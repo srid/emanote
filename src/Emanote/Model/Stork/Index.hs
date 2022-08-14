@@ -41,8 +41,8 @@ readOrBuildStorkIndex (IndexVar indexVar) input = do
       -- And we want to encapsulate this whole thing.
       logW "STORK: Generating search index (this may be expensive)"
       (diff, !index) <- timeIt $ runStork input
-      atomically $ modifyTVar' indexVar $ \_ -> Just index
       log $ toText $ "STORK: Done generating search index in " <> showGFloat (Just 2) diff "" <> " seconds"
+      atomically $ modifyTVar' indexVar $ \_ -> Just index
       pure index
   where
     timeIt :: MonadIO m => m b -> m (Double, b)
