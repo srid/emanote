@@ -22,20 +22,21 @@
         haskell-flake.flakeModule
         ./nix/emanote.nix
         ./nix/docker.nix
+        ./nix/stork.nix
       ];
-      perSystem = { pkgs, inputs', self', ... }: {
+      perSystem = { system, pkgs, inputs', self', ... }: {
         haskellProjects.default = {
           root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt
-              nixpkgs-fmt
-              stork;
+              nixpkgs-fmt;
             inherit (hp)
               cabal-fmt
               ormolu;
             inherit (inputs'.tailwind-haskell.packages)
               tailwind;
+            inherit (self'.packages) stork;
           };
           source-overrides = {
             inherit (inputs)
@@ -50,7 +51,7 @@
               tailwind;
           };
           modifier = drv: with pkgs.haskell.lib;
-            addBuildDepends drv [ pkgs.stork ];
+            addBuildDepends drv [ self'.packages.stork ];
         };
         packages.test =
           pkgs.runCommand "emanote-test" { } ''
