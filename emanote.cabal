@@ -170,6 +170,7 @@ library
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Model.Stork
+    Emanote.Model.Stork.Index
     Emanote.Model.Task
     Emanote.Model.Title
     Emanote.Model.Type

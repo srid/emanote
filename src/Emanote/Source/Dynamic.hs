@@ -20,6 +20,7 @@ import Ema (Dynamic (..))
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
+import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Prelude (chainM)
@@ -53,7 +54,7 @@ emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action ->
 emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
-  storkIndexTVar <- newTVarIO mempty
+  storkIndexTVar <- Stork.newIndex
   let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
       initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndexTVar
   Dynamic

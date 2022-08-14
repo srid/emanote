@@ -14,6 +14,7 @@ import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
+import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude
   ( BadInput (BadInput),
@@ -35,7 +36,7 @@ patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
-  TVar (Maybe LByteString) ->
+  Stork.IndexVar ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -56,7 +57,7 @@ patchModel' ::
   (MonadIO m, MonadLogger m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
-  TVar (Maybe LByteString) ->
+  Stork.IndexVar ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -65,14 +66,22 @@ patchModel' ::
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
 patchModel' layers noteF storkIndexTVar fpType fp action = do
-  let clearStorkIndex = atomically $ writeTVar storkIndexTVar mempty
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
           pure id -- Impossible
         Just r -> do
-          clearStorkIndex
+          -- Stork doesn't support incremental building of index, so we must
+          -- clear it to pave way for a rebuild later when requested.
+          --
+          -- From https://github.com/jameslittle230/stork/discussions/112#discussioncomment-252861
+          --
+          -- > Stork also doesn't support incremental index updates today --
+          -- you'd have to re-index everything when users added a new document,
+          -- which might be prohibitively long.
+          Stork.clearStorkIndex storkIndexTVar
+
           case action of
             UM.Refresh refreshAction overlays -> do
               let fpAbs = locResolve $ head overlays
