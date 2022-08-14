@@ -35,6 +35,7 @@ patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
+  TVar (Maybe LByteString) ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -42,19 +43,20 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF fpType fp action = do
+patchModel layers noteF storkIndexTVar fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
+  TVar (Maybe LByteString) ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -62,25 +64,28 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF fpType fp action = do
+patchModel' layers noteF storkIndexTVar fpType fp action = do
+  let clearStorkIndex = atomically $ writeTVar storkIndexTVar mempty
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
           pure id -- Impossible
-        Just r -> case action of
-          UM.Refresh refreshAction overlays -> do
-            let fpAbs = locResolve $ head overlays
-                -- TODO: This should automatically be computed, instead of being passed.
-                -- We need access to the model though! With dependency management to boot.
-                -- Until this, `layers` is threaded through as a hack.
-                currentLayerPath = locPath $ primaryLayer layers
-            s <- readRefreshedFile refreshAction fpAbs
-            note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
-            pure $ M.modelInsertNote $ noteF note
-          UM.Delete -> do
-            log $ "Removing note: " <> toText fp
-            pure $ M.modelDeleteNote r
+        Just r -> do
+          clearStorkIndex
+          case action of
+            UM.Refresh refreshAction overlays -> do
+              let fpAbs = locResolve $ head overlays
+                  -- TODO: This should automatically be computed, instead of being passed.
+                  -- We need access to the model though! With dependency management to boot.
+                  -- Until this, `layers` is threaded through as a hack.
+                  currentLayerPath = locPath $ primaryLayer layers
+              s <- readRefreshedFile refreshAction fpAbs
+              note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
+              pure $ M.modelInsertNote $ noteF note
+            UM.Delete -> do
+              log $ "Removing note: " <> toText fp
+              pure $ M.modelDeleteNote r
     R.Yaml ->
       case R.mkRouteFromFilePath fp of
         Nothing ->

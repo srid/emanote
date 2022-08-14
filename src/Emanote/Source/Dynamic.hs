@@ -53,15 +53,16 @@ emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action ->
 emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
+  storkIndexTVar <- newTVarIO mempty
   let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndexTVar
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn)
+      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndexTVar)
 
 type ChangeHandler tag model m =
   tag ->

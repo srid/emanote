@@ -63,7 +63,8 @@ data ModelT encF = Model
     _modelStaticFiles :: IxStaticFile,
     _modelTasks :: IxTask,
     _modelNav :: [Tree Slug],
-    _modelHeistTemplate :: TemplateState
+    _modelHeistTemplate :: TemplateState,
+    _modelStorkIndex :: TVar (Maybe LByteString)
   }
   deriving stock (Generic)
 
@@ -90,7 +91,7 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> ModelEma
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> TVar (Maybe LByteString) -> ModelEma
 emptyModel layers act ren ctw instanceId =
   Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
