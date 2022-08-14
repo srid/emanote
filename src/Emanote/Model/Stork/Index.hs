@@ -12,7 +12,9 @@ module Emanote.Model.Stork.Index
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
 import Emanote.Prelude (log, logD, logW)
+import Numeric (showGFloat)
 import Relude
 import System.Process.ByteString (readProcessWithExitCode)
 import System.Which (staticWhich)
@@ -38,10 +40,20 @@ readOrBuildStorkIndex (IndexVar indexVar) input = do
       -- TODO: What if there are concurrent reads? We probably need a lock.
       -- And we want to encapsulate this whole thing.
       logW "STORK: Generating search index (this may be expensive)"
-      index <- runStork input
+      liftIO $ print =<< getCurrentTime
+      (diff, !index) <- timeIt $ runStork input
+      liftIO $ print =<< getCurrentTime
       atomically $ modifyTVar' indexVar $ \_ -> Just index
-      log "STORK: Done generating search index"
+      log $ toText $ "STORK: Done generating search index in " <> showGFloat (Just 2) diff "" <> " seconds"
       pure index
+  where
+    timeIt :: MonadIO m => m b -> m (Double, b)
+    timeIt m = do
+      t0 <- liftIO getCurrentTime
+      !x <- m
+      t1 <- liftIO getCurrentTime
+      let diff :: NominalDiffTime = diffUTCTime t1 t0
+      pure (realToFrac diff, x)
 
 storkBin :: FilePath
 storkBin = $(staticWhich "stork")
