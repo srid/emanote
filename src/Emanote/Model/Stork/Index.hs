@@ -40,9 +40,7 @@ readOrBuildStorkIndex (IndexVar indexVar) input = do
       -- TODO: What if there are concurrent reads? We probably need a lock.
       -- And we want to encapsulate this whole thing.
       logW "STORK: Generating search index (this may be expensive)"
-      liftIO $ print =<< getCurrentTime
       (diff, !index) <- timeIt $ runStork input
-      liftIO $ print =<< getCurrentTime
       atomically $ modifyTVar' indexVar $ \_ -> Just index
       log $ toText $ "STORK: Done generating search index in " <> showGFloat (Just 2) diff "" <> " seconds"
       pure index
