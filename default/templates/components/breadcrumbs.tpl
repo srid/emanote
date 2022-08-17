@@ -25,11 +25,10 @@
         </ema:breadcrumbs>
       </ul>
     </div>
-    <button
-      class="inline px-2 py-1 text-white bg-${theme}-100 outline-none cursor-pointer focus:outline-none"
-      title="Search documents" type="button"
-      onclick="toggleSearch()"
-      >🔍</button>
+    <button class="inline px-2 py-1 bg-gray-50 outline-none cursor-pointer focus:outline-none"
+      title="Search (Ctrl+K)" type="button" onclick="toggleSearch()">
+      <apply template="stork/stork-icon" />
+    </button>
     <button
       class="inline px-2 py-1 text-white bg-${theme}-600 outline-none cursor-pointer focus:outline-none"
       title="Toggle sidebar" type="button" onclick="toggleHidden('sidebar')">
