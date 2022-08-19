@@ -131,6 +131,7 @@ common library-common
     , relude                 >=1.0
     , shower
     , some
+    , stm
     , tagged
     , tagtree
     , tailwind               >=0.3
@@ -142,7 +143,6 @@ common library-common
     , unordered-containers
     , uri-encode
     , url-slug
-    , stm
     , uuid
     , which
     , with-utf8
