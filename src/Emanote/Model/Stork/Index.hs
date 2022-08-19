@@ -12,6 +12,7 @@ module Emanote.Model.Stork.Index
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Text qualified as T
 import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
 import Emanote.Prelude (log, logD, logW)
 import Numeric (showGFloat)
@@ -58,7 +59,7 @@ storkBin = $(staticWhich "stork")
 
 runStork :: MonadIO m => Input -> m LByteString
 runStork input = do
-  let storkToml = Toml.encode inputCodec input
+  let storkToml = handleTomlandBug $ Toml.encode inputCodec input
   (_, !index, _) <-
     liftIO $
       readProcessWithExitCode
@@ -68,6 +69,15 @@ runStork input = do
         ["build", "-t", "--input", "-", "--output", "/dev/stdout"]
         (encodeUtf8 storkToml)
   pure $ toLazy index
+  where
+    handleTomlandBug =
+      -- HACK: Deal with tomland's bug.
+      -- https://github.com/EmaApps/emanote/issues/336
+      -- https://github.com/kowainik/tomland/issues/408
+      --
+      -- This could be problematic if the user literally uses \\U in their note
+      -- title (but why would they?)
+      T.replace "\\\\U" "\\U"
 
 newtype Input = Input
   { inputFiles :: [File]
