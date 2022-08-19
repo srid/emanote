@@ -103,7 +103,7 @@ common library-common
     , data-default
     , dependent-sum
     , directory
-    , ema                    >=0.7.2
+    , ema                    >=0.8
     , filepath
     , filepattern
     , fsnotify
@@ -142,6 +142,7 @@ common library-common
     , unordered-containers
     , uri-encode
     , url-slug
+    , stm
     , uuid
     , which
     , with-utf8
