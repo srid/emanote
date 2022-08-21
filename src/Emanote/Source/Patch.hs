@@ -27,6 +27,7 @@ import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~))
 import Relude
+import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
@@ -103,7 +104,7 @@ patchModel' layers noteF storkIndexTVar fpType fp action = do
           UM.Refresh refreshAction overlays -> do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
-              readRefreshedFile refreshAction fpAbs
+              traverseToSnd (readRefreshedFile refreshAction) fpAbs
             sData <-
               liftIO $
                 either (throwIO . BadInput) pure $
