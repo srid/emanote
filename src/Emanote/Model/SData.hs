@@ -35,9 +35,10 @@ instance Indexable SDataIxs SData where
 
 makeLenses ''SData
 
-parseSDataCascading :: R.R 'R.Yaml -> NonEmpty ByteString -> Either Text SData
+parseSDataCascading :: R.R 'R.Yaml -> NonEmpty (FilePath, ByteString) -> Either Text SData
 parseSDataCascading r bs = do
-  vals <- traverse (first (show @Text) . Yaml.decodeEither') bs
+  vals <- forM bs $ \(fp, b) ->
+    (first (\err -> toText $ "Failed to parse " <> fp <> " :" <> Yaml.prettyPrintParseException err) . Yaml.decodeEither') b
   let val = mergeAesons vals
   pure $ SData val r
 
