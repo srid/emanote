@@ -8,9 +8,13 @@ You will need [Nix](https://nixos.org/download.html) version 2.4 or greater.
 
 This will provide the `emanote` command in your environment.
 
-```sh-session
+```sh
 $ nix profile install github:EmaApps/emanote
 ```
+
+## Using as `flake-parts` module
+
+[[emanote-template]] uses this approach. See https://github.com/srid/emanote-template/blob/master/flake.nix
 
 ## Using Emanote as a Home Manager service
 
@@ -43,7 +47,7 @@ Re-apply your home-manager configuration the usual way (e.g. `home-manager switc
 You will then have an `emanote` command in your profile, and a systemd
 user service running a live-preview of your notes.
 
-```sh-session
+```sh
 $ home-manager switch
 ...
 $ systemctl --user status emanote.service
