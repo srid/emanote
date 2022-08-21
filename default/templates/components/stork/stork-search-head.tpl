@@ -9,11 +9,6 @@
   .stork-overflow-hidden-important {
     overflow: hidden !important;
   }
-
-  .stork-wrapper-flat .stork-close-button svg {
-    /* small bugfix in Stork's stock styling */
-    margin: auto;
-  }
 </style>
 
 
