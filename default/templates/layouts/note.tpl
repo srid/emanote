@@ -16,7 +16,8 @@
         <div class="relative md:shadow-2xl md:mb-8">
 
           <div class="absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center">
-            <a title="Search (Ctrl+K)" class="cursor-pointer" onclick="toggleSearch()">
+            <a title="Search (Ctrl+K)" class="cursor-pointer"
+              onclick="window.emanote.stork.toggleSearch()">
               <apply template="components/stork/stork-icon" />
             </a>
           </div>

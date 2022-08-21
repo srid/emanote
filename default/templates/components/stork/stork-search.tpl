@@ -1,6 +1,6 @@
 <div id="stork-search-container"
   class="hidden fixed w-screen h-screen inset-0 backdrop-filter backdrop-blur-sm">
-  <div class="fixed w-screen h-screen inset-0" onclick="toggleSearch()"></div>
+  <div class="fixed w-screen h-screen inset-0" onclick="window.emanote.stork.toggleSearch()"></div>
 
   <div class="container mx-auto p-10 mt-10">
     <div class="stork-wrapper-flat container mx-auto">
