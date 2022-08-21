@@ -60,6 +60,7 @@ emanoteGeneratableRoutes model =
                       NE.filter (not . null) $ NE.inits tagPath
          in VirtualRoute_Index :
             VirtualRoute_Export :
+            VirtualRoute_StorkIndex :
             VirtualRoute_TaskIndex :
             (VirtualRoute_TagIndex <$> toList tagPaths)
    in htmlRoutes

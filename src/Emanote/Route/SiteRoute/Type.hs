@@ -24,6 +24,7 @@ data VirtualRoute
   = VirtualRoute_Index
   | VirtualRoute_TagIndex [HT.TagNode]
   | VirtualRoute_Export
+  | VirtualRoute_StorkIndex
   | VirtualRoute_TaskIndex
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
@@ -65,6 +66,7 @@ decodeVirtualRoute fp =
   (VirtualRoute_Index <$ decodeIndexR fp)
     <|> (VirtualRoute_TagIndex <$> decodeTagIndexR fp)
     <|> (VirtualRoute_Export <$ decodeExportR fp)
+    <|> (VirtualRoute_StorkIndex <$ decodeStorkIndexR fp)
     <|> (VirtualRoute_TaskIndex <$ decodeTaskIndexR fp)
 
 decodeIndexR :: FilePath -> Maybe ()
@@ -75,6 +77,11 @@ decodeIndexR fp = do
 decodeExportR :: FilePath -> Maybe ()
 decodeExportR fp = do
   "-" :| ["export.json"] <- R.unRoute <$> R.decodeAnyRoute fp
+  pass
+
+decodeStorkIndexR :: FilePath -> Maybe ()
+decodeStorkIndexR fp = do
+  "-" :| ["stork.st"] <- R.unRoute <$> R.decodeAnyRoute fp
   pass
 
 decodeTagIndexR :: FilePath -> Maybe [HT.TagNode]
@@ -97,6 +104,8 @@ encodeVirtualRoute = \case
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
   VirtualRoute_Export ->
     R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
+  VirtualRoute_StorkIndex ->
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["stork.st"]
   VirtualRoute_TaskIndex ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
 

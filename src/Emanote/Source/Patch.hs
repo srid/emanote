@@ -14,6 +14,7 @@ import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
+import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude
   ( BadInput (BadInput),
@@ -35,6 +36,7 @@ patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
+  Stork.IndexVar ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -42,19 +44,20 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF fpType fp action = do
+patchModel layers noteF storkIndexTVar fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
   LocLayers ->
   (N.Note -> N.Note) ->
+  Stork.IndexVar ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -62,25 +65,36 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF fpType fp action = do
+patchModel' layers noteF storkIndexTVar fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
           pure id -- Impossible
-        Just r -> case action of
-          UM.Refresh refreshAction overlays -> do
-            let fpAbs = locResolve $ head overlays
-                -- TODO: This should automatically be computed, instead of being passed.
-                -- We need access to the model though! With dependency management to boot.
-                -- Until this, `layers` is threaded through as a hack.
-                currentLayerPath = locPath $ primaryLayer layers
-            s <- readRefreshedFile refreshAction fpAbs
-            note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
-            pure $ M.modelInsertNote $ noteF note
-          UM.Delete -> do
-            log $ "Removing note: " <> toText fp
-            pure $ M.modelDeleteNote r
+        Just r -> do
+          -- Stork doesn't support incremental building of index, so we must
+          -- clear it to pave way for a rebuild later when requested.
+          --
+          -- From https://github.com/jameslittle230/stork/discussions/112#discussioncomment-252861
+          --
+          -- > Stork also doesn't support incremental index updates today --
+          -- you'd have to re-index everything when users added a new document,
+          -- which might be prohibitively long.
+          Stork.clearStorkIndex storkIndexTVar
+
+          case action of
+            UM.Refresh refreshAction overlays -> do
+              let fpAbs = locResolve $ head overlays
+                  -- TODO: This should automatically be computed, instead of being passed.
+                  -- We need access to the model though! With dependency management to boot.
+                  -- Until this, `layers` is threaded through as a hack.
+                  currentLayerPath = locPath $ primaryLayer layers
+              s <- readRefreshedFile refreshAction fpAbs
+              note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
+              pure $ M.modelInsertNote $ noteF note
+            UM.Delete -> do
+              log $ "Removing note: " <> toText fp
+              pure $ M.modelDeleteNote r
     R.Yaml ->
       case R.mkRouteFromFilePath fp of
         Nothing ->
