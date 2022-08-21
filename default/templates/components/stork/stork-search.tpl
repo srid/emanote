@@ -23,5 +23,3 @@
     </div>
   </div>
 </div>
-<apply template="stork-search-css" />
-<apply template="stork-search-js" />

@@ -34,6 +34,7 @@
   <apply template="/templates/hooks/more-head" />
 
   <head-main />
+  <apply template="components/stork/stork-search-head" />
 </head>
 
 <!-- DoNotFormat -->
