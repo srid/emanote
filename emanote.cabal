@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.6.23.1
+version:            0.7.0.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -103,7 +103,7 @@ common library-common
     , data-default
     , dependent-sum
     , directory
-    , ema                    >=0.7.2
+    , ema                    >=0.8
     , filepath
     , filepattern
     , fsnotify
@@ -126,15 +126,18 @@ common library-common
     , pandoc-types
     , parsec
     , path-tree              >=0.2
+    , process-extras
     , profunctors
     , relude                 >=1.0
     , shower
     , some
+    , stm
     , tagged
     , tagtree
     , tailwind               >=0.3
     , text
     , time
+    , tomland
     , unionmount             >=0.2
     , unliftio
     , unordered-containers
@@ -167,6 +170,8 @@ library
     Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile
+    Emanote.Model.Stork
+    Emanote.Model.Stork.Index
     Emanote.Model.Task
     Emanote.Model.Title
     Emanote.Model.Type

@@ -12,7 +12,15 @@
     <div class="${containerClass}">
       <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
-        <div class="md:shadow-2xl md:mb-8">
+
+        <div class="relative md:shadow-2xl md:mb-8">
+
+          <div class="absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center">
+            <a title="Search (Ctrl+K)" class="cursor-pointer"
+              onclick="window.emanote.stork.toggleSearch()">
+              <apply template="components/stork/stork-icon" />
+            </a>
+          </div>
           <div class="flex-1 w-full overflow-x-auto bg-white">
             <main class="px-4 py-4">
               <apply template="components/note-title" />

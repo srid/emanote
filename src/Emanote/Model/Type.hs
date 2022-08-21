@@ -27,6 +27,7 @@ import Emanote.Model.StaticFile
   ( IxStaticFile,
     StaticFile (StaticFile),
   )
+import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
@@ -63,7 +64,8 @@ data ModelT encF = Model
     _modelStaticFiles :: IxStaticFile,
     _modelTasks :: IxTask,
     _modelNav :: [Tree Slug],
-    _modelHeistTemplate :: TemplateState
+    _modelHeistTemplate :: TemplateState,
+    _modelStorkIndex :: Stork.IndexVar
   }
   deriving stock (Generic)
 
@@ -90,7 +92,7 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> ModelEma
+emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
 emptyModel layers act ren ctw instanceId =
   Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 
