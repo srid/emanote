@@ -7,7 +7,8 @@ module Emanote
   )
 where
 
-import Control.Monad.Logger (runStderrLoggingT, runStdoutLoggingT)
+import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdoutLoggingT)
+import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
@@ -20,6 +21,7 @@ import Ema
     toPrism_,
   )
 import Ema.CLI qualified
+import Ema.Dynamic (Dynamic (Dynamic))
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type (modelCompileTailwind)
@@ -58,19 +60,39 @@ defaultEmanoteConfig cli =
 
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
-  Ema.runSiteWithCli @SiteRoute (CLI.emaCli _emanoteConfigCli) cfg
-    >>= postRun cfg
+  case CLI.cmd _emanoteConfigCli of
+    CLI.Cmd_Ema emaCli ->
+      Ema.runSiteWithCli @SiteRoute emaCli cfg
+        >>= postRun cfg
+    CLI.Cmd_Export -> do
+      Dynamic (unModelEma -> model0, _) <-
+        flip runLoggerLoggingT oneOffLogger $
+          siteInput @SiteRoute (Ema.CLI.action def) cfg
+      putLBSLn $ Export.renderGraphExport model0
+  where
+    -- A logger suited for running one-off commands.
+    oneOffLogger =
+      logToStderr
+        & allowLogLevelFrom LevelError
+      where
+        allowLogLevelFrom :: LogLevel -> Logger -> Logger
+        allowLogLevelFrom minLevel (Logger f) = Logger $ \loc src level msg ->
+          if level >= minLevel
+            then f loc src level msg
+            else pass
 
 postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO ()
 postRun EmanoteConfig {..} = \case
-  (model0', Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-    let model0 = Model.withRoutePrism (fromPrism_ $ routePrism @SiteRoute model0') model0'
+  (unModelEma -> model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
     when (model0 ^. modelCompileTailwind) $
       compileTailwindCss (outPath </> generatedCssFile) genPaths
     checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
     checkBadMarkdownFiles $ Model.modelNoteErrors model0
   _ ->
     pass
+
+unModelEma :: Model.ModelEma -> Model.Model
+unModelEma m = Model.withRoutePrism (fromPrism_ $ routePrism @SiteRoute m) m
 
 checkBadMarkdownFiles :: Map LMLRoute [Text] -> IO ()
 checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
