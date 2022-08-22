@@ -1,15 +1,26 @@
+---
+page: 
+  headHtml: |
+    <snippet var="js.highlightjs" />
+    <with var="js">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/vim.min.js"></script>
+    </with>
+---
+
 # Vim
 
 [Vim](https://www.vim.org/), and its very popular fork
 [Neovim](https://neovim.io/), are [modal text editors](https://unix.stackexchange.com/a/57708)
-for editing plain text files. You can use it to edit Markdown files.
+for editing plain text files. You can use it to edit [[markdown|Markdown]] files.
+
+NOTE: If you are looking to write a Vim extension for Emanote, see [[export]].
 
 ## Known issue: glitches when saving file
 
 Vim editors has a feature that clashes with Emanote and can cause slight glitchy
 hickups when saving a file, while producing logs such as:
 
-```log
+```text
 [Info#emanote] [15:52:41] Re-registering file: ./docs/4913 R[/4913]
 [Info#emanote] [15:52:41] Removing note: guide.md
 [Info#emanote] [15:52:41] Reading file: ./docs/guide.md
@@ -23,7 +34,7 @@ hickups when saving a file, while producing logs such as:
 
 Compared to the much slimmer logs from when using for example [[vscode]]:
 
-```log
+```text
 [Info#emanote] [15:54:39] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:41] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:43] Reading file: ./docs/guide.md
