@@ -26,7 +26,7 @@
       </ul>
     </div>
     <button class="inline px-2 py-1 bg-gray-50 outline-none cursor-pointer focus:outline-none"
-      title="Search (Ctrl+K)" type="button" onclick="toggleSearch()">
+      title="Search (Ctrl+K)" type="button" onclick="window.emanote.stork.toggleSearch()">
       <apply template="stork/stork-icon" />
     </button>
     <button
