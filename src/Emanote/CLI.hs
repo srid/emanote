@@ -3,6 +3,7 @@
 
 module Emanote.CLI
   ( Cli (..),
+    Cmd (..),
     parseCli,
     cliParser,
   )
@@ -20,15 +21,21 @@ data Cli = Cli
   { layers :: NonEmpty FilePath,
     test :: Bool,
     allowBrokenLinks :: Bool,
-    emaCli :: Ema.CLI.Cli
+    cmd :: Cmd
   }
+
+data Cmd
+  = Cmd_Ema Ema.CLI.Cli
+  | Cmd_Export
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- pathList (one cwd)
   test <- switch (long "test" <> help "Run tests")
   allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
-  emaCli <- Ema.CLI.cliParser
+  cmd <-
+    fmap Cmd_Ema Ema.CLI.cliParser
+      <|> subparser (command "export" (info (pure Cmd_Export) (progDesc "Export metadata JSON")))
   pure Cli {..}
   where
     pathList defaultPath = do

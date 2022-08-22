@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.7.2.0
+version:            0.7.3.0
 license:            AGPL-3.0-only
 copyright:          2021 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -116,6 +116,7 @@ common library-common
     , map-syntax
     , megaparsec
     , monad-logger
+    , monad-logger-extras
     , mtl
     , neat-interpolation
     , optics-core
