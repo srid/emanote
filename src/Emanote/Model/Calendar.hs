@@ -19,9 +19,9 @@ backlinkSortKey model =
 
 -- HACK: Until we have a proper search support. This sorts query results for
 -- timeline
-noteSortKey :: N.Note -> (Down (Maybe Text), Title)
+noteSortKey :: N.Note -> (Down (Maybe Text), LMLRoute)
 noteSortKey note =
-  (Down $ N.lookupMeta @Text (one "date") note, N._noteTitle note)
+  (Down $ N.lookupMeta @Text (one "date") note, N._noteRoute note)
 
 isDailyNote :: LMLRoute -> Bool
 isDailyNote =
