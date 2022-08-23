@@ -16,7 +16,6 @@ import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
-import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
@@ -192,7 +191,7 @@ routeTreeSplice tCtx mr model = do
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
              getOrder tr =
                ( Meta.lookupRouteMeta @Int 0 (one "order") tr model,
-                 maybe (Tit.fromRoute tr) MN._noteTitle $ M.modelLookupNoteByRoute tr model
+                 tr
                )
              getCollapsed tr =
                Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
