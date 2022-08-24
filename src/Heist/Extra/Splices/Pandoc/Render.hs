@@ -230,7 +230,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
         HE.runCustomTemplate tpl ("ema:url" ## HI.textSplice url)
       else do
         let attrs =
-              catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title2", tit), pure ("alt2", WL.plainify is)]
+              catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", WL.plainify is)]
                 <> rpAttr (rewriteClass ctx attr)
         pure $ one . X.Element "img" attrs $ mempty
   B.Note _bs -> do
