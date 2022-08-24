@@ -224,7 +224,8 @@ rpInline' ctx@RenderCtx {..} i = case i of
             <> rpAttr (concatAttr attr $ iAttr i)
     one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
   B.Image attr is (url, tit) -> do
-    if T.isInfixOf ".pdf?t=" (T.toLower url)
+    let lowerUrl = T.toLower url
+    if T.isInfixOf ".pdf?t=" lowerUrl || T.isSuffixOf ".pdf" lowerUrl
       then do
         tpl <- HE.lookupHtmlTemplateMust "/templates/filters/embed-pdf"
         HE.runCustomTemplate tpl ("ema:url" ## HI.textSplice url)
