@@ -11,6 +11,7 @@ import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Source.Loc qualified as Loc
 import Optics.Core ((^.))
 import Relude
@@ -26,5 +27,5 @@ storkFiles model =
    in Ix.toList (model ^. M.modelNotes) <&> \note ->
         File
           ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
-          (toText $ R.encodeRoute $ N.noteHtmlRoute note)
+          (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. N.noteRoute)
           (Tit.toPlain $ note ^. N.noteTitle)
