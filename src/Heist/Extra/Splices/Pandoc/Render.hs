@@ -226,7 +226,7 @@ rpInline' ctx@RenderCtx {..} i = case i of
   B.Image attr is (url, tit) -> do
     if T.isInfixOf ".pdf?t=" (T.toLower url)
       then do
-        tpl <- HE.lookupHtmlTemplateMust $ "/templates/filters/embed-pdf"
+        tpl <- HE.lookupHtmlTemplateMust "/templates/filters/embed-pdf"
         HE.runCustomTemplate tpl ("ema:url" ## HI.textSplice url)
       else do
         let attrs =
