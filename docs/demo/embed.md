@@ -35,3 +35,10 @@ It is also posible to add images inline (example, here's the site favicon: [![[f
 The following is the result of using `![[death-note.mp4]]`.
 
 ![[death-note.mp4]]
+
+
+### PDFs
+
+An embedded version of [GitHub's Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf) is shown below:
+
+![[git-cheat-sheet-education.pdf]]
