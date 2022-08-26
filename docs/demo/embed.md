@@ -41,4 +41,10 @@ The following is the result of using `![[death-note.mp4]]`.
 
 An embedded version of [GitHub's Git Cheat Sheet](https://education.github.com/git-cheat-sheet-education.pdf) is shown below:
 
+Wikilink `![[git-cheat-sheet-education.pdf]]`
+
 ![[git-cheat-sheet-education.pdf]]
+
+Markdown link `![](git-cheat-sheet-education.pdf)`
+
+![](git-cheat-sheet-education.pdf)
