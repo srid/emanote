@@ -34,9 +34,4 @@
   .header-font {
     font-family: 'MavenPro', sans-serif;
   }
-
-  .embedded-pdf {
-    width: 100%;
-    height: 800px;
-  }
 </style>
