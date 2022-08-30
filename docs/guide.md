@@ -5,5 +5,9 @@ order: 2
 # Guide
 
 :::{.sticky-note .text-lg}
-**TODO** There is nothing here yet. You should learn from [[demo]] instead.
+**TODO** The guide section is incomplete. You should probably learn from [[demo]] instead.
 :::
+
+```query
+path:./*
+```
