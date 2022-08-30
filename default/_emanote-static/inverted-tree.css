@@ -12,7 +12,7 @@ body .tree.flipped {
 body .tree {
   overflow: auto;
   /* See more-head.tpl */
-  font-family: 'MavenPro', sans-serif;
+  font-family: 'WorkSans', sans-serif;
   font-variation-settings: 'wght' 475;
 
   font-size: 0.8em;
