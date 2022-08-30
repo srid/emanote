@@ -4,7 +4,7 @@ order: 15
 
 # Resources
 
-Applications you can use along-side Emanote.
+Applications and resources relevant to Emanote.
 
 ```query
 path:./*
