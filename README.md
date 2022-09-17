@@ -2,13 +2,13 @@
 
 [![AGPL](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://en.wikipedia.org/wiki/Affero_General_Public_License)
 [![built with nix](https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos&labelColor=73C3D5)](https://builtwithnix.org)
-[![Matrix](https://img.shields.io/matrix/neuron:matrix.org)](https://app.element.io/#/room/#neuron:matrix.org "Chat on Matrix")
+[![Matrix](https://img.shields.io/matrix/ema:matrix.org)](https://app.element.io/#/room/#ema:matrix.org "Chat on Matrix")
 
 Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](https://ema.srid.ca).
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: In beta phase, but is [nearly 1.0](https://github.com/srid/emanote/milestone/3).
+**Project Status**: [almost out of beta](https://github.com/srid/emanote/milestone/3).
 
 ## Installing and using
 
