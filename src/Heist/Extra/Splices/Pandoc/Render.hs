@@ -14,7 +14,7 @@ import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Heist qualified as H
-import Heist.Extra qualified as HE
+import Heist.Extra (runCustomNode)
 import Heist.Extra.Splices.Pandoc.Attr (concatAttr, rpAttr)
 import Heist.Extra.Splices.Pandoc.Ctx
   ( RenderCtx (..),
@@ -40,7 +40,7 @@ withTplTag :: RenderCtx -> Text -> H.Splices (HI.Splice Identity) -> HI.Splice I
 withTplTag RenderCtx {..} name splices default_ =
   case X.childElementTag name =<< rootNode of
     Nothing -> default_
-    Just node -> HE.runCustomNode node splices
+    Just node -> runCustomNode node splices
 
 rpBlock' :: RenderCtx -> B.Block -> HI.Splice Identity
 rpBlock' ctx@RenderCtx {..} b = case b of
@@ -224,16 +224,10 @@ rpInline' ctx@RenderCtx {..} i = case i of
             <> rpAttr (concatAttr attr $ iAttr i)
     one . X.Element "a" attrs <$> foldMapM (rpInline ctx) is
   B.Image attr is (url, tit) -> do
-    let lowerUrl = T.toLower url
-    if T.isInfixOf ".pdf?t=" lowerUrl || T.isSuffixOf ".pdf" lowerUrl
-      then do
-        tpl <- HE.lookupHtmlTemplateMust "/templates/filters/embed-pdf"
-        HE.runCustomTemplate tpl ("ema:url" ## HI.textSplice url)
-      else do
-        let attrs =
-              catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", WL.plainify is)]
-                <> rpAttr (rewriteClass ctx attr)
-        pure $ one . X.Element "img" attrs $ mempty
+    let attrs =
+          catMaybes [pure ("src", url), guard (not $ T.null tit) >> pure ("title", tit), pure ("alt", WL.plainify is)]
+            <> rpAttr (rewriteClass ctx attr)
+    pure $ one . X.Element "img" attrs $ mempty
   B.Note _bs -> do
     -- Footnotes are to be handled separately; see Footenotes.hs
     pure $ one $ X.Element "sup" mempty $ one $ X.TextNode "*"
