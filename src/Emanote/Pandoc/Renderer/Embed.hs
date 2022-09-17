@@ -82,6 +82,9 @@ embedStaticFileRoute model wl staticFile = do
       | any (`T.isSuffixOf` toText fp) videoExts -> do
         pure . runEmbedTemplate "video" $ do
           "ema:url" ## HI.textSplice url
+      | ".pdf" `T.isSuffixOf` toText fp -> do
+        pure . runEmbedTemplate "pdf" $ do
+          "ema:url" ## HI.textSplice url
       | otherwise -> Nothing
 
 imageExts :: [Text]
