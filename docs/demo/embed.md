@@ -26,19 +26,19 @@ See https://github.com/srid/emanote/issues/24 for progress.
 
 Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg))` (this example links to [[disaster-girl.jpg|this image]]).  See also the tip: [[adding-images]].
 
-[![](disaster-girl.jpg)](https://knowyourmeme.com/memes/disaster-girl)
+[![[disaster-girl.jpg]]](https://knowyourmeme.com/memes/disaster-girl)
 
 It is also posible to add images inline (example, here's the site favicon: [![[favicon.svg]]]{.w-6}) say in the middle of a paragraph.
 
 ### Videos
 
-The following is the result of using `![[death-note.mp4]]`.
+The following is the result of using `![[death-note.mp4]]` (note that `![](death-note.mp4)` also works).
 
 ![[death-note.mp4]]
 
 
 ### PDFs
 
-PDFs can be embedded using the same syntax; ie. `![[git-cheat-sheet-education.pdf]]` will show:
+PDFs can be embedded using the same syntax. The following is the result of using `![[git-cheat-sheet-education.pdf]]` (note that `![](git-cheat-sheet-education.pdf)` also works):
 
 ![[git-cheat-sheet-education.pdf]]

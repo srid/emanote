@@ -143,6 +143,7 @@ defaultEmanotePandocRenderers =
             PF.urlResolvingSplice
           ]
           [ PF.embedBlockWikiLinkResolvingSplice,
+            PF.embedBlockRegularLinkResolvingSplice,
             PF.queryResolvingSplice
           ]
       inlineRenderers =
