@@ -26,7 +26,7 @@ See https://github.com/srid/emanote/issues/24 for progress.
 
 Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg))` (this example links to [[disaster-girl.jpg|this image]]).  See also the tip: [[adding-images]].
 
-[![](disaster-girl.jpg)](https://knowyourmeme.com/memes/disaster-girl)
+[![[disaster-girl.jpg]]](https://knowyourmeme.com/memes/disaster-girl)
 
 It is also posible to add images inline (example, here's the site favicon: [![[favicon.svg]]]{.w-6}) say in the middle of a paragraph.
 
