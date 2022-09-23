@@ -36,8 +36,8 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute = \case
     (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
       Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
     let rRel = Resolve.resolveWikiLinkMustExist model wl
-    let f = embedBlockSiteRoute model ctx
-    RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+    RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
+      embedBlockSiteRoute model ctx
   _ ->
     Nothing
 
@@ -48,8 +48,8 @@ embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   let parentR = R.withLmlRoute R.routeParent noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-      f = embedInlineSiteRoute model wl
-  RenderedUrl.renderSomeInlineRefWith f Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
+    embedInlineSiteRoute model wl
 
 embedBlockSiteRoute :: Model -> HP.RenderCtx -> Either MN.Note SF.StaticFile -> Maybe (HI.Splice Identity)
 embedBlockSiteRoute model ctx = either (embedResourceRoute model ctx) (const Nothing)
