@@ -15,6 +15,8 @@
     ema.flake = false;
     tailwind-haskell.url = "github:srid/tailwind-haskell/master";
     tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
+    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
@@ -41,7 +43,7 @@
           };
           source-overrides = {
             inherit (inputs)
-              ema;
+              ema heist-extra;
           };
           overrides = self: super: with pkgs.haskell.lib; {
             ema = dontCheck super.ema;
