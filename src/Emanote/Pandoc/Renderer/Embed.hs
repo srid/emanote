@@ -80,7 +80,7 @@ embedResourceRoute model ctx note = do
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
-  let fp = traceShowId $ staticFile ^. SF.staticFilePath
+  let fp = staticFile ^. SF.staticFilePath
       url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
   if
       | any (`T.isSuffixOf` toText fp) imageExts ->
