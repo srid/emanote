@@ -249,6 +249,8 @@ wikilinkSpec =
       CT.hasType (CM.Symbol c)
 
 -- | Convert Pandoc AST inlines to raw text.
+--
+-- TODO: extend on top of plainify from heist-extra
 plainify :: [B.Inline] -> Text
 plainify = W.query $ \case
   B.Str x -> x
