@@ -42,3 +42,7 @@ The following is the result of using `![[death-note.mp4]]`.
 PDFs can be embedded using the same syntax; ie. `![[git-cheat-sheet-education.pdf]]` will show:
 
 ![[git-cheat-sheet-education.pdf]]
+
+Or it can also be embedded using the regular image link syntax; ie. `![](git-cheat-sheet-education.pdf)` will show:
+
+![Embedded PDF](git-cheat-sheet-education.pdf)
