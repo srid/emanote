@@ -32,17 +32,13 @@ It is also posible to add images inline (example, here's the site favicon: [![[f
 
 ### Videos
 
-The following is the result of using `![[death-note.mp4]]`.
+The following is the result of using `![[death-note.mp4]]` (note that `![](death-note.mp4)` also works).
 
 ![[death-note.mp4]]
 
 
 ### PDFs
 
-PDFs can be embedded using the same syntax; ie. `![[git-cheat-sheet-education.pdf]]` will show:
+PDFs can be embedded using the same syntax. The following is the result of using `![[git-cheat-sheet-education.pdf]]` (note that `![](git-cheat-sheet-education.pdf)` also works):
 
 ![[git-cheat-sheet-education.pdf]]
-
-Or it can also be embedded using the regular image link syntax; ie. `![](git-cheat-sheet-education.pdf)` will show:
-
-![Embedded PDF](git-cheat-sheet-education.pdf)
