@@ -109,6 +109,7 @@ common library-common
     , fsnotify
     , hedgehog
     , heist-emanote          >=1.2.1
+    , heist-extra
     , hspec
     , hspec-hedgehog
     , ixset-typed            >=0.5.1.0
@@ -125,7 +126,6 @@ common library-common
     , pandoc
     , pandoc-link-context    >=1.4.0
     , pandoc-types
-    , heist-extra
     , parsec
     , path-tree              >=0.2
     , process-extras
