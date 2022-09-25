@@ -30,6 +30,7 @@
       perSystem = { pkgs, inputs', self', ... }: {
         haskellProjects.default = {
           root = ./.;
+          name = "emanote";
           buildTools = hp: {
             inherit (pkgs)
               treefmt
