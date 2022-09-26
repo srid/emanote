@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="https://files.stork-search.net/releases/v1.5.0/flat.css" />
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/flat.css" />
 <!-- Custom Stork-search styling for Emanote -->
 <style>
   #stork-search-container {
@@ -12,7 +12,7 @@
 </style>
 
 
-<script src="https://files.stork-search.net/releases/v1.5.0/stork.js"></script>
+<script src="${ema:emanoteStaticLayerUrl}/stork/stork.js"></script>
 <ema:metadata>
   <with var="template">
     <script data-emanote-base-url="${value:baseUrl}">
@@ -38,6 +38,7 @@
           const indexUrl = baseUrl + '-/stork.st';
           if (document.readyState !== 'complete') {
             window.addEventListener('load', function () {
+              stork.initialize(baseUrl + '_emanote-static/stork/stork.wasm');
               stork.register(indexName, indexUrl);
             });
 
