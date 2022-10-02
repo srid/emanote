@@ -175,6 +175,7 @@ library
     Emanote.Model.Title
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
+    Emanote.Pandoc.BuiltinFiltersSpec
     Emanote.Pandoc.Link
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag

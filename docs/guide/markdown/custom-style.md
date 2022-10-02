@@ -1,10 +1,23 @@
 ---
 tags: [emanote/syntax/demo]
+
+page:
+  headHtml: |
+    <script>
+      window.MathJax = {
+        startup: {
+          ready: () => {
+            MathJax.startup.defaultReady();
+          }
+        }
+      };
+    </script>
+    <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 ---
 
 # Custom CSS styling
 
-Parts of your Markdown may be styled using custom CSS classes provided by TailwindCSS.  
+Parts of your Markdown may be styled using custom CSS classes provided by TailwindCSS.
 
 The [attributes extension](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a "class map" in [[yaml-config|index.yaml]], the default value of which provides some builtin-in styles.
 
@@ -30,9 +43,9 @@ You should expect the above text to appear styled like a yellow sticky note, bec
 A portion of Markdown that is highlighted compared to the rest
 :::
 
-## Advanced styling 
+## Advanced styling
 
-Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes. 
+Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes.
 
 [div]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div
 
@@ -46,3 +59,28 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 
 
 [^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accepting non-standard class names, such as the Tailwind responsive classes (eg. `lg:grid-cols-2`).
+
+## External link icons
+
+A link whose address begins with an [URI scheme](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax) component is considered an external link. Emanote displays an icon next to an external hyperlink if its description contains some text, including inline code and math formulas (a common non-example is a hyperlink containing only an image in the description). The heuristic is intended to make the site look good in most cases. This behaviour can be overriden by setting the value of the `data-linkicon` attribute of a link:
+  * set `data-linkicon=show` in order to force displaying the icon next to the link;
+  * set `data-linkicon` to any other value (e.g. `hide`) to prevent displaying the icon next to the link.
+
+Note that the attribute can also be used in the template parts of the website (like the footer or the sidebar) or in raw HTML parts of the document. If this heuristic fails badly in your usecase, please [raise an issue](https://github.com/EmaApps/emanote/issues).
+
+One may easily customize the displayed icon basing on the link properties. By default, a custom icon is displayed if the scheme component is `mailto:`. Check the CSS in the [`default/templates/base.tpl`](https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl) template.
+
+* No special styling:
+  * [the emanote repo](https://github.com/EmaApps/emanote)
+  * [why the external link symbol ![[external-link-icon.svg]] is not in Unicode](https://www.unicode.org/alloc/nonapprovals.html)
+  * [$e^{i \pi} + 1 = 0$](https://en.wikipedia.org/wiki/Euler%27s_identity)
+  * [`(>>=) :: forall a b. m a -> (a -> m b) -> m b`](https://hackage.haskell.org/package/base/docs/Prelude.html#v:-62--62--61-)
+  * [![[hello-badge.svg]]](https://emanote.srid.ca)
+  * mother_hetchel@weaversguild.com
+* `{data-linkicon=hide}` used to suppress the icon:
+  * Water's formula is [H](https://en.wikipedia.org/wiki/Hydrogen){data-linkicon=hide}₂[O](https://en.wikipedia.org/wiki/Oxygen){data-linkicon=hide}.
+  * A 90's style hyperlink:
+    :::{.flex .justify-center}
+    [➡➡➡ **CLICK HERE!!!** ⬅⬅⬅](https://emanote.srid.ca){class="shadow-lg border-8 rounded-md bg-yellow-400 border-red-200" data-linkicon=hide}
+* `{data-linkicon=show}` used to show the icon
+  * [![[pIqaD.svg]]](https://en.wikipedia.org/wiki/Klingon_scripts){data-linkicon=show}
