@@ -13,7 +13,7 @@ page:
 :::{.text-gray-600}
 [Emanote][gh] is currently in **beta** phase. Feel free to try it out and give feedback, to ensure that the upcoming 1.0 release is solid. See [[examples|websites using Emanote]].
 
-Begin from [[start]], and then read through [[demo]].  Eventually, [[guide]] will contain full documentation.
+Begin from [[start]], and then read through [[guide]].
 
 Emanote is written in [Haskell](https://srid.ca/haskell). If you are interested in contributing, see [[architecture]].
 :::

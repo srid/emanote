@@ -1,3 +1,7 @@
+---
+order: -95
+---
+
 # Obsidian-style queries
 
 Emanote supports [Obsidian-style embed queries](https://help.obsidian.md/Plugins/Search#Embed+search+results). See [\#10](https://github.com/EmaApps/emanote/issues/10) for details. 

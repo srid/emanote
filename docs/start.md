@@ -11,4 +11,4 @@ order: 1
 - Run `emanote run --port=8080` (or just `emanote`) in terminal after `cd`'ing to that notebook folder; this will launch the live server.
   - Or, if you only want to generate the HTML files (for deployment), run `mkdir /tmp/output; emanote gen /tmp/output`.
 
-From here, either visit [[guide]] or [[demo]].
+From here, either visit [[guide]].

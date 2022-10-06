@@ -1,3 +1,6 @@
+---
+order: -90
+---
 # Full-text search
 
 Emanote provides client-side full-text search using [Stork](https://stork-search.net/)[^1]. Search should work in both live server and the statically generated site.

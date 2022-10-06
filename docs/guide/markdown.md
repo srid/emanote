@@ -4,7 +4,7 @@ page:
   description: "Various non-standard Markdown features supported by Emanote"
 ---
 
-# *Extended* Markdown :writing_hand:
+# Markdown :writing_hand:
 
 Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is also supported in a basic form. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
