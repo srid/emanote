@@ -28,4 +28,4 @@ Ema acts as the framework orchestrating two things at the same time:
 
 In addition, we have the following non-source files in the Git repository that are vital to Emanote's functionality:
 
-- `./default`: The primary and first "layer" used, which provides the default HTML templates (we use Heist), `index.md` and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
+- `./default`: The primary and first "[[layer|layer]]" used, which provides the default HTML templates (we use Heist), `index.md` and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
