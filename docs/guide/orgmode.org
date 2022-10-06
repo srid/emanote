@@ -1,4 +1,4 @@
-#+TITLE: Org Mode
+#+TITLE: Org Mode ✍️
 
 Emanote provides first-class support for [[file:markdown.md][Markdown]]. But it also supports secondary formats (albeit not necessarily with the same level of support) beginning with [[https://orgmode.org/][Org Mode]]. See Pandoc's [[https://pandoc.org/org.html][Org section]] for information on controlling the parsing.
 

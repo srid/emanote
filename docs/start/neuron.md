@@ -1,6 +1,10 @@
+---
+order: 2
+---
+
 # Migrating from neuron
 
-To use Emanote in your existing notebook,
+To use Emanote in your existing [neuron](https://github.com/srid/neuron) notebook,
 
 1. Configure it to use [[neuron-layout]]# (this is optional)
 1. In all notes, replace neuron's `z:zettels`-style [tag queries](https://neuron.zettel.page/tag-queries) with [[query]].
