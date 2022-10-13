@@ -22,9 +22,9 @@ Embedding a note will simply inline it. For example, using `![[start]]` displays
 Embedding of [[file-links]], as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.
 
 See https://github.com/srid/emanote/issues/24 for progress.
-### Images 
+### Images
 
-Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg))` (this example links to [[disaster-girl.jpg|this image]]).  See also the tip: [[adding-images]].
+Embedding image files as, say, `![[disaster-girl.jpg]]` is equivalent to `![](path/to/disaster-girl.jpg)` (this example links to [[disaster-girl.jpg|this image]]).  See also the tip: [[adding-images]].
 
 [![[disaster-girl.jpg]]](https://knowyourmeme.com/memes/disaster-girl)
 
