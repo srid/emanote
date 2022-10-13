@@ -2,10 +2,10 @@
 
 `[[..]]` style wikilinks can link to not only Markdown files, but also to any *other* files.
 
-For example, 
+For example,
 
 - Here is a link to some text file: [[Sample.txt]]
-- You can also specify the full, or subset of, the path: [[demo/Sample.txt]]
+- You can also specify the full, or subset of, the path: [[markdown/Sample.txt]]
 - Of course, a custom link text may also be specified: [[Sample.txt|Some text file]]
 - All of this is equivalent to [normal linking](./Sample.txt).
 
