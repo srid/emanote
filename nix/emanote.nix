@@ -35,17 +35,17 @@ in
                   description = "Emanote sites";
                   type = types.attrsOf (types.submodule {
                     options = {
-                      path = mkOption {
+                      layers = mkOption {
                         type = types.path;
-                        description = ''Path to the main Emanote layer'';
+                        description = ''List of directory paths to run Emanote on'';
                       };
                       # HACK: I can't seem to be able to convert `path` to a
                       # relative local path; so this is necessary.
                       #
                       # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
-                      pathString = mkOption {
+                      layersString = mkOption {
                         type = types.str;
-                        description = ''Like `path` but local (not in Nix store)'';
+                        description = ''Like `layers` but local (not in Nix store)'';
                       };
                       # TODO: Consolidate all these options below with those of home-manager-module.nix
                       port = mkOption {
@@ -78,7 +78,7 @@ in
       });
   };
   config = {
-    perSystem = { config, self', inputs', pkgs, ... }:
+    perSystem = { config, self', inputs', pkgs, lib, ... }:
       let
         sites =
           lib.mapAttrs
@@ -90,8 +90,9 @@ in
                   name = "emanoteRun.sh";
                   text = ''
                     set -xe
-                    cd ${cfg.pathString} 
-                    ${config.emanote.package}/bin/emanote run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                    ${config.emanote.package}/bin/emanote \
+                      --layers ${lib.concatStringsSep ";" cfg.layersString} \
+                      run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
               };
@@ -114,7 +115,7 @@ in
                     mkdir $out
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                      --layers "${configDir};${cfg.path}" \
+                      --layers "${configDir};${lib.concatStringsSep ";" cfg.layers} " \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                         gen $out
                   '';
