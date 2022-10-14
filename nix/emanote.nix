@@ -35,17 +35,17 @@ in
                   description = "Emanote sites";
                   type = types.attrsOf (types.submodule {
                     options = {
-                      path = mkOption {
-                        type = types.path;
-                        description = ''Path to the main Emanote layer'';
+                      layers = mkOption {
+                        type = types.listOf types.path;
+                        description = ''List of directory paths to run Emanote on'';
                       };
                       # HACK: I can't seem to be able to convert `path` to a
                       # relative local path; so this is necessary.
                       #
                       # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
-                      pathString = mkOption {
-                        type = types.str;
-                        description = ''Like `path` but local (not in Nix store)'';
+                      layersString = mkOption {
+                        type = types.listOf types.str;
+                        description = ''Like `layers` but local (not in Nix store)'';
                       };
                       # TODO: Consolidate all these options below with those of home-manager-module.nix
                       port = mkOption {
@@ -78,7 +78,7 @@ in
       });
   };
   config = {
-    perSystem = { config, self', inputs', pkgs, ... }:
+    perSystem = { config, self', inputs', pkgs, lib, ... }:
       let
         sites =
           lib.mapAttrs
@@ -88,11 +88,16 @@ in
                 # '' is required for escaping ${} in nix
                 program = (pkgs.writeShellApplication {
                   name = "emanoteRun.sh";
-                  text = ''
-                    set -xe
-                    cd ${cfg.pathString} 
-                    ${config.emanote.package}/bin/emanote run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
-                  '';
+                  text =
+                    let
+                      layers = lib.concatStringsSep ";" cfg.layersString;
+                    in
+                    ''
+                      set -xe
+                      ${config.emanote.package}/bin/emanote \
+                        --layers "${layers}" \
+                        run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                    '';
                 }) + /bin/emanoteRun.sh;
               };
               package =
@@ -108,13 +113,14 @@ in
                     mkdir -p $out
                     cp ${configFile} $out/index.yaml
                   '';
+                  layers = lib.concatStringsSep ";" cfg.layers;
                 in
                 pkgs.runCommand "emanote-static-website" { }
                   ''
                     mkdir $out
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                      --layers "${configDir};${cfg.path}" \
+                      --layers "${configDir};${layers}" \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                         gen $out
                   '';
