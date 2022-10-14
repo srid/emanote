@@ -88,12 +88,16 @@ in
                 # '' is required for escaping ${} in nix
                 program = (pkgs.writeShellApplication {
                   name = "emanoteRun.sh";
-                  text = ''
-                    set -xe
-                    ${config.emanote.package}/bin/emanote \
-                      --layers "${lib.concatStringsSep \";\" cfg.layersString}" \
-                      run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
-                  '';
+                  text =
+                    let
+                      layers = lib.concatStringsSep ";" cfg.layersString;
+                    in
+                    ''
+                      set -xe
+                      ${config.emanote.package}/bin/emanote \
+                        --layers "${layers}" \
+                        run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                    '';
                 }) + /bin/emanoteRun.sh;
               };
               package =
