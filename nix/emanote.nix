@@ -113,13 +113,14 @@ in
                     mkdir -p $out
                     cp ${configFile} $out/index.yaml
                   '';
+                  layers = lib.concatStringsSep ";" cfg.layers;
                 in
                 pkgs.runCommand "emanote-static-website" { }
                   ''
                     mkdir $out
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                      --layers "${configDir};${lib.concatStringsSep ";" cfg.layers} " \
+                      --layers "${configDir};${layers} " \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                         gen $out
                   '';
