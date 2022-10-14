@@ -36,7 +36,7 @@ in
                   type = types.attrsOf (types.submodule {
                     options = {
                       layers = mkOption {
-                        type = types.path;
+                        type = types.listOf types.path;
                         description = ''List of directory paths to run Emanote on'';
                       };
                       # HACK: I can't seem to be able to convert `path` to a
@@ -44,7 +44,7 @@ in
                       #
                       # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
                       layersString = mkOption {
-                        type = types.str;
+                        type = types.listOf types.str;
                         description = ''Like `layers` but local (not in Nix store)'';
                       };
                       # TODO: Consolidate all these options below with those of home-manager-module.nix
