@@ -91,7 +91,7 @@ in
                   text = ''
                     set -xe
                     ${config.emanote.package}/bin/emanote \
-                      --layers ${lib.concatStringsSep ";" cfg.layersString} \
+                      --layers "${lib.concatStringsSep \";\" cfg.layersString}" \
                       run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
                   '';
                 }) + /bin/emanoteRun.sh;
