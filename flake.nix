@@ -65,8 +65,8 @@
           package = self'.packages.default;
           sites = {
             "docs" = {
-              path = ./docs;
-              pathString = "./docs";
+              layers = [ ./docs ];
+              layersString = [ "./docs" ];
               allowBrokenLinks = true; # A couple, by design, in demo.md
             };
           };
