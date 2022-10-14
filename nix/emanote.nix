@@ -120,7 +120,7 @@ in
                     mkdir $out
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/EmaApps/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
-                      --layers "${configDir};${layers} " \
+                      --layers "${configDir};${layers}" \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
                         gen $out
                   '';
