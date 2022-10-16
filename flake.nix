@@ -12,8 +12,8 @@
     # Haskell dependency overrides
     ema.url = "github:srid/ema/master";
     ema.flake = false;
-    tailwind-haskell.url = "github:srid/tailwind-haskell/master";
-    tailwind-haskell.inputs.nixpkgs.follows = "nixpkgs";
+    tailwind.url = "github:srid/tailwind-haskell/master";
+    tailwind.flake = false;
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
   };
@@ -25,6 +25,7 @@
         ./nix/emanote.nix
         ./nix/docker.nix
         ./nix/stork.nix
+        ./nix/tailwind.nix
       ];
       perSystem = { pkgs, inputs', self', ... }: {
         haskellProjects.default = {
@@ -37,24 +38,22 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            inherit (inputs'.tailwind-haskell.packages)
-              tailwind;
-            inherit (self'.packages) stork;
           };
           source-overrides = {
             inherit (inputs)
-              ema heist-extra;
+              ema tailwind heist-extra;
           };
           overrides = self: super: with pkgs.haskell.lib; {
             ema = dontCheck super.ema;
+            tailwind = addBuildDepends super.tailwind [ self'.packages.tailwind ];
             heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
             ixset-typed = unmarkBroken super.ixset-typed;
             pandoc-link-context = unmarkBroken super.pandoc-link-context;
-            inherit (inputs'.tailwind-haskell.packages)
-              tailwind;
           };
           modifier = drv: with pkgs.haskell.lib;
-            addBuildDepends drv [ self'.packages.stork ];
+            addBuildDepends drv [
+              self'.packages.stork
+            ];
         };
         packages.test =
           pkgs.runCommand "emanote-test" { } ''
@@ -66,7 +65,7 @@
             "docs" = {
               layers = [ ./docs ];
               layersString = [ "./docs" ];
-              allowBrokenLinks = true; # A couple, by design, in demo.md
+              allowBrokenLinks = true; # A couple, by design, in markdown.md
             };
           };
         };
