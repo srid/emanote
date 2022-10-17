@@ -16,7 +16,7 @@ import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
-import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc)
+import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -146,7 +146,7 @@ renderLmlHtml model note = do
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
               "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                let ctxDoc :: Pandoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                let ctxDoc :: Pandoc = preparePandoc $ Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
                 "context:body" ## C.withInlineCtx bctx $ \ctx' ->
                   Splices.pandocSplice ctx' ctxDoc
     -- Sidebar navigation
