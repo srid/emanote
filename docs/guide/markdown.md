@@ -17,7 +17,7 @@ Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [F
 
 ### Anchors 
 
-Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](../demo/markdown.md#lists)).
+Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).
 
 ## Emojis
 
