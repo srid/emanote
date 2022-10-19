@@ -1,11 +1,11 @@
 <style>
   body {
-    font-family: 16px/1.5 "Georgia", serif;
-    font-variation-settings: 'wght' 350;
+    font-family: "Georgia", serif;
   }
 
-  a.mavenLinkBold {
-    font-weight: bold;
+  a.mavenLinkBold,
+  strong {
+    font-weight: bolder;
   }
 
   h1,
@@ -15,7 +15,8 @@
   h5,
   h6,
   header,
-  .header-font {
+  .header-font,
+  #sidebar {
     font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   }
 </style>
