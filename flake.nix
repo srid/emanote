@@ -38,6 +38,8 @@
             inherit (hp)
               cabal-fmt
               ormolu;
+            inherit (self'.packages)
+              stork;
           };
           source-overrides = {
             inherit (inputs)
