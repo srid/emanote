@@ -1,7 +1,6 @@
 module Emanote.Pandoc.BuiltinFilters
   ( prepareNoteDoc,
     preparePandoc,
-    markLinksWithIcon,
   )
 where
 
@@ -25,7 +24,7 @@ preparePandoc :: W.Walkable B.Inline b => b -> b
 preparePandoc =
   linkifyInlineTags
     >>> fixEmojiFontFamily
-    >>> markLinksWithIcon
+    >>> setExternalLinkicon
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
@@ -56,13 +55,13 @@ fixEmojiFontFamily =
            in B.Span (id', classes, newAttrs) is
     x -> x
 
--- Adds a data-linkicon=show attribute to external links that contain some text in their description, provided that they do not already have a data-linkicon attribute.
-markLinksWithIcon :: W.Walkable B.Inline b => b -> b
-markLinksWithIcon =
+-- Adds a data-linkicon=external attribute to external links that contain some text in their description, provided that they do not already have a data-linkicon attribute.
+setExternalLinkicon :: W.Walkable B.Inline b => b -> b
+setExternalLinkicon =
   W.walk $ \case
     B.Link (id', classes, attrs) inlines (url, title)
       | hasURIScheme url && containsText inlines ->
-        let showLinkIconAttr = ("data-linkicon", "show")
+        let showLinkIconAttr = ("data-linkicon", "external")
             newAttrs = insert attrs showLinkIconAttr
          in B.Link (id', classes, newAttrs) inlines (url, title)
     x -> x

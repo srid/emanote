@@ -62,13 +62,13 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 
 ## External link icons
 
-A link whose address begins with an [URI scheme](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax) component is considered an external link. Emanote displays an icon next to an external hyperlink if its description contains some text, including inline code and math formulas (a common non-example is a hyperlink containing only an image in the description). The heuristic is intended to make the site look good in most cases. This behaviour can be overriden by setting the value of the `data-linkicon` attribute of a link:
-  * set `data-linkicon=show` in order to force displaying the icon next to the link;
-  * set `data-linkicon` to any other value (e.g. `hide`) to prevent displaying the icon next to the link.
+A link whose address begins with an [URI scheme](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax) component is considered an external link. Emanote displays an icon next to an external hyperlink if its description contains some text, including inline code and math formulas. (A common non-example is a hyperlink containing only an image in the description.) The heuristic is intended to make the site look good in most cases. This behaviour can be overriden by setting the value of the `data-linkicon` attribute of a link:
+  * use `{data-linkicon=external}` in order to force displaying the icon next to the link;
+  * use `{data-linkicon=none}` or `{data-linkicon=""}` to prevent displaying the icon next to the link.
 
-Note that the attribute can also be used in the template parts of the website (like the footer or the sidebar) or in raw HTML parts of the document. If this heuristic fails badly in your usecase, please [raise an issue](https://github.com/EmaApps/emanote/issues).
+Note that the attribute can also be used to display the icons in the template parts of the website (like the footer or the sidebar) or in raw HTML parts of the document.
 
-One may easily customize the displayed icon basing on the link properties. By default, a custom icon is displayed if the scheme component is `mailto:`. Check the CSS in the [`default/templates/base.tpl`](https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl) template.
+The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is customized using CSS. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the [`default/templates/base.tpl`](https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl) template for details.
 
 * No special styling:
   * [the emanote repo](https://github.com/EmaApps/emanote)
@@ -77,10 +77,10 @@ One may easily customize the displayed icon basing on the link properties. By de
   * [`(>>=) :: forall a b. m a -> (a -> m b) -> m b`](https://hackage.haskell.org/package/base/docs/Prelude.html#v:-62--62--61-)
   * [![[hello-badge.svg]]](https://emanote.srid.ca)
   * mother_hetchel@weaversguild.com
-* `{data-linkicon=hide}` used to suppress the icon:
-  * Water's formula is [H](https://en.wikipedia.org/wiki/Hydrogen){data-linkicon=hide}₂[O](https://en.wikipedia.org/wiki/Oxygen){data-linkicon=hide}.
+* `{data-linkicon=none}` used to suppress the icon:
+  * Water's formula is [H](https://en.wikipedia.org/wiki/Hydrogen){data-linkicon=none}₂[O](https://en.wikipedia.org/wiki/Oxygen){data-linkicon=none}.
   * A 90's style hyperlink:
-    :::{.flex .justify-center}
-    [➡➡➡ **CLICK HERE!!!** ⬅⬅⬅](https://emanote.srid.ca){class="shadow-lg border-8 rounded-md bg-yellow-400 border-red-200" data-linkicon=hide}
-* `{data-linkicon=show}` used to show the icon
-  * [![[pIqaD.svg]]](https://en.wikipedia.org/wiki/Klingon_scripts){data-linkicon=show}
+    :::{.center}
+    [➡➡➡ **CLICK HERE!!!** ⬅⬅⬅](https://emanote.srid.ca){class="shadow-lg border-8 rounded-md bg-yellow-400 border-red-200" data-linkicon=none}
+* `{data-linkicon=external}` used to show the icon
+  * [![[pIqaD.svg]]](https://en.wikipedia.org/wiki/Klingon_scripts){data-linkicon=external}
