@@ -45,12 +45,11 @@
     </dl>
   </DefinitionList>
   <Note:Ref>
-    <!-- DoNotFormat -->
-    <!-- We use JavaScript because anchor links won't work if there is a <base> tag;
-         see https://stackoverflow.com/a/34765348 
-    -->
-    <sup class="px-0.5"><a class="text-${theme}-600 hover:underline" href="javascript:;" onclick="document.location.hash='#fn${footnote:idx}';"><footnote:idx /></a></sup>
-    <!-- DoNotFormat -->
+    <sup class="px-0.5">
+      <a class="text-${theme}-600 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
+        <footnote:idx />
+      </a>
+    </sup>
   </Note:Ref>
   <Note:List>
     <div title="Footnotes"

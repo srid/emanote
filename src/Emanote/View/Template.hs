@@ -159,6 +159,8 @@ renderLmlHtml model note = do
     let modelRoute = R.ModelRoute_LML r
     "ema:note:source-path"
       ## HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
+    "ema:note:url"
+      ## HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ r)
     "ema:note:backlinks"
       ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
