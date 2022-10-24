@@ -115,7 +115,7 @@ Ordered lists,
 
 ## Hash Tags
 
-Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the YAML frontmatter. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
+Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the [[yaml-config|YAML frontmatter]]. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
 
 ## Highlighting
 
