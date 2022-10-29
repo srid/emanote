@@ -55,7 +55,8 @@ data Link = Link
 renderGraphExport :: Model -> LByteString
 renderGraphExport model =
   let notes_ =
-        M.modelNoteMetas model & Map.mapKeys lmlRouteKey
+        M.modelNoteMetas model
+          & Map.mapKeys lmlRouteKey
           & Map.map
             ( \(tit, r, meta_) ->
                 let k = lmlRouteKey r

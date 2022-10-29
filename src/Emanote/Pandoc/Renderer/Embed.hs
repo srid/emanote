@@ -71,8 +71,8 @@ embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
-    "ema:note:pandoc"
-      ## pandocSplice ctx (prepareNoteDoc note)
+    "ema:note:pandoc" ##
+      pandocSplice ctx (prepareNoteDoc note)
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
@@ -80,15 +80,15 @@ embedStaticFileRoute model altText staticFile = do
       url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
   if
       | any (`T.isSuffixOf` toText fp) imageExts ->
-        pure . runEmbedTemplate "image" $ do
-          "ema:url" ## HI.textSplice url
-          "ema:alt" ## HI.textSplice altText
+          pure . runEmbedTemplate "image" $ do
+            "ema:url" ## HI.textSplice url
+            "ema:alt" ## HI.textSplice altText
       | any (`T.isSuffixOf` toText fp) videoExts -> do
-        pure . runEmbedTemplate "video" $ do
-          "ema:url" ## HI.textSplice url
+          pure . runEmbedTemplate "video" $ do
+            "ema:url" ## HI.textSplice url
       | ".pdf" `T.isSuffixOf` toText fp -> do
-        pure . runEmbedTemplate "pdf" $ do
-          "ema:url" ## HI.textSplice url
+          pure . runEmbedTemplate "pdf" $ do
+            "ema:url" ## HI.textSplice url
       | otherwise -> Nothing
 
 imageExts :: [Text]

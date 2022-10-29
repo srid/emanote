@@ -178,7 +178,8 @@ ancestorPlaceholderNote r =
               -- TODO: or, .org
               B.Span (cls "font-mono text-sm") $
                 one $
-                  B.Str $ oneOfLmlFilenames r
+                  B.Str $
+                    oneOfLmlFilenames r
             ]
         ]
    in mkEmptyNoteWith (R.defaultLmlRoute r) placeHolder
@@ -199,7 +200,9 @@ missingNote route404 urlPath =
           B.Code B.nullAttr $ "/" <> urlPath,
           -- TODO: org
           B.Span (cls "font-mono text-sm") $
-            one $ B.Str $ ". You may create a file with that name, ie. one of: " <> oneOfLmlFilenames route404
+            one $
+              B.Str $
+                ". You may create a file with that name, ie. one of: " <> oneOfLmlFilenames route404
         ]
 
 oneOfLmlFilenames :: R ext -> Text
@@ -313,11 +316,11 @@ applyNoteMetaFilters doc =
     addTagsFromBody frontmatter =
       frontmatter
         & AO.key "tags" % AO._Array
-        .~ ( fromList . fmap Aeson.toJSON $
-               ordNub $
-                 SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                   <> HT.inlineTagsInPandoc doc
-           )
+          .~ ( fromList . fmap Aeson.toJSON $
+                 ordNub $
+                   SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                     <> HT.inlineTagsInPandoc doc
+             )
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
         B.Para is -> [plainify is]
