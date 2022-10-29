@@ -53,11 +53,11 @@ queryParser = do
     fromUserPath s =
       if
           | "*" `T.isInfixOf` s ->
-            QueryByPathPattern (toString s)
+              QueryByPathPattern (toString s)
           | "/" `T.isPrefixOf` s ->
-            QueryByPath (toString $ T.drop 1 s)
+              QueryByPath (toString $ T.drop 1 s)
           | otherwise ->
-            QueryByPathPattern (toString $ "**/" <> s <> "/**")
+              QueryByPathPattern (toString $ "**/" <> s <> "/**")
 
 runQuery :: R.LMLRoute -> Model -> Query -> [Note]
 runQuery currentRoute model =
