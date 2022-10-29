@@ -41,6 +41,7 @@ import Heist.Splices.Json qualified as HJ
 import Optics.Operators ((^.))
 import Paths_emanote qualified
 import Relude
+import System.FilePath ((</>))
 import Text.Blaze.Html ((!))
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes qualified as A
@@ -164,11 +165,21 @@ commonSplices withCtx model meta routeTitle = do
     ## HI.textSplice
       ( -- HACK
         -- Also: more-head.tpl is the one place where this is hardcoded.
-        let itUrl =
+        let staticFolder = "_emanote-static"
+            itUrl =
               SR.siteRouteUrl model $
                 SR.staticFileSiteRoute $
-                  fromMaybe (error "no _emanote-static?") $ M.modelLookupStaticFile "_emanote-static/inverted-tree.css" model
-         in fst $ T.breakOn "/inverted-tree.css" itUrl
+                  fromMaybe (error "no _emanote-static?") $ M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
+            staticFolderUrl = fst $ T.breakOn "/inverted-tree.css" itUrl
+            -- Deal with a silly Firefox bug https://github.com/EmaApps/emanote/issues/340
+            --
+            -- Firefox deduces an incorrect <base> after doing morphdom
+            -- patching, unless the <base> is absolute (i.e., starts with a '/').
+            patchForFirefoxBug folder url =
+              if M.inLiveServer model && url == toText folder
+                then "/" <> url
+                else url
+         in patchForFirefoxBug staticFolder staticFolderUrl
       )
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix"
