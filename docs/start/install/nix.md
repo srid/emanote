@@ -63,4 +63,4 @@ $ systemctl --user status emanote.service
 ```
 
 [home-manager]: https://github.com/nix-community/home-manager
-[module]: https://github.com/srid/emanote/blob/master/home-manager-module.nix
+[module]: https://github.com/EmaApps/emanote/blob/master/nix/home-manager-module.nix
