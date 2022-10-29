@@ -55,7 +55,7 @@ $ emanote export | jq '.files | .[] | select(.filePath=="architecture.md")'
 ### Get all link targets from a note
 
 ```sh
-$ emanote export | jq '.files | .[] | select(.filePath=="guide/neuron.md") | .links | .[] | .resolvedRelTarget.contents'  
+$ emanote export | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
 "demo/neuron-layout"
 "demo/yaml-config"
 "demo/yaml-config"
