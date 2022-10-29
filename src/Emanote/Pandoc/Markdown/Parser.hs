@@ -44,6 +44,8 @@ parseMarkdown =
           CM.defaultSyntaxSpec
         ]
     gfmExtensionsSansPipeTable =
-      CE.emojiSpec <> CE.strikethroughSpec <> CE.autolinkSpec
+      CE.emojiSpec
+        <> CE.strikethroughSpec
+        <> CE.autolinkSpec
         <> CE.autoIdentifiersSpec
         <> CE.taskListSpec

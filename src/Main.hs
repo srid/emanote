@@ -24,5 +24,5 @@ main =
 test :: IO ()
 test = do
   Env.withArgs
-    mempty --Discard emanote's CLI arguments
+    mempty -- Discard emanote's CLI arguments
     Spec.main
