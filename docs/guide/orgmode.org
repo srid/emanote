@@ -35,4 +35,4 @@ If $a^2=b$ and \( b=2 \), then the solution must be
 either $$ a=+\sqrt{2} $$ or \[ a=-\sqrt{2} \]
 
 ** Limitations
-- While =#+TITLE= is recognized, other metadata are not recognized (yet). Org Mode has no notion of a "frontmatter", therefore you must store file-associated metadata in a separate [[file:yaml-config.md][YAML file]].
+- While =#+TITLE= is recognized, other metadata are not recognized (yet). Therefore you must store file-associated metadata in a separate [[file:yaml-config.md][YAML file]].
