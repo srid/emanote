@@ -120,8 +120,8 @@ commonSplices withCtx model meta routeTitle = do
   "bind" ## HB.bindImpl
   "apply" ## HA.applyImpl
   -- Add tailwind css shim
-  "tailwindCssShim"
-    ## do
+  "tailwindCssShim" ##
+    do
       pure . RX.renderHtmlNodes $
         if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
           then do
@@ -135,41 +135,42 @@ commonSplices withCtx model meta routeTitle = do
               ! A.href (H.toValue $ cannotBeCached generatedCssFile)
               ! A.rel "stylesheet"
               ! A.type_ "text/css"
-  "ema:version"
-    ## HI.textSplice (toText $ showVersion Paths_emanote.version)
-  "ema:metadata"
-    ## HJ.bindJson meta
+  "ema:version" ##
+    HI.textSplice (toText $ showVersion Paths_emanote.version)
+  "ema:metadata" ##
+    HJ.bindJson meta
   "ema:title" ## withCtx $ \ctx ->
     Tit.titleSplice ctx preparePandoc routeTitle
   -- <head>'s <title> cannot contain HTML
-  "ema:titleFull"
-    ## Tit.titleSpliceNoHtml routeTitleFull
+  "ema:titleFull" ##
+    Tit.titleSpliceNoHtml routeTitleFull
   -- `ema:homeUrl` is normally `""`; but if Emanote is being served from an URL
   -- prefix, it would be "/foo/" (with a slash at the end). This allows you to
   -- just concatanate homeUrl with a relative URL path (no slash in between), to
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
-  "ema:homeUrl"
-    ## ( let homeR = SR.lmlSiteRoute (M.modelIndexRoute model)
-             homeUrl' = SR.siteRouteUrl model homeR
-             homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
-          in HI.textSplice homeUrl
-       )
-  "ema:indexUrl"
-    ## HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
-  "ema:tagIndexUrl"
-    ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
-  "ema:taskIndexUrl"
-    ## HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
-  "ema:emanoteStaticLayerUrl"
-    ## HI.textSplice
+  "ema:homeUrl" ##
+    ( let homeR = SR.lmlSiteRoute (M.modelIndexRoute model)
+          homeUrl' = SR.siteRouteUrl model homeR
+          homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
+       in HI.textSplice homeUrl
+    )
+  "ema:indexUrl" ##
+    HI.textSplice (SR.siteRouteUrl model SR.indexRoute)
+  "ema:tagIndexUrl" ##
+    HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
+  "ema:taskIndexUrl" ##
+    HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
+  "ema:emanoteStaticLayerUrl" ##
+    HI.textSplice
       ( -- HACK
         -- Also: more-head.tpl is the one place where this is hardcoded.
         let staticFolder = "_emanote-static"
             itUrl =
               SR.siteRouteUrl model $
                 SR.staticFileSiteRoute $
-                  fromMaybe (error "no _emanote-static?") $ M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
+                  fromMaybe (error "no _emanote-static?") $
+                    M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
             staticFolderUrl = fst $ T.breakOn "/inverted-tree.css" itUrl
             -- Deal with a silly Firefox bug https://github.com/EmaApps/emanote/issues/340
             --
@@ -182,8 +183,8 @@ commonSplices withCtx model meta routeTitle = do
          in patchForFirefoxBug staticFolder staticFolderUrl
       )
   -- For those cases the user really wants to hardcode the URL
-  "ema:urlStrategySuffix"
-    ## HI.textSplice (SR.urlStrategySuffix model)
+  "ema:urlStrategySuffix" ##
+    HI.textSplice (SR.urlStrategySuffix model)
   where
     -- A hack to force the browser not to cache the CSS, because we are not md5
     -- hashing the CSS yet (because the CSS is generated *after* the HTML files
@@ -193,7 +194,8 @@ commonSplices withCtx model meta routeTitle = do
     cachedTailwindCdn = do
       let localCdnUrl =
             SR.siteRouteUrl model $
-              SR.staticFileSiteRoute $ LiveServerFiles.tailwindCssFile model
+              SR.staticFileSiteRoute $
+                LiveServerFiles.tailwindCssFile model
       H.link
         ! A.href (H.toValue localCdnUrl)
         ! A.rel "stylesheet"

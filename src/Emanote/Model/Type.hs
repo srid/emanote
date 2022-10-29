@@ -112,11 +112,11 @@ modelInsertNote note =
            >>> flip (foldr injectAncestor) (N.noteAncestors note)
        )
     >>> modelRels
-    %~ updateIxMulti r (Rel.noteRels note)
+      %~ updateIxMulti r (Rel.noteRels note)
     >>> modelTasks
-    %~ updateIxMulti r (Task.noteTasks note)
+      %~ updateIxMulti r (Task.noteTasks note)
     >>> modelNav
-    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
+      %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
 
@@ -130,18 +130,19 @@ injectAncestor (N.unRAncestor -> folderR) ns =
 
 modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
 modelDeleteNote k model =
-  model & modelNotes
-    %~ ( Ix.deleteIx k
-           -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
-           -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
-           >>> maybe id restoreFolderPlaceholder mFolderR
-       )
+  model
+    & modelNotes
+      %~ ( Ix.deleteIx k
+             -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+             -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
+             >>> maybe id restoreFolderPlaceholder mFolderR
+         )
     & modelRels
-    %~ deleteIxMulti k
+      %~ deleteIxMulti k
     & modelTasks
-    %~ deleteIxMulti k
+      %~ deleteIxMulti k
     & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
+      %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
