@@ -203,7 +203,7 @@ library
     Emanote.View.Template
     Paths_emanote
 
-  exposed-modules:
+  other-modules:
     Emanote.Model.Link.RelSpec
     Emanote.Model.QuerySpec
     Spec
