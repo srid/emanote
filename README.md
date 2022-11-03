@@ -8,8 +8,6 @@ Spiritual successor to [neuron](https://neuron.zettel.page), based on [Ema](http
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
-**Project Status**: [almost out of beta](https://github.com/srid/emanote/milestone/3).
-
 ## Installing and using
 
 https://emanote.srid.ca/start/install
