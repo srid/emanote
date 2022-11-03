@@ -201,11 +201,11 @@ library
     Emanote.View.TagIndex
     Emanote.View.TaskIndex
     Emanote.View.Template
-    Paths_emanote
 
   other-modules:
     Emanote.Model.Link.RelSpec
     Emanote.Model.QuerySpec
+    Paths_emanote
     Spec
 
   autogen-modules: Paths_emanote
