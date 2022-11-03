@@ -160,13 +160,11 @@ library
     Emanote.Model.Calendar
     Emanote.Model.Graph
     Emanote.Model.Link.Rel
-    Emanote.Model.Link.RelSpec
     Emanote.Model.Link.Resolve
     Emanote.Model.Meta
     Emanote.Model.Note
     Emanote.Model.Note.Filter
     Emanote.Model.Query
-    Emanote.Model.QuerySpec
     Emanote.Model.SData
     Emanote.Model.StaticFile
     Emanote.Model.Stork
@@ -204,6 +202,10 @@ library
     Emanote.View.TaskIndex
     Emanote.View.Template
     Paths_emanote
+
+  exposed-modules:
+    Emanote.Model.Link.RelSpec
+    Emanote.Model.QuerySpec
     Spec
 
   autogen-modules: Paths_emanote
