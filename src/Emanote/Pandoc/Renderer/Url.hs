@@ -5,6 +5,7 @@ module Emanote.Pandoc.Renderer.Url
   )
 where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
@@ -13,7 +14,6 @@ import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
