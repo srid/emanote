@@ -15,8 +15,8 @@ module Emanote.Model.Title
   )
 where
 
+import Commonmark.Extensions.WikiLink (plainify)
 import Data.Aeson (ToJSON)
-import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)
 import Emanote.Route qualified as R
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI

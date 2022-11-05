@@ -98,6 +98,7 @@ common library-common
     , commonmark-extensions
     , commonmark-pandoc
     , commonmark-simple
+    , commonmark-wikilink
     , containers
     , data-default
     , dependent-sum
@@ -178,7 +179,6 @@ library
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag
     Emanote.Pandoc.Markdown.Syntax.Highlight
-    Emanote.Pandoc.Markdown.Syntax.WikiLink
     Emanote.Pandoc.Renderer
     Emanote.Pandoc.Renderer.Embed
     Emanote.Pandoc.Renderer.Query

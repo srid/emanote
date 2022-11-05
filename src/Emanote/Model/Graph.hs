@@ -1,5 +1,6 @@
 module Emanote.Model.Graph where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
@@ -11,7 +12,6 @@ import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type (Model, modelRels, resolveLmlRoute)
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
 import Optics.Operators as Lens ((^.))

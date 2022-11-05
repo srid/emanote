@@ -3,6 +3,7 @@
 
 module Emanote.Model.Link.Rel where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
@@ -10,7 +11,6 @@ import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Emanote.Model.Note (Note, noteDoc, noteRoute)
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
