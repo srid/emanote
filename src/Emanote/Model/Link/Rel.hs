@@ -74,7 +74,8 @@ noteRels note =
 
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
-  let wls = either (R.withLmlRoute WL.allowedWikiLinks) WL.allowedWikiLinks $ R.modelRouteCase r
+  let allowedWikiLinks = WL.allowedWikiLinks . R.unRoute
+      wls = either (R.withLmlRoute allowedWikiLinks) allowedWikiLinks $ R.modelRouteCase r
    in (URTWikiLink <$> toList wls)
         <> [URTResource r]
 
