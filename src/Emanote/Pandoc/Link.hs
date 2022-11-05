@@ -1,6 +1,6 @@
 module Emanote.Pandoc.Link where
 
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
+import Commonmark.Extensions.WikiLink qualified as WL
 import Relude
 import Text.Pandoc.Definition qualified as B
 

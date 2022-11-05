@@ -3,10 +3,10 @@
 
 module Emanote.Model.StaticFile where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Time (UTCTime)
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
 import Relude
@@ -34,6 +34,7 @@ staticFileSelfRefs :: StaticFile -> NonEmpty WL.WikiLink
 staticFileSelfRefs =
   fmap snd
     . WL.allowedWikiLinks
+    . R.unRoute
     . _staticFileRoute
 
 makeLenses ''StaticFile

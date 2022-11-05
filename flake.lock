@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "commonmark-wikilink": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1667660671,
+        "narHash": "sha256-3Z7TJKCNCu8N1KPmUZgXOHMghPH3qEpHiXP1g2UPTlE=",
+        "owner": "srid",
+        "repo": "commonmark-wikilink",
+        "rev": "6c249d1e1dd931e730fa9ecd803610da83d3fc38",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "commonmark-wikilink",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -69,6 +85,7 @@
     },
     "root": {
       "inputs": {
+        "commonmark-wikilink": "commonmark-wikilink",
         "flake-parts": "flake-parts",
         "haskell-flake": "haskell-flake",
         "nixpkgs": "nixpkgs"

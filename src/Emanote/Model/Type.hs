@@ -4,6 +4,7 @@
 
 module Emanote.Model.Type where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
@@ -32,7 +33,6 @@ import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
