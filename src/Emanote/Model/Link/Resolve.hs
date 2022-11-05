@@ -1,11 +1,11 @@
 module Emanote.Model.Link.Resolve where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Relude

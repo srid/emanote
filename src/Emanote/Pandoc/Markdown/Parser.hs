@@ -5,11 +5,11 @@ where
 
 import Commonmark qualified as CM
 import Commonmark.Extensions qualified as CE
+import Commonmark.Extensions.WikiLink qualified as WL
 import Commonmark.Simple (parseMarkdownWithFrontMatter)
 import Data.Aeson qualified as Aeson
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as IT
 import Emanote.Pandoc.Markdown.Syntax.Highlight qualified as IH
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Relude
 import Text.Pandoc.Definition (Pandoc)
 

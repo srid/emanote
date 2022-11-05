@@ -1,5 +1,6 @@
 module Emanote.Pandoc.Renderer.Embed where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Model (Model)
@@ -10,7 +11,6 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import Emanote.Pandoc.Renderer.Url qualified as RenderedUrl
 import Emanote.Route.ModelRoute qualified as R

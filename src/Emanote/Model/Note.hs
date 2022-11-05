@@ -5,6 +5,8 @@
 
 module Emanote.Model.Note where
 
+import Commonmark.Extensions.WikiLink (plainify)
+import Commonmark.Extensions.WikiLink qualified as WL
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
@@ -19,8 +21,6 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Pandoc.Markdown.Syntax.WikiLink (plainify)
-import Emanote.Pandoc.Markdown.Syntax.WikiLink qualified as WL
 import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
 import Network.URI.Slug (Slug)
