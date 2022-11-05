@@ -33,3 +33,7 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 
 [matrix]: https://matrix.to/#/#ema:matrix.org
 [ghdiscuss]: https://github.com/srid/emanote/discussions
+
+## Related projects
+
+- https://github.com/squidfunk/mkdocs-material
