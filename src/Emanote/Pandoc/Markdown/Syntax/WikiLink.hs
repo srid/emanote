@@ -1,21 +1,30 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 module Emanote.Pandoc.Markdown.Syntax.WikiLink
-  ( WikiLink,
+  ( -- * Types
+    WikiLink,
     WikiLinkType (..),
-    wikilinkSpec,
-    mkWikiLinkFromRoute,
+
+    -- * Parsing wikilinks
+    mkWikiLinkFromSlugs,
+    mkWikiLinkFromInline,
     delineateLink,
+
+    -- * Wikilink candidates
+    allowedWikiLinks,
+
+    -- * Converting wikilinks
     wikilinkInline,
     wikiLinkInlineRendered,
-    mkWikiLinkFromInline,
-    allowedWikiLinks,
+
+    -- * Commonmark parser spec
+    wikilinkSpec,
 
     -- * Anchors in URLs
     Anchor,
     anchorSuffix,
 
-    -- * Pandoc helper, which use wikilink somehow
+    -- * Pandoc helper
     plainify,
   )
 where
@@ -29,8 +38,6 @@ import Data.Data (Data)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.Route.Ext qualified as Ext
-import Emanote.Route.R (R (..))
 import Network.URI.Encode qualified as UE
 import Network.URI.Slug (Slug)
 import Network.URI.Slug qualified as Slug
@@ -44,7 +51,7 @@ import Text.Show qualified (Show (show))
 
 -- | Represents the "Foo" in [[Foo]]
 --
--- As wiki links may contain multiple path components, it can also represent
+-- As wiki links may contain multiple path components, it can represent
 -- [[Foo/Bar]], hence we use nonempty slug list.
 newtype WikiLink = WikiLink {unWikiLink :: NonEmpty Slug}
   deriving stock (Eq, Ord, Typeable, Data)
@@ -60,8 +67,8 @@ instance Show WikiLink where
 -- Making wiki links
 -- -----------------
 
-mkWikiLinkFromRoute :: R ext -> WikiLink
-mkWikiLinkFromRoute (R slugs) = WikiLink slugs
+mkWikiLinkFromSlugs :: NonEmpty Slug -> WikiLink
+mkWikiLinkFromSlugs = WikiLink
 
 mkWikiLinkFromUrl :: (Monad m, Alternative m) => Text -> m WikiLink
 mkWikiLinkFromUrl s = do
@@ -146,9 +153,9 @@ wikiLinkInlineRendered x = do
 -- Foo/Bar/Qux.md -> [[Qux]], [[Bar/Qux]], [[Foo/Bar/Qux]]
 --
 -- All possible combinations of Wikilink type use is automatically included.
-allowedWikiLinks :: HasCallStack => R @Ext.SourceExt ext -> NonEmpty (WikiLinkType, WikiLink)
-allowedWikiLinks r =
-  let wls = fmap WikiLink $ tailsNE $ unRoute r
+allowedWikiLinks :: HasCallStack => NonEmpty Slug -> NonEmpty (WikiLinkType, WikiLink)
+allowedWikiLinks slugs =
+  let wls = WikiLink <$> tailsNE slugs
       typs :: NonEmpty WikiLinkType = NE.fromList universe
    in liftM2 (,) typs wls
   where

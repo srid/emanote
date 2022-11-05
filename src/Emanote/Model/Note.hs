@@ -87,7 +87,7 @@ noteSelfRefs =
     routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
     routeSelfRefs =
       fmap snd
-        . R.withLmlRoute WL.allowedWikiLinks
+        . R.withLmlRoute (WL.allowedWikiLinks . R.unRoute)
 
 noteAncestors :: Note -> [RAncestor]
 noteAncestors =
