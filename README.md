@@ -4,7 +4,9 @@
 [![built with nix](https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos&labelColor=73C3D5)](https://builtwithnix.org)
 [![Matrix](https://img.shields.io/matrix/ema:matrix.org)](https://app.element.io/#/room/#ema:matrix.org "Chat on Matrix")
 
-Emanate a structured view of your plain-text notes.
+Emanote emanates[^def] a structured view of your plain-text notes.
+
+[^def]: **emanate**: *(of something abstract but perceptible) issue or spread out from (a source)*
 
 Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
