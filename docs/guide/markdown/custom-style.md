@@ -3,16 +3,7 @@ tags: [emanote/syntax/demo]
 
 page:
   headHtml: |
-    <script>
-      window.MathJax = {
-        startup: {
-          ready: () => {
-            MathJax.startup.defaultReady();
-          }
-        }
-      };
-    </script>
-    <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <snippet var="js.mathjax" />
 ---
 
 # Custom CSS styling
@@ -66,9 +57,9 @@ A link whose address begins with an [URI scheme](https://en.wikipedia.org/wiki/U
   * use `{data-linkicon=external}` in order to force displaying the icon next to the link;
   * use `{data-linkicon=none}` or `{data-linkicon=""}` to prevent displaying the icon next to the link.
 
-Note that the attribute can also be used to display the icons in the template parts of the website (like the footer or the sidebar) or in raw HTML parts of the document.
+Note that the attribute can also be used to display the icons in the [[html-template|template]] parts of the website (like the footer or the sidebar) or in raw HTML parts of the document.
 
-The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is customized using CSS. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the [`default/templates/base.tpl`](https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl) template for details.
+The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is customized using CSS. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the <https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl> [[html-template|HTML template]] for details.
 
 * No special styling:
   * [the emanote repo](https://github.com/EmaApps/emanote)
