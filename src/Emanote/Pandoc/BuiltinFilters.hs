@@ -4,6 +4,7 @@ module Emanote.Pandoc.BuiltinFilters
   )
 where
 
+import Data.Aeson (Value (Bool))
 import Emanote.Model.Note qualified as N
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
@@ -66,9 +67,13 @@ setExternalLinkicon =
          in B.Link (id', classes, newAttrs) inlines (url, title)
     x -> x
   where
+    -- Inserts an element in a key-value list if the element's key is not already in the list.
+    insert :: Eq a => [(a, b)] -> (a, b) -> [(a, b)]
     insert as a
       | fst a `elem` (fst <$> as) = as
       | otherwise = a : as
+    -- Checks whether the given text begins with an RFC 3986 compliant URI scheme.
+    hasURIScheme :: Text -> Bool
     hasURIScheme =
       isRight . P.parse schemeP ""
       where
@@ -77,6 +82,8 @@ setExternalLinkicon =
           cs <- P.many (PC.alphaNum P.<|> P.oneOf ".-+")
           _ <- PC.char ':'
           return (c : cs)
+    -- Checks whether a list of inlines contains a (perhaps nested) "textual element", understood as a Pandoc `Str`, `Code` or `Math`.
+    containsText :: [B.Inline] -> Bool
     containsText =
       getAny
         . W.query
