@@ -62,9 +62,9 @@ setExternalLinkicon =
   W.walk $ \case
     B.Link (id', classes, attrs) inlines (url, title)
       | hasURIScheme url && containsText inlines ->
-        let showLinkIconAttr = ("data-linkicon", "external")
-            newAttrs = insert attrs showLinkIconAttr
-         in B.Link (id', classes, newAttrs) inlines (url, title)
+          let showLinkIconAttr = ("data-linkicon", "external")
+              newAttrs = insert attrs showLinkIconAttr
+           in B.Link (id', classes, newAttrs) inlines (url, title)
     x -> x
   where
     -- Inserts an element in a key-value list if the element's key is not already in the list.
