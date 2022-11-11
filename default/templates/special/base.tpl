@@ -5,9 +5,6 @@
         <h1 class="pb-2 mt-2 mb-2 text-6xl text-center">
           <ema:title />
         </h1>
-        <apply template="experimental">
-          <bind tag="dnum">50</bind>
-        </apply>
         <div class="pb-2 mx-auto my-4 lg:max-w-screen-md ">
           <special-main />
         </div>
