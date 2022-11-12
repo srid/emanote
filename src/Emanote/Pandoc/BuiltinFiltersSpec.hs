@@ -13,8 +13,8 @@ spec :: Spec
 spec =
   do
     describe "setExternalLinkIcon" $ do
-      let linkIconAttrs = fmap (query getDataLinkIconAttr) . parseAndRunFilters
-          parseAndRunFilters = fmap (preparePandoc . snd) . parseMarkdown "<test>"
+      let linkIconAttrs = fmap (query getDataLinkIconAttr) . parseEmanoteMarkdown
+          parseEmanoteMarkdown = fmap (preparePandoc . snd) . parseMarkdown "<test>"
           getDataLinkIconAttr (Link (_, _, attrs) _ (_, _)) = snd <$> filter ((== "data-linkicon") . fst) attrs
           getDataLinkIconAttr _ = []
       it "respects user-specified data-linkicon attribute" . hedgehog $ do
