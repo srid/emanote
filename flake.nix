@@ -23,10 +23,9 @@
         ./nix/stork.nix
         ./nix/tailwind.nix
       ];
-      perSystem = { pkgs, inputs', self', ... }: {
+      perSystem = { pkgs, config, ... }: {
         haskellProjects.default = {
-          root = ./.;
-          name = "emanote";
+          packages.emanote.root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt
@@ -34,29 +33,29 @@
             inherit (hp)
               cabal-fmt
               ormolu;
-            inherit (self'.packages)
+            inherit (config.packages)
               stork;
           };
           source-overrides = {
             inherit (inputs) commonmark-wikilink;
           };
           overrides = self: super: with pkgs.haskell.lib; {
-            tailwind = addBuildDepends (unmarkBroken super.tailwind) [ self'.packages.tailwind ];
+            tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
             heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
             ixset-typed = unmarkBroken super.ixset-typed;
             pandoc-link-context = unmarkBroken super.pandoc-link-context;
+            emanote = addBuildDepends super.emanote [ config.packages.stork ];
           };
-          modifier = drv: with pkgs.haskell.lib;
-            addBuildDepends drv [
-              self'.packages.stork
-            ];
         };
-        packages.test =
-          pkgs.runCommand "emanote-test" { } ''
-            ${pkgs.lib.getExe self'.packages.default} --test 2>&1 | tee $out
-          '';
+        packages = {
+          default = config.packages.emanote;
+          test =
+            pkgs.runCommand "emanote-test" { } ''
+              ${pkgs.lib.getExe config.packages.emanote} --test 2>&1 | tee $out
+            '';
+        };
         emanote = {
-          package = self'.packages.default;
+          package = config.packages.emanote;
           sites = {
             "docs" = {
               layers = [ ./docs ];
