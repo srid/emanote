@@ -74,6 +74,7 @@
 <body class="${bodyClass}">
   <body-main />
   <apply template="components/stork/stork-search" />
+  <snippet var="page.bodyHtml" />
 </body>
 
 </html>

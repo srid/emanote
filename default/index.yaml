@@ -81,6 +81,11 @@ page:
   headHtml: |
     <meta name="generator" content="Emanote" />
 
+  # Put anything that should below the <body> of these routes here:
+  # You can reference other metadata keys using <snippet var=".." />
+  # Or use the JS behaviour library below.
+  bodyHtml: |
+
 # Builtin JS behaviour library. Use them in `page.headHtml` of your .yaml or .md
 # frontmatter.
 js:
