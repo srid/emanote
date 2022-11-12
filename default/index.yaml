@@ -81,6 +81,11 @@ page:
   headHtml: |
     <meta name="generator" content="Emanote" />
 
+  # Put anything that should below the <body> of these routes here:
+  # You can reference other metadata keys using <snippet var=".." />
+  # Or use the JS behaviour library below.
+  bodyHtml: |
+
 # Builtin JS behaviour library. Use them in `page.headHtml` of your .yaml or .md
 # frontmatter.
 js:
@@ -106,9 +111,9 @@ js:
   # Diagrams using mermaid.js
   mermaid: |
     <!-- mermaid.js -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({startOnLoad:false});
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: false });
       mermaid.init(undefined,document.querySelectorAll(".mermaid"));
     </script>
   mathjax: |
