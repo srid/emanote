@@ -1,6 +1,6 @@
 module Emanote.Pandoc.BuiltinFiltersSpec where
 
-import Emanote.Pandoc.BuiltinFilters
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
 import Hedgehog
 import Relude
