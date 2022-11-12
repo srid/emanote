@@ -4,7 +4,6 @@ module Emanote.Pandoc.BuiltinFilters
   )
 where
 
-import Data.Aeson (Value (Bool))
 import Emanote.Model.Note qualified as N
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
