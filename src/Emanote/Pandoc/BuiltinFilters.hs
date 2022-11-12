@@ -55,7 +55,9 @@ fixEmojiFontFamily =
            in B.Span (id', classes, newAttrs) is
     x -> x
 
--- Adds a data-linkicon=external attribute to external links that contain some text in their description, provided that they do not already have a data-linkicon attribute.
+-- Add a data-linkicon=external attribute to external links that contain some
+-- text in their description, provided that they do not already have a
+-- data-linkicon attribute.
 setExternalLinkIcon :: W.Walkable B.Inline b => b -> b
 setExternalLinkIcon =
   W.walk $ \case
@@ -66,12 +68,14 @@ setExternalLinkIcon =
            in B.Link (id', classes, newAttrs) inlines (url, title)
     x -> x
   where
-    -- Inserts an element in a key-value list if the element's key is not already in the list.
+    -- Inserts an element in a key-value list if the element's key is not
+    -- already in the list.
     insert :: Eq a => [(a, b)] -> (a, b) -> [(a, b)]
     insert as a
       | fst a `elem` (fst <$> as) = as
       | otherwise = a : as
-    -- Checks whether the given text begins with an RFC 3986 compliant URI scheme.
+    -- Checks whether the given text begins with an RFC 3986 compliant URI
+    -- scheme.
     hasURIScheme :: Text -> Bool
     hasURIScheme =
       isRight . P.parse schemeP ""
@@ -81,7 +85,8 @@ setExternalLinkIcon =
           cs <- P.many (PC.alphaNum P.<|> P.oneOf ".-+")
           _ <- PC.char ':'
           return (c : cs)
-    -- Checks whether a list of inlines contains a (perhaps nested) "textual element", understood as a Pandoc `Str`, `Code` or `Math`.
+    -- Checks whether a list of inlines contains a (perhaps nested) "textual
+    -- element", understood as a Pandoc `Str`, `Code` or `Math`.
     containsText :: [B.Inline] -> Bool
     containsText =
       getAny
