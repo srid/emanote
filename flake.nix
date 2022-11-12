@@ -44,6 +44,7 @@
             heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
             ixset-typed = unmarkBroken super.ixset-typed;
             pandoc-link-context = unmarkBroken super.pandoc-link-context;
+            commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
             emanote = addBuildDepends super.emanote [ config.packages.stork ];
           };
         };

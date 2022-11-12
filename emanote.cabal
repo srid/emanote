@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.8.1.5
+version:            0.8.1.6
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -95,7 +95,7 @@ common library-common
     , blaze-html
     , bytestring
     , commonmark
-    , commonmark-extensions
+    , commonmark-extensions  <0.2.3.3
     , commonmark-pandoc
     , commonmark-simple
     , commonmark-wikilink
