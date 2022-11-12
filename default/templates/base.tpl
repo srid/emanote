@@ -74,6 +74,9 @@
 <body class="${bodyClass}">
   <body-main />
   <apply template="components/stork/stork-search" />
+  <ema:metadata>
+    <snippet var="page.bodyHtml" />
+  </ema:metadata>
 </body>
 
 </html>
