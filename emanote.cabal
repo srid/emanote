@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.8.1.3
+version:            0.8.1.4
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -175,6 +175,7 @@ library
     Emanote.Model.Title
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
+    Emanote.Pandoc.BuiltinFiltersSpec
     Emanote.Pandoc.Link
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag

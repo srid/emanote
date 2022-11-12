@@ -4,7 +4,7 @@ tags: [emanote/syntax/demo]
 
 # Custom CSS styling
 
-Parts of your Markdown may be styled using custom CSS classes provided by TailwindCSS.  
+Parts of your Markdown may be styled using custom CSS classes provided by TailwindCSS.
 
 The [attributes extension](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a "class map" in [[yaml-config|index.yaml]], the default value of which provides some builtin-in styles.
 
@@ -30,9 +30,9 @@ You should expect the above text to appear styled like a yellow sticky note, bec
 A portion of Markdown that is highlighted compared to the rest
 :::
 
-## Advanced styling 
+## Advanced styling
 
-Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes. 
+Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md) with [attributes](https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md) extension, you can wrap parts of your Markdown using a [div], and then style it en masse. For example, to [[embed|embed multiple notes]] in a "matrix" arrangement[^mob] you can make use of CSS grids as provided by Tailwind's classes.
 
 [div]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div
 
@@ -46,3 +46,4 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 
 
 [^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accepting non-standard class names, such as the Tailwind responsive classes (eg. `lg:grid-cols-2`).
+
