@@ -111,9 +111,9 @@ js:
   # Diagrams using mermaid.js
   mermaid: |
     <!-- mermaid.js -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-      mermaid.initialize({startOnLoad:false});
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: false });
       mermaid.init(undefined,document.querySelectorAll(".mermaid"));
     </script>
   mathjax: |
