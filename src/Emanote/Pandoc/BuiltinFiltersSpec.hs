@@ -13,8 +13,6 @@ spec :: Spec
 spec =
   do
     describe "setExternalLinkIcon" $ do
-      let parseEmanoteMarkdown = fmap (preparePandoc . snd) . parseMarkdown "<test>"
-          getDataLinkIconAttrs = fmap (W.query $ getLinkAttr "data-linkicon") . parseEmanoteMarkdown
       it "respects user-specified data-linkicon attribute" . hedgehog $ do
         getDataLinkIconAttrs "[test](https://www.test.com){data-linkicon=abc}" === Right ["abc"]
         getDataLinkIconAttrs "[test](https://www.test.com){data-linkicon=\"\"}" === Right [""]
@@ -44,6 +42,13 @@ spec =
         getDataLinkIconAttrs "[](http://nothing.interesting.here)" === Right []
         getDataLinkIconAttrs "[![[image.png]]](https://www.example.com)" === Right []
         getDataLinkIconAttrs "[==*_**~~![[img.png]]~~**_*==](http://something.info)" === Right []
+
+-- | Extract "data-linkicon" attributes present in the given Markdown content.
+getDataLinkIconAttrs :: Text -> Either Text [Text]
+getDataLinkIconAttrs =
+  fmap (W.query $ getLinkAttr "data-linkicon") . parseEmanoteMarkdown
+  where
+    parseEmanoteMarkdown = fmap (preparePandoc . snd) . parseMarkdown "<test>"
 
 getLinkAttr :: Text -> Inline -> [Text]
 getLinkAttr name (Link (_, _, attrs) _ (_, _)) =
