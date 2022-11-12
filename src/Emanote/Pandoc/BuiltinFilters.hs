@@ -82,8 +82,8 @@ setExternalLinkIcon =
       where
         schemeP = do
           c <- PC.letter
-          cs <- P.many (PC.alphaNum P.<|> P.oneOf ".-+")
-          _ <- PC.char ':'
+          cs <- P.many $ PC.alphaNum P.<|> P.oneOf ".-+"
+          void $ PC.char ':'
           return (c : cs)
     -- Checks whether a list of inlines contains a (perhaps nested) "textual
     -- element", understood as a Pandoc `Str`, `Code` or `Math`.
