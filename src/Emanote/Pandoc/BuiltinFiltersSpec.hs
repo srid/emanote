@@ -7,13 +7,13 @@ import Relude
 import Test.Hspec
 import Test.Hspec.Hedgehog (hedgehog)
 import Text.Pandoc.Definition (Inline (..))
-import Text.Pandoc.Walk (query)
+import Text.Pandoc.Walk qualified as W
 
 spec :: Spec
 spec =
   do
     describe "setExternalLinkIcon" $ do
-      let linkIconAttrs = fmap (query $ getLinkAttr "data-linkicon") . parseEmanoteMarkdown
+      let linkIconAttrs = fmap (W.query $ getLinkAttr "data-linkicon") . parseEmanoteMarkdown
           parseEmanoteMarkdown = fmap (preparePandoc . snd) . parseMarkdown "<test>"
       it "respects user-specified data-linkicon attribute" . hedgehog $ do
         linkIconAttrs "[test](https://www.test.com){data-linkicon=abc}" === Right ["abc"]
