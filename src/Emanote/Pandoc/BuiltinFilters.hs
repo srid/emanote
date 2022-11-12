@@ -24,7 +24,7 @@ preparePandoc :: W.Walkable B.Inline b => b -> b
 preparePandoc =
   linkifyInlineTags
     >>> fixEmojiFontFamily
-    >>> setExternalLinkicon
+    >>> setExternalLinkIcon
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
@@ -56,8 +56,8 @@ fixEmojiFontFamily =
     x -> x
 
 -- Adds a data-linkicon=external attribute to external links that contain some text in their description, provided that they do not already have a data-linkicon attribute.
-setExternalLinkicon :: W.Walkable B.Inline b => b -> b
-setExternalLinkicon =
+setExternalLinkIcon :: W.Walkable B.Inline b => b -> b
+setExternalLinkIcon =
   W.walk $ \case
     B.Link (id', classes, attrs) inlines (url, title)
       | hasURIScheme url && containsText inlines ->

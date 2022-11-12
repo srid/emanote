@@ -12,7 +12,7 @@ import Text.Pandoc.Walk (query)
 spec :: Spec
 spec =
   do
-    describe "setExternalLinkicon" $ do
+    describe "setExternalLinkIcon" $ do
       let linkIconAttrs = fmap (query getDataLinkIconAttr) . parseAndRunFilters
           parseAndRunFilters = fmap (preparePandoc . snd) . parseMarkdown ""
           getDataLinkIconAttr (Link (_, _, attrs) _ (_, _)) = snd <$> filter ((== "data-linkicon") . fst) attrs
