@@ -1,19 +1,20 @@
 ---
 page:
   headHtml: |
-    <snippet var="js.mermaid" />
     <snippet var="js.highlightjs" />
+  bodyHtml: |
+    <snippet var="js.mermaid" />
 ---
 
 # Mermaid Diagrams
 
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks. 
 
-To enable this, add the following to your `page.headHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]]):
+To enable this, add the following to your `page.bodyHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]]):
 
 ```yaml
 page:
-  headHtml: |
+  bodyHtml: |
     <snippet var="js.mermaid" />
 ```
 
