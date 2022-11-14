@@ -32,6 +32,10 @@ data-files:
   index.yaml
   templates/**/*.tpl
 
+flag ghcid
+  default: False
+  manual:  True
+
 common haskell-common
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
@@ -207,15 +211,31 @@ library
 -- To profile: ghc-options: -fexternal-interpreter -prof -fprof-auto -rtsopts
 executable emanote
   import:         library-common
-  hs-source-dirs: exe src
+  hs-source-dirs: exe
   main-is:        Main.hs
   ghc-options:    -threaded -rtsopts -with-rtsopts=-N
+
+  if flag(ghcid)
+    hs-source-dirs: src
+
+  else
+    build-depends: emanote
 
 test-suite test
   import:         library-common 
   type:           exitcode-stdio-1.0
-  hs-source-dirs: test src
+  hs-source-dirs: test
   main-is:        Spec.hs
   build-depends:
     , hspec
     , relude
+
+  if flag(ghcid)
+    hs-source-dirs: src
+
+  else
+    build-depends: emanote
+    other-modules:
+      Emanote.Model.Link.RelSpec
+      Emanote.Model.QuerySpec
+      Emanote.Pandoc.BuiltinFiltersSpec
