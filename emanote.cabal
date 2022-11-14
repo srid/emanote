@@ -150,10 +150,9 @@ common library-common
     , xmlhtml
     , yaml
 
-
 library
   import:          library-common
-  hs-source-dirs:   src
+  hs-source-dirs:  src
   exposed-modules:
     Emanote
     Emanote.CLI
@@ -208,14 +207,14 @@ library
 -- To profile: ghc-options: -fexternal-interpreter -prof -fprof-auto -rtsopts
 executable emanote
   import:         library-common
-  hs-source-dirs: exe
+  hs-source-dirs: exe src
   main-is:        Main.hs
   ghc-options:    -threaded -rtsopts -with-rtsopts=-N
 
 test-suite test
   import:         library-common 
   type:           exitcode-stdio-1.0
-  hs-source-dirs: test
+  hs-source-dirs: test src
   main-is:        Spec.hs
   build-depends:
     , hspec
