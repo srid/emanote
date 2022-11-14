@@ -48,13 +48,7 @@
             emanote = addBuildDepends super.emanote [ config.packages.stork ];
           };
         };
-        packages = {
-          default = config.packages.emanote;
-          test =
-            pkgs.runCommand "emanote-test" { } ''
-              ${pkgs.lib.getExe config.packages.emanote} --test 2>&1 | tee $out
-            '';
-        };
+        packages.default = config.packages.emanote;
         emanote = {
           package = config.packages.emanote;
           sites = {

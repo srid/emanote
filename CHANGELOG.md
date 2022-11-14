@@ -8,8 +8,8 @@
   - `js.mermaid` snippet uses the "module" script tag approach, which is added to end of `<body>`. See [here](https://mermaid-js.github.io/mermaid/#/n00b-gettingStarted?id=_3-calling-the-javascript-api). 
 - Configuration
   - Add `page.bodyHtml` option to inject custom HTML at the end of `<body>` tag.
-- Dev
-  - Move test sources to Cabal's `other-modules` so they are not exposed.
+- Packaging
+  - Move tests to their own cabal component (thereby, also, unexpose them from library exposed modules)
   - Wikilink parser is now a separate library: https://github.com/srid/commonmark-wikilink
 
 ## 0.8.0.0 (2022-11-03)
