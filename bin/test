@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -xe
 
-exec nix develop -c ghcid -c "cabal repl exe:emanote" --warnings -T ":main --test"
+exec nix develop -i -c ghcid -c "cabal repl test:test --flags=ghcid" --warnings -T :main

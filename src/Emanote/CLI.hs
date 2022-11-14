@@ -19,7 +19,6 @@ import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
   { layers :: NonEmpty FilePath,
-    test :: Bool,
     allowBrokenLinks :: Bool,
     cmd :: Cmd
   }
@@ -31,7 +30,6 @@ data Cmd
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- pathList (one cwd)
-  test <- switch (long "test" <> help "Run tests")
   allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
