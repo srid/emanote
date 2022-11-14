@@ -85,7 +85,6 @@ common library-common
   default-language: Haskell2010
 
   -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
-  hs-source-dirs:   src
   build-depends:
     , aeson
     , aeson-extra
@@ -151,10 +150,10 @@ common library-common
     , xmlhtml
     , yaml
 
-  hs-source-dirs:   src
 
 library
   import:          library-common
+  hs-source-dirs:   src
   exposed-modules:
     Emanote
     Emanote.CLI
@@ -206,23 +205,18 @@ library
   other-modules:   Paths_emanote
   autogen-modules: Paths_emanote
 
+-- To profile: ghc-options: -fexternal-interpreter -prof -fprof-auto -rtsopts
 executable emanote
   import:         library-common
-  main-is:        Main.hs
   hs-source-dirs: exe
+  main-is:        Main.hs
   ghc-options:    -threaded -rtsopts -with-rtsopts=-N
 
 test-suite test
   import:         library-common 
-  main-is:        Spec.hs
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
+  main-is:        Spec.hs
   build-depends:
     , hspec
     , relude
-
-  other-modules:
-    Emanote.Model.Link.RelSpec
-    Emanote.Model.QuerySpec
-    Emanote.Pandoc.BuiltinFiltersSpec
-    Spec
