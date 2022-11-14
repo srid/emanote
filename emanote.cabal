@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            0.8.1.6
+version:            0.8.1.7
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -175,7 +175,6 @@ library
     Emanote.Model.Title
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
-    Emanote.Pandoc.BuiltinFiltersSpec
     Emanote.Pandoc.Link
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag
@@ -204,15 +203,26 @@ library
     Emanote.View.TaskIndex
     Emanote.View.Template
 
-  other-modules:
-    Emanote.Model.Link.RelSpec
-    Emanote.Model.QuerySpec
-    Paths_emanote
-    Spec
-
+  other-modules:   Paths_emanote
   autogen-modules: Paths_emanote
 
 executable emanote
-  import:      library-common
-  main-is:     Main.hs
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  import:         library-common
+  main-is:        Main.hs
+  hs-source-dirs: exe
+  ghc-options:    -threaded -rtsopts -with-rtsopts=-N
+
+test-suite test
+  import:         library-common 
+  main-is:        Spec.hs
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  build-depends:
+    , hspec
+    , relude
+
+  other-modules:
+    Emanote.Model.Link.RelSpec
+    Emanote.Model.QuerySpec
+    Emanote.Pandoc.BuiltinFiltersSpec
+    Spec
