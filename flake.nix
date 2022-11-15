@@ -9,9 +9,13 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
 
-    # TODO: Dependencies to be put on Hackage.
+    # TODO: Dependencies waiting to go from Hackage to nixpkgs.
     commonmark-wikilink.url = "github:srid/commonmark-wikilink";
     commonmark-wikilink.flake = false;
+    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.flake = false;
+    heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
+    heist.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
@@ -37,13 +41,12 @@
               stork;
           };
           source-overrides = {
-            inherit (inputs) commonmark-wikilink;
+            inherit (inputs)
+              commonmark-wikilink heist-extra heist;
           };
           overrides = self: super: with pkgs.haskell.lib; {
+            heist = dontCheck super.heist; # Tests are broken.
             tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-            heist-emanote = dontCheck (doJailbreak (unmarkBroken super.heist-emanote)); # Tests are broken.
-            ixset-typed = unmarkBroken super.ixset-typed;
-            pandoc-link-context = unmarkBroken super.pandoc-link-context;
             commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
             emanote = addBuildDepends super.emanote [ config.packages.stork ];
           };
