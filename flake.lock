@@ -21,11 +21,11 @@
         "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
-        "lastModified": 1668267756,
-        "narHash": "sha256-qPHFVEKjHEqpJunN1mfxUhbzcPYVDApxnQ3PGYxZT1c=",
+        "lastModified": 1668450977,
+        "narHash": "sha256-cfLhMhnvXn6x1vPm+Jow3RiFAUSCw/l1utktCw5rVA4=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "f44ebd5897ae5313494d94910f413744e275b096",
+        "rev": "d591857e9d7dd9ddbfba0ea02b43b927c3c0f1fa",
         "type": "github"
       },
       "original": {
@@ -49,13 +49,45 @@
         "type": "github"
       }
     },
+    "heist": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1668478922,
+        "narHash": "sha256-HVIRUx90r0pvJKfLU6fM51/SdzvNOzv0466xIOeSFlo=",
+        "owner": "snapframework",
+        "repo": "heist",
+        "rev": "a23f0b5d70556742644189d71d694f379738cdbc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "snapframework",
+        "repo": "heist",
+        "type": "github"
+      }
+    },
+    "heist-extra": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1668486579,
+        "narHash": "sha256-VmyGntVH/tVosftplC4O0JhYA34kXeq1Wu/RbJr132Y=",
+        "owner": "srid",
+        "repo": "heist-extra",
+        "rev": "da94abfa68f67933baef9b529fe8d2a4edc572d5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "heist-extra",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1668231603,
-        "narHash": "sha256-/4br947zgRqABb52iLF4DCHgD49Fw5aQ6/IdTwaM95E=",
+        "lastModified": 1668443372,
+        "narHash": "sha256-lXNlVyNWwO22/JUdBtUWz68jZB3DM+Jq/irlsbwncI0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "d8f2c4d846a2e65ad3f5a5e842b672f0b81588a2",
+        "rev": "dad4de1694cd92d9a0e123bfdf134d0047b836a5",
         "type": "github"
       },
       "original": {
@@ -88,6 +120,8 @@
         "commonmark-wikilink": "commonmark-wikilink",
         "flake-parts": "flake-parts",
         "haskell-flake": "haskell-flake",
+        "heist": "heist",
+        "heist-extra": "heist-extra",
         "nixpkgs": "nixpkgs"
       }
     }
