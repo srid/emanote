@@ -1,6 +1,6 @@
-module Emanote.Pandoc.BuiltinFiltersSpec where
+module Emanote.Pandoc.ExternalLinkSpec where
 
-import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.ExternalLink (setExternalLinkIcon)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
 import Hedgehog
 import Relude
@@ -47,7 +47,7 @@ getDataLinkIconAttrs :: Text -> Either Text [Text]
 getDataLinkIconAttrs =
   fmap (W.query $ getLinkAttr "data-linkicon") . parseEmanoteMarkdown
   where
-    parseEmanoteMarkdown = fmap (preparePandoc . snd) . parseMarkdown "<test>"
+    parseEmanoteMarkdown = fmap (setExternalLinkIcon . snd) . parseMarkdown "<test>"
 
 getLinkAttr :: Text -> Inline -> [Text]
 getLinkAttr name (Link (_, _, attrs) _ (_, _)) =
