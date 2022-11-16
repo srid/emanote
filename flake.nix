@@ -16,6 +16,8 @@
     heist-extra.flake = false;
     heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
     heist.flake = false;
+    ema.url = "github:EmaApps/ema/split";
+    ema.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
@@ -43,6 +45,7 @@
           source-overrides = {
             inherit (inputs)
               commonmark-wikilink heist-extra heist;
+            ema = inputs.ema + /ema;
           };
           overrides = self: super: with pkgs.haskell.lib; {
             heist = dontCheck super.heist; # Tests are broken.
