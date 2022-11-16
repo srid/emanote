@@ -16,6 +16,23 @@
         "type": "github"
       }
     },
+    "ema": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1668560716,
+        "narHash": "sha256-/WCL4+ERh/mOZe9q4XaLJABrNGAXfMiWGfVuHkzE1RE=",
+        "owner": "EmaApps",
+        "repo": "ema",
+        "rev": "70b9582814ce2d761544cff74566b7dbb2fc448c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "EmaApps",
+        "ref": "split",
+        "repo": "ema",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -118,6 +135,7 @@
     "root": {
       "inputs": {
         "commonmark-wikilink": "commonmark-wikilink",
+        "ema": "ema",
         "flake-parts": "flake-parts",
         "haskell-flake": "haskell-flake",
         "heist": "heist",
