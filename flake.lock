@@ -19,16 +19,15 @@
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1668560716,
-        "narHash": "sha256-/WCL4+ERh/mOZe9q4XaLJABrNGAXfMiWGfVuHkzE1RE=",
+        "lastModified": 1668883024,
+        "narHash": "sha256-fftvlkkAZgtExQ3vIiUPJbxIkMPDuvTi0XAZqo7jtNM=",
         "owner": "EmaApps",
         "repo": "ema",
-        "rev": "70b9582814ce2d761544cff74566b7dbb2fc448c",
+        "rev": "7cc73addf8191c4a2fbe157e6c02d9fed9644c3b",
         "type": "github"
       },
       "original": {
         "owner": "EmaApps",
-        "ref": "split",
         "repo": "ema",
         "type": "github"
       }
