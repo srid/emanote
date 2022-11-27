@@ -7,9 +7,9 @@
     <ul>
       <result>
         <li>
-          <div class="flex flex-wrap my-2">
+          <div class="flex flex-wrap flex-row my-2">
             <ema:note:metadata>
-              <span data-nosnippet class="mr-2 text-right text-gray-600">
+              <span data-nosnippet class="mr-2 text-right font-mono text-gray-600">
                 <value var="date" />
               </span>
             </ema:note:metadata>
