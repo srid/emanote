@@ -13,6 +13,8 @@
   - Move tests to their own cabal component (thereby, also, unexpose them from library exposed modules)
   - Wikilink parser is now a separate library: https://github.com/srid/commonmark-wikilink
   - Use `heist-extra` 0.2.0.0 which switches over from `heist-emanote` to using official `heist` package.
+- Bug fixes
+  - #380 & #386: Better handling of `.org` and `.md` ambiguties. Default layer's `index.md` has been removed.
 
 ## 0.8.0.0 (2022-11-03)
 
