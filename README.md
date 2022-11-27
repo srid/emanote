@@ -39,3 +39,7 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 ## Related projects
 
 - https://github.com/squidfunk/mkdocs-material
+
+## Licenses
+
+- Logo: https://www.svgrepo.com/svg/267765/paper-plane
