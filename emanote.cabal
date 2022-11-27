@@ -28,7 +28,6 @@ data-files:
   _emanote-static/stork/stork.js
   _emanote-static/stork/stork.wasm
   favicon.svg
-  index.md
   index.yaml
   templates/**/*.tpl
 
