@@ -109,7 +109,8 @@ modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
            -- Insert folder placeholder automatically for ancestor paths
-           >>> flip (foldr injectAncestor) (N.noteAncestors note)
+           >>> injectAncestors (N.noteAncestors note)
+           >>> dropRedundantAncestor r
        )
     >>> modelRels
       %~ updateIxMulti r (Rel.noteRels note)
@@ -119,6 +120,41 @@ modelInsertNote note =
       %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
+
+-- | If a placeholder route was added already, but the newly added note is a
+-- non-Markdown, removce that markdown placeholder route.
+dropRedundantAncestor :: LMLRoute -> IxNote -> IxNote
+dropRedundantAncestor recentNoteRoute ns =
+  case recentNoteRoute of
+    R.LMLRoute_Md _ -> ns
+    R.LMLRoute_Org r ->
+      case N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) ns of
+        Nothing -> ns
+        Just placeholderNote -> Ix.deleteIx (placeholderNote ^. N.noteRoute) ns
+
+injectAncestors :: [N.RAncestor] -> IxNote -> IxNote
+injectAncestors ancs' =
+  case nonEmpty ancs' of
+    Nothing ->
+      injectRoot
+    Just ancs ->
+      flip (foldr injectAncestor) ancs
+
+-- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+-- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
+restoreAncestor :: Maybe N.RAncestor -> IxNote -> IxNote
+restoreAncestor =
+  maybe injectRoot injectAncestor
+
+injectRoot :: IxNote -> IxNote
+injectRoot ns =
+  case resolveLmlRouteIfExists ns idxR of
+    Just _ -> ns
+    Nothing ->
+      let r = R.defaultLmlRoute idxR
+       in Ix.updateIx r (N.ancestorPlaceholderNote $ coerce idxR) ns
+  where
+    idxR = R.indexRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor (N.unRAncestor -> folderR) ns =
@@ -133,9 +169,7 @@ modelDeleteNote k model =
   model
     & modelNotes
       %~ ( Ix.deleteIx k
-             -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
-             -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
-             >>> maybe id restoreFolderPlaceholder mFolderR
+             >>> restoreAncestor (N.RAncestor <$> mFolderR)
          )
     & modelRels
       %~ deleteIxMulti k
@@ -150,8 +184,6 @@ modelDeleteNote k model =
       let folderR = R.withLmlRoute coerce k
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
-    restoreFolderPlaceholder =
-      injectAncestor . N.RAncestor
 
 -- | Like `Ix.updateIx`, but works for multiple items.
 updateIxMulti ::
@@ -260,6 +292,7 @@ resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRo
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 
+-- | Lookup a LML route, returning the less popular LML format if there are ambiguities.
 resolveLmlRouteIfExists :: forall ext. IxNote -> R ext -> Maybe LMLRoute
 resolveLmlRouteIfExists notes r = do
   -- TODO: Refactor using `[minBound..maxBound] :: [LML]`
