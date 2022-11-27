@@ -32,10 +32,6 @@
     }
 
     /* External link icon */
-    a[data-linkicon]:not([data-linkicon=""]):not([data-linkicon="none"])::after {
-      margin-left: 1px;
-    }
-
     a[data-linkicon=""]::after {
       content: ""
     }
