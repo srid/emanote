@@ -128,6 +128,12 @@ injectAncestors ancs' =
     Just ancs ->
       flip (foldr injectAncestor) ancs
 
+-- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
+-- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
+restoreAncestor :: Maybe N.RAncestor -> IxNote -> IxNote
+restoreAncestor =
+  maybe injectRoot injectAncestor
+
 injectRoot :: IxNote -> IxNote
 injectRoot ns =
   case resolveLmlRouteIfExists ns idxR of
@@ -151,9 +157,7 @@ modelDeleteNote k model =
   model
     & modelNotes
       %~ ( Ix.deleteIx k
-             -- Restore folder placeholder, if $folder.md gets deleted (with $folder/*.md still present)
-             -- TODO: If $k.md is the only file in its parent, delete unnecessary ancestors
-             >>> maybe id restoreFolderPlaceholder mFolderR
+             >>> restoreAncestor (N.RAncestor <$> mFolderR)
          )
     & modelRels
       %~ deleteIxMulti k
@@ -168,8 +172,6 @@ modelDeleteNote k model =
       let folderR = R.withLmlRoute coerce k
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
-    restoreFolderPlaceholder =
-      injectAncestor . N.RAncestor
 
 -- | Like `Ix.updateIx`, but works for multiple items.
 updateIxMulti ::
