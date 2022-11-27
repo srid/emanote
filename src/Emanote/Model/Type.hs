@@ -109,7 +109,7 @@ modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
            -- Insert folder placeholder automatically for ancestor paths
-           >>> flip (foldr injectAncestor) (N.noteAncestors note)
+           >>> injectAncestors (N.noteAncestors note)
        )
     >>> modelRels
       %~ updateIxMulti r (Rel.noteRels note)
@@ -119,6 +119,24 @@ modelInsertNote note =
       %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
+
+injectAncestors :: [N.RAncestor] -> IxNote -> IxNote
+injectAncestors ancs' =
+  case nonEmpty ancs' of
+    Nothing ->
+      injectRoot
+    Just ancs ->
+      flip (foldr injectAncestor) ancs
+
+injectRoot :: IxNote -> IxNote
+injectRoot ns =
+  case resolveLmlRouteIfExists ns idxR of
+    Just _ -> ns
+    Nothing ->
+      let r = R.defaultLmlRoute idxR
+       in Ix.updateIx r (N.ancestorPlaceholderNote $ coerce idxR) ns
+  where
+    idxR = R.indexRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
 injectAncestor (N.unRAncestor -> folderR) ns =
@@ -260,6 +278,7 @@ resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRo
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 
+-- | Lookup a LML route, returning the less popular LML format if there are ambiguities.
 resolveLmlRouteIfExists :: forall ext. IxNote -> R ext -> Maybe LMLRoute
 resolveLmlRouteIfExists notes r = do
   -- TODO: Refactor using `[minBound..maxBound] :: [LML]`
