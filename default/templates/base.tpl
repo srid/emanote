@@ -33,12 +33,7 @@
 
     /* External link icon */
     a[data-linkicon]:not([data-linkicon=""]):not([data-linkicon="none"])::after {
-      /* filter converts black to rgb(156,163,175) */
       margin-left: 1px;
-    }
-
-    a[data-linkicon]:not([data-linkicon=""]):not([data-linkicon="none"]):hover::after {
-      /* filter converts black to  rgb(175,85,99) */
     }
 
     a[data-linkicon=""]::after {
