@@ -2,6 +2,7 @@
 order: -100
 page:
   description: "Various non-standard Markdown features supported by Emanote"
+date: 2021-01-01
 ---
 
 # Markdown :writing_hand:

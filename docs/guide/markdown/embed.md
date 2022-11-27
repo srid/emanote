@@ -1,5 +1,6 @@
 ---
 tags: [emanote/syntax/demo]
+date: 2022-08-03
 ---
 
 # Embedding

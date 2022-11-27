@@ -50,8 +50,12 @@ Queries can be rendered as a timeline by using the `timeline` code block attribu
 
 ~~~markdown
 ```query {.timeline}
-tag:blog/ema
+tag:emanote/syntax/**
 ```
 ~~~
 
-This will use the `date` [[yaml-config|frontmatter]] metadata to sort the results, as well as display the date alongside it.
+This will use the `date` [[yaml-config|frontmatter]] metadata to sort the results, as well as display the date alongside it. A live demo of that snippet above is presented below:
+
+```query {.timeline}
+tag:emanote/syntax/**
+```
