@@ -23,7 +23,7 @@ https://emanote.srid.ca/examples
 ## Developing
 
 
-Emanote is a Haskell software. Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code. 
+Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code. 
 
 See https://srid.ca/haskell-template/start for complete instructions, but the tldr is: Install nix, enable Flakes and run `bin/run`.
 
@@ -40,6 +40,7 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 
 - https://github.com/squidfunk/mkdocs-material
 
-## Licenses
-
-- Logo: https://www.svgrepo.com/svg/267765/paper-plane
+[^licenses]: Emanote uses software and resources that are licensed differently, viz.:
+    - [Logo](https://www.svgrepo.com/svg/267765/paper-plane)
+    - [Stork search](https://github.com/jameslittle230/stork/blob/master/license.txt)
+    - Various SVG icons are from [Heroicons](https://heroicons.com/)
