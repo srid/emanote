@@ -32,17 +32,6 @@
     }
 
     /* External link icon */
-    a[data-linkicon]:not([data-linkicon=""]):not([data-linkicon="none"])::after {
-      /* filter converts black to rgb(156,163,175) */
-      filter: invert(71%) sepia(3%) saturate(904%) hue-rotate(179deg) brightness(92%) contrast(87%);
-      margin-left: 1px;
-    }
-
-    a[data-linkicon]:not([data-linkicon=""]):not([data-linkicon="none"]):hover::after {
-      /* filter converts black to  rgb(175,85,99) */
-      filter: invert(32%) sepia(10%) saturate(834%) hue-rotate(176deg) brightness(92%) contrast(88%);
-    }
-
     a[data-linkicon=""]::after {
       content: ""
     }
@@ -52,11 +41,34 @@
     }
 
     a[data-linkicon="external"]::after {
-      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='1em' fill='none' viewBox='0 0 24 24' stroke='black' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14' /%3E%3C/svg%3E");
+      content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:gray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
     }
 
     a[data-linkicon="external"][href^="mailto:"]::after {
-      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='1em' fill='none' viewBox='0 0 24 24' stroke='black' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /%3E%3C/svg%3E");
+      content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
     }
   </style>
   <apply template="/templates/hooks/more-head" />
