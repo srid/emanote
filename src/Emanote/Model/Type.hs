@@ -110,6 +110,7 @@ modelInsertNote note =
     %~ ( Ix.updateIx r note
            -- Insert folder placeholder automatically for ancestor paths
            >>> injectAncestors (N.noteAncestors note)
+           >>> dropRedundantAncestor r
        )
     >>> modelRels
       %~ updateIxMulti r (Rel.noteRels note)
@@ -119,6 +120,17 @@ modelInsertNote note =
       %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
+
+-- | If a placeholder route was added already, but the newly added note is a
+-- non-Markdown, removce that markdown placeholder route.
+dropRedundantAncestor :: LMLRoute -> IxNote -> IxNote
+dropRedundantAncestor recentNoteRoute ns =
+  case recentNoteRoute of
+    R.LMLRoute_Md _ -> ns
+    R.LMLRoute_Org r ->
+      case N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) ns of
+        Nothing -> ns
+        Just placeholderNote -> Ix.deleteIx (placeholderNote ^. N.noteRoute) ns
 
 injectAncestors :: [N.RAncestor] -> IxNote -> IxNote
 injectAncestors ancs' =
