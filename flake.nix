@@ -10,8 +10,6 @@
     haskell-flake.url = "github:srid/haskell-flake";
 
     # TODO: Dependencies waiting to go from Hackage to nixpkgs.
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink";
-    commonmark-wikilink.flake = false;
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
     heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
@@ -44,7 +42,7 @@
           };
           source-overrides = {
             inherit (inputs)
-              commonmark-wikilink heist-extra heist;
+              heist-extra heist;
             ema = inputs.ema + /ema;
           };
           overrides = self: super: with pkgs.haskell.lib; {

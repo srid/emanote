@@ -1,29 +1,13 @@
 {
   "nodes": {
-    "commonmark-wikilink": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1667660916,
-        "narHash": "sha256-ZyYSsihq5nqP/YmkL2Tlr+XVwUu+3MquThpyc0yx65c=",
-        "owner": "srid",
-        "repo": "commonmark-wikilink",
-        "rev": "72c880b5dbe8521f8c424c7bd39cb11b26e8dbb8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "commonmark-wikilink",
-        "type": "github"
-      }
-    },
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1668883024,
-        "narHash": "sha256-fftvlkkAZgtExQ3vIiUPJbxIkMPDuvTi0XAZqo7jtNM=",
+        "lastModified": 1668972953,
+        "narHash": "sha256-WyTqCQg9xPqB2wC16PdjocaIL81MBLtjgC3eCzhN5hE=",
         "owner": "EmaApps",
         "repo": "ema",
-        "rev": "7cc73addf8191c4a2fbe157e6c02d9fed9644c3b",
+        "rev": "61faae56aa0f3c6ca815f344684cc566f6341662",
         "type": "github"
       },
       "original": {
@@ -68,11 +52,11 @@
     "heist": {
       "flake": false,
       "locked": {
-        "lastModified": 1668478922,
-        "narHash": "sha256-HVIRUx90r0pvJKfLU6fM51/SdzvNOzv0466xIOeSFlo=",
+        "lastModified": 1668990382,
+        "narHash": "sha256-5GEnEdDmUBSxrF0IWwiu5eNvtublv0rY7OEpvaU1NG0=",
         "owner": "snapframework",
         "repo": "heist",
-        "rev": "a23f0b5d70556742644189d71d694f379738cdbc",
+        "rev": "88105c85996b8d621922b38e67b9460b36ccad51",
         "type": "github"
       },
       "original": {
@@ -99,11 +83,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1668443372,
-        "narHash": "sha256-lXNlVyNWwO22/JUdBtUWz68jZB3DM+Jq/irlsbwncI0=",
+        "lastModified": 1670086663,
+        "narHash": "sha256-hT8C8AQB74tdoCPwz4nlJypLMD7GI2F5q+vn+VE/qQk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "dad4de1694cd92d9a0e123bfdf134d0047b836a5",
+        "rev": "813836d64fa57285d108f0dbf2356457ccd304e3",
         "type": "github"
       },
       "original": {
@@ -133,7 +117,6 @@
     },
     "root": {
       "inputs": {
-        "commonmark-wikilink": "commonmark-wikilink",
         "ema": "ema",
         "flake-parts": "flake-parts",
         "haskell-flake": "haskell-flake",
