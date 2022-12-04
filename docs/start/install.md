@@ -38,4 +38,4 @@ If you do not wish to use Nix, you may use Emanote in one of the following ways:
 | ---------- | ----------------- | ----------------- |
 | [[docker]] | Guaranteed        | Linux, WSL, macOS |
 
-Emanote is not on [Hackage](https://hackage.haskell.org/) yet, as 1.0 is yet to be released. Once on Hackage, Emanote can be packaged up in various ways like [Pandoc](https://pandoc.org/) (another Haskell software on Hackage) is. It will become the distributor's responsibility to create and maintain this long-term. Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. 
+Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. Emanote is also available in nixpkgs.

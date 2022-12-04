@@ -1,6 +1,6 @@
 # Revision history for emanote
 
-## 0.8.2.0 (Unreleased)
+## 1.0.0.0 (2022-12-04)
 
 - UI
   - Index pages are no longer marked as 'experimental'
