@@ -43,4 +43,5 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 [^licenses]: Emanote uses software and resources that are licensed differently, viz.:
     - [Logo](https://www.svgrepo.com/svg/267765/paper-plane)
     - [Stork search](https://github.com/jameslittle230/stork/blob/master/license.txt)
-    - Various SVG icons are from [Heroicons](https://heroicons.com/)
+    - [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)
+    - Various SVG icons are from [Heroicons](https://github.com/tailwindlabs/heroicons/blob/master/LICENSE)
