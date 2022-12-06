@@ -71,7 +71,7 @@
               warp
             ]);
         emanote = {
-          package = config.packages.emanote;
+          package = config.packages.default;
           sites = {
             "docs" = {
               layers = [ ./docs ];
