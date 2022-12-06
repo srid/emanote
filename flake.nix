@@ -58,7 +58,7 @@
                     # cf. https://github.com/NixOS/nixpkgs/pull/204675
                     postInstall = (old.postInstall or "") + ''
                       ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                      ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/emanote\n") disallowedReferences)}
+                      ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
                     '';
                   });
               in
