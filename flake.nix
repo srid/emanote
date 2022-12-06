@@ -53,7 +53,7 @@
               let
                 haskellExeSansDependencyBloat = pkg: get-deps: with pkgs.haskell.lib;
                   (justStaticExecutables pkg).overrideAttrs (old: rec {
-                    disallowedReferences = get-deps config.haskellProjects.default.haskellPackages;
+                    disallowedReferences = get-deps self;
                     # Ditch data dependencies that are not needed at runtime.
                     # cf. https://github.com/NixOS/nixpkgs/pull/204675
                     postInstall = (old.postInstall or "") + ''
