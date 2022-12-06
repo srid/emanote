@@ -45,29 +45,30 @@
               heist-extra heist;
             ema = inputs.ema + /ema;
           };
-          overrides = self: super: with pkgs.haskell.lib; {
-            heist = dontCheck super.heist; # Tests are broken.
-            tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-            commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
-            emanote =
-              let
-                haskellExeSansDependencyBloat = pkg: disallowedReferences: with pkgs.haskell.lib;
-                  (justStaticExecutables pkg).overrideAttrs (old: rec {
-                    inherit disallowedReferences;
-                    # Ditch data dependencies that are not needed at runtime.
-                    # cf. https://github.com/NixOS/nixpkgs/pull/204675
-                    postInstall = (old.postInstall or "") + ''
-                      ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                      ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
-                    '';
-                  });
-              in
-              haskellExeSansDependencyBloat (addBuildDepends super.emanote [ config.packages.stork ]) [
-                self.pandoc
-                self.pandoc-types
-                self.warp
-              ];
-          };
+          overrides = with pkgs.haskell.lib;
+            let
+              haskellExeSansDependencyBloat = pkg: disallowedReferences:
+                (justStaticExecutables pkg).overrideAttrs (old: rec {
+                  inherit disallowedReferences;
+                  # Ditch data dependencies that are not needed at runtime.
+                  # cf. https://github.com/NixOS/nixpkgs/pull/204675
+                  postInstall = (old.postInstall or "") + ''
+                    ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
+                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
+                  '';
+                });
+            in
+            self: super: {
+              heist = dontCheck super.heist; # Tests are broken.
+              tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
+              commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
+              emanote =
+                haskellExeSansDependencyBloat (addBuildDepends super.emanote [ config.packages.stork ]) [
+                  self.pandoc
+                  self.pandoc-types
+                  self.warp
+                ];
+            };
         };
         packages.default = config.packages.emanote;
         emanote = {
