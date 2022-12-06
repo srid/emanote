@@ -48,7 +48,7 @@
           overrides = with pkgs.haskell.lib;
             let
               # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
-              haskellExeSansDependencyBloat = drv: disallowedReferences:
+              haskellExeSansDependencyBloat = disallowedReferences: drv:
                 drv.overrideAttrs (old: rec {
                   inherit disallowedReferences;
                   # Ditch data dependencies that are not needed at runtime.
@@ -65,10 +65,14 @@
               tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
               commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
               emanote =
-                haskellExeSansDependencyBloat (justStaticExecutables (addBuildDepends super.emanote [ config.packages.stork ])) [
-                  self.pandoc
-                  self.pandoc-types
-                  self.warp
+                lib.pipe super.emanote [
+                  (lib.flip addBuildDepends [ config.packages.stork ])
+                  justStaticExecutables
+                  (haskellExeSansDependencyBloat [
+                    self.pandoc
+                    self.pandoc-types
+                    self.warp
+                  ])
                 ];
             };
         };
