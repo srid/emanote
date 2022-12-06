@@ -27,7 +27,7 @@
         ./nix/stork.nix
         ./nix/tailwind.nix
       ];
-      perSystem = { pkgs, config, ... }: {
+      perSystem = { pkgs, lib, config, ... }: {
         haskellProjects.default = {
           packages.emanote.root = ./.;
           buildTools = hp: {
@@ -45,16 +45,41 @@
               heist-extra heist;
             ema = inputs.ema + /ema;
           };
-          overrides = self: super: with pkgs.haskell.lib; {
-            heist = dontCheck super.heist; # Tests are broken.
-            tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-            commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
-            emanote = addBuildDepends super.emanote [ config.packages.stork ];
-          };
+          overrides = with pkgs.haskell.lib;
+            let
+              # Remove the given references from drv's executables.
+              # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
+              removeReferencesTo = disallowedReferences: drv:
+                drv.overrideAttrs (old: rec {
+                  inherit disallowedReferences;
+                  # Ditch data dependencies that are not needed at runtime.
+                  # cf. https://github.com/NixOS/nixpkgs/pull/204675
+                  # cf. https://srid.ca/remove-references-to
+                  postInstall = (old.postInstall or "") + ''
+                    ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
+                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
+                  '';
+                });
+            in
+            self: super: {
+              heist = dontCheck super.heist; # Tests are broken.
+              tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
+              commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
+              emanote =
+                lib.pipe super.emanote [
+                  (lib.flip addBuildDepends [ config.packages.stork ])
+                  justStaticExecutables
+                  (removeReferencesTo [
+                    self.pandoc
+                    self.pandoc-types
+                    self.warp
+                  ])
+                ];
+            };
         };
         packages.default = config.packages.emanote;
         emanote = {
-          package = config.packages.emanote;
+          package = config.packages.default;
           sites = {
             "docs" = {
               layers = [ ./docs ];

@@ -30,6 +30,7 @@ jobs:
         id: build-nix
         run: |
           nix build -j auto --no-link
+          nix path-info -rSh .#default | sort -rhk2 | head
       - name: Build as docker img
         id: build
         run: |
