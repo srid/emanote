@@ -27,7 +27,7 @@
         ./nix/stork.nix
         ./nix/tailwind.nix
       ];
-      perSystem = { pkgs, config, ... }: {
+      perSystem = { pkgs, lib, config, ... }: {
         haskellProjects.default = {
           packages.emanote.root = ./.;
           buildTools = hp: {
@@ -52,7 +52,24 @@
             emanote = addBuildDepends super.emanote [ config.packages.stork ];
           };
         };
-        packages.default = config.packages.emanote;
+        packages.default =
+          let
+            haskellExeSansDependencyBloat = pkg: get-deps: with pkgs.haskell.lib;
+              (justStaticExecutables pkg).overrideAttrs (old: rec {
+                disallowedReferences = get-deps config.haskellProjects.default.haskellPackages;
+                # Ditch data dependencies that are not needed at runtime.
+                # cf. https://github.com/NixOS/nixpkgs/pull/204675
+                postInstall = (old.postInstall or "") + ''
+                  ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/emanote\n") disallowedReferences)}
+                '';
+              });
+          in
+          haskellExeSansDependencyBloat config.packages.emanote
+            (hp: with hp; [
+              pandoc
+              pandoc-types
+              warp
+            ]);
         emanote = {
           package = config.packages.emanote;
           sites = {
@@ -70,3 +87,5 @@
       };
     };
 }
+
+

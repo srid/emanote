@@ -1,5 +1,10 @@
 # Revision history for emanote
 
+## Unreleased
+
+- Nix
+  - Reduce Emanote's Nix runtime closure size
+
 ## 1.0.0.0 (2022-12-04)
 
 - UI
