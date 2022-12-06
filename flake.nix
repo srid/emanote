@@ -51,9 +51,9 @@
             commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
             emanote =
               let
-                haskellExeSansDependencyBloat = pkg: get-deps: with pkgs.haskell.lib;
+                haskellExeSansDependencyBloat = pkg: disallowedReferences: with pkgs.haskell.lib;
                   (justStaticExecutables pkg).overrideAttrs (old: rec {
-                    disallowedReferences = get-deps self;
+                    inherit disallowedReferences;
                     # Ditch data dependencies that are not needed at runtime.
                     # cf. https://github.com/NixOS/nixpkgs/pull/204675
                     postInstall = (old.postInstall or "") + ''
@@ -62,12 +62,11 @@
                     '';
                   });
               in
-              haskellExeSansDependencyBloat (addBuildDepends super.emanote [ config.packages.stork ])
-                (hp: with hp; [
-                  pandoc
-                  pandoc-types
-                  warp
-                ]);
+              haskellExeSansDependencyBloat (addBuildDepends super.emanote [ config.packages.stork ]) [
+                self.pandoc
+                self.pandoc-types
+                self.warp
+              ];
           };
         };
         packages.default = config.packages.emanote;
