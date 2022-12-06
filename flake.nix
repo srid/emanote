@@ -47,11 +47,13 @@
           };
           overrides = with pkgs.haskell.lib;
             let
-              haskellExeSansDependencyBloat = pkg: disallowedReferences:
-                (justStaticExecutables pkg).overrideAttrs (old: rec {
+              # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
+              haskellExeSansDependencyBloat = drv: disallowedReferences:
+                drv.overrideAttrs (old: rec {
                   inherit disallowedReferences;
                   # Ditch data dependencies that are not needed at runtime.
                   # cf. https://github.com/NixOS/nixpkgs/pull/204675
+                  # cf. https://srid.ca/remove-references-to
                   postInstall = (old.postInstall or "") + ''
                     ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
                     ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
@@ -63,7 +65,7 @@
               tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
               commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
               emanote =
-                haskellExeSansDependencyBloat (addBuildDepends super.emanote [ config.packages.stork ]) [
+                haskellExeSansDependencyBloat (justStaticExecutables (addBuildDepends super.emanote [ config.packages.stork ])) [
                   self.pandoc
                   self.pandoc-types
                   self.warp
