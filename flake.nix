@@ -47,8 +47,9 @@
           };
           overrides = with pkgs.haskell.lib;
             let
+              # Remove the given references from drv's executables.
               # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
-              haskellExeSansDependencyBloat = disallowedReferences: drv:
+              removeReferencesTo = disallowedReferences: drv:
                 drv.overrideAttrs (old: rec {
                   inherit disallowedReferences;
                   # Ditch data dependencies that are not needed at runtime.
@@ -68,7 +69,7 @@
                 lib.pipe super.emanote [
                   (lib.flip addBuildDepends [ config.packages.stork ])
                   justStaticExecutables
-                  (haskellExeSansDependencyBloat [
+                  (removeReferencesTo [
                     self.pandoc
                     self.pandoc-types
                     self.warp
