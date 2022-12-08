@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -xe
-
-echo "Deprecation Warning: this script should not be used anymore"
