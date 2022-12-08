@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.0.1.0
+version:            1.0.1.1
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -26,6 +26,7 @@ data-files:
   _emanote-static/*.svg
   _emanote-static/stork/flat.css
   _emanote-static/stork/stork.js
+  _emanote-static/stork/stork.js.map
   _emanote-static/stork/stork.wasm
   favicon.svg
   index.yaml
