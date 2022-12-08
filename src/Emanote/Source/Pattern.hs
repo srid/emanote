@@ -38,5 +38,12 @@ ignorePatterns =
     -- Ignore vi/vim/neovim writebackup files (see ":help writebackup")
     "**/*~",
     -- /Top-level ./-/ directory is reserved by Emanote
-    "-/**"
+    "-/**",
+    -- Special files that are not meant to be rendered
+    -- NOTE: We must hardcode this only because there is no user-controllable
+    -- `.emanoteignore` setting yet.{-# ANN annotation #-}
+    --
+    -- Any top-level Nix flake files
+    "flake.nix",
+    "flake.lock"
   ]

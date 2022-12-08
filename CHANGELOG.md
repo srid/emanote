@@ -6,6 +6,8 @@
   - Reduce Emanote's Nix runtime closure size
 - UI
   - Add source map for Stork [\#391](https://github.com/EmaApps/emanote/pull/391)
+- New features
+  - Ignore toplevel `flake.{nix,lock}` by default.
 
 ## 1.0.0.0 (2022-12-04)
 
