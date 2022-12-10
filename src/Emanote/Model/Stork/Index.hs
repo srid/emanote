@@ -8,6 +8,7 @@ module Emanote.Model.Stork.Index
     readOrBuildStorkIndex,
     File (File),
     Input (Input),
+    Handling (Handling_Ignore, Handling_Omit, Handling_Parse),
   )
 where
 
@@ -19,7 +20,7 @@ import Numeric (showGFloat)
 import Relude
 import System.Process.ByteString (readProcessWithExitCode)
 import System.Which (staticWhich)
-import Toml (TomlCodec, encode, list, string, text, (.=))
+import Toml (Key, TomlCodec, diwrap, encode, list, string, table, text, textBy, (.=))
 
 -- | In-memory Stork index tracked in a @TVar@
 newtype IndexVar = IndexVar (TVar (Maybe LByteString))
@@ -59,7 +60,7 @@ storkBin = $(staticWhich "stork")
 
 runStork :: MonadIO m => Input -> m LByteString
 runStork input = do
-  let storkToml = handleTomlandBug $ Toml.encode inputCodec input
+  let storkToml = handleTomlandBug $ Toml.encode storkInputCodec $ StorkInput input
   (_, !index, _) <-
     liftIO $
       readProcessWithExitCode
@@ -79,8 +80,20 @@ runStork input = do
       -- title (but why would they?)
       T.replace "\\\\U" "\\U"
 
-newtype Input = Input
-  { inputFiles :: [File]
+data Input = Input
+  { inputFiles :: [File],
+    inputFrontmatterHandling :: Handling
+  }
+  deriving stock (Eq, Show)
+
+data Handling
+  = Handling_Ignore
+  | Handling_Omit
+  | Handling_Parse
+  deriving stock (Eq, Show)
+
+newtype StorkInput = StorkInput
+  { globalInput :: Input
   }
   deriving stock (Eq, Show)
 
@@ -98,7 +111,29 @@ fileCodec =
     <*> Toml.text "url" .= fileUrl
     <*> Toml.text "title" .= fileTitle
 
+showHandling :: Handling -> Text
+showHandling handling = case handling of
+  Handling_Ignore -> "Ignore"
+  Handling_Omit -> "Omit"
+  Handling_Parse -> "Parse"
+
+parseHandling :: Text -> Either Text Handling
+parseHandling handling = case handling of
+  "Ignore" -> Right Handling_Ignore
+  "Omit" -> Right Handling_Omit
+  "Parse" -> Right Handling_Parse
+  other -> Left $ "Unsupport value for frontmatter handling: " <> other
+
+handlingCodec :: Toml.Key -> TomlCodec Handling
+handlingCodec = textBy showHandling parseHandling
+
 inputCodec :: TomlCodec Input
 inputCodec =
   Input
-    <$> Toml.list fileCodec "input.files" .= inputFiles
+    <$> Toml.list fileCodec "files" .= inputFiles
+    <*> Toml.diwrap (handlingCodec "frontmatter_handling") .= inputFrontmatterHandling
+
+storkInputCodec :: TomlCodec StorkInput
+storkInputCodec =
+  StorkInput
+    <$> Toml.table inputCodec "input" .= globalInput

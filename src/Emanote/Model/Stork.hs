@@ -6,7 +6,7 @@ where
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Stork.Index (File (File), Input (Input), readOrBuildStorkIndex)
+import Emanote.Model.Stork.Index (File (File), Handling (Handling_Omit), Input (Input), readOrBuildStorkIndex)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
@@ -19,7 +19,7 @@ import System.FilePath ((</>))
 
 renderStorkIndex :: (MonadIO m, MonadLoggerIO m) => Model -> m LByteString
 renderStorkIndex model = do
-  readOrBuildStorkIndex (model ^. M.modelStorkIndex) (Input $ storkFiles model)
+  readOrBuildStorkIndex (model ^. M.modelStorkIndex) (Input (storkFiles model) Handling_Omit)
 
 storkFiles :: Model -> [File]
 storkFiles model =
