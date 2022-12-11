@@ -6,6 +6,8 @@
   - Reduce Emanote's Nix runtime closure size
 - UI
   - Add source map for Stork [\#391](https://github.com/EmaApps/emanote/pull/391)
+- Features
+  - Timeline backlinks recognize flexible daily notes suffixed with arbitrary string [\#395](https://github.com/EmaApps/emanote/issues/395)
 - Misc
   - Ignore toplevel `flake.{nix,lock}` by default.
   - Remove deprecated `_emanote-bin/compile-css` script
