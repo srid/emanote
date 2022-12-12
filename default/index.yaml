@@ -131,3 +131,5 @@ js:
 emanote:
   # Whether to automatically treat folder notes as a folgezettel parent of its contents
   folder-folgezettel: true
+  stork:
+    frontmatter-handling: omit

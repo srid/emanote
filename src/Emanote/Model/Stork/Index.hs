@@ -13,6 +13,8 @@ module Emanote.Model.Stork.Index
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Aeson (FromJSON (parseJSON))
+import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
 import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
 import Emanote.Prelude (log, logD, logW)
@@ -122,7 +124,7 @@ parseHandling handling = case handling of
   "Ignore" -> Right Handling_Ignore
   "Omit" -> Right Handling_Omit
   "Parse" -> Right Handling_Parse
-  other -> Left $ "Unsupport value for frontmatter handling: " <> other
+  other -> Left $ "Unsupported value for frontmatter handling: " <> other
 
 handlingCodec :: Toml.Key -> TomlCodec Handling
 handlingCodec = textBy showHandling parseHandling
@@ -137,3 +139,10 @@ storkInputCodec :: TomlCodec StorkInput
 storkInputCodec =
   StorkInput
     <$> Toml.table inputCodec "input" .= globalInput
+
+instance FromJSON Handling where
+  parseJSON = Aeson.withText "FrontmatterHandling" $ \case
+    "ignore" -> pure Handling_Ignore
+    "omit" -> pure Handling_Omit
+    "parse" -> pure Handling_Parse
+    _ -> fail "Unsupported value for frontmatter-handling"

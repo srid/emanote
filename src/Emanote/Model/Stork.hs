@@ -5,6 +5,7 @@ where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.IxSet.Typed qualified as Ix
+import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Stork.Index (File (File), Handling (Handling_Omit), Input (Input), readOrBuildStorkIndex)
 import Emanote.Model.Title qualified as Tit
@@ -19,7 +20,7 @@ import System.FilePath ((</>))
 
 renderStorkIndex :: (MonadIO m, MonadLoggerIO m) => Model -> m LByteString
 renderStorkIndex model = do
-  readOrBuildStorkIndex (model ^. M.modelStorkIndex) (Input (storkFiles model) Handling_Omit)
+  readOrBuildStorkIndex (model ^. M.modelStorkIndex) (Input (storkFiles model) (frontmatterHandling model))
 
 storkFiles :: Model -> [File]
 storkFiles model =
@@ -29,3 +30,8 @@ storkFiles model =
           ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
           (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. N.noteRoute)
           (Tit.toPlain $ note ^. N.noteTitle)
+
+frontmatterHandling :: Model -> Handling
+frontmatterHandling model =
+  let indexRoute = M.modelIndexRoute model
+   in lookupRouteMeta Handling_Omit ("emanote" :| ["stork", "frontmatter-handling"]) indexRoute model
