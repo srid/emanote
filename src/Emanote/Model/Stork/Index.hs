@@ -62,7 +62,7 @@ storkBin = $(staticWhich "stork")
 
 runStork :: MonadIO m => Input -> m LByteString
 runStork input = do
-  let storkToml = handleTomlandBug $ Toml.encode storkInputCodec $ StorkInput input
+  let storkToml = handleTomlandBug $ Toml.encode configCodec $ Config input
   (_, !index, _) <-
     liftIO $
       readProcessWithExitCode
@@ -94,8 +94,8 @@ data Handling
   | Handling_Parse
   deriving stock (Eq, Show)
 
-newtype StorkInput = StorkInput
-  { globalInput :: Input
+newtype Config = Config
+  { configInput :: Input
   }
   deriving stock (Eq, Show)
 
@@ -135,10 +135,10 @@ inputCodec =
     <$> Toml.list fileCodec "files" .= inputFiles
     <*> Toml.diwrap (handlingCodec "frontmatter_handling") .= inputFrontmatterHandling
 
-storkInputCodec :: TomlCodec StorkInput
-storkInputCodec =
-  StorkInput
-    <$> Toml.table inputCodec "input" .= globalInput
+configCodec :: TomlCodec Config
+configCodec =
+  Config
+    <$> Toml.table inputCodec "input" .= configInput
 
 instance FromJSON Handling where
   parseJSON = Aeson.withText "FrontmatterHandling" $ \case
