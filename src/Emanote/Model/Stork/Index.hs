@@ -13,7 +13,7 @@ module Emanote.Model.Stork.Index
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
-import Data.Aeson (FromJSON (parseJSON))
+import Data.Aeson (FromJSON, genericParseJSON)
 import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
 import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
@@ -92,7 +92,7 @@ data Handling
   = Handling_Ignore
   | Handling_Omit
   | Handling_Parse
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Show, Generic)
 
 newtype Config = Config
   { configInput :: Input
@@ -140,9 +140,11 @@ configCodec =
   Config
     <$> Toml.table inputCodec "input" .= configInput
 
+handlingJSONOptions :: Aeson.Options
+handlingJSONOptions =
+  Aeson.defaultOptions
+    { Aeson.constructorTagModifier = toString . T.toLower . T.replace "Handling_" "" . toText
+    }
+
 instance FromJSON Handling where
-  parseJSON = Aeson.withText "FrontmatterHandling" $ \case
-    "ignore" -> pure Handling_Ignore
-    "omit" -> pure Handling_Omit
-    "parse" -> pure Handling_Parse
-    _ -> fail "Unsupported value for frontmatter-handling"
+  parseJSON = genericParseJSON handlingJSONOptions
