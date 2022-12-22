@@ -170,7 +170,7 @@ renderLmlHtml model note = do
       ## backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
     "ema:note:uptree"
-      ## Splices.treeSplice (const ()) folgeAnc
+      ## Splices.treeSplice (\_ _ -> ()) folgeAnc
       $ \(last -> nodeRoute) children -> do
         "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
@@ -191,16 +191,22 @@ routeTreeSplice ::
 routeTreeSplice tCtx mr model = do
   "ema:route-tree"
     ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
-             getOrder tr =
-              ( Meta.lookupRouteMeta @Int 0 (one "order") tr model
-              , tr
-              )
+             getFoldersFirst tr =
+              Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
+             getOrder path children =
+              let tr = mkLmlRoute path
+                  isLeaf = null children
+                  priority = if getFoldersFirst tr && isLeaf then 1 else 0 :: Int
+               in ( priority
+                  , Meta.lookupRouteMeta @Int 0 (one "order") tr model
+                  , tr
+                  )
              getCollapsed tr =
               Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
              mkLmlRoute =
               M.resolveLmlRoute model . R.mkRouteFromSlugs
              lmlRouteSlugs = R.withLmlRoute R.unRoute
-          in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+          in Splices.treeSplice getOrder tree $ \(mkLmlRoute -> nodeRoute) children -> do
               "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
               "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
               let isActiveNode = Just nodeRoute == mr
