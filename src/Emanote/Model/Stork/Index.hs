@@ -8,6 +8,7 @@ module Emanote.Model.Stork.Index
     readOrBuildStorkIndex,
     File (File),
     Input (Input),
+    Config (Config),
     Handling,
   )
 where
@@ -35,8 +36,8 @@ newIndex =
 clearStorkIndex :: (MonadIO m) => IndexVar -> m ()
 clearStorkIndex (IndexVar var) = atomically $ writeTVar var mempty
 
-readOrBuildStorkIndex :: (MonadIO m, MonadLoggerIO m) => IndexVar -> Input -> m LByteString
-readOrBuildStorkIndex (IndexVar indexVar) input = do
+readOrBuildStorkIndex :: (MonadIO m, MonadLoggerIO m) => IndexVar -> Config -> m LByteString
+readOrBuildStorkIndex (IndexVar indexVar) config = do
   readTVarIO indexVar >>= \case
     Just index -> do
       logD "STORK: Returning cached search index"
@@ -45,7 +46,7 @@ readOrBuildStorkIndex (IndexVar indexVar) input = do
       -- TODO: What if there are concurrent reads? We probably need a lock.
       -- And we want to encapsulate this whole thing.
       logW "STORK: Generating search index (this may be expensive)"
-      (diff, !index) <- timeIt $ runStork input
+      (diff, !index) <- timeIt $ runStork config
       log $ toText $ "STORK: Done generating search index in " <> showGFloat (Just 2) diff "" <> " seconds"
       atomically $ modifyTVar' indexVar $ \_ -> Just index
       pure index
@@ -61,9 +62,9 @@ readOrBuildStorkIndex (IndexVar indexVar) input = do
 storkBin :: FilePath
 storkBin = $(staticWhich "stork")
 
-runStork :: MonadIO m => Input -> m LByteString
-runStork input = do
-  let storkToml = handleTomlandBug $ Toml.encode configCodec $ Config input
+runStork :: MonadIO m => Config -> m LByteString
+runStork config = do
+  let storkToml = handleTomlandBug $ Toml.encode configCodec config
   (_, !index, _) <-
     liftIO $
       readProcessWithExitCode
