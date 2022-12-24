@@ -104,6 +104,7 @@ common library-common
     , containers
     , data-default
     , dependent-sum
+    , deriving-aeson
     , directory
     , ema                    >=0.9
     , filepath

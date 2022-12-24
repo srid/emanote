@@ -14,12 +14,10 @@ module Emanote.Model.Stork.Index
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
-import Data.Aeson (FromJSON, genericParseJSON)
-import Data.Aeson qualified as Aeson
-import Data.Char (toLower)
 import Data.Default (Default (..))
 import Data.Text qualified as T
 import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
+import Deriving.Aeson
 import Emanote.Prelude (log, logD, logW)
 import Numeric (showGFloat)
 import Relude
@@ -108,22 +106,15 @@ data Handling
   | Handling_Omit
   | Handling_Parse
   deriving stock (Eq, Show, Generic)
+  deriving
+    (FromJSON)
+    via CustomJSON
+          '[ ConstructorTagModifier '[StripPrefix "Handling_", CamelToSnake]
+           ]
+          Handling
 
 instance Default Handling where
   def = Handling_Omit
-
-instance FromJSON Handling where
-  parseJSON = genericParseJSON handlingJSONOptions
-    where
-      handlingJSONOptions :: Aeson.Options
-      handlingJSONOptions =
-        Aeson.defaultOptions
-          { Aeson.constructorTagModifier = applyFirst toLower . drop 9
-          }
-      applyFirst :: (Char -> Char) -> String -> String
-      applyFirst _f [] = []
-      applyFirst f (x:xs) = f x : xs
-
 
 configCodec :: TomlCodec Config
 configCodec =
