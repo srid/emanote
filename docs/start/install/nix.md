@@ -9,7 +9,7 @@ You will need [Nix](https://nixos.org/download.html) version 2.4 or greater.
 This will provide the `emanote` command in your environment.
 
 ```sh
-$ nix profile install github:EmaApps/emanote
+$ nix profile install github:srid/emanote
 ```
 
 ## Using as `flake-parts` module
@@ -63,4 +63,4 @@ $ systemctl --user status emanote.service
 ```
 
 [home-manager]: https://github.com/nix-community/home-manager
-[module]: https://github.com/EmaApps/emanote/blob/master/nix/home-manager-module.nix
+[module]: https://github.com/srid/emanote/blob/master/nix/home-manager-module.nix

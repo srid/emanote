@@ -20,7 +20,7 @@ page:
 
 The above alias will add Mermaid `<style>` and `<script>` tags based on Emanote's defaults.[^js.mermaid-source]
 
-[^js.mermaid-source]: Source code for the `<snippet var="js.mermaid" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
+[^js.mermaid-source]: Source code for the `<snippet var="js.mermaid" />` alias can be found in the <https://github.com/srid/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
 
 ## Example using Mermaid
 
