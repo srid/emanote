@@ -20,7 +20,8 @@ import System.FilePath ((</>))
 
 renderStorkIndex :: (MonadIO m, MonadLoggerIO m) => Model -> m LByteString
 renderStorkIndex model = do
-  readOrBuildStorkIndex (model ^. M.modelStorkIndex) (Input (storkFiles model) (frontmatterHandling model))
+  let input = Input (storkFiles model) (frontmatterHandling model)
+  readOrBuildStorkIndex (model ^. M.modelStorkIndex) input
 
 storkFiles :: Model -> [File]
 storkFiles model =
