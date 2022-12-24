@@ -110,51 +110,49 @@ data File = File
   }
   deriving stock (Eq, Show)
 
-fileCodec :: TomlCodec File
-fileCodec =
-  File
-    <$> Toml.string "path"
-      .= filePath
-    <*> Toml.text "url"
-      .= fileUrl
-    <*> Toml.text "title"
-      .= fileTitle
-
-showHandling :: Handling -> Text
-showHandling handling = case handling of
-  Handling_Ignore -> "Ignore"
-  Handling_Omit -> "Omit"
-  Handling_Parse -> "Parse"
-
-parseHandling :: Text -> Either Text Handling
-parseHandling handling = case handling of
-  "Ignore" -> Right Handling_Ignore
-  "Omit" -> Right Handling_Omit
-  "Parse" -> Right Handling_Parse
-  other -> Left $ "Unsupported value for frontmatter handling: " <> other
-
 handlingCodec :: Toml.Key -> TomlCodec Handling
 handlingCodec = textBy showHandling parseHandling
-
-inputCodec :: TomlCodec Input
-inputCodec =
-  Input
-    <$> Toml.list fileCodec "files"
-      .= inputFiles
-    <*> Toml.diwrap (handlingCodec "frontmatter_handling")
-      .= inputFrontmatterHandling
+  where
+    showHandling :: Handling -> Text
+    showHandling handling = case handling of
+      Handling_Ignore -> "Ignore"
+      Handling_Omit -> "Omit"
+      Handling_Parse -> "Parse"
+    parseHandling :: Text -> Either Text Handling
+    parseHandling handling = case handling of
+      "Ignore" -> Right Handling_Ignore
+      "Omit" -> Right Handling_Omit
+      "Parse" -> Right Handling_Parse
+      other -> Left $ "Unsupported value for frontmatter handling: " <> other
 
 configCodec :: TomlCodec Config
 configCodec =
   Config
     <$> Toml.table inputCodec "input"
-      .= configInput
-
-handlingJSONOptions :: Aeson.Options
-handlingJSONOptions =
-  Aeson.defaultOptions
-    { Aeson.constructorTagModifier = toString . T.toLower . T.replace "Handling_" "" . toText
-    }
+    .= configInput
+  where
+    inputCodec :: TomlCodec Input
+    inputCodec =
+      Input
+        <$> Toml.list fileCodec "files"
+        .= inputFiles
+        <*> Toml.diwrap (handlingCodec "frontmatter_handling")
+        .= inputFrontmatterHandling
+    fileCodec :: TomlCodec File
+    fileCodec =
+      File
+        <$> Toml.string "path"
+        .= filePath
+        <*> Toml.text "url"
+        .= fileUrl
+        <*> Toml.text "title"
+        .= fileTitle
 
 instance FromJSON Handling where
   parseJSON = genericParseJSON handlingJSONOptions
+    where
+      handlingJSONOptions :: Aeson.Options
+      handlingJSONOptions =
+        Aeson.defaultOptions
+          { Aeson.constructorTagModifier = toString . T.toLower . T.replace "Handling_" "" . toText
+          }
