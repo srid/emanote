@@ -37,6 +37,7 @@ template:
     # (unless a route in it is active)
     collapsed: true
   stork:
+    # https://stork-search.net/docs/config-ref#frontmatter_handling
     frontmatter-handling: omit
 
 pandoc:
