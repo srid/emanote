@@ -16,18 +16,14 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
             trusted-public-keys = cache.srid.ca:8sQkbPrOIoXktIwI0OucQBXod2e9fDjjoEZWn8OXbdo= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
             substituters = https://cache.srid.ca https://cache.nixos.org/
-      - name: Cache Nix dependencies
-        run: |
-          nix --version
-          nix develop -j 4 -c echo
-      - name: Format check
-        run: |
-          nix develop -j auto -c treefmt --fail-on-change
       - name: Build Nix
         id: build-nix
         run: |
           nix build -j auto --no-link
           nix path-info -rSh .#default | sort -rhk2 | head
+      - name: Flake check
+        run: |
+          nix build -j auto --no-link .#check -L
       - name: Build as docker img
         id: build
         run: |
