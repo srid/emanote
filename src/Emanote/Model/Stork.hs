@@ -4,10 +4,11 @@ module Emanote.Model.Stork
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Default (Default (def))
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Stork.Index (File (File), Handling (Handling_Omit), Input (Input), readOrBuildStorkIndex)
+import Emanote.Model.Stork.Index (File (File), Handling, Input (Input), readOrBuildStorkIndex)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
@@ -35,4 +36,4 @@ storkFiles model =
 frontmatterHandling :: Model -> Handling
 frontmatterHandling model =
   let indexRoute = M.modelIndexRoute model
-   in lookupRouteMeta Handling_Omit ("template" :| ["stork", "frontmatter-handling"]) indexRoute model
+   in lookupRouteMeta def ("template" :| ["stork", "frontmatter-handling"]) indexRoute model

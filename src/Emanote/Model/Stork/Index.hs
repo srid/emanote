@@ -8,13 +8,14 @@ module Emanote.Model.Stork.Index
     readOrBuildStorkIndex,
     File (File),
     Input (Input),
-    Handling (Handling_Ignore, Handling_Omit, Handling_Parse),
+    Handling,
   )
 where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson (FromJSON, genericParseJSON)
 import Data.Aeson qualified as Aeson
+import Data.Default (Default (..))
 import Data.Text qualified as T
 import Data.Time (NominalDiffTime, diffUTCTime, getCurrentTime)
 import Emanote.Prelude (log, logD, logW)
@@ -93,6 +94,9 @@ data Handling
   | Handling_Omit
   | Handling_Parse
   deriving stock (Eq, Show, Generic)
+
+instance Default Handling where
+  def = Handling_Omit
 
 newtype Config = Config
   { configInput :: Input
