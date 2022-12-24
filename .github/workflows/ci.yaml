@@ -23,7 +23,7 @@ jobs:
           nix path-info -rSh .#default | sort -rhk2 | head
       - name: Flake check
         run: |
-          nix build -j auto .#check -L
+          nix build -j auto --no-link .#check -L
       - name: Build as docker img
         id: build
         run: |
