@@ -36,6 +36,8 @@ template:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
     collapsed: true
+  stork:
+    frontmatter-handling: omit
 
 pandoc:
   # Rewrite the class specified in Pandoc's Div and Span nodes. You can specify the class using
