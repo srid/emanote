@@ -29,6 +29,10 @@ See https://srid.ca/haskell-template/start for complete instructions, but the tl
 
 See [architecture.md](docs/architecture.md) for a high-level overview of the codebase.
 
+### PR contribution guidelines
+
+Run `nix build .#check -L` when opening a PR.
+
 ## Discussion
 
 To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discussions][ghdiscuss].

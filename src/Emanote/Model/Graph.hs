@@ -41,9 +41,9 @@ modelFolgezettelAncestorTree r0 model =
               parentLmlRoute model lmlR
           folgezettelParents =
             mconcat
-              [ folgezettelBacklinks,
-                folgezettelFrontlinks,
-                folgezettelFolder
+              [ folgezettelBacklinks
+              , folgezettelFrontlinks
+              , folgezettelFolder
               ]
       fmap catMaybes . forM folgezettelParents $ \parentR -> do
         let parentModelR = R.ModelRoute_LML parentR
@@ -71,10 +71,11 @@ modelFolgezettelAncestorTree r0 model =
       Rel.RRTFound x -> Just x
       _ -> Nothing
 
--- | Return the route to parent folder (unless indexRoute is passed).
---
---  This will return the existing note (.org or .md) if possible. Otherwise
---  fallback to .md even if missing.
+{- | Return the route to parent folder (unless indexRoute is passed).
+
+  This will return the existing note (.org or .md) if possible. Otherwise
+  fallback to .md even if missing.
+-}
 parentLmlRoute :: Model -> R.LMLRoute -> Maybe R.LMLRoute
 parentLmlRoute model r = do
   pr <- do

@@ -1,17 +1,16 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Emanote.Model.Stork.Index
-  ( IndexVar,
-    newIndex,
-    clearStorkIndex,
-    readOrBuildStorkIndex,
-    File (File),
-    Input (Input),
-    Config (Config),
-    Handling,
-  )
-where
+module Emanote.Model.Stork.Index (
+  IndexVar,
+  newIndex,
+  clearStorkIndex,
+  readOrBuildStorkIndex,
+  File (File),
+  Input (Input),
+  Config (Config),
+  Handling,
+) where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Default (Default (..))
@@ -89,15 +88,15 @@ newtype Config = Config
   deriving stock (Eq, Show)
 
 data Input = Input
-  { inputFiles :: [File],
-    inputFrontmatterHandling :: Handling
+  { inputFiles :: [File]
+  , inputFrontmatterHandling :: Handling
   }
   deriving stock (Eq, Show)
 
 data File = File
-  { filePath :: FilePath,
-    fileUrl :: Text,
-    fileTitle :: Text
+  { filePath :: FilePath
+  , fileUrl :: Text
+  , fileTitle :: Text
   }
   deriving stock (Eq, Show)
 
@@ -120,24 +119,24 @@ configCodec :: TomlCodec Config
 configCodec =
   Config
     <$> Toml.table inputCodec "input"
-      .= configInput
+    .= configInput
   where
     inputCodec :: TomlCodec Input
     inputCodec =
       Input
         <$> Toml.list fileCodec "files"
-          .= inputFiles
+        .= inputFiles
         <*> Toml.diwrap (handlingCodec "frontmatter_handling")
-          .= inputFrontmatterHandling
+        .= inputFrontmatterHandling
     fileCodec :: TomlCodec File
     fileCodec =
       File
         <$> Toml.string "path"
-          .= filePath
+        .= filePath
         <*> Toml.text "url"
-          .= fileUrl
+        .= fileUrl
         <*> Toml.text "title"
-          .= fileTitle
+        .= fileTitle
     handlingCodec :: Toml.Key -> TomlCodec Handling
     handlingCodec = textBy showHandling parseHandling
       where

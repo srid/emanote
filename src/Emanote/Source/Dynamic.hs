@@ -1,15 +1,14 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Emanote.Source.Dynamic
-  ( emanoteSiteInput,
-    EmanoteConfig (..),
-    emanoteCompileTailwind,
-    emanoteConfigCli,
-    emanoteConfigNoteFn,
-    emanoteConfigPandocRenderers,
-  )
-where
+module Emanote.Source.Dynamic (
+  emanoteSiteInput,
+  EmanoteConfig (..),
+  emanoteCompileTailwind,
+  emanoteConfigCli,
+  emanoteConfigNoteFn,
+  emanoteConfigPandocRenderers,
+) where
 
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Data.Map.Strict qualified as Map
@@ -38,18 +37,19 @@ import UnliftIO (MonadUnliftIO)
 -- | Everything that's required to run an Emanote site.
 data EmanoteConfig = EmanoteConfig
   { -- | CLI arguments (includes layers)
-    _emanoteConfigCli :: CLI.Cli,
-    -- | A function to filter the `Note` before it gets added to the model.
-    _emanoteConfigNoteFn :: Note -> Note,
-    -- | How to render Pandoc to Heist HTML.
-    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute,
-    -- | Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
+    _emanoteConfigCli :: CLI.Cli
+  , -- | A function to filter the `Note` before it gets added to the model.
+    _emanoteConfigNoteFn :: Note -> Note
+  , -- | How to render Pandoc to Heist HTML.
+    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+  , -- | Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
     _emanoteCompileTailwind :: Bool
   }
 
--- | Make an Ema `Dynamic` for the Emanote model.
---
--- The bulk of logic for building the Dynamic is in `Patch.hs`.
+{- | Make an Ema `Dynamic` for the Emanote model.
+
+ The bulk of logic for building the Dynamic is in `Patch.hs`.
+-}
 emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
 emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir

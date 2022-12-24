@@ -35,11 +35,11 @@ import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Walk qualified as W
 
 data Note = Note
-  { _noteRoute :: R.LMLRoute,
-    _noteDoc :: Pandoc,
-    _noteMeta :: Aeson.Value,
-    _noteTitle :: Tit.Title,
-    _noteErrors :: [Text]
+  { _noteRoute :: R.LMLRoute
+  , _noteDoc :: Pandoc
+  , _noteMeta :: Aeson.Value
+  , _noteTitle :: Tit.Title
+  , _noteErrors :: [Text]
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -50,18 +50,18 @@ newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
 
 type NoteIxs =
   '[ -- Route to this note
-     R.LMLRoute,
-     -- Allowed ways to wiki-link to this note.
-     WL.WikiLink,
-     -- HTML route for this note
-     R 'R.Html,
-     -- Ancestor folder routes
-     RAncestor,
-     -- Parent folder
-     R 'R.Folder,
-     -- Tag
-     HT.Tag,
-     -- Alias route for this note. Can be "foo" or "foo/bar".
+     R.LMLRoute
+   , -- Allowed ways to wiki-link to this note.
+     WL.WikiLink
+   , -- HTML route for this note
+     R 'R.Html
+   , -- Ancestor folder routes
+     RAncestor
+   , -- Parent folder
+     R 'R.Folder
+   , -- Tag
+     HT.Tag
+   , -- Alias route for this note. Can be "foo" or "foo/bar".
      NonEmpty Slug
    ]
 
@@ -107,7 +107,7 @@ noteTags =
 noteSlug :: Note -> Maybe (NonEmpty Slug)
 noteSlug note = do
   slugPath :: Text <- lookupMeta (one "slug") note
-  fmap R.unRoute $ R.mkRouteFromFilePath @_ @'R.AnyExt $ toString slugPath
+  fmap R.unRoute $ R.mkRouteFromFilePath @_ @( 'R.AnyExt) $ toString slugPath
 
 lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
@@ -169,13 +169,13 @@ lookupNotesByRoute r ix = do
 ancestorPlaceholderNote :: R.R 'Folder -> Note
 ancestorPlaceholderNote r =
   let placeHolder =
-        [ folderListingQuery,
-          -- TODO: Ideally, we should use semantic tags, like <aside> (rather
+        [ folderListingQuery
+        , -- TODO: Ideally, we should use semantic tags, like <aside> (rather
           -- than <div>), to render these non-relevant content.
           B.Div (cls "emanote:placeholder-message") . one . B.Para $
             [ B.Str
-                "Note: To override the auto-generated content here, create a file named one of: ",
-              -- TODO: or, .org
+                "Note: To override the auto-generated content here, create a file named one of: "
+            , -- TODO: or, .org
               B.Span (cls "font-mono text-sm") $
                 one $
                   B.Str $
@@ -196,9 +196,9 @@ missingNote route404 urlPath =
   mkEmptyNoteWith (R.defaultLmlRoute route404) $
     one $
       B.Para
-        [ B.Str "No note has the URL ",
-          B.Code B.nullAttr $ "/" <> urlPath,
-          -- TODO: org
+        [ B.Str "No note has the URL "
+        , B.Code B.nullAttr $ "/" <> urlPath
+        , -- TODO: org
           B.Span (cls "font-mono text-sm") $
             one $
               B.Str $
@@ -215,9 +215,9 @@ ambiguousNoteURL :: FilePath -> NonEmpty R.LMLRoute -> Note
 ambiguousNoteURL urlPath rs =
   mkEmptyNoteWith (head rs) $
     [ B.Para
-        [ B.Str "The URL ",
-          B.Code B.nullAttr $ toText urlPath,
-          B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
+        [ B.Str "The URL "
+        , B.Code B.nullAttr $ toText urlPath
+        , B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
         ]
     ]
       <> one candidates
@@ -226,8 +226,8 @@ ambiguousNoteURL urlPath rs =
     candidates =
       B.BulletList $
         toList rs <&> \(R.lmlRouteCase -> r) ->
-          [ B.Plain $ one $ B.Str "  ",
-            B.Plain $ one $ B.Code B.nullAttr $ show r
+          [ B.Plain $ one $ B.Str "  "
+          , B.Plain $ one $ B.Code B.nullAttr $ show r
           ]
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
@@ -317,9 +317,9 @@ applyNoteMetaFilters doc =
       frontmatter
         & AO.key "tags" % AO._Array
           .~ ( fromList . fmap Aeson.toJSON $
-                 ordNub $
-                   SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                     <> HT.inlineTagsInPandoc doc
+                ordNub $
+                  SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+                    <> HT.inlineTagsInPandoc doc
              )
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case

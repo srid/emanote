@@ -1,20 +1,19 @@
-module Emanote.Route.SiteRoute.Class
-  ( decodeVirtualRoute,
-    noteFileSiteRoute,
-    staticFileSiteRoute,
-    lmlSiteRoute,
-    indexRoute,
-    tagIndexRoute,
-    taskIndexRoute,
-    siteRouteUrl,
-    siteRouteUrlStatic,
-    urlStrategySuffix,
+module Emanote.Route.SiteRoute.Class (
+  decodeVirtualRoute,
+  noteFileSiteRoute,
+  staticFileSiteRoute,
+  lmlSiteRoute,
+  indexRoute,
+  tagIndexRoute,
+  taskIndexRoute,
+  siteRouteUrl,
+  siteRouteUrlStatic,
+  urlStrategySuffix,
 
-    -- * Ema stuff
-    emanoteRouteEncoder,
-    emanoteGeneratableRoutes,
-  )
-where
+  -- * Ema stuff
+  emanoteRouteEncoder,
+  emanoteGeneratableRoutes,
+) where
 
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
@@ -58,11 +57,11 @@ emanoteGeneratableRoutes model =
                   concat $
                     tags <&> \(HT.deconstructTag -> tagPath) ->
                       NE.filter (not . null) $ NE.inits tagPath
-         in VirtualRoute_Index
-              : VirtualRoute_Export
-              : VirtualRoute_StorkIndex
-              : VirtualRoute_TaskIndex
-              : (VirtualRoute_TagIndex <$> toList tagPaths)
+         in VirtualRoute_Index :
+            VirtualRoute_Export :
+            VirtualRoute_StorkIndex :
+            VirtualRoute_TaskIndex :
+            (VirtualRoute_TagIndex <$> toList tagPaths)
    in htmlRoutes
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
@@ -93,15 +92,14 @@ emanoteRouteEncoder model =
 encodeResourceRoute :: HasCallStack => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
   ResourceRoute_LML r ->
-    R.encodeRoute
-      $
+    R.encodeRoute $
       -- HACK: This should never fail ... but *if* it does, consult
       -- https://github.com/srid/emanote/issues/148
       maybe
         -- FIXME: See note above.
         (error $ "emanote: attempt to encode missing note: " <> show r)
         N.noteHtmlRoute
-      $ M.modelLookupNoteByRoute r model
+        $ M.modelLookupNoteByRoute r model
   ResourceRoute_StaticFile r _fpAbs ->
     R.encodeRoute r
 

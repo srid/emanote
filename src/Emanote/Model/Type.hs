@@ -18,16 +18,16 @@ import Data.UUID (UUID)
 import Ema.CLI qualified
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
-import Emanote.Model.Note
-  ( IxNote,
-    Note,
-  )
+import Emanote.Model.Note (
+  IxNote,
+  Note,
+ )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
-import Emanote.Model.StaticFile
-  ( IxStaticFile,
-    StaticFile (StaticFile),
-  )
+import Emanote.Model.StaticFile (
+  IxStaticFile,
+  StaticFile (StaticFile),
+ )
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
@@ -49,31 +49,32 @@ data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
 
 data ModelT encF = Model
-  { _modelStatus :: Status,
-    _modelLayers :: Set Loc,
-    _modelEmaCLIAction :: Some Ema.CLI.Action,
-    _modelRoutePrism :: encF (Prism' FilePath SiteRoute),
-    -- | Dictates how exactly to render `Pandoc` to Heist nodes.
-    _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute,
-    _modelCompileTailwind :: Bool,
-    -- | An unique ID for this process's model. ID changes across processes.
-    _modelInstanceID :: UUID,
-    _modelNotes :: IxNote,
-    _modelRels :: IxRel,
-    _modelSData :: IxSData,
-    _modelStaticFiles :: IxStaticFile,
-    _modelTasks :: IxTask,
-    _modelNav :: [Tree Slug],
-    _modelHeistTemplate :: TemplateState,
-    _modelStorkIndex :: Stork.IndexVar
+  { _modelStatus :: Status
+  , _modelLayers :: Set Loc
+  , _modelEmaCLIAction :: Some Ema.CLI.Action
+  , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
+  , -- | Dictates how exactly to render `Pandoc` to Heist nodes.
+    _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
+  , _modelCompileTailwind :: Bool
+  , -- | An unique ID for this process's model. ID changes across processes.
+    _modelInstanceID :: UUID
+  , _modelNotes :: IxNote
+  , _modelRels :: IxRel
+  , _modelSData :: IxSData
+  , _modelStaticFiles :: IxStaticFile
+  , _modelTasks :: IxTask
+  , _modelNav :: [Tree Slug]
+  , _modelHeistTemplate :: TemplateState
+  , _modelStorkIndex :: Stork.IndexVar
   }
   deriving stock (Generic)
 
 type Model = ModelT Identity
 
--- | A bare version of `Model` that is managed by the Ema app.
---
--- The only difference is that this one has no `RouteEncoder`.
+{- | A bare version of `Model` that is managed by the Ema app.
+
+ The only difference is that this one has no `RouteEncoder`.
+-}
 type ModelEma = ModelT (Const ())
 
 deriving stock instance Generic ModelEma
@@ -108,9 +109,9 @@ modelInsertNote :: Note -> ModelT f -> ModelT f
 modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
-           -- Insert folder placeholder automatically for ancestor paths
-           >>> injectAncestors (N.noteAncestors note)
-           >>> dropRedundantAncestor r
+          -- Insert folder placeholder automatically for ancestor paths
+          >>> injectAncestors (N.noteAncestors note)
+          >>> dropRedundantAncestor r
        )
     >>> modelRels
       %~ updateIxMulti r (Rel.noteRels note)
@@ -121,8 +122,9 @@ modelInsertNote note =
   where
     r = note ^. N.noteRoute
 
--- | If a placeholder route was added already, but the newly added note is a
--- non-Markdown, removce that markdown placeholder route.
+{- | If a placeholder route was added already, but the newly added note is a
+ non-Markdown, removce that markdown placeholder route.
+-}
 dropRedundantAncestor :: LMLRoute -> IxNote -> IxNote
 dropRedundantAncestor recentNoteRoute ns =
   case recentNoteRoute of
@@ -169,7 +171,7 @@ modelDeleteNote k model =
   model
     & modelNotes
       %~ ( Ix.deleteIx k
-             >>> restoreAncestor (N.RAncestor <$> mFolderR)
+            >>> restoreAncestor (N.RAncestor <$> mFolderR)
          )
     & modelRels
       %~ deleteIxMulti k
@@ -281,14 +283,15 @@ modelNoteErrors model =
       guard $ not $ null errs
       pure (note ^. N.noteRoute, errs)
 
--- | Return the most suitable index LML route
---
---  If index.org exist, use that. Otherwise, fallback to index.md.
+{- | Return the most suitable index LML route
+
+  If index.org exist, use that. Otherwise, fallback to index.md.
+-}
 modelIndexRoute :: ModelT f -> LMLRoute
 modelIndexRoute model = do
   resolveLmlRoute model R.indexRoute
 
-resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute :: forall lmlType f. ModelT f -> R ( 'R.LMLType lmlType) -> LMLRoute
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 
@@ -298,7 +301,7 @@ resolveLmlRouteIfExists notes r = do
   -- TODO: Refactor using `[minBound..maxBound] :: [LML]`
   note <-
     asum
-      [ N.lookupNotesByRoute (R.LMLRoute_Org $ coerce r) notes,
-        N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) notes
+      [ N.lookupNotesByRoute (R.LMLRoute_Org $ coerce r) notes
+      , N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) notes
       ]
   pure $ note ^. N.noteRoute

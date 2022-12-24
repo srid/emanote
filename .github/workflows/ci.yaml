@@ -23,9 +23,6 @@ jobs:
       - name: Format check
         run: |
           nix develop -j auto -c treefmt --fail-on-change
-      - name: Hlint
-        run: |
-          nix develop -j auto -c hlint src
       - name: Build Nix
         id: build-nix
         run: |
