@@ -18,7 +18,7 @@
     ema.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
-    flake-parts.lib.mkFlake { inherit self; } {
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         haskell-flake.flakeModule
