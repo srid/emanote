@@ -34,4 +34,4 @@ storkFiles model =
 frontmatterHandling :: Model -> Handling
 frontmatterHandling model =
   let indexRoute = M.modelIndexRoute model
-   in lookupRouteMeta Handling_Omit ("emanote" :| ["stork", "frontmatter-handling"]) indexRoute model
+   in lookupRouteMeta Handling_Omit ("template" :| ["stork", "frontmatter-handling"]) indexRoute model

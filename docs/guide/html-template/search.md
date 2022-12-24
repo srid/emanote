@@ -17,7 +17,7 @@ By default, Stork doesn't include the text in the frontmatter as searchable.
 This can be changed by adding the following to `index.yaml`:
 
 ```yaml
-emanote:
+template:
   stork:
     frontmatter-handling: ignore
 ```
