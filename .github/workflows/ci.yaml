@@ -20,9 +20,10 @@ jobs:
         run: |
           nix --version
           nix develop -j 4 -c echo
-      - name: Format check
+      - name: Flake check
         run: |
-          nix develop -j auto -c treefmt --fail-on-change
+          nix run nixpkgs#sd 'systems = nixpkgs.lib.systems.flakeExposed' 'systems = [ "x86_64-linux" ]' flake.nix
+          nix flake check -L
       - name: Build Nix
         id: build-nix
         run: |
