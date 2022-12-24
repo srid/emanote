@@ -10,11 +10,11 @@ You can trigger search input in one of the following ways:
 - Press `Ctrl+K` (or `⌘K` on macOS).
 - Click the lens icon on the sidebar (if using the 'book' [[html-template|template layout]]) or top-right corner (if using [[neuron-layout]]).
 
-## Including frontmatter content in the search
+## Including frontmatter in the search index
 
 By default, Stork doesn't include the text in the frontmatter as searchable.
 
-This can be changed by adding the following to `index.yaml`:
+This can be changed by adding the following to [[yaml-config|`index.yaml`]]:
 
 ```yaml
 template:
@@ -22,9 +22,10 @@ template:
     frontmatter-handling: ignore
 ```
 
-This allows you to search by the tags present in the frontmatter, but you will also get potentially undesired results when searching words like `order` or `date`.
-
 The possible values are `ignore`, `omit` and `parse`. Default `omit`. See the Stork [docs](https://stork-search.net/docs/config-ref#frontmatter_handling).
+
+This allows you to search by your frontmatter metadata (eg: tags) instead of just markdown body. Note that you may also get undesired results when searching words including non-relevant parts of the YAML frontmatter, like `order` or `date`; this is why the default is `omit`.
+
 
 ## Known issues
 
