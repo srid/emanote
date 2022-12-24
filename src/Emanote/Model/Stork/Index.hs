@@ -119,24 +119,24 @@ configCodec :: TomlCodec Config
 configCodec =
   Config
     <$> Toml.table inputCodec "input"
-      .= configInput
+    .= configInput
   where
     inputCodec :: TomlCodec Input
     inputCodec =
       Input
         <$> Toml.list fileCodec "files"
-          .= inputFiles
+        .= inputFiles
         <*> Toml.diwrap (handlingCodec "frontmatter_handling")
-          .= inputFrontmatterHandling
+        .= inputFrontmatterHandling
     fileCodec :: TomlCodec File
     fileCodec =
       File
         <$> Toml.string "path"
-          .= filePath
+        .= filePath
         <*> Toml.text "url"
-          .= fileUrl
+        .= fileUrl
         <*> Toml.text "title"
-          .= fileTitle
+        .= fileTitle
     handlingCodec :: Toml.Key -> TomlCodec Handling
     handlingCodec = textBy showHandling parseHandling
       where
