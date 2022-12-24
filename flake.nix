@@ -10,6 +10,7 @@
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     flake-root.url = "github:srid/flake-root";
+    check-flake.url = "github:srid/check-flake";
 
     # TODO: Dependencies waiting to go from Hackage to nixpkgs.
     heist-extra.url = "github:srid/heist-extra";
@@ -19,11 +20,12 @@
     ema.url = "github:srid/ema";
     ema.flake = false;
   };
-  outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
-        haskell-flake.flakeModule
+        inputs.haskell-flake.flakeModule
+        inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
         ./nix/emanote.nix
