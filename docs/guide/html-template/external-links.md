@@ -27,12 +27,12 @@ Note that the attribute can also be used to display the icons in the [[html-temp
 
 ## URL properties
 
-The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is [[custom-style|customized using CSS]]. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the <https://github.com/EmaApps/emanote/blob/master/default/templates/base.tpl> of [[html-template|HTML template]] for details.
+The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is [[custom-style|customized using CSS]]. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the <https://github.com/srid/emanote/blob/master/default/templates/base.tpl> of [[html-template|HTML template]] for details.
 
 ## Demo
 
 * Default styling:
-  * [the emanote repo](https://github.com/EmaApps/emanote)
+  * [the emanote repo](https://github.com/srid/emanote)
   * [why the external link symbol ![[external-link-icon.svg]] is not in Unicode](https://www.unicode.org/alloc/nonapprovals.html)
   * [$e^{i \pi} + 1 = 0$](https://en.wikipedia.org/wiki/Euler%27s_identity)
   * [`(>>=) :: forall a b. m a -> (a -> m b) -> m b`](https://hackage.haskell.org/package/base/docs/Prelude.html#v:-62--62--61-)

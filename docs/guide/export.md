@@ -12,7 +12,7 @@ Option (1) might be useful for text editor plugins, though option (2) is bound t
 Here are some examples of running `emanote export`. These commands are run on the `./docs` directory of the Emanote source repository.
 
 ```sh
-git clone https://github.com/EmaApps/emanote.git
+git clone https://github.com/srid/emanote.git
 cd ./emanote/docs
 ```
 

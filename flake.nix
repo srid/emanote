@@ -1,8 +1,8 @@
 {
   description = "emanote";
   nixConfig = {
-    extra-substituters = "https://cache.garnix.io";
-    extra-trusted-public-keys = "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=";
+    extra-substituters = "https://cache.srid.ca";
+    extra-trusted-public-keys = "cache.srid.ca:8sQkbPrOIoXktIwI0OucQBXod2e9fDjjoEZWn8OXbdo=";
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -14,7 +14,7 @@
     heist-extra.flake = false;
     heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
     heist.flake = false;
-    ema.url = "github:EmaApps/ema";
+    ema.url = "github:srid/ema";
     ema.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:
@@ -92,6 +92,8 @@
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = import ./nix/emanote.nix;
+        # CI configuration
+        herculesCI.ciSystems = [ "x86_64-linux" "aarch64-darwin" ];
       };
     };
 }
