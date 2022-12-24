@@ -172,7 +172,7 @@ commonSplices withCtx model meta routeTitle = do
                   fromMaybe (error "no _emanote-static?") $
                     M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
             staticFolderUrl = fst $ T.breakOn "/inverted-tree.css" itUrl
-            -- Deal with a silly Firefox bug https://github.com/EmaApps/emanote/issues/340
+            -- Deal with a silly Firefox bug https://github.com/srid/emanote/issues/340
             --
             -- Firefox deduces an incorrect <base> after doing morphdom
             -- patching, unless the <base> is absolute (i.e., starts with a '/').

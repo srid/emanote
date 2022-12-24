@@ -28,7 +28,7 @@ spec = do
       getDataLinkIconAttrs "#tag" === Right []
       getDataLinkIconAttrs "[[abc|def]]" === Right []
     it "adds attribute if link is external and its description contains text, code or math" . hedgehog $ do
-      getDataLinkIconAttrs "[Emanote](https://github.com/EmaApps/emanote)" === Right ["external"]
+      getDataLinkIconAttrs "[Emanote](https://github.com/srid/emanote)" === Right ["external"]
       getDataLinkIconAttrs "[`text`](http://somehost:1234/test)" === Right ["external"]
       getDataLinkIconAttrs "[$$E=mc^2$$](ssh://user@host.abc/~/path/)" === Right ["external"]
       getDataLinkIconAttrs "[![[picture.png]] ~~**`code`**~~](scheme://host:port/path?query)" === Right ["external"]
