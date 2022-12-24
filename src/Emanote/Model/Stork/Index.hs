@@ -95,14 +95,14 @@ fileCodec :: TomlCodec File
 fileCodec =
   File
     <$> Toml.string "path"
-    .= filePath
+      .= filePath
     <*> Toml.text "url"
-    .= fileUrl
+      .= fileUrl
     <*> Toml.text "title"
-    .= fileTitle
+      .= fileTitle
 
 inputCodec :: TomlCodec Input
 inputCodec =
   Input
     <$> Toml.list fileCodec "input.files"
-    .= inputFiles
+      .= inputFiles
