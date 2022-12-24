@@ -23,8 +23,7 @@ jobs:
           nix path-info -rSh .#default | sort -rhk2 | head
       - name: Flake check
         run: |
-          nix run nixpkgs#sd 'systems = nixpkgs.lib.systems.flakeExposed' 'systems = [ "x86_64-linux" ]' flake.nix
-          nix flake check -L
+          nix build -j auto .#check -L
       - name: Build as docker img
         id: build
         run: |
