@@ -3,3 +3,4 @@ status = [
   "ci/hercules/evaluation",
 ]
 delete_merged_branches = true
+use_squash_merge = true
