@@ -14,7 +14,7 @@ page:
     <snippet var="js.highlightjs" />
 ```
 
-(Source code for the `<snippet var="js.highlightjs" />` alias can be found in the <https://github.com/EmaApps/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map)
+(Source code for the `<snippet var="js.highlightjs" />` alias can be found in the <https://github.com/srid/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map)
 
 Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell by default; otherwise, it is normally added as:
 

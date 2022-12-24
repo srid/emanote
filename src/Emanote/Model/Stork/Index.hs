@@ -72,7 +72,7 @@ runStork input = do
   where
     handleTomlandBug =
       -- HACK: Deal with tomland's bug.
-      -- https://github.com/EmaApps/emanote/issues/336
+      -- https://github.com/srid/emanote/issues/336
       -- https://github.com/kowainik/tomland/issues/408
       --
       -- This could be problematic if the user literally uses \\U in their note
@@ -94,11 +94,15 @@ data File = File
 fileCodec :: TomlCodec File
 fileCodec =
   File
-    <$> Toml.string "path" .= filePath
-    <*> Toml.text "url" .= fileUrl
-    <*> Toml.text "title" .= fileTitle
+    <$> Toml.string "path"
+    .= filePath
+    <*> Toml.text "url"
+    .= fileUrl
+    <*> Toml.text "title"
+    .= fileTitle
 
 inputCodec :: TomlCodec Input
 inputCodec =
   Input
-    <$> Toml.list fileCodec "input.files" .= inputFiles
+    <$> Toml.list fileCodec "input.files"
+    .= inputFiles

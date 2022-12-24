@@ -11,7 +11,7 @@ description:
   Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
 
 -- A URL where users can report bugs.
-bug-reports:        https://github.com/EmaApps/emanote/issues
+bug-reports:        https://github.com/srid/emanote/issues
 extra-source-files:
   CHANGELOG.md
   LICENSE

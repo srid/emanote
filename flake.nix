@@ -14,7 +14,7 @@
     heist-extra.flake = false;
     heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
     heist.flake = false;
-    ema.url = "github:EmaApps/ema";
+    ema.url = "github:srid/ema";
     ema.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, haskell-flake, ... }:

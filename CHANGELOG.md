@@ -5,9 +5,9 @@
 - Nix
   - Reduce Emanote's Nix runtime closure size
 - UI
-  - Add source map for Stork [\#391](https://github.com/EmaApps/emanote/pull/391)
+  - Add source map for Stork [\#391](https://github.com/srid/emanote/pull/391)
 - Features
-  - Timeline backlinks recognize flexible daily notes suffixed with arbitrary string [\#395](https://github.com/EmaApps/emanote/issues/395)
+  - Timeline backlinks recognize flexible daily notes suffixed with arbitrary string [\#395](https://github.com/srid/emanote/issues/395)
 - Misc
   - Ignore toplevel `flake.{nix,lock}` by default.
   - Remove deprecated `_emanote-bin/compile-css` script
@@ -16,7 +16,7 @@
 
 - UI
   - Index pages are no longer marked as 'experimental'
-  - Add external link icon to external links (this behaviour is customizable). [\#189](https://github.com/EmaApps/emanote/pull/189)
+  - Add external link icon to external links (this behaviour is customizable). [\#189](https://github.com/srid/emanote/pull/189)
   - `js.mermaid` snippet uses the "module" script tag approach, which is added to end of `<body>`. See [here](https://mermaid-js.github.io/mermaid/#/n00b-gettingStarted?id=_3-calling-the-javascript-api). 
   - Align dates in timeline queries
 - Configuration

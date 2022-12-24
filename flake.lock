@@ -5,13 +5,13 @@
       "locked": {
         "lastModified": 1668972953,
         "narHash": "sha256-WyTqCQg9xPqB2wC16PdjocaIL81MBLtjgC3eCzhN5hE=",
-        "owner": "EmaApps",
+        "owner": "srid",
         "repo": "ema",
         "rev": "61faae56aa0f3c6ca815f344684cc566f6341662",
         "type": "github"
       },
       "original": {
-        "owner": "EmaApps",
+        "owner": "srid",
         "repo": "ema",
         "type": "github"
       }

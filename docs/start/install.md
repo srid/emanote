@@ -13,9 +13,9 @@ Emanote is supported on all popular operating systems through [Nix].
    1. For NixOS, see [[nix]]
 1. Optional: [Use](https://nixos.wiki/wiki/Binary_Cache#Using_a_binary_cache) the Nix binary cache: 
      - https://cache.srid.ca (key: `cache.srid.ca:8sQkbPrOIoXktIwI0OucQBXod2e9fDjjoEZWn8OXbdo=`)
-2. Run `nix profile install github:EmaApps/emanote` to install Emanote[^try]
+2. Run `nix profile install github:srid/emanote` to install Emanote[^try]
 
-[^try]: You may also "try before installing" by running `nix run github:EmaApps/emanote`. This still downloads emanote to your nix store, `/nix`, but will not install it to the user profile like `nix profile install` does.
+[^try]: You may also "try before installing" by running `nix run github:srid/emanote`. This still downloads emanote to your nix store, `/nix`, but will not install it to the user profile like `nix profile install` does.
 
 To test your Emanote install,
 
