@@ -1,17 +1,16 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Emanote.Model.Stork.Index
-  ( IndexVar,
-    newIndex,
-    clearStorkIndex,
-    readOrBuildStorkIndex,
-    File (File),
-    Input (Input),
-    Config (Config),
-    Handling,
-  )
-where
+module Emanote.Model.Stork.Index (
+  IndexVar,
+  newIndex,
+  clearStorkIndex,
+  readOrBuildStorkIndex,
+  File (File),
+  Input (Input),
+  Config (Config),
+  Handling,
+) where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Default (Default (..))
@@ -89,15 +88,15 @@ newtype Config = Config
   deriving stock (Eq, Show)
 
 data Input = Input
-  { inputFiles :: [File],
-    inputFrontmatterHandling :: Handling
+  { inputFiles :: [File]
+  , inputFrontmatterHandling :: Handling
   }
   deriving stock (Eq, Show)
 
 data File = File
-  { filePath :: FilePath,
-    fileUrl :: Text,
-    fileTitle :: Text
+  { filePath :: FilePath
+  , fileUrl :: Text
+  , fileTitle :: Text
   }
   deriving stock (Eq, Show)
 

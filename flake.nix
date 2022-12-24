@@ -89,6 +89,7 @@
           programs.cabal-fmt.enable = true;
 
           # We use fourmolu
+          programs.ormolu.package = pkgs.haskellPackages.fourmolu;
           settings.formatter.ormolu = {
             options = [
               "--ghc-opt"

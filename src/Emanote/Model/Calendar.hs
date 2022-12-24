@@ -1,5 +1,6 @@
--- | A primitive module to eventually pave way towards first-class "calendar"
--- (daily notes, etc.) support in Emanote; either built-in or as plugin.
+{- | A primitive module to eventually pave way towards first-class "calendar"
+ (daily notes, etc.) support in Emanote; either built-in or as plugin.
+-}
 module Emanote.Model.Calendar where
 
 import Data.Time.Calendar (Day, fromGregorianValid)
@@ -43,8 +44,9 @@ parseRouteDay =
       -- Day
       day <- asInt =<< replicateM 2 M.digitChar
       -- Optional suffix (ignored)
-      void $ optional $ do
-        void $ M.oneOf ['-', '_', ' ']
-        void M.takeRest
+      void $
+        optional $ do
+          void $ M.oneOf ['-', '_', ' ']
+          void M.takeRest
       maybe (fail "Not a date") pure $
         fromGregorianValid year (fromInteger month) (fromInteger day)

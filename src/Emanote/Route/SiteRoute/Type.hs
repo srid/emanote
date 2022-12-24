@@ -1,14 +1,13 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.Route.SiteRoute.Type
-  ( SiteRoute (..),
-    VirtualRoute (..),
-    ResourceRoute (..),
-    decodeVirtualRoute,
-    encodeVirtualRoute,
-    encodeTagIndexR,
-  )
-where
+module Emanote.Route.SiteRoute.Type (
+  SiteRoute (..),
+  VirtualRoute (..),
+  ResourceRoute (..),
+  decodeVirtualRoute,
+  encodeVirtualRoute,
+  encodeTagIndexR,
+) where
 
 import Data.Aeson (ToJSON)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
@@ -29,10 +28,11 @@ data VirtualRoute
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (ToJSON)
 
--- | A route to a resource in `Model`
---
--- This is *mostly isomorphic* to `ModelRoute`, except for containing the
--- absolute path to the static file.
+{- | A route to a resource in `Model`
+
+ This is *mostly isomorphic* to `ModelRoute`, except for containing the
+ absolute path to the static file.
+-}
 data ResourceRoute
   = ResourceRoute_StaticFile StaticFileRoute FilePath
   | ResourceRoute_LML LMLRoute
@@ -101,13 +101,13 @@ encodeVirtualRoute = \case
   VirtualRoute_TagIndex tagNodes ->
     R.encodeRoute $ encodeTagIndexR tagNodes
   VirtualRoute_Index ->
-    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
+    R.encodeRoute $ R.R @() @( 'Ext.Html) $ "-" :| ["all"]
   VirtualRoute_Export ->
-    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
+    R.encodeRoute $ R.R @Ext.SourceExt @( 'Ext.AnyExt) $ "-" :| ["export.json"]
   VirtualRoute_StorkIndex ->
-    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["stork.st"]
+    R.encodeRoute $ R.R @Ext.SourceExt @( 'Ext.AnyExt) $ "-" :| ["stork.st"]
   VirtualRoute_TaskIndex ->
-    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
+    R.encodeRoute $ R.R @() @( 'Ext.Html) $ "-" :| ["tasks"]
 
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =

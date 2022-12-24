@@ -1,13 +1,12 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Emanote.CLI
-  ( Cli (..),
-    Cmd (..),
-    parseCli,
-    cliParser,
-  )
-where
+module Emanote.CLI (
+  Cli (..),
+  Cmd (..),
+  parseCli,
+  cliParser,
+) where
 
 import Data.Text qualified as T
 import Data.Version (showVersion)
@@ -18,9 +17,9 @@ import Relude
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
-  { layers :: NonEmpty FilePath,
-    allowBrokenLinks :: Bool,
-    cmd :: Cmd
+  { layers :: NonEmpty FilePath
+  , allowBrokenLinks :: Bool
+  , cmd :: Cmd
   }
 
 data Cmd
@@ -39,11 +38,11 @@ cliParser cwd = do
     pathList defaultPath = do
       option pathListReader $
         mconcat
-          [ long "layers",
-            short 'L',
-            metavar "LAYERS",
-            value defaultPath,
-            help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
+          [ long "layers"
+          , short 'L'
+          , metavar "LAYERS"
+          , value defaultPath
+          , help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
           ]
     pathListReader :: ReadM (NonEmpty FilePath)
     pathListReader =

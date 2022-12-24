@@ -16,12 +16,12 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 
 data Task = Task
-  { _taskRoute :: R.LMLRoute,
-    -- Index of this task within the containing note. Used to sort tasks by
+  { _taskRoute :: R.LMLRoute
+  , -- Index of this task within the containing note. Used to sort tasks by
     -- their original order of appearance in the Markdown file.
-    _taskNum :: Word,
-    _taskDescription :: [B.Inline],
-    _taskChecked :: Bool
+    _taskNum :: Word
+  , _taskDescription :: [B.Inline]
+  , _taskChecked :: Bool
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Aeson.ToJSON)

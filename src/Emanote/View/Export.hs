@@ -1,11 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Emanote.View.Export
-  ( renderGraphExport,
-    Link (..),
-    modelRels,
-  )
-where
+module Emanote.View.Export (
+  renderGraphExport,
+  Link (..),
+  modelRels,
+) where
 
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
@@ -24,8 +23,8 @@ import Optics.Operators ((^.))
 import Relude
 
 data Export = Export
-  { version :: Word,
-    files :: Map Text SourceFile
+  { version :: Word
+  , files :: Map Text SourceFile
   }
   deriving stock (Generic, Show)
   deriving anyclass (ToJSON)
@@ -35,19 +34,19 @@ currentVersion = 1
 
 -- | A source file in `Model`
 data SourceFile = SourceFile
-  { title :: Text,
-    filePath :: Text,
-    parentNote :: Maybe Text,
-    url :: Text,
-    meta :: Aeson.Value,
-    links :: [Link]
+  { title :: Text
+  , filePath :: Text
+  , parentNote :: Maybe Text
+  , url :: Text
+  , meta :: Aeson.Value
+  , links :: [Link]
   }
   deriving stock (Generic, Show)
   deriving anyclass (ToJSON)
 
 data Link = Link
-  { unresolvedRelTarget :: Rel.UnresolvedRelTarget,
-    resolvedRelTarget :: Rel.ResolvedRelTarget Text
+  { unresolvedRelTarget :: Rel.UnresolvedRelTarget
+  , resolvedRelTarget :: Rel.ResolvedRelTarget Text
   }
   deriving stock (Generic, Eq, Ord, Show)
   deriving anyclass (ToJSON)

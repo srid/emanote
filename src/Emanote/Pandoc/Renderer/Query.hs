@@ -1,8 +1,7 @@
-module Emanote.Pandoc.Renderer.Query
-  ( queryResolvingSplice,
-    noteSpliceMap,
-  )
-where
+module Emanote.Pandoc.Renderer.Query (
+  queryResolvingSplice,
+  noteSpliceMap,
+) where
 
 import Data.List qualified as List
 import Data.Map.Syntax ((##))
@@ -36,10 +35,10 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
   pure $ do
     tpl <- HE.lookupHtmlTemplateMust queryTpl
     HE.runCustomTemplate tpl $ do
-      "query" ##
-        HI.textSplice (show q)
-      "result" ##
-        (HI.runChildrenWith . noteSpliceMap ($ ctx) model) `foldMapM` Q.runQuery noteRoute model q
+      "query"
+        ## HI.textSplice (show q)
+      "result"
+        ## (HI.runChildrenWith . noteSpliceMap ($ ctx) model) `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
