@@ -92,6 +92,8 @@
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = import ./nix/emanote.nix;
+        # CI configuration
+        herculesCI.ciSystems = [ "x86_64-linux" "aarch64-darwin" ];
       };
     };
 }
