@@ -11,8 +11,9 @@ import Relude
 import System.FilePath (splitPath)
 import Text.Show qualified (Show (show))
 
--- | Represents the relative path to some file (or its isomporphic URL
--- represetation).
+{- | Represents the relative path to some file (or its isomporphic URL
+ represetation).
+-}
 newtype R (ext :: FileType a) = R {unRoute :: NonEmpty Slug}
   deriving stock (Eq, Ord, Typeable, Data)
 
@@ -106,4 +107,4 @@ decodeHtmlRoute fp = do
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =
-  mkRouteFromFilePath @_ @'AnyExt
+  mkRouteFromFilePath @_ @( 'AnyExt)

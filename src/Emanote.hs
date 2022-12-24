@@ -1,11 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Emanote
-  ( run,
-    defaultEmanoteConfig,
-  )
-where
+module Emanote (
+  run,
+  defaultEmanoteConfig,
+) where
 
 import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdoutLoggingT)
 import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
@@ -13,13 +12,13 @@ import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
 import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
-import Ema
-  ( EmaSite (..),
-    IsRoute (..),
-    fromPrism_,
-    runSiteWithCli,
-    toPrism_,
-  )
+import Ema (
+  EmaSite (..),
+  IsRoute (..),
+  fromPrism_,
+  runSiteWithCli,
+  toPrism_,
+ )
 import Ema.CLI qualified
 import Ema.Dynamic (Dynamic (Dynamic))
 import Emanote.CLI qualified as CLI
@@ -139,17 +138,17 @@ defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =
   let blockRenderers =
         PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-            PF.urlResolvingSplice
+          [ PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          , PF.urlResolvingSplice
           ]
-          [ PF.embedBlockWikiLinkResolvingSplice,
-            PF.embedBlockRegularLinkResolvingSplice,
-            PF.queryResolvingSplice
+          [ PF.embedBlockWikiLinkResolvingSplice
+          , PF.embedBlockRegularLinkResolvingSplice
+          , PF.queryResolvingSplice
           ]
       inlineRenderers =
         PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice, -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
-            PF.urlResolvingSplice
+          [ PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          , PF.urlResolvingSplice
           ]
           mempty
       linkInlineRenderers =

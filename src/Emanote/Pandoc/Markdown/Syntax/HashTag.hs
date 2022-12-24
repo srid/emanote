@@ -1,17 +1,16 @@
-module Emanote.Pandoc.Markdown.Syntax.HashTag
-  ( hashTagSpec,
-    inlineTagsInPandoc,
-    getTagFromInline,
-    TT.Tag (..),
-    TT.TagPattern (..),
-    TT.TagNode (..),
-    TT.mkTagPattern,
-    TT.tagMatch,
-    TT.constructTag,
-    TT.deconstructTag,
-    TT.tagTree,
-  )
-where
+module Emanote.Pandoc.Markdown.Syntax.HashTag (
+  hashTagSpec,
+  inlineTagsInPandoc,
+  getTagFromInline,
+  TT.Tag (..),
+  TT.TagPattern (..),
+  TT.TagNode (..),
+  TT.mkTagPattern,
+  TT.tagMatch,
+  TT.constructTag,
+  TT.deconstructTag,
+  TT.tagTree,
+) where
 
 import Commonmark (TokType (..))
 import Commonmark qualified as CM
@@ -42,12 +41,12 @@ class HasHashTag il where
 instance HasHashTag (CP.Cm b B.Inlines) where
   hashTag (TT.Tag tag) =
     let attrs =
-          [ ("title", "Tag"),
-            (tagDataAttr, tag)
+          [ ("title", "Tag")
+          , (tagDataAttr, tag)
           ]
         classes =
-          [ "emanote:inline-tag",
-            -- This must be placed *after* the class above, to allow the user to
+          [ "emanote:inline-tag"
+          , -- This must be placed *after* the class above, to allow the user to
             -- override generic styles (of the class above)
             "emanote:inline-tag:" <> tag
           ]

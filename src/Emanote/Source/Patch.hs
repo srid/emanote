@@ -1,10 +1,9 @@
 -- | Patch model state depending on file change event.
-module Emanote.Source.Patch
-  ( patchModel,
-    filePatterns,
-    ignorePatterns,
-  )
-where
+module Emanote.Source.Patch (
+  patchModel,
+  filePatterns,
+  ignorePatterns,
+) where
 
 import Control.Exception (throwIO)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
@@ -16,11 +15,11 @@ import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
-import Emanote.Prelude
-  ( BadInput (BadInput),
-    log,
-    logD,
-  )
+import Emanote.Prelude (
+  BadInput (BadInput),
+  log,
+  logD,
+ )
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, LocLayers, locPath, locResolve, primaryLayer)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
@@ -159,11 +158,12 @@ readRefreshedFile refreshAction fp =
     _ ->
       readFileFollowingFsnotify fp
 
--- | Like `readFileBS` but accounts for file truncation due to us responding
--- *immediately* to a fsnotify modify event (which is triggered even before the
--- writer *finishes* writing the new contents). We solve this "glitch" by
--- delaying the read retry, expecting (hoping really) that *this time* the new
--- non-empty contents will come through. 'tis a bit of a HACK though.
+{- | Like `readFileBS` but accounts for file truncation due to us responding
+ *immediately* to a fsnotify modify event (which is triggered even before the
+ writer *finishes* writing the new contents). We solve this "glitch" by
+ delaying the read retry, expecting (hoping really) that *this time* the new
+ non-empty contents will come through. 'tis a bit of a HACK though.
+-}
 readFileFollowingFsnotify :: (MonadIO m, MonadLogger m) => FilePath -> m ByteString
 readFileFollowingFsnotify fp = do
   log $ "Reading file: " <> toText fp

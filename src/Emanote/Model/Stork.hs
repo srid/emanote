@@ -1,20 +1,19 @@
-module Emanote.Model.Stork
-  ( renderStorkIndex,
-  )
-where
+module Emanote.Model.Stork (
+  renderStorkIndex,
+) where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Default (Default (def))
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Stork.Index
-  ( Config (Config),
-    File (File),
-    Handling,
-    Input (Input),
-    readOrBuildStorkIndex,
-  )
+import Emanote.Model.Stork.Index (
+  Config (Config),
+  File (File),
+  Handling,
+  Input (Input),
+  readOrBuildStorkIndex,
+ )
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M

@@ -1,29 +1,29 @@
 -- | Notebook location
-module Emanote.Source.Loc
-  ( -- * Type
-    Loc (..),
+module Emanote.Source.Loc (
+  -- * Type
+  Loc (..),
 
-    -- * Making a `Loc`
-    defaultLayer,
-    userLayers,
+  -- * Making a `Loc`
+  defaultLayer,
+  userLayers,
 
-    -- * Using a `Loc`
-    locResolve,
-    locPath,
+  -- * Using a `Loc`
+  locResolve,
+  locPath,
 
-    -- * Dealing with layers of locs
-    LocLayers,
-    primaryLayer,
-  )
-where
+  -- * Dealing with layers of locs
+  LocLayers,
+  primaryLayer,
+) where
 
 import Data.Set qualified as Set
 import Relude
 import System.FilePath ((</>))
 
--- | Location of the notebook
---
--- The order here matters. Top = higher precedence.
+{- | Location of the notebook
+
+ The order here matters. Top = higher precedence.
+-}
 data Loc
   = -- | The Int argument specifies the precedence (lower value = higher precedence)
     LocUser Int FilePath
@@ -33,9 +33,10 @@ data Loc
 
 type LocLayers = Set Loc
 
--- | Return the "primary" `LocUser` layer (that which are not overrides).
---
--- Assumes that the user has put it always by last; i.e, `-L foo;primary/layer`.
+{- | Return the "primary" `LocUser` layer (that which are not overrides).
+
+ Assumes that the user has put it always by last; i.e, `-L foo;primary/layer`.
+-}
 primaryLayer :: HasCallStack => LocLayers -> Loc
 primaryLayer =
   Set.findMax . Set.filter isUserLayer

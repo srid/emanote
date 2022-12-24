@@ -1,7 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
--- | We use `relude` as our prelude; any extra Prelude-like functionality is put
--- here.
+{- | We use `relude` as our prelude; any extra Prelude-like functionality is put
+ here.
+-}
 module Emanote.Prelude where
 
 import Control.Monad.Logger (MonadLogger, logDebugNS, logErrorNS, logInfoNS, logWarnNS)
