@@ -83,9 +83,21 @@ runStork input = do
       -- title (but why would they?)
       T.replace "\\\\U" "\\U"
 
+newtype Config = Config
+  { configInput :: Input
+  }
+  deriving stock (Eq, Show)
+
 data Input = Input
   { inputFiles :: [File],
     inputFrontmatterHandling :: Handling
+  }
+  deriving stock (Eq, Show)
+
+data File = File
+  { filePath :: FilePath,
+    fileUrl :: Text,
+    fileTitle :: Text
   }
   deriving stock (Eq, Show)
 
@@ -98,56 +110,6 @@ data Handling
 instance Default Handling where
   def = Handling_Omit
 
-newtype Config = Config
-  { configInput :: Input
-  }
-  deriving stock (Eq, Show)
-
-data File = File
-  { filePath :: FilePath,
-    fileUrl :: Text,
-    fileTitle :: Text
-  }
-  deriving stock (Eq, Show)
-
-handlingCodec :: Toml.Key -> TomlCodec Handling
-handlingCodec = textBy showHandling parseHandling
-  where
-    showHandling :: Handling -> Text
-    showHandling handling = case handling of
-      Handling_Ignore -> "Ignore"
-      Handling_Omit -> "Omit"
-      Handling_Parse -> "Parse"
-    parseHandling :: Text -> Either Text Handling
-    parseHandling handling = case handling of
-      "Ignore" -> Right Handling_Ignore
-      "Omit" -> Right Handling_Omit
-      "Parse" -> Right Handling_Parse
-      other -> Left $ "Unsupported value for frontmatter handling: " <> other
-
-configCodec :: TomlCodec Config
-configCodec =
-  Config
-    <$> Toml.table inputCodec "input"
-    .= configInput
-  where
-    inputCodec :: TomlCodec Input
-    inputCodec =
-      Input
-        <$> Toml.list fileCodec "files"
-        .= inputFiles
-        <*> Toml.diwrap (handlingCodec "frontmatter_handling")
-        .= inputFrontmatterHandling
-    fileCodec :: TomlCodec File
-    fileCodec =
-      File
-        <$> Toml.string "path"
-        .= filePath
-        <*> Toml.text "url"
-        .= fileUrl
-        <*> Toml.text "title"
-        .= fileTitle
-
 instance FromJSON Handling where
   parseJSON = genericParseJSON handlingJSONOptions
     where
@@ -156,3 +118,40 @@ instance FromJSON Handling where
         Aeson.defaultOptions
           { Aeson.constructorTagModifier = toString . T.toLower . T.replace "Handling_" "" . toText
           }
+
+configCodec :: TomlCodec Config
+configCodec =
+  Config
+    <$> Toml.table inputCodec "input"
+      .= configInput
+  where
+    inputCodec :: TomlCodec Input
+    inputCodec =
+      Input
+        <$> Toml.list fileCodec "files"
+          .= inputFiles
+        <*> Toml.diwrap (handlingCodec "frontmatter_handling")
+          .= inputFrontmatterHandling
+    fileCodec :: TomlCodec File
+    fileCodec =
+      File
+        <$> Toml.string "path"
+          .= filePath
+        <*> Toml.text "url"
+          .= fileUrl
+        <*> Toml.text "title"
+          .= fileTitle
+    handlingCodec :: Toml.Key -> TomlCodec Handling
+    handlingCodec = textBy showHandling parseHandling
+      where
+        showHandling :: Handling -> Text
+        showHandling handling = case handling of
+          Handling_Ignore -> "Ignore"
+          Handling_Omit -> "Omit"
+          Handling_Parse -> "Parse"
+        parseHandling :: Text -> Either Text Handling
+        parseHandling handling = case handling of
+          "Ignore" -> Right Handling_Ignore
+          "Omit" -> Right Handling_Omit
+          "Parse" -> Right Handling_Parse
+          other -> Left $ "Unsupported value for frontmatter handling: " <> other
