@@ -7,6 +7,7 @@
 - UI
   - Add source map for Stork [\#391](https://github.com/srid/emanote/pull/391)
   - Workaround for Prism.js and Tailwind CSS both using `table` class [\#320](https://github.com/srid/emanote/pull/396)
+  - Add option to include YAML frontmatter in the Stork index [\#398](https://github.com/srid/emanote/pull/398)
 - Features
   - Timeline backlinks recognize flexible daily notes suffixed with arbitrary string [\#395](https://github.com/srid/emanote/issues/395)
 - Misc
