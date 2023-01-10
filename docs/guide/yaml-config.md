@@ -16,4 +16,5 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 
 ## Examples
 
-- https://github.com/srid/srid/blob/master/content/index.yaml
+- https://github.com/srid/srid/blob/master/index.yaml
+- https://github.com/srid/emanote-template/blob/master/index.yaml
