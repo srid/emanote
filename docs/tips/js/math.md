@@ -10,21 +10,13 @@ page:
 
 [MathJax](https://www.mathjax.org) can be used to render Math formulas.  For example, $a^2 + b ^ 2 = c$.
 
-1. Add the following to your `page.headHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]])
-    ```yaml
-    page:
-      headHtml: |
-        <script>
-          window.MathJax = {
-            startup: {
-              ready: () => {
-                MathJax.startup.defaultReady();
-              }
-            }
-          };
-        </script>
-        <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    ```
+To enable it, add the following to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.mathjax" />
+```
 
 ## Demo
 
