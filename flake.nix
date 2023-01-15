@@ -13,7 +13,7 @@
     check-flake.url = "github:srid/check-flake";
 
     # TODO: Dependencies waiting to go from Hackage to nixpkgs.
-    heist-extra.url = "github:jfpedroza/heist-extra/jp/tree-splice-sort-children";
+    heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
     heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
     heist.flake = false;
