@@ -111,7 +111,7 @@ js:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/nix.min.js"></script>
     <script>hljs.highlightAll();</script>
     </with>
-  highlightjs-ver: 11.6.0 # Ref: https://cdnjs.com/libraries/highlight.js
+  highlightjs-ver: 11.9.0 # Ref: https://cdnjs.com/libraries/highlight.js
   # Diagrams using mermaid.js
   mermaid: |
     <!-- mermaid.js -->
