@@ -10,9 +10,6 @@
   - Add option to include YAML frontmatter in the Stork index [\#398](https://github.com/srid/emanote/pull/398)
 - Features
   - Timeline backlinks recognize flexible daily notes suffixed with arbitrary string [\#395](https://github.com/srid/emanote/issues/395)
-- Performance
-  - Update highlight.js to `11.9.0` to fix a memory leak [\#411](https://github.com/srid/emanote/issues/411)
-
 - Misc
   - Ignore toplevel `flake.{nix,lock}` by default.
   - Remove deprecated `_emanote-bin/compile-css` script
