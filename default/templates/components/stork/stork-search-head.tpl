@@ -50,7 +50,6 @@
 
         init: function () {
           if (document.readyState !== 'complete') {
-            console.log("stork: normal register");
             window.addEventListener('load', function () {
               stork.initialize(window.emanote.stork.getBaseUrl() + '_emanote-static/stork/stork.wasm');
               window.emanote.stork.registerIndex();
@@ -66,6 +65,8 @@
               }
             });
           } else {
+            // This section is called during Ema's hot reload.
+            // 
             // Mark the current index as stale, and refresh it *only when* the
             // user actually invokes search.
             // 
