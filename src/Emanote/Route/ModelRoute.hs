@@ -39,8 +39,8 @@ data ModelRoute
 
 -- | R to a note file in LML (lightweight markup language) format
 data LMLRoute
-  = LMLRoute_Md (R ( 'LMLType 'Md))
-  | LMLRoute_Org (R ( 'LMLType 'Org))
+  = LMLRoute_Md (R ('LMLType 'Md))
+  | LMLRoute_Org (R ('LMLType 'Org))
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
@@ -56,7 +56,7 @@ possibleLmlRoutes r =
 
 lmlRouteCase ::
   LMLRoute ->
-  Either (R ( 'LMLType 'Md)) (R ( 'LMLType 'Org))
+  Either (R ('LMLType 'Md)) (R ('LMLType 'Org))
 lmlRouteCase = \case
   LMLRoute_Md r -> Left r
   LMLRoute_Org r -> Right r
@@ -66,7 +66,7 @@ isMdRoute = \case
   LMLRoute_Md _ -> True
   _ -> False
 
-withLmlRoute :: (forall lmlType. HasExt ( 'LMLType lmlType) => R ( 'LMLType lmlType) -> r) -> LMLRoute -> r
+withLmlRoute :: (forall lmlType. HasExt ('LMLType lmlType) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
 
 modelRouteCase ::

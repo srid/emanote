@@ -107,4 +107,4 @@ decodeHtmlRoute fp = do
 
 decodeAnyRoute :: FilePath -> Maybe (R 'AnyExt)
 decodeAnyRoute =
-  mkRouteFromFilePath @_ @( 'AnyExt)
+  mkRouteFromFilePath @_ @('AnyExt)

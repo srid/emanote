@@ -50,12 +50,12 @@ class HasExt (ext :: FileType a) where
   -- | Return the filepath without the known extension.
   withoutKnownExt :: FilePath -> Maybe FilePath
 
-instance HasExt ( 'LMLType 'Md) where
+instance HasExt ('LMLType 'Md) where
   fileType = LMLType Md
   withExt = flip FP.addExtension ".md"
   withoutKnownExt = fpWithoutExt ".md"
 
-instance HasExt ( 'LMLType 'Org) where
+instance HasExt ('LMLType 'Org) where
   fileType = LMLType Org
   withExt = flip FP.addExtension ".org"
   withoutKnownExt = fpWithoutExt ".org"
