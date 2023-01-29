@@ -32,9 +32,9 @@ linkifyInlineTags =
     inline@(B.Span attr is) ->
       if
           | Just inlineTag <- HT.getTagFromInline inline ->
-            B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
+              B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
           | otherwise ->
-            inline
+              inline
     x ->
       x
   where
@@ -48,7 +48,7 @@ fixEmojiFontFamily =
   W.walk $ \case
     B.Span (id', classes, attrs) is
       | classes == ["emoji"] ->
-        let emojiFontAttr = ("style", "font-family: emoji")
-            newAttrs = attrs <> one emojiFontAttr
-         in B.Span (id', classes, newAttrs) is
+          let emojiFontAttr = ("style", "font-family: emoji")
+              newAttrs = attrs <> one emojiFontAttr
+           in B.Span (id', classes, newAttrs) is
     x -> x

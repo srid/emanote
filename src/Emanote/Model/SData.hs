@@ -19,8 +19,8 @@ import Relude
 -}
 data SData = SData
   { _sdataValue :: Aeson.Value
-  , -- | Location of this data file
-    _sdataRoute :: R.R 'R.Yaml
+  , _sdataRoute :: R.R 'R.Yaml
+  -- ^ Location of this data file
   }
   deriving stock (Eq, Ord, Data, Show, Generic)
   deriving anyclass (Aeson.ToJSON)

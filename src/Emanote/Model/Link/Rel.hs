@@ -31,8 +31,8 @@ data Rel = Rel
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
-  , -- | The relation context in LML
-    _relCtx :: [B.Block]
+  , _relCtx :: [B.Block]
+  -- ^ The relation context in LML
   }
   deriving stock (Eq, Ord, Show)
 

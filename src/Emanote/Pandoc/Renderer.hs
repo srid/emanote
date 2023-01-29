@@ -67,11 +67,11 @@ mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
 
 data EmanotePandocRenderers a r = EmanotePandocRenderers
   { blockRenderers :: PandocRenderers a r
-  , -- | Like `blockRenderers` but for use in inline contexts.
-    --
-    -- Backlinks and titles constitute an example of inline context, where we don't
-    -- care about block elements.
-    inlineRenderers :: PandocRenderers a r
-  , -- | Like `inlineRenderers` but suitable for use inside links (<a> tags).
-    linkInlineRenderers :: PandocRenderers a r
+  , inlineRenderers :: PandocRenderers a r
+  -- ^ Like `blockRenderers` but for use in inline contexts.
+  --
+  -- Backlinks and titles constitute an example of inline context, where we don't
+  -- care about block elements.
+  , linkInlineRenderers :: PandocRenderers a r
+  -- ^ Like `inlineRenderers` but suitable for use inside links (<a> tags).
   }

@@ -53,11 +53,11 @@ data ModelT encF = Model
   , _modelLayers :: Set Loc
   , _modelEmaCLIAction :: Some Ema.CLI.Action
   , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
-  , -- | Dictates how exactly to render `Pandoc` to Heist nodes.
-    _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
+  , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
+  -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
   , _modelCompileTailwind :: Bool
-  , -- | An unique ID for this process's model. ID changes across processes.
-    _modelInstanceID :: UUID
+  , _modelInstanceID :: UUID
+  -- ^ An unique ID for this process's model. ID changes across processes.
   , _modelNotes :: IxNote
   , _modelRels :: IxRel
   , _modelSData :: IxSData
@@ -291,7 +291,7 @@ modelIndexRoute :: ModelT f -> LMLRoute
 modelIndexRoute model = do
   resolveLmlRoute model R.indexRoute
 
-resolveLmlRoute :: forall lmlType f. ModelT f -> R ( 'R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRoute
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 

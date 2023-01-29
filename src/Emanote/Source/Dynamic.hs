@@ -36,14 +36,14 @@ import UnliftIO (MonadUnliftIO)
 
 -- | Everything that's required to run an Emanote site.
 data EmanoteConfig = EmanoteConfig
-  { -- | CLI arguments (includes layers)
-    _emanoteConfigCli :: CLI.Cli
-  , -- | A function to filter the `Note` before it gets added to the model.
-    _emanoteConfigNoteFn :: Note -> Note
-  , -- | How to render Pandoc to Heist HTML.
-    _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
-  , -- | Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
-    _emanoteCompileTailwind :: Bool
+  { _emanoteConfigCli :: CLI.Cli
+  -- ^ CLI arguments (includes layers)
+  , _emanoteConfigNoteFn :: Note -> Note
+  -- ^ A function to filter the `Note` before it gets added to the model.
+  , _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+  -- ^ How to render Pandoc to Heist HTML.
+  , _emanoteCompileTailwind :: Bool
+  -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
   }
 
 {- | Make an Ema `Dynamic` for the Emanote model.
