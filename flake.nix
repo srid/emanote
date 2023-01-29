@@ -1,5 +1,5 @@
 {
-  description = "emanote";
+  description = "emanote: Emanate a structured view of your plain-text notes";
   nixConfig = {
     extra-substituters = "https://srid.cachix.org";
     extra-trusted-public-keys = "srid.cachix.org-1:3clnql5gjbJNEvhA/WQp7nrZlBptwpXnUk6JAv8aB2M=";
