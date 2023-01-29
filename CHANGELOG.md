@@ -1,6 +1,6 @@
 # Revision history for emanote
 
-## 1.0.2.0 (Unreleased)
+## 1.0.2.0 (2023-01-29)
 
 - Nix
   - Reduce Emanote's Nix runtime closure size
