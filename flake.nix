@@ -11,14 +11,6 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
-
-    # TODO: Dependencies waiting to go from Hackage to nixpkgs.
-    heist-extra.url = "github:srid/heist-extra";
-    heist-extra.flake = false;
-    heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
-    heist.flake = false;
-    ema.url = "github:srid/ema";
-    ema.flake = false;
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -38,15 +30,27 @@
         # haskell-flake configuration
         haskellProjects.default = {
           packages.emanote.root = ./.;
-          buildTools = hp: {
-            inherit (config.packages)
-              stork;
-            treefmt = config.treefmt.build.wrapper;
-          } // config.treefmt.build.programs;
+          buildTools = hp:
+            let
+              # Workaround for https://github.com/NixOS/nixpkgs/issues/140774
+              fixCyclicReference = drv:
+                pkgs.haskell.lib.overrideCabal drv (_: {
+                  enableSeparateBinOutput = false;
+                });
+            in
+            {
+              inherit (config.packages)
+                stork;
+              treefmt = config.treefmt.build.wrapper;
+              ghcid = fixCyclicReference hp.ghcid;
+              haskell-language-server = hp.haskell-language-server.overrideScope (lself: lsuper: {
+                ormolu = fixCyclicReference hp.ormolu;
+              });
+            } // config.treefmt.build.programs;
           source-overrides = {
-            inherit (inputs)
-              heist-extra heist;
-            ema = inputs.ema + /ema;
+            #inherit (inputs)
+            #  heist-extra heist;
+            # ema = inputs.ema + /ema;
           };
           overrides = with pkgs.haskell.lib;
             let
@@ -65,9 +69,10 @@
                 });
             in
             self: super: {
-              heist = dontCheck super.heist; # Tests are broken.
-              tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-              commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
+              #heist = dontCheck super.heist; # Tests are broken.
+              #tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
+              #commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
+              commonmark-extensions = super.commonmark-extensions_0_2_3_2;
               emanote =
                 lib.pipe super.emanote [
                   (lib.flip addBuildDepends [ config.packages.stork ])
