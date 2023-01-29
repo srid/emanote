@@ -15,22 +15,6 @@
         "type": "github"
       }
     },
-    "ema": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1668972953,
-        "narHash": "sha256-WyTqCQg9xPqB2wC16PdjocaIL81MBLtjgC3eCzhN5hE=",
-        "owner": "srid",
-        "repo": "ema",
-        "rev": "61faae56aa0f3c6ca815f344684cc566f6341662",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "ema",
-        "type": "github"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -79,45 +63,13 @@
         "type": "github"
       }
     },
-    "heist": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1668990382,
-        "narHash": "sha256-5GEnEdDmUBSxrF0IWwiu5eNvtublv0rY7OEpvaU1NG0=",
-        "owner": "snapframework",
-        "repo": "heist",
-        "rev": "88105c85996b8d621922b38e67b9460b36ccad51",
-        "type": "github"
-      },
-      "original": {
-        "owner": "snapframework",
-        "repo": "heist",
-        "type": "github"
-      }
-    },
-    "heist-extra": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1668486579,
-        "narHash": "sha256-VmyGntVH/tVosftplC4O0JhYA34kXeq1Wu/RbJr132Y=",
-        "owner": "srid",
-        "repo": "heist-extra",
-        "rev": "da94abfa68f67933baef9b529fe8d2a4edc572d5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "heist-extra",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1671848398,
-        "narHash": "sha256-cJIIPd1kvCI6ne/S0facbiBNH7sZUzk405GfdSJPwZE=",
+        "lastModified": 1674361931,
+        "narHash": "sha256-lUIZItHbW+LmJAz9V9puLq2rHlewcUgg1RPehkQIkzc=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "bb0359be0a1a08c8d74412fe8c69aa2ffb3f477e",
+        "rev": "ef479383e13698c8d5ccf8a608485dc8ce1d4f80",
         "type": "github"
       },
       "original": {
@@ -148,12 +100,9 @@
     "root": {
       "inputs": {
         "check-flake": "check-flake",
-        "ema": "ema",
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
         "haskell-flake": "haskell-flake",
-        "heist": "heist",
-        "heist-extra": "heist-extra",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       }
