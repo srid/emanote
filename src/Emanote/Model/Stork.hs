@@ -12,6 +12,7 @@ import Emanote.Model.Stork.Index (
   File (File),
   Handling,
   Input (Input),
+  fileTypeFromFilename,
   readOrBuildStorkIndex,
  )
 import Emanote.Model.Title qualified as Tit
@@ -33,10 +34,12 @@ storkFiles :: Model -> [File]
 storkFiles model =
   let baseDir = Loc.locPath . Loc.primaryLayer $ model ^. M.modelLayers
    in Ix.toList (model ^. M.modelNotes) <&> \note ->
-        File
-          ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
-          (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. N.noteRoute)
-          (Tit.toPlain $ note ^. N.noteTitle)
+        let fp = ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
+         in File
+              fp
+              (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. N.noteRoute)
+              (Tit.toPlain $ note ^. N.noteTitle)
+              (fileTypeFromFilename fp)
 
 frontmatterHandling :: Model -> Handling
 frontmatterHandling model =
