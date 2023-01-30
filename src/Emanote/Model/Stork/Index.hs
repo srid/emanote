@@ -10,7 +10,7 @@ module Emanote.Model.Stork.Index (
   Input (Input),
   Config (Config),
   Handling,
-  fileTypeFromFilename,
+  FileType (..),
 ) where
 
 import Control.Monad.Logger (MonadLoggerIO)
@@ -21,7 +21,6 @@ import Deriving.Aeson
 import Emanote.Prelude (log, logD, logW)
 import Numeric (showGFloat)
 import Relude
-import System.FilePath (takeExtension)
 import System.Process.ByteString (readProcessWithExitCode)
 import System.Which (staticWhich)
 import Toml (Key, TomlCodec, diwrap, encode, list, string, table, text, textBy, (.=))
@@ -106,7 +105,6 @@ data File = File
 data FileType
   = FileType_PlainText
   | FileType_Markdown
-  | FileType_HTML
   deriving stock (Eq, Show, Generic)
   deriving
     (FromJSON)
@@ -114,14 +112,6 @@ data FileType
           '[ ConstructorTagModifier '[StripPrefix "FileType_", CamelToSnake]
            ]
           FileType
-
-fileTypeFromFilename :: FilePath -> FileType
-fileTypeFromFilename fp =
-  case takeExtension fp of
-    ".md" -> FileType_Markdown
-    ".html" -> FileType_HTML
-    ".tpl" -> FileType_HTML
-    _ -> FileType_PlainText
 
 data Handling
   = Handling_Ignore
@@ -183,10 +173,8 @@ configCodec =
         showFileType filetype = case filetype of
           FileType_PlainText -> "PlainText"
           FileType_Markdown -> "Markdown"
-          FileType_HTML -> "HTML"
         parseFileType :: Text -> Either Text FileType
         parseFileType filetype = case filetype of
           "PlainText" -> Right FileType_PlainText
           "Markdown" -> Right FileType_Markdown
-          "HTML" -> Right FileType_HTML
           other -> Left $ "Unsupported value for filetype: " <> other
