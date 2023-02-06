@@ -13,9 +13,9 @@ filePattern = \case
     R.withExt @_ @('R.LMLType 'R.Org) $
       "**/*"
   R.Yaml ->
-    R.withExt @_ @('R.Yaml) "**/*"
+    R.withExt @_ @'R.Yaml "**/*"
   R.HeistTpl ->
-    R.withExt @_ @('R.HeistTpl) $
+    R.withExt @_ @'R.HeistTpl $
       "**/*"
   R.AnyExt ->
     "**"
