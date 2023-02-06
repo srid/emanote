@@ -101,13 +101,13 @@ encodeVirtualRoute = \case
   VirtualRoute_TagIndex tagNodes ->
     R.encodeRoute $ encodeTagIndexR tagNodes
   VirtualRoute_Index ->
-    R.encodeRoute $ R.R @() @('Ext.Html) $ "-" :| ["all"]
+    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
   VirtualRoute_Export ->
-    R.encodeRoute $ R.R @Ext.SourceExt @('Ext.AnyExt) $ "-" :| ["export.json"]
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
   VirtualRoute_StorkIndex ->
-    R.encodeRoute $ R.R @Ext.SourceExt @('Ext.AnyExt) $ "-" :| ["stork.st"]
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["stork.st"]
   VirtualRoute_TaskIndex ->
-    R.encodeRoute $ R.R @() @('Ext.Html) $ "-" :| ["tasks"]
+    R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
 
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =
