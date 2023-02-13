@@ -12,6 +12,8 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
+
+    nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -30,24 +32,14 @@
 
         # haskell-flake configuration
         haskellProjects.default = {
-          packages.emanote.root = ./.;
-          buildTools = hp:
-            let
-              # Workaround for https://github.com/NixOS/nixpkgs/issues/140774
-              fixCyclicReference = drv:
-                pkgs.haskell.lib.overrideCabal drv (_: {
-                  enableSeparateBinOutput = false;
-                });
-            in
-            {
-              inherit (config.packages)
-                stork;
-              treefmt = config.treefmt.build.wrapper;
-              ghcid = fixCyclicReference hp.ghcid;
-              haskell-language-server = hp.haskell-language-server.overrideScope (lself: lsuper: {
-                ormolu = fixCyclicReference hp.ormolu;
-              });
-            } // config.treefmt.build.programs;
+          imports = [
+            inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
+          ];
+          devShell.tools = hp: {
+            inherit (config.packages)
+              stork;
+            treefmt = config.treefmt.build.wrapper;
+          } // config.treefmt.build.programs;
           source-overrides = {
             #inherit (inputs)
             #  heist-extra heist;
