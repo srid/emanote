@@ -32,7 +32,7 @@
         inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        ./nix/emanote.nix
+        ./nix/flake-module.nix
         ./nix/docker.nix
         ./nix/stork.nix
       ];
@@ -49,11 +49,6 @@
               stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
-          source-overrides = {
-            #inherit (inputs)
-            #  heist-extra heist;
-            # ema = inputs.ema + /ema;
-          };
           overrides = with pkgs.haskell.lib;
             let
               # Remove the given references from drv's executables.
@@ -71,9 +66,6 @@
                 });
             in
             self: super: {
-              #heist = dontCheck super.heist; # Tests are broken.
-              #tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-              #commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
               commonmark-extensions = super.commonmark-extensions_0_2_3_2;
               emanote =
                 lib.pipe super.emanote [
@@ -124,7 +116,7 @@
       };
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
-        flakeModule = import ./nix/emanote.nix;
+        flakeModule = import ./nix/flake-module.nix;
       };
     };
 }

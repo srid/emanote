@@ -3,15 +3,10 @@
 
 let
   inherit (flake-parts-lib)
-    mkSubmoduleOptions
     mkPerSystemOption;
   inherit (lib)
     mkOption
-    mkDefault
     types;
-  inherit (types)
-    functionTo
-    raw;
 in
 {
   options = {
