@@ -13,6 +13,15 @@
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
 
+    ema.url = "github:srid/ema";
+    ema.inputs.nixpkgs.follows = "nixpkgs";
+    ema.inputs.haskell-flake.follows = "haskell-flake";
+    ema.inputs.flake-parts.follows = "flake-parts";
+    ema.inputs.check-flake.follows = "check-flake";
+    ema.inputs.treefmt-nix.follows = "treefmt-nix";
+    ema.inputs.flake-root.follows = "flake-root";
+    ema.inputs.nixpkgs-140774-workaround.follows = "nixpkgs-140774-workaround";
+
     nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
@@ -34,6 +43,7 @@
         haskellProjects.default = {
           imports = [
             inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
+            inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
             inherit (config.packages)
