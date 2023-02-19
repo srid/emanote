@@ -4,6 +4,8 @@
 
 - Bug fixes
   - Make Stork recognize orgmode notes ([\#413](https://github.com/srid/emanote/issues/413))
+- Misc
+  - Update Ema to simplify the live server websocket observation logic
 
 ## 1.0.2.0 (2023-01-29)
 
