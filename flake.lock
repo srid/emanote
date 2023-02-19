@@ -15,6 +15,44 @@
         "type": "github"
       }
     },
+    "ema": {
+      "inputs": {
+        "check-flake": [
+          "check-flake"
+        ],
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "flake-root": [
+          "flake-root"
+        ],
+        "haskell-flake": [
+          "haskell-flake"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nixpkgs-140774-workaround": [
+          "nixpkgs-140774-workaround"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1676819423,
+        "narHash": "sha256-bnq16t0hjI0lJ+6/diuM0PU0EXuq4pvB2NVnFIFxNug=",
+        "owner": "srid",
+        "repo": "ema",
+        "rev": "182759761f40b9ed8f29fac19270598eea8bb2fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "ema",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -50,11 +88,11 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1674066917,
-        "narHash": "sha256-nRSAb7N64zmAbXUoVVqY/s2LbSIdDTdfN0sSKG5/CCY=",
+        "lastModified": 1676149835,
+        "narHash": "sha256-rE/MIjs65pBtYzpyltvoZx4V8GcGkuh04GjlLi4VvTE=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "c6ff897db9abdd4e5ff7911b5f9234a1380c6611",
+        "rev": "34641d4508c2ad00d1a5ef5fb592f49bfa9e2770",
         "type": "github"
       },
       "original": {
@@ -79,6 +117,21 @@
         "type": "github"
       }
     },
+    "nixpkgs-140774-workaround": {
+      "locked": {
+        "lastModified": 1676155560,
+        "narHash": "sha256-HIuz7BVsZ5hQwJfqsSwP6VNT6xfl4K+O+d2tRvLMIO4=",
+        "owner": "srid",
+        "repo": "nixpkgs-140774-workaround",
+        "rev": "be38f84cb651c2c8672b1459d1c65a7879ba84ab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "nixpkgs-140774-workaround",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "dir": "lib",
@@ -100,20 +153,27 @@
     "root": {
       "inputs": {
         "check-flake": "check-flake",
+        "ema": "ema",
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
         "haskell-flake": "haskell-flake",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-140774-workaround": "nixpkgs-140774-workaround",
         "treefmt-nix": "treefmt-nix"
       }
     },
     "treefmt-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1671882555,
-        "narHash": "sha256-43HxY5gNaDMkKckeEXbhua4Ay1/S1HnYzqZBIVhzeqI=",
+        "lastModified": 1675588998,
+        "narHash": "sha256-CLeFLmah0mxNp/EIW0PMG3YutKxVIIs4B0f5oJhwe8E=",
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "rev": "97981314ddf673803a1d5f966014f444a1054b1e",
+        "rev": "70e03145e26c2f3199f4320ecd9fd343f1129c60",
         "type": "github"
       },
       "original": {

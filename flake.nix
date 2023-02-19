@@ -9,8 +9,20 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
+
+    ema.url = "github:srid/ema";
+    ema.inputs.nixpkgs.follows = "nixpkgs";
+    ema.inputs.haskell-flake.follows = "haskell-flake";
+    ema.inputs.flake-parts.follows = "flake-parts";
+    ema.inputs.check-flake.follows = "check-flake";
+    ema.inputs.treefmt-nix.follows = "treefmt-nix";
+    ema.inputs.flake-root.follows = "flake-root";
+    ema.inputs.nixpkgs-140774-workaround.follows = "nixpkgs-140774-workaround";
+
+    nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -20,38 +32,23 @@
         inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        ./nix/emanote.nix
+        ./nix/flake-module.nix
         ./nix/docker.nix
         ./nix/stork.nix
-        ./nix/tailwind.nix
       ];
       perSystem = { pkgs, lib, config, ... }: {
 
         # haskell-flake configuration
         haskellProjects.default = {
-          packages.emanote.root = ./.;
-          buildTools = hp:
-            let
-              # Workaround for https://github.com/NixOS/nixpkgs/issues/140774
-              fixCyclicReference = drv:
-                pkgs.haskell.lib.overrideCabal drv (_: {
-                  enableSeparateBinOutput = false;
-                });
-            in
-            {
-              inherit (config.packages)
-                stork;
-              treefmt = config.treefmt.build.wrapper;
-              ghcid = fixCyclicReference hp.ghcid;
-              haskell-language-server = hp.haskell-language-server.overrideScope (lself: lsuper: {
-                ormolu = fixCyclicReference hp.ormolu;
-              });
-            } // config.treefmt.build.programs;
-          source-overrides = {
-            #inherit (inputs)
-            #  heist-extra heist;
-            # ema = inputs.ema + /ema;
-          };
+          imports = [
+            inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
+            inputs.ema.haskellFlakeProjectModules.output
+          ];
+          devShell.tools = hp: {
+            inherit (config.packages)
+              stork;
+            treefmt = config.treefmt.build.wrapper;
+          } // config.treefmt.build.programs;
           overrides = with pkgs.haskell.lib;
             let
               # Remove the given references from drv's executables.
@@ -69,9 +66,6 @@
                 });
             in
             self: super: {
-              #heist = dontCheck super.heist; # Tests are broken.
-              #tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-              #commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
               commonmark-extensions = super.commonmark-extensions_0_2_3_2;
               emanote =
                 lib.pipe super.emanote [
@@ -94,6 +88,7 @@
           programs.ormolu.enable = true;
           programs.nixpkgs-fmt.enable = true;
           programs.cabal-fmt.enable = true;
+          programs.hlint.enable = true;
 
           # We use fourmolu
           programs.ormolu.package = pkgs.haskellPackages.fourmolu;
@@ -121,9 +116,7 @@
       };
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
-        flakeModule = import ./nix/emanote.nix;
-        # CI configuration
-        herculesCI.ciSystems = [ "x86_64-linux" "aarch64-darwin" ];
+        flakeModule = import ./nix/flake-module.nix;
       };
     };
 }

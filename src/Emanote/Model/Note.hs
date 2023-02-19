@@ -107,7 +107,7 @@ noteTags =
 noteSlug :: Note -> Maybe (NonEmpty Slug)
 noteSlug note = do
   slugPath :: Text <- lookupMeta (one "slug") note
-  fmap R.unRoute $ R.mkRouteFromFilePath @_ @('R.AnyExt) $ toString slugPath
+  fmap R.unRoute $ R.mkRouteFromFilePath @_ @'R.AnyExt $ toString slugPath
 
 lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
