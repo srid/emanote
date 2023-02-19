@@ -37,6 +37,11 @@ The following is the result of using `![[death-note.mp4]]` (note that `![](death
 
 ![[death-note.mp4]]
 
+### Audio
+
+The following is the result of using `![[cat.ogg]]` (note that `![](cat.ogg)` also works).
+
+![[cat.ogg]]
 
 ### PDFs
 
