@@ -35,7 +35,6 @@
         ./nix/emanote.nix
         ./nix/docker.nix
         ./nix/stork.nix
-        ./nix/tailwind.nix
       ];
       perSystem = { pkgs, lib, config, ... }: {
 
