@@ -86,6 +86,9 @@ embedStaticFileRoute model altText staticFile = do
       | any (`T.isSuffixOf` toText fp) videoExts -> do
           pure . runEmbedTemplate "video" $ do
             "ema:url" ## HI.textSplice url
+      | any (`T.isSuffixOf` toText fp) audioExts -> do
+          pure . runEmbedTemplate "audio" $ do
+            "ema:url" ## HI.textSplice url
       | ".pdf" `T.isSuffixOf` toText fp -> do
           pure . runEmbedTemplate "pdf" $ do
             "ema:url" ## HI.textSplice url
@@ -107,4 +110,15 @@ videoExts =
   [ ".mp4"
   , ".webm"
   , ".ogv"
+  ]
+
+audioExts :: [Text]
+audioExts =
+  [ ".aac"
+  , ".caf"
+  , ".flac"
+  , ".mp3"
+  , ".ogg"
+  , ".wav"
+  , ".wave"
   ]
