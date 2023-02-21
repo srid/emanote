@@ -5,7 +5,7 @@ date: 2022-08-03
 
 # Embedding
 
-You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/How+to/Embed+files). The HTML can be fully customized for each embed types.
+You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/Linking+notes+and+files/Embedding+files). The HTML can be fully customized for each embed types.
 
 Note that the embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported.
 
