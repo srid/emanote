@@ -20,6 +20,7 @@ in
                 package = mkOption {
                   type = types.package;
                   default = inputs'.emanote.packages.default;
+                  defaultText = "inputs'.emanote.packages.default";
                   description = ''
                     The emanote package to use. 
 
@@ -58,6 +59,7 @@ in
                         type = types.str;
                         description = ''Base URL for relative links'';
                         default = "/";
+                        defaultText = ''Root URL'';
                       };
                       prettyUrls = mkOption {
                         type = types.bool;
