@@ -116,7 +116,7 @@
       };
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
-        flakeModule = import ./nix/flake-module.nix;
+        flakeModule = ./nix/flake-module.nix;
       };
     };
 }
