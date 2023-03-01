@@ -8,7 +8,7 @@ order: 1
 
 Emanote is supported on all popular operating systems through [Nix].
 
-1. [Install Nix](https://nixos.org/download.html) & [enable Flakes](https://nixos.wiki/wiki/Flakes#Installing_flakes)
+1. [Install Nix & enable Flakes](https://haskell.flake.page/nix)
    1. For Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230)
    1. For NixOS, see [[nix]]
 1. Optional: Use the Nix binary cache: https://srid.cachix.org
