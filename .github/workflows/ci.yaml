@@ -18,6 +18,7 @@ jobs:
       - uses: cachix/cachix-action@v11
         with:
           name: srid
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build Nix
         id: build-nix
         run: |
