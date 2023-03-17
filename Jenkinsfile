@@ -3,7 +3,9 @@ pipeline {
     stages {
         stage ('Hello') {
             steps {
-                sh 'echo Hello'
+                sh '''#!/run/current-system/sw/bin/bash
+                    echo Hello'
+                   '''
             }
         }
         stage ('Cachix setup') {
