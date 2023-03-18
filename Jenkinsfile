@@ -11,5 +11,15 @@ pipeline {
                 sh 'nix build .#default'
             }
         }
+        stage ('Docker Build') {
+            steps {
+                sh 'nix build -j auto .#dockerImage'
+            }
+        }
+        stage ('Docs Build') {
+            steps {
+                sh 'nix build .#docs'
+            }
+        }
     }
 }
