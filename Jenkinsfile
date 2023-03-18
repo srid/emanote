@@ -13,7 +13,7 @@ pipeline {
         }
         stage ('Docker image') {
             steps {
-                sh 'nix build -j auto .#dockerImage'
+                sh 'nix build .#dockerImage'
             }
         }
         stage ('Docs static site') {
