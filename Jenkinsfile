@@ -6,17 +6,17 @@ pipeline {
                 sh 'cachix use srid'
             }
         }
-        stage ('Nix Build') {
+        stage ('Haskell package') {
             steps {
                 sh 'nix build .#default'
             }
         }
-        stage ('Docker Build') {
+        stage ('Docker image') {
             steps {
                 sh 'nix build -j auto .#dockerImage'
             }
         }
-        stage ('Docs Build') {
+        stage ('Documentation site') {
             steps {
                 sh 'nix build .#docs'
             }
