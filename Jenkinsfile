@@ -16,7 +16,7 @@ pipeline {
                 sh 'nix build -j auto .#dockerImage'
             }
         }
-        stage ('Documentation site') {
+        stage ('Docs static site') {
             steps {
                 sh 'nix build .#docs'
             }
