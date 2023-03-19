@@ -19,7 +19,8 @@ pipeline {
                 sh 'docker load -i $(nix build .#dockerImage --print-out-paths)'
                 sh '''
                    echo ${DOCKER_PASS} | docker login -u sridca --password-stdin
-                   docker push sridca/emanote:jenkins
+                   # TODO: waiting on porting gh-pages deployment here
+                   # docker push sridca/emanote:latest
                    '''
             }
         }
