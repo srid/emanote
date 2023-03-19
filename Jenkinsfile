@@ -6,7 +6,7 @@ pipeline {
                 sh 'cachix use srid'
             }
         }
-        stage ('Haskell package') {
+        stage ('Build') {
             steps {
                 sh 'nix build .#default'
             }
