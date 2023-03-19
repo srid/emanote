@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+      CACHIX_AUTH_TOKEN = credentials('cachix-auth-token')
+    }
     stages {
         stage ('Cachix setup') {
             steps {
@@ -21,12 +24,10 @@ pipeline {
                 sh 'nix build .#docs'
             }
         }
-    }
-    node {
-      stage ('Push to cachix') {
-        withCredentials([string(credentialsId: 'cachix-auth-token', variable: 'CACHIX_AUTH_TOKEN')]) {
-          sh 'nix run .#cachix-push'
+        stage ('Push to cachix') {
+          steps {
+            sh 'nix run .#cachix-push'
+          }
         }
-      }
     }
 }
