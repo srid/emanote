@@ -23,6 +23,8 @@
     ema.inputs.nixpkgs-140774-workaround.follows = "nixpkgs-140774-workaround";
 
     nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
+
+    cachix-push.url = "github:juspay/cachix-push";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -32,11 +34,13 @@
         inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
+        inputs.cachix-push.flakeModule
         ./nix/flake-module.nix
         ./nix/docker.nix
         ./nix/stork.nix
       ];
       perSystem = { pkgs, lib, config, ... }: {
+        cachix-push.cacheName = "srid";
 
         # haskell-flake configuration
         haskellProjects.default = {

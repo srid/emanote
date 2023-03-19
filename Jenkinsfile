@@ -21,5 +21,12 @@ pipeline {
                 sh 'nix build .#docs'
             }
         }
+        stage ('Push to cachix') {
+          withCredentials([string(credentialsId: 'cachix-auth-token', variable: 'CACHIX_AUTH_TOKEN')]) {
+            steps {
+              sh 'nix run .#cachix-push'
+            }
+          }
+        }
     }
 }
