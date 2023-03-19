@@ -15,12 +15,12 @@ pipeline {
             steps {
                 sh 'nix build .#dockerImage'
             }
-        }
+        } */
         stage ('Docs static site') {
             steps {
                 sh 'nix build .#docs'
             }
-        } */
+        }
         stage ('Push to cachix') {
           environment {
             CACHIX_AUTH_TOKEN = credentials('cachix-auth-token')
