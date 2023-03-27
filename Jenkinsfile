@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage ('Cachix setup') {
             steps {
-                sh 'cachix use srid'
+                cachixUse 'srid'
             }
         }
         stage ('Build') {
@@ -13,7 +13,7 @@ pipeline {
         }
         stage ('Docker image') {
             environment {
-              DOCKER_PASS = credentials('docker-pass')
+                DOCKER_PASS = credentials('docker-pass')
             }
             steps {
                 sh 'docker load -i $(nix build .#dockerImage --print-out-paths)'
@@ -30,13 +30,10 @@ pipeline {
                 sh 'nix build .#docs'
             }
         }
-        stage ('Push to cachix') {
-          environment {
-            CACHIX_AUTH_TOKEN = credentials('cachix-auth-token')
-          }
-          steps {
-            sh 'nix run .#cachix-push'
-          }
+        stage ('Cachix push') {
+            steps {
+                cachixPush "nammayatri"
+            }
         }
     }
 }
