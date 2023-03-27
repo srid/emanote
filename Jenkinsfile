@@ -32,7 +32,7 @@ pipeline {
         }
         stage ('Cachix push') {
             steps {
-                cachixPush "nammayatri"
+                cachixPush "srid"
             }
         }
     }
