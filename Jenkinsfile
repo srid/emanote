@@ -8,12 +8,7 @@ pipeline {
         }
         stage ('Build') {
             steps {
-                sh 'nix build .#default'
-            }
-        }
-        stage ('Docs static site') {
-            steps {
-                sh 'nix build .#docs'
+                nixBuildAll ()
             }
         }
         stage ('Cachix push') {
