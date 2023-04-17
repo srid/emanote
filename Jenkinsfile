@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent 'nixos'
     stages {
         stage ('Cachix setup') {
             steps {
