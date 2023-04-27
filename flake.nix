@@ -24,8 +24,8 @@
 
     cachix-push.url = "github:juspay/cachix-push";
   };
-  outputs = inputs@{ self, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
       imports = [
         inputs.haskell-flake.flakeModule
@@ -72,6 +72,7 @@
                 lib.pipe super.emanote [
                   (lib.flip addBuildDepends [ config.packages.stork ])
                   dontHaddock
+                  disableLibraryProfiling
                   justStaticExecutables
                   (removeReferencesTo [
                     self.pandoc
@@ -106,6 +107,7 @@
 
         packages.default = config.packages.emanote;
         apps.default = config.apps.emanote;
+
         emanote = {
           package = config.packages.default;
           sites = {
