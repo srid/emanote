@@ -21,13 +21,10 @@
     ema.inputs.check-flake.follows = "check-flake";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
-    ema.inputs.nixpkgs-140774-workaround.follows = "nixpkgs-140774-workaround";
-
-    nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
 
     cachix-push.url = "github:juspay/cachix-push";
   };
-  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
+  outputs = inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
       imports = [
@@ -46,7 +43,6 @@
         # haskell-flake configuration
         haskellProjects.default = {
           imports = [
-            inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
             inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
@@ -75,6 +71,7 @@
               emanote =
                 lib.pipe super.emanote [
                   (lib.flip addBuildDepends [ config.packages.stork ])
+                  dontHaddock
                   justStaticExecutables
                   (removeReferencesTo [
                     self.pandoc
@@ -108,6 +105,7 @@
         };
 
         packages.default = config.packages.emanote;
+        apps.default = config.apps.emanote;
         emanote = {
           package = config.packages.default;
           sites = {
