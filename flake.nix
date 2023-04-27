@@ -8,7 +8,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "github:srid/haskell-flake/enableSeparateBinOut"; # https://github.com/srid/haskell-flake/pull/146
+    haskell-flake.url = "github:srid/haskell-flake/cabal2nix-order"; # https://github.com/srid/haskell-flake/pull/149
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
