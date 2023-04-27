@@ -22,6 +22,8 @@
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
 
+    nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
+
     cachix-push.url = "github:juspay/cachix-push";
   };
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
@@ -43,6 +45,7 @@
         # haskell-flake configuration
         haskellProjects.default = {
           imports = [
+            inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
             inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
