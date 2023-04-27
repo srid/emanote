@@ -8,7 +8,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "github:srid/haskell-flake";
+    haskell-flake.url = "github:srid/haskell-flake/enableSeparateBinOut"; # https://github.com/srid/haskell-flake/pull/146
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
@@ -21,9 +21,6 @@
     ema.inputs.check-flake.follows = "check-flake";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
-    ema.inputs.nixpkgs-140774-workaround.follows = "nixpkgs-140774-workaround";
-
-    nixpkgs-140774-workaround.url = "github:srid/nixpkgs-140774-workaround";
 
     cachix-push.url = "github:juspay/cachix-push";
   };
@@ -46,7 +43,6 @@
         # haskell-flake configuration
         haskellProjects.default = {
           imports = [
-            inputs.nixpkgs-140774-workaround.haskellFlakeProjectModules.default
             inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
@@ -108,6 +104,7 @@
         };
 
         packages.default = config.packages.emanote;
+        apps.default = config.apps.emanote;
         emanote = {
           package = config.packages.default;
           sites = {
