@@ -65,7 +65,7 @@
                   # cf. https://srid.ca/remove-references-to
                   postInstall = (old.postInstall or "") + ''
                     ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
+                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $bin/bin/*\n") disallowedReferences)}
                   '';
                 });
             in
