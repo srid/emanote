@@ -7,18 +7,24 @@ pipeline {
             }
         }
         stage ('Nix Build') {
-            steps {
-                parallel(
-                    native: {
-                        nixBuildAll ()
-                    },
-                    macOS: {
-                        sh 'nix --option system aarch64-darwin -j0 build -L'
-                    },
-                    macOS_Intel: {
-                        sh 'nix --option system x86_64-darwin -j0 build -L'
+                parallel{
+                    stage('Linux'){
+                        agent {
+                            label "nixos"
+                        }
+                        steps {
+                            nixBuildAll ()
+                        }
                     }
-                )
+                    stage('macOS'){
+                        agent {
+                            label "macos"
+                        }
+                        steps {
+                            nixBuildAll ()
+                        }
+                    }
+                }
             }
         }
         stage ('Cachix push') {
