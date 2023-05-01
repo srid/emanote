@@ -7,22 +7,21 @@ pipeline {
             }
         }
         stage ('Nix Build') {
-                parallel{
-                    stage('Linux'){
-                        agent {
-                            label "nixos"
-                        }
-                        steps {
-                            nixBuildAll ()
-                        }
+            parallel{
+                stage('Linux'){
+                    agent {
+                        label "nixos"
                     }
-                    stage('macOS'){
-                        agent {
-                            label "macos"
-                        }
-                        steps {
-                            nixBuildAll ()
-                        }
+                    steps {
+                        nixBuildAll ()
+                    }
+                }
+                stage('macOS'){
+                    agent {
+                        label "macos"
+                    }
+                    steps {
+                        nixBuildAll ()
                     }
                 }
             }
