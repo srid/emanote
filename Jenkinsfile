@@ -11,6 +11,11 @@ pipeline {
                 nixBuildAll ()
             }
         }
+        stage ('Build, macOS') {
+            steps {
+                sh 'nix --option system aarch64-darwin -j0 build -L'
+            }
+        }
         stage ('Cachix push') {
             steps {
                 cachixPush "srid"
