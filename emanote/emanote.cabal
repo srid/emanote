@@ -8,7 +8,7 @@ author:             Sridhar Ratnakumar
 category:           Web
 synopsis:           Emanate a structured view of your plain-text notes
 description:
-  Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
+  Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time. XX
 
 -- A URL where users can report bugs.
 bug-reports:        https://github.com/srid/emanote/issues
