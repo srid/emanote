@@ -6,14 +6,16 @@ pipeline {
                 cachixUse 'srid'
             }
         }
-        stage ('Build') {
+        stage ('Nix Build') {
             steps {
-                nixBuildAll ()
-            }
-        }
-        stage ('Build, macOS') {
-            steps {
-                sh 'nix --option system aarch64-darwin -j0 build -L'
+                parallel(
+                    native: {
+                        nixBuildAll ()
+                    },
+                    macOS: {
+                        sh 'nix --option system aarch64-darwin -j0 build -L'
+                    }
+                )
             }
         }
         stage ('Cachix push') {
