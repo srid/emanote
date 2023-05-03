@@ -13,6 +13,32 @@ pipeline {
                         name 'PLATFORM'
                         values 'nixos', 'macos'
                     }
+                    axis {
+                        name 'SYSTEM'
+                        values 'x86_64-linux', 'aarch64-darwin', 'x86_64-darwin'
+                    }
+                }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            value 'linux'
+                        }
+                        axis {
+                            name 'SYSTEM'
+                            notValues 'x86_64-linux'
+                        }
+                    }
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            value 'macos'
+                        }
+                        axis {
+                            name 'SYSTEM'
+                            values 'aarch64-darwin', 'x86_64-darwin'
+                        }
+                    }
                 }
                 stages {
                     stage ('Cachix setup') {
@@ -22,17 +48,7 @@ pipeline {
                     }
                     stage ('Build') {
                         steps {
-                            nixBuildAll ()
-                        }
-                    }
-                    stage ('Rosetta Build') {
-                        when {
-                            expression {
-                                env.PLATFORM == "macos"
-                            }
-                        }
-                        steps {
-                            nixBuildAll system: "x86_64-darwin"
+                            nixBuildAll system: env.SYSTEM
                         }
                     }
                     stage ('Cachix push') {
