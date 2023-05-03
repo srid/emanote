@@ -36,7 +36,7 @@ pipeline {
                         }
                         axis {
                             name 'SYSTEM'
-                            values 'aarch64-darwin', 'x86_64-darwin'
+                            notValues 'aarch64-darwin', 'x86_64-darwin'
                         }
                     }
                 }
