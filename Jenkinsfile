@@ -1,37 +1,34 @@
 pipeline {
-    agent {
-        label "nixos"
-    }
+    agent any
     stages {
-        stage ('Cachix setup') {
-            steps {
-                cachixUse 'srid'
-            }
-        }
-        stage ('Nix Build') {
-            parallel {
-                stage('Linux') {
-                    agent {
-                        label "nixos"
-                    }
-                    steps {
-                        nixBuildAll ()
+        stage ('Platform Matrix') {
+            matrix {
+                agent {
+                    label "${PLATFORM}"
+                }
+                axes {
+                    axis {
+                        name 'PLATFORM'
+                        values 'nixos', 'macos'
                     }
                 }
-                stage('macOS') {
-                    agent {
-                        label "macos"
+                stages {
+                    stage ('Cachix setup') {
+                        steps {
+                            cachixUse 'srid'
+                        }
                     }
-                    steps {
-                        nixBuildAll ()
-                        cachixPush "srid"
+                    stage ('Build') {
+                        steps {
+                            nixBuildAll ()
+                        }
+                    }
+                    stage ('Cachix push') {
+                        steps {
+                            cachixPush "srid"
+                        }
                     }
                 }
-            }
-        }
-        stage ('Cachix push') {
-            steps {
-                cachixPush "srid"
             }
         }
     }
