@@ -22,7 +22,7 @@ pipeline {
                     exclude {
                         axis {
                             name 'PLATFORM'
-                            value 'linux'
+                            values 'linux'
                         }
                         axis {
                             name 'SYSTEM'
@@ -32,7 +32,7 @@ pipeline {
                     exclude {
                         axis {
                             name 'PLATFORM'
-                            value 'macos'
+                            values 'macos'
                         }
                         axis {
                             name 'SYSTEM'
