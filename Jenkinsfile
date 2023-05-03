@@ -20,7 +20,7 @@ pipeline {
                             cachixUse 'srid'
                         }
                     }
-                    stage ('Build') {
+                    stage ('Build ${PLATFORM}') {
                         steps {
                             nixBuildAll ()
                         }
@@ -28,7 +28,7 @@ pipeline {
                     stage ('Rosetta Build') {
                         when {
                             expression {
-                                PLATFORM == "macos"
+                                "${PLATFORM}" == "macos"
                             }
                         }
                         steps {
