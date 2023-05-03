@@ -27,7 +27,9 @@ pipeline {
                     }
                     stage ('Rosetta Build') {
                         when {
-                            params.PLATFORM == "macos"
+                            expression {
+                                params.PLATFORM == "macos"
+                            }
                         }
                         steps {
                             nixBuildAll system: "x86_64-darwin"
