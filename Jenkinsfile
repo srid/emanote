@@ -22,7 +22,7 @@ pipeline {
                     exclude {
                         axis {
                             name 'PLATFORM'
-                            values 'linux'
+                            values 'nixos'
                         }
                         axis {
                             name 'SYSTEM'
