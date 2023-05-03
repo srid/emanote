@@ -24,8 +24,6 @@ pipeline {
                     }
                     steps {
                         nixBuildAll ()
-                    }
-                    steps {
                         cachixPush "srid"
                     }
                 }
