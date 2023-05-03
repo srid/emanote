@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'nixos'
+    }
     stages {
         stage ('Platform Matrix') {
             matrix {
@@ -21,6 +23,14 @@ pipeline {
                     stage ('Build') {
                         steps {
                             nixBuildAll ()
+                        }
+                    }
+                    stage ('Rosetta Build') {
+                        when {
+                            params.PLATFORM == "macos"
+                        }
+                        steps {
+                            nixBuildAll system: "x86_64-darwin"
                         }
                     }
                     stage ('Cachix push') {
