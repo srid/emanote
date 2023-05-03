@@ -1,5 +1,7 @@
 pipeline {
-    agent { label "nixos" }
+    agent {
+        label "nixos"
+    }
     stages {
         stage ('Cachix setup') {
             steps {
@@ -7,8 +9,8 @@ pipeline {
             }
         }
         stage ('Nix Build') {
-            parallel{
-                stage('Linux'){
+            parallel {
+                stage('Linux') {
                     agent {
                         label "nixos"
                     }
@@ -16,12 +18,15 @@ pipeline {
                         nixBuildAll ()
                     }
                 }
-                stage('macOS'){
+                stage('macOS') {
                     agent {
                         label "macos"
                     }
                     steps {
                         nixBuildAll ()
+                    }
+                    steps {
+                        cachixPush "srid"
                     }
                 }
             }
