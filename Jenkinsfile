@@ -28,7 +28,7 @@ pipeline {
                     stage ('Rosetta Build') {
                         when {
                             expression {
-                                params[PLATFORM] == "macos"
+                                env.PLATFORM == "macos"
                             }
                         }
                         steps {
