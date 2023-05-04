@@ -3,14 +3,14 @@ pipeline {
         label 'nixos'
     }
     stages {
-        stage ('Platform Matrix') {
+        stage ('OS Matrix') {
             matrix {
                 agent {
-                    label "${PLATFORM}"
+                    label "${OS}"
                 }
                 axes {
                     axis {
-                        name 'PLATFORM'
+                        name 'OS'
                         values 'nixos', 'macos'
                     }
                     axis {
@@ -21,7 +21,7 @@ pipeline {
                 excludes {
                     exclude {
                         axis {
-                            name 'PLATFORM'
+                            name 'OS'
                             values 'nixos'
                         }
                         axis {
@@ -31,7 +31,7 @@ pipeline {
                     }
                     exclude {
                         axis {
-                            name 'PLATFORM'
+                            name 'OS'
                             values 'macos'
                         }
                         axis {
