@@ -8,8 +8,9 @@ pipeline {
     stages {
         stage ('OS Matrix') {
             steps {
-                script {
-                    withMatrix {
+                matrix {
+                    withMatrix ()
+                    stages {
                         stage ('Cachix setup') {
                             steps {
                                 cachixUse 'srid'
@@ -33,44 +34,39 @@ pipeline {
 }
 
 def withMatrix (Closure body) {
-    matrix {
-        agent {
-            label "${OS}"
+    agent {
+        label "${OS}"
+    }
+    axes {
+        axis {
+            name 'OS'
+            values 'nixos', 'macos'
         }
-        axes {
+        axis {
+            name 'SYSTEM'
+            values 'x86_64-linux', 'aarch64-darwin', 'x86_64-darwin'
+        }
+    }
+    excludes {
+        exclude {
             axis {
                 name 'OS'
-                values 'nixos', 'macos'
+                values 'nixos'
             }
             axis {
                 name 'SYSTEM'
-                values 'x86_64-linux', 'aarch64-darwin', 'x86_64-darwin'
+                notValues 'x86_64-linux'
             }
         }
-        excludes {
-            exclude {
-                axis {
-                    name 'OS'
-                    values 'nixos'
-                }
-                axis {
-                    name 'SYSTEM'
-                    notValues 'x86_64-linux'
-                }
+        exclude {
+            axis {
+                name 'OS'
+                values 'macos'
             }
-            exclude {
-                axis {
-                    name 'OS'
-                    values 'macos'
-                }
-                axis {
-                    name 'SYSTEM'
-                    notValues 'aarch64-darwin', 'x86_64-darwin'
-                }
+            axis {
+                name 'SYSTEM'
+                notValues 'aarch64-darwin', 'x86_64-darwin'
             }
-        }
-        stages {
-            body
         }
     }
 }
