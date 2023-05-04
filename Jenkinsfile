@@ -8,7 +8,9 @@ pipeline {
     stages {
         stage ('OS Matrix') {
             matrix {
-                withMatrix ()
+                script {
+                    withMatrix ()
+                }
                 stages {
                     stage ('Cachix setup') {
                         steps {
