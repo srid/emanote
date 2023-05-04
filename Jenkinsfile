@@ -48,12 +48,15 @@ pipeline {
                     }
                     stage ('Build') {
                         steps {
-                            nixBuildAll system: env.SYSTEM
+                            script {
+                                flakeOutputs = nixBuildAll system: env.SYSTEM
+                                env.FLAKE_OUTPUTS = flakeOutputs.trim()
+                            }
                         }
                     }
                     stage ('Cachix push') {
                         steps {
-                            cachixPush "srid"
+                            cachixPush name: "srid", paths: env.FLAKE_OUTPUTS
                         }
                     }
                 }
