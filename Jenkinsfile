@@ -8,20 +8,22 @@ pipeline {
     stages {
         stage ('OS Matrix') {
             steps {
-                withMatrix {
-                    stage ('Cachix setup') {
-                        steps {
-                            cachixUse 'srid'
+                script {
+                    withMatrix {
+                        stage ('Cachix setup') {
+                            steps {
+                                cachixUse 'srid'
+                            }
                         }
-                    }
-                    stage ('Build') {
-                        steps {
-                            nixBuildAll system: env.SYSTEM
+                        stage ('Build') {
+                            steps {
+                                nixBuildAll system: env.SYSTEM
+                            }
                         }
-                    }
-                    stage ('Cachix push') {
-                        steps {
-                            cachixPush name: "srid"
+                        stage ('Cachix push') {
+                            steps {
+                                cachixPush name: "srid"
+                            }
                         }
                     }
                 }
