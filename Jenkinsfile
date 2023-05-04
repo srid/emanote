@@ -33,7 +33,7 @@ pipeline {
     }
 }
 
-def withMatrix (Closure body) {
+def withMatrix () {
     agent {
         label "${OS}"
     }
