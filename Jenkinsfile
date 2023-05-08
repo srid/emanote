@@ -29,7 +29,7 @@ pipeline {
                     }
                     stage ('Cachix push') {
                         steps {
-                            cachixPush name: "srid"
+                            cachixPush "srid"
                         }
                     }
                 }
