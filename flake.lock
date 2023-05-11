@@ -52,15 +52,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1678746319,
-        "narHash": "sha256-vOh7o0AK2PohGa1LPTAGIPmua1beR67XowEcaI8UPhg=",
+        "lastModified": 1683754814,
+        "narHash": "sha256-ULkdNwLSkpkEg6PDDZA5pIvSi9OdAryRuUbVQnlkrLo=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "b46a08d7a26491b9801642ab9c13e94f929c6a90",
+        "rev": "c00e5384bfbfddd08d016264b5062e6e70459763",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "package-settings-ng",
         "repo": "ema",
         "type": "github"
       }
@@ -100,15 +101,16 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1682614676,
-        "narHash": "sha256-Eu53z8fdtt8mfMRp+IskjclCT9LqvCViMOzvqO0Rz50=",
+        "lastModified": 1683829897,
+        "narHash": "sha256-RS/5Ci2ngxcGQF8KXI88LUsc5GOW/7iB0sDOa9DZh3g=",
         "owner": "srid",
         "repo": "haskell-flake",
-        "rev": "11ab35533afaf0cacc5f3ed8032cb2482cedf8fd",
+        "rev": "755c43f8e97ddee0990eeb381fe919da27990d1b",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "package-settings-ng",
         "repo": "haskell-flake",
         "type": "github"
       }

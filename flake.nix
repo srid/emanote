@@ -8,13 +8,14 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "github:srid/haskell-flake";
+    haskell-flake.url = "github:srid/haskell-flake/package-settings-ng";
+    # haskell-flake.url = "path:/Users/srid/code/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
 
-    ema.url = "github:srid/ema";
+    ema.url = "github:srid/ema/package-settings-ng";
     ema.inputs.nixpkgs.follows = "nixpkgs";
     ema.inputs.haskell-flake.follows = "haskell-flake";
     ema.inputs.flake-parts.follows = "flake-parts";
@@ -37,20 +38,17 @@
         ./nix/docker.nix
         ./nix/stork.nix
       ];
-      perSystem = { pkgs, lib, config, ... }: {
+      perSystem = perSystem@{ pkgs, system, lib, config, ... }: {
         cachix-push.cacheName = "srid";
 
         # haskell-flake configuration
-        haskellProjects.default = {
-          imports = [
-            inputs.ema.haskellFlakeProjectModules.output
-          ];
+        haskellProjects.default = ({ config, ... }: {
           devShell.tools = hp: {
             inherit (config.packages)
               stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
-          overrides = with pkgs.haskell.lib;
+          packageSettings = with pkgs.haskell.lib;
             let
               # Remove the given references from drv's executables.
               # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
@@ -66,22 +64,33 @@
                   '';
                 });
             in
-            self: super: {
-              commonmark-extensions = super.commonmark-extensions_0_2_3_2;
-              emanote =
-                lib.pipe super.emanote [
-                  (lib.flip addBuildDepends [ config.packages.stork ])
+            [
+              inputs.ema.haskellFlakeProjectOverlays.output
+
+              # TODO: Upstream to haskell-flake as `defaults.packageSettings` or the like.
+              (lib.flip lib.mapAttrs config.outputs.packages (name: info: {
+                overrides = [
                   dontHaddock
                   disableLibraryProfiling
+                ] ++ lib.optional (info.exes != { })
                   justStaticExecutables
-                  (removeReferencesTo [
-                    self.pandoc
-                    self.pandoc-types
-                    self.warp
-                  ])
-                ];
-            };
-        };
+                ;
+              }))
+
+              {
+                commonmark-extensions.source = "0.2.3.2";
+                emanote.overrides = self: super:
+                  [
+                    (lib.flip addBuildDepends [ perSystem.config.packages.stork ])
+                    (removeReferencesTo [
+                      self.pandoc
+                      self.pandoc-types
+                      self.warp
+                    ])
+                  ];
+              }
+            ];
+        });
 
         # treefmt-nix configuration
         treefmt.config = {
