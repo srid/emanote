@@ -14,6 +14,7 @@
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
 
+    #ema2.url = "github:srid/ema";
     ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
     ema.inputs.haskell-flake.follows = "haskell-flake";
@@ -43,12 +44,15 @@
           let locals = config.defaults.packages;
           in lib.mapAttrs
             (_: v: {
-              haddock = false; # Because, this is end-user software. No need for library docs.
-              libraryProfiling = false; # Avoid double-compilation.
-              justStaticExecutables = true; # Avoid needless runtime deps.
+              settings = {
+                haddock = false; # Because, this is end-user software. No need for library docs.
+                libraryProfiling = false; # Avoid double-compilation.
+                justStaticExecutables = true; # Avoid needless runtime deps.
+              };
             })
             locals;
       };
+      debug = true;
       perSystem = { pkgs, lib, config, system, ... }: {
         cachix-push.cacheName = "srid";
         _module.args = import inputs.nixpkgs {
@@ -62,6 +66,7 @@
 
         # haskell-flake configuration
         haskellProjects.default = {
+          debug = true;
           imports = [
             inputs.self.haskellFlakeProjectModules.localDefaults
             inputs.ema.haskellFlakeProjectModules.packages
@@ -73,13 +78,18 @@
           } // config.treefmt.build.programs;
           packages = {
             commonmark-extensions.root = "0.2.3.2";
+            # ema.root = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
             emanote = { pkgs, ... }: {
-              extraBuildDepends = [ pkgs.stork-emanote ];
-              removeReferencesTo = self: super: [
-                self.pandoc
-                self.pandoc-types
-                self.warp
-              ];
+              settings = {
+                check = false;
+                extraBuildDepends = [ pkgs.stork-emanote ];
+                removeReferencesTo = self: super: [
+                  self.pandoc
+                  self.pandoc-types
+                  self.warp
+                ];
+                custom = self: super: pkg: builtins.trace pkg.version pkg;
+              };
             };
           };
         };
