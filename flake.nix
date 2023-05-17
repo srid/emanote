@@ -8,7 +8,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "github:srid/haskell-flake";
+    haskell-flake.url = "path:/Users/srid/code/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
@@ -37,50 +37,51 @@
         ./nix/docker.nix
         ./nix/stork.nix
       ];
-      perSystem = { pkgs, lib, config, ... }: {
+      # Sensible package overrides for local packages.
+      flake.haskellFlakeProjectModules.localDefaults = { pkgs, lib, config, ... }: {
+        packages =
+          let locals = config.defaults.packages;
+          in lib.mapAttrs
+            (_: v: {
+              haddock = false; # Because, this is end-user software. No need for library docs.
+              libraryProfiling = false; # Avoid double-compilation.
+              justStaticExecutables = true; # Avoid needless runtime deps.
+            })
+            locals;
+      };
+      perSystem = { pkgs, lib, config, system, ... }: {
         cachix-push.cacheName = "srid";
+        _module.args = import inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            (self: super: {
+              stork-emanote = config.packages.stork;
+            })
+          ];
+        };
 
         # haskell-flake configuration
         haskellProjects.default = {
           imports = [
-            inputs.ema.haskellFlakeProjectModules.output
+            inputs.self.haskellFlakeProjectModules.localDefaults
+            inputs.ema.haskellFlakeProjectModules.packages
           ];
           devShell.tools = hp: {
             inherit (config.packages)
               stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
-          overrides = with pkgs.haskell.lib;
-            let
-              # Remove the given references from drv's executables.
-              # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
-              removeReferencesTo = disallowedReferences: drv:
-                drv.overrideAttrs (old: rec {
-                  inherit disallowedReferences;
-                  # Ditch data dependencies that are not needed at runtime.
-                  # cf. https://github.com/NixOS/nixpkgs/pull/204675
-                  # cf. https://srid.ca/remove-references-to
-                  postInstall = (old.postInstall or "") + ''
-                    ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
-                  '';
-                });
-            in
-            self: super: {
-              commonmark-extensions = super.commonmark-extensions_0_2_3_2;
-              emanote =
-                lib.pipe super.emanote [
-                  (lib.flip addBuildDepends [ config.packages.stork ])
-                  dontHaddock
-                  disableLibraryProfiling
-                  justStaticExecutables
-                  (removeReferencesTo [
-                    self.pandoc
-                    self.pandoc-types
-                    self.warp
-                  ])
-                ];
+          packages = {
+            commonmark-extensions.root = "0.2.3.2";
+            emanote = { pkgs, ... }: {
+              extraBuildDepends = [ pkgs.stork-emanote ];
+              removeReferencesTo = self: super: [
+                self.pandoc
+                self.pandoc-types
+                self.warp
+              ];
             };
+          };
         };
 
         # treefmt-nix configuration
