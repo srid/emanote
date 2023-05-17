@@ -41,12 +41,14 @@
       # Sensible package overrides for local packages.
       flake.haskellFlakeProjectModules.localDefaults = { pkgs, lib, config, ... }: {
         packages =
+          # TODO: We should try not to rely on config.defaults.
           let locals = config.defaults.packages;
           in lib.mapAttrs
-            (_: v: {
+            (_: _: {
               settings = {
                 haddock = false; # Because, this is end-user software. No need for library docs.
                 libraryProfiling = false; # Avoid double-compilation.
+                # TODO: Must enable only if there is executable stanza.
                 justStaticExecutables = true; # Avoid needless runtime deps.
               };
             })
