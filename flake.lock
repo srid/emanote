@@ -100,8 +100,8 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1684354275,
-        "narHash": "sha256-YSvcz/RQaUE06tik/v9kO1lEtAGjRWCcEvtBmXrOqOI=",
+        "lastModified": 1684440542,
+        "narHash": "sha256-vW2p9OuBEGZqWMtPQSkNs2KO8VUudwPczRe//ogiqj4=",
         "path": "/Users/srid/code/haskell-flake",
         "type": "path"
       },

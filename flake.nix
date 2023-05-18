@@ -38,23 +38,24 @@
         ./nix/docker.nix
         ./nix/stork.nix
       ];
+      debug = true;
       # Sensible package overrides for local packages.
       flake.haskellFlakeProjectModules.localDefaults = { pkgs, lib, config, ... }: {
         packages =
           # TODO: We should try not to rely on config.defaults.
           let locals = config.defaults.packages;
           in lib.mapAttrs
-            (_: _: {
+            (name: p: {
               settings = {
                 haddock = false; # Because, this is end-user software. No need for library docs.
                 libraryProfiling = false; # Avoid double-compilation.
-                # TODO: Must enable only if there is executable stanza.
-                justStaticExecutables = true; # Avoid needless runtime deps.
+                justStaticExecutables = self: super:
+                  # Uses packages.${name}.cabal.executables stored in passthru of the package.
+                  super.${name}.passthru.haskell-flake.cabal.executables != [ ];
               };
             })
             locals;
       };
-      debug = true;
       perSystem = { pkgs, lib, config, system, ... }: {
         cachix-push.cacheName = "srid";
         _module.args = import inputs.nixpkgs {
@@ -78,6 +79,7 @@
               stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
+
           packages = {
             commonmark-extensions.root = "0.2.3.2";
             # ema.root = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
