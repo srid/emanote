@@ -8,13 +8,13 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    haskell-flake.url = "path:/Users/srid/code/haskell-flake";
+    haskell-flake.url = "github:srid/haskell-flake/packages-ng";
+    # haskell-flake.url = "path:/Users/srid/code/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
     check-flake.url = "github:srid/check-flake";
 
-    #ema2.url = "github:srid/ema";
     ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
     ema.inputs.haskell-flake.follows = "haskell-flake";
@@ -39,23 +39,22 @@
         ./nix/stork.nix
       ];
       debug = true;
-      # Sensible package overrides for local packages.
-      flake.haskellFlakeProjectModules.localDefaults = { pkgs, lib, config, ... }: {
-        packages =
-          # TODO: We should try not to rely on config.defaults.
-          let locals = config.defaults.packages;
-          in lib.mapAttrs
+
+      # Sensible Haskell overrides for local packages.
+      flake.haskellFlakeProjectModules.localDefaults = { lib, config, ... }: {
+        settings =
+          let
+            localPackages = lib.filterAttrs (_: p: p.local) config.packages;
+          in
+          lib.mapAttrs
             (name: p: {
-              settings = {
-                haddock = false; # Because, this is end-user software. No need for library docs.
-                libraryProfiling = false; # Avoid double-compilation.
-                justStaticExecutables = self: super:
-                  # Uses packages.${name}.cabal.executables stored in passthru of the package.
-                  super.${name}.passthru.haskell-flake.cabal.executables != [ ];
-              };
+              haddock = false; # Because, this is end-user software. No need for library docs.
+              libraryProfiling = false; # Avoid double-compilation.
+              justStaticExecutables = p.cabal.executables != [ ]; # Reduce closure size
             })
-            locals;
+            localPackages;
       };
+
       perSystem = { pkgs, lib, config, system, ... }: {
         cachix-push.cacheName = "srid";
         _module.args = import inputs.nixpkgs {
@@ -72,7 +71,7 @@
           debug = true;
           imports = [
             inputs.self.haskellFlakeProjectModules.localDefaults
-            inputs.ema.haskellFlakeProjectModules.packages
+            inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
             inherit (pkgs)
@@ -83,17 +82,17 @@
           packages = {
             commonmark-extensions.root = "0.2.3.2";
             # ema.root = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
+          };
+          settings = {
             emanote = { pkgs, ... }: {
-              settings = {
-                check = false;
-                extraBuildDepends = [ pkgs.stork-emanote ];
-                removeReferencesTo = self: super: [
-                  self.pandoc
-                  self.pandoc-types
-                  self.warp
-                ];
-                custom = self: super: pkg: builtins.trace pkg.version pkg;
-              };
+              check = false;
+              extraBuildDepends = [ pkgs.stork-emanote ];
+              removeReferencesTo = self: super: [
+                self.pandoc
+                self.pandoc-types
+                self.warp
+              ];
+              custom = self: super: pkg: builtins.trace pkg.version pkg;
             };
           };
         };

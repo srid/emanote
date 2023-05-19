@@ -100,14 +100,18 @@
     },
     "haskell-flake": {
       "locked": {
-        "lastModified": 1684440542,
-        "narHash": "sha256-vW2p9OuBEGZqWMtPQSkNs2KO8VUudwPczRe//ogiqj4=",
-        "path": "/Users/srid/code/haskell-flake",
-        "type": "path"
+        "lastModified": 1684523086,
+        "narHash": "sha256-UdFkrXQUWvByUCtsmAFbOxjeMtRQ4SnVgrC+9deHFIU=",
+        "owner": "srid",
+        "repo": "haskell-flake",
+        "rev": "8c018847b31be182cbdb673cb9904fb9f0524d2a",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/srid/code/haskell-flake",
-        "type": "path"
+        "owner": "srid",
+        "ref": "packages-ng",
+        "repo": "haskell-flake",
+        "type": "github"
       }
     },
     "nixpkgs": {
