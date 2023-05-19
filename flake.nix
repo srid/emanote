@@ -75,8 +75,8 @@
             inputs.ema.haskellFlakeProjectModules.packages
           ];
           devShell.tools = hp: {
-            inherit (config.packages)
-              stork;
+            inherit (pkgs)
+              stork-emanote;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
 
