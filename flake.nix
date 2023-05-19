@@ -84,15 +84,15 @@
             # ema.root = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
           };
           settings = {
-            emanote = { pkgs, ... }: {
+            emanote = { name, self, super, pkgs, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
-              removeReferencesTo = self: super: [
+              removeReferencesTo = [
                 self.pandoc
                 self.pandoc-types
                 self.warp
               ];
-              custom = self: super: pkg: builtins.trace pkg.version pkg;
+              custom = pkg: builtins.trace "Emanote setting: ${builtins.toJSON pkg.meta}" pkg;
             };
           };
         };
