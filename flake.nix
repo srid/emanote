@@ -68,6 +68,7 @@
 
         # haskell-flake configuration
         haskellProjects.default = {
+          projectFlakeName = "emanote";
           debug = true;
           imports = [
             inputs.self.haskellFlakeProjectModules.localDefaults
@@ -80,8 +81,8 @@
           } // config.treefmt.build.programs;
 
           packages = {
-            commonmark-extensions.root = "0.2.3.2";
-            # ema.root = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
+            commonmark-extensions.source = "0.2.3.2";
+            # ema.source = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
           };
           settings = {
             emanote = { name, self, super, pkgs, ... }: {
@@ -92,7 +93,7 @@
                 self.pandoc-types
                 self.warp
               ];
-              custom = pkg: builtins.trace "Emanote setting: ${builtins.toJSON pkg.meta}" pkg;
+              custom = pkg: builtins.trace "Emanote outputs: ${builtins.toJSON pkg.meta.outputsToInstall}" pkg;
             };
           };
         };
