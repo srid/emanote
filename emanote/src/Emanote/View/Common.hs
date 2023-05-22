@@ -22,7 +22,6 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
-import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Route (LMLRoute)
@@ -75,7 +74,7 @@ mkTemplateRenderCtx model r meta =
       -- TODO: We should be using withInlineCtx, so as to make the wikilink
       -- render in note title.
       titleSplice titleDoc = withLinkInlineCtx $ \ctx ->
-        Tit.titleSplice ctx preparePandoc titleDoc
+        Tit.titleSplice ctx id titleDoc
    in TemplateRenderCtx {..}
   where
     withRenderCtx ::
@@ -140,7 +139,7 @@ commonSplices withCtx model meta routeTitle = do
   "ema:metadata" ##
     HJ.bindJson meta
   "ema:title" ## withCtx $ \ctx ->
-    Tit.titleSplice ctx preparePandoc routeTitle
+    Tit.titleSplice ctx id routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull" ##
     Tit.titleSpliceNoHtml routeTitleFull

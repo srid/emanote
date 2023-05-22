@@ -10,7 +10,6 @@ import Emanote.Model (Model)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Query qualified as Q
 import Emanote.Model.Title qualified as Tit
-import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
 import Emanote.Route (LMLRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -38,7 +37,8 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
       "query" ##
         HI.textSplice (show q)
       "result" ##
-        (HI.runChildrenWith . noteSpliceMap ($ ctx) model) `foldMapM` Q.runQuery noteRoute model q
+        (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
+          `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
@@ -47,6 +47,6 @@ noteSpliceMap ::
   MN.Note ->
   H.Splices (HI.Splice Identity)
 noteSpliceMap withCtx model note = do
-  "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
+  "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx id (MN._noteTitle note)
   "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
