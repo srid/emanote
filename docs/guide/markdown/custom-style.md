@@ -45,6 +45,35 @@ Using [fenced_divs](https://github.com/jgm/commonmark-hs/blob/master/commonmark-
 ![[file-links]]
 :::
 
+## Customizing Default Styling and Templates
+
+Emanote allows you to customize the appearance of HTML components without the need for
+manual styling each time. This can be accomplished by overriding default templates in your
+notebook.
+
+To start customizing, create a templates directory in your notebook. From there, you can
+override any templates you wish by copying them from Emanote's default templates into your
+notebook's templates directory. For example, if you want to customize the default pandoc
+styling, you can copy the [pandoc.tpl](https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl)
+file from Emanote's GitHub repository into your templates/components directory and edit it
+accordingly.
+
+This customization process works through a "union" of the default layer (provided by
+Emanote) and your notebook's layer. Essentially, it's similar to the `unionfs` concept -
+both the default layer and your notebook are union-mounted in Haskell using
+[srid/unionmount](https://github.com/srid/unionmount). This way, you only need to copy and
+modify the specific files you want to override, without affecting the rest of the default templates.
+
+Several users have successfully implemented this customization approach in their projects.
+Refer to the following examples for inspiration:
+
+- [srid/srid](https://github.com/srid/srid/tree/master/templates)
+- [TheNeikos/hemera.systems](https://github.com/TheNeikos/hemera.systems/tree/master/content/templates)
+- [gil0mendes](https://gitlab.com/gil0mendes/website/-/tree/live/content/templates)
+- [ChenghaoMou/chenghaomou](https://github.com/ChenghaoMou/chenghaomou.github.io/tree/master/templates)
+
+For additional information and discussion on this topic, check out
+[this discussion on GitHub](https://github.com/srid/emanote/discussions/438).
 
 [^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accepting non-standard class names, such as the Tailwind responsive classes (eg. `lg:grid-cols-2`).
 
