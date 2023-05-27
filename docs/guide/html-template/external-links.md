@@ -27,7 +27,7 @@ Note that the attribute can also be used to display the icons in the [[html-temp
 
 ## URL properties
 
-The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is [[custom-style|customized using CSS]]. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the <https://github.com/srid/emanote/blob/master/default/templates/base.tpl> of [[html-template|HTML template]] for details.
+The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is [[custom-style|customized using CSS]]. By default, Emanote displays a different icon if the URI scheme component is `mailto:`. Check the <https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl> of [[html-template|HTML template]] for details.
 
 ## Demo
 
