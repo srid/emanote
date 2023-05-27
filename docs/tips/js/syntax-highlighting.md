@@ -25,7 +25,7 @@ page:
     </with>
 ```
 
-(The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/default/index.yaml).)
+(The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
 
 ## Example (highlight.js)
 
