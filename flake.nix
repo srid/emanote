@@ -85,7 +85,7 @@
             # ema.source = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
           };
           settings = {
-            emanote = { name, self, super, pkgs, ... }: {
+            emanote = { name, pkgs, self, super, ... }: {
               imports = [
                 ./nix/removeReferencesTo.nix
               ];
@@ -96,7 +96,8 @@
                 self.pandoc-types
                 self.warp
               ];
-              custom = pkg: builtins.trace "Emanote outputs: ${builtins.toJSON pkg.meta.outputsToInstall}" pkg;
+              custom = pkg:
+                builtins.trace "Emanote outputs: ${builtins.toJSON pkg.meta.outputsToInstall}" super.emanote;
             };
           };
         };

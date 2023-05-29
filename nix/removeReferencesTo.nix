@@ -1,4 +1,4 @@
-{ config, lib, mkCabalSettingOptions, ... }:
+{ lib, mkCabalSettingOptions, ... }:
 
 let
   inherit (lib)
@@ -6,7 +6,6 @@ let
 in
 {
   options = mkCabalSettingOptions {
-    inherit config;
     name = "removeReferencesTo";
     type = types.listOf types.package;
     description = ''
