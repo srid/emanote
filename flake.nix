@@ -9,7 +9,6 @@
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake/packages-ng";
-    # haskell-flake.url = "path:/Users/srid/code/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
@@ -40,21 +39,6 @@
       ];
       debug = true;
 
-      # Sensible Haskell overrides for local packages.
-      flake.haskellFlakeProjectModules.localDefaults = { lib, config, ... }: {
-        settings =
-          let
-            localPackages = lib.filterAttrs (_: p: p.local) config.packages;
-          in
-          lib.mapAttrs
-            (name: p: {
-              haddock = false; # Because, this is end-user software. No need for library docs.
-              libraryProfiling = false; # Avoid double-compilation.
-              justStaticExecutables = p.cabal.executables != [ ]; # Reduce closure size
-            })
-            localPackages;
-      };
-
       perSystem = { pkgs, lib, config, system, ... }: {
         cachix-push.cacheName = "srid";
         _module.args = import inputs.nixpkgs {
@@ -71,8 +55,8 @@
           projectFlakeName = "emanote";
           debug = true;
           imports = [
-            inputs.self.haskellFlakeProjectModules.localDefaults
             inputs.ema.haskellFlakeProjectModules.output
+            ./nix/local-defaults.nix
           ];
           devShell.tools = hp: {
             inherit (pkgs)
