@@ -56,7 +56,6 @@
           debug = true;
           imports = [
             inputs.ema.haskellFlakeProjectModules.output
-            ./nix/local-defaults.nix
           ];
           devShell.tools = hp: {
             inherit (pkgs)
