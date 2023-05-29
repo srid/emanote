@@ -86,6 +86,9 @@
           };
           settings = {
             emanote = { name, self, super, pkgs, ... }: {
+              imports = [
+                ./nix/removeReferencesTo.nix
+              ];
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
               removeReferencesTo = [
