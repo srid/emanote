@@ -23,7 +23,7 @@ in
         inherit disallowedReferences;
         postInstall = (old.postInstall or "") + ''
           ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-          ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
+          ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/* $bin/bin/*\n") disallowedReferences)}
         '';
       });
   };

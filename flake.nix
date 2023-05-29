@@ -75,6 +75,7 @@
               ];
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
+              justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
                 self.pandoc-types

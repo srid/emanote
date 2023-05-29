@@ -8,7 +8,7 @@
       (name: p: {
         haddock = false; # Because, this is end-user software. No need for library docs.
         libraryProfiling = false; # Avoid double-compilation.
-        justStaticExecutables = p.cabal.executables != [ ]; # Reduce closure size
+        separateBinOutput = p.cabal.executables != [ ]; # Reduce closure size
       })
       localPackages;
 }
