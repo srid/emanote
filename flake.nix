@@ -21,8 +21,6 @@
     ema.inputs.check-flake.follows = "check-flake";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
-
-    cachix-push.url = "github:juspay/cachix-push";
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -32,7 +30,6 @@
         inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        inputs.cachix-push.flakeModule
         ./nix/flake-module.nix
         ./nix/docker.nix
         ./nix/stork.nix
@@ -40,7 +37,6 @@
       debug = true;
 
       perSystem = { pkgs, lib, config, system, ... }: {
-        cachix-push.cacheName = "srid";
         _module.args = import inputs.nixpkgs {
           inherit system;
           overlays = [
@@ -74,7 +70,6 @@
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
               justStaticExecutables = true;
-              # triggerRebuild = "blah";
               removeReferencesTo = [
                 self.pandoc
                 self.pandoc-types
