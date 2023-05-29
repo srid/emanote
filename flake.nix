@@ -65,7 +65,6 @@
 
           packages = {
             commonmark-extensions.source = "0.2.3.2";
-            # ema.source = lib.mkForce "0.8.2.0"; #  lib.mkForce (inputs.ema2 + /ema);
           };
           settings = {
             emanote = { name, pkgs, self, super, ... }: {
@@ -75,13 +74,12 @@
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
               justStaticExecutables = true;
+              # triggerRebuild = "blah";
               removeReferencesTo = [
                 self.pandoc
                 self.pandoc-types
                 self.warp
               ];
-              custom = pkg:
-                builtins.trace "Emanote outputs: ${builtins.toJSON pkg.meta.outputsToInstall}" super.emanote;
             };
           };
         };
