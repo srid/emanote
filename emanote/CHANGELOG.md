@@ -6,6 +6,8 @@
   - Make Stork recognize orgmode notes ([\#413](https://github.com/srid/emanote/issues/413))
 - Features
   - Audio embedding ([\#418](https://github.com/srid/emanote/pull/418))
+- UI
+  - Remove inline styling of H2 elements
 - Misc
   - Update Ema to simplify the live server websocket observation logic
 
