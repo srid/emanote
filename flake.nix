@@ -67,6 +67,7 @@
               ];
               check = false;
               extraBuildDepends = [ pkgs.stork-emanote ];
+              separateBinOutput = false;  # removeReferencesTo.nix doesn't work otherwise
               justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
