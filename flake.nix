@@ -32,7 +32,6 @@
         inputs.treefmt-nix.flakeModule
         ./nix/flake-module.nix
         ./nix/docker.nix
-        ./nix/stork.nix
       ];
 
       perSystem = { pkgs, lib, config, system, ... }: {
@@ -40,7 +39,9 @@
           inherit system;
           overlays = [
             (self: super: {
-              stork-emanote = config.packages.stork;
+              # Stork is marked as broken on intel mac, but it does work.
+              # Unfortunately we cannot test this code PATH due to lack of CI for intel mac (#335).
+              stork = if system == "x86_64-darwin" then super.stork.overrideAttrs (_oa: { meta.broken = false; }) else super.stork;
             })
           ];
         };
@@ -53,7 +54,7 @@
           ];
           devShell.tools = hp: {
             inherit (pkgs)
-              stork-emanote;
+              stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
 
@@ -66,7 +67,7 @@
                 ./nix/removeReferencesTo.nix
               ];
               check = false;
-              extraBuildDepends = [ pkgs.stork-emanote ];
+              extraBuildDepends = [ pkgs.stork ];
               separateBinOutput = false; # removeReferencesTo.nix doesn't work otherwise
               justStaticExecutables = true;
               removeReferencesTo = [
