@@ -2,11 +2,11 @@ module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
-import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
+import Emanote.Model.StaticFile (StaticFileInfo (..), staticFileInfoToName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
@@ -76,49 +76,20 @@ embedResourceRoute model ctx note = do
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
-  let fp = staticFile ^. SF.staticFilePath
-      url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
-  if
-      | any (`T.isSuffixOf` toText fp) imageExts ->
-          pure . runEmbedTemplate "image" $ do
-            "ema:url" ## HI.textSplice url
-            "ema:alt" ## HI.textSplice altText
-      | any (`T.isSuffixOf` toText fp) videoExts -> do
-          pure . runEmbedTemplate "video" $ do
-            "ema:url" ## HI.textSplice url
-      | any (`T.isSuffixOf` toText fp) audioExts -> do
-          pure . runEmbedTemplate "audio" $ do
-            "ema:url" ## HI.textSplice url
-      | ".pdf" `T.isSuffixOf` toText fp -> do
-          pure . runEmbedTemplate "pdf" $ do
-            "ema:url" ## HI.textSplice url
-      | otherwise -> Nothing
+  let url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
 
-imageExts :: [Text]
-imageExts =
-  [ ".jpg"
-  , ".jpeg"
-  , ".png"
-  , ".svg"
-  , ".gif"
-  , ".bmp"
-  , ".webp"
-  ]
+  staticFileInfo <- SF._staticFileInfo staticFile
 
-videoExts :: [Text]
-videoExts =
-  [ ".mp4"
-  , ".webm"
-  , ".ogv"
-  ]
-
-audioExts :: [Text]
-audioExts =
-  [ ".aac"
-  , ".caf"
-  , ".flac"
-  , ".mp3"
-  , ".ogg"
-  , ".wav"
-  , ".wave"
-  ]
+  pure . runEmbedTemplate (staticFileInfoToName staticFileInfo) $ do
+    case staticFileInfo of
+      StaticFileInfoImage -> do
+        "ema:url" ## HI.textSplice url
+        "ema:alt" ## HI.textSplice altText
+      StaticFileInfoVideo ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoAudio ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoPDF ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoCode content -> do
+        "ema:content" ## HI.textSplice content

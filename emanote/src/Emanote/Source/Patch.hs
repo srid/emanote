@@ -13,6 +13,7 @@ import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
+import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
@@ -145,7 +146,10 @@ patchModel' layers noteF storkIndexTVar fpType fp action = do
                       _ -> log . ("Re-registering" <>)
                 logF $ " file: " <> toText fpAbs <> " " <> show r
                 t <- liftIO getCurrentTime
-                pure $ M.modelInsertStaticFile t r fpAbs
+
+                mbStaticFileInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
+
+                pure $ M.modelInsertStaticFile t r fpAbs mbStaticFileInfo
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
 
