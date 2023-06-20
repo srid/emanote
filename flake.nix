@@ -21,8 +21,6 @@
     ema.inputs.check-flake.follows = "check-flake";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
-
-    cachix-push.url = "github:juspay/cachix-push";
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -32,55 +30,53 @@
         inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        inputs.cachix-push.flakeModule
         ./nix/flake-module.nix
         ./nix/docker.nix
-        ./nix/stork.nix
       ];
-      perSystem = { pkgs, lib, config, ... }: {
-        cachix-push.cacheName = "srid";
+
+      perSystem = { pkgs, lib, config, system, ... }: {
+        _module.args = import inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            (self: super: {
+              # Stork is marked as broken on intel mac, but it does work.
+              # Unfortunately we cannot test this code PATH due to lack of CI for intel mac (#335).
+              stork = if system == "x86_64-darwin" then super.stork.overrideAttrs (_oa: { meta.broken = false; }) else super.stork;
+            })
+          ];
+        };
 
         # haskell-flake configuration
         haskellProjects.default = {
+          projectFlakeName = "emanote";
           imports = [
             inputs.ema.haskellFlakeProjectModules.output
           ];
           devShell.tools = hp: {
-            inherit (config.packages)
+            inherit (pkgs)
               stork;
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
-          overrides = with pkgs.haskell.lib;
-            let
-              # Remove the given references from drv's executables.
-              # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
-              removeReferencesTo = disallowedReferences: drv:
-                drv.overrideAttrs (old: rec {
-                  inherit disallowedReferences;
-                  # Ditch data dependencies that are not needed at runtime.
-                  # cf. https://github.com/NixOS/nixpkgs/pull/204675
-                  # cf. https://srid.ca/remove-references-to
-                  postInstall = (old.postInstall or "") + ''
-                    ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
-                  '';
-                });
-            in
-            self: super: {
-              commonmark-extensions = super.commonmark-extensions_0_2_3_2;
-              emanote =
-                lib.pipe super.emanote [
-                  (lib.flip addBuildDepends [ config.packages.stork ])
-                  dontHaddock
-                  disableLibraryProfiling
-                  justStaticExecutables
-                  (removeReferencesTo [
-                    self.pandoc
-                    self.pandoc-types
-                    self.warp
-                  ])
-                ];
+
+          packages = {
+            commonmark-extensions.source = "0.2.3.2";
+          };
+          settings = {
+            emanote = { name, pkgs, self, super, ... }: {
+              imports = [
+                ./nix/removeReferencesTo.nix
+              ];
+              check = false;
+              extraBuildDepends = [ pkgs.stork ];
+              separateBinOutput = false; # removeReferencesTo.nix doesn't work otherwise
+              justStaticExecutables = true;
+              removeReferencesTo = [
+                self.pandoc
+                self.pandoc-types
+                self.warp
+              ];
             };
+          };
         };
 
         # treefmt-nix configuration
