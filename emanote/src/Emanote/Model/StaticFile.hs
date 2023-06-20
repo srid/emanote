@@ -50,11 +50,12 @@ data StaticFileInfo where
   deriving anyclass (Aeson.ToJSON)
 
 staticFileInfoToName :: IsString s => StaticFileInfo -> s
-staticFileInfoToName StaticFileInfoImage = "image"
-staticFileInfoToName StaticFileInfoAudio = "audio"
-staticFileInfoToName StaticFileInfoVideo = "video"
-staticFileInfoToName StaticFileInfoPDF = "pdf"
-staticFileInfoToName (StaticFileInfoCode _) = "code"
+staticFileInfoToName = \case
+  StaticFileInfoImage -> "image"
+  StaticFileInfoAudio -> "audio"
+  StaticFileInfoVideo -> "video"
+  StaticFileInfoPDF -> "pdf"
+  StaticFileInfoCode _ -> "code"
 
 readStaticFileInfo ::
   Monad m =>
@@ -64,11 +65,16 @@ readStaticFileInfo ::
 readStaticFileInfo fp readFilePath = do
   let extension = toText (takeExtension fp)
   if
-      | extension `elem` imageExts -> staticFileImage
-      | extension `elem` videoExts -> staticFileVideo
-      | extension `elem` audioExts -> staticFileAudio
-      | extension == "pdf" -> staticFilePDF
-      | extension `elem` codeExts -> staticFileCode
+      | extension `elem` imageExts ->
+          pure $ Just StaticFileInfoImage
+      | extension `elem` videoExts ->
+          pure $ Just StaticFileInfoVideo
+      | extension `elem` audioExts ->
+          pure $ Just StaticFileInfoAudio
+      | extension == "pdf" ->
+          pure $ Just StaticFileInfoPDF
+      | extension `elem` codeExts ->
+          readFilePath fp <&> Just . StaticFileInfoCode
       | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
@@ -91,12 +97,5 @@ readStaticFileInfo fp readFilePath = do
       , ".ts"
       , ".php"
       ]
-    staticFileImage = return $ Just StaticFileInfoImage
-    staticFileVideo = return $ Just StaticFileInfoImage
-    staticFileAudio = return $ Just StaticFileInfoAudio
-    staticFilePDF = return $ Just StaticFileInfoPDF
-    staticFileCode =
-      readFilePath fp
-        <&> Just . StaticFileInfoCode
 
 makeLenses ''StaticFile
