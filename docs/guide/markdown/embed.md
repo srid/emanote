@@ -78,4 +78,5 @@ Right now these are the code file extensions supported:
 - `.php`
 - `.c`
 
-To include a new one please see [here](https://github.com/srid/emanote/pull/444).
+To include a new one please see [here](https://github.com/srid/emanote/pull/444). Please
+note that the wrong syntax highlighting might be applied if not using Chrome.
