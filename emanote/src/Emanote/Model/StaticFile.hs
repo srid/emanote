@@ -84,8 +84,8 @@ readStaticFileInfo fp readFilePath = do
           pure $ Just StaticFileInfoAudio
       | extension == "pdf" ->
           pure $ Just StaticFileInfoPDF
-      | extension `Map.member` codeExts ->
-          readFilePath fp <&> Just . StaticFileInfoCode (codeExts Map.! extension)
+      | Just lang <- Map.lookup extension codeExts ->
+          readFilePath fp <&> Just . StaticFileInfoCode lang
       | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
