@@ -6,6 +6,7 @@ module Emanote.Model.StaticFile where
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
+import Data.Map.Strict qualified as Map
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
@@ -45,7 +46,16 @@ data StaticFileInfo where
   StaticFileInfoAudio :: StaticFileInfo
   StaticFileInfoVideo :: StaticFileInfo
   StaticFileInfoPDF :: StaticFileInfo
-  StaticFileInfoCode :: Text -> StaticFileInfo
+  StaticFileInfoCode ::
+    -- | File code language name
+    CodeLanguage ->
+    -- | File content
+    Text ->
+    StaticFileInfo
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (Aeson.ToJSON)
+
+newtype CodeLanguage = CodeLanguage Text
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (Aeson.ToJSON)
 
@@ -54,7 +64,7 @@ staticFileInfoToName StaticFileInfoImage = "image"
 staticFileInfoToName StaticFileInfoAudio = "audio"
 staticFileInfoToName StaticFileInfoVideo = "video"
 staticFileInfoToName StaticFileInfoPDF = "pdf"
-staticFileInfoToName (StaticFileInfoCode _) = "code"
+staticFileInfoToName (StaticFileInfoCode _ _) = "code"
 
 readStaticFileInfo ::
   Monad m =>
@@ -68,35 +78,36 @@ readStaticFileInfo fp readFilePath = do
       | extension `elem` videoExts -> staticFileVideo
       | extension `elem` audioExts -> staticFileAudio
       | extension == "pdf" -> staticFilePDF
-      | extension `elem` codeExts -> staticFileCode
+      | extension `elem` Map.keys codeExts -> staticFileCode (codeExts Map.! extension)
       | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
     videoExts = [".mp4", ".webm", ".ogv"]
     audioExts = [".aac", ".caf", ".flac", ".mp3", ".ogg", ".wav", ".wave"]
     codeExts =
-      [ ".hs"
-      , ".sh"
-      , ".py"
-      , ".js"
-      , ".java"
-      , ".c"
-      , ".cpp"
-      , ".cs"
-      , ".rb"
-      , ".go"
-      , ".swift"
-      , ".kt"
-      , ".rs"
-      , ".ts"
-      , ".php"
-      ]
+      Map.fromList
+        [ (".hs", "haskell")
+        , (".sh", "bash")
+        , (".py", "python")
+        , (".js", "javascript")
+        , (".java", "java")
+        , (".c", "c")
+        , (".cpp", "cpp")
+        , (".cs", "cs")
+        , (".rb", "ruby")
+        , (".go", "go")
+        , (".swift", "swift")
+        , (".kt", "kotlin")
+        , (".rs", "rust")
+        , (".ts", "typescript")
+        , (".php", "php")
+        ]
     staticFileImage = return $ Just StaticFileInfoImage
     staticFileVideo = return $ Just StaticFileInfoImage
     staticFileAudio = return $ Just StaticFileInfoAudio
     staticFilePDF = return $ Just StaticFileInfoPDF
-    staticFileCode =
+    staticFileCode l =
       readFilePath fp
-        <&> Just . StaticFileInfoCode
+        <&> Just . StaticFileInfoCode (CodeLanguage l)
 
 makeLenses ''StaticFile

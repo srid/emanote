@@ -6,7 +6,7 @@ import Emanote.Model (Model)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.StaticFile (StaticFileInfo (..), staticFileInfoToName)
+import Emanote.Model.StaticFile (CodeLanguage (..), StaticFileInfo (..), staticFileInfoToName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
@@ -91,5 +91,6 @@ embedStaticFileRoute model altText staticFile = do
         "ema:url" ## HI.textSplice url
       StaticFileInfoPDF ->
         "ema:url" ## HI.textSplice url
-      StaticFileInfoCode content -> do
+      StaticFileInfoCode (CodeLanguage language) content -> do
         "ema:content" ## HI.textSplice content
+        "ema:language" ## HI.textSplice language
