@@ -6,7 +6,7 @@ import Emanote.Model (Model)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.StaticFile (StaticFileInfo (..), staticFileInfoToName)
+import Emanote.Model.StaticFile (StaticFileInfo (..), staticFileInfoTemplateName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
@@ -71,8 +71,8 @@ embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx preparePandoc (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
-    "ema:note:pandoc" ##
-      pandocSplice ctx (prepareNoteDoc note)
+    "ema:note:pandoc"
+      ## pandocSplice ctx (prepareNoteDoc note)
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
@@ -80,7 +80,7 @@ embedStaticFileRoute model altText staticFile = do
 
   staticFileInfo <- SF._staticFileInfo staticFile
 
-  pure . runEmbedTemplate (staticFileInfoToName staticFileInfo) $ do
+  pure . runEmbedTemplate (staticFileInfoTemplateName staticFileInfo) $ do
     case staticFileInfo of
       StaticFileInfoImage -> do
         "ema:url" ## HI.textSplice url

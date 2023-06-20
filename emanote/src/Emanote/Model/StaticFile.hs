@@ -49,8 +49,9 @@ data StaticFileInfo where
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (Aeson.ToJSON)
 
-staticFileInfoToName :: IsString s => StaticFileInfo -> s
-staticFileInfoToName = \case
+-- | Return the ${name} in the corresponding templates/filters/embed-${name}.tpl
+staticFileInfoTemplateName :: IsString s => StaticFileInfo -> s
+staticFileInfoTemplateName = \case
   StaticFileInfoImage -> "image"
   StaticFileInfoAudio -> "audio"
   StaticFileInfoVideo -> "video"
