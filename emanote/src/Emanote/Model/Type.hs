@@ -216,10 +216,10 @@ modelLookupStaticFile fp m = do
   Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
 modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> ModelT f -> ModelT f
-modelInsertStaticFile t r fp mbContent =
+modelInsertStaticFile t r fp mInfo =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
-    staticFile = StaticFile r fp t mbContent
+    staticFile = StaticFile r fp t mInfo
 
 modelDeleteStaticFile :: R.R 'AnyExt -> ModelT f -> ModelT f
 modelDeleteStaticFile r =
