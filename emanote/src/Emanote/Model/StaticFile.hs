@@ -84,7 +84,7 @@ readStaticFileInfo fp readFilePath = do
           pure $ Just StaticFileInfoAudio
       | extension == "pdf" ->
           pure $ Just StaticFileInfoPDF
-      | extension `elem` Map.keys codeExts ->
+      | extension `Map.member` codeExts ->
           readFilePath fp <&> Just . StaticFileInfoCode (codeExts Map.! extension)
       | otherwise -> return Nothing
   where
