@@ -146,10 +146,8 @@ patchModel' layers noteF storkIndexTVar fpType fp action = do
                       _ -> log . ("Re-registering" <>)
                 logF $ " file: " <> toText fpAbs <> " " <> show r
                 t <- liftIO getCurrentTime
-
-                mbStaticFileInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
-
-                pure $ M.modelInsertStaticFile t r fpAbs mbStaticFileInfo
+                mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
+                pure $ M.modelInsertStaticFile t r fpAbs mInfo
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
 

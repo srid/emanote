@@ -51,7 +51,7 @@ PDFs can be embedded using the same syntax. The following is the result of using
 
 ### Code files
 
-Code files can be embedded using the same syntax. The following is the result of using
+Source code files can be embedded using the same syntax. The following is the result of using
 `![[haskell-code.hs]]` (note that `![](haskell-code.hs)` also works):
 
 ![[haskell-code.hs]]
@@ -60,7 +60,7 @@ A C file:
 
 ![[c-code.c]]
 
-Right now these are the code file extensions supported:
+The following file extensions are currently supported:
 
 - `.hs`
 - `.sh`
@@ -79,4 +79,5 @@ Right now these are the code file extensions supported:
 - `.c`
 
 To include a new one please see [here](https://github.com/srid/emanote/pull/444). Please
-note that the wrong syntax highlighting might be applied if not using Chrome.
+note that the wrong syntax highlighting might be applied if you are on Firefox
+due to what appears to be a browser bug.
