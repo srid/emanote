@@ -77,9 +77,7 @@ embedResourceRoute model ctx note = do
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
   let url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
-
   staticFileInfo <- SF._staticFileInfo staticFile
-
   pure . runEmbedTemplate (staticFileInfoTemplateName staticFileInfo) $ do
     case staticFileInfo of
       StaticFileInfoImage -> do
@@ -94,3 +92,4 @@ embedStaticFileRoute model altText staticFile = do
       StaticFileInfoCode (CodeLanguage language) content -> do
         "ema:code:content" ## HI.textSplice content
         "ema:code:language" ## HI.textSplice language
+        "ema:alt" ## HI.textSplice altText
