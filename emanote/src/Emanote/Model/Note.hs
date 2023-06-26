@@ -19,10 +19,12 @@ import Data.Text qualified as T
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
+import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Route (FileType (Folder), R)
 import Emanote.Route qualified as R
+import Emanote.Route.Ext (FileType (Folder))
+import Emanote.Route.R (R)
 import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
@@ -279,7 +281,7 @@ parseNoteOrg s =
       pure (mempty, defaultFrontMatter)
     Right doc ->
       -- TODO: Merge Pandoc's Meta in here?
-      pure (doc, defaultFrontMatter)
+      pure (preparePandoc doc, defaultFrontMatter)
 
 parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
 parseNoteMarkdown pluginBaseDir fp md = do
@@ -293,7 +295,7 @@ parseNoteMarkdown pluginBaseDir fp md = do
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
       let filterPaths = (pluginBaseDir </>) <$> SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      doc <- applyPandocFilters filterPaths doc'
+      doc <- applyPandocFilters filterPaths $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc frontmatter
       pure (doc, meta)
   where

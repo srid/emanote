@@ -1,22 +1,14 @@
 module Emanote.Pandoc.BuiltinFilters (
-  prepareNoteDoc,
   preparePandoc,
 ) where
 
-import Emanote.Model.Note qualified as N
 import Emanote.Pandoc.ExternalLink (setExternalLinkIcon)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route (encodeRoute)
 import Emanote.Route.SiteRoute.Type (encodeTagIndexR)
-import Optics.Core ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
-
--- TODO: Run this in `parseNote`?
-prepareNoteDoc :: N.Note -> B.Pandoc
-prepareNoteDoc note =
-  preparePandoc $ note ^. N.noteDoc
 
 preparePandoc :: W.Walkable B.Inline b => b -> b
 preparePandoc =
