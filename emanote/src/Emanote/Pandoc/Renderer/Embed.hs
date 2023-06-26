@@ -36,8 +36,12 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
-    either (embedResourceRoute model ctx) (const Nothing)
+  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
+    Left r -> embedResourceRoute model ctx r
+    Right sf
+      | isJust (SF._staticFileInfo sf) ->
+          embedStaticFileRoute model (toText $ SF._staticFilePath sf) sf
+    _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
