@@ -2,11 +2,11 @@ module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
-import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
+import Emanote.Model.StaticFile (CodeLanguage (..), StaticFileInfo (..), staticFileInfoTemplateName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (prepareNoteDoc, preparePandoc)
@@ -36,8 +36,12 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
-    either (embedResourceRoute model ctx) (const Nothing)
+  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
+    Left r -> embedResourceRoute model ctx r
+    Right sf
+      | isJust (SF._staticFileInfo sf) ->
+          embedStaticFileRoute model (toText $ SF._staticFilePath sf) sf
+    _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
@@ -76,49 +80,20 @@ embedResourceRoute model ctx note = do
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
-  let fp = staticFile ^. SF.staticFilePath
-      url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
-  if
-      | any (`T.isSuffixOf` toText fp) imageExts ->
-          pure . runEmbedTemplate "image" $ do
-            "ema:url" ## HI.textSplice url
-            "ema:alt" ## HI.textSplice altText
-      | any (`T.isSuffixOf` toText fp) videoExts -> do
-          pure . runEmbedTemplate "video" $ do
-            "ema:url" ## HI.textSplice url
-      | any (`T.isSuffixOf` toText fp) audioExts -> do
-          pure . runEmbedTemplate "audio" $ do
-            "ema:url" ## HI.textSplice url
-      | ".pdf" `T.isSuffixOf` toText fp -> do
-          pure . runEmbedTemplate "pdf" $ do
-            "ema:url" ## HI.textSplice url
-      | otherwise -> Nothing
-
-imageExts :: [Text]
-imageExts =
-  [ ".jpg"
-  , ".jpeg"
-  , ".png"
-  , ".svg"
-  , ".gif"
-  , ".bmp"
-  , ".webp"
-  ]
-
-videoExts :: [Text]
-videoExts =
-  [ ".mp4"
-  , ".webm"
-  , ".ogv"
-  ]
-
-audioExts :: [Text]
-audioExts =
-  [ ".aac"
-  , ".caf"
-  , ".flac"
-  , ".mp3"
-  , ".ogg"
-  , ".wav"
-  , ".wave"
-  ]
+  let url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
+  staticFileInfo <- SF._staticFileInfo staticFile
+  pure . runEmbedTemplate (staticFileInfoTemplateName staticFileInfo) $ do
+    case staticFileInfo of
+      StaticFileInfoImage -> do
+        "ema:url" ## HI.textSplice url
+        "ema:alt" ## HI.textSplice altText
+      StaticFileInfoVideo ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoAudio ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoPDF ->
+        "ema:url" ## HI.textSplice url
+      StaticFileInfoCode (CodeLanguage language) content -> do
+        "ema:code:content" ## HI.textSplice content
+        "ema:code:language" ## HI.textSplice language
+        "ema:alt" ## HI.textSplice altText
