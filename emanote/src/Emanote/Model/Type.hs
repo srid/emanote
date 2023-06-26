@@ -27,6 +27,7 @@ import Emanote.Model.SData (IxSData, SData, sdataRoute)
 import Emanote.Model.StaticFile (
   IxStaticFile,
   StaticFile (StaticFile),
+  StaticFileInfo,
  )
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
@@ -214,11 +215,11 @@ modelLookupStaticFile fp m = do
   r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
   Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
-modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> ModelT f -> ModelT f
-modelInsertStaticFile t r fp =
+modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> ModelT f -> ModelT f
+modelInsertStaticFile t r fp mInfo =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
-    staticFile = StaticFile r fp t
+    staticFile = StaticFile r fp t mInfo
 
 modelDeleteStaticFile :: R.R 'AnyExt -> ModelT f -> ModelT f
 modelDeleteStaticFile r =

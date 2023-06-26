@@ -6,6 +6,7 @@
   - Make Stork recognize orgmode notes ([\#413](https://github.com/srid/emanote/issues/413))
 - Features
   - Audio embedding ([\#418](https://github.com/srid/emanote/pull/418))
+  - Source code embedding ([\#444](https://github.com/srid/emanote/pull/444))
 - UI
   - Remove inline styling of H2 elements
 - Misc
