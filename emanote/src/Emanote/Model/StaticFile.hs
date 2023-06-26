@@ -83,7 +83,7 @@ readStaticFileInfo fp readFilePath = do
           pure $ Just StaticFileInfoVideo
       | extension `elem` audioExts ->
           pure $ Just StaticFileInfoAudio
-      | extension == "pdf" ->
+      | extension == ".pdf" ->
           pure $ Just StaticFileInfoPDF
       | Just lang <- Map.lookup extension codeExts -> do
           code <- readFilePath fp
