@@ -7,7 +7,6 @@ import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Map.Strict qualified as Map
-import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
