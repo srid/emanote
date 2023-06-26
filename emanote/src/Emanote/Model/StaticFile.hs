@@ -7,6 +7,7 @@ import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
@@ -84,8 +85,9 @@ readStaticFileInfo fp readFilePath = do
           pure $ Just StaticFileInfoAudio
       | extension == "pdf" ->
           pure $ Just StaticFileInfoPDF
-      | Just lang <- Map.lookup extension codeExts ->
-          readFilePath fp <&> Just . StaticFileInfoCode lang
+      | Just lang <- Map.lookup extension codeExts -> do
+          code <- readFilePath fp
+          pure $ Just $ StaticFileInfoCode lang code
       | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
