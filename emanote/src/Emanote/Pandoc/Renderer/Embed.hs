@@ -92,5 +92,5 @@ embedStaticFileRoute model altText staticFile = do
       StaticFileInfoPDF ->
         "ema:url" ## HI.textSplice url
       StaticFileInfoCode (CodeLanguage language) content -> do
-        "ema:content" ## HI.textSplice content
-        "ema:language" ## HI.textSplice language
+        "ema:code:content" ## HI.textSplice content
+        "ema:code:language" ## HI.textSplice language
