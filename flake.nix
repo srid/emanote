@@ -58,9 +58,6 @@
             treefmt = config.treefmt.build.wrapper;
           } // config.treefmt.build.programs;
 
-          packages = {
-            commonmark-extensions.source = "0.2.3.2";
-          };
           settings = {
             emanote = { name, pkgs, self, super, ... }: {
               imports = [

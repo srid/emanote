@@ -97,7 +97,7 @@ common library-common
     , blaze-html
     , bytestring
     , commonmark
-    , commonmark-extensions  <0.2.3.3
+    , commonmark-extensions  >=0.2.3.4
     , commonmark-pandoc
     , commonmark-simple
     , commonmark-wikilink
@@ -223,7 +223,7 @@ executable emanote
     build-depends: emanote
 
 test-suite test
-  import:         library-common 
+  import:         library-common
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
   main-is:        Spec.hs
