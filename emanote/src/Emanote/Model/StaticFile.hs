@@ -96,6 +96,7 @@ readStaticFileInfo fp readFilePath = do
       CodeLanguage
         <$> Map.fromList
           [ (".hs", "haskell")
+          , (".nix", "nix")
           , (".sh", "bash")
           , (".py", "python")
           , (".js", "javascript")
