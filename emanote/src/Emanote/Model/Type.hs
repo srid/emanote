@@ -21,6 +21,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note (
   IxNote,
   Note,
+  noteHasFeed,
  )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
@@ -242,6 +243,18 @@ modelLookupNoteByHtmlRoute r =
   Rel.resolvedRelTargetFromCandidates
     . N.lookupNotesByHtmlRoute r
     . _modelNotes
+
+modelLookupFeedNoteByHtmlRoute :: R 'R.Xml -> ModelT f -> Maybe Note
+modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
+  Rel.RRTFound note
+    | noteHasFeed note -> pure note
+    | otherwise -> Nothing
+  _ -> Nothing
+  where
+    resolvedTarget =
+      Rel.resolvedRelTargetFromCandidates $
+        N.lookupNotesByXmlRoute r $
+          _modelNotes model
 
 modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =

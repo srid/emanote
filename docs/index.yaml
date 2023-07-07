@@ -5,3 +5,6 @@ page:
   siteTitle: Emanote
   headHtml: |
     <snippet var="js.highlightjs" />
+
+feed:
+  siteUrl: https://emanote.srid.ca

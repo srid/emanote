@@ -22,6 +22,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
+import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
 import Heist qualified as H
@@ -34,6 +35,7 @@ import Heist.Splices qualified as Heist
 import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
+import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -85,10 +87,18 @@ render m sr =
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute m = \case
-  SR.ResourceRoute_LML r -> do
+  SR.ResourceRoute_LML SR.LMLView_Html r -> do
     case M.modelLookupNoteByRoute r m of
       Just note ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
+      Nothing ->
+        -- This should never be reached because decodeRoute looks up the model.
+        error $ "Bad route: " <> show r
+  SR.ResourceRoute_LML SR.LMLView_Atom r ->
+    case M.modelLookupNoteByRoute r m of
+      Just note -> case renderFeed m note of
+        Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
+        Right feed -> Ema.AssetGenerated Ema.Other feed
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
@@ -160,6 +170,11 @@ renderLmlHtml model note = do
       HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
     "ema:note:url" ##
       HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ r)
+    "emaNoteFeedUrl" ##
+      pure . RX.renderHtmlNodes $
+        if MN.noteHasFeed note
+          then feedDiscoveryLink model note
+          else mempty
     "ema:note:backlinks" ##
       backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model

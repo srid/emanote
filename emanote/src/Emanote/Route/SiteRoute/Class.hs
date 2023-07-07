@@ -1,6 +1,7 @@
 module Emanote.Route.SiteRoute.Class (
   decodeVirtualRoute,
   noteFileSiteRoute,
+  noteFeedSiteRoute,
   staticFileSiteRoute,
   lmlSiteRoute,
   indexRoute,
@@ -41,6 +42,11 @@ emanoteGeneratableRoutes model =
         model ^. M.modelNotes
           & Ix.toList
           <&> noteFileSiteRoute
+      feedRoutes =
+        model ^. M.modelNotes
+          & Ix.toList
+          & filter N.noteHasFeed
+          <&> noteFeedSiteRoute
       staticRoutes =
         let includeFile f =
               not (LiveServerFile.isLiveServerFile f)
@@ -63,6 +69,7 @@ emanoteGeneratableRoutes model =
               : VirtualRoute_TaskIndex
               : (VirtualRoute_TagIndex <$> toList tagPaths)
    in htmlRoutes
+        <> feedRoutes
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
 
@@ -91,7 +98,7 @@ emanoteRouteEncoder model =
 
 encodeResourceRoute :: HasCallStack => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
-  ResourceRoute_LML r ->
+  ResourceRoute_LML LMLView_Html r ->
     R.encodeRoute
       $
       -- HACK: This should never fail ... but *if* it does, consult
@@ -101,6 +108,12 @@ encodeResourceRoute model = \case
         (error $ "emanote: attempt to encode missing note: " <> show r)
         N.noteHtmlRoute
       $ M.modelLookupNoteByRoute r model
+  ResourceRoute_LML LMLView_Atom r ->
+    R.encodeRoute
+      $ fromMaybe
+        -- FIXME: See note above.
+        (error $ "emanote: attempt to encode missing feed: " <> show r)
+      $ N.noteXmlRoute =<< M.modelLookupNoteByRoute r model
   ResourceRoute_StaticFile r _fpAbs ->
     R.encodeRoute r
 
@@ -110,9 +123,14 @@ decodeGeneratedRoute model fp =
   fmap
     staticFileSiteRoute
     (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
+    <|> mFeedRoute
     <|> noteHtmlSiteRoute
       (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
   where
+    mFeedRoute :: Maybe SiteRoute
+    mFeedRoute = case R.decodeXmlRoute fp of
+      Nothing -> Nothing
+      Just r -> noteFeedSiteRoute <$> M.modelLookupFeedNoteByHtmlRoute r model
     noteHtmlSiteRoute :: Rel.ResolvedRelTarget N.Note -> Maybe SiteRoute
     noteHtmlSiteRoute = \case
       Rel.RRTMissing ->
@@ -125,6 +143,9 @@ decodeGeneratedRoute model fp =
     ambiguousNoteURLsRoute ns =
       SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
+noteFeedSiteRoute :: N.Note -> SiteRoute
+noteFeedSiteRoute = SiteRoute_ResourceRoute . ResourceRoute_LML LMLView_Atom . N._noteRoute
+
 noteFileSiteRoute :: N.Note -> SiteRoute
 noteFileSiteRoute =
   lmlSiteRoute . N._noteRoute
@@ -134,7 +155,7 @@ lmlSiteRoute =
   SiteRoute_ResourceRoute . lmlResourceRoute
 
 lmlResourceRoute :: LMLRoute -> ResourceRoute
-lmlResourceRoute = ResourceRoute_LML
+lmlResourceRoute = ResourceRoute_LML LMLView_Html
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
@@ -174,7 +195,7 @@ siteRouteUrl model sr =
         case rr of
           ResourceRoute_StaticFile sfR _fp ->
             Just sfR
-          ResourceRoute_LML _ ->
+          ResourceRoute_LML _ _ ->
             Nothing
       SiteRoute_VirtualRoute _ -> Nothing
 

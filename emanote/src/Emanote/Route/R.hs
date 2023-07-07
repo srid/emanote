@@ -88,6 +88,14 @@ encodeRoute (R slugs) =
   let parts = Slug.unSlug <$> slugs
    in withExt @a @ft $ toString $ T.intercalate "/" (toList parts)
 
+decodeXmlRoute :: FilePath -> Maybe (R 'Xml)
+decodeXmlRoute fp = case T.stripSuffix ".xml" (toText fp) of
+  Nothing -> Nothing
+  Just base -> case T.splitOn "/" base of
+    [] -> Nothing
+    [""] -> Nothing
+    x : xs -> Just $ R $ fmap Slug.decodeSlug (x :| xs)
+
 -- | Parse our route from html file path
 decodeHtmlRoute :: FilePath -> R 'Html
 decodeHtmlRoute fp = do

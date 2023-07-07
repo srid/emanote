@@ -107,6 +107,7 @@ common library-common
     , deriving-aeson
     , directory
     , ema                    >=0.10.1
+    , feed
     , filepath
     , filepattern
     , fsnotify
@@ -201,6 +202,7 @@ library
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export
+    Emanote.View.Feed
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
     Emanote.View.TaskIndex
