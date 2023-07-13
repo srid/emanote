@@ -8,7 +8,8 @@ pipeline {
         }
         stage ('Build') {
             steps {
-                nixBuildAll ()
+                // https://github.com/srid/nixci
+                nixCI ()
             }
         }
         stage ('Cachix push') {
