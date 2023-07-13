@@ -26,6 +26,7 @@ jobs:
           nix build -j auto --no-link .#check -L
       - name: Build as docker img
         id: build
+        if: github.ref == 'refs/heads/master'
         run: |
           nix build -j auto -o docker-img .#dockerImage
           # docker
