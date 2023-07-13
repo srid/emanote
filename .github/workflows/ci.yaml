@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - nix-magic-cache
 jobs:
   build:
     runs-on: ubuntu-latest
