@@ -3,6 +3,7 @@
 [![AGPL](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://en.wikipedia.org/wiki/Affero_General_Public_License)
 [![built with nix](https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos&labelColor=73C3D5)](https://builtwithnix.org)
 [![Matrix](https://img.shields.io/matrix/ema:matrix.org)](https://app.element.io/#/room/#ema:matrix.org "Chat on Matrix")
+[![Unwoke](https://img.shields.io/badge/unwoke-8A2BE2)](https://srid.ca/unwoke)
 
 Emanote emanates[^def] a structured view of your plain-text notes.
 
