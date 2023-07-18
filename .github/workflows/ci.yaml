@@ -9,16 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main        
+      - uses: nixbuild/nix-quick-install-action@v21
+        with:
+          nix_conf: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v11
+        with:
+          name: srid
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build Nix
         id: build-nix
         run: |
           nix run github:srid/nixci
       - name: Build as docker img
         id: build
-        if: github.ref == 'refs/heads/master'
         run: |
           nix build -j auto -o docker-img .#dockerImage
           # docker
