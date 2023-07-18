@@ -15,11 +15,7 @@ jobs:
       - name: Build Nix
         id: build-nix
         run: |
-          nix build -j auto --no-link
-          nix path-info -rSh .#default | sort -rhk2 | head
-      - name: Flake check
-        run: |
-          nix build -j auto --no-link .#check -L
+          nix run github:srid/nixci
       - name: Build as docker img
         id: build
         if: github.ref == 'refs/heads/master'
