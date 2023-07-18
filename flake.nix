@@ -55,8 +55,8 @@
           devShell.tools = hp: {
             inherit (pkgs)
               stork;
-            treefmt = config.treefmt.build.wrapper;
-          } // config.treefmt.build.programs;
+          };
+          autoWire = [ "packages" "apps" "checks" ];
 
           settings = {
             emanote = { name, pkgs, self, super, ... }: {
@@ -100,6 +100,12 @@
 
         packages.default = config.packages.emanote;
         apps.default = config.apps.emanote;
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [
+            config.haskellProjects.default.outputs.devShell
+            config.treefmt.build.devShell
+          ];
+        };
 
         emanote = {
           package = config.packages.default;
