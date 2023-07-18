@@ -17,9 +17,7 @@
     },
     "ema": {
       "inputs": {
-        "check-flake": [
-          "check-flake"
-        ],
+        "check-flake": "check-flake",
         "flake-parts": [
           "flake-parts"
         ],
@@ -134,7 +132,6 @@
     },
     "root": {
       "inputs": {
-        "check-flake": "check-flake",
         "ema": "ema",
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
