@@ -35,15 +35,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1685469753,
-        "narHash": "sha256-97b7df7/9yaMzv/Rl1mF5dH7dEsR/DMQAHZX3qEzE7U=",
-        "owner": "srid",
+        "lastModified": 1679254043,
+        "narHash": "sha256-jp3fbXX8G7tarpxlDoyigDJWjoQbKLHC4aASrO6UIlE=",
+        "owner": "lucasvreis",
         "repo": "ema",
-        "rev": "5d47724589b1b1bce4b49279e800254114a1c88a",
+        "rev": "46aad402509ab73a075aae47495a50e35265e4e4",
         "type": "github"
       },
       "original": {
-        "owner": "srid",
+        "owner": "lucasvreis",
+        "ref": "customize-server",
         "repo": "ema",
         "type": "github"
       }
@@ -138,7 +139,8 @@
         "haskell-flake": "haskell-flake",
         "nixpkgs": "nixpkgs",
         "systems": "systems",
-        "treefmt-nix": "treefmt-nix"
+        "treefmt-nix": "treefmt-nix",
+        "unionmount": "unionmount"
       }
     },
     "systems": {
@@ -173,6 +175,23 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "unionmount": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683486146,
+        "narHash": "sha256-xVi9tB6nJHqSfQnjLU4n8KDscq2ON/IGEWzO3tBxiRs=",
+        "owner": "lucasvreis",
+        "repo": "unionmount",
+        "rev": "5fef2d328b5c15b9feec7ca0dd71d2d403c39941",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lucasvreis",
+        "ref": "master",
+        "repo": "unionmount",
         "type": "github"
       }
     }

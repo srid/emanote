@@ -13,12 +13,15 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
 
-    ema.url = "github:srid/ema";
+    ema.url = "github:lucasvreis/ema/customize-server";
     ema.inputs.nixpkgs.follows = "nixpkgs";
     ema.inputs.haskell-flake.follows = "haskell-flake";
     ema.inputs.flake-parts.follows = "flake-parts";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
+
+    unionmount.url = "github:lucasvreis/unionmount/master";
+    unionmount.flake = false;
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -52,8 +55,14 @@
           devShell.tools = hp: {
             inherit (pkgs)
               stork;
+            ghcid = null;
           };
           autoWire = [ "packages" "apps" "checks" ];
+
+          packages = {
+            unionmount.source = inputs.unionmount;
+            fsnotify.source = "0.4.1.0";  # Not in nixpkgs, yet.
+          };
 
           settings = {
             emanote = { name, pkgs, self, super, ... }: {
