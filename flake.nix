@@ -20,7 +20,7 @@
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
 
-    unionmount.url = "github:lucasvreis/unionmount/master";
+    unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
   };
   outputs = inputs:
@@ -60,7 +60,7 @@
 
           packages = {
             unionmount.source = inputs.unionmount;
-            fsnotify.source = "0.4.1.0";  # Not in nixpkgs, yet.
+            fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
             ghcid.source = "0.8.8";
           };
 
