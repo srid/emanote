@@ -35,16 +35,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1679254043,
-        "narHash": "sha256-jp3fbXX8G7tarpxlDoyigDJWjoQbKLHC4aASrO6UIlE=",
-        "owner": "lucasvreis",
+        "lastModified": 1685469753,
+        "narHash": "sha256-97b7df7/9yaMzv/Rl1mF5dH7dEsR/DMQAHZX3qEzE7U=",
+        "owner": "srid",
         "repo": "ema",
-        "rev": "46aad402509ab73a075aae47495a50e35265e4e4",
+        "rev": "5d47724589b1b1bce4b49279e800254114a1c88a",
         "type": "github"
       },
       "original": {
-        "owner": "lucasvreis",
-        "ref": "customize-server",
+        "owner": "srid",
         "repo": "ema",
         "type": "github"
       }

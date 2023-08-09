@@ -13,7 +13,7 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
 
-    ema.url = "github:lucasvreis/ema/customize-server";
+    ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
     ema.inputs.haskell-flake.follows = "haskell-flake";
     ema.inputs.flake-parts.follows = "flake-parts";
