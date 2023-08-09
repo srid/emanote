@@ -55,16 +55,17 @@
           devShell.tools = hp: {
             inherit (pkgs)
               stork;
-            ghcid = null;
           };
           autoWire = [ "packages" "apps" "checks" ];
 
           packages = {
             unionmount.source = inputs.unionmount;
             fsnotify.source = "0.4.1.0";  # Not in nixpkgs, yet.
+            ghcid.source = "0.8.8";
           };
 
           settings = {
+            fsnotify.check = false;
             emanote = { name, pkgs, self, super, ... }: {
               imports = [
                 ./nix/removeReferencesTo.nix
