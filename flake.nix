@@ -19,6 +19,9 @@
     ema.inputs.flake-parts.follows = "flake-parts";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
+
+    unionmount.url = "github:srid/unionmount";
+    unionmount.flake = false;
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -55,7 +58,14 @@
           };
           autoWire = [ "packages" "apps" "checks" ];
 
+          packages = {
+            unionmount.source = inputs.unionmount;
+            fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
+            ghcid.source = "0.8.8";
+          };
+
           settings = {
+            fsnotify.check = false;
             emanote = { name, pkgs, self, super, ... }: {
               imports = [
                 ./nix/removeReferencesTo.nix
