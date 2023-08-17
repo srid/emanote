@@ -169,7 +169,7 @@ renderLmlHtml model note = do
       backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
     "ema:note:uptree" ##
-      Splices.treeSplice (const ()) folgeAnc $
+      Splices.treeSplice (\_ _ -> ()) folgeAnc $
         \(last -> nodeRoute) children -> do
           "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
           "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
@@ -182,7 +182,7 @@ renderLmlHtml model note = do
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
-  Monad n =>
+  (Monad n) =>
   C.TemplateRenderCtx n ->
   Maybe R.LMLRoute ->
   Model ->
@@ -199,7 +199,7 @@ routeTreeSplice tCtx mr model = do
           mkLmlRoute =
             M.resolveLmlRoute model . R.mkRouteFromSlugs
           lmlRouteSlugs = R.withLmlRoute R.unRoute
-       in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+       in Splices.treeSplice (\tr _ -> getOrder . mkLmlRoute $ tr) tree $ \(mkLmlRoute -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
             let isActiveNode = Just nodeRoute == mr
@@ -217,7 +217,7 @@ routeTreeSplice tCtx mr model = do
             "tree:open" ## Heist.ifElseISplice openTree
     )
 
-lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
+lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
 lookupTemplateName meta =
   encodeUtf8 $ SData.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
   where

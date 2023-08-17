@@ -96,18 +96,34 @@
         "type": "github"
       }
     },
-    "nixpkgs": {
+    "heist-extra": {
+      "flake": false,
       "locked": {
-        "lastModified": 1691464053,
-        "narHash": "sha256-D21ctOBjr2Y3vOFRXKRoFr6uNBvE8q5jC4RrMxRZXTM=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "844ffa82bbe2a2779c86ab3a72ff1b4176cec467",
+        "lastModified": 1691619499,
+        "narHash": "sha256-4e8v5t4FM99pdcPhohP3dAeGtsFnirbfYGpbr2+qWxI=",
+        "owner": "srid",
+        "repo": "heist-extra",
+        "rev": "54ff970f733dd45b5509d1c4c298927b6241041b",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
+        "owner": "srid",
+        "repo": "heist-extra",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1692296088,
+        "narHash": "sha256-cs7cr5kX3FLxvL1Lg1m6crFYUFxedsiIDUTns/6BV+s=",
+        "owner": "srid",
+        "repo": "nixpkgs",
+        "rev": "0e467325e2e48a37b8c8ac2f9380eaee447ca8a0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "ref": "streamly09",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -136,6 +152,7 @@
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
         "haskell-flake": "haskell-flake",
+        "heist-extra": "heist-extra",
         "nixpkgs": "nixpkgs",
         "systems": "systems",
         "treefmt-nix": "treefmt-nix",

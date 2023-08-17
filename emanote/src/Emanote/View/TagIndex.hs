@@ -67,7 +67,7 @@ mkTagIndex model tagPath' =
     lookupForestMust path =
       fromMaybe (error $ "Tag not found in forest: " <> show path)
         . lookupForest path
-    lookupForest :: Eq k => NonEmpty k -> Forest (k, a) -> Maybe (Tree (k, a))
+    lookupForest :: (Eq k) => NonEmpty k -> Forest (k, a) -> Maybe (Tree (k, a))
     lookupForest (k :| ks') trees =
       case nonEmpty ks' of
         Nothing ->

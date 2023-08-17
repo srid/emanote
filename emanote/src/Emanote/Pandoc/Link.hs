@@ -25,7 +25,7 @@ parseInlineRef = \case
 {- | Given an inline that is known to be an InlineRef, reconstruct and return
  its orginal Markdown source.
 -}
-unParseLink :: HasCallStack => B.Inline -> Text
+unParseLink :: (HasCallStack) => B.Inline -> Text
 unParseLink inl =
   case WL.wikiLinkInlineRendered inl of
     Just url ->

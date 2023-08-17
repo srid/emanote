@@ -126,7 +126,7 @@ inlinesWithWikiLinksPlainified = W.walk $ \case
   x -> x
 
 replaceLinkNodeWithRoute ::
-  HasCallStack =>
+  (HasCallStack) =>
   Model ->
   SR.SiteRoute ->
   ([B.Inline], Text) ->

@@ -66,7 +66,7 @@ emanoteGeneratableRoutes model =
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
 
-emanoteRouteEncoder :: HasCallStack => ModelEma -> Prism' FilePath SiteRoute
+emanoteRouteEncoder :: (HasCallStack) => ModelEma -> Prism' FilePath SiteRoute
 emanoteRouteEncoder model =
   prism' enc dec
   where
@@ -89,7 +89,7 @@ emanoteRouteEncoder model =
         <|> decodeGeneratedRoute model fp
         <|> pure (SiteRoute_MissingR fp)
 
-encodeResourceRoute :: HasCallStack => ModelEma -> ResourceRoute -> FilePath
+encodeResourceRoute :: (HasCallStack) => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
   ResourceRoute_LML r ->
     R.encodeRoute
@@ -144,13 +144,13 @@ staticFileSiteRoute =
     staticResourceRoute = uncurry ResourceRoute_StaticFile
 
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
-siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
+siteRouteUrlStatic :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrlStatic model =
   Ema.routeUrlWith (urlStrategy model) rp
   where
     (rp, _) = M.withoutRoutePrism model
 
-siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
+siteRouteUrl :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
   siteRouteUrlStatic model sr
     <> siteRouteQuery
