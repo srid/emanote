@@ -6,6 +6,7 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-old.url = "github:nixos/nixpkgs/nixos-23.05";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -58,6 +59,7 @@
           devShell.tools = hp: {
             inherit (pkgs)
               stork;
+            fourmolu = config.treefmt.programs.ormolu.package;
           };
           autoWire = [ "packages" "apps" "checks" ];
 
@@ -69,6 +71,10 @@
           };
 
           settings = {
+            /* fourmolu = { super, ... }: {
+              custom = _: super.fourmolu_0_10_1_0;
+              # check = false;
+            }; */
             fsnotify.check = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
@@ -107,7 +113,8 @@
           programs.hlint.enable = true;
 
           # We use fourmolu
-          programs.ormolu.package = pkgs.haskellPackages.fourmolu;
+          # TODO: Switch to latest fourmolu once there are no ongoing PRs.
+          programs.ormolu.package = inputs.nixpkgs-old.legacyPackages.${system}.haskellPackages.fourmolu;
           settings.formatter.ormolu = {
             options = [
               "--ghc-opt"
