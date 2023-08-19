@@ -74,8 +74,8 @@ embedResourceRoute model ctx note = do
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx id (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
-    "ema:note:pandoc"
-      ## pandocSplice ctx (note ^. MN.noteDoc)
+    "ema:note:pandoc" ##
+      pandocSplice ctx (note ^. MN.noteDoc)
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do

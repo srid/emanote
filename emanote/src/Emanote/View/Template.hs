@@ -156,41 +156,41 @@ renderLmlHtml model note = do
                   Splices.pandocSplice ctx' ctxDoc
     -- Sidebar navigation
     routeTreeSplice ctx (Just r) model
-    "ema:breadcrumbs"
-      ## C.routeBreadcrumbs ctx model r
+    "ema:breadcrumbs" ##
+      C.routeBreadcrumbs ctx model r
     -- Note stuff
-    "ema:note:title"
-      ## C.titleSplice ctx (note ^. MN.noteTitle)
+    "ema:note:title" ##
+      C.titleSplice ctx (note ^. MN.noteTitle)
     let modelRoute = R.ModelRoute_LML R.LMLView_Html r
-    "ema:note:source-path"
-      ## HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
-    "ema:note:url"
-      ## HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
+    "ema:note:source-path" ##
+      HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
+    "ema:note:url" ##
+      HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
     "emaNoteFeedUrl"
       ## pure
-      . RX.renderHtmlNodes
+        . RX.renderHtmlNodes
       $ if MN.noteHasFeed note
         then feedDiscoveryLink model note
         else mempty
-    "ema:note:backlinks"
-      ## backlinksSplice (G.modelLookupBacklinks modelRoute model)
+    "ema:note:backlinks" ##
+      backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
-    "ema:note:backlinks:daily"
-      ## backlinksSplice backlinksDaily
-    "ema:note:backlinks:nodaily"
-      ## backlinksSplice backlinksNoDaily
+    "ema:note:backlinks:daily" ##
+      backlinksSplice backlinksDaily
+    "ema:note:backlinks:nodaily" ##
+      backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
-    "ema:note:uptree"
-      ## Splices.treeSplice (\_ _ -> ()) folgeAnc
-      $ \(last -> nodeRoute) children -> do
-        "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
-        "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
-        "tree:open" ## Heist.ifElseISplice (not . null $ children)
+    "ema:note:uptree" ##
+      Splices.treeSplice (\_ _ -> ()) folgeAnc $
+        \(last -> nodeRoute) children -> do
+          "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
+          "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
+          "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
-    "ema:note:pandoc"
-      ## C.withBlockCtx ctx
-      $ \ctx' ->
-        Splices.pandocSplice ctx' (note ^. MN.noteDoc)
+    "ema:note:pandoc" ##
+      C.withBlockCtx ctx $
+        \ctx' ->
+          Splices.pandocSplice ctx' (note ^. MN.noteDoc)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
@@ -200,34 +200,34 @@ routeTreeSplice ::
   Model ->
   H.Splices (HI.Splice Identity)
 routeTreeSplice tCtx mr model = do
-  "ema:route-tree"
-    ## ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
-             getOrder tr =
-              ( Meta.lookupRouteMeta @Int 0 (one "order") tr model
-              , tr
-              )
-             getCollapsed tr =
-              Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-             mkLmlRoute =
-              M.resolveLmlRoute model . R.mkRouteFromSlugs
-             lmlRouteSlugs = R.withLmlRoute R.unRoute
-          in Splices.treeSplice (\tr _ -> getOrder . mkLmlRoute $ tr) tree $ \(mkLmlRoute -> nodeRoute) children -> do
-              "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
-              "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
-              let isActiveNode = Just nodeRoute == mr
-                  isActiveTree =
-                    -- Active tree checking is applicable only when there is an
-                    -- active route (i.e., mr is a Just)
-                    flip (maybe True) mr $ \r ->
-                      toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
-                  openTree =
-                    isActiveTree -- Active tree is always open
-                      || not (getCollapsed nodeRoute)
-              "node:active" ## Heist.ifElseISplice isActiveNode
-              "node:terminal" ## Heist.ifElseISplice (null children)
-              "tree:childrenCount" ## HI.textSplice (show $ length children)
-              "tree:open" ## Heist.ifElseISplice openTree
-       )
+  "ema:route-tree" ##
+    ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
+          getOrder tr =
+            ( Meta.lookupRouteMeta @Int 0 (one "order") tr model
+            , tr
+            )
+          getCollapsed tr =
+            Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+          mkLmlRoute =
+            M.resolveLmlRoute model . R.mkRouteFromSlugs
+          lmlRouteSlugs = R.withLmlRoute R.unRoute
+       in Splices.treeSplice (\tr _ -> getOrder . mkLmlRoute $ tr) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+            "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
+            "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
+            let isActiveNode = Just nodeRoute == mr
+                isActiveTree =
+                  -- Active tree checking is applicable only when there is an
+                  -- active route (i.e., mr is a Just)
+                  flip (maybe True) mr $ \r ->
+                    toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
+                openTree =
+                  isActiveTree -- Active tree is always open
+                    || not (getCollapsed nodeRoute)
+            "node:active" ## Heist.ifElseISplice isActiveNode
+            "node:terminal" ## Heist.ifElseISplice (null children)
+            "tree:childrenCount" ## HI.textSplice (show $ length children)
+            "tree:open" ## Heist.ifElseISplice openTree
+    )
 
 lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
 lookupTemplateName meta =

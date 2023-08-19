@@ -36,8 +36,8 @@ renderTasks model = do
       taskGroupSplice r tasks = do
         "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, r))
         "t:note:title" ## Common.titleSplice tCtx (M.modelLookupTitle r model)
-        "t:note:breadcrumbs"
-          ## Common.routeBreadcrumbs tCtx model r
+        "t:note:breadcrumbs" ##
+          Common.routeBreadcrumbs tCtx model r
         "t:tasks" ## Splices.listSplice (toList tasks) "task" taskSplice
       taskSplice task = do
         let r = task ^. Task.taskRoute
