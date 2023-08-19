@@ -1,6 +1,7 @@
 module Emanote.Route.SiteRoute.Class (
   decodeVirtualRoute,
   noteFileSiteRoute,
+  noteFileSiteRoute',
   noteFeedSiteRoute,
   staticFileSiteRoute,
   lmlSiteRoute,
@@ -41,7 +42,7 @@ emanoteGeneratableRoutes model =
   let htmlRoutes =
         model ^. M.modelNotes
           & Ix.toList
-          <&> noteFileSiteRoute
+          <&> noteFileSiteRoute'
       feedRoutes =
         model ^. M.modelNotes
           & Ix.toList
@@ -73,7 +74,7 @@ emanoteGeneratableRoutes model =
         <> staticRoutes
         <> fmap SiteRoute_VirtualRoute virtualRoutes
 
-emanoteRouteEncoder :: HasCallStack => ModelEma -> Prism' FilePath SiteRoute
+emanoteRouteEncoder :: (HasCallStack) => ModelEma -> Prism' FilePath SiteRoute
 emanoteRouteEncoder model =
   prism' enc dec
   where
@@ -96,24 +97,20 @@ emanoteRouteEncoder model =
         <|> decodeGeneratedRoute model fp
         <|> pure (SiteRoute_MissingR fp)
 
-encodeResourceRoute :: HasCallStack => ModelEma -> ResourceRoute -> FilePath
+encodeResourceRoute :: (HasCallStack) => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
-  ResourceRoute_LML LMLView_Html r ->
-    R.encodeRoute
-      $
-      -- HACK: This should never fail ... but *if* it does, consult
-      -- https://github.com/srid/emanote/issues/148
-      maybe
-        -- FIXME: See note above.
-        (error $ "emanote: attempt to encode missing note: " <> show r)
-        N.noteHtmlRoute
-      $ M.modelLookupNoteByRoute r model
-  ResourceRoute_LML LMLView_Atom r ->
-    R.encodeRoute
-      $ fromMaybe
-        -- FIXME: See note above.
-        (error $ "emanote: attempt to encode missing feed: " <> show r)
-      $ N.noteXmlRoute =<< M.modelLookupNoteByRoute r model
+  ResourceRoute_LML view r ->
+    -- HACK: This should never fail ... but *if* it does, consult
+    -- https://github.com/srid/emanote/issues/148
+    fromMaybe
+      -- FIXME: See note above.
+      (error $ "emanote: attempt to encode missing note resource: " <> show r)
+      ( do
+          (_, note) <- M.modelLookupNoteByRoute (view, r) model
+          case view of
+            R.LMLView_Atom -> R.encodeRoute <$> N.noteXmlRoute note
+            R.LMLView_Html -> pure $ R.encodeRoute $ N.noteHtmlRoute note
+      )
   ResourceRoute_StaticFile r _fpAbs ->
     R.encodeRoute r
 
@@ -136,7 +133,7 @@ decodeGeneratedRoute model fp =
       Rel.RRTMissing ->
         Nothing
       Rel.RRTFound note ->
-        Just $ noteFileSiteRoute note
+        Just $ noteFileSiteRoute' note
       Rel.RRTAmbiguous notes ->
         Just $ ambiguousNoteURLsRoute notes
     ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
@@ -144,18 +141,22 @@ decodeGeneratedRoute model fp =
       SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
 noteFeedSiteRoute :: N.Note -> SiteRoute
-noteFeedSiteRoute = SiteRoute_ResourceRoute . ResourceRoute_LML LMLView_Atom . N._noteRoute
+noteFeedSiteRoute = SiteRoute_ResourceRoute . ResourceRoute_LML R.LMLView_Atom . N._noteRoute
 
-noteFileSiteRoute :: N.Note -> SiteRoute
+noteFileSiteRoute :: (R.LMLView, N.Note) -> SiteRoute
 noteFileSiteRoute =
-  lmlSiteRoute . N._noteRoute
+  lmlSiteRoute . fmap N._noteRoute
 
-lmlSiteRoute :: LMLRoute -> SiteRoute
+noteFileSiteRoute' :: N.Note -> SiteRoute
+noteFileSiteRoute' =
+  noteFileSiteRoute . (R.LMLView_Html,)
+
+lmlSiteRoute :: (R.LMLView, LMLRoute) -> SiteRoute
 lmlSiteRoute =
-  SiteRoute_ResourceRoute . lmlResourceRoute
+  SiteRoute_ResourceRoute . uncurry lmlResourceRoute
 
-lmlResourceRoute :: LMLRoute -> ResourceRoute
-lmlResourceRoute = ResourceRoute_LML LMLView_Html
+lmlResourceRoute :: R.LMLView -> LMLRoute -> ResourceRoute
+lmlResourceRoute = ResourceRoute_LML
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
@@ -165,13 +166,13 @@ staticFileSiteRoute =
     staticResourceRoute = uncurry ResourceRoute_StaticFile
 
 -- | Like `siteRouteUrl` but avoids any dynamism in the URL
-siteRouteUrlStatic :: HasCallStack => Model -> SiteRoute -> Text
+siteRouteUrlStatic :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrlStatic model =
   Ema.routeUrlWith (urlStrategy model) rp
   where
     (rp, _) = M.withoutRoutePrism model
 
-siteRouteUrl :: HasCallStack => Model -> SiteRoute -> Text
+siteRouteUrl :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
   siteRouteUrlStatic model sr
     <> siteRouteQuery

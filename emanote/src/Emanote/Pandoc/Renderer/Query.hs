@@ -11,7 +11,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.Query qualified as Q
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
-import Emanote.Route (LMLRoute)
+import Emanote.Route (LMLRoute, LMLView (LMLView_Html))
 import Emanote.Route.SiteRoute qualified as SR
 import Heist qualified as H
 import Heist.Extra qualified as HE
@@ -34,11 +34,11 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
   pure $ do
     tpl <- HE.lookupHtmlTemplateMust queryTpl
     HE.runCustomTemplate tpl $ do
-      "query" ##
-        HI.textSplice (show q)
-      "result" ##
-        (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
-          `foldMapM` Q.runQuery noteRoute model q
+      "query"
+        ## HI.textSplice (show q)
+      "result"
+        ## (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
+        `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
@@ -48,5 +48,5 @@ noteSpliceMap ::
   H.Splices (HI.Splice Identity)
 noteSpliceMap withCtx model note = do
   "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx id (MN._noteTitle note)
-  "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. MN.noteRoute)
+  "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (LMLView_Html, note ^. MN.noteRoute))
   "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

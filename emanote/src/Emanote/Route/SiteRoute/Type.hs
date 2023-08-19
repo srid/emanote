@@ -4,7 +4,6 @@ module Emanote.Route.SiteRoute.Type (
   SiteRoute (..),
   VirtualRoute (..),
   ResourceRoute (..),
-  LMLView (..),
   decodeVirtualRoute,
   encodeVirtualRoute,
   encodeTagIndexR,
@@ -13,7 +12,7 @@ module Emanote.Route.SiteRoute.Type (
 import Data.Aeson (ToJSON)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route.Ext qualified as Ext
-import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute, lmlRouteCase)
+import Emanote.Route.ModelRoute (LMLRoute, LMLView, StaticFileRoute, lmlRouteCase)
 import Emanote.Route.R qualified as R
 import Network.URI.Slug qualified as Slug
 import Relude hiding (show)
@@ -37,10 +36,6 @@ data VirtualRoute
 data ResourceRoute
   = ResourceRoute_StaticFile StaticFileRoute FilePath
   | ResourceRoute_LML LMLView LMLRoute
-  deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
-
-data LMLView = LMLView_Html | LMLView_Atom
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 

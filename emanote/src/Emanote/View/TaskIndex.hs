@@ -34,10 +34,10 @@ renderTasks model = do
       tCtx = Common.mkTemplateRenderCtx model defR meta
       taskIndex = mkTaskIndex model
       taskGroupSplice r tasks = do
-        "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
+        "t:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, r))
         "t:note:title" ## Common.titleSplice tCtx (M.modelLookupTitle r model)
-        "t:note:breadcrumbs" ##
-          Common.routeBreadcrumbs tCtx model r
+        "t:note:breadcrumbs"
+          ## Common.routeBreadcrumbs tCtx model r
         "t:tasks" ## Splices.listSplice (toList tasks) "task" taskSplice
       taskSplice task = do
         let r = task ^. Task.taskRoute
@@ -45,7 +45,7 @@ renderTasks model = do
         "task:description" ## Common.withInlineCtx tCtx $ \ctx ->
           Splices.pandocSplice ctx $ B.Pandoc mempty $ one $ B.Plain $ task ^. Task.taskDescription
         "note:title" ## Common.titleSplice tCtx (M.modelLookupTitle r model)
-        "note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute r)
+        "note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, r))
 
   Common.renderModelTemplate model "templates/special/tasks" $ do
     Common.commonSplices ($ emptyRenderCtx) model meta "Task Index"

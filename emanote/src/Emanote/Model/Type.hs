@@ -234,9 +234,18 @@ modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupNoteByRoute :: LMLRoute -> ModelT f -> Maybe Note
-modelLookupNoteByRoute r (_modelNotes -> notes) =
-  N.lookupNotesByRoute r notes
+modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> ModelT f -> Maybe (R.LMLView, Note)
+modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
+  note <- N.lookupNotesByRoute r notes
+  case (view, noteHasFeed note) of
+    (R.LMLView_Atom, True) -> pure (view, note)
+    (R.LMLView_Atom, False) -> Nothing
+    (_, _) -> pure (view, note)
+
+-- | Like `modelLookupNoteByRoute`, but for `R.Html` routes only.
+modelLookupNoteByRoute' :: LMLRoute -> ModelT f -> Maybe Note
+modelLookupNoteByRoute' r =
+  fmap snd . modelLookupNoteByRoute (R.LMLView_Html, r)
 
 modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
@@ -258,10 +267,10 @@ modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
 
 modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =
-  maybe (Tit.fromRoute r) N._noteTitle . modelLookupNoteByRoute r
+  maybe (Tit.fromRoute r) N._noteTitle . modelLookupNoteByRoute' r
 
 -- Lookup the wiki-link and return its candidates in the model.
-modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either Note StaticFile]
+modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either (R.LMLView, Note) StaticFile]
 modelWikiLinkTargets wl model =
   let notes =
         Ix.toList $
@@ -269,7 +278,7 @@ modelWikiLinkTargets wl model =
       staticFiles =
         Ix.toList $
           (model ^. modelStaticFiles) @= wl
-   in fmap Right staticFiles <> fmap Left notes
+   in fmap Right staticFiles <> fmap Left ((R.LMLView_Html,) <$> notes)
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
 modelLookupStaticFileByRoute r =

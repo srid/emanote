@@ -2,7 +2,6 @@ module Emanote.Route.SiteRoute (
   SiteRoute (..),
   VirtualRoute (..),
   ResourceRoute (..),
-  LMLView (..),
   decodeVirtualRoute,
   noteFileSiteRoute,
   staticFileSiteRoute,

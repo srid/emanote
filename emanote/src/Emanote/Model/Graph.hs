@@ -23,7 +23,7 @@ modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute
 modelFolgezettelAncestorTree r0 model =
   fst $ usingState mempty $ go r0
   where
-    go :: MonadState (Set ModelRoute) m => ModelRoute -> m (Forest R.LMLRoute)
+    go :: (MonadState (Set ModelRoute) m) => ModelRoute -> m (Forest R.LMLRoute)
     go r = do
       let folgezettelBacklinks =
             backlinkRels r model
@@ -36,7 +36,7 @@ modelFolgezettelAncestorTree r0 model =
           -- Folders are automatically made a folgezettel
           folgezettelFolder =
             maybeToList $ do
-              lmlR <- leftToMaybe (R.modelRouteCase r)
+              (_, lmlR) <- leftToMaybe (R.modelRouteCase r)
               guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
               parentLmlRoute model lmlR
           folgezettelParents =
@@ -46,7 +46,7 @@ modelFolgezettelAncestorTree r0 model =
               , folgezettelFolder
               ]
       fmap catMaybes . forM folgezettelParents $ \parentR -> do
-        let parentModelR = R.ModelRoute_LML parentR
+        let parentModelR = R.ModelRoute_LML R.LMLView_Html parentR
         gets (parentModelR `Set.member`) >>= \case
           True -> pure Nothing
           False -> do
@@ -64,7 +64,7 @@ modelFolgezettelAncestorTree r0 model =
       _ -> Nothing
     lookupWikiLink :: WL.WikiLink -> Maybe R.LMLRoute
     lookupWikiLink wl = do
-      note <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
+      (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
       pure $ note ^. MN.noteRoute
     getFound :: Rel.ResolvedRelTarget a -> Maybe a
     getFound = \case
@@ -94,7 +94,7 @@ modelLookupBacklinks r model =
       backlinkRels r model <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where
-    groupNE :: forall a b. Ord a => [(a, b)] -> [(a, NonEmpty b)]
+    groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
     groupNE =
       Map.toList . foldl' f Map.empty
       where
@@ -112,5 +112,5 @@ backlinkRels r model =
 frontlinkRels :: ModelRoute -> Model -> [Rel.Rel]
 frontlinkRels r model =
   maybeToMonoid $ do
-    lmlR <- leftToMaybe $ R.modelRouteCase r
+    (_, lmlR) <- leftToMaybe $ R.modelRouteCase r
     pure $ Ix.toList $ (model ^. modelRels) @= lmlR

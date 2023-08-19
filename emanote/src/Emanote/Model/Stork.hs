@@ -40,7 +40,7 @@ storkFiles model =
               R.LMLRoute_Org _ -> FileType_PlainText
          in File
               fp
-              (SR.siteRouteUrl model $ SR.lmlSiteRoute $ note ^. N.noteRoute)
+              (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. N.noteRoute))
               (Tit.toPlain $ note ^. N.noteTitle)
               ft
 

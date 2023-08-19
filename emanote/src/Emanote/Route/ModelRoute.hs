@@ -10,6 +10,7 @@ module Emanote.Route.ModelRoute (
   modelRouteCase,
   mkModelRouteFromFilePath,
   -- Only LML routes
+  LMLView (..),
   LMLRoute (..),
   defaultLmlRoute,
   possibleLmlRoutes,
@@ -23,17 +24,21 @@ module Emanote.Route.ModelRoute (
 ) where
 
 import Data.Aeson.Types (ToJSON)
-import Emanote.Route.Ext (FileType (AnyExt, LMLType), HasExt, LML (Md, Org))
+import Emanote.Route.Ext (FileType (AnyExt, LMLType, Xml), HasExt, LML (Md, Org))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
 
 type StaticFileRoute = R 'AnyExt
 
+data LMLView = LMLView_Html | LMLView_Atom
+  deriving stock (Eq, Show, Ord, Generic)
+  deriving anyclass (ToJSON)
+
 -- | A R to anywhere in `Model`
 data ModelRoute
   = ModelRoute_StaticFile StaticFileRoute
-  | ModelRoute_LML LMLRoute
+  | ModelRoute_LML LMLView LMLRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
 
@@ -66,25 +71,32 @@ isMdRoute = \case
   LMLRoute_Md _ -> True
   _ -> False
 
-withLmlRoute :: (forall lmlType. HasExt ('LMLType lmlType) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
+withLmlRoute :: (forall lmlType. (HasExt ('LMLType lmlType)) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
 
 modelRouteCase ::
   ModelRoute ->
-  Either LMLRoute StaticFileRoute
+  Either (LMLView, LMLRoute) StaticFileRoute
 modelRouteCase = \case
-  ModelRoute_LML r -> Left r
+  ModelRoute_LML view r -> Left (view, r)
   ModelRoute_StaticFile r -> Right r
 
 mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
 mkModelRouteFromFilePath fp =
-  fmap ModelRoute_LML (mkLMLRouteFromFilePath fp)
+  fmap (uncurry ModelRoute_LML) (mkLMLRouteFromFilePath fp)
     <|> fmap ModelRoute_StaticFile (R.mkRouteFromFilePath fp)
 
-mkLMLRouteFromFilePath :: FilePath -> Maybe LMLRoute
+mkLMLRouteFromFilePath :: FilePath -> Maybe (LMLView, LMLRoute)
 mkLMLRouteFromFilePath fp =
-  mkLMLRouteFromKnownFilePath Md fp
-    <|> mkLMLRouteFromKnownFilePath Org fp
+  fmap
+    (LMLView_Html,)
+    ( mkLMLRouteFromKnownFilePath Md fp
+        <|> mkLMLRouteFromKnownFilePath Org fp
+    )
+    <|> ( do
+            xmlR <- R.mkRouteFromFilePath @_ @'Xml fp
+            pure (LMLView_Atom, LMLRoute_Md $ coerce xmlR)
+        )
 
 {- | Like `mkLMLRouteFromFilePath`, but when the file extension is known ahead
  to be of `lmlType`.
