@@ -7,6 +7,7 @@
 - Features
   - Audio embedding ([\#418](https://github.com/srid/emanote/pull/418))
   - Source code embedding ([\#444](https://github.com/srid/emanote/pull/444))
+  - Atom feed ([\#451](https://github.com/srid/emanote/pull/451))
 - UI
   - Remove inline styling of H2 elements
 - Misc

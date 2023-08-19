@@ -103,7 +103,7 @@ generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
 
 commonSplices ::
-  HasCallStack =>
+  (HasCallStack) =>
   ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
   Model ->
   Aeson.Value ->
@@ -149,7 +149,7 @@ commonSplices withCtx model meta routeTitle = do
   -- get the full URL. The reason there is no slash in between is to account for
   -- the usual case of homeUrl being an empty string.
   "ema:homeUrl" ##
-    ( let homeR = SR.lmlSiteRoute (M.modelIndexRoute model)
+    ( let homeR = SR.lmlSiteRoute (R.LMLView_Html, M.modelIndexRoute model)
           homeUrl' = SR.siteRouteUrl model homeR
           homeUrl = if homeUrl' /= "" then homeUrl' <> "/" else homeUrl'
        in HI.textSplice homeUrl
@@ -221,5 +221,5 @@ routeBreadcrumbs TemplateRenderCtx {..} model r = do
           & init
           & fmap (M.resolveLmlRoute model)
   Splices.listSplice breadcrumbs "each-crumb" $ \crumbR -> do
-    "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute crumbR)
+    "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, crumbR))
     "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)

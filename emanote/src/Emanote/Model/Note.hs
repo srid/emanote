@@ -37,12 +37,21 @@ import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
 
+data Feed = Feed
+  { _feedEnable :: Bool
+  , _feedTitle :: Maybe Text
+  , _feedLimit :: Maybe Word
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, Aeson.FromJSON)
+
 data Note = Note
   { _noteRoute :: R.LMLRoute
   , _noteDoc :: Pandoc
   , _noteMeta :: Aeson.Value
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
+  , _noteFeed :: Maybe Feed
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -58,6 +67,8 @@ type NoteIxs =
      WL.WikiLink
    , -- HTML route for this note
      R 'R.Html
+   , -- XML route for this note
+     R 'R.Xml
    , -- Ancestor folder routes
      RAncestor
    , -- Parent folder
@@ -76,6 +87,7 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . _noteRoute)
       (ixFun $ toList . noteSelfRefs)
       (ixFun $ one . noteHtmlRoute)
+      (ixFun $ maybeToList . noteXmlRoute)
       (ixFun noteAncestors)
       (ixFun $ maybeToList . noteParent)
       (ixFun noteTags)
@@ -116,6 +128,17 @@ lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
   SData.lookupAeson Nothing k . _noteMeta
 
+noteHasFeed :: Note -> Bool
+noteHasFeed = maybe False _feedEnable . _noteFeed
+
+queryNoteFeed :: Aeson.Value -> Maybe Feed
+queryNoteFeed meta = do
+  feed <- SData.lookupAeson Nothing (one "feed") meta
+  let title = SData.lookupAeson Nothing (one "title") feed
+  let enable = SData.lookupAeson False (one "enable") feed
+  let feedLimit = SData.lookupAeson Nothing (one "limit") feed
+  pure $ Feed enable title feedLimit
+
 queryNoteTitle :: R.LMLRoute -> Pandoc -> Aeson.Value -> (Pandoc, Tit.Title)
 queryNoteTitle r doc meta =
   let yamlNoteTitle = fromString <$> SData.lookupAeson Nothing (one "title") meta
@@ -148,6 +171,12 @@ queryNoteTitle r doc meta =
     withoutH1 x =
       x
 
+-- | The xml route intended by user for this note.
+noteXmlRoute :: Note -> Maybe (R 'R.Xml)
+noteXmlRoute note
+  | noteHasFeed note = Just (coerce $ noteHtmlRoute note)
+  | otherwise = Nothing
+
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
@@ -161,6 +190,10 @@ noteHtmlRoute note@Note {..} =
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
   Ix.toList . Ix.getEQ htmlRoute
+
+lookupNotesByXmlRoute :: R 'R.Xml -> IxNote -> [Note]
+lookupNotesByXmlRoute xmlRoute =
+  Ix.toList . Ix.getEQ xmlRoute
 
 lookupNotesByRoute :: HasCallStack => R.LMLRoute -> IxNote -> Maybe Note
 lookupNotesByRoute r ix = do
@@ -242,8 +275,9 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
 mkNoteWith :: R.LMLRoute -> Pandoc -> Aeson.Value -> [Text] -> Note
 mkNoteWith r doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
+      feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
-   in Note r doc meta tit errs
+   in Note r doc meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc

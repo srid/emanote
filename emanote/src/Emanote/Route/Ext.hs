@@ -15,6 +15,7 @@ data SourceExt = SourceExt
 data FileType a where
   LMLType :: LML -> FileType SourceExt
   Yaml :: FileType SourceExt
+  Xml :: FileType ()
   HeistTpl :: FileType SourceExt
   -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
   -- "catch all" type to capture files using an arbitrary.
@@ -69,6 +70,11 @@ instance HasExt 'Html where
   fileType = Html
   withExt = flip FP.addExtension ".html"
   withoutKnownExt = fpWithoutExt ".html"
+
+instance HasExt 'Xml where
+  fileType = Xml
+  withExt = flip FP.addExtension ".xml"
+  withoutKnownExt = fpWithoutExt ".xml"
 
 instance HasExt 'HeistTpl where
   fileType = HeistTpl

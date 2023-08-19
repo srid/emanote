@@ -27,12 +27,12 @@ resolveUnresolvedRelTarget model = \case
         virtualRoute
 
 resolveWikiLinkMustExist ::
-  Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
+  Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
 resolveWikiLinkMustExist model wl =
   Rel.resolvedRelTargetFromCandidates $ M.modelWikiLinkTargets wl model
 
 resolveModelRoute ::
-  Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either MN.Note SF.StaticFile)
+  Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
 resolveModelRoute model lr =
   bitraverse
     (`M.modelLookupNoteByRoute` model)
@@ -40,6 +40,6 @@ resolveModelRoute model lr =
     (R.modelRouteCase lr)
     & maybe Rel.RRTMissing Rel.RRTFound
 
-resourceSiteRoute :: Either MN.Note SF.StaticFile -> SR.SiteRoute
+resourceSiteRoute :: Either (R.LMLView, MN.Note) SF.StaticFile -> SR.SiteRoute
 resourceSiteRoute =
   either SR.noteFileSiteRoute SR.staticFileSiteRoute
