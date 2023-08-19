@@ -184,7 +184,7 @@ renderLmlHtml model note = do
       backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
     "ema:note:uptree" ##
-      Splices.treeSplice (const ()) folgeAnc $
+      Splices.treeSplice (\_ _ -> ()) folgeAnc $
         \(last -> nodeRoute) children -> do
           "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
           "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
@@ -214,7 +214,7 @@ routeTreeSplice tCtx mr model = do
           mkLmlRoute =
             M.resolveLmlRoute model . R.mkRouteFromSlugs
           lmlRouteSlugs = R.withLmlRoute R.unRoute
-       in Splices.treeSplice (getOrder . mkLmlRoute) tree $ \(mkLmlRoute -> nodeRoute) children -> do
+       in Splices.treeSplice (\tr _ -> getOrder . mkLmlRoute $ tr) tree $ \(mkLmlRoute -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
             let isActiveNode = Just nodeRoute == mr

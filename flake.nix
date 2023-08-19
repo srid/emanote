@@ -6,6 +6,7 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-old.url = "github:nixos/nixpkgs/nixos-23.05";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -19,6 +20,12 @@
     ema.inputs.flake-parts.follows = "flake-parts";
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
+
+    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.flake = false;
+
+    unionmount.url = "github:srid/unionmount";
+    unionmount.flake = false;
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -52,10 +59,29 @@
           devShell.tools = hp: {
             inherit (pkgs)
               stork;
+            fourmolu = config.treefmt.programs.ormolu.package;
           };
           autoWire = [ "packages" "apps" "checks" ];
 
+          packages = {
+            unionmount.source = inputs.unionmount;
+            fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
+            ghcid.source = "0.8.8";
+            heist-extra.source = inputs.heist-extra;
+          };
+
           settings = {
+            # TODO: Eliminate these after new emanote gets upstreamed to nixpkgs
+            fsnotify.check = false;
+            ixset-typed.broken = false;
+            ixset-typed.jailbreak = true;
+            ema.jailbreak = true;
+            pandoc-link-context.broken = false;
+            pandoc-link-context.jailbreak = true;
+            tagtree.broken = false;
+            tagtree.jailbreak = true;
+            tailwind.broken = false;
+            tailwind.jailbreak = true;
             emanote = { name, pkgs, self, super, ... }: {
               imports = [
                 ./nix/removeReferencesTo.nix
@@ -84,7 +110,8 @@
           programs.hlint.enable = true;
 
           # We use fourmolu
-          programs.ormolu.package = pkgs.haskellPackages.fourmolu;
+          # TODO: Switch to latest fourmolu once there are no ongoing PRs.
+          programs.ormolu.package = inputs.nixpkgs-old.legacyPackages.${system}.haskellPackages.fourmolu;
           settings.formatter.ormolu = {
             options = [
               "--ghc-opt"

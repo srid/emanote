@@ -29,6 +29,7 @@ import Optics.Operators ((%~))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
+import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
@@ -38,6 +39,8 @@ patchModel ::
   LocLayers ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
+  -- | Lua scripting engine
+  ScriptingEngine ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -45,13 +48,13 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar fpType fp action = do
+patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
@@ -59,6 +62,8 @@ patchModel' ::
   LocLayers ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
+  -- | Lua scripting engine
+  ScriptingEngine ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -66,7 +71,7 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar fpType fp action = do
+patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
@@ -91,7 +96,7 @@ patchModel' layers noteF storkIndexTVar fpType fp action = do
                   -- Until this, `layers` is threaded through as a hack.
                   currentLayerPath = locPath $ primaryLayer layers
               s <- readRefreshedFile refreshAction fpAbs
-              note <- N.parseNote currentLayerPath r fpAbs (decodeUtf8 s)
+              note <- N.parseNote scriptingEngine currentLayerPath r fpAbs (decodeUtf8 s)
               pure $ M.modelInsertNote $ noteF note
             UM.Delete -> do
               log $ "Removing note: " <> toText fp

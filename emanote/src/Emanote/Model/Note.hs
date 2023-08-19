@@ -34,6 +34,7 @@ import Text.Pandoc (runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Readers.Org (readOrg)
+import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
 
 data Feed = Feed
@@ -293,16 +294,17 @@ mkNoteWith r doc' meta errs =
 parseNote ::
   forall m.
   (MonadIO m, MonadLogger m) =>
+  ScriptingEngine ->
   FilePath ->
   R.LMLRoute ->
   FilePath ->
   Text ->
   m Note
-parseNote pluginBaseDir r fp s = do
+parseNote scriptingEngine pluginBaseDir r fp s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
-        parseNoteMarkdown pluginBaseDir fp s
+        parseNoteMarkdown scriptingEngine pluginBaseDir fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
   pure $ mkNoteWith r doc meta errs
@@ -317,8 +319,8 @@ parseNoteOrg s =
       -- TODO: Merge Pandoc's Meta in here?
       pure (preparePandoc doc, defaultFrontMatter)
 
-parseNoteMarkdown :: (MonadIO m, MonadLogger m) => FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
-parseNoteMarkdown pluginBaseDir fp md = do
+parseNoteMarkdown :: (MonadIO m, MonadLogger m) => ScriptingEngine -> FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
+parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
@@ -329,7 +331,7 @@ parseNoteMarkdown pluginBaseDir fp md = do
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
       let filterPaths = (pluginBaseDir </>) <$> SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      doc <- applyPandocFilters filterPaths $ preparePandoc doc'
+      doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc frontmatter
       pure (doc, meta)
   where
