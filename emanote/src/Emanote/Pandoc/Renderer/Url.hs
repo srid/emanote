@@ -126,7 +126,7 @@ inlinesWithWikiLinksPlainified = W.walk $ \case
   x -> x
 
 replaceLinkNodeWithRoute ::
-  HasCallStack =>
+  (HasCallStack) =>
   Model ->
   SR.SiteRoute ->
   ([B.Inline], Text) ->
@@ -158,8 +158,9 @@ siteRouteDefaultInnerText model url = \case
   SR.SiteRoute_VirtualRoute _ -> Nothing
   SR.SiteRoute_ResourceRoute resR ->
     case resR of
-      SR.ResourceRoute_LML lmlR ->
-        Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute lmlR model
+      SR.ResourceRoute_LML R.LMLView_Html lmlR ->
+        Tit.toInlines . MN._noteTitle <$> M.modelLookupNoteByRoute' lmlR model
+      SR.ResourceRoute_LML R.LMLView_Atom _ -> Nothing
       SR.ResourceRoute_StaticFile _ _ ->
         -- Just append a file: prefix, to existing wiki-link.
         pure $ B.Str "File:" : [B.Str url]

@@ -21,6 +21,7 @@
     </with>
     <snippet var="page.headHtml" />
   </ema:metadata>
+  <emaNoteFeedUrl />
   <tailwindCssShim />
 
   <style>

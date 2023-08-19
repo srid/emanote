@@ -22,6 +22,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderGraphExport)
+import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
 import Heist qualified as H
@@ -34,6 +35,7 @@ import Heist.Splices qualified as Heist
 import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
+import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 
@@ -85,10 +87,14 @@ render m sr =
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute m = \case
-  SR.ResourceRoute_LML r -> do
-    case M.modelLookupNoteByRoute r m of
-      Just note ->
+  SR.ResourceRoute_LML view r -> do
+    case M.modelLookupNoteByRoute (view, r) m of
+      Just (R.LMLView_Html, note) ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
+      Just (R.LMLView_Atom, note) ->
+        case renderFeed m note of
+          Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
+          Right feed -> Ema.AssetGenerated Ema.Other feed
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
@@ -138,12 +144,12 @@ renderLmlHtml model note = do
     let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
           Splices.listSplice bs "backlink" $
             \(source, contexts) -> do
-              let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute source model
+              let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
                   bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
                   bctx = C.mkTemplateRenderCtx model source bmeta
               -- TODO: reuse note splice
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
-              "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute source)
+              "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
               "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
                 let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
                 "context:body" ## C.withInlineCtx bctx $ \ctx' ->
@@ -155,11 +161,17 @@ renderLmlHtml model note = do
     -- Note stuff
     "ema:note:title" ##
       C.titleSplice ctx (note ^. MN.noteTitle)
-    let modelRoute = R.ModelRoute_LML r
+    let modelRoute = R.ModelRoute_LML R.LMLView_Html r
     "ema:note:source-path" ##
       HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
     "ema:note:url" ##
-      HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ r)
+      HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
+    "emaNoteFeedUrl"
+      ## pure
+        . RX.renderHtmlNodes
+      $ if MN.noteHasFeed note
+        then feedDiscoveryLink model note
+        else mempty
     "ema:note:backlinks" ##
       backlinksSplice (G.modelLookupBacklinks modelRoute model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
@@ -172,7 +184,7 @@ renderLmlHtml model note = do
       Splices.treeSplice (\_ _ -> ()) folgeAnc $
         \(last -> nodeRoute) children -> do
           "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
-          "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
+          "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
           "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
     "ema:note:pandoc" ##
@@ -182,7 +194,7 @@ renderLmlHtml model note = do
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
-  Monad n =>
+  (Monad n) =>
   C.TemplateRenderCtx n ->
   Maybe R.LMLRoute ->
   Model ->
@@ -201,7 +213,7 @@ routeTreeSplice tCtx mr model = do
           lmlRouteSlugs = R.withLmlRoute R.unRoute
        in Splices.treeSplice (\tr _ -> getOrder . mkLmlRoute $ tr) tree $ \(mkLmlRoute -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
-            "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute nodeRoute
+            "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
             let isActiveNode = Just nodeRoute == mr
                 isActiveTree =
                   -- Active tree checking is applicable only when there is an
@@ -217,7 +229,7 @@ routeTreeSplice tCtx mr model = do
             "tree:open" ## Heist.ifElseISplice openTree
     )
 
-lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
+lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
 lookupTemplateName meta =
   encodeUtf8 $ SData.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
   where
