@@ -10,11 +10,11 @@ import System.FilePath (takeExtension)
 import Text.Pandoc (runIO)
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Filter qualified as PF
-import Text.Pandoc.Lua (getEngine)
+import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Exception (handle)
 
-applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => [FilePath] -> Pandoc -> m Pandoc
-applyPandocFilters paths doc = do
+applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> [FilePath] -> Pandoc -> m Pandoc
+applyPandocFilters scriptingEngine paths doc = do
   res <- traverse mkLuaFilter paths
   forM_ (lefts res) $ \err ->
     tell [err]
@@ -22,7 +22,7 @@ applyPandocFilters paths doc = do
     [] ->
       pure doc
     filters ->
-      applyPandocLuaFilters filters doc >>= \case
+      applyPandocLuaFilters scriptingEngine filters doc >>= \case
         Left err -> tell [err] >> pure doc
         Right x -> pure x
 
@@ -35,11 +35,9 @@ mkLuaFilter relPath = do
         False -> pure $ Left $ toText $ "Lua filter missing: " <> relPath
     else pure $ Left $ "Unsupported filter: " <> toText relPath
 
-applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
-applyPandocLuaFilters filters x = do
+applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
+applyPandocLuaFilters scriptingEngine filters x = do
   logW $ "[Experimental feature] Applying pandoc filters: " <> show filters
-  -- TODO: store engine in model
-  scriptingEngine <- getEngine
   -- TODO: Can we constrain this to run Lua code purely (embedded) without using IO?
   liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters ["markdown"] x) >>= \case
     Left err -> do
