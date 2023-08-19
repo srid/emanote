@@ -10,7 +10,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
-preparePandoc :: W.Walkable B.Inline b => b -> b
+preparePandoc :: (W.Walkable B.Inline b) => b -> b
 preparePandoc =
   linkifyInlineTags
     >>> fixEmojiFontFamily
@@ -18,7 +18,7 @@ preparePandoc =
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
-linkifyInlineTags :: W.Walkable B.Inline b => b -> b
+linkifyInlineTags :: (W.Walkable B.Inline b) => b -> b
 linkifyInlineTags =
   W.walk $ \case
     inline@(B.Span attr is) ->
@@ -35,7 +35,7 @@ linkifyInlineTags =
 
 -- Undo font-family on emoji spans, so the browser uses an emoji font.
 -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
-fixEmojiFontFamily :: W.Walkable B.Inline b => b -> b
+fixEmojiFontFamily :: (W.Walkable B.Inline b) => b -> b
 fixEmojiFontFamily =
   W.walk $ \case
     B.Span (id', classes, attrs) is

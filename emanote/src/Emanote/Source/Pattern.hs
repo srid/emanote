@@ -4,7 +4,7 @@ import Emanote.Route qualified as R
 import Relude
 import System.FilePattern (FilePattern)
 
-filePattern :: HasCallStack => R.FileType R.SourceExt -> FilePath
+filePattern :: (HasCallStack) => R.FileType R.SourceExt -> FilePath
 filePattern = \case
   R.LMLType R.Md ->
     R.withExt @_ @('R.LMLType 'R.Md) $

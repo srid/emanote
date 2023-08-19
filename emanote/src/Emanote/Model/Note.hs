@@ -124,7 +124,7 @@ noteSlug note = do
   slugPath :: Text <- lookupMeta (one "slug") note
   fmap R.unRoute $ R.mkRouteFromFilePath @_ @'R.AnyExt $ toString slugPath
 
-lookupMeta :: Aeson.FromJSON a => NonEmpty Text -> Note -> Maybe a
+lookupMeta :: (Aeson.FromJSON a) => NonEmpty Text -> Note -> Maybe a
 lookupMeta k =
   SData.lookupAeson Nothing k . _noteMeta
 
@@ -195,7 +195,7 @@ lookupNotesByXmlRoute :: R 'R.Xml -> IxNote -> [Note]
 lookupNotesByXmlRoute xmlRoute =
   Ix.toList . Ix.getEQ xmlRoute
 
-lookupNotesByRoute :: HasCallStack => R.LMLRoute -> IxNote -> Maybe Note
+lookupNotesByRoute :: (HasCallStack) => R.LMLRoute -> IxNote -> Maybe Note
 lookupNotesByRoute r ix = do
   res <- nonEmpty $ Ix.toList $ Ix.getEQ r ix
   case res of

@@ -124,7 +124,7 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
       log "(Tip: use `--allow-broken-links` to ignore this check.)"
       exitFailure
 
-compileTailwindCss :: MonadUnliftIO m => FilePath -> [FilePath] -> m ()
+compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = do
   runStdoutLoggingT $ do
     log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
