@@ -182,7 +182,7 @@ renderLmlHtml model note = do
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.
 routeTreeSplice ::
-  (Monad n) =>
+  Monad n =>
   C.TemplateRenderCtx n ->
   Maybe R.LMLRoute ->
   Model ->
