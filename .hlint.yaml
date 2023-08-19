@@ -1,5 +1,6 @@
 # Ours
 - ignore: {name: Use camelCase }
+- ignore: {name: Redundant bracket}
 
 # Relude's hlint.yaml
 - arguments:

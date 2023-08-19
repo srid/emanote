@@ -32,6 +32,7 @@ import Optics.TH (makeLenses)
 import Paths_emanote qualified
 import Relude
 import System.UnionMount qualified as UM
+import Text.Pandoc.Lua (getEngine)
 import UnliftIO (MonadUnliftIO)
 
 -- | Everything that's required to run an Emanote site.
@@ -57,13 +58,14 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   storkIndex <- Stork.newIndex
   let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
       initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
+  scriptingEngine <- getEngine
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex)
+      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
 
 type ChangeHandler tag model m =
   tag ->
