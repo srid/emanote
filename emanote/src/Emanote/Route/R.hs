@@ -17,16 +17,16 @@ import Text.Show qualified (Show (show))
 newtype R (ext :: FileType a) = R {unRoute :: NonEmpty Slug}
   deriving stock (Eq, Ord, Typeable, Data)
 
-instance (HasExt ext) => ToJSON (R ext) where
+instance HasExt ext => ToJSON (R ext) where
   toJSON = toJSON . encodeRoute
 
-instance (HasExt ext) => Show (R ext) where
+instance HasExt ext => Show (R ext) where
   show r =
     toString $
       "R[/" <> encodeRoute r <> "]"
 
 -- | Convert foo/bar.<ext> to a @R@
-mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
+mkRouteFromFilePath :: forall a (ext :: FileType a). HasExt ext => FilePath -> Maybe (R ext)
 mkRouteFromFilePath fp = do
   base <- withoutKnownExt @_ @ext fp
   let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
@@ -83,7 +83,7 @@ indexRoute :: R ext
 indexRoute = R $ "index" :| []
 
 -- | Convert a route to filepath
-encodeRoute :: forall a (ft :: FileType a). (HasExt ft) => R ft -> FilePath
+encodeRoute :: forall a (ft :: FileType a). HasExt ft => R ft -> FilePath
 encodeRoute (R slugs) =
   let parts = Slug.unSlug <$> slugs
    in withExt @a @ft $ toString $ T.intercalate "/" (toList parts)

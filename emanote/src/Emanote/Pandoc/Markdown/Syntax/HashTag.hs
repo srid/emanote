@@ -70,7 +70,7 @@ hashTagSpec =
       _ <- symbol '#'
       tag <- CM.untokenize <$> tagP
       pure $ hashTag $ TT.Tag tag
-    tagP :: (Monad m) => P.ParsecT [CM.Tok] s m [CM.Tok]
+    tagP :: Monad m => P.ParsecT [CM.Tok] s m [CM.Tok]
     tagP = do
       s <- some (noneOfToks disallowed)
       -- A tag cannot end with a slash (which is a separator in hierarchical tags)

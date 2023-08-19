@@ -16,7 +16,7 @@ import Optics.Operators as Lens ((^.))
 import Relude
 
 -- | Look up a specific key in the meta for a given route.
-lookupRouteMeta :: (FromJSON a) => a -> NonEmpty Text -> R.LMLRoute -> ModelT f -> a
+lookupRouteMeta :: FromJSON a => a -> NonEmpty Text -> R.LMLRoute -> ModelT f -> a
 lookupRouteMeta x k r =
   SData.lookupAeson x k . getEffectiveRouteMeta r
 

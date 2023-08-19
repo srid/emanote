@@ -23,7 +23,7 @@ modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute
 modelFolgezettelAncestorTree r0 model =
   fst $ usingState mempty $ go r0
   where
-    go :: (MonadState (Set ModelRoute) m) => ModelRoute -> m (Forest R.LMLRoute)
+    go :: MonadState (Set ModelRoute) m => ModelRoute -> m (Forest R.LMLRoute)
     go r = do
       let folgezettelBacklinks =
             backlinkRels r model
@@ -94,7 +94,7 @@ modelLookupBacklinks r model =
       backlinkRels r model <&> \rel ->
         (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where
-    groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
+    groupNE :: forall a b. Ord a => [(a, b)] -> [(a, NonEmpty b)]
     groupNE =
       Map.toList . foldl' f Map.empty
       where

@@ -66,7 +66,7 @@ isMdRoute = \case
   LMLRoute_Md _ -> True
   _ -> False
 
-withLmlRoute :: (forall lmlType. (HasExt ('LMLType lmlType)) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
+withLmlRoute :: (forall lmlType. HasExt ('LMLType lmlType) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
 
 modelRouteCase ::

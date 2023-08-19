@@ -60,7 +60,7 @@ newtype CodeLanguage = CodeLanguage Text
   deriving anyclass (Aeson.ToJSON)
 
 -- | Return the ${name} in the corresponding templates/filters/embed-${name}.tpl
-staticFileInfoTemplateName :: (IsString s) => StaticFileInfo -> s
+staticFileInfoTemplateName :: IsString s => StaticFileInfo -> s
 staticFileInfoTemplateName = \case
   StaticFileInfoImage -> "image"
   StaticFileInfoAudio -> "audio"
@@ -69,7 +69,7 @@ staticFileInfoTemplateName = \case
   StaticFileInfoCode _ _ -> "code"
 
 readStaticFileInfo ::
-  (Monad m) =>
+  Monad m =>
   FilePath ->
   (FilePath -> m Text) ->
   m (Maybe StaticFileInfo)

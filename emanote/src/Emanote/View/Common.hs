@@ -103,7 +103,7 @@ generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
 
 commonSplices ::
-  (HasCallStack) =>
+  HasCallStack =>
   ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
   Model ->
   Aeson.Value ->

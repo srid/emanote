@@ -9,7 +9,7 @@ import Control.Monad.Logger (MonadLogger, logDebugNS, logErrorNS, logInfoNS, log
 import Relude
 
 -- | Monadic version of `chain`
-chainM :: (Monad m) => (b -> m (a -> a)) -> [b] -> m (a -> a)
+chainM :: Monad m => (b -> m (a -> a)) -> [b] -> m (a -> a)
 chainM f =
   fmap chain . mapM f
   where
@@ -28,14 +28,14 @@ newtype BadInput = BadInput Text
 -- Logging
 --------------
 
-log :: (MonadLogger m) => Text -> m ()
+log :: MonadLogger m => Text -> m ()
 log = logInfoNS "emanote"
 
-logD :: (MonadLogger m) => Text -> m ()
+logD :: MonadLogger m => Text -> m ()
 logD = logDebugNS "emanote"
 
-logE :: (MonadLogger m) => Text -> m ()
+logE :: MonadLogger m => Text -> m ()
 logE = logErrorNS "emanote"
 
-logW :: (MonadLogger m) => Text -> m ()
+logW :: MonadLogger m => Text -> m ()
 logW = logWarnNS "emanote"

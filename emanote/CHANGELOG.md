@@ -11,7 +11,6 @@
   - Remove inline styling of H2 elements
 - Misc
   - Update Ema to simplify the live server websocket observation logic
-  - Use GHC 9.4 & Pandoc 3
 
 ## 1.0.2.0 (2023-01-29)
 
