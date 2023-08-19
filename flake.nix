@@ -71,10 +71,7 @@
           };
 
           settings = {
-            /* fourmolu = { super, ... }: {
-              custom = _: super.fourmolu_0_10_1_0;
-              # check = false;
-            }; */
+            # TODO: Eliminate these after new emanote gets upstreamed to nixpkgs
             fsnotify.check = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
