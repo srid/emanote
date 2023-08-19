@@ -217,7 +217,7 @@ routeTreeSplice tCtx mr model = do
             "tree:open" ## Heist.ifElseISplice openTree
     )
 
-lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
+lookupTemplateName :: ConvertUtf8 Text b => Aeson.Value -> b
 lookupTemplateName meta =
   encodeUtf8 $ SData.lookupAeson @Text defaultTemplate ("template" :| ["name"]) meta
   where
