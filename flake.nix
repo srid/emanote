@@ -20,6 +20,9 @@
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
 
+    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.flake = false;
+
     unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
   };
@@ -62,10 +65,20 @@
             unionmount.source = inputs.unionmount;
             fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
             ghcid.source = "0.8.8";
+            heist-extra.source = inputs.heist-extra;
           };
 
           settings = {
             fsnotify.check = false;
+            ixset-typed.broken = false;
+            ixset-typed.jailbreak = true;
+            ema.jailbreak = true;
+            pandoc-link-context.broken = false;
+            pandoc-link-context.jailbreak = true;
+            tagtree.broken = false;
+            tagtree.jailbreak = true;
+            tailwind.broken = false;
+            tailwind.jailbreak = true;
             emanote = { name, pkgs, self, super, ... }: {
               imports = [
                 ./nix/removeReferencesTo.nix
