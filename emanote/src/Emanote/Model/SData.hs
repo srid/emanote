@@ -52,7 +52,7 @@ mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson = AesonMerge.lodashMerge
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
-lookupAeson :: forall a. Aeson.FromJSON a => a -> NonEmpty Text -> Aeson.Value -> a
+lookupAeson :: forall a. (Aeson.FromJSON a) => a -> NonEmpty Text -> Aeson.Value -> a
 lookupAeson x (k :| ks) meta =
   fromMaybe x $ do
     Aeson.Object obj <- pure meta

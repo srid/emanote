@@ -28,7 +28,7 @@ import Toml (Key, TomlCodec, diwrap, encode, list, string, table, text, textBy, 
 -- | In-memory Stork index tracked in a @TVar@
 newtype IndexVar = IndexVar (TVar (Maybe LByteString))
 
-newIndex :: MonadIO m => m IndexVar
+newIndex :: (MonadIO m) => m IndexVar
 newIndex =
   IndexVar <$> newTVarIO mempty
 
@@ -50,7 +50,7 @@ readOrBuildStorkIndex (IndexVar indexVar) config = do
       atomically $ modifyTVar' indexVar $ \_ -> Just index
       pure index
   where
-    timeIt :: MonadIO m => m b -> m (Double, b)
+    timeIt :: (MonadIO m) => m b -> m (Double, b)
     timeIt m = do
       t0 <- liftIO getCurrentTime
       !x <- m
@@ -61,7 +61,7 @@ readOrBuildStorkIndex (IndexVar indexVar) config = do
 storkBin :: FilePath
 storkBin = $(staticWhich "stork")
 
-runStork :: MonadIO m => Config -> m LByteString
+runStork :: (MonadIO m) => Config -> m LByteString
 runStork config = do
   let storkToml = handleTomlandBug $ Toml.encode configCodec config
   (_, !index, _) <-

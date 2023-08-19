@@ -24,9 +24,9 @@ data FileType a where
   Folder :: FileType ()
   deriving stock (Typeable)
 
-deriving stock instance Eq a => Eq (FileType a)
+deriving stock instance (Eq a) => Eq (FileType a)
 
-deriving stock instance Ord a => Ord (FileType a)
+deriving stock instance (Ord a) => Ord (FileType a)
 
 {- | A lightweight markup language
 

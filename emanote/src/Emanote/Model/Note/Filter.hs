@@ -26,7 +26,7 @@ applyPandocFilters scriptingEngine paths doc = do
         Left err -> tell [err] >> pure doc
         Right x -> pure x
 
-mkLuaFilter :: MonadIO m => FilePath -> m (Either Text PF.Filter)
+mkLuaFilter :: (MonadIO m) => FilePath -> m (Either Text PF.Filter)
 mkLuaFilter relPath = do
   if takeExtension relPath == ".lua"
     then do

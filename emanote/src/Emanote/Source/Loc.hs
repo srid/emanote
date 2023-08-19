@@ -37,7 +37,7 @@ type LocLayers = Set Loc
 
  Assumes that the user has put it always by last; i.e, `-L foo;primary/layer`.
 -}
-primaryLayer :: HasCallStack => LocLayers -> Loc
+primaryLayer :: (HasCallStack) => LocLayers -> Loc
 primaryLayer =
   Set.findMax . Set.filter isUserLayer
   where

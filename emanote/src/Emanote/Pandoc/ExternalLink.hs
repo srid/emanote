@@ -11,7 +11,7 @@ import Text.Parsec.Char qualified as PC
 -- Add a data-linkicon=external attribute to external links that contain some
 -- text in their description, provided that they do not already have a
 -- data-linkicon attribute.
-setExternalLinkIcon :: W.Walkable B.Inline b => b -> b
+setExternalLinkIcon :: (W.Walkable B.Inline b) => b -> b
 setExternalLinkIcon =
   W.walk $ \case
     B.Link (id', classes, attrs) inlines (url, title)
@@ -23,7 +23,7 @@ setExternalLinkIcon =
   where
     -- Inserts an element in a key-value list if the element's key is not
     -- already in the list.
-    insert :: Eq a => [(a, b)] -> (a, b) -> [(a, b)]
+    insert :: (Eq a) => [(a, b)] -> (a, b) -> [(a, b)]
     insert as a
       | fst a `elem` (fst <$> as) = as
       | otherwise = a : as
