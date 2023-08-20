@@ -8,9 +8,9 @@ page:
 
 # Mermaid Diagrams
 
-[Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks. 
+[Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks.
 
-To enable this, add the following to your `page.bodyHtml`, either in frontmatter or `index.yaml` (see [[yaml-config]]):
+To enable this, add the following to `page.bodyHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
 
 ```yaml
 page:
@@ -18,9 +18,7 @@ page:
     <snippet var="js.mermaid" />
 ```
 
-The above alias will add Mermaid `<style>` and `<script>` tags based on Emanote's defaults.[^js.mermaid-source]
-
-[^js.mermaid-source]: Source code for the `<snippet var="js.mermaid" />` alias can be found in the <https://github.com/srid/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map
+The above alias will add Mermaid `<style>` and `<script>` tags based on Emanote's defaults.
 
 ## Example using Mermaid
 

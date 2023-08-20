@@ -1,84 +1,100 @@
 {
-  description = "emanote";
+  description = "emanote: Emanate a structured view of your plain-text notes";
   nixConfig = {
-    extra-substituters = "https://cache.srid.ca";
-    extra-trusted-public-keys = "cache.srid.ca:8sQkbPrOIoXktIwI0OucQBXod2e9fDjjoEZWn8OXbdo=";
+    extra-substituters = "https://srid.cachix.org";
+    extra-trusted-public-keys = "srid.cachix.org-1:3clnql5gjbJNEvhA/WQp7nrZlBptwpXnUk6JAv8aB2M=";
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
-    check-flake.url = "github:srid/check-flake";
 
-    # TODO: Dependencies waiting to go from Hackage to nixpkgs.
+    ema.url = "github:srid/ema";
+    ema.inputs.nixpkgs.follows = "nixpkgs";
+    ema.inputs.haskell-flake.follows = "haskell-flake";
+    ema.inputs.flake-parts.follows = "flake-parts";
+    ema.inputs.treefmt-nix.follows = "treefmt-nix";
+    ema.inputs.flake-root.follows = "flake-root";
+
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
-    heist.url = "github:snapframework/heist"; # Waiting for 1.1.1.0 on nixpkgs cabal hashes
-    heist.flake = false;
-    ema.url = "github:srid/ema";
-    ema.flake = false;
+
+    unionmount.url = "github:srid/unionmount";
+    unionmount.flake = false;
   };
-  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = nixpkgs.lib.systems.flakeExposed;
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = import inputs.systems;
       imports = [
         inputs.haskell-flake.flakeModule
-        inputs.check-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        ./nix/emanote.nix
+        ./nix/flake-module.nix
         ./nix/docker.nix
-        ./nix/stork.nix
-        ./nix/tailwind.nix
       ];
-      perSystem = { pkgs, lib, config, ... }: {
+
+      perSystem = { pkgs, lib, config, system, ... }: {
+        _module.args = import inputs.nixpkgs {
+          inherit system;
+          overlays = [
+            (self: super: {
+              # Stork is marked as broken on intel mac, but it does work.
+              # Unfortunately we cannot test this code PATH due to lack of CI for intel mac (#335).
+              stork = if system == "x86_64-darwin" then super.stork.overrideAttrs (_oa: { meta.broken = false; }) else super.stork;
+            })
+          ];
+        };
 
         # haskell-flake configuration
         haskellProjects.default = {
-          packages.emanote.root = ./.;
-          buildTools = hp: {
-            inherit (config.packages)
+          projectFlakeName = "emanote";
+          imports = [
+            inputs.ema.haskellFlakeProjectModules.output
+          ];
+          devShell.tools = hp: {
+            inherit (pkgs)
               stork;
-            treefmt = config.treefmt.build.wrapper;
-          } // config.treefmt.build.programs;
-          source-overrides = {
-            inherit (inputs)
-              heist-extra heist;
-            ema = inputs.ema + /ema;
           };
-          overrides = with pkgs.haskell.lib;
-            let
-              # Remove the given references from drv's executables.
-              # We shouldn't need this after https://github.com/haskell/cabal/pull/8534
-              removeReferencesTo = disallowedReferences: drv:
-                drv.overrideAttrs (old: rec {
-                  inherit disallowedReferences;
-                  # Ditch data dependencies that are not needed at runtime.
-                  # cf. https://github.com/NixOS/nixpkgs/pull/204675
-                  # cf. https://srid.ca/remove-references-to
-                  postInstall = (old.postInstall or "") + ''
-                    ${lib.concatStrings (map (e: "echo Removing reference to: ${e}\n") disallowedReferences)}
-                    ${lib.concatStrings (map (e: "remove-references-to -t ${e} $out/bin/*\n") disallowedReferences)}
-                  '';
-                });
-            in
-            self: super: {
-              heist = dontCheck super.heist; # Tests are broken.
-              tailwind = addBuildDepends (unmarkBroken super.tailwind) [ config.packages.tailwind ];
-              commonmark-extensions = self.callHackage "commonmark-extensions" "0.2.3.2" { };
-              emanote =
-                lib.pipe super.emanote [
-                  (lib.flip addBuildDepends [ config.packages.stork ])
-                  justStaticExecutables
-                  (removeReferencesTo [
-                    self.pandoc
-                    self.pandoc-types
-                    self.warp
-                  ])
-                ];
+          autoWire = [ "packages" "apps" "checks" ];
+
+          packages = {
+            unionmount.source = inputs.unionmount;
+            fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
+            ghcid.source = "0.8.8";
+            heist-extra.source = inputs.heist-extra;
+          };
+
+          settings = {
+            # TODO: Eliminate these after new emanote gets upstreamed to nixpkgs
+            fsnotify.check = false;
+            ixset-typed.broken = false;
+            ixset-typed.jailbreak = true;
+            ema.jailbreak = true;
+            pandoc-link-context.broken = false;
+            pandoc-link-context.jailbreak = true;
+            tagtree.broken = false;
+            tagtree.jailbreak = true;
+            tailwind.broken = false;
+            tailwind.jailbreak = true;
+            emanote = { name, pkgs, self, super, ... }: {
+              imports = [
+                ./nix/removeReferencesTo.nix
+              ];
+              check = false;
+              extraBuildDepends = [ pkgs.stork ];
+              separateBinOutput = false; # removeReferencesTo.nix doesn't work otherwise
+              justStaticExecutables = true;
+              removeReferencesTo = [
+                self.pandoc
+                self.pandoc-types
+                self.warp
+              ];
             };
+          };
         };
 
         # treefmt-nix configuration
@@ -89,6 +105,7 @@
           programs.ormolu.enable = true;
           programs.nixpkgs-fmt.enable = true;
           programs.cabal-fmt.enable = true;
+          programs.hlint.enable = true;
 
           # We use fourmolu
           programs.ormolu.package = pkgs.haskellPackages.fourmolu;
@@ -103,6 +120,14 @@
         };
 
         packages.default = config.packages.emanote;
+        apps.default = config.apps.emanote;
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [
+            config.haskellProjects.default.outputs.devShell
+            config.treefmt.build.devShell
+          ];
+        };
+
         emanote = {
           package = config.packages.default;
           sites = {
@@ -116,9 +141,7 @@
       };
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
-        flakeModule = import ./nix/emanote.nix;
-        # CI configuration
-        herculesCI.ciSystems = [ "x86_64-linux" "aarch64-darwin" ];
+        flakeModule = ./nix/flake-module.nix;
       };
     };
 }

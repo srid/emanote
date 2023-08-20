@@ -6,7 +6,7 @@ page:
 ---
 # Syntax Highlighting
 
-In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):
+In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):
 
 ```yaml
 page:
@@ -14,10 +14,7 @@ page:
     <snippet var="js.highlightjs" />
 ```
 
-(Source code for the `<snippet var="js.highlightjs" />` alias can be found in the <https://github.com/srid/emanote/blob/master/default/index.yaml> file, under the `js:` YAML map)
-
-Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell by default; otherwise, it is normally added as:
-
+Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and Nix by default; otherwise, it is normally added as:
 
 ```yaml
 page:
@@ -28,7 +25,7 @@ page:
     </with>
 ```
 
-(The `highlightjs-ver` variable also comes from the default `index.yaml`)
+(The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
 
 ## Example (highlight.js)
 
@@ -52,3 +49,14 @@ fib 1 = 1
 fib n = fib (n-1) + fib (n-2)
 ```
 
+## Prism
+
+A predefined snippet also exists for another syntax highlighter called [Prism](https://prismjs.com/). To use it add the following to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.prism" />
+```
+
+However, take note that Prism does not cooperate well with Emanote's live preview mode.

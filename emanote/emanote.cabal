@@ -1,0 +1,245 @@
+cabal-version:      2.4
+name:               emanote
+version:            1.0.3.22
+license:            AGPL-3.0-only
+copyright:          2022 Sridhar Ratnakumar
+maintainer:         srid@srid.ca
+author:             Sridhar Ratnakumar
+category:           Web
+synopsis:           Emanate a structured view of your plain-text notes
+description:
+  Create beautiful websites -- such as personal webpage, blog, wiki, Zettelkasten, notebook, knowledge-base, documentation, etc. from future-proof plain-text notes and arbitrary data -- with live preview that updates in real-time.
+
+-- A URL where users can report bugs.
+bug-reports:        https://github.com/srid/emanote/issues
+extra-source-files:
+  CHANGELOG.md
+  LICENSE
+  README.md
+
+data-dir:           default
+data-files:
+  _emanote-live-server/**/*.css
+  _emanote-static/**/*.ttf
+  _emanote-static/*.css
+  _emanote-static/*.svg
+  _emanote-static/stork/flat.css
+  _emanote-static/stork/stork.js
+  _emanote-static/stork/stork.js.map
+  _emanote-static/stork/stork.wasm
+  favicon.svg
+  index.yaml
+  templates/**/*.tpl
+
+flag ghcid
+  default: False
+  manual:  True
+
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  default-extensions:
+    NoImplicitPrelude
+    NoStarIsType
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    ImportQualifiedPost
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NumericUnderscores
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    RankNTypes
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    ViewPatterns
+
+common library-common
+  import:           haskell-common
+  default-language: Haskell2010
+
+  -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
+  build-depends:
+    , aeson
+    , aeson-extra
+    , aeson-optics
+    , async
+    , base                   >=4.14    && <5
+    , blaze-html
+    , bytestring
+    , commonmark
+    , commonmark-extensions  >=0.2.3.4
+    , commonmark-pandoc
+    , commonmark-simple
+    , commonmark-wikilink
+    , containers
+    , data-default
+    , dependent-sum
+    , deriving-aeson
+    , directory
+    , ema                    >=0.10.1
+    , feed
+    , filepath
+    , filepattern
+    , fsnotify
+    , hedgehog
+    , heist                  >=1.1.1.0
+    , heist-extra            >=0.2.0.0
+    , hspec
+    , hspec-hedgehog
+    , ixset-typed            >=0.5.1.0
+    , lvar
+    , map-syntax
+    , megaparsec
+    , monad-logger
+    , monad-logger-extras
+    , mtl
+    , neat-interpolation
+    , optics-core
+    , optics-th
+    , optparse-applicative
+    , pandoc
+    , pandoc-link-context    >=1.4.0
+    , pandoc-lua-engine
+    , pandoc-types
+    , parsec
+    , path-tree              >=0.2
+    , process-extras
+    , profunctors
+    , relude                 >=1.0
+    , shower
+    , some
+    , stm
+    , tagged
+    , tagtree
+    , tailwind               >=0.3
+    , text
+    , time
+    , tomland
+    , unionmount             >=0.2
+    , unliftio
+    , unordered-containers
+    , uri-encode
+    , url-slug
+    , uuid
+    , which
+    , with-utf8
+    , xmlhtml
+    , yaml
+
+library
+  import:          library-common
+  hs-source-dirs:  src
+  exposed-modules:
+    Emanote
+    Emanote.CLI
+    Emanote.Model
+    Emanote.Model.Calendar
+    Emanote.Model.Graph
+    Emanote.Model.Link.Rel
+    Emanote.Model.Link.Resolve
+    Emanote.Model.Meta
+    Emanote.Model.Note
+    Emanote.Model.Note.Filter
+    Emanote.Model.Query
+    Emanote.Model.SData
+    Emanote.Model.StaticFile
+    Emanote.Model.Stork
+    Emanote.Model.Stork.Index
+    Emanote.Model.Task
+    Emanote.Model.Title
+    Emanote.Model.Type
+    Emanote.Pandoc.BuiltinFilters
+    Emanote.Pandoc.ExternalLink
+    Emanote.Pandoc.Link
+    Emanote.Pandoc.Markdown.Parser
+    Emanote.Pandoc.Markdown.Syntax.HashTag
+    Emanote.Pandoc.Markdown.Syntax.Highlight
+    Emanote.Pandoc.Renderer
+    Emanote.Pandoc.Renderer.Embed
+    Emanote.Pandoc.Renderer.Query
+    Emanote.Pandoc.Renderer.Url
+    Emanote.Prelude
+    Emanote.Route
+    Emanote.Route.Ext
+    Emanote.Route.ModelRoute
+    Emanote.Route.R
+    Emanote.Route.SiteRoute
+    Emanote.Route.SiteRoute.Class
+    Emanote.Route.SiteRoute.Type
+    Emanote.Source.Dynamic
+    Emanote.Source.Loc
+    Emanote.Source.Patch
+    Emanote.Source.Pattern
+    Emanote.View
+    Emanote.View.Common
+    Emanote.View.Export
+    Emanote.View.Feed
+    Emanote.View.LiveServerFiles
+    Emanote.View.TagIndex
+    Emanote.View.TaskIndex
+    Emanote.View.Template
+
+  other-modules:   Paths_emanote
+  autogen-modules: Paths_emanote
+
+-- To profile: ghc-options: -fexternal-interpreter -prof -fprof-auto -rtsopts
+executable emanote
+  import:         library-common
+  hs-source-dirs: exe
+  main-is:        Main.hs
+  ghc-options:    -threaded -rtsopts -with-rtsopts=-N
+
+  if flag(ghcid)
+    hs-source-dirs: src
+
+  else
+    build-depends: emanote
+
+test-suite test
+  import:         library-common
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Spec.hs
+  build-depends:
+    , hspec
+    , relude
+
+  if flag(ghcid)
+    hs-source-dirs: src
+
+  else
+    build-depends: emanote
+    other-modules:
+      Emanote.Model.Link.RelSpec
+      Emanote.Model.QuerySpec
+      Emanote.Pandoc.ExternalLinkSpec

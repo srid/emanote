@@ -8,11 +8,10 @@ order: 1
 
 Emanote is supported on all popular operating systems through [Nix].
 
-1. [Install Nix](https://nixos.org/download.html) & [enable Flakes](https://nixos.wiki/wiki/Flakes#Installing_flakes)
+1. [Install Nix & enable Flakes](https://haskell.flake.page/nix)
    1. For Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230)
    1. For NixOS, see [[nix]]
-1. Optional: [Use](https://nixos.wiki/wiki/Binary_Cache#Using_a_binary_cache) the Nix binary cache: 
-     - https://cache.srid.ca (key: `cache.srid.ca:8sQkbPrOIoXktIwI0OucQBXod2e9fDjjoEZWn8OXbdo=`)
+1. Optional: Use the Nix binary cache: https://srid.cachix.org
 2. Run `nix profile install github:srid/emanote` to install Emanote[^try]
 
 [^try]: You may also "try before installing" by running `nix run github:srid/emanote`. This still downloads emanote to your nix store, `/nix`, but will not install it to the user profile like `nix profile install` does.
