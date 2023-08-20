@@ -36,6 +36,8 @@ template:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
     collapsed: true
+    # Weather this node should put folders before single notes
+    folders-first: false
   stork:
     # https://stork-search.net/docs/config-ref#frontmatter_handling
     frontmatter-handling: omit
