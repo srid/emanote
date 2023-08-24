@@ -82,20 +82,23 @@ in
             (name: cfg: {
               app = {
                 type = "app";
+
                 # '' is required for escaping ${} in nix
-                program = (pkgs.writeShellApplication {
-                  name = "emanoteRun.sh";
-                  text =
-                    let
-                      layers = lib.concatStringsSep ";" cfg.layersString;
-                    in
-                    ''
-                      set -xe
-                      ${config.emanote.package}/bin/emanote \
-                        --layers "${layers}" \
-                        run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
-                    '';
-                }) + /bin/emanoteRun.sh;
+                program =
+                  lib.addMetaAttrs { description = "Live server for Emanote site ${name}"; }
+                    (pkgs.writeShellApplication {
+                      name = "emanoteRun.sh";
+                      text =
+                        let
+                          layers = lib.concatStringsSep ";" cfg.layersString;
+                        in
+                        ''
+                          set -xe
+                          ${config.emanote.package}/bin/emanote \
+                            --layers "${layers}" \
+                            run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                        '';
+                    });
               };
               package =
                 let
@@ -112,15 +115,16 @@ in
                   '';
                   layers = lib.concatStringsSep ";" cfg.layers;
                 in
-                pkgs.runCommand "emanote-static-website" { }
-                  ''
-                    mkdir $out
-                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
-                    ${pkgs.lib.getExe config.emanote.package} \
-                      --layers "${configDir};${layers}" \
-                      ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                        gen $out
-                  '';
+                lib.addMetaAttrs { description = "Contents of the statically-generated Emanote website for ${name}"; }
+                  (pkgs.runCommand "emanote-static-website" { }
+                    ''
+                      mkdir $out
+                      export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
+                      ${pkgs.lib.getExe config.emanote.package} \
+                        --layers "${configDir};${layers}" \
+                        ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
+                          gen $out
+                    '');
             })
             config.emanote.sites;
       in
