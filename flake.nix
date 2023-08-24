@@ -93,6 +93,19 @@
                 self.pandoc-types
                 self.warp
               ];
+              custom = pkg: lib.addMetaAttrs
+                {
+                  description = "Emanate a structured view of your plain-text notes";
+                  longDescription = ''
+                    Emanote is a tool for generating a structured view of your
+                    plain-text notes on the web, as a statically generated
+                    website as well as a local live server. 
+
+                    For editing notes, you can use any text editor of your
+                    choice including the likes of Obsidian.
+                  '';
+                }
+                pkg;
             };
           };
         };
@@ -121,12 +134,15 @@
 
         packages.default = config.packages.emanote;
         apps.default = config.apps.emanote;
-        devShells.default = pkgs.mkShell {
-          inputsFrom = [
-            config.haskellProjects.default.outputs.devShell
-            config.treefmt.build.devShell
-          ];
-        };
+        devShells.default =
+          lib.addMetaAttrs { description = "Emanote development environment"; }
+            (pkgs.mkShell {
+              name = "emanote-dev";
+              inputsFrom = [
+                config.haskellProjects.default.outputs.devShell
+                config.treefmt.build.devShell
+              ];
+            });
 
         emanote = {
           package = config.packages.default;
