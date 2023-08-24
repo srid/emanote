@@ -93,6 +93,7 @@
                 self.pandoc-types
                 self.warp
               ];
+              custom = pkg: lib.addMetaAttrs { description = "Emanate a structured view of your plain-text notes"; } pkg;
             };
           };
         };
@@ -122,6 +123,7 @@
         packages.default = config.packages.emanote;
         apps.default = config.apps.emanote;
         devShells.default = pkgs.mkShell {
+          name = "emanote-dev";
           inputsFrom = [
             config.haskellProjects.default.outputs.devShell
             config.treefmt.build.devShell
