@@ -1,6 +1,6 @@
 # Revision history for emanote
 
-## 1.0.4.0 (Unreleased)
+## 1.2.0.0 (2023-08-24)
 
 - Bug fixes
   - Make Stork recognize orgmode notes ([\#413](https://github.com/srid/emanote/issues/413))
