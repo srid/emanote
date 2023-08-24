@@ -95,7 +95,6 @@
               ];
               custom = pkg: lib.addMetaAttrs
                 {
-                  description = "Emanate a structured view of your plain-text notes";
                   longDescription = ''
                     Emanote is a tool for generating a structured view of your
                     plain-text notes on the web, as a statically generated
