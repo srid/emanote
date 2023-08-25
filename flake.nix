@@ -93,18 +93,19 @@
                 self.pandoc-types
                 self.warp
               ];
-              custom = pkg: lib.addMetaAttrs
-                {
-                  longDescription = ''
-                    Emanote is a tool for generating a structured view of your
-                    plain-text notes on the web, as a statically generated
-                    website as well as a local live server. 
+              custom = pkg: pkg.overrideAttrs (old: {
+                # https://github.com/NixOS/cabal2nix/issues/608
+                meta.longDescription = ''
+                  Emanote is a tool for generating a structured view of your
+                  plain-text notes on the web, as a statically generated
+                  website as well as a local live server. 
 
-                    For editing notes, you can use any text editor of your
-                    choice including the likes of Obsidian.
-                  '';
-                }
-                pkg;
+                  For editing notes, you can use any text editor of your
+                  choice including the likes of Obsidian.
+                '';
+                # Can we store arbitrary data in a derivation?
+                meta.unwoke = "https://srid.ca/unwoke";
+              });
             };
           };
         };
