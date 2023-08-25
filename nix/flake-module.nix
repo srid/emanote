@@ -115,16 +115,16 @@ in
                   '';
                   layers = lib.concatStringsSep ";" cfg.layers;
                 in
-                lib.addMetaAttrs { description = "Contents of the statically-generated Emanote website for ${name}"; }
-                  (pkgs.runCommand "emanote-static-website" { }
-                    ''
-                      mkdir $out
-                      export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
-                      ${pkgs.lib.getExe config.emanote.package} \
-                        --layers "${configDir};${layers}" \
-                        ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                          gen $out
-                    '');
+                pkgs.runCommand "emanote-static-website"
+                  { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
+                  ''
+                    mkdir $out
+                    export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
+                    ${pkgs.lib.getExe config.emanote.package} \
+                      --layers "${configDir};${layers}" \
+                      ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
+                        gen $out
+                  '';
             })
             config.emanote.sites;
       in
