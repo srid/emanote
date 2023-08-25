@@ -94,6 +94,7 @@
                 self.warp
               ];
               custom = pkg: pkg.overrideAttrs (old: {
+                meta.mainProgram = "emanote";
                 # https://github.com/NixOS/cabal2nix/issues/608
                 meta.longDescription = ''
                   Emanote is a tool for generating a structured view of your
