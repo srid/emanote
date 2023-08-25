@@ -93,8 +93,9 @@
                 self.pandoc-types
                 self.warp
               ];
-              custom = pkg: pkg.overrideAttrs (old: {
+              custom = pkg: pkg.overrideAttrs ({
                 meta.mainProgram = "emanote";
+                meta.description = "Emanate a structured view of your plain-text notes";
                 # https://github.com/NixOS/cabal2nix/issues/608
                 meta.longDescription = ''
                   Emanote is a tool for generating a structured view of your
