@@ -81,6 +81,21 @@
         "type": "github"
       }
     },
+    "flake-schemas": {
+      "locked": {
+        "lastModified": 1693491534,
+        "narHash": "sha256-ifw8Td8kD08J8DxFbYjeIx5naHcDLz7s2IFP3X42I/U=",
+        "owner": "DeterminateSystems",
+        "repo": "flake-schemas",
+        "rev": "c702cbb663d6d70bbb716584a2ee3aeb35017279",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DeterminateSystems",
+        "repo": "flake-schemas",
+        "type": "github"
+      }
+    },
     "haskell-flake": {
       "locked": {
         "lastModified": 1691763544,
@@ -151,6 +166,7 @@
         "ema": "ema",
         "flake-parts": "flake-parts",
         "flake-root": "flake-root",
+        "flake-schemas": "flake-schemas",
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
         "nixpkgs": "nixpkgs",
