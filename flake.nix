@@ -12,6 +12,7 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
+    flake-schemas.url = "github:DeterminateSystems/flake-schemas";
 
     ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
@@ -156,6 +157,7 @@
         };
       };
       flake = {
+        schemas = inputs.flake-schemas.schemas;
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = ./nix/flake-module.nix;
       };
