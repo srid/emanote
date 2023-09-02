@@ -84,21 +84,20 @@ in
                 type = "app";
 
                 # '' is required for escaping ${} in nix
-                program =
-                  lib.addMetaAttrs { description = "Live server for Emanote site ${name}"; }
-                    (pkgs.writeShellApplication {
-                      name = "emanoteRun.sh";
-                      text =
-                        let
-                          layers = lib.concatStringsSep ";" cfg.layersString;
-                        in
-                        ''
-                          set -xe
-                          ${config.emanote.package}/bin/emanote \
-                            --layers "${layers}" \
-                            run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
-                        '';
-                    });
+                program = pkgs.writeShellApplication {
+                  name = "emanoteRun.sh";
+                  meta.description = "Live server for Emanote site ${name}";
+                  text =
+                    let
+                      layers = lib.concatStringsSep ";" cfg.layersString;
+                    in
+                    ''
+                      set -xe
+                      ${config.emanote.package}/bin/emanote \
+                        --layers "${layers}" \
+                        run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                    '';
+                };
               };
               package =
                 let
