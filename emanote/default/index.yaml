@@ -35,7 +35,7 @@ template:
   sidebar:
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
-    collapsed: false
+    collapsed: true
     # Weather this node should put folders before single notes
     folders-first: false
   stork:
