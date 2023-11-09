@@ -11,7 +11,7 @@ tags: []
 # TODO: How to design this when generating RSS feeds?
 template:
   # Which template to use to render notes. The filepath without the .tpl extension.
-  name: /templates/layouts/book
+  name: /templates/layouts/note
   # Layout specific settings
   layout:
     # For base.tpl
