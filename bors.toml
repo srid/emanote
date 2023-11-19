@@ -1,3 +1,0 @@
-status = ["continuous-integration/jenkins/branch"]
-delete_merged_branches = true
-use_squash_merge = true
