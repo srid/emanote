@@ -104,8 +104,6 @@
                   For editing notes, you can use any text editor of your
                   choice including the likes of Obsidian.
                 '';
-                # Checking if arbitrary data can be stored in meta
-                unwoke = "https://srid.ca/unwoke";
               });
             };
           };
