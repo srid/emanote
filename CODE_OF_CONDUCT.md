@@ -1,1 +1,0 @@
-https://srid.ca/coc
