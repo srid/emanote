@@ -64,14 +64,30 @@ data Callout = Callout
 
 -- | Parse `Callout` from blockquote blocks
 parseCallout :: [B.Block] -> Maybe Callout
-parseCallout blks = do
-  -- FIXME: handle SoftBreak continuation
-  B.Para (B.Str calloutType : inlines) : body <- pure blks
+parseCallout = parseObsidianCallout
+
+-- | Parse according to https://help.obsidian.md/Editing+and+formatting/Callouts
+parseObsidianCallout :: [B.Block] -> Maybe Callout
+parseObsidianCallout blks = do
+  B.Para (B.Str calloutType : inlines) : body' <- pure blks
   type_ <- parseCalloutType calloutType
-  let title = case inlines of
-        B.Space : tit -> tit
-        _ -> defaultTitle type_
+  let (title', mFirstPara) = disrespectSoftbreak inlines
+      title = if null title' then defaultTitle type_ else title'
+      body = maybe body' (: body') mFirstPara
   pure $ Callout {..}
+
+{- | If there is a `B.SoftBreak`, treat it as paragraph break.
+
+We do this to support Obsidian callouts where the first paragraph can start
+immediately after the callout heading without a newline break in between.
+-}
+disrespectSoftbreak :: [B.Inline] -> ([B.Inline], Maybe B.Block)
+disrespectSoftbreak = \case
+  [] -> ([], Nothing)
+  (B.SoftBreak : rest) -> ([], Just (B.Para rest))
+  (x : xs) ->
+    let (a, b) = disrespectSoftbreak xs
+     in (x : a, b)
 
 defaultTitle :: CalloutType -> [B.Inline]
 defaultTitle t =

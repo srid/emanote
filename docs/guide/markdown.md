@@ -19,7 +19,7 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 > sdf
 
 > [!info]
-> This is a note callout
+> This is an info callout
 > 
 > sdf
 
