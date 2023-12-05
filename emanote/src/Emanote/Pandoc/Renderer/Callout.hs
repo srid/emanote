@@ -85,7 +85,7 @@ parseCalloutType =
     parser :: M.Parsec Void Text CalloutType
     parser = do
       void $ M.string "[!"
-      s <- toText <$> M.some M.letterChar
+      s <- T.toLower . toText <$> M.some M.letterChar
       void $ M.string "]"
       maybe (fail "Unknown") pure $ parseType s
     parseType :: Text -> Maybe CalloutType

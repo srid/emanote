@@ -11,7 +11,7 @@ Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is a
 
 ## Callouts
 
-Obsidian
+Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts). To customizing their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
 
 > [!note]
 > This is a note callout
