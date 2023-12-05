@@ -11,6 +11,8 @@ Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is a
 
 ## Callouts
 
+Obsidian
+
 > [!note]
 > This is a note callout
 > wtf

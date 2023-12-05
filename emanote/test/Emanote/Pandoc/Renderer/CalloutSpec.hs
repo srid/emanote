@@ -1,5 +1,6 @@
 module Emanote.Pandoc.Renderer.CalloutSpec where
 
+import Emanote.Pandoc.Renderer.Callout
 import Hedgehog
 import Relude
 import Test.Hspec
@@ -9,4 +10,4 @@ spec :: Spec
 spec = do
   describe "callout" $ do
     it "type" . hedgehog $ do
-      True === True
+      parseCalloutType "[!tip]" === Just Tip

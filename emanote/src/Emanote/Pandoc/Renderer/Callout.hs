@@ -2,10 +2,17 @@
 
 module Emanote.Pandoc.Renderer.Callout (
   calloutResolvingSplice,
+
+  -- * For tests
+  CalloutType (..),
+  Callout (..),
+  parseCalloutType,
 ) where
 
+import Control.Monad (msum)
 import Data.Default (Default (def))
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
@@ -14,6 +21,8 @@ import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI
 import Relude
+import Text.Megaparsec qualified as M
+import Text.Megaparsec.Char qualified as M
 import Text.Pandoc.Definition qualified as B
 
 calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
@@ -56,15 +65,30 @@ parseCallout blks = do
   type_ <- parseCalloutType calloutType
   let title = case inlines of
         B.Space : tit -> tit
-        _ -> [B.Str $ show type_]
+        _ -> defaultTitle type_
   pure $ Callout {..}
+
+defaultTitle :: CalloutType -> [B.Inline]
+defaultTitle t =
+  [B.Str $ show t]
 
 -- | Parse, for example, "[!tip]" into 'Tip'.
 parseCalloutType :: Text -> Maybe CalloutType
-parseCalloutType = \case
-  -- TODO: refactor, and finish
-  "[!note]" -> Just Note
-  "[!tip]" -> Just Tip
-  "[!warning]" -> Just Warning
-  "[!failure]" -> Just Failure
-  _ -> Nothing
+parseCalloutType =
+  rightToMaybe . parse parser "<callout:type>"
+  where
+    parser :: M.Parsec Void Text CalloutType
+    parser = do
+      void $ M.string "[!"
+      s <- toText <$> M.some M.letterChar
+      void $ M.string "]"
+      maybe (fail "Unknown") pure $ parseType s
+    parseType :: Text -> Maybe CalloutType
+    parseType s =
+      msum $ flip fmap (universe @CalloutType) $ \t -> do
+        guard $ s == T.toLower (show @Text t)
+        Just t
+    parse :: M.Parsec Void Text a -> String -> Text -> Either Text a
+    parse p fn =
+      first (toText . M.errorBundlePretty)
+        . M.parse (p <* M.eof) fn
