@@ -4,6 +4,7 @@ module Emanote.Pandoc.Renderer.Callout (
   calloutResolvingSplice,
 ) where
 
+import Data.Default (Default (def))
 import Data.Map.Syntax ((##))
 import Emanote.Model (Model)
 import Emanote.Model.Title qualified as Tit
@@ -15,13 +16,28 @@ import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition qualified as B
 
+calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
+calloutResolvingSplice _model _nr ctx _noteRoute blk = do
+  B.BlockQuote blks <- pure blk
+  callout <- parseCallout $ traceShowId blks
+  pure $ do
+    tpl <- traceShow (show callout) $ HE.lookupHtmlTemplateMust "/templates/filters/callout"
+    HE.runCustomTemplate tpl $ do
+      "callout:type" ## HI.textSplice (show $ type_ callout)
+      "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
+      "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
+      "query" ##
+        HI.textSplice (show blks)
+
 data CalloutType
-  = -- Default callout type
-    Note
+  = Note
   | Tip
   | Warning
   | Failure
   deriving stock (Eq, Ord, Show, Enum, Bounded)
+
+instance Default CalloutType where
+  def = Note
 
 data Callout = Callout
   { type_ :: CalloutType
@@ -52,16 +68,3 @@ parseCalloutType = \case
   "[!warning]" -> Just Warning
   "[!failure]" -> Just Failure
   _ -> Nothing
-
-calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
-calloutResolvingSplice _model _nr ctx _noteRoute blk = do
-  B.BlockQuote blks <- pure blk
-  callout <- parseCallout $ traceShowId blks
-  pure $ do
-    tpl <- traceShow (show callout) $ HE.lookupHtmlTemplateMust "/templates/filters/callout"
-    HE.runCustomTemplate tpl $ do
-      "callout:type" ## HI.textSplice (show $ type_ callout)
-      "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
-      "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
-      "query" ##
-        HI.textSplice (show blks)
