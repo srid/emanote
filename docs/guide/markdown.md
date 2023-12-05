@@ -153,6 +153,8 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 >
 > Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
+Callouts also work with [[orgmode]] syntax.
+
 ## More extensions
 
 :::{.flex-row .space-y-8}

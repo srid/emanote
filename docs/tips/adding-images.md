@@ -1,8 +1,7 @@
 # Adding Images
 
-:::{.note}
-Note that the extension uses the traditional `![]()` syntax to link to the image, but you may switch to using the [[embed|wiki-link embedding syntax]] (`![[]]`) as it has the advantage of not needing to specify the full path to the image (thus allowing you to the move the image around under the notebook without breaking referring links). [[emanote-template]] is already configured to do this by default.
-:::
+>[!tip]
+> The extension uses the traditional `![]()` syntax to link to the image, but you may switch to using the [[embed|wiki-link embedding syntax]] (`![[]]`) as it has the advantage of not needing to specify the full path to the image (thus allowing you to the move the image around under the notebook without breaking referring links). [[emanote-template]] is already configured to do this by default.
 
 If your image is already copied in the OS clipboard---many screenshoting tools[^scr] already provide this capability---and if you use [[vscode]], you can use the [Paste Image](https://marketplace.visualstudio.com/items?itemName=mushan.vscode-paste-image) extension to *directly paste* it in your Markdown note. This does the following,
 
