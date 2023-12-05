@@ -15,7 +15,12 @@ Obsidian
 
 > [!note]
 > This is a note callout
-> wtf
+> 
+> sdf
+
+> [!info]
+> This is a note callout
+> 
 > sdf
 
 > [!tip] Callouts can have *custom* titles
