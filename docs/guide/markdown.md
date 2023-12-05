@@ -9,33 +9,6 @@ date: 2021-01-01
 
 Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is also supported in a basic form. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
-## Callouts
-
-Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts). To customizing their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
-
-> [!note]
-> This is a note callout
-> 
-> sdf
-
-> [!info]
-> This is an info callout
-> 
-> sdf
-
-> [!tip] Callouts can have *custom* titles
-> Like this one.
->
-> And supports **bold**  etc
-
-> [!warning] This is a warning
->
-> And supports **bold**  etc
-
-> [!failure]
->
-> And supports **bold**  etc
-
 ## Wiki Links
 
 You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;
@@ -150,6 +123,35 @@ Add Twitter-like hashtags anywhere in Markdown file. They can also be added to t
 You can highlight any ==inline text== by wraping them in `==` (ie. `==inline text==`).[^prop] The CSS style for highlighted inlines can be specified in [[custom-style|index.yaml]]. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to ==🍓 give a **distinction** on top== of it all.
 
 [^prop]: See original proposal for this syntax [here](https://talk.commonmark.org/t/highlighting-text-with-the-mark-element/840).
+
+## Callouts
+
+Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts).[^callout] To customizing their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
+
+[^callout]: Not all of Obsidian spec may yet be supported. See https://github.com/srid/emanote/issues/465 for details.
+
+> [!note]
+> This is a note callout
+> 
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!info]
+> This is an info callout
+> 
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!tip] Callouts can have *custom* titles
+> Like this one.
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!warning]
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!failure]
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
 ## More extensions
 

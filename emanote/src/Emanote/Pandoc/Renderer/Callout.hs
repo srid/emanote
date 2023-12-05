@@ -28,9 +28,9 @@ import Text.Pandoc.Definition qualified as B
 calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
 calloutResolvingSplice _model _nr ctx _noteRoute blk = do
   B.BlockQuote blks <- pure blk
-  callout <- parseCallout $ traceShowId blks
+  callout <- parseCallout blks
   pure $ do
-    tpl <- traceShow (show callout) $ HE.lookupHtmlTemplateMust "/templates/filters/callout"
+    tpl <- HE.lookupHtmlTemplateMust "/templates/filters/callout"
     HE.runCustomTemplate tpl $ do
       "callout:type" ## HI.textSplice (T.toLower $ show $ type_ callout)
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
@@ -59,8 +59,6 @@ data Callout = Callout
   , body :: [B.Block]
   }
   deriving stock (Eq, Ord, Show)
-
--- TODO: tests, for all cases
 
 -- | Parse `Callout` from blockquote blocks
 parseCallout :: [B.Block] -> Maybe Callout
