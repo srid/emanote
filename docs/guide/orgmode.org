@@ -2,7 +2,10 @@
 
 Emanote provides first-class support for [[file:markdown.md][Markdown]]. But it also supports secondary formats (albeit not necessarily with the same level of support) beginning with [[https://orgmode.org/][Org Mode]]. See Pandoc's [[https://pandoc.org/org.html][Org section]] for information on controlling the parsing.
 
-**WARNING**: This is a =🧪 beta 🧪= feature.
+#+BEGIN_QUOTE
+[!warning]
+This is a =🧪 beta 🧪= feature.
+#+END_QUOTE
 
 ** Linking
 Org Mode has no notion of wiki-links, but you can use =file:= [[https://orgmode.org/guide/Hyperlinks.html][hyperlinks]] to link to other files such as Markdown files. If you wish to link to a .org file from a Markdown file, however, regular wiki-links ought to work.

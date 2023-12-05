@@ -58,11 +58,8 @@ styling, you can copy the [pandoc.tpl](https://github.com/srid/emanote/blob/mast
 file from Emanote's GitHub repository into your templates/components directory and edit it
 accordingly.
 
-This customization process works through a "union" of the default layer (provided by
-Emanote) and your notebook's layer. Essentially, it's similar to the `unionfs` concept -
-both the default layer and your notebook are union-mounted in Haskell using
-[srid/unionmount](https://github.com/srid/unionmount). This way, you only need to copy and
-modify the specific files you want to override, without affecting the rest of the default templates.
+> [!info] How it works
+> This customization process works through a "union" of the default layer (provided by Emanote) and your notebook's layer. Essentially, it's similar to the `unionfs` concept - both the default layer and your notebook are union-mounted in Haskell using [srid/unionmount](https://github.com/srid/unionmount). This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
 
 Several users have successfully implemented this customization approach in their projects.
 Refer to the following examples for inspiration:

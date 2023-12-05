@@ -14,18 +14,19 @@ page:
     <snippet var="js.highlightjs" />
 ```
 
-Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and Nix by default; otherwise, it is normally added as:
-
-```yaml
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
-    <with var="js">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
-    </with>
-```
-
-(The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
+> [!warning] 
+> Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and [Nix](https://nixos.asia) by default; otherwise, it is normally added as:
+>
+> ```yaml
+> page:
+>   headHtml: |
+>     <snippet var="js.highlightjs" />
+>     <with var="js">
+>     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
+>     </with>
+> ```
+> 
+> (The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
 
 ## Example (highlight.js)
 
@@ -59,4 +60,4 @@ page:
     <snippet var="js.prism" />
 ```
 
-However, take note that Prism does not cooperate well with Emanote's live preview mode.
+> [!warning] Prism does not cooperate well with Emanote's live preview mode.

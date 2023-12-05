@@ -7,7 +7,10 @@ feed:
 
 # Obsidian-style queries
 
-Emanote supports [Obsidian-style embed queries](https://help.obsidian.md/Plugins/Search#Embed+search+results+in+a+note). See [\#10](https://github.com/srid/emanote/issues/10) for details.
+Emanote supports [Obsidian-style embed queries](https://help.obsidian.md/Plugins/Search#Embed+search+results+in+a+note). 
+
+> [!tip] Progress
+> See [\#10](https://github.com/srid/emanote/issues/10) for details.
 
 Both `*` and `**` are supported in the path patterns. See [System.FilePattern](https://hackage.haskell.org/package/filepattern-0.1.3/docs/System-FilePattern.html) for exact semantics.
 
