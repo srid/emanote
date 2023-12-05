@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.2.0.0
+version:            1.2.1.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -186,6 +186,7 @@ library
     Emanote.Pandoc.Markdown.Syntax.HashTag
     Emanote.Pandoc.Markdown.Syntax.Highlight
     Emanote.Pandoc.Renderer
+    Emanote.Pandoc.Renderer.Callout
     Emanote.Pandoc.Renderer.Embed
     Emanote.Pandoc.Renderer.Query
     Emanote.Pandoc.Renderer.Url
@@ -244,3 +245,4 @@ test-suite test
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
       Emanote.Pandoc.ExternalLinkSpec
+      Emanote.Pandoc.Renderer.CalloutSpec

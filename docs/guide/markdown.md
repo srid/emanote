@@ -124,6 +124,35 @@ You can highlight any ==inline text== by wraping them in `==` (ie. `==inline tex
 
 [^prop]: See original proposal for this syntax [here](https://talk.commonmark.org/t/highlighting-text-with-the-mark-element/840).
 
+## Callouts
+
+Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts).[^callout] To customizing their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
+
+[^callout]: Not all of Obsidian spec may yet be supported. See https://github.com/srid/emanote/issues/465 for details.
+
+> [!note]
+> This is a note callout
+> 
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!info]
+> This is an info callout
+> 
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!tip] Callouts can have *custom* titles
+> Like this one.
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!warning]
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!failure]
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
 ## More extensions
 
 :::{.flex-row .space-y-8}
