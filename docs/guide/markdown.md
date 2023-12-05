@@ -9,6 +9,18 @@ date: 2021-01-01
 
 Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is also supported in a basic form. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
+## Callouts
+
+> [!note]
+> This is a note callout
+> wtf
+> sdf
+
+> [!tip] Callouts can have custom titles
+> Like this one.
+>
+> And supports **bold**  etc
+
 ## Wiki Links
 
 You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;

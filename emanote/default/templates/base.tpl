@@ -32,6 +32,25 @@
       font-family: monospace;
     }
 
+    /* Callouts */
+    div.callout {
+      background-color: #f5f5f5;
+      padding: 0.5em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    div.callout-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5em;
+      font-variation-settings: 'wght' 500;
+    }
+
+    div.callout-title div.callout-title-inner {
+      margin-left: 1em;
+    }
+
     /* External link icon */
     a[data-linkicon=""]::after {
       content: ""
