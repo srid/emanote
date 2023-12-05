@@ -41,33 +41,43 @@
     }
 
     .callout[data-callout="note"] {
-      background-color: rgba(8, 109, 221, 0.1);
+      --callout-color: 8, 109, 221;
+    }
+
+    .callout[data-callout="info"] {
+      --callout-color: 8, 109, 221;
     }
 
     .callout[data-callout="tip"] {
-      background-color: rgba(0, 191, 188, 0.1)
+      --callout-color: 8, 191, 188;
     }
 
     .callout[data-callout="warning"] {
-      background-color: rgba(236, 117, 0, 0.1);
+      --callout-color: 236, 117, 0;
     }
 
     .callout[data-callout="failure"] {
-      background-color: rgba(233, 49, 71, 0.1);
+      --callout-color: 233, 49, 71;
+    }
+
+    div.callout {
+      background-color: rgba(var(--callout-color), 0.1);
+    }
+
+    .callout .callout-title {
+      color: rgb(var(--callout-color));
     }
 
     div.callout-title {
       display: flex;
       align-items: center;
       margin-bottom: 0.5em;
-      font-variation-settings: 'wght' 500;
+      font-variation-settings: 'wght' 600;
     }
 
     div.callout-title div.callout-title-inner {
       margin-left: 0.5em;
     }
-
-    div.callout-content {}
 
     /* External link icon */
     a[data-linkicon=""]::after {
