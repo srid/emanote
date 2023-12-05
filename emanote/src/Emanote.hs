@@ -26,6 +26,7 @@ import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type (modelCompileTailwind)
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer
+import Emanote.Pandoc.Renderer.Callout qualified as PF
 import Emanote.Pandoc.Renderer.Embed qualified as PF
 import Emanote.Pandoc.Renderer.Query qualified as PF
 import Emanote.Pandoc.Renderer.Url qualified as PF
@@ -144,6 +145,7 @@ defaultEmanotePandocRenderers =
           [ PF.embedBlockWikiLinkResolvingSplice
           , PF.embedBlockRegularLinkResolvingSplice
           , PF.queryResolvingSplice
+          , PF.calloutResolvingSplice
           ]
       inlineRenderers =
         PandocRenderers
