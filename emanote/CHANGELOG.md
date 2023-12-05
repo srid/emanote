@@ -1,5 +1,10 @@
 # Revision history for emanote
 
+## Unreleased
+
+- Features
+  - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
+
 ## 1.2.0.0 (2023-08-24)
 
 - Bug fixes
