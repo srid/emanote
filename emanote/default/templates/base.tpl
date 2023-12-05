@@ -35,9 +35,25 @@
     /* Callouts */
     div.callout {
       background-color: #f5f5f5;
-      padding: 0.5em;
+      padding: 1em 1em 0.5em;
       border-radius: 0.5em;
       margin-bottom: 1em;
+    }
+
+    .callout[data-callout="note"] {
+      background-color: rgba(8, 109, 221, 0.1);
+    }
+
+    .callout[data-callout="tip"] {
+      background-color: rgba(0, 191, 188, 0.1)
+    }
+
+    .callout[data-callout="warning"] {
+      background-color: rgba(236, 117, 0, 0.1);
+    }
+
+    .callout[data-callout="failure"] {
+      background-color: rgba(233, 49, 71, 0.1);
     }
 
     div.callout-title {
@@ -48,8 +64,10 @@
     }
 
     div.callout-title div.callout-title-inner {
-      margin-left: 1em;
+      margin-left: 0.5em;
     }
+
+    div.callout-content {}
 
     /* External link icon */
     a[data-linkicon=""]::after {

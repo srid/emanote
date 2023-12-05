@@ -32,14 +32,19 @@ calloutResolvingSplice _model _nr ctx _noteRoute blk = do
   pure $ do
     tpl <- traceShow (show callout) $ HE.lookupHtmlTemplateMust "/templates/filters/callout"
     HE.runCustomTemplate tpl $ do
-      "callout:type" ## HI.textSplice (show $ type_ callout)
+      "callout:type" ## HI.textSplice (T.toLower $ show $ type_ callout)
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
       "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
       "query" ##
         HI.textSplice (show blks)
 
+{- | Obsidian callout type
+
+TODO: Add the rest, from https://help.obsidian.md/Editing+and+formatting/Callouts#Supported%20types
+-}
 data CalloutType
   = Note
+  | Info
   | Tip
   | Warning
   | Failure

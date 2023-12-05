@@ -18,8 +18,16 @@ Obsidian
 > wtf
 > sdf
 
-> [!tip] Callouts can have custom titles
+> [!tip] Callouts can have *custom* titles
 > Like this one.
+>
+> And supports **bold**  etc
+
+> [!warning] This is a warning
+>
+> And supports **bold**  etc
+
+> [!failure]
 >
 > And supports **bold**  etc
 
