@@ -14,6 +14,10 @@ Configure your site metadata, rendering configuration and such using YAML config
 
 Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? View [the source of this page](https://github.com/srid/emanote/blob/master/docs/guide/yaml-config.md) to see the magic involved. That CSS greenery you just saw too comes from YAML.
 
+>[!tip] Using in HTML templates
+> You can reference the YAML frontmatter config from [[html-template]]. See [here](https://github.com/srid/emanote/discussions/131#discussioncomment-1382189) for details.
+
+
 ## Examples
 
 - https://github.com/srid/srid/blob/master/index.yaml
