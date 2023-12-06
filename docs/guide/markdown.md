@@ -126,7 +126,7 @@ You can highlight any ==inline text== by wraping them in `==` (ie. `==inline tex
 
 ## Callouts
 
-Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts).[^callout] To customizing their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
+Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+formatting/Callouts).[^callout] To customize their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]].
 
 [^callout]: Not all of Obsidian spec may yet be supported. See https://github.com/srid/emanote/issues/465 for details.
 
