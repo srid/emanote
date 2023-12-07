@@ -23,12 +23,11 @@ https://emanote.srid.ca/examples
 
 ## Developing
 
-
 Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code. 
 
-See https://srid.ca/haskell-template/start for complete instructions, but the tldr is: Install nix, enable Flakes and run `just run` in the Nix dev shell.
+See https://srid.ca/haskell-template/start for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
 
-See [architecture.md](docs/architecture.md) for a high-level overview of the codebase.
+See [architecture](https://emanote.srid.ca/architecture) for a high-level overview of the codebase.
 
 ### PR contribution guidelines
 
