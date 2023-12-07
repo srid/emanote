@@ -11,7 +11,6 @@ import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
-import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Title qualified as Tit
@@ -62,7 +61,7 @@ renderJSONExport model =
                  in SourceFile
                       (Tit.toPlain tit)
                       k
-                      (toText . lmlSourcePath <$> G.parentLmlRoute model r)
+                      (toText . lmlSourcePath <$> M.parentLmlRoute model r)
                       (SR.siteRouteUrl model $ lmlSiteRoute (R.LMLView_Html, r))
                       meta_
                       (fromMaybe [] $ Map.lookup k rels)

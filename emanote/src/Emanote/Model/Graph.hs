@@ -11,7 +11,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelRels, resolveLmlRoute)
+import Emanote.Model.Type (Model, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
 import Optics.Operators as Lens ((^.))
@@ -75,22 +75,6 @@ folgezettelParentsFor model r = do
     getFound = \case
       Rel.RRTFound x -> Just x
       _ -> Nothing
-
-{- | Return the route to parent folder (unless indexRoute is passed).
-
-  This will return the existing note (.org or .md) if possible. Otherwise
-  fallback to .md even if missing.
--}
-parentLmlRoute :: Model -> R.LMLRoute -> Maybe R.LMLRoute
-parentLmlRoute model r = do
-  pr <- do
-    let lmlR = R.lmlRouteCase r
-    -- Root index do not have a parent folder.
-    guard $ lmlR /= Left R.indexRoute && lmlR /= Right R.indexRoute
-    -- Consider the index route as parent folder for all
-    -- top-level notes.
-    pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
-  pure $ resolveLmlRoute model . coerce $ pr
 
 modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =

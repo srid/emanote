@@ -329,3 +329,19 @@ resolveLmlRouteIfExists notes r = do
       , N.lookupNotesByRoute (R.LMLRoute_Md $ coerce r) notes
       ]
   pure $ note ^. N.noteRoute
+
+{- | Return the route to parent folder (unless indexRoute is passed).
+
+  This will return the existing note (.org or .md) if possible. Otherwise
+  fallback to .md even if missing.
+-}
+parentLmlRoute :: Model -> R.LMLRoute -> Maybe R.LMLRoute
+parentLmlRoute model r = do
+  pr <- do
+    let lmlR = R.lmlRouteCase r
+    -- Root index do not have a parent folder.
+    guard $ lmlR /= Left R.indexRoute && lmlR /= Right R.indexRoute
+    -- Consider the index route as parent folder for all
+    -- top-level notes.
+    pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
+  pure $ resolveLmlRoute model . coerce $ pr
