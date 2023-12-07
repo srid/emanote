@@ -140,6 +140,9 @@
                 config.haskellProjects.default.outputs.devShell
                 config.treefmt.build.devShell
               ];
+              packages = with pkgs; [
+                just
+              ];
             });
 
         emanote = {

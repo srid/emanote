@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-set -xe
-
-exec nix develop -c cabal -- repl --flags=ghcid
