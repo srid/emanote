@@ -1,3 +1,5 @@
+notebook := "../docs"
+
 default:
     @just --list
 
@@ -16,7 +18,7 @@ fmt:
 
 # Run the app using ghcid (with auto-reload / recompile)
 run:
-  ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L ../docs run --port=9010"
+  ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L {{notebook}} run --port=9010"
 
 # Run tests (with auto-reload / recompile)
 test:
