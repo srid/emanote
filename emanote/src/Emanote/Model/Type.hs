@@ -66,6 +66,7 @@ data ModelT encF = Model
   , _modelStaticFiles :: IxStaticFile
   , _modelTasks :: IxTask
   , _modelNav :: [Tree Slug]
+  -- ^ A tree (forest) of all notes, based on their folder hierarchy.
   , _modelHeistTemplate :: TemplateState
   , _modelStorkIndex :: Stork.IndexVar
   }

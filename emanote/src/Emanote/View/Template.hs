@@ -179,7 +179,7 @@ renderLmlHtml model note = do
       backlinksSplice backlinksDaily
     "ema:note:backlinks:nodaily" ##
       backlinksSplice backlinksNoDaily
-    let folgeAnc = G.modelFolgezettelAncestorTree modelRoute model
+    let folgeAnc = G.modelFolgezettelAncestorTree model modelRoute
     "ema:note:uptree" ##
       Splices.treeSplice (\_ _ -> ()) folgeAnc $
         \(last -> nodeRoute) children -> do

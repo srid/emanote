@@ -19,40 +19,45 @@ import Relude hiding (empty)
 import Text.Pandoc.Definition qualified as B
 
 -- TODO: Do breadth-first instead of depth-first
-modelFolgezettelAncestorTree :: ModelRoute -> Model -> Forest R.LMLRoute
-modelFolgezettelAncestorTree r0 model =
-  fst $ usingState mempty $ go r0
+modelFolgezettelAncestorTree :: Model -> ModelRoute -> Forest R.LMLRoute
+modelFolgezettelAncestorTree model =
+  fst . usingState mempty . go
   where
     go :: (MonadState (Set ModelRoute) m) => ModelRoute -> m (Forest R.LMLRoute)
-    go r = do
-      let folgezettelBacklinks =
-            backlinkRels r model
-              & filter (isFolgezettel . (^. Rel.relTo))
-              <&> (^. Rel.relFrom)
-          -- Handle reverse folgezettel links here
-          folgezettelFrontlinks =
-            frontlinkRels r model
-              & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
-          -- Folders are automatically made a folgezettel
-          folgezettelFolder =
-            maybeToList $ do
-              (_, lmlR) <- leftToMaybe (R.modelRouteCase r)
-              guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
-              parentLmlRoute model lmlR
-          folgezettelParents =
-            mconcat
-              [ folgezettelBacklinks
-              , folgezettelFrontlinks
-              , folgezettelFolder
-              ]
-      fmap catMaybes . forM folgezettelParents $ \parentR -> do
+    go r =
+      fmap catMaybes . forM (folgezettelParentsFor model r) $ \parentR -> do
         let parentModelR = R.ModelRoute_LML R.LMLView_Html parentR
         gets (parentModelR `Set.member`) >>= \case
-          True -> pure Nothing
+          True -> pure Nothing -- already visited
           False -> do
             modify $ Set.insert parentModelR
             sub <- go parentModelR
             pure $ Just $ Node parentR sub
+
+folgezettelParentsFor :: Model -> ModelRoute -> [R.LMLRoute]
+folgezettelParentsFor model r = do
+  let folgezettelBacklinks =
+        backlinkRels r model
+          & filter (isFolgezettel . (^. Rel.relTo))
+          <&> (^. Rel.relFrom)
+      -- Handle reverse folgezettel links (`#[[..]]`) here
+      folgezettelFrontlinks =
+        frontlinkRels r model
+          & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
+      -- Folders are automatically made a folgezettel
+      folgezettelFolder =
+        maybeToList $ do
+          (_, lmlR) <- leftToMaybe (R.modelRouteCase r)
+          guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
+          parentLmlRoute model lmlR
+      folgezettelParents =
+        mconcat
+          [ folgezettelBacklinks
+          , folgezettelFrontlinks
+          , folgezettelFolder
+          ]
+   in folgezettelParents
+  where
     isFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, _wl) ->
         True
