@@ -11,8 +11,7 @@
       <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
 
-        <div class="relative md:shadow-2xl md:mb-8">
-
+        <div id="container" class="relative md:shadow-2xl md:mb-8">
           <div class="absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center">
             <a title="Search (Ctrl+K)" class="cursor-pointer"
               onclick="window.emanote.stork.toggleSearch()">
@@ -21,6 +20,7 @@
           </div>
           <apply template="components/body" />
         </div>
+
         <apply template="components/footer" />
       </div>
     </div>
