@@ -2,7 +2,7 @@
 
 Emanote can be easily built using the Nix expressions provided in its source repo.
 
-You will need [Nix](https://nixos.org/download.html) version 2.4 or greater.
+You will need [Nix](https://nixos.asia/en/install) version 2.4 or greater.
 
 ## Installing with Nix Flakes
 
@@ -62,5 +62,5 @@ $ systemctl --user status emanote.service
              └─1705303 /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote --layers /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config;/home/user/notes
 ```
 
-[home-manager]: https://github.com/nix-community/home-manager
+[home-manager]: https://nixos.asia/en/home-manager
 [module]: https://github.com/srid/emanote/blob/master/nix/home-manager-module.nix
