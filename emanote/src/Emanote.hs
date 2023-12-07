@@ -68,7 +68,7 @@ run cfg@EmanoteConfig {..} = do
       Dynamic (unModelEma -> model0, _) <-
         flip runLoggerLoggingT oneOffLogger $
           siteInput @SiteRoute (Ema.CLI.action def) cfg
-      putLBSLn $ Export.renderGraphExport model0
+      putLBSLn $ Export.renderJSONExport model0
   where
     -- A logger suited for running one-off commands.
     oneOffLogger =

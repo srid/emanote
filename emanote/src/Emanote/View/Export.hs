@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 module Emanote.View.Export (
-  renderGraphExport,
+  renderJSONExport,
   Link (..),
   modelRels,
 ) where
@@ -51,8 +51,8 @@ data Link = Link
   deriving stock (Generic, Eq, Ord, Show)
   deriving anyclass (ToJSON)
 
-renderGraphExport :: Model -> LByteString
-renderGraphExport model =
+renderJSONExport :: Model -> LByteString
+renderJSONExport model =
   let notes_ =
         M.modelNoteMetas model
           & Map.mapKeys lmlRouteKey
