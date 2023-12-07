@@ -20,6 +20,8 @@ template:
       bodyClass: bg-gray-400 overflow-y-scroll
     note:
       containerClass: container mx-auto max-w-prose
+    book:
+      containerClass: container mx-auto
   error:
     containerClass: container mx-auto max-w-prose
   uptree:
