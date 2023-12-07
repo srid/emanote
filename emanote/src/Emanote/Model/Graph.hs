@@ -43,7 +43,7 @@ folgezettelParentsFor model r = do
       -- Handle reverse folgezettel links (`#[[..]]`) here
       folgezettelFrontlinks =
         frontlinkRels r model
-          & mapMaybe (lookupWikiLink <=< selectReverseFolgezettel . (^. Rel.relTo))
+          & mapMaybe (lookupNoteByWikiLink model <=< selectReverseFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolder =
         maybeToList $ do
@@ -67,10 +67,12 @@ folgezettelParentsFor model r = do
     selectReverseFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkTag, wl) -> Just wl
       _ -> Nothing
-    lookupWikiLink :: WL.WikiLink -> Maybe R.LMLRoute
-    lookupWikiLink wl = do
-      (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
-      pure $ note ^. MN.noteRoute
+
+lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
+lookupNoteByWikiLink model wl = do
+  (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
+  pure $ note ^. MN.noteRoute
+  where
     getFound :: Rel.ResolvedRelTarget a -> Maybe a
     getFound = \case
       Rel.RRTFound x -> Just x
@@ -93,11 +95,13 @@ modelLookupBacklinks r model =
             Nothing -> Map.insert x (one y) m
             Just ys -> Map.insert x (ys <> one y) m
 
+-- | Rels pointing *to* this route
 backlinkRels :: ModelRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo r
    in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
 
+-- | Rels pointing *from* this route
 frontlinkRels :: ModelRoute -> Model -> [Rel.Rel]
 frontlinkRels r model =
   maybeToMonoid $ do
