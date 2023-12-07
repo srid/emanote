@@ -1,7 +1,11 @@
+<!-- DoNotFormat -->
+<bind tag="containerClass"><ema:metadata><value var="template.layout.book.containerClass" /></ema:metadata></bind>
+<!-- DoNotFormat -->
+
 <apply template="base">
   <bind tag="head-main"></bind>
   <bind tag="body-main">
-    <div class="container mx-auto">
+    <div class="${containerClass}">
 
       <apply template="components/breadcrumbs" />
 
