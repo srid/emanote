@@ -1,5 +1,3 @@
-<!-- TODO: Main navigation links (Home, index, tags, ...) -->
-
 <!-- DoNotFormat -->
 <bind tag="containerClass"><ema:metadata><value var="template.layout.note.containerClass" /></ema:metadata></bind>
 <!-- DoNotFormat -->
