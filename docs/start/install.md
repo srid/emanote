@@ -60,7 +60,7 @@ This template initializes the directory with the following paths:
 - `index.md`: The index page of your site
 - `index.yaml`: The emanote configuration file
 - `.github`: The GitHub Actions workflow for deploying your site to GitHub Pages
-- `.vscode`: Enrich your VSCode experience with Emanote
+- `.vscode`: The recommended VSCode workspace settings and extensions
 
 
 ```bash
