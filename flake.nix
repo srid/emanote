@@ -26,6 +26,13 @@
 
     unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
+
+    emanote-template.url = "github:srid/emanote-template";
+    # Don't care about the output of emanote-template, only the source
+    emanote-template.flake = false;
+    # To filter emanote-template source
+    # Why nix-filter? Try filtering directories with `builtins.path`, then you will see why.
+    nix-filter.url = "github:numtide/nix-filter";
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -158,6 +165,27 @@
         schemas = inputs.flake-schemas.schemas;
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = ./nix/flake-module.nix;
+        templates.default = {
+          description = "A simple flake.nix template for emanote";
+          path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
+        };
+        templates.example =
+          let
+            filter = inputs.nix-filter.lib;
+          in
+          {
+            description = "An example emanote site with VSCode integration and Github actions workflow";
+            path = filter.filter {
+              root = inputs.emanote-template;
+              include = [
+                (filter.inDirectory ".github")
+                (filter.inDirectory ".vscode")
+                "flake.nix"
+                "index.md"
+                "index.yaml"
+              ];
+            };
+          };
       };
     };
 }
