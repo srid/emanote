@@ -40,3 +40,29 @@ If you do not wish to use Nix, you may use Emanote in one of the following ways:
 | [[docker]] | Guaranteed        | Linux, WSL, macOS |
 
 Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. Emanote is also available in nixpkgs.
+
+## Using the flake template
+
+If you already have a directory containing your `.md` files, you can use the flake template to get started with Emanote.
+
+### Default template
+
+This template only initializes the directory with a `flake.nix` file, leaving you to configure the rest of the project yourself.
+
+```bash
+nix flake init -t github:srid/emanote
+```
+
+### Example template
+
+This template initializes the directory with the following paths:
+- `flake.nix`: The flake file
+- `index.md`: The index page of your site
+- `index.yaml`: The emanote configuration file
+- `.github`: The GitHub Actions workflow for deploying your site to GitHub Pages
+- `.vscode`: Enrich your VSCode experience with Emanote
+
+
+```bash
+nix flake init -t github:srid/emanote#example
+```
