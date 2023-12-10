@@ -9,6 +9,7 @@ date: 2021-01-01
 
 Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is also supported in a basic form. A tutorial is [available here](https://commonmark.org/help/tutorial/). Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
 
+{#wikilink}
 ## Wiki Links
 
 You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;
@@ -38,6 +39,7 @@ Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You 
 [^2]: Second footnote example. Footnotes *within*[^1] footnotes are not handled.
 
 
+{#tasks}
 ## Task lists
 
 - [x] A task that was done
@@ -53,6 +55,7 @@ Tasks can also be written outside of list context, such as paragraphs:
 
 Unchecked tasks will appear in the task index available at [/-/tasks](-/tasks).
 
+{#dl}
 ## Definition lists
 
 https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md
