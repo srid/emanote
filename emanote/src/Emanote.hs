@@ -15,8 +15,9 @@ import Data.Map.Strict qualified as Map
 import Ema (
   EmaSite (..),
   IsRoute (..),
+  SiteConfig (SiteConfig),
   fromPrism_,
-  runSiteWithCli,
+  runSiteWith,
   toPrism_,
  )
 import Ema.CLI qualified
@@ -61,8 +62,9 @@ defaultEmanoteConfig cli =
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
-    CLI.Cmd_Ema emaCli ->
-      Ema.runSiteWithCli @SiteRoute emaCli cfg
+    CLI.Cmd_Ema emaCli -> do
+      let emaCfg = SiteConfig emaCli def
+      Ema.runSiteWith @SiteRoute emaCfg cfg
         >>= postRun cfg
     CLI.Cmd_Export -> do
       Dynamic (unModelEma -> model0, _) <-

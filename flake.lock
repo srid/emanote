@@ -1,23 +1,7 @@
 {
   "nodes": {
-    "check-flake": {
-      "locked": {
-        "lastModified": 1662502605,
-        "narHash": "sha256-jAT55UhabAxLAVGanxjnNdzH2/oX2ZjLsL4i2jPIP+g=",
-        "owner": "srid",
-        "repo": "check-flake",
-        "rev": "48a17393ed4fcd523399d6602c283775b5127295",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "check-flake",
-        "type": "github"
-      }
-    },
     "ema": {
       "inputs": {
-        "check-flake": "check-flake",
         "flake-parts": [
           "flake-parts"
         ],
@@ -35,11 +19,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1691619338,
-        "narHash": "sha256-Nxx184m3caxW5z/EMjVZyuTGi8IPH1qTwMAzJBblWUA=",
+        "lastModified": 1702324456,
+        "narHash": "sha256-rO1lcrsJ8ru0ptiR6XSWHh7xN+RTXXSS/ycBFX3liEs=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "de01c397e050434f41fc9a12fc40de264dc62c21",
+        "rev": "23a35e2ba7b037db73d1f3ad4ebcf089a3ee2fad",
         "type": "github"
       },
       "original": {
