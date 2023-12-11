@@ -10,7 +10,6 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
-import Data.Some (Some)
 import Data.Time (UTCTime)
 import Data.Tree (Tree)
 import Data.Tree.Path qualified as PathTree
@@ -53,7 +52,7 @@ data Status = Status_Loading | Status_Ready
 data ModelT encF = Model
   { _modelStatus :: Status
   , _modelLayers :: Set Loc
-  , _modelEmaCLIAction :: Some Ema.CLI.Action
+  , _modelEmaCLIAction :: Ema.CLI.Action
   , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
   , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
@@ -96,7 +95,7 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Some Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
 emptyModel layers act ren ctw instanceId =
   Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
 

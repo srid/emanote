@@ -13,7 +13,6 @@ module Emanote.Source.Dynamic (
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
-import Data.Some (Some)
 import Data.UUID.V4 qualified as UUID
 import Ema (Dynamic (..))
 import Ema.CLI qualified
@@ -51,7 +50,7 @@ data EmanoteConfig = EmanoteConfig
 
  The bulk of logic for building the Dynamic is in `Patch.hs`.
 -}
-emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Some Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
+emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
 emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom

@@ -19,11 +19,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1702324456,
-        "narHash": "sha256-rO1lcrsJ8ru0ptiR6XSWHh7xN+RTXXSS/ycBFX3liEs=",
+        "lastModified": 1702330642,
+        "narHash": "sha256-VIJqng88Z9YfhKjM5cXUwjcpm6s/4yezmlEJ89bQJ7o=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "23a35e2ba7b037db73d1f3ad4ebcf089a3ee2fad",
+        "rev": "089c5fa8823d5650da29cd64f3ed0be3c47a1c87",
         "type": "github"
       },
       "original": {

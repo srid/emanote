@@ -10,7 +10,6 @@ import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdout
 import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
-import Data.Dependent.Sum (DSum ((:=>)))
 import Data.Map.Strict qualified as Map
 import Ema (
   EmaSite (..),
@@ -83,15 +82,12 @@ run cfg@EmanoteConfig {..} = do
             then f loc src level msg
             else pass
 
-postRun :: EmanoteConfig -> (Model.ModelEma, DSum Ema.CLI.Action Identity) -> IO ()
-postRun EmanoteConfig {..} = \case
-  (unModelEma -> model0, Ema.CLI.Generate outPath :=> Identity genPaths) -> do
-    when (model0 ^. modelCompileTailwind) $
-      compileTailwindCss (outPath </> generatedCssFile) genPaths
-    checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
-    checkBadMarkdownFiles $ Model.modelNoteErrors model0
-  _ ->
-    pass
+postRun :: EmanoteConfig -> (Model.ModelEma, (FilePath, [FilePath])) -> IO ()
+postRun EmanoteConfig {..} (unModelEma -> model0, (outPath, genPaths)) = do
+  when (model0 ^. modelCompileTailwind) $
+    compileTailwindCss (outPath </> generatedCssFile) genPaths
+  checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
+  checkBadMarkdownFiles $ Model.modelNoteErrors model0
 
 unModelEma :: Model.ModelEma -> Model.Model
 unModelEma m = Model.withRoutePrism (fromPrism_ $ routePrism @SiteRoute m) m
