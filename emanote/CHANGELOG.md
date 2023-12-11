@@ -4,6 +4,7 @@
 
 - Features
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
+  - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
 
 ## 1.2.0.0 (2023-08-24)
 

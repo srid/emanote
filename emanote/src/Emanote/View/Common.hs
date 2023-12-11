@@ -16,7 +16,7 @@ import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
-import Ema qualified
+import Ema.Server.Common qualified as Ema
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit

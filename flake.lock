@@ -19,15 +19,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1702330642,
-        "narHash": "sha256-VIJqng88Z9YfhKjM5cXUwjcpm6s/4yezmlEJ89bQJ7o=",
+        "lastModified": 1702334080,
+        "narHash": "sha256-zrtzyLrSORxtocLMji5U9p4pDicMulOqgsuiB4LCu1o=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "089c5fa8823d5650da29cd64f3ed0be3c47a1c87",
+        "rev": "33f4cf31ace7e612e78ad25f5fc45089745ab644",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "no-ws",
         "repo": "ema",
         "type": "github"
       }
