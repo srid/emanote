@@ -45,7 +45,7 @@ folgezettelParentsFor model r = do
       -- Folders are automatically made a folgezettel
       folgezettelFolder =
         maybeToList $ do
-          guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) r model
+          guard $ folderFolgezettelEnabledFor model r
           parentLmlRoute model r
       folgezettelParents =
         mconcat
@@ -80,9 +80,9 @@ folgezettelChildrenFor model r = do
         -- If r is a folder, look up the contents of that folder, and return their routes as list
         maybeToMonoid $ do
           let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
-          -- TODO: Check of folder-folgezettel is toggled on this child.
-          -- guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
-          pure $ fmap MN._noteRoute $ Ix.toList $ (model ^. modelNotes) @= folderR
+              notes = Ix.toList $ (model ^. modelNotes) @= folderR
+              rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
+          pure rs
       folgezettelChildren =
         mconcat
           [ folgezettelBacklinks
@@ -100,6 +100,10 @@ folgezettelChildrenFor model r = do
     selectReverseFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
+
+folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
+folderFolgezettelEnabledFor model r =
+  lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) r model
 
 lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
 lookupNoteByWikiLink model wl = do
