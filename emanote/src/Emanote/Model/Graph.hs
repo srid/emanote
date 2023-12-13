@@ -11,30 +11,28 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelRels, parentLmlRoute)
+import Emanote.Model.Type (Model, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
-import Emanote.Route.ModelRoute (ModelRoute)
 import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
 import Text.Pandoc.Definition qualified as B
 
 -- TODO: Do breadth-first instead of depth-first
-modelFolgezettelAncestorTree :: Model -> ModelRoute -> Forest R.LMLRoute
+modelFolgezettelAncestorTree :: Model -> R.LMLRoute -> Forest R.LMLRoute
 modelFolgezettelAncestorTree model =
   fst . usingState mempty . go
   where
-    go :: (MonadState (Set ModelRoute) m) => ModelRoute -> m (Forest R.LMLRoute)
+    go :: (MonadState (Set R.LMLRoute) m) => R.LMLRoute -> m (Forest R.LMLRoute)
     go r =
       fmap catMaybes . forM (folgezettelParentsFor model r) $ \parentR -> do
-        let parentModelR = R.ModelRoute_LML R.LMLView_Html parentR
-        gets (parentModelR `Set.member`) >>= \case
+        gets (parentR `Set.member`) >>= \case
           True -> pure Nothing -- already visited
           False -> do
-            modify $ Set.insert parentModelR
-            sub <- go parentModelR
+            modify $ Set.insert parentR
+            sub <- go parentR
             pure $ Just $ Node parentR sub
 
-folgezettelParentsFor :: Model -> ModelRoute -> [R.LMLRoute]
+folgezettelParentsFor :: Model -> R.LMLRoute -> [R.LMLRoute]
 folgezettelParentsFor model r = do
   let folgezettelBacklinks =
         backlinkRels r model
@@ -47,9 +45,8 @@ folgezettelParentsFor model r = do
       -- Folders are automatically made a folgezettel
       folgezettelFolder =
         maybeToList $ do
-          (_, lmlR) <- leftToMaybe (R.modelRouteCase r)
-          guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
-          parentLmlRoute model lmlR
+          guard $ folderFolgezettelEnabledFor model r
+          parentLmlRoute model r
       folgezettelParents =
         mconcat
           [ folgezettelBacklinks
@@ -68,6 +65,44 @@ folgezettelParentsFor model r = do
       Rel.URTWikiLink (WL.WikiLinkTag, wl) -> Just wl
       _ -> Nothing
 
+folgezettelChildrenFor :: Model -> R.LMLRoute -> [R.LMLRoute]
+folgezettelChildrenFor model r = do
+  let folgezettelBacklinks =
+        backlinkRels r model
+          & filter (isReverseFolgezettel . (^. Rel.relTo))
+          <&> (^. Rel.relFrom)
+      folgezettelFrontlinks =
+        frontlinkRels r model
+          & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
+      -- Folders are automatically made a folgezettel
+      folgezettelFolderChildren :: [R.LMLRoute] =
+        maybeToMonoid $ do
+          let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
+              notes = Ix.toList $ (model ^. modelNotes) @= folderR
+              rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
+          pure rs
+      folgezettelChildren =
+        mconcat
+          [ folgezettelBacklinks
+          , folgezettelFrontlinks
+          , folgezettelFolderChildren
+          ]
+   in folgezettelChildren
+  where
+    isReverseFolgezettel = \case
+      Rel.URTWikiLink (WL.WikiLinkTag, _wl) ->
+        True
+      _ ->
+        False
+    selectFolgezettel :: Rel.UnresolvedRelTarget -> Maybe WL.WikiLink
+    selectFolgezettel = \case
+      Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
+      _ -> Nothing
+
+folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
+folderFolgezettelEnabledFor model r =
+  lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) r model
+
 lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
 lookupNoteByWikiLink model wl = do
   (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
@@ -78,7 +113,7 @@ lookupNoteByWikiLink model wl = do
       Rel.RRTFound x -> Just x
       _ -> Nothing
 
-modelLookupBacklinks :: ModelRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
+modelLookupBacklinks :: R.LMLRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   sortOn (Calendar.backlinkSortKey model . fst) $
     groupNE $
@@ -96,14 +131,15 @@ modelLookupBacklinks r model =
             Just ys -> Map.insert x (ys <> one y) m
 
 -- | Rels pointing *to* this route
-backlinkRels :: ModelRoute -> Model -> [Rel.Rel]
+backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
-  let allPossibleLinks = Rel.unresolvedRelsTo r
+  let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
    in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+  where
+    toModelRoute = R.ModelRoute_LML R.LMLView_Html
 
 -- | Rels pointing *from* this route
-frontlinkRels :: ModelRoute -> Model -> [Rel.Rel]
+frontlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 frontlinkRels r model =
   maybeToMonoid $ do
-    (_, lmlR) <- leftToMaybe $ R.modelRouteCase r
-    pure $ Ix.toList $ (model ^. modelRels) @= lmlR
+    pure $ Ix.toList $ (model ^. modelRels) @= r

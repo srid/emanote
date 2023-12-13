@@ -50,6 +50,23 @@ tag:foo/*/qux
 ```
 ~~~
 
+### List folgezettel children of current note
+
+~~~markdown
+```query
+children:.
+```
+~~~~
+
+
+### List folgezettel parents of current note
+
+~~~markdown
+```query
+parents:.
+```
+~~~
+
 ## Timeline queries
 
 Queries can be rendered as a timeline by using the `timeline` code block attribute.

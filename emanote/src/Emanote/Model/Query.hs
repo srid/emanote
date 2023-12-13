@@ -4,6 +4,7 @@ import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Text qualified as T
 import Emanote.Model.Calendar qualified as Calendar
+import Emanote.Model.Graph qualified as G
 import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelNotes, modelTags)
@@ -22,6 +23,8 @@ data Query
   | QueryByTagPattern TagPattern
   | QueryByPath FilePath
   | QueryByPathPattern FilePattern
+  | QueryFolgezettelChildren
+  | QueryFolgezettelParents
   deriving stock (Eq)
 
 instance Show.Show Query where
@@ -34,6 +37,10 @@ instance Show.Show Query where
       "Pages under path '/" <> p <> "'"
     QueryByPathPattern pat ->
       "Pages matching path '" <> pat <> "'"
+    QueryFolgezettelChildren ->
+      "Folgezettel children"
+    QueryFolgezettelParents ->
+      "Folgezettel parents"
 
 parseQuery :: Text -> Maybe Query
 parseQuery = do
@@ -49,6 +56,8 @@ queryParser = do
   (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
     <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
     <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
+    <|> (M.string "children:." $> QueryFolgezettelChildren)
+    <|> (M.string "parents:." $> QueryFolgezettelParents)
   where
     fromUserPath s =
       if
@@ -77,9 +86,15 @@ runQuery currentRoute model =
        in flip mapMaybe notes $ \note -> do
             guard $ pat ?== R.withLmlRoute R.encodeRoute (note ^. N.noteRoute)
             pure note
+    QueryFolgezettelChildren ->
+      let rs = G.folgezettelChildrenFor model currentRoute
+       in Ix.toList $ (model ^. modelNotes) @+ rs
+    QueryFolgezettelParents ->
+      let rs = G.folgezettelParentsFor model currentRoute
+       in Ix.toList $ (model ^. modelNotes) @+ rs
   where
-    -- Resolve the ./ prefix which will for substituting "$PWD" in current
-    -- note's route context.
+    -- Resolve the ./ prefix substituting it with "$PWD" in current note's route
+    -- context.
     resolveDotInFilePattern (toText -> pat) =
       if "./" `T.isPrefixOf` pat
         then

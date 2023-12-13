@@ -161,7 +161,6 @@ renderLmlHtml model note = do
     -- Note stuff
     "ema:note:title" ##
       C.titleSplice ctx (note ^. MN.noteTitle)
-    let modelRoute = R.ModelRoute_LML R.LMLView_Html r
     "ema:note:source-path" ##
       HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
     "ema:note:url" ##
@@ -173,13 +172,13 @@ renderLmlHtml model note = do
         then feedDiscoveryLink model note
         else mempty
     "ema:note:backlinks" ##
-      backlinksSplice (G.modelLookupBacklinks modelRoute model)
-    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks modelRoute model
+      backlinksSplice (G.modelLookupBacklinks r model)
+    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
     "ema:note:backlinks:daily" ##
       backlinksSplice backlinksDaily
     "ema:note:backlinks:nodaily" ##
       backlinksSplice backlinksNoDaily
-    let folgeAnc = G.modelFolgezettelAncestorTree model modelRoute
+    let folgeAnc = G.modelFolgezettelAncestorTree model r
     "ema:note:uptree" ##
       Splices.treeSplice (\_ _ -> ()) folgeAnc $
         \(last -> nodeRoute) children -> do
