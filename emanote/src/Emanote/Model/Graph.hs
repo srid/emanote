@@ -76,7 +76,6 @@ folgezettelChildrenFor model r = do
           & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
-        -- If r is a folder, look up the contents of that folder, and return their routes as list
         maybeToMonoid $ do
           let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
               notes = Ix.toList $ (model ^. modelNotes) @= folderR
