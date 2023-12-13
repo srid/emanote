@@ -69,12 +69,11 @@ folgezettelChildrenFor :: Model -> R.LMLRoute -> [R.LMLRoute]
 folgezettelChildrenFor model r = do
   let folgezettelBacklinks =
         backlinkRels r model
-          & filter (isFolgezettel . (^. Rel.relTo))
+          & filter (isReverseFolgezettel . (^. Rel.relTo))
           <&> (^. Rel.relFrom)
-      -- Handle reverse folgezettel links (`#[[..]]`) here
       folgezettelFrontlinks =
         frontlinkRels r model
-          & mapMaybe (lookupNoteByWikiLink model <=< selectReverseFolgezettel . (^. Rel.relTo))
+          & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
         -- If r is a folder, look up the contents of that folder, and return their routes as list
@@ -91,13 +90,13 @@ folgezettelChildrenFor model r = do
           ]
    in folgezettelChildren
   where
-    isFolgezettel = \case
+    isReverseFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkTag, _wl) ->
         True
       _ ->
         False
-    selectReverseFolgezettel :: Rel.UnresolvedRelTarget -> Maybe WL.WikiLink
-    selectReverseFolgezettel = \case
+    selectFolgezettel :: Rel.UnresolvedRelTarget -> Maybe WL.WikiLink
+    selectFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
 
