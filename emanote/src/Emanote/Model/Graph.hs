@@ -11,7 +11,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelRels, parentLmlRoute)
+import Emanote.Model.Type (Model, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (ModelRoute)
 import Optics.Operators as Lens ((^.))
@@ -66,6 +66,43 @@ folgezettelParentsFor model r = do
     selectReverseFolgezettel :: Rel.UnresolvedRelTarget -> Maybe WL.WikiLink
     selectReverseFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkTag, wl) -> Just wl
+      _ -> Nothing
+
+folgezettelChildrenFor :: Model -> ModelRoute -> [R.LMLRoute]
+folgezettelChildrenFor model r = do
+  let folgezettelBacklinks =
+        backlinkRels r model
+          & filter (isFolgezettel . (^. Rel.relTo))
+          <&> (^. Rel.relFrom)
+      -- Handle reverse folgezettel links (`#[[..]]`) here
+      folgezettelFrontlinks =
+        frontlinkRels r model
+          & mapMaybe (lookupNoteByWikiLink model <=< selectReverseFolgezettel . (^. Rel.relTo))
+      -- Folders are automatically made a folgezettel
+      folgezettelFolderChildren :: [R.LMLRoute] =
+        -- If r is a folder, look up the contents of that folder, and return their routes as list
+        maybeToMonoid $ do
+          (_, lmlR) <- leftToMaybe (R.modelRouteCase r)
+          let folderR :: R.R 'R.Folder = R.withLmlRoute coerce lmlR
+          -- TODO: Check of folder-folgezettel is toggled on this child.
+          -- guard $ lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) lmlR model
+          pure $ fmap MN._noteRoute $ Ix.toList $ (model ^. modelNotes) @= folderR
+      folgezettelChildren =
+        mconcat
+          [ folgezettelBacklinks
+          , folgezettelFrontlinks
+          , folgezettelFolderChildren
+          ]
+   in folgezettelChildren
+  where
+    isFolgezettel = \case
+      Rel.URTWikiLink (WL.WikiLinkTag, _wl) ->
+        True
+      _ ->
+        False
+    selectReverseFolgezettel :: Rel.UnresolvedRelTarget -> Maybe WL.WikiLink
+    selectReverseFolgezettel = \case
+      Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
 
 lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
