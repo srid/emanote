@@ -56,8 +56,8 @@ queryParser = do
   (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
     <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
     <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
-    <|> (M.string "children:" $> QueryFolgezettelChildren)
-    <|> (M.string "parents:" $> QueryFolgezettelParents)
+    <|> (M.string "children:." $> QueryFolgezettelChildren)
+    <|> (M.string "parents:." $> QueryFolgezettelParents)
   where
     fromUserPath s =
       if

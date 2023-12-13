@@ -5,7 +5,7 @@ order: 2
 # Migrating from neuron
 
 ```query
-children:
+children:.
 ```
 
 

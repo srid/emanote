@@ -13,9 +13,9 @@ path:./*
 ---
 
 ```query
-children:
+children:.
 ```
 
 ```query
-parents:
+parents:.
 ```
