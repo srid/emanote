@@ -87,14 +87,14 @@ runQuery currentRoute model =
             guard $ pat ?== R.withLmlRoute R.encodeRoute (note ^. N.noteRoute)
             pure note
     QueryFolgezettelChildren ->
-      let rs = G.folgezettelChildrenFor model (R.ModelRoute_LML R.LMLView_Html currentRoute)
+      let rs = G.folgezettelChildrenFor model currentRoute
        in Ix.toList $ (model ^. modelNotes) @+ rs
     QueryFolgezettelParents ->
-      let rs = G.folgezettelParentsFor model (R.ModelRoute_LML R.LMLView_Html currentRoute)
+      let rs = G.folgezettelParentsFor model currentRoute
        in Ix.toList $ (model ^. modelNotes) @+ rs
   where
-    -- Resolve the ./ prefix which will for substituting "$PWD" in current
-    -- note's route context.
+    -- Resolve the ./ prefix substituting it with "$PWD" in current note's route
+    -- context.
     resolveDotInFilePattern (toText -> pat) =
       if "./" `T.isPrefixOf` pat
         then
