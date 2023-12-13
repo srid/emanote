@@ -15,3 +15,5 @@ Git also acts as backup if you push your repository to a remote location (GitHub
 [^sup]: "superior" ... because when using Dropbox, Android phones (unlike desktop computers) cannot have automatic full-sync of files on disk.
 
 [^ios]: Obsidian can also synchronize notes between iOS and macOS [via iCloud](https://help.obsidian.md/Getting+started/Sync+your+notes+across+devices).
+
+#[[resources]]

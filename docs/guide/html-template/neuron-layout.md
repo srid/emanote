@@ -5,6 +5,11 @@ template:
 
 # Neuron-like layout
 
+
+```query
+parents:
+```
+
 Emanote comes with two built-in [[html-template|HTML template]] layouts. The default layout is called "book", but you may select the "note" layout (which mimics [Neuron](https://neuron.zettel.page/)) by adding the following to your [[yaml-config|index.yaml]],
 
 ```yml

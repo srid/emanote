@@ -4,6 +4,11 @@ order: 2
 
 # Migrating from neuron
 
+```query
+children:
+```
+
+
 To use Emanote in your existing [neuron](https://github.com/srid/neuron) notebook,
 
 1. Configure it to use [[neuron-layout]]# (this is optional)
@@ -33,3 +38,4 @@ To use Emanote in your existing [neuron](https://github.com/srid/neuron) noteboo
 ## Porting existing Vim plugins
 
 See [[export]].
+
