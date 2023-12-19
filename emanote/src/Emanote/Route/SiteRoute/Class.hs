@@ -40,22 +40,25 @@ import Relude
 emanoteGeneratableRoutes :: ModelEma -> [SiteRoute]
 emanoteGeneratableRoutes model =
   let htmlRoutes =
-        model ^. M.modelNotes
-          & Ix.toList
-          <&> noteFileSiteRoute'
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            <&> noteFileSiteRoute'
       feedRoutes =
-        model ^. M.modelNotes
-          & Ix.toList
-          & filter N.noteHasFeed
-          <&> noteFeedSiteRoute
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            & filter N.noteHasFeed
+            <&> noteFeedSiteRoute
       staticRoutes =
         let includeFile f =
               not (LiveServerFile.isLiveServerFile f)
                 || (f == LiveServerFile.tailwindFullCssPath && not (model ^. M.modelCompileTailwind))
-         in model ^. M.modelStaticFiles
-              & Ix.toList
-              & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
-              <&> staticFileSiteRoute
+         in model
+              ^. M.modelStaticFiles
+                & Ix.toList
+                & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
+                <&> staticFileSiteRoute
       virtualRoutes :: [VirtualRoute] =
         let tags = fst <$> M.modelTags model
             tagPaths =

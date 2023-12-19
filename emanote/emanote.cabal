@@ -43,8 +43,6 @@ common haskell-common
     -fprint-explicit-foralls -fprint-explicit-kinds
 
   default-extensions:
-    NoImplicitPrelude
-    NoStarIsType
     BangPatterns
     ConstraintKinds
     DataKinds
@@ -70,6 +68,8 @@ common haskell-common
     LambdaCase
     MultiParamTypeClasses
     MultiWayIf
+    NoImplicitPrelude
+    NoStarIsType
     NumericUnderscores
     OverloadedStrings
     PolyKinds

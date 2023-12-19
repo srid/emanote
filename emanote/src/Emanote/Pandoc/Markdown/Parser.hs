@@ -14,19 +14,20 @@ import Text.Pandoc.Definition (Pandoc)
 
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, Pandoc)
 parseMarkdown =
-  parseMarkdownWithFrontMatter @Aeson.Value $
+  parseMarkdownWithFrontMatter @Aeson.Value
+    $
     -- As the commonmark documentation states, pipeTableSpec should be placed after
     -- fancyListSpec and defaultSyntaxSpec to avoid bad results when parsing
     -- non-table lines.
     -- see https://github.com/jgm/commonmark-hs/issues/52
     baseExtsSansPipeTable
-      <> gfmExtensionsSansPipeTable
-      <> CE.pipeTableSpec
-      <> WL.wikilinkSpec
-      -- ASK: Can we conditionally disable this?
-      -- cf. https://github.com/srid/emanote/issues/167
-      <> IT.hashTagSpec
-      <> IH.highlightSpec
+    <> gfmExtensionsSansPipeTable
+    <> CE.pipeTableSpec
+    <> WL.wikilinkSpec
+    -- ASK: Can we conditionally disable this?
+    -- cf. https://github.com/srid/emanote/issues/167
+    <> IT.hashTagSpec
+    <> IH.highlightSpec
   where
     baseExtsSansPipeTable =
       mconcat

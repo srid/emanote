@@ -55,13 +55,15 @@ mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
   Splices.mkRenderCtx
     classRules
     ( \ctx blk ->
-        asum $
-          pandocBlockRenderers <&> \f ->
+        asum
+          $ pandocBlockRenderers
+          <&> \f ->
             f model nr ctx x blk
     )
     ( \ctx blk ->
-        asum $
-          pandocInlineRenderers <&> \f ->
+        asum
+          $ pandocInlineRenderers
+          <&> \f ->
             f model nr ctx x blk
     )
 

@@ -22,8 +22,8 @@ resolveUnresolvedRelTarget model = \case
     resolveModelRoute model r
       <&> resourceSiteRoute
   Rel.URTVirtual virtualRoute -> do
-    Rel.RRTFound $
-      SR.SiteRoute_VirtualRoute
+    Rel.RRTFound
+      $ SR.SiteRoute_VirtualRoute
         virtualRoute
 
 resolveWikiLinkMustExist ::

@@ -22,8 +22,10 @@ instance (HasExt ext) => ToJSON (R ext) where
 
 instance (HasExt ext) => Show (R ext) where
   show r =
-    toString $
-      "R[/" <> encodeRoute r <> "]"
+    toString
+      $ "R[/"
+      <> encodeRoute r
+      <> "]"
 
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)

@@ -67,8 +67,8 @@ run cfg@EmanoteConfig {..} = do
         >>= postRun cfg
     CLI.Cmd_Export -> do
       Dynamic (unModelEma -> model0, _) <-
-        flip runLoggerLoggingT oneOffLogger $
-          siteInput @SiteRoute (Ema.CLI.action def) cfg
+        flip runLoggerLoggingT oneOffLogger
+          $ siteInput @SiteRoute (Ema.CLI.action def) cfg
       putLBSLn $ Export.renderJSONExport model0
   where
     -- A logger suited for running one-off commands.
@@ -84,8 +84,8 @@ run cfg@EmanoteConfig {..} = do
 
 postRun :: EmanoteConfig -> (Model.ModelEma, (FilePath, [FilePath])) -> IO ()
 postRun EmanoteConfig {..} (unModelEma -> model0, (outPath, genPaths)) = do
-  when (model0 ^. modelCompileTailwind) $
-    compileTailwindCss (outPath </> generatedCssFile) genPaths
+  when (model0 ^. modelCompileTailwind)
+    $ compileTailwindCss (outPath </> generatedCssFile) genPaths
   checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
   checkBadMarkdownFiles $ Model.modelNoteErrors model0
 
@@ -104,8 +104,9 @@ checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
 
 checkBrokenLinks :: CLI.Cli -> Map LMLRoute [Export.Link] -> IO ()
 checkBrokenLinks cli modelRels = runStderrLoggingT $ do
-  ((), res :: Sum Int) <- runWriterT $
-    forM_ (Map.toList modelRels) $ \(noteRoute, rels) ->
+  ((), res :: Sum Int) <- runWriterT
+    $ forM_ (Map.toList modelRels)
+    $ \(noteRoute, rels) ->
       forM_ (sortNub rels) $ \(Export.Link urt rrt) ->
         case rrt of
           RRTFound _ -> pass
@@ -127,11 +128,15 @@ compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = do
   runStdoutLoggingT $ do
     log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
-    Tailwind.runTailwind $
-      def
-        & Tailwind.tailwindConfig % Tailwind.tailwindConfigContent .~ genPaths
-        & Tailwind.tailwindOutput .~ cssPath
-        & Tailwind.tailwindMode .~ Tailwind.Production
+    Tailwind.runTailwind
+      $ def
+      & Tailwind.tailwindConfig
+      % Tailwind.tailwindConfigContent
+      .~ genPaths
+      & Tailwind.tailwindOutput
+      .~ cssPath
+      & Tailwind.tailwindMode
+      .~ Tailwind.Production
 
 defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =

@@ -115,10 +115,11 @@ lookupNoteByWikiLink model wl = do
 
 modelLookupBacklinks :: R.LMLRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
-  sortOn (Calendar.backlinkSortKey model . fst) $
-    groupNE $
-      backlinkRels r model <&> \rel ->
-        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+  sortOn (Calendar.backlinkSortKey model . fst)
+    $ groupNE
+    $ backlinkRels r model
+    <&> \rel ->
+      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where
     groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
     groupNE =

@@ -76,14 +76,15 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
                 ]
             )
         details <-
-          HP.rpInline ctx $
+          HP.rpInline ctx
+            $
             -- FIXME: This aside is meaningless for non-wikilink links (regular
             -- Markdown links)
-            B.Span ("", ["emanote:error:aside"], []) $
-              one $
-                tooltip "Find notes containing this broken link" $
-                  one $
-                    B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
+            B.Span ("", ["emanote:error:aside"], [])
+            $ one
+            $ tooltip "Find notes containing this broken link"
+            $ one
+            $ B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
         if M.inLiveServer model
           then pure $ raw <> details
           else pure raw
@@ -144,10 +145,11 @@ replaceLinkNodeWithRoute model r (inner, url) =
     nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
     nonEmptyLinkInlines model' url' mr = \case
       [] ->
-        toList $
-          nonEmptyInlines url $
-            fromMaybe [] $
-              siteRouteDefaultInnerText model' url' =<< mr
+        toList
+          $ nonEmptyInlines url
+          $ fromMaybe []
+          $ siteRouteDefaultInnerText model' url'
+          =<< mr
       x -> x
 
 -- | Ensure that inlines list is non-empty, using the provided singleton value if necessary.

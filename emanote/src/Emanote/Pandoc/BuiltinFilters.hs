@@ -23,10 +23,10 @@ linkifyInlineTags =
   W.walk $ \case
     inline@(B.Span attr is) ->
       if
-          | Just inlineTag <- HT.getTagFromInline inline ->
-              B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
-          | otherwise ->
-              inline
+        | Just inlineTag <- HT.getTagFromInline inline ->
+            B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
+        | otherwise ->
+            inline
     x ->
       x
   where

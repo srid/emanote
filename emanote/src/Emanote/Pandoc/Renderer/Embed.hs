@@ -51,8 +51,8 @@ embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
   (Rel.URTResource mr, _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveModelRoute model mr
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
-    either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
+  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+    $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
@@ -61,8 +61,8 @@ embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   let parentR = R.withLmlRoute R.routeParent noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $
-    either (const Nothing) (embedStaticFileRoute model $ show wl)
+  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+    $ either (const Nothing) (embedStaticFileRoute model $ show wl)
 
 runEmbedTemplate :: ByteString -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
 runEmbedTemplate name splices = do
