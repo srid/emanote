@@ -91,20 +91,24 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
       pure $ do
         raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
         candidates <-
-          fmap mconcat . sequence $
-            toList srs
-              <&> \(getSr -> sr) -> do
-                let (rp, _) = M.withoutRoutePrism model
-                    srRoute = toText $ review rp sr
-                    (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
-                    linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
-                    newIs = one $ B.Str $ show sr
-                HP.rpInline ctx $
-                  B.Span ("", ["emanote:error:aside"], []) $
-                    one $
-                      tooltip (show sr <> " -> " <> srRoute) $
-                        one $
-                          B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
+          fmap
+            mconcat
+            ( mapM
+                ( \(getSr -> sr) -> do
+                    let (rp, _) = M.withoutRoutePrism model
+                        srRoute = toText $ review rp sr
+                        (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
+                        linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
+                        newIs = one $ B.Str $ show sr
+                    HP.rpInline ctx
+                      $ B.Span ("", ["emanote:error:aside"], [])
+                      $ one
+                      $ tooltip (show sr <> " -> " <> srRoute)
+                      $ one
+                      $ B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
+                )
+                (toList srs)
+            )
         if M.inLiveServer model
           then pure $ raw <> candidates
           else pure raw
