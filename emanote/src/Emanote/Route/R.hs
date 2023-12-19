@@ -52,7 +52,7 @@ routeSlugWithPrefix prefix r = do
 -- | The base name of the route without its parent path.
 routeBaseName :: R ext -> Text
 routeBaseName =
-  Slug.unSlug . head . NE.reverse . unRoute
+  Slug.unSlug . last . unRoute
 
 routeParent :: R ext -> Maybe (R 'Folder)
 routeParent =
