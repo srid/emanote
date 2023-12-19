@@ -7,16 +7,16 @@ import System.FilePattern (FilePattern)
 filePattern :: (HasCallStack) => R.FileType R.SourceExt -> FilePath
 filePattern = \case
   R.LMLType R.Md ->
-    R.withExt @_ @('R.LMLType 'R.Md) $
-      "**/*"
+    R.withExt @_ @('R.LMLType 'R.Md)
+      $ "**/*"
   R.LMLType R.Org ->
-    R.withExt @_ @('R.LMLType 'R.Org) $
-      "**/*"
+    R.withExt @_ @('R.LMLType 'R.Org)
+      $ "**/*"
   R.Yaml ->
     R.withExt @_ @'R.Yaml "**/*"
   R.HeistTpl ->
-    R.withExt @_ @'R.HeistTpl $
-      "**/*"
+    R.withExt @_ @'R.HeistTpl
+      $ "**/*"
   R.AnyExt ->
     "**"
 

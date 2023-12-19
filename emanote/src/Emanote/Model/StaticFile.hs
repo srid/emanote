@@ -76,18 +76,18 @@ readStaticFileInfo ::
 readStaticFileInfo fp readFilePath = do
   let extension = toText (takeExtension fp)
   if
-      | extension `elem` imageExts ->
-          pure $ Just StaticFileInfoImage
-      | extension `elem` videoExts ->
-          pure $ Just StaticFileInfoVideo
-      | extension `elem` audioExts ->
-          pure $ Just StaticFileInfoAudio
-      | extension == ".pdf" ->
-          pure $ Just StaticFileInfoPDF
-      | Just lang <- Map.lookup extension codeExts -> do
-          code <- readFilePath fp
-          pure $ Just $ StaticFileInfoCode lang code
-      | otherwise -> return Nothing
+    | extension `elem` imageExts ->
+        pure $ Just StaticFileInfoImage
+    | extension `elem` videoExts ->
+        pure $ Just StaticFileInfoVideo
+    | extension `elem` audioExts ->
+        pure $ Just StaticFileInfoAudio
+    | extension == ".pdf" ->
+        pure $ Just StaticFileInfoPDF
+    | Just lang <- Map.lookup extension codeExts -> do
+        code <- readFilePath fp
+        pure $ Just $ StaticFileInfoCode lang code
+    | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
     videoExts = [".mp4", ".webm", ".ogv"]

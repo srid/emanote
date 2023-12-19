@@ -115,12 +115,12 @@ modelInsertNote note =
           >>> injectAncestors (N.noteAncestors note)
           >>> dropRedundantAncestor r
        )
-    >>> modelRels
-      %~ updateIxMulti r (Rel.noteRels note)
-    >>> modelTasks
-      %~ updateIxMulti r (Task.noteTasks note)
-    >>> modelNav
-      %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
+      >>> modelRels
+    %~ updateIxMulti r (Rel.noteRels note)
+      >>> modelTasks
+    %~ updateIxMulti r (Task.noteTasks note)
+      >>> modelNav
+    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
 
@@ -172,15 +172,15 @@ modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
 modelDeleteNote k model =
   model
     & modelNotes
-      %~ ( Ix.deleteIx k
-            >>> restoreAncestor (N.RAncestor <$> mFolderR)
-         )
-    & modelRels
-      %~ deleteIxMulti k
-    & modelTasks
-      %~ deleteIxMulti k
-    & modelNav
-      %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
+    %~ ( Ix.deleteIx k
+          >>> restoreAncestor (N.RAncestor <$> mFolderR)
+       )
+      & modelRels
+    %~ deleteIxMulti k
+      & modelTasks
+    %~ deleteIxMulti k
+      & modelNav
+    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
@@ -261,9 +261,9 @@ modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
   _ -> Nothing
   where
     resolvedTarget =
-      Rel.resolvedRelTargetFromCandidates $
-        N.lookupNotesByXmlRoute r $
-          _modelNotes model
+      Rel.resolvedRelTargetFromCandidates
+        $ N.lookupNotesByXmlRoute r
+        $ _modelNotes model
 
 modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =
@@ -273,11 +273,13 @@ modelLookupTitle r =
 modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either (R.LMLView, Note) StaticFile]
 modelWikiLinkTargets wl model =
   let notes =
-        Ix.toList $
-          (model ^. modelNotes) @= wl
+        Ix.toList
+          $ (model ^. modelNotes)
+          @= wl
       staticFiles =
-        Ix.toList $
-          (model ^. modelStaticFiles) @= wl
+        Ix.toList
+          $ (model ^. modelStaticFiles)
+          @= wl
    in fmap Right staticFiles <> fmap Left ((R.LMLView_Html,) <$> notes)
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
@@ -294,14 +296,16 @@ modelNoteRels =
 
 modelNoteMetas :: Model -> Map LMLRoute (Tit.Title, LMLRoute, Aeson.Value)
 modelNoteMetas model =
-  Map.fromList $
-    Ix.toList (_modelNotes model) <&> \note ->
+  Map.fromList
+    $ Ix.toList (_modelNotes model)
+    <&> \note ->
       (note ^. N.noteRoute, (note ^. N.noteTitle, note ^. N.noteRoute, note ^. N.noteMeta))
 
 modelNoteErrors :: Model -> Map LMLRoute [Text]
 modelNoteErrors model =
-  Map.fromList $
-    flip mapMaybe (Ix.toList (_modelNotes model)) $ \note -> do
+  Map.fromList
+    $ flip mapMaybe (Ix.toList (_modelNotes model))
+    $ \note -> do
       let errs = note ^. N.noteErrors
       guard $ not $ null errs
       pure (note ^. N.noteRoute, errs)

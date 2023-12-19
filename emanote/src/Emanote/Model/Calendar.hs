@@ -44,9 +44,10 @@ parseRouteDay =
       -- Day
       day <- asInt =<< replicateM 2 M.digitChar
       -- Optional suffix (ignored)
-      void $
-        optional $ do
+      void
+        $ optional
+        $ do
           void $ M.oneOf ['-', '_', ' ']
           void M.takeRest
-      maybe (fail "Not a date") pure $
-        fromGregorianValid year (fromInteger month) (fromInteger day)
+      maybe (fail "Not a date") pure
+        $ fromGregorianValid year (fromInteger month) (fromInteger day)

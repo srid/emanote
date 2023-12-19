@@ -67,8 +67,9 @@ noteRels note =
   where
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
-      Ix.fromList $
-        flip concatMap (Map.toList m) $ \(url, instances) -> do
+      Ix.fromList
+        $ flip concatMap (Map.toList m)
+        $ \(url, instances) -> do
           flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
             let parentR = R.withLmlRoute R.routeParent $ note ^. noteRoute
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
@@ -103,8 +104,8 @@ parseUnresolvedRelTarget baseDir attrs url = do
 
 relocateRelUrlUnder :: Maybe FilePath -> FilePath -> FilePath
 relocateRelUrlUnder mbase fp =
-  normalizeIgnoringSymlinks $
-    case mbase of
+  normalizeIgnoringSymlinks
+    $ case mbase of
       Nothing -> fp
       Just x -> x </> fp
 

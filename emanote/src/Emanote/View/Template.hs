@@ -74,13 +74,15 @@ render m sr =
               note404 =
                 MN.missingNote hereRoute (toText urlPath)
                   & setErrorPageMeta
-                  & MN.noteTitle .~ "! Missing link"
+                  & MN.noteTitle
+                  .~ "! Missing link"
           pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
         SR.SiteRoute_AmbiguousR urlPath notes -> do
           let noteAmb =
                 MN.ambiguousNoteURL urlPath notes
                   & setErrorPageMeta
-                  & MN.noteTitle .~ "! Ambiguous link"
+                  & MN.noteTitle
+                  .~ "! Ambiguous link"
           pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
         SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
         SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
@@ -142,18 +144,20 @@ renderLmlHtml model note = do
   withDoctype . withLoadingMessage . C.renderModelTemplate model templateName $ do
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
-          Splices.listSplice bs "backlink" $
-            \(source, contexts) -> do
+          Splices.listSplice bs "backlink"
+            $ \(source, contexts) -> do
               let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
                   bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
                   bctx = C.mkTemplateRenderCtx model source bmeta
               -- TODO: reuse note splice
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
-              "backlink:note:contexts" ## Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                "context:body" ## C.withInlineCtx bctx $ \ctx' ->
-                  Splices.pandocSplice ctx' ctxDoc
+              "backlink:note:contexts" ##
+                Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
+                  let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                  "context:body" ##
+                    C.withInlineCtx bctx $ \ctx' ->
+                      Splices.pandocSplice ctx' ctxDoc
     -- Sidebar navigation
     routeTreeSplice ctx (Just r) model
     "ema:breadcrumbs" ##
@@ -165,12 +169,12 @@ renderLmlHtml model note = do
       HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
     "ema:note:url" ##
       HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
-    "emaNoteFeedUrl"
-      ## pure
+    "emaNoteFeedUrl" ##
+      pure
         . RX.renderHtmlNodes
-      $ if MN.noteHasFeed note
-        then feedDiscoveryLink model note
-        else mempty
+        $ if MN.noteHasFeed note
+          then feedDiscoveryLink model note
+          else mempty
     "ema:note:backlinks" ##
       backlinksSplice (G.modelLookupBacklinks r model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
@@ -180,15 +184,15 @@ renderLmlHtml model note = do
       backlinksSplice backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree model r
     "ema:note:uptree" ##
-      Splices.treeSplice (\_ _ -> ()) folgeAnc $
-        \(last -> nodeRoute) children -> do
+      Splices.treeSplice (\_ _ -> ()) folgeAnc
+        $ \(last -> nodeRoute) children -> do
           "node:text" ## C.titleSplice ctx $ M.modelLookupTitle nodeRoute model
           "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
           "tree:open" ## Heist.ifElseISplice (not . null $ children)
     "ema:note:uptree:nonempty" ## Heist.ifElseISplice (not . null $ folgeAnc)
     "ema:note:pandoc" ##
-      C.withBlockCtx ctx $
-        \ctx' ->
+      C.withBlockCtx ctx
+        $ \ctx' ->
           Splices.pandocSplice ctx' (note ^. MN.noteDoc)
 
 -- | If there is no 'current route', all sub-trees are marked as active/open.

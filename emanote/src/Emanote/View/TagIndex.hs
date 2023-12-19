@@ -87,23 +87,23 @@ renderTagIndex model tagPath = do
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
     "ema:tagcrumbs" ##
-      Splices.listSplice parents "ema:each-crumb" $
-        \crumb -> do
+      Splices.listSplice parents "ema:each-crumb"
+        $ \crumb -> do
           let crumbTitle = maybe "/" (HT.unTagNode . last) . nonEmpty $ crumb
               crumbUrl = SR.siteRouteUrl model $ SR.tagIndexRoute crumb
           "ema:tagcrumb:title" ## HI.textSplice crumbTitle
           "ema:tagcrumb:url" ## HI.textSplice crumbUrl
     "ema:childTags" ##
-      Splices.listSplice (tagIndexChildren tagIdx) "ema:each-childTag" $
-        \childTag -> do
+      Splices.listSplice (tagIndexChildren tagIdx) "ema:each-childTag"
+        $ \childTag -> do
           let childIndex = mkTagIndex model (toList . fst $ childTag)
           "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
           "ema:childTag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute (toList $ fst childTag))
           "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))
           "ema:childTag:count-tag" ## HI.textSplice (show (length $ tagIndexChildren childIndex))
     "ema:notes" ##
-      Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note" $
-        \note ->
+      Splices.listSplice (tagIndexNotes tagIdx) "ema:each-note"
+        $ \note ->
           PF.noteSpliceMap (withInlineCtx tCtx) model note
 
 tagNodesText :: NonEmpty HT.TagNode -> Text

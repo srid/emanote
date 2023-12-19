@@ -40,30 +40,35 @@ import Relude
 emanoteGeneratableRoutes :: ModelEma -> [SiteRoute]
 emanoteGeneratableRoutes model =
   let htmlRoutes =
-        model ^. M.modelNotes
-          & Ix.toList
-          <&> noteFileSiteRoute'
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            <&> noteFileSiteRoute'
       feedRoutes =
-        model ^. M.modelNotes
-          & Ix.toList
-          & filter N.noteHasFeed
-          <&> noteFeedSiteRoute
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            & filter N.noteHasFeed
+            <&> noteFeedSiteRoute
       staticRoutes =
         let includeFile f =
               not (LiveServerFile.isLiveServerFile f)
                 || (f == LiveServerFile.tailwindFullCssPath && not (model ^. M.modelCompileTailwind))
-         in model ^. M.modelStaticFiles
-              & Ix.toList
-              & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
-              <&> staticFileSiteRoute
+         in model
+              ^. M.modelStaticFiles
+                & Ix.toList
+                & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
+                <&> staticFileSiteRoute
       virtualRoutes :: [VirtualRoute] =
         let tags = fst <$> M.modelTags model
             tagPaths =
-              Set.fromList $
-                ([] :) $ -- [] Triggers generation of main tag index.
-                  concat $
-                    tags <&> \(HT.deconstructTag -> tagPath) ->
+              Set.fromList
+                $ ([] :)
+                $ concatMap -- [] Triggers generation of main tag index.
+                  ( \(HT.deconstructTag -> tagPath) ->
                       NE.filter (not . null) $ NE.inits tagPath
+                  )
+                  tags
          in VirtualRoute_Index
               : VirtualRoute_Export
               : VirtualRoute_StorkIndex
