@@ -11,5 +11,5 @@ Emanote includes two builtin layouts, called `book` (the default) and [[neuron-l
 ## Features
 
 ```query
-path:./*
+children:.
 ```
