@@ -11,7 +11,7 @@ tags: []
 # TODO: How to design this when generating RSS feeds?
 template:
   # Which template to use to render notes. The filepath without the .tpl extension.
-  name: /templates/layouts/book
+  name: /templates/layouts/note
   # Layout specific settings
   layout:
     # For base.tpl
@@ -19,7 +19,7 @@ template:
       # The class to apply for <body> element when using base.tpl (used by note and book layouts)
       bodyClass: bg-gray-400 overflow-y-scroll
     note:
-      containerClass: container mx-auto max-w-prose
+      containerClass: container max-w-prose
     book:
       containerClass: container mx-auto
   error:

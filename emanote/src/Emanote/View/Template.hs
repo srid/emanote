@@ -153,11 +153,29 @@ renderLmlHtml model note = do
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
               "backlink:note:contexts" ##
-                Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                  let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                  "context:body" ##
-                    C.withInlineCtx bctx $ \ctx' ->
-                      Splices.pandocSplice ctx' ctxDoc
+                Splices.listSplice (toList contexts) "context"
+                  $ \backlinkCtx -> do
+                    let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                    "context:body" ##
+                      C.withInlineCtx bctx
+                        $ \ctx' ->
+                          Splices.pandocSplice ctx' ctxDoc
+        parentsSplice =
+          Splices.listSplice (G.folgezettelParentsFor model r) "parent"
+            $ \parentRoute -> do
+              "parent:title" ## C.titleSplice ctx (M.modelLookupTitle parentRoute model)
+              "parent:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, parentRoute))
+              let siblings = G.folgezettelChildrenFor model parentRoute
+              "parent:children" ##
+                Splices.listSplice siblings "child"
+                  $ \childRoute -> do
+                    "child:title" ## C.titleSplice ctx (M.modelLookupTitle childRoute model)
+                    "child:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, childRoute))
+        childrenSplice =
+          Splices.listSplice (G.folgezettelChildrenFor model r) "child"
+            $ \childRoute -> do
+              "child:title" ## C.titleSplice ctx (M.modelLookupTitle childRoute model)
+              "child:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, childRoute))
     -- Sidebar navigation
     routeTreeSplice ctx (Just r) model
     "ema:breadcrumbs" ##
@@ -175,6 +193,8 @@ renderLmlHtml model note = do
         $ if MN.noteHasFeed note
           then feedDiscoveryLink model note
           else mempty
+    "ema:note:parents" ## parentsSplice
+    "ema:note:children" ## childrenSplice
     "ema:note:backlinks" ##
       backlinksSplice (G.modelLookupBacklinks r model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
