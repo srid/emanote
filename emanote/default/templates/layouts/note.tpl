@@ -19,6 +19,7 @@
       <div class="mt-2 md:mt-4">
         <apply template="components/note-uptree" />
 
+        <div id="container" class="relative md:shadow-2xl md:mb-8">
           <storkSearchButtonTopRight />
           <apply template="components/body" />
         </div>
