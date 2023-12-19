@@ -59,11 +59,13 @@ emanoteGeneratableRoutes model =
       virtualRoutes :: [VirtualRoute] =
         let tags = fst <$> M.modelTags model
             tagPaths =
-              Set.fromList $
-                ([] :) $ -- [] Triggers generation of main tag index.
-                  concat $
-                    tags <&> \(HT.deconstructTag -> tagPath) ->
+              Set.fromList
+                $ ([] :)
+                $ concatMap -- [] Triggers generation of main tag index.
+                  ( \(HT.deconstructTag -> tagPath) ->
                       NE.filter (not . null) $ NE.inits tagPath
+                  )
+                  tags
          in VirtualRoute_Index
               : VirtualRoute_Export
               : VirtualRoute_StorkIndex
