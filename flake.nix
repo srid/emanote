@@ -71,6 +71,7 @@
           settings = {
             # TODO: Eliminate these after new emanote gets upstreamed to nixpkgs
             fsnotify.check = false;
+            heist.broken = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
             ema.jailbreak = true;
@@ -90,7 +91,7 @@
               justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
-                self.pandoc_3_1_6
+                self.pandoc_3_1_9
                 self.pandoc-types
                 self.warp
               ];
