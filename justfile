@@ -17,6 +17,8 @@ fmt:
     treefmt
 
 # Run the app using ghcid (with auto-reload / recompile)
+# To run against a custom notebook:
+#   just notebook=$HOME/code/mynotebook run
 run:
   ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L {{notebook}} run --port=9010"
 
