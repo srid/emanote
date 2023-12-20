@@ -11,7 +11,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelNotes, modelRels, parentLmlRoute)
+import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
@@ -76,11 +76,19 @@ folgezettelChildrenFor model r = do
           & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
-        maybeToMonoid $ do
-          let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
-              notes = Ix.toList $ (model ^. modelNotes) @= folderR
-              rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
-          pure rs
+        if r == modelIndexRoute model
+          then
+            let notes = Ix.toList $ (model ^. modelNotes) @= (Nothing :: Maybe (R.R 'R.Folder))
+             in flip mapMaybe notes $ \note -> do
+                  let childR = note ^. MN.noteRoute
+                  guard $ folderFolgezettelEnabledFor model childR
+                  guard $ childR /= r -- Exclude index.md being a children of itself.
+                  pure childR
+          else
+            let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
+                notes = Ix.toList $ (model ^. modelNotes) @= Just folderR
+                rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
+             in rs
       folgezettelChildren =
         mconcat
           [ folgezettelBacklinks
@@ -98,6 +106,15 @@ folgezettelChildrenFor model r = do
     selectFolgezettel = \case
       Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
+
+folgezettelTreeFrom :: Model -> R.LMLRoute -> Tree R.LMLRoute
+folgezettelTreeFrom model = go Set.empty
+  where
+    go visitedRoutes route
+      | route `Set.member` visitedRoutes = Node route []
+      -- TODO: Favour folder children first?
+      -- TODO: Does this respect `order` key?
+      | otherwise = Node route $ folgezettelChildrenFor model route <&> go (Set.insert route visitedRoutes)
 
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
 folderFolgezettelEnabledFor model r =

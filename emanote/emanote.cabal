@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.2.2.1
+version:            1.2.3.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -132,7 +132,6 @@ common library-common
     , pandoc-lua-engine
     , pandoc-types
     , parsec
-    , path-tree              >=0.2
     , process-extras
     , profunctors
     , relude                 >=1.0

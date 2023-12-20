@@ -11,8 +11,6 @@ import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Time (UTCTime)
-import Data.Tree (Tree)
-import Data.Tree.Path qualified as PathTree
 import Data.UUID (UUID)
 import Ema.CLI qualified
 import Emanote.Model.Link.Rel (IxRel)
@@ -40,7 +38,6 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
-import Network.URI.Slug (Slug)
 import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
@@ -64,7 +61,6 @@ data ModelT encF = Model
   , _modelSData :: IxSData
   , _modelStaticFiles :: IxStaticFile
   , _modelTasks :: IxTask
-  , _modelNav :: [Tree Slug]
   -- ^ A tree (forest) of all notes, based on their folder hierarchy.
   , _modelHeistTemplate :: TemplateState
   , _modelStorkIndex :: Stork.IndexVar
@@ -97,7 +93,7 @@ withRoutePrism enc Model {..} =
 
 emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
 emptyModel layers act ren ctw instanceId =
-  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty def
 
 modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =
@@ -119,8 +115,6 @@ modelInsertNote note =
     %~ updateIxMulti r (Rel.noteRels note)
       >>> modelTasks
     %~ updateIxMulti r (Task.noteTasks note)
-      >>> modelNav
-    %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
   where
     r = note ^. N.noteRoute
 
@@ -179,8 +173,6 @@ modelDeleteNote k model =
     %~ deleteIxMulti k
       & modelTasks
     %~ deleteIxMulti k
-      & modelNav
-    %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.

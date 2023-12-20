@@ -6,7 +6,7 @@ import Data.List (partition)
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
-import Data.Tree.Path qualified as PathTree
+import Data.Tree (Tree (..))
 import Ema qualified
 import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
@@ -153,11 +153,13 @@ renderLmlHtml model note = do
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
               "backlink:note:contexts" ##
-                Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                  let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                  "context:body" ##
-                    C.withInlineCtx bctx $ \ctx' ->
-                      Splices.pandocSplice ctx' ctxDoc
+                Splices.listSplice (toList contexts) "context"
+                  $ \backlinkCtx -> do
+                    let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                    "context:body" ##
+                      C.withInlineCtx bctx
+                        $ \ctx' ->
+                          Splices.pandocSplice ctx' ctxDoc
     -- Sidebar navigation
     routeTreeSplice ctx (Just r) model
     "ema:breadcrumbs" ##
@@ -204,11 +206,11 @@ routeTreeSplice ::
   H.Splices (HI.Splice Identity)
 routeTreeSplice tCtx mr model = do
   "ema:route-tree" ##
-    ( let tree = PathTree.treeDeleteChild "index" $ model ^. M.modelNav
+    ( let (Node _ tree) = G.folgezettelTreeFrom model (M.modelIndexRoute model)
           getFoldersFirst tr =
             Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
           getOrder path children =
-            let tr = mkLmlRoute path
+            let tr = last path
                 isLeaf = null children
                 priority = if getFoldersFirst tr && isLeaf then 1 else 0 :: Int
              in ( priority
@@ -217,12 +219,11 @@ routeTreeSplice tCtx mr model = do
                 )
           getCollapsed tr =
             Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-          mkLmlRoute =
-            M.resolveLmlRoute model . R.mkRouteFromSlugs
           lmlRouteSlugs = R.withLmlRoute R.unRoute
-       in Splices.treeSplice getOrder tree $ \(mkLmlRoute -> nodeRoute) children -> do
+       in Splices.treeSplice getOrder tree $ \(last -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
+            -- FIXME: active check should use RAncestor index check
             let isActiveNode = Just nodeRoute == mr
                 isActiveTree =
                   -- Active tree checking is applicable only when there is an

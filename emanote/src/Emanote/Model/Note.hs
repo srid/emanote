@@ -72,7 +72,7 @@ type NoteIxs =
    , -- Ancestor folder routes
      RAncestor
    , -- Parent folder
-     R 'R.Folder
+     Maybe (R 'R.Folder)
    , -- Tag
      HT.Tag
    , -- Alias route for this note. Can be "foo" or "foo/bar".
@@ -89,7 +89,7 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . noteHtmlRoute)
       (ixFun $ maybeToList . noteXmlRoute)
       (ixFun noteAncestors)
-      (ixFun $ maybeToList . noteParent)
+      (ixFun $ one . noteParent)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
@@ -113,7 +113,7 @@ noteParent = R.withLmlRoute R.routeParent . _noteRoute
 
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
-  not . Ix.null . Ix.getEQ r
+  not . Ix.null . Ix.getEQ (Just r)
 
 noteTags :: Note -> [HT.Tag]
 noteTags =
