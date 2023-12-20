@@ -107,6 +107,12 @@ folgezettelChildrenFor model r = do
       Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
 
+{- | Returns a tree of all folgezettel notes, starting from the given route.
+
+If a note has two parents, that note will be positioned in *both* the sub-trees.
+
+Cycles are discarded.
+-}
 folgezettelTreeFrom :: Model -> R.LMLRoute -> Tree R.LMLRoute
 folgezettelTreeFrom model = go Set.empty
   where

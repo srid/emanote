@@ -3,7 +3,6 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
-import Data.List.NonEmpty qualified as NE
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Tree (Tree (..))
@@ -197,14 +196,19 @@ renderLmlHtml model note = do
         $ \ctx' ->
           Splices.pandocSplice ctx' (note ^. MN.noteDoc)
 
--- | If there is no 'current route', all sub-trees are marked as active/open.
+{- | Heist splice for the sidebar tree.
+
+If there is no 'current route', all sub-trees are marked as active/open.
+-}
 routeTreeSplice ::
   (Monad n) =>
   C.TemplateRenderCtx n ->
+  -- | Current route
   Maybe R.LMLRoute ->
   Model ->
   H.Splices (HI.Splice Identity)
-routeTreeSplice tCtx mr model = do
+routeTreeSplice tCtx mCurrentRoute model = do
+  -- TODO: memoize folgezettelTree creation in model (as TVar?)
   "ema:route-tree" ##
     ( let (Node _ tree) = G.folgezettelTreeFrom model (M.modelIndexRoute model)
           getFoldersFirst tr =
@@ -219,17 +223,17 @@ routeTreeSplice tCtx mr model = do
                 )
           getCollapsed tr =
             Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-          lmlRouteSlugs = R.withLmlRoute R.unRoute
        in Splices.treeSplice getOrder tree $ \(last -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
             -- FIXME: active check should use RAncestor index check
-            let isActiveNode = Just nodeRoute == mr
+            let isActiveNode = Just nodeRoute == mCurrentRoute
                 isActiveTree =
                   -- Active tree checking is applicable only when there is an
                   -- active route (i.e., mr is a Just)
-                  flip (maybe True) mr $ \r ->
-                    toList (lmlRouteSlugs nodeRoute) `NE.isPrefixOf` lmlRouteSlugs r
+                  flip (maybe True) mCurrentRoute $ \r ->
+                    -- FIXME: Should take folgezettel ancestor into consideration!
+                    r == nodeRoute || M.isAncestor model (MN.RAncestor $ R.withLmlRoute coerce nodeRoute) r
                 openTree =
                   isActiveTree -- Active tree is always open
                     || not (getCollapsed nodeRoute)
