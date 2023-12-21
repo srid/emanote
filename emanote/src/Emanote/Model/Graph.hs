@@ -147,8 +147,9 @@ folgezettelTreesFrom model fromRoute =
       | otherwise = do
           modify $ Set.delete route
           -- Filter children by not visited.
-          allowedRoutes <- get
-          let children = folgezettelChildrenFor model route & filter (`Set.member` allowedRoutes)
+          -- FIXME: How do we we keep to allowedRoutes while allowing multiple parents?
+          -- allowedRoutes <- get
+          let children = folgezettelChildrenFor model route -- & filter (`Set.member` allowedRoutes)
           cs <- traverse (go (Set.insert route visitedRoutes)) children
           pure $ Node route cs
 
