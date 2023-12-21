@@ -236,11 +236,9 @@ routeTreeSplice tCtx mCurrentRoute model = do
                   flip (maybe True) mCurrentRoute $ \r ->
                     -- FIXME: Performance! (exponential complexity)
                     let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
-                        isFolgeAnc1 = Set.member nodeRoute folgeAnc
-                        isFolgeAnc2 = traceShowId $ Set.member (traceShowId nodeRoute) (traceShowId folgeAnc)
+                        isFolgeAnc = Set.member nodeRoute folgeAnc
                      in -- FIXME: Should take folgezettel ancestor into consideration!
-                        -- in r == nodeRoute || M.isAncestor model (MN.RAncestor $ R.withLmlRoute coerce nodeRoute) r
-                        r == nodeRoute || if T.isInfixOf "neuron-layout" (toText (R.withLmlRoute R.encodeRoute r)) then isFolgeAnc2 else isFolgeAnc1
+                        r == nodeRoute || isFolgeAnc
                 openTree =
                   isActiveTree -- Active tree is always open
                     || not (getCollapsed nodeRoute)
