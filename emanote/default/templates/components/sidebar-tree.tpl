@@ -1,12 +1,10 @@
 <!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-${theme}-300</bind>
+<bind tag="link-class">hover:bg-${theme}-200</bind>
 <node:active>
-  <bind tag="link-class">mavenLinkBold bg-${theme}-200 hover:bg-${theme}-300</bind>
+  <bind tag="link-class">mavenLinkBold bg-${theme}-100 hover:bg-${theme}-200</bind>
   <else />
   <node:activeTree>
-    <bind tag="link-class">mavenLinkBold hover:bg-${theme}-300</bind>
-    <else />
-    <bind tag="link-class">hover:bg-${theme}-300</bind>
+    <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
   </node:activeTree>
   <!-- tree:open>
     <has-children>
