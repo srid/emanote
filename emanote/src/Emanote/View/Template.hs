@@ -4,8 +4,10 @@ import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.Map.Syntax ((##))
+import Data.Set qualified as Set
 import Data.Text qualified as T
 import Data.Tree (Tree (..))
+import Data.Tree qualified as Tree
 import Ema qualified
 import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
@@ -232,15 +234,22 @@ routeTreeSplice tCtx mCurrentRoute model = do
                   -- Active tree checking is applicable only when there is an
                   -- active route (i.e., mr is a Just)
                   flip (maybe True) mCurrentRoute $ \r ->
-                    -- FIXME: Should take folgezettel ancestor into consideration!
-                    r == nodeRoute || M.isAncestor model (MN.RAncestor $ R.withLmlRoute coerce nodeRoute) r
+                    -- FIXME: Performance! (exponential complexity)
+                    let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
+                        isFolgeAnc1 = Set.member nodeRoute folgeAnc
+                        isFolgeAnc2 = traceShowId $ Set.member (traceShowId nodeRoute) (traceShowId folgeAnc)
+                     in -- FIXME: Should take folgezettel ancestor into consideration!
+                        -- in r == nodeRoute || M.isAncestor model (MN.RAncestor $ R.withLmlRoute coerce nodeRoute) r
+                        r == nodeRoute || if T.isInfixOf "neuron-layout" (toText (R.withLmlRoute R.encodeRoute r)) then isFolgeAnc2 else isFolgeAnc1
                 openTree =
                   isActiveTree -- Active tree is always open
                     || not (getCollapsed nodeRoute)
             "node:active" ## Heist.ifElseISplice isActiveNode
+            "node:activeTree" ## Heist.ifElseISplice isActiveTree
             "node:terminal" ## Heist.ifElseISplice (null children)
             "tree:childrenCount" ## HI.textSplice (show $ length children)
             "tree:open" ## Heist.ifElseISplice openTree
+            -- TODO: Add one for indicating this is *an* ancestor of the current route
     )
 
 lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b

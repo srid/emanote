@@ -1,16 +1,18 @@
 <!-- Variable bindings for this tree-->
+<bind tag="link-class">hover:bg-${theme}-300</bind>
 <node:active>
-  <bind tag="link-class">font-bold text-${theme}-600 hover:underline</bind>
+  <bind tag="link-class">mavenLinkBold bg-${theme}-200 hover:bg-${theme}-300</bind>
   <else />
-  <tree:open>
-    <has-children>
-      <bind tag="link-class">font-bold hover:underline</bind>
-      <else />
-      <bind tag="link-class">hover:underline</bind>
-    </has-children>
+  <node:activeTree>
+    <bind tag="link-class">mavenLinkBold hover:bg-${theme}-300</bind>
     <else />
-    <bind tag="link-class">hover:underline</bind>
-  </tree:open>
+    <bind tag="link-class">hover:bg-${theme}-300</bind>
+  </node:activeTree>
+  <!-- tree:open>
+    <has-children>
+      <bind tag="link-class">hover:bg-${theme}-300</bind>
+    </has-children>
+  </tree:open -->
 </node:active>
 
 <has-children>
@@ -55,7 +57,7 @@
   <!-- Node's rootLabel-->
   <div class="flex items-center my-2 space-x-2 justify-left">
     <icon />
-    <a class="${link-class} truncate" title="${node:text}" href="${node:url}">
+    <a class="${link-class} rounded px-1.5 truncate" title="${node:text}" href="${node:url}">
       <node:text />
     </a>
     <tree:open>
