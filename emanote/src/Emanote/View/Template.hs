@@ -6,7 +6,6 @@ import Data.List (partition)
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
-import Data.Tree (Tree (..))
 import Data.Tree qualified as Tree
 import Ema qualified
 import Emanote.Model (Model, ModelEma)
@@ -212,7 +211,7 @@ routeTreeSplice ::
 routeTreeSplice tCtx mCurrentRoute model = do
   -- TODO: memoize folgezettelTree creation in model (as TVar?)
   "ema:route-tree" ##
-    ( let (Node _ tree) = G.folgezettelTreeFrom model (M.modelIndexRoute model)
+    ( let trees = G.folgezettelTreesFrom model (M.modelIndexRoute model)
           getFoldersFirst tr =
             Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
           getOrder path children =
@@ -225,7 +224,7 @@ routeTreeSplice tCtx mCurrentRoute model = do
                 )
           getCollapsed tr =
             Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-       in Splices.treeSplice getOrder tree $ \(last -> nodeRoute) children -> do
+       in Splices.treeSplice getOrder trees $ \(last -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
             -- FIXME: active check should use RAncestor index check
