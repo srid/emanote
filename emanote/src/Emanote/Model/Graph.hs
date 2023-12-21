@@ -77,19 +77,22 @@ folgezettelChildrenFor model r = do
           & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
-        if r == modelIndexRoute model
+        -- TODO: document inverse semantics of folder-folgezettel. Also update the uplink tree implementation.
+        if folderFolgezettelEnabledFor model r
           then
-            let notes = Ix.toList $ (model ^. modelNotes) @= (Nothing :: Maybe (R.R 'R.Folder))
-             in flip mapMaybe notes $ \note -> do
-                  let childR = note ^. MN.noteRoute
-                  guard $ folderFolgezettelEnabledFor model childR
-                  guard $ childR /= r -- Exclude index.md being a children of itself.
-                  pure childR
-          else
-            let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
-                notes = Ix.toList $ (model ^. modelNotes) @= Just folderR
-                rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
-             in rs
+            if r == modelIndexRoute model
+              then
+                let notes = Ix.toList $ (model ^. modelNotes) @= (Nothing :: Maybe (R.R 'R.Folder))
+                 in flip mapMaybe notes $ \note -> do
+                      let childR = note ^. MN.noteRoute
+                      guard $ childR /= r -- Exclude index.md being a children of itself.
+                      pure childR
+              else
+                let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
+                    notes = Ix.toList $ (model ^. modelNotes) @= Just folderR
+                    rs = notes <&> (^. MN.noteRoute)
+                 in rs
+          else []
       folgezettelChildren =
         ordNub
           $ mconcat
