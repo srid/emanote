@@ -48,11 +48,12 @@ folgezettelParentsFor model r = do
           guard $ folderFolgezettelEnabledFor model r
           parentLmlRoute model r
       folgezettelParents =
-        mconcat
-          [ folgezettelBacklinks
-          , folgezettelFrontlinks
-          , folgezettelFolder
-          ]
+        ordNub
+          $ mconcat
+            [ folgezettelBacklinks
+            , folgezettelFrontlinks
+            , folgezettelFolder
+            ]
    in folgezettelParents
   where
     isFolgezettel = \case
@@ -90,11 +91,12 @@ folgezettelChildrenFor model r = do
                 rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
              in rs
       folgezettelChildren =
-        mconcat
-          [ folgezettelBacklinks
-          , folgezettelFrontlinks
-          , folgezettelFolderChildren
-          ]
+        ordNub
+          $ mconcat
+            [ folgezettelBacklinks
+            , folgezettelFrontlinks
+            , folgezettelFolderChildren
+            ]
    in folgezettelChildren
   where
     isReverseFolgezettel = \case
