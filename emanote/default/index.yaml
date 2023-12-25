@@ -12,6 +12,9 @@ tags: []
 template:
   # Which template to use to render notes. The filepath without the .tpl extension.
   name: /templates/layouts/book
+  # Toggleable features for templates. Always true or false.
+  flag:
+    uptree: false
   # Layout specific settings
   layout:
     # For base.tpl
