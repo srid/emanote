@@ -36,13 +36,18 @@
         <ema:note:meta:template:flag:uptree>
           <apply template="components/note-uptree" />
         </ema:note:meta:template:flag:uptree>
-        <apply template="components/breadcrumbs" />
+
+        <ema:note:meta:template:flag:breadcrumbs>
+          <apply template="components/breadcrumbs" />
+        </ema:note:meta:template:flag:breadcrumbs>
 
         <div id="container"
           class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
 
-          <!-- Sidebar column -->
-          <apply template="components/sidebar" />
+          <ema:note:meta:template:flag:sidebar>
+            <!-- Sidebar column -->
+            <apply template="components/sidebar" />
+          </ema:note:meta:template:flag:sidebar>
           <!-- Main body column -->
           <apply template="components/body" />
         </div>
