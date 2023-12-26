@@ -1,9 +1,11 @@
 ---
 template:
-  flag:
-    uptree: true
-    sidebar: false
-    breadcrumbs: false
+  uptree: 
+    enable: true
+  sidebar: 
+    enable: false
+  breadcrumbs: 
+    enable: false
   layout:
     book:
       containerClass: container mx-auto max-w-prose
@@ -15,10 +17,12 @@ Emanote's builtin [[html-template|HTML template]] layout can be configured to to
 
 ```yml
 template:
-  flag:
-    uptree: true
-    sidebar: false
-    breadcrumbs: false
+  uptree: 
+    enable: true
+  sidebar: 
+    enable: false
+  breadcrumbs: 
+    enable: false
   layout:
     book:
       containerClass: container mx-auto max-w-prose

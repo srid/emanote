@@ -1,10 +1,10 @@
 <li>
 
-  <div class="${nodeClass} forest-link">
-    <a href="${node:url}">
+  <a href="${node:url}">
+    <div class="${nodeClass} forest-link">
       <node:text />
-    </a>
-  </div>
+    </div>
+  </a>
 
   <tree:open>
     <ul>

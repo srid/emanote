@@ -25,29 +25,29 @@
       }
     </style>
 
-    <ema:note:meta:template:flag:uptree>
+    <ema:has:uptree>
       <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/inverted-tree.css" />
-    </ema:note:meta:template:flag:uptree>
+    </ema:has:uptree>
   </bind>
 
   <bind tag="body-main">
     <div class="${containerClass}">
       <div class="md:mt-8">
-        <ema:note:meta:template:flag:uptree>
+        <ema:has:uptree>
           <apply template="components/note-uptree" />
-        </ema:note:meta:template:flag:uptree>
+        </ema:has:uptree>
 
-        <ema:note:meta:template:flag:breadcrumbs>
+        <ema:has:breadcrumbs>
           <apply template="components/breadcrumbs" />
-        </ema:note:meta:template:flag:breadcrumbs>
+        </ema:has:breadcrumbs>
 
         <div id="container"
           class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
 
-          <ema:note:meta:template:flag:sidebar>
+          <ema:has:sidebar>
             <!-- Sidebar column -->
             <apply template="components/sidebar" />
-          </ema:note:meta:template:flag:sidebar>
+          </ema:has:sidebar>
           <!-- Main body column -->
           <apply template="components/body" />
         </div>

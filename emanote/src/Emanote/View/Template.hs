@@ -162,7 +162,7 @@ renderLmlHtml model note = do
                           Splices.pandocSplice ctx' ctxDoc
     -- Template flags
     forM_ ["uptree", "breadcrumbs", "sidebar"] $ \flag ->
-      "ema:note:meta:template:flag:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| ["flag", flag]) r model)
+      "ema:has:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model)
     -- Sidebar navigation
     routeTreeSplice ctx (Just r) model
     "ema:breadcrumbs" ##
