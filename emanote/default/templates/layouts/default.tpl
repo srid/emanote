@@ -49,22 +49,21 @@
         <apply template="components/breadcrumbs" />
       </ema:has:breadcrumbs>
 
-      <div id="container"
-        class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
-
-        <ema:has:sidebar>
+      <ema:has:sidebar>
+        <div id="container"
+          class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
           <!-- Sidebar column -->
           <apply template="components/sidebar" />
           <!-- Main body column -->
           <apply template="components/body" />
-          <else />
-          <div class="relative md:shadow-2xl md:mb-8">
-            <storkSearchButtonTopRight />
-            <!-- Main body column -->
-            <apply template="components/body" />
-          </div>
-        </ema:has:sidebar>
-      </div>
+        </div>
+        <else />
+        <div id="container" class="relative md:shadow-2xl md:mb-8">
+          <storkSearchButtonTopRight />
+          <!-- Main body column -->
+          <apply template="components/body" />
+        </div>
+      </ema:has:sidebar>
 
       <apply template="components/footer" />
     </div>
