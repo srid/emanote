@@ -31,3 +31,6 @@ emanote:
   # Whether to automatically treat the contents of this folder notes as its folgezettel children
   folder-folgezettel: false
 ```
+
+>[!tip]
+> Put this configuration in `index.md` if you want to disable folder folgezettel for just the top-level index route. Put it in `index.yaml` if you want to disable it for all folder notes.
