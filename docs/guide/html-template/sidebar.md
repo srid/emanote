@@ -1,6 +1,6 @@
 # Sidebar
 
-In [[html-template|the default template]], the sidebar is rendered on the left side. The sidebar tree is determined from the directory layout of the [[markdown|Markdown]] or [[orgmode|Org]] files.
+In [[html-template|the default template]], the sidebar is rendered on the left side. The sidebar tree is determined from [[folgezettel|folgezettel heterarchy]].
 
 - The sidebar tree is collapsed by default. But this can be disabled by setting `template.sidebar.collapsed` to `false` in [[yaml-config]]
 - The ordering of children in the tree is determined in the following order (this is also the order in which [[query]] results are rendered by default):
