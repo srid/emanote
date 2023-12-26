@@ -1,5 +1,5 @@
 <!-- DoNotFormat -->
-<bind tag="containerClass"><ema:metadata><value var="template.layout.book.containerClass" /></ema:metadata> <ema:has:sidebar>md:mt-8 <else/>mt-2 <ema:has:uptree>md:mt-4 <else/> md:mt-8 </ema:has:uptree> </ema:has:sidebar></bind>
+<bind tag="containerClass"><ema:metadata><value var="template.base.containerClass" /></ema:metadata> <ema:has:sidebar>md:mt-8 <else/>mt-2 <ema:has:uptree>md:mt-4 <else/> md:mt-8 </ema:has:uptree> </ema:has:sidebar></bind>
 <!-- DoNotFormat -->
 
 <bind tag="storkSearchButtonTopRight">

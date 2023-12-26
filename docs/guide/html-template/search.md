@@ -8,7 +8,8 @@ Emanote provides client-side full-text search using [Stork](https://stork-search
 You can trigger search input in one of the following ways:
 
 - Press `Ctrl+K` (or `⌘K` on macOS).
-- Click the lens icon on the sidebar (if using the 'book' [[html-template|template layout]]) or top-right corner (if using [[neuron-layout]]).
+- Click the lens icon on the sidebar 
+  - If the sidebar is disabled (eg.: you are on [[neuron-layout]]), the search lens icon will be on the top-right corner.
 
 ## Including frontmatter in the search index
 

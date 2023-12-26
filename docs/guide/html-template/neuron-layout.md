@@ -6,9 +6,8 @@ template:
     enable: false
   breadcrumbs: 
     enable: false
-  layout:
-    book:
-      containerClass: container mx-auto max-w-prose
+  base:
+    containerClass: container mx-auto max-w-prose
 ---
 
 # Neuron-like layout
@@ -23,9 +22,8 @@ template:
     enable: false
   breadcrumbs: 
     enable: false
-  layout:
-    book:
-      containerClass: container mx-auto max-w-prose
+  base:
+    containerClass: container mx-auto max-w-prose
 ```
 
 This includes the [[uptree]] of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the "home" link appears on top in the uplink tree of all notes. 
