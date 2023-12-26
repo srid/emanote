@@ -4,7 +4,9 @@
   <bind tag="link-class">mavenLinkBold bg-${theme}-100 hover:bg-${theme}-200</bind>
   <else />
   <node:activeTree>
-    <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
+    <has-current-route>
+      <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
+    </has-current-route>
   </node:activeTree>
   <!-- tree:open>
     <has-children>

@@ -249,6 +249,7 @@ routeTreeSplice tCtx mCurrentRoute model = do
             "node:terminal" ## Heist.ifElseISplice (null children)
             "tree:childrenCount" ## HI.textSplice (show $ length children)
             "tree:open" ## Heist.ifElseISplice openTree
+            "has-current-route" ## Heist.ifElseISplice (isJust mCurrentRoute)
             -- TODO: Add one for indicating this is *an* ancestor of the current route
     )
 
