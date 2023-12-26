@@ -12,7 +12,7 @@ template:
 
 # Neuron-like layout
 
-Emanote's builtin [[html-template|HTML template]] layout can be configured to toggle UX features on or off. The default configuration includes [[sidebar]] and breadcrumbs but hides the [[uptree]]. To mimic the layout used by [Neuron](https://neuron.zettel.page/), turn off sidebar and breadcrumbs while enabling the uptree. Add this to your [[yaml-config]]:
+Emanote's builtin [[html-template|HTML template]] layout can be configured to toggle UX features on or off. The default configuration includes [[sidebar]] and [[breadcrumbs]] but hides the [[uptree]]. To mimic the layout used by [Neuron](https://neuron.zettel.page/), turn off sidebar and breadcrumbs while enabling the uptree. Add this to your [[yaml-config]]:
 
 ```yml
 template:
