@@ -24,11 +24,10 @@ Here is the [[target-note]]#
 
 By default, Emanote also includes any directories in your note's path as vertices in the folgezettel graph. This makes the folder note a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the folder note.
 
-This behavior can be configured. To turn off the implicit folder nodes, set to `false` the corresponding flag in [[yaml-config|your configuration]] as shown here:
-
+This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in [[yaml-config|your configuration]] to `false` as shown here:
 
 ```yaml
 emanote:
-  # Whether to automatically treat folder notes as a folgezettel parent of its contents
+  # Whether to automatically treat the contents of this folder notes as its folgezettel children
   folder-folgezettel: false
 ```
