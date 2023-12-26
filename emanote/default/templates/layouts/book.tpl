@@ -1,6 +1,15 @@
 <!-- DoNotFormat -->
-<bind tag="containerClass"><ema:metadata><value var="template.layout.book.containerClass" /></ema:metadata></bind>
+<bind tag="containerClass"><ema:metadata><value var="template.layout.book.containerClass" /></ema:metadata> <ema:has:sidebar>md:mt-8 <else/>mt-2 <ema:has:uptree>md:mt-4 <else/> md:mt-8 </ema:has:uptree> </ema:has:sidebar></bind>
 <!-- DoNotFormat -->
+
+<bind tag="storkSearchButtonTopRight">
+  <div class="absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center">
+    <a title="Search (Ctrl+K)" class="cursor-pointer" onclick="window.emanote.stork.toggleSearch()">
+      <apply template="components/stork/stork-icon" />
+    </a>
+  </div>
+</bind>
+
 
 <apply template="base">
   <bind tag="head-main">
@@ -32,25 +41,29 @@
 
   <bind tag="body-main">
     <div class="${containerClass}">
-      <div class="md:mt-8">
-        <ema:has:uptree>
-          <apply template="components/note-uptree" />
-        </ema:has:uptree>
+      <ema:has:uptree>
+        <apply template="components/note-uptree" />
+      </ema:has:uptree>
 
-        <ema:has:breadcrumbs>
-          <apply template="components/breadcrumbs" />
-        </ema:has:breadcrumbs>
+      <ema:has:breadcrumbs>
+        <apply template="components/breadcrumbs" />
+      </ema:has:breadcrumbs>
 
-        <div id="container"
-          class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
+      <div id="container"
+        class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
 
-          <ema:has:sidebar>
-            <!-- Sidebar column -->
-            <apply template="components/sidebar" />
-          </ema:has:sidebar>
+        <ema:has:sidebar>
+          <!-- Sidebar column -->
+          <apply template="components/sidebar" />
           <!-- Main body column -->
           <apply template="components/body" />
-        </div>
+          <else />
+          <div class="relative md:shadow-2xl md:mb-8">
+            <storkSearchButtonTopRight />
+            <!-- Main body column -->
+            <apply template="components/body" />
+          </div>
+        </ema:has:sidebar>
       </div>
 
       <apply template="components/footer" />
