@@ -153,13 +153,11 @@ renderLmlHtml model note = do
               "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
               "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
               "backlink:note:contexts" ##
-                Splices.listSplice (toList contexts) "context"
-                  $ \backlinkCtx -> do
-                    let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                    "context:body" ##
-                      C.withInlineCtx bctx
-                        $ \ctx' ->
-                          Splices.pandocSplice ctx' ctxDoc
+                Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
+                  let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+                  "context:body" ##
+                    C.withInlineCtx bctx $ \ctx' ->
+                      Splices.pandocSplice ctx' ctxDoc
     -- Template flags
     forM_ ["uptree", "breadcrumbs", "sidebar"] $ \flag ->
       "ema:has:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model)
