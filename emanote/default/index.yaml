@@ -137,4 +137,5 @@ js:
 
 emanote:
   # Whether to automatically treat folder notes as a folgezettel parent of its contents
-  folder-folgezettel: true
+  # By default, all but top-level folders are treated as folgezettel parents.
+  # folder-folgezettel: true

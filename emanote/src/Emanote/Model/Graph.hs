@@ -155,7 +155,11 @@ folgezettelTreesFrom model fromRoute =
 
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
 folderFolgezettelEnabledFor model r =
-  lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) r model
+  lookupRouteMeta defaultValue ("emanote" :| ["folder-folgezettel"]) r model
+  where
+    -- We don't treat the top-level folder as folgezettel, to support the "flat
+    -- list of notes" use case (popularized by original neuron).
+    defaultValue = r /= modelIndexRoute model
 
 lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
 lookupNoteByWikiLink model wl = do
