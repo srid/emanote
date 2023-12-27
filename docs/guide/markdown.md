@@ -17,6 +17,9 @@ you can specify a custom title as `[[neuron|Moving off neuron]]` which renders a
 
 Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [Foo bar](foo-bar.md) (if a regular Markdown link).
 
+>[!tip] Folgezettel
+> See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar]] (and [[uptree]]) heirarchy.
+
 ### Anchors 
 
 Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).

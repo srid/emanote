@@ -22,6 +22,7 @@ import Ema (
 import Ema.CLI qualified
 import Ema.Dynamic (Dynamic (Dynamic))
 import Emanote.CLI qualified as CLI
+import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type (modelCompileTailwind)
 import Emanote.Model.Type qualified as Model
@@ -51,8 +52,17 @@ instance IsRoute SiteRoute where
 
 instance EmaSite SiteRoute where
   type SiteArg SiteRoute = EmanoteConfig
-  siteInput = emanoteSiteInput
+  siteInput cliAct cfg = do
+    model <- emanoteSiteInput cliAct cfg
+    pure $ model <&> modelUpdateCachedFields
   siteOutput = View.emanoteSiteOutput
+
+-- | Populate model fields that needs to be computed once per update.
+modelUpdateCachedFields :: Model.ModelEma -> Model.ModelEma
+modelUpdateCachedFields model =
+  model
+    & Model.modelFolgezettelTree
+    .~ G.folgezettelTreesFrom (unModelEma model) (Model.modelIndexRoute model)
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
