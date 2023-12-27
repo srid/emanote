@@ -343,9 +343,3 @@ parentLmlRoute model r = do
     -- top-level notes.
     pure $ fromMaybe R.indexRoute $ R.withLmlRoute R.routeParent r
   pure $ resolveLmlRoute model . coerce $ pr
-
-isAncestor :: Model -> N.RAncestor -> R.LMLRoute -> Bool
-isAncestor model ancestorR r =
-  case modelLookupNoteByRoute (R.LMLView_Html, r) model of
-    Nothing -> False
-    Just (_, note) -> ancestorR `elem` (N.noteAncestors note)
