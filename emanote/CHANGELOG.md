@@ -6,6 +6,8 @@
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
   - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
   - Add query syntax for listing folgezetten children & parents ([\#476](https://github.com/srid/emanote/pull/476))
+  - **BACKWARDS INCOMPATIBLE** A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
+    - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
 
 ## 1.2.0.0 (2023-08-24)
 
