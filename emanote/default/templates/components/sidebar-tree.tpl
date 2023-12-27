@@ -8,11 +8,6 @@
       <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
     </has-current-route>
   </node:activeTree>
-  <!-- tree:open>
-    <has-children>
-      <bind tag="link-class">hover:bg-${theme}-300</bind>
-    </has-children>
-  </tree:open -->
 </node:active>
 
 <has-children>
