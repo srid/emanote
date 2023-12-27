@@ -11,6 +11,7 @@ import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Time (UTCTime)
+import Data.Tree (Forest)
 import Data.UUID (UUID)
 import Ema.CLI qualified
 import Emanote.Model.Link.Rel (IxRel)
@@ -64,6 +65,8 @@ data ModelT encF = Model
   -- ^ A tree (forest) of all notes, based on their folder hierarchy.
   , _modelHeistTemplate :: TemplateState
   , _modelStorkIndex :: Stork.IndexVar
+  , _modelFolgezettelTree :: Forest R.LMLRoute
+  -- ^ Folgezettel tree computed once for each update to model.
   }
   deriving stock (Generic)
 
@@ -92,8 +95,8 @@ withRoutePrism enc Model {..} =
    in Model {..}
 
 emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren ctw instanceId =
-  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty def
+emptyModel layers act ren ctw instanceId storkVar =
+  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty def storkVar mempty
 
 modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =

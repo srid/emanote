@@ -212,9 +212,8 @@ routeTreeSplice ::
   Model ->
   H.Splices (HI.Splice Identity)
 routeTreeSplice tCtx mCurrentRoute model = do
-  -- TODO: memoize folgezettelTree creation in model (as TVar?)
   "ema:route-tree" ##
-    ( let trees = G.folgezettelTreesFrom model (M.modelIndexRoute model)
+    ( let trees = model ^. M.modelFolgezettelTree
           getFoldersFirst tr =
             Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
           getOrder path children =
