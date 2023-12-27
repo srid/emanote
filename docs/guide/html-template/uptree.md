@@ -15,4 +15,4 @@ template:
 ```
 
 >[!tip] See also 
-> [[neuron-layout]].
+> #[[neuron-layout]].

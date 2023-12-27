@@ -33,7 +33,7 @@ This includes the [[uptree]] of Neuron based on folgezettel links as well as dir
 
 ## In lieu of sidebar
 
-In the absence of [[sidebar]], you may use the [[query|folgezettel children query]] to show the children of the current note:
+In the absence of [[sidebar]], you may use the [[query|folgezettel children query]] to show the children of the current note. Example below:
 
 ```query
 children:.
