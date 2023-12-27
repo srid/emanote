@@ -136,19 +136,16 @@ folgezettelTreesFrom model fromRoute =
     loop fromRoute allRoutes
   where
     allRoutes = Set.fromList $ fmap N._noteRoute $ Ix.toList $ model ^. modelNotes
+    -- Run in a state monad of unvisited routes, taking visited routes as argument.
     go :: (MonadState (Set R.LMLRoute) m) => Set R.LMLRoute -> R.LMLRoute -> m (Tree R.LMLRoute)
     go visitedRoutes route
       | route `Set.member` visitedRoutes = do
           modify $ Set.delete route
           pure $ Node route []
-      -- TODO: Favour folder children first?
       | otherwise = do
           modify $ Set.delete route
-          -- Filter children by not visited.
-          -- FIXME: How do we we keep to allowedRoutes while allowing multiple parents?
-          -- allowedRoutes <- get
-          let children = folgezettelChildrenFor model route -- & filter (`Set.member` allowedRoutes)
-          cs <- traverse (go (Set.insert route visitedRoutes)) children
+          let children = folgezettelChildrenFor model route
+          cs <- go (Set.insert route visitedRoutes) `traverse` children
           pure $ Node route cs
 
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
