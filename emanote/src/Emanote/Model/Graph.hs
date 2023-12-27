@@ -80,18 +80,12 @@ folgezettelChildrenFor model r = do
       folgezettelFolderChildren :: [R.LMLRoute] =
         if folderFolgezettelEnabledFor model r
           then
-            if r == modelIndexRoute model
-              then
-                let notes = Ix.toList $ (model ^. modelNotes) @= (Nothing :: Maybe (R.R 'R.Folder))
-                 in flip mapMaybe notes $ \note -> do
-                      let childR = note ^. MN.noteRoute
-                      guard $ childR /= r -- Exclude index.md being a children of itself.
-                      pure childR
-              else
-                let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
-                    notes = Ix.toList $ (model ^. modelNotes) @= Just folderR
-                    rs = notes <&> (^. MN.noteRoute)
-                 in rs
+            let isIndexRoute = r == modelIndexRoute model
+                parentR :: Maybe (R.R 'R.Folder) = if isIndexRoute then Nothing else Just (R.withLmlRoute coerce r)
+                allowed route = not isIndexRoute || (route /= r) -- Exclude index.md from being a children of itself
+                notes = Ix.toList $ (model ^. modelNotes) @= parentR
+                rs = notes <&> (^. MN.noteRoute) & filter allowed
+             in rs
           else []
       folgezettelChildren =
         ordNub
