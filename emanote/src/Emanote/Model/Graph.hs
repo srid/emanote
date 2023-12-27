@@ -78,7 +78,6 @@ folgezettelChildrenFor model r = do
           & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
-        -- TODO: document inverse semantics of folder-folgezettel. Also update the uplink tree implementation.
         if folderFolgezettelEnabledFor model r
           then
             if r == modelIndexRoute model
@@ -143,7 +142,6 @@ folgezettelTreesFrom model fromRoute =
           modify $ Set.delete route
           pure $ Node route []
       -- TODO: Favour folder children first?
-      -- TODO: Does this respect `order` key?
       | otherwise = do
           modify $ Set.delete route
           -- Filter children by not visited.

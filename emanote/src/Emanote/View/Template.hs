@@ -229,7 +229,6 @@ routeTreeSplice tCtx mCurrentRoute model = do
        in Splices.treeSplice getOrder trees $ \(last -> nodeRoute) children -> do
             "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
             "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
-            -- FIXME: active check should use RAncestor index check
             let isActiveNode = Just nodeRoute == mCurrentRoute
                 isActiveTree =
                   -- Active tree checking is applicable only when there is an
@@ -238,8 +237,7 @@ routeTreeSplice tCtx mCurrentRoute model = do
                     -- FIXME: Performance! (exponential complexity)
                     let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
                         isFolgeAnc = Set.member nodeRoute folgeAnc
-                     in -- FIXME: Should take folgezettel ancestor into consideration!
-                        r == nodeRoute || isFolgeAnc
+                     in r == nodeRoute || isFolgeAnc
                 openTree =
                   isActiveTree -- Active tree is always open
                     || not (getCollapsed nodeRoute)
