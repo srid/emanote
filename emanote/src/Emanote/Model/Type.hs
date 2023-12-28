@@ -148,22 +148,19 @@ restoreAncestor =
   maybe injectRoot injectAncestor
 
 injectRoot :: IxNote -> IxNote
-injectRoot ns =
-  case resolveLmlRouteIfExists ns idxR of
-    Just _ -> ns
-    Nothing ->
-      let r = R.defaultLmlRoute idxR
-       in Ix.updateIx r (N.ancestorPlaceholderNote $ coerce idxR) ns
-  where
-    idxR = R.indexRoute
+injectRoot =
+  injectAncestorPlaceholder R.indexRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
-injectAncestor (N.unRAncestor -> folderR) ns =
-  case resolveLmlRouteIfExists ns folderR of
+injectAncestor =
+  injectAncestorPlaceholder . N.unRAncestor
+
+injectAncestorPlaceholder :: R ext -> IxNote -> IxNote
+injectAncestorPlaceholder r ns =
+  case resolveLmlRouteIfExists ns r of
     Just _ -> ns
     Nothing ->
-      let r = R.defaultLmlRoute folderR
-       in Ix.updateIx r (N.ancestorPlaceholderNote folderR) ns
+      Ix.updateIx (R.defaultLmlRoute r) (N.ancestorPlaceholderNote $ coerce r) ns
 
 modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
 modelDeleteNote k model =
