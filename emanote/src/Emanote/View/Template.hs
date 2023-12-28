@@ -65,27 +65,27 @@ emanoteSiteOutput rp model' r = do
           pure prefix
 
 render :: (MonadIO m, MonadLoggerIO m) => Model -> SR.SiteRoute -> m (Ema.Asset LByteString)
-render m sr =
-  let setErrorPageMeta =
-        MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
-   in case sr of
-        SR.SiteRoute_MissingR urlPath -> do
-          let hereRoute = R.decodeHtmlRoute urlPath
-              note404 =
-                MN.missingNote hereRoute (toText urlPath)
-                  & setErrorPageMeta
-                  & MN.noteTitle
-                  .~ "! Missing link"
-          pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
-        SR.SiteRoute_AmbiguousR urlPath notes -> do
-          let noteAmb =
-                MN.ambiguousNoteURL urlPath notes
-                  & setErrorPageMeta
-                  & MN.noteTitle
-                  .~ "! Ambiguous link"
-          pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-        SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
-        SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
+render m = \case
+  SR.SiteRoute_MissingR urlPath -> do
+    let hereRoute = R.decodeHtmlRoute urlPath
+        note404 =
+          MN.missingNote hereRoute (toText urlPath)
+            & setErrorPageMeta
+            & MN.noteTitle
+            .~ "! Missing link"
+    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+  SR.SiteRoute_AmbiguousR urlPath notes -> do
+    let noteAmb =
+          MN.ambiguousNoteURL urlPath notes
+            & setErrorPageMeta
+            & MN.noteTitle
+            .~ "! Ambiguous link"
+    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
+  SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
+  SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
+  where
+    setErrorPageMeta =
+      MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute m = \case
@@ -122,7 +122,7 @@ renderSRIndex model = do
       tCtx = C.mkTemplateRenderCtx model r meta
   C.renderModelTemplate model "templates/special/index" $ do
     C.commonSplices ($ emptyRenderCtx) model meta "Index"
-    routeTreeSplice tCtx Nothing model
+    routeTreeSplices tCtx Nothing model
 
 loaderHead :: LByteString
 loaderHead =
@@ -132,8 +132,6 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      ctx = C.mkTemplateRenderCtx model r meta
-      templateName = lookupTemplateName meta
       -- Force a doctype into the generated HTML as a workaround for Heist
       -- discarding it. See: https://github.com/srid/emanote/issues/216
       withDoctype = ("<!DOCTYPE html>\n" <>)
@@ -141,28 +139,14 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withDoctype . withLoadingMessage . C.renderModelTemplate model templateName $ do
+  withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
+    let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
-    let backlinksSplice (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
-          Splices.listSplice bs "backlink"
-            $ \(source, contexts) -> do
-              let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
-                  bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
-                  bctx = C.mkTemplateRenderCtx model source bmeta
-              -- TODO: reuse note splice
-              "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
-              "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
-              "backlink:note:contexts" ##
-                Splices.listSplice (toList contexts) "context" $ \backlinkCtx -> do
-                  let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-                  "context:body" ##
-                    C.withInlineCtx bctx $ \ctx' ->
-                      Splices.pandocSplice ctx' ctxDoc
     -- Template flags
     forM_ ["uptree", "breadcrumbs", "sidebar"] $ \flag ->
       "ema:has:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model)
     -- Sidebar navigation
-    routeTreeSplice ctx (Just r) model
+    routeTreeSplices ctx (Just r) model
     "ema:breadcrumbs" ##
       C.routeBreadcrumbs ctx model r
     -- Note stuff
@@ -179,12 +163,12 @@ renderLmlHtml model note = do
           then feedDiscoveryLink model note
           else mempty
     "ema:note:backlinks" ##
-      backlinksSplice (G.modelLookupBacklinks r model)
+      backlinksSplice model (G.modelLookupBacklinks r model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
     "ema:note:backlinks:daily" ##
-      backlinksSplice backlinksDaily
+      backlinksSplice model backlinksDaily
     "ema:note:backlinks:nodaily" ##
-      backlinksSplice backlinksNoDaily
+      backlinksSplice model backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree model r
     "ema:note:uptree" ##
       Splices.treeSplice (\_ _ -> ()) folgeAnc
@@ -198,55 +182,67 @@ renderLmlHtml model note = do
         $ \ctx' ->
           Splices.pandocSplice ctx' (note ^. MN.noteDoc)
 
+backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
+backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
+  Splices.listSplice bs "backlink"
+    $ \(source, contexts) -> do
+      let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
+          bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
+          bctx = C.mkTemplateRenderCtx model source bmeta
+      -- TODO: reuse note splice
+      "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
+      "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
+      "backlink:note:contexts" ##
+        Splices.listSplice (toList contexts) "context"
+          $ \backlinkCtx -> do
+            let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+            "context:body" ##
+              C.withInlineCtx bctx
+                $ \ctx' ->
+                  Splices.pandocSplice ctx' ctxDoc
+
 {- | Heist splice for the sidebar tree.
 
 If there is no 'current route', all sub-trees are marked as active/open.
 -}
-routeTreeSplice ::
-  (Monad n) =>
-  C.TemplateRenderCtx n ->
-  -- | Current route
-  Maybe R.LMLRoute ->
-  Model ->
-  H.Splices (HI.Splice Identity)
-routeTreeSplice tCtx mCurrentRoute model = do
+routeTreeSplices :: (Monad n) => C.TemplateRenderCtx n -> Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice Identity)
+routeTreeSplices tCtx mCurrentRoute model = do
   "ema:route-tree" ##
-    ( let trees = model ^. M.modelFolgezettelTree
-          getFoldersFirst tr =
-            Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
-          getOrder path children =
-            let tr = last path
-                isLeaf = null children
-                priority = if getFoldersFirst tr && isLeaf then 1 else 0 :: Int
-             in ( priority
-                , Meta.lookupRouteMeta @Int 0 (one "order") tr model
-                , tr
-                )
-          getCollapsed tr =
-            Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
-       in Splices.treeSplice getOrder trees $ \(last -> nodeRoute) children -> do
-            "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
-            "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
-            let isActiveNode = Just nodeRoute == mCurrentRoute
-                isActiveTree =
-                  -- Active tree checking is applicable only when there is an
-                  -- active route (i.e., mr is a Just)
-                  flip (maybe True) mCurrentRoute $ \r ->
-                    -- FIXME: Performance! (exponential complexity)
-                    let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
-                        isFolgeAnc = Set.member nodeRoute folgeAnc
-                     in r == nodeRoute || isFolgeAnc
-                openTree =
-                  isActiveTree -- Active tree is always open
-                    || not (getCollapsed nodeRoute)
-            "node:active" ## Heist.ifElseISplice isActiveNode
-            "node:activeTree" ## Heist.ifElseISplice isActiveTree
-            "node:terminal" ## Heist.ifElseISplice (null children)
-            "tree:childrenCount" ## HI.textSplice (show $ length children)
-            "tree:open" ## Heist.ifElseISplice openTree
-            "has-current-route" ## Heist.ifElseISplice (isJust mCurrentRoute)
-            -- TODO: Add one for indicating this is *an* ancestor of the current route
-    )
+    Splices.treeSplice getOrder (model ^. M.modelFolgezettelTree)
+      $ \(last -> nodeRoute) children -> do
+        "node:text" ## C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model
+        "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
+        let isActiveNode = Just nodeRoute == mCurrentRoute
+            isActiveTree =
+              -- Active tree checking is applicable only when there is an
+              -- active route (i.e., mr is a Just)
+              flip (maybe True) mCurrentRoute $ \r ->
+                -- FIXME: Performance! (exponential complexity)
+                let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
+                    isFolgeAnc = Set.member nodeRoute folgeAnc
+                 in r == nodeRoute || isFolgeAnc
+            openTree =
+              isActiveTree -- Active tree is always open
+                || not (getCollapsed nodeRoute)
+        "node:active" ## Heist.ifElseISplice isActiveNode
+        "node:activeTree" ## Heist.ifElseISplice isActiveTree
+        "node:terminal" ## Heist.ifElseISplice (null children)
+        "tree:childrenCount" ## HI.textSplice (show $ length children)
+        "tree:open" ## Heist.ifElseISplice openTree
+        "has-current-route" ## Heist.ifElseISplice (isJust mCurrentRoute)
+  where
+    getFoldersFirst tr =
+      Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
+    getOrder path children =
+      let tr = last path
+          isLeaf = null children
+          priority = if getFoldersFirst tr && isLeaf then 1 else 0 :: Int
+       in ( priority
+          , Meta.lookupRouteMeta @Int 0 (one "order") tr model
+          , tr
+          )
+    getCollapsed tr =
+      Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
 
 lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
 lookupTemplateName meta =
