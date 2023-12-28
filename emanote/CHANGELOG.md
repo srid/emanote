@@ -10,6 +10,8 @@
     - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
     - The semantics of `folder-folgezettel` is now applied in inverse (see docs)
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
+- Bug fixes:
+  - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
 
 ## 1.2.0.0 (2023-08-24)
 

@@ -104,7 +104,9 @@ emptyModel layers act ren ctw instanceId storkVar =
     , _modelPandocRenderers = ren
     , _modelCompileTailwind = ctw
     , _modelInstanceID = instanceId
-    , _modelNotes = Ix.empty
+    , -- Inject a placeholder `index.md` to account for the use case of emanote
+      -- being run on an empty directory.
+      _modelNotes = Ix.empty & injectRoot
     , _modelRels = Ix.empty
     , _modelSData = Ix.empty
     , _modelStaticFiles = Ix.empty
