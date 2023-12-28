@@ -96,7 +96,23 @@ withRoutePrism enc Model {..} =
 
 emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
 emptyModel layers act ren ctw instanceId storkVar =
-  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty def storkVar mempty
+  Model
+    { _modelStatus = Status_Loading
+    , _modelLayers = layers
+    , _modelEmaCLIAction = act
+    , _modelRoutePrism = Const ()
+    , _modelPandocRenderers = ren
+    , _modelCompileTailwind = ctw
+    , _modelInstanceID = instanceId
+    , _modelNotes = Ix.empty
+    , _modelRels = Ix.empty
+    , _modelSData = Ix.empty
+    , _modelStaticFiles = Ix.empty
+    , _modelTasks = Ix.empty
+    , _modelHeistTemplate = def
+    , _modelStorkIndex = storkVar
+    , _modelFolgezettelTree = mempty
+    }
 
 modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =
