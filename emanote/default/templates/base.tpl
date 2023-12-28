@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
-<html lang="en">
+
+<!-- DoNotFormat -->
+<bind tag="ema-lang"><ema:metadata><value var="page.lang" /></ema:metadata></bind>
+<!-- DoNotFormat -->
+
+<html lang="${ema-lang}">
 
 <head>
   <meta charset="UTF-8">

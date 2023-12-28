@@ -75,6 +75,10 @@ page:
   # Used for https://ogp.me/
   description: ""
 
+  # Language code for the page.
+  # https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang
+  lang: "en"
+
   # Image URL for previews.
   # By default, the first image URL is used. Note: wikilink are not yet
   # supported.
