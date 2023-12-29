@@ -8,6 +8,22 @@ In [[html-template|the default template]], the sidebar is rendered on the left s
   2. If the `order` [[yaml-config|frontmatter]] metadata exists, use that as the primary sort key.
   3. If the note has a H1 title, use that as the secondary sort key; otherwise, use the note filename as the secondary sort key.
 
+## Customizing page title
+
+The sidebar will use a page's title by default, but you can override the sidebar item text by setting the `short-title` [[yaml-config|frontmatter]] property.
+
+```markdown
+---
+short-title: hello
+---
+
+# Hello World
+
+Foo bar ...
+```
+
+This page will use "Hello World" as its title in the main view, but "hello" in the sidebar and index pages. For real-world example, see the page "[[lua-filters]]".
+
 ## Disabling the sidebar
 
 In [[yaml-config]],
