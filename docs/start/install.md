@@ -6,6 +6,10 @@ order: 1
 
 ## Official method
 
+>[!info] Avoiding installation
+> Emanote need not have to be installed if you are using the [[emanote-template]] [flake](https://nixos.asia/en/flakes) to manage your content.
+
+
 Emanote is supported on all popular operating systems through [Nix].
 
 1. [Install Nix & enable Flakes](https://nixos.asia/en/install)
@@ -40,31 +44,3 @@ If you do not wish to use Nix, you may use Emanote in one of the following ways:
 | [[docker]] | Guaranteed        | Linux, WSL, macOS |
 
 Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. Emanote is also available in nixpkgs.
-
-## Using the flake template
-
-If you already have a directory containing your `.md` files, you can use the flake template to get started with Emanote.
-
-### Default template
-
-This template only initializes the directory with a `flake.nix` file, leaving you to configure the rest of the project yourself.
-
-```bash
-nix flake init -t github:srid/emanote-template
-```
-
-### Example template
-
-This template initializes the directory with the following paths:
-- `flake.nix`: The flake file
-- `index.md`: The index page of your site
-- `index.yaml`: The emanote configuration file
-- `.github`: The GitHub Actions workflow for deploying your site to GitHub Pages
-- `.vscode`: The recommended VSCode workspace settings and extensions
-
-
-```bash
-nix flake init -t github:srid/emanote-template#example
-```
-> [!note] Remove `flake.templates`
-> `flake.templates` in `flake.nix` is only required in `emanote-template` repository. You can remove it after you have initialized your project.

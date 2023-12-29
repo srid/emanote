@@ -25,6 +25,9 @@
 
     unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
+
+    emanote-template.url = "github:srid/emanote-template";
+    emanote-template.flake = false;
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
@@ -161,6 +164,10 @@
       flake = {
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = ./nix/flake-module.nix;
+        templates.default = {
+          description = "A simple flake.nix template for emanote notebooks";
+          path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
+        };
       };
     };
 }
