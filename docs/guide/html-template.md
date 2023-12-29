@@ -4,12 +4,12 @@ Unlike [[neuron|Neuron]], Emanote's generated HTML can be **completely** customi
 
 The default HTML templates are stored in the [[layer|default layer]], which can you override either totally or in subset. 
 
-## Layouts
+## Default Layout
 
-Emanote includes two builtin layouts, called `book` (the default) and [[neuron-layout|`note`]], but you can also write your own HTML layout from scratch, as long as you specify that template in [[yaml-config]] for the notes in question. For eg., [`templates/home.tpl`](https://github.com/srid/srid/blob/master/content/templates/home.tpl) is how https://srid.ca homepage is generated, because its [`index.md`](https://raw.githubusercontent.com/srid/srid/master/index.md) specifies this template as `template.name` in its YAML frontmatter (which could also be `index.yaml`).
+Emanote includes a default layout that includes a [[sidebar]], but can be customized to mimic [[neuron-layout]]. You may also write your own HTML layout from scratch, as long as you specify that template in [[yaml-config]] for the notes in question. For eg., [`templates/home.tpl`](https://github.com/srid/srid/blob/master/templates/home.tpl) is how https://srid.ca homepage is generated, because its [`index.md`](https://raw.githubusercontent.com/srid/srid/master/index.md) specifies this template as `template.name` in its YAML frontmatter (which could also be `index.yaml`).
 
 ## Features
 
 ```query
-path:./*
+children:.
 ```

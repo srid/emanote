@@ -72,8 +72,9 @@ renderJSONExport model =
 
 modelRels :: Model -> Map LMLRoute [Link]
 modelRels model =
-  Map.fromListWith (<>) $
-    M.modelNoteRels model <&> \rel ->
+  Map.fromListWith (<>)
+    $ M.modelNoteRels model
+    <&> \rel ->
       let from_ = rel ^. Rel.relFrom
           to_ = rel ^. Rel.relTo
           toTarget =

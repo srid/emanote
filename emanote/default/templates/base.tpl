@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
-<html lang="en">
+
+<!-- DoNotFormat -->
+<bind tag="ema-lang"><ema:metadata><value var="page.lang" /></ema:metadata></bind>
+<!-- DoNotFormat -->
+
+<html lang="${ema-lang}">
 
 <head>
   <meta charset="UTF-8">
@@ -128,7 +133,7 @@
 <!-- DoNotFormat -->
 <bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
 <bind tag="iconSize">w-4 h-4 flex-shrink-0</bind>
-<bind tag="bodyClass"><ema:metadata><value var="template.layout.base.bodyClass" /></ema:metadata></bind>
+<bind tag="bodyClass"><ema:metadata><value var="template.base.bodyClass" /></ema:metadata></bind>
 <!-- DoNotFormat -->
 
 <body class="${bodyClass}">

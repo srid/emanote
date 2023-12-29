@@ -72,7 +72,7 @@ type NoteIxs =
    , -- Ancestor folder routes
      RAncestor
    , -- Parent folder
-     R 'R.Folder
+     Maybe (R 'R.Folder)
    , -- Tag
      HT.Tag
    , -- Alias route for this note. Can be "foo" or "foo/bar".
@@ -89,7 +89,7 @@ instance Indexable NoteIxs Note where
       (ixFun $ one . noteHtmlRoute)
       (ixFun $ maybeToList . noteXmlRoute)
       (ixFun noteAncestors)
-      (ixFun $ maybeToList . noteParent)
+      (ixFun $ one . noteParent)
       (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
@@ -113,7 +113,7 @@ noteParent = R.withLmlRoute R.routeParent . _noteRoute
 
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
-  not . Ix.null . Ix.getEQ r
+  not . Ix.null . Ix.getEQ (Just r)
 
 noteTags :: Note -> [HT.Tag]
 noteTags =
@@ -149,8 +149,9 @@ queryNoteTitle r doc meta =
             getPandocTitle doc
           R.LMLRoute_Org _ ->
             getPandocMetaTitle doc
-   in fromMaybe (doc, fileNameTitle) $
-        fmap (doc,) yamlNoteTitle <|> fmap (withoutH1 doc,) notePandocTitle
+   in fromMaybe (doc, fileNameTitle)
+        $ fmap (doc,) yamlNoteTitle
+        <|> fmap (withoutH1 doc,) notePandocTitle
   where
     getPandocTitle :: Pandoc -> Maybe Tit.Title
     getPandocTitle =
@@ -208,15 +209,17 @@ ancestorPlaceholderNote r =
         [ folderListingQuery
         , -- TODO: Ideally, we should use semantic tags, like <aside> (rather
           -- than <div>), to render these non-relevant content.
-          B.Div (cls "emanote:placeholder-message") . one . B.Para $
-            [ B.Str
-                "Note: To override the auto-generated content here, create a file named one of: "
-            , -- TODO: or, .org
-              B.Span (cls "font-mono text-sm") $
-                one $
-                  B.Str $
-                    oneOfLmlFilenames r
-            ]
+          B.Div (cls "emanote:placeholder-message")
+            . one
+            . B.Para
+            $ [ B.Str
+                  "Note: To override the auto-generated content here, create a file named one of: "
+              , -- TODO: or, .org
+                B.Span (cls "font-mono text-sm")
+                  $ one
+                  $ B.Str
+                  $ oneOfLmlFilenames r
+              ]
         ]
    in mkEmptyNoteWith (R.defaultLmlRoute r) placeHolder
   where
@@ -229,17 +232,18 @@ cls x =
 
 missingNote :: R.R ext -> Text -> Note
 missingNote route404 urlPath =
-  mkEmptyNoteWith (R.defaultLmlRoute route404) $
-    one $
-      B.Para
-        [ B.Str "No note has the URL "
-        , B.Code B.nullAttr $ "/" <> urlPath
-        , -- TODO: org
-          B.Span (cls "font-mono text-sm") $
-            one $
-              B.Str $
-                ". You may create a file with that name, ie. one of: " <> oneOfLmlFilenames route404
-        ]
+  mkEmptyNoteWith (R.defaultLmlRoute route404)
+    $ one
+    $ B.Para
+      [ B.Str "No note has the URL "
+      , B.Code B.nullAttr $ "/" <> urlPath
+      , -- TODO: org
+        B.Span (cls "font-mono text-sm")
+          $ one
+          $ B.Str
+          $ ". You may create a file with that name, ie. one of: "
+          <> oneOfLmlFilenames route404
+      ]
 
 oneOfLmlFilenames :: R ext -> Text
 oneOfLmlFilenames r =
@@ -249,19 +253,20 @@ oneOfLmlFilenames r =
 
 ambiguousNoteURL :: FilePath -> NonEmpty R.LMLRoute -> Note
 ambiguousNoteURL urlPath rs =
-  mkEmptyNoteWith (head rs) $
-    [ B.Para
-        [ B.Str "The URL "
-        , B.Code B.nullAttr $ toText urlPath
-        , B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
-        ]
-    ]
-      <> one candidates
+  mkEmptyNoteWith (head rs)
+    $ [ B.Para
+          [ B.Str "The URL "
+          , B.Code B.nullAttr $ toText urlPath
+          , B.Str " is ambiguous, as more than one note (see list below) use it. To fix this, specify a different slug for these notes:"
+          ]
+      ]
+    <> one candidates
   where
     candidates :: B.Block
     candidates =
-      B.BulletList $
-        toList rs <&> \(R.lmlRouteCase -> r) ->
+      B.BulletList
+        $ toList rs
+        <&> \(R.lmlRouteCase -> r) ->
           [ B.Plain $ one $ B.Str "  "
           , B.Plain $ one $ B.Code B.nullAttr $ show r
           ]
@@ -353,12 +358,14 @@ applyNoteMetaFilters doc =
     -- DESIGN: In retrospect, this is like a Pandoc lua filter?
     addTagsFromBody frontmatter =
       frontmatter
-        & AO.key "tags" % AO._Array
-          .~ ( fromList . fmap Aeson.toJSON $
-                ordNub $
-                  SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-                    <> HT.inlineTagsInPandoc doc
-             )
+        & AO.key "tags"
+        % AO._Array
+        .~ ( fromList
+              . fmap Aeson.toJSON
+              $ ordNub
+              $ SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+              <> HT.inlineTagsInPandoc doc
+           )
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
         B.Para is -> [plainify is]
@@ -371,13 +378,13 @@ applyNoteMetaFilters doc =
         _ -> mempty
     overrideAesonText :: forall a. (W.Walkable a Pandoc) => NonEmpty Text -> (a -> [Text]) -> Aeson.Value -> Aeson.Value
     overrideAesonText key f frontmatter =
-      SData.mergeAesons $
-        frontmatter
-          :| maybeToList
-            ( do
-                guard $ "" == SData.lookupAeson @Text "" key frontmatter
-                val <- viaNonEmpty head $ W.query f doc
-                pure $ SData.oneAesonText (toList key) val
-            )
+      SData.mergeAesons
+        $ frontmatter
+        :| maybeToList
+          ( do
+              guard $ "" == SData.lookupAeson @Text "" key frontmatter
+              val <- viaNonEmpty head $ W.query f doc
+              pure $ SData.oneAesonText (toList key) val
+          )
 
 makeLenses ''Note

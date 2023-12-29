@@ -11,7 +11,8 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.Type (Model, modelNotes, modelRels, parentLmlRoute)
+import Emanote.Model.Note qualified as N
+import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
@@ -48,11 +49,12 @@ folgezettelParentsFor model r = do
           guard $ folderFolgezettelEnabledFor model r
           parentLmlRoute model r
       folgezettelParents =
-        mconcat
-          [ folgezettelBacklinks
-          , folgezettelFrontlinks
-          , folgezettelFolder
-          ]
+        ordNub
+          $ mconcat
+            [ folgezettelBacklinks
+            , folgezettelFrontlinks
+            , folgezettelFolder
+            ]
    in folgezettelParents
   where
     isFolgezettel = \case
@@ -76,17 +78,22 @@ folgezettelChildrenFor model r = do
           & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
-        maybeToMonoid $ do
-          let folderR :: R.R 'R.Folder = R.withLmlRoute coerce r
-              notes = Ix.toList $ (model ^. modelNotes) @= folderR
-              rs = filter (folderFolgezettelEnabledFor model) $ notes <&> (^. MN.noteRoute)
-          pure rs
+        if folderFolgezettelEnabledFor model r
+          then
+            let isIndexRoute = r == modelIndexRoute model
+                parentR :: Maybe (R.R 'R.Folder) = if isIndexRoute then Nothing else Just (R.withLmlRoute coerce r)
+                allowed route = not isIndexRoute || (route /= r) -- Exclude index.md from being a children of itself
+                notes = Ix.toList $ (model ^. modelNotes) @= parentR
+                rs = notes <&> (^. MN.noteRoute) & filter allowed
+             in rs
+          else []
       folgezettelChildren =
-        mconcat
-          [ folgezettelBacklinks
-          , folgezettelFrontlinks
-          , folgezettelFolderChildren
-          ]
+        ordNub
+          $ mconcat
+            [ folgezettelBacklinks
+            , folgezettelFrontlinks
+            , folgezettelFolderChildren
+            ]
    in folgezettelChildren
   where
     isReverseFolgezettel = \case
@@ -99,9 +106,49 @@ folgezettelChildrenFor model r = do
       Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> Just wl
       _ -> Nothing
 
+{- | Returns a tree of all folgezettel notes, starting from the given route.
+
+If a note has two parents, that note will be positioned in *both* the sub-trees.
+
+Cycles are discarded.
+
+Returns the tree, while considering unvisited (disconnected) notes as sibling trees.
+
+`fromRoute` node itself is ignored fro the returned tree.
+-}
+folgezettelTreesFrom :: Model -> R.LMLRoute -> Forest R.LMLRoute
+folgezettelTreesFrom model fromRoute =
+  snd $ usingState (mempty :: Forest R.LMLRoute) $ do
+    let loop fromR rs = do
+          let (tree@(Node _ children), unvisited) = usingState rs $ go Set.empty fromR
+          if fromR == fromRoute
+            then modify (<> children) -- ignore `fromRoute` itself
+            else modify (<> one tree)
+          case nonEmpty (Set.toList unvisited) of
+            Nothing -> pass
+            Just ne -> loop (head ne) unvisited
+    loop fromRoute allRoutes
+  where
+    allRoutes = Set.fromList $ fmap N._noteRoute $ Ix.toList $ model ^. modelNotes
+    -- Run in a state monad of unvisited routes, taking visited routes as argument.
+    go :: (MonadState (Set R.LMLRoute) m) => Set R.LMLRoute -> R.LMLRoute -> m (Tree R.LMLRoute)
+    go visitedRoutes route
+      | route `Set.member` visitedRoutes = do
+          modify $ Set.delete route
+          pure $ Node route []
+      | otherwise = do
+          modify $ Set.delete route
+          let children = folgezettelChildrenFor model route
+          cs <- go (Set.insert route visitedRoutes) `traverse` children
+          pure $ Node route cs
+
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
 folderFolgezettelEnabledFor model r =
-  lookupRouteMeta True ("emanote" :| ["folder-folgezettel"]) r model
+  lookupRouteMeta defaultValue ("emanote" :| ["folder-folgezettel"]) r model
+  where
+    -- We don't treat the top-level folder as folgezettel, to support the "flat
+    -- list of notes" use case (popularized by original neuron).
+    defaultValue = r /= modelIndexRoute model
 
 lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
 lookupNoteByWikiLink model wl = do
@@ -115,10 +162,11 @@ lookupNoteByWikiLink model wl = do
 
 modelLookupBacklinks :: R.LMLRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
-  sortOn (Calendar.backlinkSortKey model . fst) $
-    groupNE $
-      backlinkRels r model <&> \rel ->
-        (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+  sortOn (Calendar.backlinkSortKey model . fst)
+    $ groupNE
+    $ backlinkRels r model
+    <&> \rel ->
+      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where
     groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
     groupNE =

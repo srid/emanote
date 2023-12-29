@@ -11,8 +11,7 @@ import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Time (UTCTime)
-import Data.Tree (Tree)
-import Data.Tree.Path qualified as PathTree
+import Data.Tree (Forest)
 import Data.UUID (UUID)
 import Ema.CLI qualified
 import Emanote.Model.Link.Rel (IxRel)
@@ -40,7 +39,6 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
 import Heist.Extra.TemplateState (TemplateState)
-import Network.URI.Slug (Slug)
 import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
@@ -64,10 +62,11 @@ data ModelT encF = Model
   , _modelSData :: IxSData
   , _modelStaticFiles :: IxStaticFile
   , _modelTasks :: IxTask
-  , _modelNav :: [Tree Slug]
   -- ^ A tree (forest) of all notes, based on their folder hierarchy.
   , _modelHeistTemplate :: TemplateState
   , _modelStorkIndex :: Stork.IndexVar
+  , _modelFolgezettelTree :: Forest R.LMLRoute
+  -- ^ Folgezettel tree computed once for each update to model.
   }
   deriving stock (Generic)
 
@@ -96,8 +95,26 @@ withRoutePrism enc Model {..} =
    in Model {..}
 
 emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren ctw instanceId =
-  Model Status_Loading layers act (Const ()) ren ctw instanceId Ix.empty Ix.empty Ix.empty Ix.empty mempty mempty def
+emptyModel layers act ren ctw instanceId storkVar =
+  Model
+    { _modelStatus = Status_Loading
+    , _modelLayers = layers
+    , _modelEmaCLIAction = act
+    , _modelRoutePrism = Const ()
+    , _modelPandocRenderers = ren
+    , _modelCompileTailwind = ctw
+    , _modelInstanceID = instanceId
+    , -- Inject a placeholder `index.md` to account for the use case of emanote
+      -- being run on an empty directory.
+      _modelNotes = Ix.empty & injectRoot
+    , _modelRels = Ix.empty
+    , _modelSData = Ix.empty
+    , _modelStaticFiles = Ix.empty
+    , _modelTasks = Ix.empty
+    , _modelHeistTemplate = def
+    , _modelStorkIndex = storkVar
+    , _modelFolgezettelTree = mempty
+    }
 
 modelReadyForView :: ModelT f -> ModelT f
 modelReadyForView =
@@ -115,12 +132,10 @@ modelInsertNote note =
           >>> injectAncestors (N.noteAncestors note)
           >>> dropRedundantAncestor r
        )
-    >>> modelRels
-      %~ updateIxMulti r (Rel.noteRels note)
-    >>> modelTasks
-      %~ updateIxMulti r (Task.noteTasks note)
-    >>> modelNav
-      %~ PathTree.treeInsertPath (R.withLmlRoute R.unRoute r)
+      >>> modelRels
+    %~ updateIxMulti r (Rel.noteRels note)
+      >>> modelTasks
+    %~ updateIxMulti r (Task.noteTasks note)
   where
     r = note ^. N.noteRoute
 
@@ -151,36 +166,31 @@ restoreAncestor =
   maybe injectRoot injectAncestor
 
 injectRoot :: IxNote -> IxNote
-injectRoot ns =
-  case resolveLmlRouteIfExists ns idxR of
-    Just _ -> ns
-    Nothing ->
-      let r = R.defaultLmlRoute idxR
-       in Ix.updateIx r (N.ancestorPlaceholderNote $ coerce idxR) ns
-  where
-    idxR = R.indexRoute
+injectRoot =
+  injectAncestorPlaceholder R.indexRoute
 
 injectAncestor :: N.RAncestor -> IxNote -> IxNote
-injectAncestor (N.unRAncestor -> folderR) ns =
-  case resolveLmlRouteIfExists ns folderR of
+injectAncestor =
+  injectAncestorPlaceholder . N.unRAncestor
+
+injectAncestorPlaceholder :: R ext -> IxNote -> IxNote
+injectAncestorPlaceholder r ns =
+  case resolveLmlRouteIfExists ns r of
     Just _ -> ns
     Nothing ->
-      let r = R.defaultLmlRoute folderR
-       in Ix.updateIx r (N.ancestorPlaceholderNote folderR) ns
+      Ix.updateIx (R.defaultLmlRoute r) (N.ancestorPlaceholderNote $ coerce r) ns
 
 modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
 modelDeleteNote k model =
   model
     & modelNotes
-      %~ ( Ix.deleteIx k
-            >>> restoreAncestor (N.RAncestor <$> mFolderR)
-         )
-    & modelRels
-      %~ deleteIxMulti k
-    & modelTasks
-      %~ deleteIxMulti k
-    & modelNav
-      %~ maybe (PathTree.treeDeletePath (R.withLmlRoute R.unRoute k)) (const id) mFolderR
+    %~ ( Ix.deleteIx k
+          >>> restoreAncestor (N.RAncestor <$> mFolderR)
+       )
+      & modelRels
+    %~ deleteIxMulti k
+      & modelTasks
+    %~ deleteIxMulti k
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
@@ -261,9 +271,9 @@ modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
   _ -> Nothing
   where
     resolvedTarget =
-      Rel.resolvedRelTargetFromCandidates $
-        N.lookupNotesByXmlRoute r $
-          _modelNotes model
+      Rel.resolvedRelTargetFromCandidates
+        $ N.lookupNotesByXmlRoute r
+        $ _modelNotes model
 
 modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =
@@ -273,11 +283,13 @@ modelLookupTitle r =
 modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either (R.LMLView, Note) StaticFile]
 modelWikiLinkTargets wl model =
   let notes =
-        Ix.toList $
-          (model ^. modelNotes) @= wl
+        Ix.toList
+          $ (model ^. modelNotes)
+          @= wl
       staticFiles =
-        Ix.toList $
-          (model ^. modelStaticFiles) @= wl
+        Ix.toList
+          $ (model ^. modelStaticFiles)
+          @= wl
    in fmap Right staticFiles <> fmap Left ((R.LMLView_Html,) <$> notes)
 
 modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
@@ -294,14 +306,16 @@ modelNoteRels =
 
 modelNoteMetas :: Model -> Map LMLRoute (Tit.Title, LMLRoute, Aeson.Value)
 modelNoteMetas model =
-  Map.fromList $
-    Ix.toList (_modelNotes model) <&> \note ->
+  Map.fromList
+    $ Ix.toList (_modelNotes model)
+    <&> \note ->
       (note ^. N.noteRoute, (note ^. N.noteTitle, note ^. N.noteRoute, note ^. N.noteMeta))
 
 modelNoteErrors :: Model -> Map LMLRoute [Text]
 modelNoteErrors model =
-  Map.fromList $
-    flip mapMaybe (Ix.toList (_modelNotes model)) $ \note -> do
+  Map.fromList
+    $ flip mapMaybe (Ix.toList (_modelNotes model))
+    $ \note -> do
       let errs = note ^. N.noteErrors
       guard $ not $ null errs
       pure (note ^. N.noteRoute, errs)

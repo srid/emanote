@@ -76,14 +76,15 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
                 ]
             )
         details <-
-          HP.rpInline ctx $
+          HP.rpInline ctx
+            $
             -- FIXME: This aside is meaningless for non-wikilink links (regular
             -- Markdown links)
-            B.Span ("", ["emanote:error:aside"], []) $
-              one $
-                tooltip "Find notes containing this broken link" $
-                  one $
-                    B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
+            B.Span ("", ["emanote:error:aside"], [])
+            $ one
+            $ tooltip "Find notes containing this broken link"
+            $ one
+            $ B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
         if M.inLiveServer model
           then pure $ raw <> details
           else pure raw
@@ -91,20 +92,24 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
       pure $ do
         raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
         candidates <-
-          fmap mconcat . sequence $
-            toList srs
-              <&> \(getSr -> sr) -> do
-                let (rp, _) = M.withoutRoutePrism model
-                    srRoute = toText $ review rp sr
-                    (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
-                    linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
-                    newIs = one $ B.Str $ show sr
-                HP.rpInline ctx $
-                  B.Span ("", ["emanote:error:aside"], []) $
-                    one $
-                      tooltip (show sr <> " -> " <> srRoute) $
-                        one $
-                          B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
+          fmap
+            mconcat
+            ( mapM
+                ( \(getSr -> sr) -> do
+                    let (rp, _) = M.withoutRoutePrism model
+                        srRoute = toText $ review rp sr
+                        (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
+                        linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
+                        newIs = one $ B.Str $ show sr
+                    HP.rpInline ctx
+                      $ B.Span ("", ["emanote:error:aside"], [])
+                      $ one
+                      $ tooltip (show sr <> " -> " <> srRoute)
+                      $ one
+                      $ B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
+                )
+                (toList srs)
+            )
         if M.inLiveServer model
           then pure $ raw <> candidates
           else pure raw
@@ -140,10 +145,11 @@ replaceLinkNodeWithRoute model r (inner, url) =
     nonEmptyLinkInlines :: Model -> Text -> Maybe SR.SiteRoute -> [B.Inline] -> [B.Inline]
     nonEmptyLinkInlines model' url' mr = \case
       [] ->
-        toList $
-          nonEmptyInlines url $
-            fromMaybe [] $
-              siteRouteDefaultInnerText model' url' =<< mr
+        toList
+          $ nonEmptyInlines url
+          $ fromMaybe []
+          $ siteRouteDefaultInnerText model' url'
+          =<< mr
       x -> x
 
 -- | Ensure that inlines list is non-empty, using the provided singleton value if necessary.

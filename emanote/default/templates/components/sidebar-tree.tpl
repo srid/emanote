@@ -1,32 +1,30 @@
 <!-- Variable bindings for this tree-->
+<bind tag="link-class">hover:bg-${theme}-200</bind>
 <node:active>
-  <bind tag="link-class">font-bold text-${theme}-600 hover:underline</bind>
+  <bind tag="link-class">mavenLinkBold bg-${theme}-100 hover:bg-${theme}-200</bind>
   <else />
-  <tree:open>
-    <has-children>
-      <bind tag="link-class">font-bold hover:underline</bind>
-      <else />
-      <bind tag="link-class">hover:underline</bind>
-    </has-children>
-    <else />
-    <bind tag="link-class">hover:underline</bind>
-  </tree:open>
+  <node:activeTree>
+    <has-current-route>
+      <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
+    </has-current-route>
+  </node:activeTree>
 </node:active>
 
 <has-children>
   <bind tag="icon">
     <tree:open>
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-700"
-        viewBox="0 0 20 20" fill="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        class="${iconSize} inline text-gray-700" fill="currentColor">
         <path fill-rule="evenodd"
-          d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z"
+          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
           clip-rule="evenodd" />
-        <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
       </svg>
       <else />
       <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500"
-        viewBox="0 0 20 20" fill="currentColor">
-        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+        viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd"
+          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+          clip-rule="evenodd" />
       </svg>
     </tree:open>
   </bind>
@@ -54,8 +52,20 @@
 <div class="pl-2">
   <!-- Node's rootLabel-->
   <div class="flex items-center my-2 space-x-2 justify-left">
-    <icon />
-    <a class="${link-class} truncate" title="${node:text}" href="${node:url}">
+    <span>
+      <tree:open>
+        <icon />
+        <else />
+        <has-children>
+          <a href="${node:url}" title="View folgezettel children">
+            <icon />
+          </a>
+          <else />
+          <icon />
+        </has-children>
+      </tree:open>
+    </span>
+    <a class="${link-class} rounded px-1.5 truncate" title="${node:text}" href="${node:url}">
       <node:text />
     </a>
     <tree:open>

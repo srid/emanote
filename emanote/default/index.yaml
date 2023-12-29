@@ -11,22 +11,18 @@ tags: []
 # TODO: How to design this when generating RSS feeds?
 template:
   # Which template to use to render notes. The filepath without the .tpl extension.
-  name: /templates/layouts/book
-  # Layout specific settings
-  layout:
-    # For base.tpl
-    base:
-      # The class to apply for <body> element when using base.tpl (used by note and book layouts)
-      bodyClass: bg-gray-400 overflow-y-scroll
-    note:
-      containerClass: container mx-auto max-w-prose
-    book:
-      containerClass: container mx-auto
+  name: /templates/layouts/default
+  # Base settings for our default layout.
+  base:
+    # The class to apply for <body> element when
+    bodyClass: bg-gray-400 overflow-y-scroll
+    containerClass: container mx-auto
   error:
     containerClass: container mx-auto max-w-prose
   uptree:
+    enable: false
     # Class to apply for uptree's nodes
-    nodeClass: text-gray-900
+    nodeClass: text-gray-900 hover:bg-${theme}-500 hover:text-white cursor-pointer
   # List of available colors: https://v2.tailwindcss.com/docs/customizing-colors#default-color-palette
   theme: blue
   # Value of the <base> tag.
@@ -35,11 +31,14 @@ template:
   urlStrategy: direct
   iconUrl: ${ema:homeUrl}favicon.svg
   sidebar:
+    enable: true
     # Whether this node in the sidebar tree should remain collapsed by default
     # (unless a route in it is active)
     collapsed: true
     # Weather this node should put folders before single notes
     folders-first: false
+  breadcrumbs:
+    enable: true
   stork:
     # https://stork-search.net/docs/config-ref#frontmatter_handling
     frontmatter-handling: omit
@@ -75,6 +74,10 @@ page:
   # By default, the first paragraph is used for description.
   # Used for https://ogp.me/
   description: ""
+
+  # Language code for the page.
+  # https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang
+  lang: "en"
 
   # Image URL for previews.
   # By default, the first image URL is used. Note: wikilink are not yet
@@ -138,4 +141,5 @@ js:
 
 emanote:
   # Whether to automatically treat folder notes as a folgezettel parent of its contents
-  folder-folgezettel: true
+  # By default, all but top-level folders are treated as folgezettel parents.
+  # folder-folgezettel: true

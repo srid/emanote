@@ -121,8 +121,9 @@ commonSplices withCtx model meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim" ##
     do
-      pure . RX.renderHtmlNodes $
-        if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
+      pure
+        . RX.renderHtmlNodes
+        $ if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
           then do
             -- Twind shim doesn't reliably work in dev server mode. Let's just use the
             -- tailwind CDN.
@@ -138,8 +139,9 @@ commonSplices withCtx model meta routeTitle = do
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
     HJ.bindJson meta
-  "ema:title" ## withCtx $ \ctx ->
-    Tit.titleSplice ctx id routeTitle
+  "ema:title" ##
+    withCtx $ \ctx ->
+      Tit.titleSplice ctx id routeTitle
   -- <head>'s <title> cannot contain HTML
   "ema:titleFull" ##
     Tit.titleSpliceNoHtml routeTitleFull
@@ -166,10 +168,10 @@ commonSplices withCtx model meta routeTitle = do
         -- Also: more-head.tpl is the one place where this is hardcoded.
         let staticFolder = "_emanote-static"
             itUrl =
-              SR.siteRouteUrl model $
-                SR.staticFileSiteRoute $
-                  fromMaybe (error "no _emanote-static?") $
-                    M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
+              SR.siteRouteUrl model
+                $ SR.staticFileSiteRoute
+                $ fromMaybe (error "no _emanote-static?")
+                $ M.modelLookupStaticFile (staticFolder </> "inverted-tree.css") model
             staticFolderUrl = fst $ T.breakOn "/inverted-tree.css" itUrl
             -- Deal with a silly Firefox bug https://github.com/srid/emanote/issues/340
             --
@@ -192,9 +194,9 @@ commonSplices withCtx model meta routeTitle = do
     cannotBeCached url = url <> "?instanceId=" <> show (model ^. M.modelInstanceID)
     cachedTailwindCdn = do
       let localCdnUrl =
-            SR.siteRouteUrl model $
-              SR.staticFileSiteRoute $
-                LiveServerFiles.tailwindCssFile model
+            SR.siteRouteUrl model
+              $ SR.staticFileSiteRoute
+              $ LiveServerFiles.tailwindCssFile model
       H.link
         ! A.href (H.toValue localCdnUrl)
         ! A.rel "stylesheet"

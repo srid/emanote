@@ -36,8 +36,8 @@ cliParser cwd = do
   pure Cli {..}
   where
     pathList defaultPath = do
-      option pathListReader $
-        mconcat
+      option pathListReader
+        $ mconcat
           [ long "layers"
           , short 'L'
           , metavar "LAYERS"

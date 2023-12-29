@@ -50,8 +50,9 @@ defaultLayer = LocDefault
 
 userLayers :: NonEmpty FilePath -> Set Loc
 userLayers paths =
-  fromList $
-    zip [1 ..] (toList paths) <&> uncurry LocUser
+  fromList
+    $ zip [1 ..] (toList paths)
+    <&> uncurry LocUser
 
 -- | Return the effective path of a file.
 locResolve :: (Loc, FilePath) -> FilePath

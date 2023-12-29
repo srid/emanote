@@ -44,8 +44,9 @@ instance Indexable TaskIxs Task where
 noteTasks :: Note -> IxTask
 noteTasks note =
   let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
-   in Ix.fromList $
-        zip [1 ..] taskListItems <&> \(idx, (checked, doc)) ->
+   in Ix.fromList
+        $ zip [1 ..] taskListItems
+        <&> \(idx, (checked, doc)) ->
           Task (note ^. N.noteRoute) idx doc checked
 
 makeLenses ''Task
