@@ -9,7 +9,7 @@
   - **BACKWARDS INCOMPATIBLE** A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
     - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
     - The semantics of `folder-folgezettel` is now applied in inverse (see docs)
-  - Allow specify custom page title in sidebar ([\#488](https://github.com/srid/emanote/pull/488))
+  - Allow specifying custom page title in sidebar ([\#488](https://github.com/srid/emanote/pull/488))
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
 - Bug fixes:
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))

@@ -210,8 +210,8 @@ routeTreeSplices tCtx mCurrentRoute model = do
   "ema:route-tree" ##
     Splices.treeSplice getOrder (model ^. M.modelFolgezettelTree)
       $ \(last -> nodeRoute) children -> do
-        let title = Meta.lookupRouteMeta @(Maybe Text) Nothing ("short-title" :| []) nodeRoute model
-        "node:text" ## maybe (C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model) HI.textSplice title
+        let shortTitle = Meta.lookupRouteMeta @(Maybe Text) Nothing ("short-title" :| []) nodeRoute model
+        "node:text" ## maybe (C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model) HI.textSplice shortTitle
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
         let isActiveNode = Just nodeRoute == mCurrentRoute
             isActiveTree =
