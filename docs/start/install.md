@@ -6,6 +6,10 @@ order: 1
 
 ## Official method
 
+>[!info] Avoiding installation
+> Emanote need not have to be installed if you are using the [[emanote-template]] [flake](https://nixos.asia/en/flakes) to manage your content.
+
+
 Emanote is supported on all popular operating systems through [Nix].
 
 1. [Install Nix & enable Flakes](https://nixos.asia/en/install)
