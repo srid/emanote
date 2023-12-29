@@ -11,7 +11,7 @@ Open the notebook in [[vscode]] and install the recommended extensions.
 A Nix flake template is also provided if you want to do this in your existing notebook. Run:
 
 ```bash
-nix flake init -t github:srid/emanote-template
+nix flake init -t github:srid/emanote
 ```
 
 This add a `flake.nix` file.  You can follow emanote-template's README from this point.
