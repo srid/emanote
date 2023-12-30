@@ -1,3 +1,7 @@
+---
+short-title: Syncthing sync
+---
+
 # Synchronizing notes using Syncthing
 
 [Syncthing](https://docs.syncthing.net/) is an open-source and superior[^sup] Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).

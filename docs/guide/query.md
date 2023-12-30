@@ -1,5 +1,6 @@
 ---
 order: -95
+short-title: Queries
 feed:
   enable: true
   title: Feed Demo - Emanote
