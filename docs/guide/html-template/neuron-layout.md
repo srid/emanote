@@ -1,4 +1,5 @@
 ---
+short-title: Neuron layout
 template:
   uptree: 
     enable: true

@@ -1,4 +1,5 @@
 ---
+short-title: Lua Filters
 pandoc:
   filters:
     - filters/list-table.lua

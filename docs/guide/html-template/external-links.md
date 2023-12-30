@@ -4,7 +4,7 @@ page:
     <snippet var="js.mathjax" />
 ---
 
-# External link icons
+# External links
 
 A link whose address begins with an [URI scheme](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax) component is considered an **external link**. 
 
