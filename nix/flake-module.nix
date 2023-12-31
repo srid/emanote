@@ -85,17 +85,22 @@ in
 
                 # '' is required for escaping ${} in nix
                 program = pkgs.writeShellApplication {
-                  name = "emanoteRun.sh";
-                  meta.description = "Live server for Emanote site ${name}";
+                  name = "emanote-with-layers-${name}";
+                  meta.description = "Live server for Emanote site ${name} (arbitrary arguments accepted)";
+                  runtimeInputs = [ config.emanote.package ];
                   text =
                     let
                       layers = lib.concatStringsSep ";" cfg.layersString;
                     in
                     ''
                       set -xe
-                      ${config.emanote.package}/bin/emanote \
-                        --layers "${layers}" \
-                        run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                      if [ -z "$*" ]; then
+                        emanote --layers "${layers}" \
+                          run ${if cfg.port == 0 then "" else "--port ${toString cfg.port}"}
+                      else
+                        emanote --layers "${layers}" \
+                          "$@"
+                      fi
                     '';
                 };
               };
