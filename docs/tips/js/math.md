@@ -18,6 +18,16 @@ page:
     <snippet var="js.mathjax" />
 ```
 
+[KaTeX](https://katex.org/) can be used as an alternative to MathJax. Just like MathJax, it renders math specified between dollar signs.
+
+To enable it:
+
+```yaml
+page:
+  headHtml: |
+    <snippet var="js.katex" />
+```
+
 ## Demo
 
 When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
