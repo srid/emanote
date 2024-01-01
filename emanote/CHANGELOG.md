@@ -11,6 +11,7 @@
     - The semantics of `folder-folgezettel` is now applied in inverse (see docs)
   - Allow specifying custom page title in sidebar ([\#488](https://github.com/srid/emanote/pull/488))
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
+  - KaTeX support ([\#489](https://github.com/srid/emanote/pull/489))
 - Bug fixes:
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
 
