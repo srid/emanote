@@ -61,6 +61,12 @@ in
                         default = "/";
                         defaultText = ''Root URL'';
                       };
+                      basePath = mkOption {
+                        type = types.str;
+                        description = ''Top-level directory to copy the static site to'';
+                        default = "";
+                        defaultText = ''Root path'';
+                      };
                       prettyUrls = mkOption {
                         type = types.bool;
                         description = ''Generate links without .html'';
@@ -127,7 +133,7 @@ in
                     ${pkgs.lib.getExe config.emanote.package} \
                       --layers "${configDir};${layers}" \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                        gen $out
+                        gen $out/${cfg.basePath}
                   '';
             })
             config.emanote.sites;
