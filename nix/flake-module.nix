@@ -61,6 +61,12 @@ in
                         default = "/";
                         defaultText = ''Root URL'';
                       };
+                      basePath = mkOption {
+                        type = types.str;
+                        description = ''Top-level directory to copy the static site to'';
+                        default = "";
+                        defaultText = ''Root path'';
+                      };
                       prettyUrls = mkOption {
                         type = types.bool;
                         description = ''Generate links without .html'';
@@ -119,15 +125,16 @@ in
                   '';
                   layers = lib.concatStringsSep ";" cfg.layers;
                 in
-                pkgs.runCommand "emanote-static-website"
+                pkgs.runCommand "emanote-static-website-${name}"
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
                   ''
-                    mkdir $out
+                    OUTPATH=$out/${cfg.basePath}
+                    mkdir -p $OUTPATH
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
                       --layers "${configDir};${layers}" \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                        gen $out
+                        gen $OUTPATH
                   '';
             })
             config.emanote.sites;
