@@ -125,7 +125,7 @@ in
                   '';
                   layers = lib.concatStringsSep ";" cfg.layers;
                 in
-                pkgs.runCommand "emanote-static-website"
+                pkgs.runCommand "emanote-static-website-${name}"
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
                   ''
                     mkdir $out
