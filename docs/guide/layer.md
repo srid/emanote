@@ -1,6 +1,6 @@
 # Layer system
 
-Emanote's layer system allows you to "merge" multiple notebooks and treat them as if they were a single notebook. The `-L` option in the command line accepts layers, and you can specify multiple of them with the right most taking the most precedence.
+Emanote's layer system allows you to "merge" multiple notebooks and treat them as if they were a single notebook. The `-L` option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.
 
 ## "Default" layer
 
