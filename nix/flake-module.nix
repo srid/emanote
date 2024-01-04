@@ -128,12 +128,13 @@ in
                 pkgs.runCommand "emanote-static-website-${name}"
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
                   ''
-                    mkdir $out
+                    OUTPATH=$out/${cfg.basePath}
+                    mkdir $OUTPATH
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
                       --layers "${configDir};${layers}" \
                       ${if cfg.allowBrokenLinks then "--allow-broken-links" else ""} \
-                        gen $out/${cfg.basePath}
+                        gen $OUTPATH
                   '';
             })
             config.emanote.sites;
