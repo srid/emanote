@@ -129,7 +129,7 @@ in
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
                   ''
                     OUTPATH=$out/${cfg.basePath}
-                    mkdir $OUTPATH
+                    mkdir -p $OUTPATH
                     export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
                     ${pkgs.lib.getExe config.emanote.package} \
                       --layers "${configDir};${layers}" \
