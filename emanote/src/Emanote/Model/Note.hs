@@ -36,6 +36,7 @@ import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
+import UnliftIO.Directory (doesPathExist)
 
 data Feed = Feed
   { _feedEnable :: Bool
@@ -300,7 +301,7 @@ parseNote ::
   forall m.
   (MonadIO m, MonadLogger m) =>
   ScriptingEngine ->
-  FilePath ->
+  [FilePath] ->
   R.LMLRoute ->
   FilePath ->
   Text ->
@@ -324,7 +325,7 @@ parseNoteOrg s =
       -- TODO: Merge Pandoc's Meta in here?
       pure (preparePandoc doc, defaultFrontMatter)
 
-parseNoteMarkdown :: (MonadIO m, MonadLogger m) => ScriptingEngine -> FilePath -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
+parseNoteMarkdown :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [FilePath] -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
 parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
@@ -335,7 +336,19 @@ parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
       --
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
-      let filterPaths = (pluginBaseDir </>) <$> SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+      filterPaths <- fmap catMaybes $ forM (SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter) $ \p -> do
+        res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
+          doesPathExist (baseDir </> p) >>= \case
+            False -> do
+              pure Nothing
+            True ->
+              pure $ Just $ baseDir </> p
+        case res of
+          [] -> do
+            tell [toText $ "Pandoc filter " <> p <> " not found in any of: " <> show pluginBaseDir]
+            pure Nothing
+          (x : _) -> pure $ Just x
+
       doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc frontmatter
       pure (doc, meta)

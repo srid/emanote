@@ -22,7 +22,7 @@ import Emanote.Prelude (
   logD,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, LocLayers, locPath, locResolve, primaryLayer)
+import Emanote.Source.Loc (Loc, LocLayers, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~))
@@ -91,12 +91,8 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
           case action of
             UM.Refresh refreshAction overlays -> do
               let fpAbs = locResolve $ head overlays
-                  -- TODO: This should automatically be computed, instead of being passed.
-                  -- We need access to the model though! With dependency management to boot.
-                  -- Until this, `layers` is threaded through as a hack.
-                  currentLayerPath = locPath $ primaryLayer layers
               s <- readRefreshedFile refreshAction fpAbs
-              note <- N.parseNote scriptingEngine currentLayerPath r fpAbs (decodeUtf8 s)
+              note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
               pure $ M.modelInsertNote $ noteF note
             UM.Delete -> do
               log $ "Removing note: " <> toText fp

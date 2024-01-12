@@ -14,6 +14,7 @@ module Emanote.Source.Loc (
   -- * Dealing with layers of locs
   LocLayers,
   primaryLayer,
+  userLayersToSearch,
 ) where
 
 import Data.Set qualified as Set
@@ -45,6 +46,19 @@ primaryLayer =
     isUserLayer = \case
       LocUser _ _ -> True
       _ -> False
+
+{- | List of user layers, highest precedent being at first.
+
+This is useful to delay searching for content in layers.
+-}
+userLayersToSearch :: LocLayers -> [FilePath]
+userLayersToSearch =
+  mapMaybe
+    ( \case
+        LocUser _ fp -> Just fp
+        LocDefault _ -> Nothing
+    )
+    . Set.toAscList
 
 defaultLayer :: FilePath -> Loc
 defaultLayer = LocDefault
