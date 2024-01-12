@@ -15,7 +15,6 @@ module Emanote.Source.Loc (
 
   -- * Dealing with layers of locs
   LocLayers,
-  primaryLayer,
   userLayersToSearch,
 ) where
 
@@ -37,19 +36,6 @@ data Loc
   deriving anyclass (Aeson.ToJSON)
 
 type LocLayers = Set Loc
-
-{- | Return the "primary" `LocUser` layer
-
-  The primary layer takes the highest precedence, hence is specified in the
-  leftmost position, i.e, `-L primary/layer;foo`.
--}
-primaryLayer :: (HasCallStack) => LocLayers -> Loc
-primaryLayer =
-  Set.findMin . Set.filter isUserLayer
-  where
-    isUserLayer = \case
-      LocUser _ _ -> True
-      _ -> False
 
 {- | List of user layers, highest precedent being at first.
 
