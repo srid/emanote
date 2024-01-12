@@ -33,13 +33,14 @@ data Loc
 
 type LocLayers = Set Loc
 
-{- | Return the "primary" `LocUser` layer (that which are not overrides).
+{- | Return the "primary" `LocUser` layer
 
- Assumes that the user has put it always by last; i.e, `-L foo;primary/layer`.
+  The primary layer takes the highest precedence, hence is specified in the
+  leftmost position, i.e, `-L primary/layer;foo`.
 -}
 primaryLayer :: (HasCallStack) => LocLayers -> Loc
 primaryLayer =
-  Set.findMax . Set.filter isUserLayer
+  Set.findMin . Set.filter isUserLayer
   where
     isUserLayer = \case
       LocUser _ _ -> True
