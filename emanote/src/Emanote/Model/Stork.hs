@@ -32,17 +32,18 @@ renderStorkIndex model = do
 
 storkFiles :: Model -> [File]
 storkFiles model =
-  let baseDir = Loc.locPath . Loc.primaryLayer $ model ^. M.modelLayers
-   in Ix.toList (model ^. M.modelNotes) <&> \note ->
-        let fp = ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
-            ft = case note ^. N.noteRoute of
-              R.LMLRoute_Md _ -> FileType_Markdown
-              R.LMLRoute_Org _ -> FileType_PlainText
-         in File
-              fp
-              (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. N.noteRoute))
-              (Tit.toPlain $ note ^. N.noteTitle)
-              ft
+  flip mapMaybe (Ix.toList (model ^. M.modelNotes)) $ \note -> do
+    baseDir <- Loc.locPath <$> note ^. N.noteLayerLoc
+    let fp = ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
+        ft = case note ^. N.noteRoute of
+          R.LMLRoute_Md _ -> FileType_Markdown
+          R.LMLRoute_Org _ -> FileType_PlainText
+    pure
+      $ File
+        fp
+        (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. N.noteRoute))
+        (Tit.toPlain $ note ^. N.noteTitle)
+        ft
 
 frontmatterHandling :: Model -> Handling
 frontmatterHandling model =

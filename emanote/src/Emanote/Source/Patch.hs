@@ -90,8 +90,8 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
 
           case action of
             UM.Refresh refreshAction overlays -> do
-              let fpAbs = locResolve $ head overlays
-              s <- readRefreshedFile refreshAction fpAbs
+              let fpAbs = head overlays
+              s <- readRefreshedFile refreshAction $ locResolve fpAbs
               note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
               pure $ M.modelInsertNote $ noteF note
             UM.Delete -> do

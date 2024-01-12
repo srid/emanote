@@ -25,6 +25,7 @@ import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.Ext (FileType (Folder))
 import Emanote.Route.R (R)
+import Emanote.Source.Loc (Loc)
 import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
@@ -48,6 +49,8 @@ data Feed = Feed
 
 data Note = Note
   { _noteRoute :: R.LMLRoute
+  , _noteLayerLoc :: Maybe Loc
+  -- ^ The layer from which this note came. Nothing if the note was auto-generated.
   , _noteDoc :: Pandoc
   , _noteMeta :: Aeson.Value
   , _noteTitle :: Tit.Title
@@ -274,16 +277,16 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  mkNoteWith someR doc meta mempty
+  mkNoteWith someR Nothing doc meta mempty
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Pandoc -> Aeson.Value -> [Text] -> Note
-mkNoteWith r doc' meta errs =
+mkNoteWith :: R.LMLRoute -> Maybe Loc -> Pandoc -> Aeson.Value -> [Text] -> Note
+mkNoteWith r layerLoc doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
-   in Note r doc meta tit errs feed
+   in Note r layerLoc doc meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -303,17 +306,17 @@ parseNote ::
   ScriptingEngine ->
   [FilePath] ->
   R.LMLRoute ->
-  FilePath ->
+  (Loc, FilePath) ->
   Text ->
   m Note
-parseNote scriptingEngine pluginBaseDir r fp s = do
+parseNote scriptingEngine pluginBaseDir r (layerLoc, fp) s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
-  pure $ mkNoteWith r doc meta errs
+  pure $ mkNoteWith r (Just layerLoc) doc meta errs
 
 parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrg s =
