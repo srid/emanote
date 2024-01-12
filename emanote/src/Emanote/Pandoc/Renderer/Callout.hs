@@ -1,5 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
+{- |  Obsidian-style callouts
+
+  TODO: Should we switch to using the commonmark-hs parser here? cf. https://github.com/jgm/commonmark-hs/pull/135
+-}
 module Emanote.Pandoc.Renderer.Callout (
   calloutResolvingSplice,
 

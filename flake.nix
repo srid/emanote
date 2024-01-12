@@ -26,6 +26,9 @@
     unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
 
+    commonmark-simple.url = "github:srid/commonmark-simple";
+    commonmark-simple.flake = false;
+
     emanote-template.url = "github:srid/emanote-template";
     emanote-template.flake = false;
   };
@@ -66,13 +69,15 @@
 
           packages = {
             unionmount.source = inputs.unionmount;
+            commonmark-simple.source = inputs.commonmark-simple;
             fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
             ghcid.source = "0.8.8";
             heist-extra.source = inputs.heist-extra;
           };
 
           settings = {
-            # TODO: Eliminate these after new emanote gets upstreamed to nixpkgs
+            # Haskell packages in nixpkgs are often broken in many ways; ergo,
+            # it is our responsibility to fix them here.
             fsnotify.check = false;
             heist.broken = false;
             ixset-typed.broken = false;
@@ -94,7 +99,7 @@
               justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
-                self.pandoc_3_1_9
+                self.pandoc_3_1_11
                 self.pandoc-types
                 self.warp
               ];
