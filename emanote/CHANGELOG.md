@@ -12,9 +12,12 @@
   - Allow specifying custom page title in sidebar ([\#488](https://github.com/srid/emanote/pull/488))
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
   - KaTeX support ([\#489](https://github.com/srid/emanote/pull/489))
+  - Lua filters: filter paths will now be looked up in all layers now.
 - Bug fixes:
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
-  - Fix empty stork index generation when using more than 1 layer ([\#493](https://github.com/srid/emanote/issues/493))
+  - Stork search fixes
+    - Fix empty stork index generation when using more than 1 layer ([\#493](https://github.com/srid/emanote/issues/493))
+    - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
 
 ## 1.2.0.0 (2023-08-24)
 
