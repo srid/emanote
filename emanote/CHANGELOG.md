@@ -17,7 +17,7 @@
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
   - Stork search fixes
     - Fix empty stork index generation when using more than 1 layer ([\#493](https://github.com/srid/emanote/issues/493))
-    - Stork search index is now uses note path from their associated layer ()
+    - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
 
 ## 1.2.0.0 (2023-08-24)
 
