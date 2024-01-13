@@ -75,10 +75,11 @@ noteRels note =
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 
+-- | Return all possible `UnresolvedRelTarget`s to the resource indexed by this `ModelRoute`.
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
   let allowedWikiLinks = WL.allowedWikiLinks . R.unRoute
-      wls = either (\(_, r') -> R.withLmlRoute allowedWikiLinks r') allowedWikiLinks $ R.modelRouteCase r
+      wls = either (R.withLmlRoute allowedWikiLinks . snd) allowedWikiLinks $ R.modelRouteCase r
    in (URTWikiLink <$> toList wls)
         <> [URTResource r]
 
@@ -138,6 +139,11 @@ data ResolvedRelTarget a
   | RRTFound a
   deriving stock (Eq, Show, Ord, Functor, Generic)
   deriving anyclass (ToJSON)
+
+getResolved :: ResolvedRelTarget a -> Maybe a
+getResolved = \case
+  RRTFound x -> Just x
+  _ -> Nothing
 
 -- This 'a' is either
 -- - Note, or

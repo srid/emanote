@@ -9,7 +9,12 @@ import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
+import Optics.Core ((^.))
 import Relude
+
+resolveRel :: Model -> Rel.Rel -> Rel.ResolvedRelTarget SR.SiteRoute
+resolveRel model rel =
+  resolveUnresolvedRelTarget model (Just $ rel ^. Rel.relFrom) (rel ^. Rel.relTo)
 
 resolveUnresolvedRelTarget ::
   Model ->

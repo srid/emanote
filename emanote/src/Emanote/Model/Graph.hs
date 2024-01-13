@@ -14,6 +14,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
 import Text.Pandoc.Definition qualified as B
@@ -188,7 +189,16 @@ modelLookupBacklinks r model =
 backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
-   in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+      rels = Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+   in -- Filter out duplicate backlinks (ones that were disambigutated about ambiguous wiki links)
+      filter
+        ( \rel -> isJust $ do
+            SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
+              Rel.getResolved $ Resolve.resolveRel model rel
+            guard $ r == r'
+            pass
+        )
+        rels
   where
     toModelRoute = R.ModelRoute_LML R.LMLView_Html
 
