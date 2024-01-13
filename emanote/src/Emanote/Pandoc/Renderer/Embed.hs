@@ -34,7 +34,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
   -- TODO: Use anchor to embed a section?
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveWikiLinkMustExist model wl
+  let rRel = Resolve.resolveWikiLinkMustExist model (Just noteRoute) wl
   RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
     Left (R.LMLView_Html, r) -> embedResourceRoute model ctx r
     Right sf
@@ -60,7 +60,7 @@ embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   guard $ inlRef == Link.InlineLink
   let parentR = R.withLmlRoute R.routeParent noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveWikiLinkMustExist model wl
+  let rRel = Resolve.resolveWikiLinkMustExist model (Just noteRoute) wl
   RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
     $ either (const Nothing) (embedStaticFileRoute model $ show wl)
 

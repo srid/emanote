@@ -31,7 +31,7 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   let parentR = R.withLmlRoute R.routeParent noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveUnresolvedRelTarget model uRel
+  let rRel = Resolve.resolveUnresolvedRelTarget model (Just noteRoute) uRel
   renderSomeInlineRefWith id (is, (url, tit)) rRel model ctx inl $ \sr ->
     case inlRef of
       Link.InlineLink -> do

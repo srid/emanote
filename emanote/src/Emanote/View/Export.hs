@@ -78,7 +78,7 @@ modelRels model =
       let from_ = rel ^. Rel.relFrom
           to_ = rel ^. Rel.relTo
           toTarget =
-            Resolve.resolveUnresolvedRelTarget model to_
+            Resolve.resolveUnresolvedRelTarget model (Just from_) to_
               <&> SR.siteRouteUrlStatic model
        in (from_, one $ Link to_ toTarget)
 

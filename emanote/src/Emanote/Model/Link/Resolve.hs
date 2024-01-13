@@ -1,6 +1,7 @@
 module Emanote.Model.Link.Resolve where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Data.Foldable (maximumBy)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile qualified as SF
@@ -12,11 +13,13 @@ import Relude
 
 resolveUnresolvedRelTarget ::
   Model ->
+  -- | Current note route; used to resolve ambiguous links
+  Maybe R.LMLRoute ->
   Rel.UnresolvedRelTarget ->
   Rel.ResolvedRelTarget SR.SiteRoute
-resolveUnresolvedRelTarget model = \case
+resolveUnresolvedRelTarget model currentRoute = \case
   Rel.URTWikiLink (_wlType, wl) -> do
-    resolveWikiLinkMustExist model wl
+    resolveWikiLinkMustExist model currentRoute wl
       <&> resourceSiteRoute
   Rel.URTResource r ->
     resolveModelRoute model r
@@ -27,9 +30,21 @@ resolveUnresolvedRelTarget model = \case
         virtualRoute
 
 resolveWikiLinkMustExist ::
-  Model -> WL.WikiLink -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
-resolveWikiLinkMustExist model wl =
-  Rel.resolvedRelTargetFromCandidates $ M.modelWikiLinkTargets wl model
+  Model ->
+  -- | Current note route; used to resolve ambiguous links
+  Maybe R.LMLRoute ->
+  WL.WikiLink ->
+  Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
+resolveWikiLinkMustExist model mCurrentRoute wl =
+  Rel.resolvedRelTargetFromCandidates (Just resolveAmbiguity) $ M.modelWikiLinkTargets wl model
+  where
+    resolveAmbiguity :: NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) -> Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
+    resolveAmbiguity candidates = do
+      currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
+      -- traceShow (currentRoute, candidates <&> either (show . MN._noteRoute . snd) show) Nothing
+      pure
+        $ traceShow (mCurrentRoute, candidates <&> either (show . MN._noteRoute . snd) show)
+        $ maximumBy (comparing $ R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute) candidates
 
 resolveModelRoute ::
   Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)

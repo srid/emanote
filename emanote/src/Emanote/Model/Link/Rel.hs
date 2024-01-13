@@ -139,12 +139,16 @@ data ResolvedRelTarget a
   deriving stock (Eq, Show, Ord, Functor, Generic)
   deriving anyclass (ToJSON)
 
-resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
-resolvedRelTargetFromCandidates xs =
+-- This 'a' is either
+-- - Note, or
+-- - Either (LMLView, Note) StaticFile
+resolvedRelTargetFromCandidates :: Maybe (NonEmpty a -> Maybe a) -> [a] -> ResolvedRelTarget a
+resolvedRelTargetFromCandidates mResolveAmbiguity xs =
   case nonEmpty xs of
     Nothing ->
       RRTMissing
     Just (x :| []) ->
       RRTFound x
-    Just xs' ->
-      RRTAmbiguous xs'
+    Just xs' -> maybe (RRTAmbiguous xs') RRTFound $ do
+      f <- mResolveAmbiguity
+      f xs'
