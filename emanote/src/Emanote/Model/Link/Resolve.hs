@@ -1,7 +1,6 @@
 module Emanote.Model.Link.Resolve where
 
 import Commonmark.Extensions.WikiLink qualified as WL
-import Data.Foldable (maximumBy)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile qualified as SF
@@ -47,9 +46,11 @@ resolveWikiLinkMustExist model mCurrentRoute wl =
     resolveAmbiguity candidates = do
       currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
       -- traceShow (currentRoute, candidates <&> either (show . MN._noteRoute . snd) show) Nothing
-      pure
-        $ traceShow (mCurrentRoute, candidates <&> either (show . MN._noteRoute . snd) show)
-        $ maximumBy (comparing $ R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute) candidates
+      let k = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
+      (a :| as) <- nonEmpty $ sortWith (Down . k) (toList candidates)
+      -- if there is no *single* maximumBy, bail out.
+      guard $ (viaNonEmpty (k . head) as) /= Just (k a)
+      pure a
 
 resolveModelRoute ::
   Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
