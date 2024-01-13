@@ -243,3 +243,4 @@ test-suite test
       Emanote.Model.QuerySpec
       Emanote.Pandoc.ExternalLinkSpec
       Emanote.Pandoc.Renderer.CalloutSpec
+      Emanote.Route.RSpec
