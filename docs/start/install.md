@@ -9,7 +9,7 @@ order: 1
 >[!info] Avoiding installation
 > Emanote need not have to be installed if you are using the [[emanote-template]] [flake](https://nixos.asia/en/flakes) to manage your content.
 
-Emanote is supported on all popular operating systems through [Nix]. If you are new Nix, checkout [this tutorial](https://nixos.asia/en/nix-first).
+Emanote is supported on all popular operating systems through [Nix]. If you are new to Nix, checkout [this tutorial](https://nixos.asia/en/nix-first).
 
 1. [Install Nix & enable Flakes](https://nixos.asia/en/install)
    1. For Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230)
