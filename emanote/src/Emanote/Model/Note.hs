@@ -5,7 +5,6 @@
 
 module Emanote.Model.Note where
 
-import Commonmark.Extensions.WikiLink (plainify)
 import Commonmark.Extensions.WikiLink qualified as WL
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
@@ -384,7 +383,7 @@ applyNoteMetaFilters doc =
            )
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
-        B.Para is -> [plainify is]
+        B.Para is -> [WL.plainify is]
         _ -> mempty
     -- FIXME this doesn't take splice rendering into account. Specifically,
     -- `![[foo.jpeg]]` is not handled at all.
