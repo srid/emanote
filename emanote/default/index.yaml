@@ -85,6 +85,9 @@ page:
   # Used for https://ogp.me/
   image: ""
 
+  twitter:
+    card: summary_large_image
+
   # Put anything that should go in <head> of these routes here:
   # You can reference other metadata keys using <snippet var=".." />
   # Or use the JS behaviour library below.

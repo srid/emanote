@@ -19,6 +19,9 @@
       <meta property="og:image" content="${value:image}" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content="${ema:title}" />
+      <with var="twitter">
+        <meta name="twitter:card" content="${value:card}" />
+      </with>
     </with>
     <with var="template">
       <base href="${value:baseUrl}" />
