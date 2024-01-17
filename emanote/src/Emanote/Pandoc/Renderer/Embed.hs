@@ -11,7 +11,7 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
-import Emanote.Pandoc.Renderer.Url qualified as RenderedUrl
+import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.R qualified as R
 import Emanote.Route.SiteRoute qualified as SF
@@ -35,7 +35,7 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
     Left (R.LMLView_Html, r) -> embedResourceRoute model ctx r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
@@ -51,7 +51,7 @@ embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
   (Rel.URTResource mr, _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveModelRoute model mr
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
     $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
@@ -61,7 +61,7 @@ embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   let parentR = R.withLmlRoute R.routeParent noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model wl
-  RenderedUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
     $ either (const Nothing) (embedStaticFileRoute model $ show wl)
 
 runEmbedTemplate :: ByteString -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
