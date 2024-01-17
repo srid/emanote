@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.3.6.2
+version:            1.3.7.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -101,7 +101,7 @@ common library-common
     , commonmark-extensions  >=0.2.3.4
     , commonmark-pandoc
     , commonmark-simple      >=0.2
-    , commonmark-wikilink
+    , commonmark-wikilink    >=0.2
     , containers
     , data-default
     , deriving-aeson
