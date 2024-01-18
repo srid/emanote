@@ -1,3 +1,9 @@
+--
+template:
+  uptree: 
+    enable: true
+---
+
 # Uplink tree
 
 The _uplink tree_ or "uptree"[^neuron] is a feature available in #[[html-template]], which visualizes hierarchical relationships between notes as a graph at the top of the page.
@@ -10,8 +16,8 @@ To enable the uptree, add the following to your [[yaml-config]]:
 
 ```yaml
 template:
-  sidebar:
-    enable: false
+  uptree: 
+    enable: true
 ```
 
 >[!tip] See also 
