@@ -2,9 +2,7 @@ template:
   urlStrategy: pretty
 
 page:
+  siteUrl: https://emanote.srid.ca
   siteTitle: Emanote
   headHtml: |
     <snippet var="js.highlightjs" />
-
-feed:
-  siteUrl: https://emanote.srid.ca
