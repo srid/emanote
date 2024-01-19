@@ -17,6 +17,10 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 >[!tip] Using in HTML templates
 > You can reference the YAML frontmatter config from [[html-template]]. See [here](https://github.com/srid/emanote/discussions/131#discussioncomment-1382189) for details.
 
+## Special properties
+
+- `page.image`: The image to use for the page. This is used for the [[ogp]] meta tag `og:image` meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if `page.siteUrl` is non-empty.
+
 
 ## Examples
 
