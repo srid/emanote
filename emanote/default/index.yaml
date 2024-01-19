@@ -69,6 +69,9 @@ pandoc:
 # Put page-specific metadata here. Override them in Markdown frontmatter or
 # per-folder YAML as necessary.
 page:
+  # The URL to the deployed site. Must include everything upto `baseUrl` above.
+  siteUrl: ""
+
   siteTitle: My Emanote Site
   # Desription is expected to be set on a per-page basis.
   # By default, the first paragraph is used for description.
@@ -84,6 +87,9 @@ page:
   # supported.
   # Used for https://ogp.me/
   image: ""
+
+  twitter:
+    card: summary_large_image
 
   # Put anything that should go in <head> of these routes here:
   # You can reference other metadata keys using <snippet var=".." />

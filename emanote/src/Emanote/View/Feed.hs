@@ -81,8 +81,8 @@ renderFeed model baseNote = case eFeedText of
       let feedMeta :: Aeson.Value
           feedMeta = getEffectiveRouteMeta (_noteRoute baseNote) model
       let mFeedUrl :: Maybe Text
-          mFeedUrl = lookupAeson Nothing ("feed" :| ["siteUrl"]) feedMeta
-      feedUrl <- maybeToRight "index.yaml or note doesn't have feed.siteUrl" mFeedUrl
+          mFeedUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
+      feedUrl <- maybeToRight "index.yaml or note doesn't have page.siteUrl" mFeedUrl
 
       -- process the notes
       let noteUrl note =

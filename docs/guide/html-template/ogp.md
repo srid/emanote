@@ -18,6 +18,10 @@ Emanote generates OGP meta tags for each note, using the following rules:
 | `og:type` | `website` |
 | `og:image` | The first image[^img] in the note, if any; otherwise, use the `image` [[yaml-config\|YAML metadata]] |
 
+## Twitter
+
+[Twitter Card](https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards) style can be set using `page.twitter.card` [[yaml-config|YAML metadata]]. It it set to `summary_large_image` by default.
+
 [^wl]: Wikilinks like `[[foo]]` render *as is* (due to a limitation). However, `[[foo|some text]]` will render as `some text` (the link text). If you do not wish to have wikilink syntax appearing in page description, specify a custom like in the second example.
 
 [^img]: Unfortunately, embed wikilinks (eg.: `![[foo.jpeg]]`) are not recognized here. You should use regular links, eg.: `![](foo.jpeg)`.

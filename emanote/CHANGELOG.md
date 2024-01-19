@@ -13,6 +13,7 @@
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
   - KaTeX support ([\#489](https://github.com/srid/emanote/pull/489))
   - Lua filters: filter paths will now be looked up in all layers now.
+  - **BACKWARDS INCOMPTABILE**: `feed.siteUrl` is now `page.siteUrl`
 - Bug fixes:
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
   - Stork search fixes
