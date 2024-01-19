@@ -42,4 +42,4 @@ If you do not wish to use Nix, you may use Emanote in one of the following ways:
 | ---------- | ----------------- | ----------------- |
 | [[docker]] | Guaranteed        | Linux, WSL, macOS |
 
-Nix and [[docker]] are the only mechanisms the author intends to support in the long-term. Emanote is also available in nixpkgs.
+Nix and [[docker]] are the only mechanisms the author intends to support in the long-term.
