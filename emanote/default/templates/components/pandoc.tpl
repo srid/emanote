@@ -96,13 +96,37 @@
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm" />
   <Code class="py-0.5 px-0.5 bg-gray-100" />
-  <Header>
-    <h1 class="pb-2 mb-2 text-5xl font-bold text-center" />
-    <h2 class="mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2" />
-    <h3 class="mt-6 mb-2 text-3xl font-bold text-gray-700" />
-    <h4 class="mt-6 mb-2 text-2xl font-bold text-gray-700" />
-    <h5 class="mt-6 mb-2 text-xl font-bold text-gray-700" />
-    <h6 class="mt-6 mb-2 text-xl font-bold text-gray-700" />
-  </Header>
 
+  <Header:1>
+    <h1 id="${header:id}" class="group pb-2 mb-2 text-5xl font-bold text-center">
+      <inlines />
+    </h1>
+  </Header:1>
+  <Header:2>
+    <h2 id="${header:id}" class="group mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2">
+      <a href="#${header:id}" class="group-hover:visible invisible text-sm align-middle">🔗</a>
+      <inlines />
+    </h2>
+  </Header:2>
+  <Header:3>
+    <h3 id="${header:id}" class="group mt-6 mb-2 text-3xl font-bold text-gray-700">
+      <a href="#${header:id}" class="group-hover:visible invisible text-sm align-middle">🔗</a>
+      <inlines />
+    </h3>
+  </Header:3>
+  <Header:4>
+    <h4 id="${header:id}" class="mt-6 mb-2 text-3xl font-bold text-gray-700">
+      <inlines />
+    </h4>
+  </Header:4>
+  <Header:5>
+    <h5 id="${header:id}" class="mt-6 mb-2 text-2xl font-bold text-gray-700">
+      <a href="#${header:id}">⛓</a>
+    </h5>
+  </Header:5>
+  <Header:6>
+    <h6 id="${header:id}" class="mt-6 mb-2 text-2xl font-bold text-gray-700">
+      <a href="#${header:id}">⛓</a>
+    </h6>
+  </Header:6>
 </ema:note:pandoc>
