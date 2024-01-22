@@ -30,9 +30,10 @@ import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath ((</>))
-import Text.Pandoc (runPure)
+import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Extensions
 import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
@@ -319,13 +320,16 @@ parseNote scriptingEngine pluginBaseDir r (layerLoc, fp) s = do
 
 parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrg s =
-  case runPure $ readOrg def s of
+  case runPure $ readOrg readerOpts s of
     Left err -> do
       tell [show err]
       pure (mempty, defaultFrontMatter)
     Right doc ->
       -- TODO: Merge Pandoc's Meta in here?
       pure (preparePandoc doc, defaultFrontMatter)
+  where
+    readerOpts = def {readerExtensions = extensionsFromList (exts)}
+    exts = [Ext_auto_identifiers]
 
 parseNoteMarkdown :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [FilePath] -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
 parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
