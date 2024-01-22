@@ -20,7 +20,7 @@ extra-source-files:
 
 data-dir:           default
 data-files:
-  _emanote-live-server/**/*.css
+  _emanote-live-server/**/*.js
   _emanote-static/**/*.ttf
   _emanote-static/*.css
   _emanote-static/*.svg

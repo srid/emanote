@@ -196,11 +196,10 @@ commonSplices withCtx model meta routeTitle = do
       let localCdnUrl =
             SR.siteRouteUrl model
               $ SR.staticFileSiteRoute
-              $ LiveServerFiles.tailwindCssFile model
-      H.link
-        ! A.href (H.toValue localCdnUrl)
-        ! A.rel "stylesheet"
-        ! A.type_ "text/css"
+              $ LiveServerFiles.tailwindJsFile model
+      H.script
+        ! A.src (H.toValue localCdnUrl)
+        $ mempty
 
 renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
 renderModelTemplate model templateName =

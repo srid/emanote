@@ -1,7 +1,7 @@
 module Emanote.View.LiveServerFiles (
   isLiveServerFile,
-  tailwindFullCssPath,
-  tailwindCssFile,
+  tailwindFullJsPath,
+  tailwindJsFile,
 ) where
 
 import Data.Text qualified as T
@@ -14,13 +14,13 @@ import Relude
 baseDir :: FilePath
 baseDir = "_emanote-live-server"
 
-tailwindFullCssPath :: FilePath
-tailwindFullCssPath = baseDir <> "/tailwind/2.2.2/tailwind.min.css"
+tailwindFullJsPath :: FilePath
+tailwindFullJsPath = baseDir <> "/tailwind/tailwind.min.js"
 
 isLiveServerFile :: FilePath -> Bool
 isLiveServerFile (toText -> fp) =
   toText baseDir `T.isPrefixOf` fp
 
-tailwindCssFile :: M.Model -> StaticFile
-tailwindCssFile model =
-  fromMaybe (error "model not ready?") $ M.modelLookupStaticFile tailwindFullCssPath model
+tailwindJsFile :: M.Model -> StaticFile
+tailwindJsFile model =
+  fromMaybe (error "model not ready?") $ M.modelLookupStaticFile tailwindFullJsPath model
