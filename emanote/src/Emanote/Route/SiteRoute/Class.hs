@@ -53,7 +53,7 @@ emanoteGeneratableRoutes model =
       staticRoutes =
         let includeFile f =
               not (LiveServerFile.isLiveServerFile f)
-                || (f == LiveServerFile.tailwindFullCssPath && not (model ^. M.modelCompileTailwind))
+                || (f == LiveServerFile.tailwindFullJsPath && not (model ^. M.modelCompileTailwind))
          in model
               ^. M.modelStaticFiles
                 & Ix.toList
