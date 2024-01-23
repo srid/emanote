@@ -1,3 +1,14 @@
+<bind tag="clickable-icon">
+  <span
+    class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
+    aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </svg></span>
+</bind>
+
 <ema:note:pandoc>
   <Para>
     <p class="mb-3">
@@ -104,29 +115,32 @@
   </Header:1>
   <Header:2>
     <h2 id="${header:id}" class="group mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2">
-      <a href="#${header:id}" class="group-hover:visible invisible text-sm align-middle">🔗</a>
       <inlines />
+      <a href="#${header:id}"><clickable-icon /></a>
     </h2>
   </Header:2>
   <Header:3>
     <h3 id="${header:id}" class="group mt-6 mb-2 text-3xl font-bold text-gray-700">
-      <a href="#${header:id}" class="group-hover:visible invisible text-sm align-middle">🔗</a>
       <inlines />
+      <a href="#${header:id}"><clickable-icon /></a>
     </h3>
   </Header:3>
   <Header:4>
-    <h4 id="${header:id}" class="mt-6 mb-2 text-3xl font-bold text-gray-700">
+    <h4 id="${header:id}" class="group mt-6 mb-2 text-2xl font-bold text-gray-700">
       <inlines />
+      <a href="#${header:id}"><clickable-icon /></a>
     </h4>
   </Header:4>
   <Header:5>
-    <h5 id="${header:id}" class="mt-6 mb-2 text-2xl font-bold text-gray-700">
-      <a href="#${header:id}">⛓</a>
+    <h5 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
+      <inlines />
+      <a href="#${header:id}"><clickable-icon /></a>
     </h5>
   </Header:5>
   <Header:6>
-    <h6 id="${header:id}" class="mt-6 mb-2 text-2xl font-bold text-gray-700">
-      <a href="#${header:id}">⛓</a>
+    <h6 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
+      <inlines />
+      <a href="#${header:id}"><clickable-icon /></a>
     </h6>
   </Header:6>
 </ema:note:pandoc>
