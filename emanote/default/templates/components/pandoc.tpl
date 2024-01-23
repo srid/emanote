@@ -116,31 +116,31 @@
   <Header:2>
     <h2 id="${header:id}" class="group mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2">
       <inlines />
-      <a href="#${header:id}"><clickable-icon /></a>
+      <a href="${ema:note:url}#${header:id}"><clickable-icon /></a>
     </h2>
   </Header:2>
   <Header:3>
     <h3 id="${header:id}" class="group mt-6 mb-2 text-3xl font-bold text-gray-700">
       <inlines />
-      <a href="#${header:id}"><clickable-icon /></a>
+      <a href="${ema:note:url}#${header:id}"><clickable-icon /></a>
     </h3>
   </Header:3>
   <Header:4>
     <h4 id="${header:id}" class="group mt-6 mb-2 text-2xl font-bold text-gray-700">
       <inlines />
-      <a href="#${header:id}"><clickable-icon /></a>
+      <a href="${ema:note:url}#${header:id}"><clickable-icon /></a>
     </h4>
   </Header:4>
   <Header:5>
     <h5 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
       <inlines />
-      <a href="#${header:id}"><clickable-icon /></a>
+      <a href="${ema:note:url}#${header:id}"><clickable-icon /></a>
     </h5>
   </Header:5>
   <Header:6>
     <h6 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
       <inlines />
-      <a href="#${header:id}"><clickable-icon /></a>
+      <a href="${ema:note:url}#${header:id}"><clickable-icon /></a>
     </h6>
   </Header:6>
 </ema:note:pandoc>
