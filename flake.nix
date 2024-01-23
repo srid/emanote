@@ -28,6 +28,8 @@
 
     commonmark-simple.url = "github:srid/commonmark-simple";
     commonmark-simple.flake = false;
+    commonmark-wikilink.url = "github:srid/commonmark-wikilink";
+    commonmark-wikilink.flake = false;
 
     emanote-template.url = "github:srid/emanote-template";
     emanote-template.flake = false;
@@ -70,6 +72,7 @@
           packages = {
             unionmount.source = inputs.unionmount;
             commonmark-simple.source = inputs.commonmark-simple;
+            commonmark-wikilink.source = inputs.commonmark-wikilink;
             fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
             ghcid.source = "0.8.8";
             heist-extra.source = inputs.heist-extra;

@@ -66,6 +66,22 @@ lookupAeson x (k :| ks) meta =
       Aeson.Error _ -> Nothing
       Aeson.Success b -> pure b
 
+-- | Modify a key inside the aeson Value
+modifyAeson :: NonEmpty KM.Key -> (Maybe Aeson.Value -> Maybe Aeson.Value) -> Aeson.Value -> Aeson.Value
+modifyAeson (k :| ks) f meta =
+  case nonEmpty ks of
+    Nothing ->
+      withObject meta $ \obj ->
+        runIdentity $ KM.alterF (pure . f) k obj
+    Just ks' ->
+      withObject meta $ \obj ->
+        runIdentity $ KM.alterF @Identity (\mv -> Identity $ modifyAeson ks' f <$> mv) k obj
+  where
+    withObject :: Aeson.Value -> (Aeson.Object -> Aeson.Object) -> Aeson.Value
+    withObject v g = case v of
+      Aeson.Object x -> Aeson.Object $ g x
+      x -> x
+
 oneAesonText :: [Text] -> Text -> Aeson.Value
 oneAesonText k v =
   case nonEmpty k of

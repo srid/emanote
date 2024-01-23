@@ -128,10 +128,26 @@ loaderHead :: LByteString
 loaderHead =
   "<em style='font-size: 400%; border-bottom: 1px solid; margin-bottom: 4em; '>Union mounting notebook layers; please wait ...</em>"
 
+patchMeta :: Aeson.Value -> Aeson.Value
+patchMeta meta =
+  -- Convert relative to absolute URLs in "page.image", because some sites
+  -- (Twitter) require "og:image" to be absolute.
+  SData.modifyAeson
+    ("page" :| ["image"])
+    ( \case
+        Just (Aeson.String v)
+          | not (":" `T.isInfixOf` v) && siteUrl /= "" ->
+              Just $ Aeson.String $ siteUrl <> "/" <> v
+        x -> x
+    )
+    meta
+  where
+    siteUrl = SData.lookupAeson @Text "" ("page" :| ["siteUrl"]) meta
+
 renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
-      meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
+      meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       -- Force a doctype into the generated HTML as a workaround for Heist
       -- discarding it. See: https://github.com/srid/emanote/issues/216
       withDoctype = ("<!DOCTYPE html>\n" <>)

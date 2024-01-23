@@ -15,10 +15,6 @@
   <bind tag="head-main">
     <style>
       /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      #sidebar:hover {
-        width: auto;
-      }
-
       /* md:min-w-48  */
       @media (min-width: 768px) {
         #sidebar {

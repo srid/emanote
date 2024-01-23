@@ -22,7 +22,7 @@ parseInlineRef = \case
   _ ->
     Nothing
 
-{- | Given an inline that is known to be an InlineRef, reconstruct and return
+{- | Given an inline that is known to be an `InlineRef`, reconstruct and return
  its orginal Markdown source.
 -}
 unParseLink :: (HasCallStack) => B.Inline -> Text
