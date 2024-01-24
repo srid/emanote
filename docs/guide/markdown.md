@@ -164,7 +164,7 @@ Callouts also work with [[orgmode]] syntax.
 {#hanchor}
 ## Heading anchors
 
-You can use the following syntax to overriding heading anchors:
+You can use the following syntax to override the default heading anchors:
 
 ```markdown
 {#head}
