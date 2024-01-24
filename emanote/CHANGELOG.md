@@ -6,14 +6,16 @@
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
   - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
   - Add query syntax for listing folgezetten children & parents ([\#476](https://github.com/srid/emanote/pull/476))
-  - **BACKWARDS INCOMPATIBLE** A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
-    - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
-    - The semantics of `folder-folgezettel` is now applied in inverse (see docs)
+  - **BACKWARDS INCOMPTABILE** changes
+    - `feed.siteUrl` is now `page.siteUrl`
+    - A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
+      - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
+      - The semantics of `folder-folgezettel` is now applied in inverse (see docs)
+    - Add anchor links to headings ([\#500](https://github.com/srid/emanote/pull/500))
   - Allow specifying custom page title in sidebar ([\#488](https://github.com/srid/emanote/pull/488))
   - Allow specifying `lang` attribute for HTML page in YAML config ([\#485](https://github.com/srid/emanote/pull/485))
   - KaTeX support ([\#489](https://github.com/srid/emanote/pull/489))
   - Lua filters: filter paths will now be looked up in all layers now.
-  - **BACKWARDS INCOMPTABILE**: `feed.siteUrl` is now `page.siteUrl`
   - Live server now uses Tailwind 3 ([\#503](https://github.com/srid/emanote/pull/503))
   - Enable auto identifier for org files ([\#502](https://github.com/srid/emanote/pull/502))
 - Bug fixes:

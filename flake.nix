@@ -20,8 +20,7 @@
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
 
-    # Remove pin when https://github.com/srid/heist-extra/pull/6 is merged
-    heist-extra.url = "github:srid/heist-extra/7d70a20c87fd2c1496148fe1169a2852d0410fff";
+    heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
 
     unionmount.url = "github:srid/unionmount";

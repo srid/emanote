@@ -1,4 +1,2 @@
 packages:
   ./emanote
--- un-comment to work with local checkout
---  ../heist-extra
