@@ -1,5 +1,5 @@
 <bind tag="clickable-icon">
-  <a href="${ema:note:url}#${header-id}">
+  <a href="${ema:note:url}#${header:id}">
     <span
       class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
       aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
@@ -13,10 +13,10 @@
 
 <bind tag="heading-inlines-with-anchor">
   <inlines />
-  <clickable-icon>
-    <bind tag="header-id">${header:id}</bind>
-  </clickable-icon>
+  <clickable-icon />
 </bind>
+
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -118,32 +118,32 @@
   <Code class="py-0.5 px-0.5 bg-gray-100" />
 
   <Header:1>
-    <h1 id="${header:id}" class="group pb-2 mb-2 text-5xl font-bold text-center">
-      <inlines />
+    <h1 id="${header:id}" class="${header-class} text-5xl">
+      <heading-inlines-with-anchor />
     </h1>
   </Header:1>
   <Header:2>
-    <h2 id="${header:id}" class="group mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2">
+    <h2 id="${header:id}" class="${header-class} text-4xl border-b-2">
       <heading-inlines-with-anchor />
     </h2>
   </Header:2>
   <Header:3>
-    <h3 id="${header:id}" class="group mt-6 mb-2 text-3xl font-bold text-gray-700">
+    <h3 id="${header:id}" class="${header-class} text-3xl">
       <heading-inlines-with-anchor />
     </h3>
   </Header:3>
   <Header:4>
-    <h4 id="${header:id}" class="group mt-6 mb-2 text-2xl font-bold text-gray-700">
+    <h4 id="${header:id}" class="${header-class} text-2xl">
       <heading-inlines-with-anchor />
     </h4>
   </Header:4>
   <Header:5>
-    <h5 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
+    <h5 id="${header:id}" class="${header-class} text-xl">
       <heading-inlines-with-anchor />
     </h5>
   </Header:5>
   <Header:6>
-    <h6 id="${header:id}" class="group mt-6 mb-2 text-xl font-bold text-gray-700">
+    <h6 id="${header:id}" class="${header-class} text-lg">
       <heading-inlines-with-anchor />
     </h6>
   </Header:6>
