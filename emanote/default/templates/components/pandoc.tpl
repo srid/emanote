@@ -1,3 +1,23 @@
+<bind tag="clickable-icon">
+  <a href="${ema:note:url}#${header:id}">
+    <span
+      class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
+      aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg></span>
+  </a>
+</bind>
+
+<bind tag="heading-inlines-with-anchor">
+  <inlines />
+  <clickable-icon />
+</bind>
+
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
+
 <ema:note:pandoc>
   <Para>
     <p class="mb-3">
@@ -96,13 +116,35 @@
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm" />
   <Code class="py-0.5 px-0.5 bg-gray-100" />
-  <Header>
-    <h1 class="pb-2 mb-2 text-5xl font-bold text-center" />
-    <h2 class="mt-6 mb-4 text-4xl font-bold text-gray-700 border-b-2" />
-    <h3 class="mt-6 mb-2 text-3xl font-bold text-gray-700" />
-    <h4 class="mt-6 mb-2 text-2xl font-bold text-gray-700" />
-    <h5 class="mt-6 mb-2 text-xl font-bold text-gray-700" />
-    <h6 class="mt-6 mb-2 text-xl font-bold text-gray-700" />
-  </Header>
 
+  <Header:1>
+    <h1 id="${header:id}" class="${header-class} text-5xl">
+      <heading-inlines-with-anchor />
+    </h1>
+  </Header:1>
+  <Header:2>
+    <h2 id="${header:id}" class="${header-class} text-4xl border-b-2">
+      <heading-inlines-with-anchor />
+    </h2>
+  </Header:2>
+  <Header:3>
+    <h3 id="${header:id}" class="${header-class} text-3xl">
+      <heading-inlines-with-anchor />
+    </h3>
+  </Header:3>
+  <Header:4>
+    <h4 id="${header:id}" class="${header-class} text-2xl">
+      <heading-inlines-with-anchor />
+    </h4>
+  </Header:4>
+  <Header:5>
+    <h5 id="${header:id}" class="${header-class} text-xl">
+      <heading-inlines-with-anchor />
+    </h5>
+  </Header:5>
+  <Header:6>
+    <h6 id="${header:id}" class="${header-class} text-lg">
+      <heading-inlines-with-anchor />
+    </h6>
+  </Header:6>
 </ema:note:pandoc>

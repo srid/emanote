@@ -161,6 +161,29 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 
 Callouts also work with [[orgmode]] syntax.
 
+{#hanchor}
+## Heading anchors
+
+You can use the following syntax to override the default heading anchors:
+
+```markdown
+{#head}
+## Some heading
+```
+
+On default theme, an anchor is displayed when you hover on the heading allowing you to copy the link to the heading. Here are all heading levels for comparison:
+
+### Level 3
+
+#### Level 4
+
+##### Level 5
+
+###### Level 6
+
+>[!warning] Live server behaviour
+> When running in the live server (not static site), you may find that scrolling to heading anchors is glitchy. This is a known issue that you can help resolve; [see here](https://github.com/srid/emanote/pull/500#issuecomment-1907363245).
+
 ## More extensions
 
 :::{.flex-row .space-y-8}
