@@ -38,6 +38,7 @@ import Relude
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Emanote.Model.Toc (newToc, renderToc)
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -197,6 +198,10 @@ renderLmlHtml model note = do
       C.withBlockCtx ctx
         $ \ctx' ->
           Splices.pandocSplice ctx' (note ^. MN.noteDoc)
+    "ema:note:toc" ##
+      C.withBlockCtx ctx
+        $ \ctx' ->
+          renderToc ctx' (newToc $ note ^. MN.noteDoc)
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =

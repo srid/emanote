@@ -24,6 +24,7 @@ import Heist.Interpreted qualified as HI
 import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
+import Emanote.Model.Toc (renderToc, newToc)
 
 embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
@@ -76,6 +77,8 @@ embedResourceRoute model ctx note = do
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
     "ema:note:pandoc" ##
       pandocSplice ctx (note ^. MN.noteDoc)
+    "ema:note:toc" ##
+      renderToc ctx (newToc $ note ^. MN.noteDoc)
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
