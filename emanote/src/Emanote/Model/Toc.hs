@@ -28,12 +28,11 @@ pandocToHeadings (Pandoc _ blocks) = mapMaybe toHeading blocks
       Header hlvl (oid, _, _) inlines -> Just (hlvl, DocHeading oid (stringify inlines))
       _ -> Nothing
 
-{- | Create the Toc
-TODO: figure out the base heading, sometime it's 1, sometime it's 2
--}
+-- | Create the Toc
 newToc :: Pandoc -> Toc
-newToc = go [] 2 . pandocToHeadings
+newToc = goInit . pandocToHeadings
   where
+    goInit xs = go [] (maybe 1 (fst . head) $ nonEmpty xs) xs
     go acc lvl ((headingLvl, heading) : rest)
       | lvl == headingLvl =
           let
