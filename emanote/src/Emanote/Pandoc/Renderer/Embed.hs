@@ -9,6 +9,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile (CodeLanguage (..), StaticFileInfo (..), staticFileInfoTemplateName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
+import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
@@ -24,7 +25,6 @@ import Heist.Interpreted qualified as HI
 import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
-import Emanote.Model.Toc (renderToc, newToc)
 
 embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
