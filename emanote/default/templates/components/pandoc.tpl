@@ -1,5 +1,5 @@
 <bind tag="clickable-icon">
-  <a href="${ema:note:url}#${header:id}">
+  <a href="${ema:note:url}#${header:id}" class="--ema-anchor">
     <span
       class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
       aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"

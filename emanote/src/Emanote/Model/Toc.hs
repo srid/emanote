@@ -52,11 +52,19 @@ renderToc ctx toc =
     Just
       $ runCustomNode renderNode
       $ do
-        "toc" ##
-          (HI.runChildrenWith . (tocSplices ctx)) `foldMapM` toc
+        "toc:entries" ## renderTocNode ctx toc
+
+renderTocNode :: RenderCtx -> Toc -> HI.Splice Identity
+renderTocNode ctx toc =
+  fromMaybe (pure []) $ do
+    renderNode <- viaNonEmpty head $ maybe [] (X.childElementsTag "Toc:Node") $ rootNode ctx
+    Just
+      $ runCustomNode renderNode
+      $ do
+        "toc:entry" ## (HI.runChildrenWith . (tocSplices ctx)) `foldMapM` toc
 
 tocSplices :: RenderCtx -> Tree DocHeading -> H.Splices (HI.Splice Identity)
 tocSplices ctx (Node heading childs) = do
   "toc:title" ## HI.textSplice (headingName heading)
-  "toc:ref" ## HI.textSplice (headingId heading)
-  "toc:childs" ## renderToc ctx childs
+  "toc:anchor" ## HI.textSplice (headingId heading)
+  "toc:childs" ## renderTocNode ctx childs
