@@ -10,10 +10,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/cachix-action@v14
-        with:
-          name: srid
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
       - name: Build Nix
         id: build-nix
         run: |
