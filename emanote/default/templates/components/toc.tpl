@@ -1,24 +1,18 @@
-<nav
-  id="toc"
-  class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64"
->
+<nav id="toc" class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64">
   <div class="pt-32 py-2 text-gray-800">
     <ema:note:toc>
-      <Toc:List>
-        <toc:entries />
-      </Toc:List>
-      <Toc:Node>
+      <Toc>
         <ul class="ml-2">
           <toc:entry>
             <li class="whitespace-nowrap">
-              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc"
-                ><toc:title
-              /></a>
+              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc">
+                <toc:title />
+              </a>
               <toc:childs />
             </li>
           </toc:entry>
         </ul>
-      </Toc:Node>
+      </Toc>
     </ema:note:toc>
   </div>
   <script>

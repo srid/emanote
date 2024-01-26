@@ -48,16 +48,7 @@ newToc = goInit . pandocToHeadings
 renderToc :: RenderCtx -> Toc -> HI.Splice Identity
 renderToc ctx toc =
   fromMaybe (pure []) $ do
-    renderNode <- viaNonEmpty head $ maybe [] (X.childElementsTag "Toc:List") $ rootNode ctx
-    Just
-      $ runCustomNode renderNode
-      $ do
-        "toc:entries" ## renderTocNode ctx toc
-
-renderTocNode :: RenderCtx -> Toc -> HI.Splice Identity
-renderTocNode ctx toc =
-  fromMaybe (pure []) $ do
-    renderNode <- viaNonEmpty head $ maybe [] (X.childElementsTag "Toc:Node") $ rootNode ctx
+    renderNode <- viaNonEmpty head $ maybe [] (X.childElementsTag "Toc") $ rootNode ctx
     Just
       $ runCustomNode renderNode
       $ do
@@ -67,4 +58,4 @@ tocSplices :: RenderCtx -> Tree DocHeading -> H.Splices (HI.Splice Identity)
 tocSplices ctx (Node heading childs) = do
   "toc:title" ## HI.textSplice (headingName heading)
   "toc:anchor" ## HI.textSplice (headingId heading)
-  "toc:childs" ## renderTocNode ctx childs
+  "toc:childs" ## renderToc ctx childs
