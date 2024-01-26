@@ -42,6 +42,8 @@ template:
   stork:
     # https://stork-search.net/docs/config-ref#frontmatter_handling
     frontmatter-handling: omit
+  toc:
+    enable: true
 
 pandoc:
   # Rewrite the class specified in Pandoc's Div and Span nodes. You can specify the class using

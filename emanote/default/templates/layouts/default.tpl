@@ -53,7 +53,9 @@
           <!-- Main body column -->
           <apply template="components/body" />
           <!-- Table of content column -->
-          <apply template="components/toc" />
+          <ema:has:toc>
+            <apply template="components/toc" />
+          </ema:has:toc>
         </div>
         <else />
         <div id="container" class="relative md:shadow-2xl md:mb-8">
@@ -61,7 +63,9 @@
           <!-- Main body column -->
           <apply template="components/body" />
           <!-- Table of content column -->
-          <apply template="components/toc" />
+          <ema:has:toc>
+            <apply template="components/toc" />
+          </ema:has:toc>
         </div>
       </ema:has:sidebar>
       <apply template="components/footer" />

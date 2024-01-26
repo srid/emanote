@@ -160,7 +160,7 @@ renderLmlHtml model note = do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
-    forM_ ["uptree", "breadcrumbs", "sidebar"] $ \flag ->
+    forM_ ["uptree", "breadcrumbs", "sidebar", "toc"] $ \flag ->
       "ema:has:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model)
     -- Sidebar navigation
     routeTreeSplices ctx (Just r) model
