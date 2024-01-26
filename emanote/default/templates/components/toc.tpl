@@ -1,54 +1,76 @@
-<ema:note:toc>
-  <Toc:List>
-    <div class="md:w-1/3 lg:w-1/4 h-screen relative sticky top-[400px]">
-      <toc:entries />
-    </div>
-    <script>
-      // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-      function highlightTOC() {
-        // Grab the toc links
-        const links = document.querySelectorAll("ul > li > a.--ema-toc");
+<nav
+  id="toc"
+  class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64"
+>
+  <div class="pt-32 py-2 text-gray-800">
+    <ema:note:toc>
+      <Toc:List>
+        <toc:entries />
+      </Toc:List>
+      <Toc:Node>
+        <ul class="ml-2">
+          <toc:entry>
+            <li class="whitespace-nowrap">
+              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc"
+                ><toc:title
+              /></a>
+              <toc:childs />
+            </li>
+          </toc:entry>
+        </ul>
+      </Toc:Node>
+    </ema:note:toc>
+  </div>
+  <script>
+    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
+    function highlightTOC() {
+      // Grab the toc links
+      const links = document.querySelectorAll("ul > li > a.--ema-toc");
 
-        // Find the section anchors
-        const sections = [];
-        links.forEach((link) => {
-          for (section of document.querySelectorAll("a.--ema-anchor")) {
-            if (link.href == section.href) {
-              sections.push(section);
-              break;
-            }
+      // Find the matching anchors in the document body
+      const sections = [];
+      links.forEach((link) => {
+        let found = {};
+        for (section of document.querySelectorAll("a.--ema-anchor")) {
+          if (link.href == section.href) {
+            found = section;
+            break;
           }
+        }
+        sections.push(found);
+      });
+
+      // Current toc link is marked with the following class
+      const mark = "bg-gray-200";
+
+      // Set window scroll handler to update the toc mark.
+      window.onscroll = () => {
+        // Remove previous mark
+        links.forEach((link) => {
+          link.classList.remove(mark);
         });
 
-        const mark = "bg-gray-200";
-        window.onscroll = () => {
-          // Remove previous mark
-          links.forEach((link) => {
-            link.classList.remove(mark);
-          });
-
-          // Mark the link of the section that is in view, starting from the end
-          for (var i = sections.length - 1; i >= 0; i--) {
-            if (window.scrollY > sections[i].offsetTop - 80) {
-              links[i].classList.add(mark);
-              break;
-            }
+        // Mark the link of the section that is in view, starting from the end
+        let marked = false;
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (window.scrollY > sections[i].offsetTop - 80) {
+            links[i].classList.add(mark);
+            marked = true;
+            break;
           }
-        };
-      }
-      highlightTOC();
-    </script>
-  </Toc:List>
-  <Toc:Node>
-    <ul class="ml-2">
-      <toc:entry>
-        <li class="whitespace-nowrap">
-          <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc"
-            ><toc:title
-          /></a>
-          <toc:childs />
-        </li>
-      </toc:entry>
-    </ul>
-  </Toc:Node>
-</ema:note:toc>
+        }
+
+        // Special case for the first and last section which might not reach the top
+        if (!marked && window.scrollY > 0) {
+          let i = 0;
+          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
+            // We are at the bottom
+            i = links.length - 1
+          }
+          links[i].classList.add(mark);
+        }
+      };
+    }
+    highlightTOC();
+  </script>
+</nav>

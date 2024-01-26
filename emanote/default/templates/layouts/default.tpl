@@ -52,12 +52,16 @@
           <apply template="components/sidebar" />
           <!-- Main body column -->
           <apply template="components/body" />
+          <!-- Table of content column -->
+          <apply template="components/toc" />
         </div>
         <else />
         <div id="container" class="relative md:shadow-2xl md:mb-8">
           <storkSearchButtonTopRight />
           <!-- Main body column -->
           <apply template="components/body" />
+          <!-- Table of content column -->
+          <apply template="components/toc" />
         </div>
       </ema:has:sidebar>
       <apply template="components/footer" />
