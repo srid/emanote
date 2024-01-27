@@ -30,7 +30,7 @@ jobs:
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
       - name: Upload docker image tgz
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/master'
         with:
           name: docker-img
@@ -46,7 +46,7 @@ jobs:
       DOCKERTAG: latest
     steps:
       - name: Download docker img
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: docker-img
       - name: Load Docker img
