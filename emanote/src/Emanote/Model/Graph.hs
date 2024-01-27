@@ -190,7 +190,7 @@ backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
       rels = Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
-   in -- Filter out duplicate backlinks (ones that were disambigutated about ambiguous wiki links)
+   in -- Filter out duplicate backlinks (ones that were disambiguated about ambiguous wiki links)
       filter
         ( \rel -> isJust $ do
             SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
