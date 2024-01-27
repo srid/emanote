@@ -8,7 +8,6 @@
     "jnoortheen.nix-ide",
     "heybourn.headwind",
     "voorjaar.windicss-intellisense",
-    "tamasfe.even-better-toml",
-    "maarti.jenkins-doc"
+    "tamasfe.even-better-toml"
   ]
 }
