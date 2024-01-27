@@ -3,7 +3,7 @@ name: "CI"
 on:
   push:
     branches:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
@@ -19,7 +19,9 @@ jobs:
         id: build-nix
         run: |
           nix run github:srid/nixci
-          nix path-info -rSh .#default | sort -rhk2 | head
+      - name: Check closure size
+        run: |
+          nix run .#check-closure-size
       - name: Build as docker img
         id: build
         run: |
