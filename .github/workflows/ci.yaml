@@ -1,19 +1,16 @@
 name: "CI"
+
 on:
-  # Run only when pushing to master branch
   push:
     branches:
-      - master
+      - "*"
+  pull_request:
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-      - uses: nixbuild/nix-quick-install-action@v21
-        with:
-          nix_conf: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
       - uses: cachix/cachix-action@v14
         with:
           name: srid
@@ -22,7 +19,9 @@ jobs:
         id: build-nix
         run: |
           nix run github:srid/nixci
-          nix path-info -rSh .#default | sort -rhk2 | head
+      - name: Check closure size
+        run: |
+          nix run .#check-closure-size
       - name: Build as docker img
         id: build
         run: |
@@ -31,7 +30,7 @@ jobs:
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
       - name: Upload docker image tgz
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/master'
         with:
           name: docker-img
@@ -47,7 +46,7 @@ jobs:
       DOCKERTAG: latest
     steps:
       - name: Download docker img
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: docker-img
       - name: Load Docker img
@@ -64,9 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download docker image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: docker-img
       - name: Load Docker image
