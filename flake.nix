@@ -6,6 +6,8 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    horizon-devtools.url = "git+https://gitlab.horizon-haskell.net/package-sets/horizon-devtools";
+    horizon-system.url = "git+https://gitlab.horizon-haskell.net/package-sets/horizon-system";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -60,12 +62,18 @@
         # haskell-flake configuration
         haskellProjects.default = {
           projectFlakeName = "emanote";
+          basePackages = inputs.horizon-system.legacyPackages.${system};
           imports = [
             inputs.ema.haskellFlakeProjectModules.output
           ];
-          devShell.tools = hp: {
-            inherit (pkgs)
-              stork;
+          devShell = {
+            tools = _:
+              let devtools = inputs.horizon-devtools.legacyPackages.${system};
+              in {
+                inherit (devtools) ghcid haskell-language-server hlint;
+                inherit (pkgs)
+                  stork;
+              };
           };
           autoWire = [ "packages" "apps" "checks" ];
 
@@ -102,7 +110,7 @@
               justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
-                self.pandoc_3_1_11
+                # self.pandoc_3_1_11
                 self.pandoc-types
                 self.warp
               ];
