@@ -45,7 +45,10 @@ folgezettelParentsFor model r = do
         frontlinkRels r model
           & mapMaybe
             ( \rel ->
-                lookupNoteByWikiLink model (Just $ rel ^. Rel.relFrom) <=< selectReverseFolgezettel . (^. Rel.relTo) $ rel
+                lookupNoteByWikiLink model (rel ^. Rel.relFrom)
+                  <=< selectReverseFolgezettel
+                  . (^. Rel.relTo)
+                  $ rel
             )
       -- Folders are automatically made a folgezettel
       folgezettelFolder =
@@ -81,7 +84,10 @@ folgezettelChildrenFor model r = do
         frontlinkRels r model
           & mapMaybe
             ( \rel ->
-                lookupNoteByWikiLink model (Just $ rel ^. Rel.relFrom) <=< selectFolgezettel . (^. Rel.relTo) $ rel
+                lookupNoteByWikiLink model (rel ^. Rel.relFrom)
+                  <=< selectFolgezettel
+                  . (^. Rel.relTo)
+                  $ rel
             )
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
@@ -157,9 +163,9 @@ folderFolgezettelEnabledFor model r =
     -- list of notes" use case (popularized by original neuron).
     defaultValue = r /= modelIndexRoute model
 
-lookupNoteByWikiLink :: Model -> Maybe R.LMLRoute -> WL.WikiLink -> Maybe R.LMLRoute
-lookupNoteByWikiLink model mCurrentRoute wl = do
-  (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model mCurrentRoute wl
+lookupNoteByWikiLink :: Model -> R.LMLRoute -> WL.WikiLink -> Maybe R.LMLRoute
+lookupNoteByWikiLink model currentRoute wl = do
+  (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model currentRoute wl
   pure $ note ^. MN.noteRoute
   where
     getFound :: Rel.ResolvedRelTarget a -> Maybe a

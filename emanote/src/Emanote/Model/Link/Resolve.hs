@@ -14,12 +14,12 @@ import Relude
 
 resolveRel :: Model -> Rel.Rel -> Rel.ResolvedRelTarget SR.SiteRoute
 resolveRel model rel =
-  resolveUnresolvedRelTarget model (Just $ rel ^. Rel.relFrom) (rel ^. Rel.relTo)
+  resolveUnresolvedRelTarget model (rel ^. Rel.relFrom) (rel ^. Rel.relTo)
 
 resolveUnresolvedRelTarget ::
   Model ->
   -- | Current note route; used to resolve ambiguous links
-  Maybe R.LMLRoute ->
+  R.LMLRoute ->
   Rel.UnresolvedRelTarget ->
   Rel.ResolvedRelTarget SR.SiteRoute
 resolveUnresolvedRelTarget model currentRoute = \case
@@ -37,14 +37,14 @@ resolveUnresolvedRelTarget model currentRoute = \case
 resolveWikiLinkMustExist ::
   Model ->
   -- | Current note route; used to resolve ambiguous links
-  Maybe R.LMLRoute ->
+  R.LMLRoute ->
   WL.WikiLink ->
   Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
-resolveWikiLinkMustExist model mCurrentRoute wl =
+resolveWikiLinkMustExist model currentRoute wl =
   Rel.resolvedRelTargetFromCandidates (M.modelWikiLinkTargets wl model)
     & resolveAmb
   where
-    resolveAmb = Rel.withAmbiguityResolvedMaybe (resolveAmbiguity mCurrentRoute)
+    resolveAmb = Rel.withAmbiguityResolvedMaybe (resolveAmbiguity currentRoute)
 
 {- | Resolve ambiguity by selecting the closest common ancestor.
 
@@ -52,11 +52,10 @@ This enables us to merge different notebooks (with similar note filenames) at
 the top-level.
 -}
 resolveAmbiguity ::
-  Maybe R.LMLRoute ->
+  R.LMLRoute ->
   NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) ->
   Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
-resolveAmbiguity mCurrentRoute candidates = do
-  currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
+resolveAmbiguity (R.withLmlRoute coerce -> currentRoute) candidates = do
   -- A function to compute the common ancestor with `currentRoute`
   let f = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
   let (a :| as) = NE.sortWith (Down . f) candidates
