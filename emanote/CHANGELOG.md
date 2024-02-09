@@ -6,6 +6,10 @@
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
   - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
   - Add query syntax for listing folgezetten children & parents ([\#476](https://github.com/srid/emanote/pull/476))
+  - Native support for combining multiple notebooks
+    - Resolve ambiguities based on closer common ancestor ([\#498](https://github.com/srid/emanote/pull/498))
+    - Support for folder "index.md" notes ([\#512](https://github.com/srid/emanote/pull/512))
+      - Instead of "foo/qux.md", you can now create "foo/qux/index.md"
   - **BACKWARDS INCOMPTABILE** changes
     - `feed.siteUrl` is now `page.siteUrl`
     - A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
