@@ -84,6 +84,21 @@ routeInits = \case
 indexRoute :: R ext
 indexRoute = R $ "index" :| []
 
+-- | Return the common ancestor of the two routes
+commonAncestor ::
+  forall ext ext1 ext2.
+  R ext1 ->
+  R ext2 ->
+  Maybe (R ext)
+commonAncestor (R (x :| xs)) (R (y :| ys)) =
+  R <$> if x == y then Just (x :| go xs ys) else Nothing
+  where
+    go :: [Slug] -> [Slug] -> [Slug]
+    go (a : as) (b : bs) =
+      if a == b then a : go as bs else []
+    go _ _ =
+      []
+
 -- | Convert a route to filepath
 encodeRoute :: forall a (ft :: FileType a). (HasExt ft) => R ft -> FilePath
 encodeRoute (R slugs) =
