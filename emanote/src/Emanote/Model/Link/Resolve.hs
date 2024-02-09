@@ -1,6 +1,7 @@
 module Emanote.Model.Link.Resolve where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Data.List.NonEmpty qualified as NE
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile qualified as SF
@@ -45,14 +46,23 @@ resolveWikiLinkMustExist model mCurrentRoute wl =
   where
     resolveAmb = Rel.withAmbiguityResolvedMaybe (resolveAmbiguity mCurrentRoute)
 
-resolveAmbiguity :: Maybe R.LMLRoute -> NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) -> Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
+{- | Resolve ambiguity by selecting the closest common ancestor.
+
+This enables us to merge different notebooks (with similar note filenames) at
+the top-level.
+-}
+resolveAmbiguity ::
+  Maybe R.LMLRoute ->
+  NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) ->
+  Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
 resolveAmbiguity mCurrentRoute candidates = do
   currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
-  -- traceShow (currentRoute, candidates <&> either (show . MN._noteRoute . snd) show) Nothing
-  let k = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
-  (a :| as) <- nonEmpty $ sortWith (Down . k) (toList candidates)
-  -- if there is no *single* maximumBy, bail out.
-  guard $ (viaNonEmpty (k . head) as) /= Just (k a)
+  -- A function to compute the common ancestor with `currentRoute`
+  let f = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
+  let (a :| as) = NE.sortWith (Down . f) candidates
+  -- If the next candidate has the same common ancestor, we have a true
+  -- ambiguity. Bail out in that case.
+  guard $ viaNonEmpty (f . head) as /= Just (f a)
   pure a
 
 resolveModelRoute ::
