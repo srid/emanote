@@ -15,14 +15,24 @@ Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is a
 You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;
 you can specify a custom title as `[[neuron|Moving off neuron]]` which renders as [[neuron|Moving off neuron]] or even force use of filename with `[[neuron|neuron]]` which renders as [[neuron|neuron]].
 
-Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [Foo bar](foo-bar.md) (if a regular Markdown link).
+### Structural links
 
->[!tip] Folgezettel
-> See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar]] (and [[uptree]]) heirarchy.
+See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar]] (and [[uptree]]) heirarchy.
 
 ### Anchors 
 
 Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).
+
+### Broken links
+
+Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [Foo bar](foo-bar.md) (if a regular Markdown link).
+
+### Ambiguous links
+
+Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig]
+
+[^ambig]: This particular selection process [was choosen](https://github.com/srid/emanote/pull/498) in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
+
 
 ## Emojis
 
