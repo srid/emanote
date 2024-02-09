@@ -169,7 +169,9 @@ renderLmlHtml model note = do
     "ema:note:title" ##
       C.titleSplice ctx (note ^. MN.noteTitle)
     "ema:note:source-path" ##
-      HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
+      HI.textSplice $ fromMaybe (toText $ R.withLmlRoute R.encodeRoute r) $ do
+        (_, fp) <- note ^. MN.noteSource
+        pure $ toText fp
     "ema:note:url" ##
       HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
     "emaNoteFeedUrl" ##
