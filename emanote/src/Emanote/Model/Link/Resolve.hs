@@ -40,17 +40,20 @@ resolveWikiLinkMustExist ::
   WL.WikiLink ->
   Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
 resolveWikiLinkMustExist model mCurrentRoute wl =
-  Rel.resolvedRelTargetFromCandidates (Just resolveAmbiguity) $ M.modelWikiLinkTargets wl model
+  Rel.resolvedRelTargetFromCandidates (M.modelWikiLinkTargets wl model)
+    & resolveAmb
   where
-    resolveAmbiguity :: NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) -> Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
-    resolveAmbiguity candidates = do
-      currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
-      -- traceShow (currentRoute, candidates <&> either (show . MN._noteRoute . snd) show) Nothing
-      let k = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
-      (a :| as) <- nonEmpty $ sortWith (Down . k) (toList candidates)
-      -- if there is no *single* maximumBy, bail out.
-      guard $ (viaNonEmpty (k . head) as) /= Just (k a)
-      pure a
+    resolveAmb = Rel.withAmbiguityResolvedMaybe (resolveAmbiguity mCurrentRoute)
+
+resolveAmbiguity :: Maybe R.LMLRoute -> NonEmpty (Either (R.LMLView, MN.Note) SF.StaticFile) -> Maybe (Either (R.LMLView, MN.Note) SF.StaticFile)
+resolveAmbiguity mCurrentRoute candidates = do
+  currentRoute :: R.R ext <- fmap (R.withLmlRoute coerce) mCurrentRoute
+  -- traceShow (currentRoute, candidates <&> either (show . MN._noteRoute . snd) show) Nothing
+  let k = R.commonAncestor currentRoute . either (R.withLmlRoute coerce . MN._noteRoute . snd) SF._staticFileRoute
+  (a :| as) <- nonEmpty $ sortWith (Down . k) (toList candidates)
+  -- if there is no *single* maximumBy, bail out.
+  guard $ (viaNonEmpty (k . head) as) /= Just (k a)
+  pure a
 
 resolveModelRoute ::
   Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)

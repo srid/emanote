@@ -259,7 +259,7 @@ modelLookupNoteByRoute' r =
 
 modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
-  Rel.resolvedRelTargetFromCandidates Nothing
+  Rel.resolvedRelTargetFromCandidates
     . N.lookupNotesByHtmlRoute r
     . _modelNotes
 
@@ -271,7 +271,7 @@ modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
   _ -> Nothing
   where
     resolvedTarget =
-      Rel.resolvedRelTargetFromCandidates Nothing
+      Rel.resolvedRelTargetFromCandidates
         $ N.lookupNotesByXmlRoute r
         $ _modelNotes model
 

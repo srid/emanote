@@ -148,13 +148,21 @@ getResolved = \case
 -- This 'a' is either
 -- - Note, or
 -- - Either (LMLView, Note) StaticFile
-resolvedRelTargetFromCandidates :: Maybe (NonEmpty a -> Maybe a) -> [a] -> ResolvedRelTarget a
-resolvedRelTargetFromCandidates mResolveAmbiguity xs =
+resolvedRelTargetFromCandidates :: [a] -> ResolvedRelTarget a
+resolvedRelTargetFromCandidates xs =
   case nonEmpty xs of
     Nothing ->
       RRTMissing
     Just (x :| []) ->
       RRTFound x
-    Just xs' -> maybe (RRTAmbiguous xs') RRTFound $ do
-      f <- mResolveAmbiguity
-      f xs'
+    Just xs' ->
+      RRTAmbiguous xs'
+
+-- | Try to resolve the RRTAmbiguous using the given function.
+withAmbiguityResolvedMaybe ::
+  (NonEmpty a -> Maybe a) ->
+  ResolvedRelTarget a ->
+  ResolvedRelTarget a
+withAmbiguityResolvedMaybe f = \case
+  x@(RRTAmbiguous xs) -> maybe x RRTFound $ f xs
+  x -> x
