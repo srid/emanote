@@ -51,11 +51,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707483331,
-        "narHash": "sha256-gl9q0LnLhXoTAaGyHcasvLq+/j4WVbWpxWeVCLhLtlM=",
+        "lastModified": 1707484760,
+        "narHash": "sha256-2wHRjoFJUpVnH7H/80bnaw8h3WELZqP9dM6DfjXWtAo=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "33e9877e6078da14680e44263f8d11c278d6454c",
+        "rev": "e3539ddd27b72a6bb90c8614ae63c70ff3351936",
         "type": "github"
       },
       "original": {
