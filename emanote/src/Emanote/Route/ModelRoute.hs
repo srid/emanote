@@ -104,5 +104,5 @@ mkLMLRouteFromFilePath fp =
 mkLMLRouteFromKnownFilePath :: LML -> FilePath -> Maybe LMLRoute
 mkLMLRouteFromKnownFilePath lmlType fp =
   case lmlType of
-    Md -> fmap LMLRoute_Md (R.mkRouteFromFilePath fp)
-    Org -> fmap LMLRoute_Org (R.mkRouteFromFilePath fp)
+    Md -> fmap LMLRoute_Md (R.mkRouteFromFilePath' True fp)
+    Org -> fmap LMLRoute_Org (R.mkRouteFromFilePath' True fp)
