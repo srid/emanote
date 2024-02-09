@@ -196,17 +196,15 @@ backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
       rels = Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
-   in -- Filter out duplicate backlinks (ones that were disambiguated about ambiguous wiki links)
-      filter
-        ( \rel -> isJust $ do
-            SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
-              Rel.getResolved $ Resolve.resolveRel model rel
-            guard $ r == r'
-            pass
-        )
-        rels
+   in filter isUnambiguousBacklink rels
   where
     toModelRoute = R.ModelRoute_LML R.LMLView_Html
+    -- Check that 'rel' points to 'r' even after resolving any ambiguous wiki links
+    isUnambiguousBacklink rel = isJust $ do
+      SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
+        Rel.getResolved $ Resolve.resolveRel model rel
+      guard $ r == r'
+      pass
 
 -- | Rels pointing *from* this route
 frontlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
