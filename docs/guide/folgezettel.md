@@ -23,7 +23,7 @@ Here is the [[target-note]]#
 {#folder}
 ## Folder notes
 
-By default, Emanote includes any directories in your note's path as vertices in the folgezettel graph. This makes the folder note a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the folder note. For eg., in `foo/bar/qux.md`, "foo" is a folgezettel parent of "bar", and "bar" is a folgezettel parent of "qux".
+By default, Emanote includes any directories in your note's path as vertices in the folgezettel graph. This makes the [[folder-note|folder note]] a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the [[folder-note|folder note]]. For eg., in `foo/bar/qux.md`, "foo" is a folgezettel parent of "bar", and "bar" is a folgezettel parent of "qux".
 
 >[!note]
 > The top-level root folder is not considered a folgezettel by default, unless you specify it (as shown below). This is to support the use-case of the user having a *flat list* of notes *without* subdirectories, but connected through [[folgezettel]].
@@ -38,4 +38,4 @@ emanote:
 ```
 
 >[!tip]
-> Put this configuration in `foo.md` if you want to disable folder folgezettel for just that folder `foo/`. Put it in `foo.yaml` if you want to disable it for `foo/` and all subfolders under it recursively. Put it in top-level `index.yaml` to disable it for all folders. See [[yaml-config]] for more details.
+> Put this configuration in `foo.md` if you want to disable folder folgezettel for just that [[folder-note|folder note]] `foo/`. Put it in `foo.yaml` if you want to disable it for `foo/` and all subfolders under it recursively. Put it in top-level `index.yaml` to disable it for all folders. See [[yaml-config]] for more details.

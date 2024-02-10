@@ -14,6 +14,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
+import Emanote.Route.SiteRoute qualified as SR
 import Optics.Operators as Lens ((^.))
 import Relude hiding (empty)
 import Text.Pandoc.Definition qualified as B
@@ -42,7 +43,13 @@ folgezettelParentsFor model r = do
       -- Handle reverse folgezettel links (`#[[..]]`) here
       folgezettelFrontlinks =
         frontlinkRels r model
-          & mapMaybe (lookupNoteByWikiLink model <=< selectReverseFolgezettel . (^. Rel.relTo))
+          & mapMaybe
+            ( \rel ->
+                lookupNoteByWikiLink model (rel ^. Rel.relFrom)
+                  <=< selectReverseFolgezettel
+                  . (^. Rel.relTo)
+                  $ rel
+            )
       -- Folders are automatically made a folgezettel
       folgezettelFolder =
         maybeToList $ do
@@ -75,7 +82,13 @@ folgezettelChildrenFor model r = do
           <&> (^. Rel.relFrom)
       folgezettelFrontlinks =
         frontlinkRels r model
-          & mapMaybe (lookupNoteByWikiLink model <=< selectFolgezettel . (^. Rel.relTo))
+          & mapMaybe
+            ( \rel ->
+                lookupNoteByWikiLink model (rel ^. Rel.relFrom)
+                  <=< selectFolgezettel
+                  . (^. Rel.relTo)
+                  $ rel
+            )
       -- Folders are automatically made a folgezettel
       folgezettelFolderChildren :: [R.LMLRoute] =
         if folderFolgezettelEnabledFor model r
@@ -150,9 +163,9 @@ folderFolgezettelEnabledFor model r =
     -- list of notes" use case (popularized by original neuron).
     defaultValue = r /= modelIndexRoute model
 
-lookupNoteByWikiLink :: Model -> WL.WikiLink -> Maybe R.LMLRoute
-lookupNoteByWikiLink model wl = do
-  (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model wl
+lookupNoteByWikiLink :: Model -> R.LMLRoute -> WL.WikiLink -> Maybe R.LMLRoute
+lookupNoteByWikiLink model currentRoute wl = do
+  (_, note) <- leftToMaybe <=< getFound $ Resolve.resolveWikiLinkMustExist model currentRoute wl
   pure $ note ^. MN.noteRoute
   where
     getFound :: Rel.ResolvedRelTarget a -> Maybe a
@@ -182,9 +195,16 @@ modelLookupBacklinks r model =
 backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
-   in Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+      rels = Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
+   in filter isUnambiguousBacklink rels
   where
     toModelRoute = R.ModelRoute_LML R.LMLView_Html
+    -- Check that 'rel' points to 'r' even after resolving any ambiguous wiki links
+    isUnambiguousBacklink rel = isJust $ do
+      SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
+        Rel.getResolved $ Resolve.resolveRel model rel
+      guard $ r == r'
+      pass
 
 -- | Rels pointing *from* this route
 frontlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]

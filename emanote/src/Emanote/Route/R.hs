@@ -29,10 +29,19 @@ instance (HasExt ext) => Show (R ext) where
 
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
-mkRouteFromFilePath fp = do
+mkRouteFromFilePath = mkRouteFromFilePath' False
+
+{- | Like `mkRouteFromFilePath` but drops the last slug if it's "index"
+
+Behaves like `mkRouteFromFilePath` for top-level files.
+-}
+mkRouteFromFilePath' :: forall a (ext :: FileType a). (HasExt ext) => Bool -> FilePath -> Maybe (R ext)
+mkRouteFromFilePath' dropIndex fp = do
   base <- withoutKnownExt @_ @ext fp
-  let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
-  viaNonEmpty R slugs
+  slugs <- nonEmpty $ fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
+  if dropIndex && length slugs > 1 && last slugs == "index"
+    then viaNonEmpty R $ init slugs
+    else pure $ R slugs
 
 mkRouteFromSlugs :: NonEmpty Slug -> R ext
 mkRouteFromSlugs =
@@ -83,6 +92,21 @@ routeInits = \case
 
 indexRoute :: R ext
 indexRoute = R $ "index" :| []
+
+-- | Return the common ancestor of the two routes
+commonAncestor ::
+  forall ext ext1 ext2.
+  R ext1 ->
+  R ext2 ->
+  Maybe (R ext)
+commonAncestor (R (x :| xs)) (R (y :| ys)) =
+  R <$> if x == y then Just (x :| go xs ys) else Nothing
+  where
+    go :: [Slug] -> [Slug] -> [Slug]
+    go (a : as) (b : bs) =
+      if a == b then a : go as bs else []
+    go _ _ =
+      []
 
 -- | Convert a route to filepath
 encodeRoute :: forall a (ft :: FileType a). (HasExt ft) => R ft -> FilePath

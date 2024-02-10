@@ -25,6 +25,15 @@ mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
       mkRouteFromFilePath "foo/bar.md" === Just r2
     it "three slugs" . hedgehog $ do
       mkRouteFromFilePath "foo/bar/qux.md" === Just r3
+  describe "dropIndex" $ do
+    it "index route" . hedgehog $ do
+      mkRouteFromFilePath' True "index.md" === Just rIndex
+    it "single slug" . hedgehog $ do
+      mkRouteFromFilePath' True "foo.md" === Just r1
+    it "two slugs" . hedgehog $ do
+      mkRouteFromFilePath' True "foo/index.md" === Just r1
+    it "three slugs" . hedgehog $ do
+      mkRouteFromFilePath' True "foo/bar/index.md" === Just r2
 
 routeInitsSpec :: Spec
 routeInitsSpec = describe "routeInits" $ do
