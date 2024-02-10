@@ -1,5 +1,5 @@
 <nav id="toc" class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64">
-  <div class="pt-32 py-2 text-gray-800">
+  <div class="text-gray-800">
     <ema:note:toc>
       <Toc>
         <ul class="ml-2">
