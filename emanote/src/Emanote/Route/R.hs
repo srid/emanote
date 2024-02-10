@@ -31,6 +31,10 @@ instance (HasExt ext) => Show (R ext) where
 mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
 mkRouteFromFilePath = mkRouteFromFilePath' False
 
+{- | Like `mkRouteFromFilePath` but drops the last slug if it's "index"
+
+Behaves like `mkRouteFromFilePath` for top-level files.
+-}
 mkRouteFromFilePath' :: forall a (ext :: FileType a). (HasExt ext) => Bool -> FilePath -> Maybe (R ext)
 mkRouteFromFilePath' dropIndex fp = do
   base <- withoutKnownExt @_ @ext fp
