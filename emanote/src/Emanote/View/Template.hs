@@ -148,6 +148,8 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
+      sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
+        fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
       -- discarding it. See: https://github.com/srid/emanote/issues/216
       withDoctype = ("<!DOCTYPE html>\n" <>)
@@ -169,7 +171,8 @@ renderLmlHtml model note = do
     "ema:note:title" ##
       C.titleSplice ctx (note ^. MN.noteTitle)
     "ema:note:source-path" ##
-      HI.textSplice (toText . R.withLmlRoute R.encodeRoute $ r)
+      HI.textSplice
+        $ toText sourcePath
     "ema:note:url" ##
       HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
     "emaNoteFeedUrl" ##

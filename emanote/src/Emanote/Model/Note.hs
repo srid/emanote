@@ -49,7 +49,7 @@ data Feed = Feed
 
 data Note = Note
   { _noteRoute :: R.LMLRoute
-  , _noteLayerLoc :: Maybe Loc
+  , _noteSource :: Maybe (Loc, FilePath)
   -- ^ The layer from which this note came. Nothing if the note was auto-generated.
   , _noteDoc :: Pandoc
   , _noteMeta :: Aeson.Value
@@ -281,12 +281,12 @@ mkEmptyNoteWith someR (Pandoc mempty -> doc) =
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Maybe Loc -> Pandoc -> Aeson.Value -> [Text] -> Note
-mkNoteWith r layerLoc doc' meta errs =
+mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [Text] -> Note
+mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
-   in Note r layerLoc doc meta tit errs feed
+   in Note r src doc meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -309,14 +309,14 @@ parseNote ::
   (Loc, FilePath) ->
   Text ->
   m Note
-parseNote scriptingEngine pluginBaseDir r (layerLoc, fp) s = do
+parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
-  pure $ mkNoteWith r (Just layerLoc) doc meta errs
+  pure $ mkNoteWith r (Just src) doc meta errs
 
 parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrg s =

@@ -29,10 +29,19 @@ instance (HasExt ext) => Show (R ext) where
 
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
-mkRouteFromFilePath fp = do
+mkRouteFromFilePath = mkRouteFromFilePath' False
+
+{- | Like `mkRouteFromFilePath` but drops the last slug if it's "index"
+
+Behaves like `mkRouteFromFilePath` for top-level files.
+-}
+mkRouteFromFilePath' :: forall a (ext :: FileType a). (HasExt ext) => Bool -> FilePath -> Maybe (R ext)
+mkRouteFromFilePath' dropIndex fp = do
   base <- withoutKnownExt @_ @ext fp
-  let slugs = fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
-  viaNonEmpty R slugs
+  slugs <- nonEmpty $ fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
+  if dropIndex && length slugs > 1 && last slugs == "index"
+    then viaNonEmpty R $ init slugs
+    else pure $ R slugs
 
 mkRouteFromSlugs :: NonEmpty Slug -> R ext
 mkRouteFromSlugs =
