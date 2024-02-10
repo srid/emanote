@@ -18,7 +18,7 @@ page:
 :::
 
 
-#### [[start|Get started]]{.flex .justify-center .items-center .my-8}
+[[start|Get started]]{.flex .justify-center .items-center .my-8 .text-3xl}
 
 
 [gh]: https://github.com/srid/emanote
