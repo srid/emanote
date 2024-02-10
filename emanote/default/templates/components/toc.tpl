@@ -4,7 +4,7 @@
       <Toc>
         <ul class="ml-2">
           <toc:entry>
-            <li class="whitespace-nowrap">
+            <li class="whitespace-nowrap truncate" title="${toc:title}">
               <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc">
                 <toc:title />
               </a>
