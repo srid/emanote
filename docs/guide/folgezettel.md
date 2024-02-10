@@ -38,4 +38,4 @@ emanote:
 ```
 
 >[!tip]
-> Put this configuration in `foo.md` if you want to disable folder folgezettel for just that folder `foo/`. Put it in `foo.yaml` if you want to disable it for `foo/` and all subfolders under it recursively. Put it in top-level `index.yaml` to disable it for all folders. See [[yaml-config]] for more details.
+> Put this configuration in `foo.md` if you want to disable folder folgezettel for just that [[folder-note|folder note]] `foo/`. Put it in `foo.yaml` if you want to disable it for `foo/` and all subfolders under it recursively. Put it in top-level `index.yaml` to disable it for all folders. See [[yaml-config]] for more details.
