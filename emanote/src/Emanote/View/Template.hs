@@ -149,6 +149,7 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
+      toc = newToc $ note ^. MN.noteDoc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
@@ -162,8 +163,10 @@ renderLmlHtml model note = do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
-    forM_ ["uptree", "breadcrumbs", "sidebar", "toc"] $ \flag ->
-      "ema:has:" <> flag ## Heist.ifElseISplice (Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model)
+    forM_ ["uptree", "breadcrumbs", "sidebar", "toc"] $ \flag -> do
+      let hasFlag' = Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model
+          hasFlag = if flag == "toc" then hasFlag' && not (null toc) else hasFlag'
+      "ema:has:" <> flag ## Heist.ifElseISplice hasFlag
     -- Sidebar navigation
     routeTreeSplices ctx (Just r) model
     "ema:breadcrumbs" ##
@@ -204,7 +207,7 @@ renderLmlHtml model note = do
     "ema:note:toc" ##
       C.withBlockCtx ctx
         $ \ctx' ->
-          renderToc ctx' (newToc $ note ^. MN.noteDoc)
+          renderToc ctx' toc
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
