@@ -1,11 +1,12 @@
-<nav id="toc" class="hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
-  <div class="text-gray-800">
+<nav id="toc"
+  class="hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
+  <div class="text-gray-600 text-sm">
     <ema:note:toc>
       <Toc>
         <ul class="ml-2">
           <toc:entry>
-            <li class="whitespace-nowrap truncate" title="${toc:title}">
-              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc">
+            <li class="whitespace-nowrap truncate mt-2" title="${toc:title}">
+              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc text-${theme}-800">
                 <toc:title />
               </a>
               <toc:childs />
@@ -35,7 +36,7 @@
       });
 
       // Current toc link is marked with the following class
-      const mark = "bg-gray-200";
+      const mark = "toc-item-active";
 
       // Set window scroll handler to update the toc mark.
       window.onscroll = () => {

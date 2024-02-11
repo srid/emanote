@@ -87,6 +87,10 @@
       margin-left: 0.5em;
     }
 
+    a.--ema-toc:not(.toc-item-active) {
+      color: #333333 !important;
+    }
+
     /* External link icon */
     a[data-linkicon=""]::after {
       content: ""
