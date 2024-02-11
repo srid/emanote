@@ -123,7 +123,7 @@
     </h1>
   </Header:1>
   <Header:2>
-    <h2 id="${header:id}" class="${header-class} text-4xl border-b-2">
+    <h2 id="${header:id}" class="${header-class} text-4xl">
       <heading-inlines-with-anchor />
     </h2>
   </Header:2>

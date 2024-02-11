@@ -6,7 +6,7 @@
         <div class="md:col-span-6">
           <apply template="note-body" />
         </div>
-        <div class="md:col-span-2 border-l-2 bg-gray-50">
+        <div class="md:col-span-2 border-l">
           <apply template="toc" />
         </div>
       </div>
