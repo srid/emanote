@@ -1,4 +1,4 @@
-<nav id="toc" class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64">
+<nav id="toc" class="hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
   <div class="text-gray-800">
     <ema:note:toc>
       <Toc>
