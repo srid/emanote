@@ -93,9 +93,6 @@
             tailwind.broken = false;
             tailwind.jailbreak = true;
             emanote = { name, pkgs, self, super, ... }: {
-              imports = [
-                ./nix/removeReferencesTo.nix
-              ];
               check = false;
               extraBuildDepends = [ pkgs.stork ];
               separateBinOutput = false; # removeReferencesTo.nix doesn't work otherwise
