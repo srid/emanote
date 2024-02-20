@@ -12,11 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
-        id: build-nix
         run: |
           nixci
       - name: Build Nix (x86_64-linux)
-        id: build-nix
         run: |
           nixci -- --option system x86_64-linux
       - name: Check closure size
