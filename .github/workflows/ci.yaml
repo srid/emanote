@@ -14,14 +14,18 @@ jobs:
       - name: Build Nix
         id: build-nix
         run: |
-          nix run github:srid/nixci
+          nixci
+      - name: Build Nix (x86_64-linux)
+        id: build-nix
+        run: |
+          nixci -- --option system x86_64-linux
       - name: Check closure size
         run: |
           nix run .#check-closure-size
       - name: Build as docker img
         id: build
         run: |
-          nix build -j auto -o docker-img .#dockerImage
+          nix --option system x86_64-linux build -j auto -o docker-img .#dockerImage
           # docker
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
