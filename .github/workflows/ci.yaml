@@ -14,9 +14,11 @@ jobs:
       - name: Build Nix
         run: |
           nixci
-      - name: Build Nix (x86_64-linux)
-        run: |
-          nixci -- --option system x86_64-linux
+      # TODO: Refactor this use actions matrix
+      # TODO: Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
+      # - name: Build Nix (x86_64-linux)
+      #  run: |
+      #    nixci -- --option system x86_64-linux
       - name: Check closure size
         run: |
           nix run .#check-closure-size
