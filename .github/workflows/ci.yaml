@@ -7,13 +7,17 @@ on:
   pull_request:
 
 jobs:
-  build:
+  nix:
     runs-on: self-hosted
+    strategy:
+      matrix:
+        system: [aarch64-linux, x86_64-linux, aarch64-darwin]
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
         run: |
-          nixci
+          # TODO: nixci
+          nix build -L ".#packages.${{ matrix.system }}.default"
       # TODO: Refactor this use actions matrix
       # TODO: Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
       # - name: Build Nix (x86_64-linux)
@@ -22,10 +26,14 @@ jobs:
       - name: Check closure size
         run: |
           nix run .#check-closure-size
+  
+  docker-build:
+    runs-on: self-hosted
+    steps:
       - name: Build as docker img
         id: build
         run: |
-          nix --option system x86_64-linux build -j auto -o docker-img .#dockerImage
+          nix build -j auto -o docker-img .#packages.x86_64-linux.dockerImage
           # docker
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
@@ -38,8 +46,8 @@ jobs:
           path: |
             ${{ steps.build.outputs.docker-img }}
 
-  docker:
-    needs: build
+  docker-push:
+    needs: docker-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     env:
@@ -59,7 +67,7 @@ jobs:
           docker push sridca/emanote:latest
 
   website:
-    needs: build
+    needs: docker-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
