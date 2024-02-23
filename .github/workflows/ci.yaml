@@ -16,15 +16,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build Nix
         run: |
-          # TODO: nixci
-          nix build -L ".#packages.${{ matrix.system }}.default"
-      # TODO: Refactor this use actions matrix
-      # TODO: Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
-      # - name: Build Nix (x86_64-linux)
-      #  run: |
-      #    nixci -- --option system x86_64-linux
+          nixci --build-systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
         run: |
+          # TODO: Check on all platforms?
           nix run .#check-closure-size
 
   docker-build:
