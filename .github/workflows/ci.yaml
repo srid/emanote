@@ -26,10 +26,11 @@ jobs:
       - name: Check closure size
         run: |
           nix run .#check-closure-size
-  
+
   docker-build:
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v4
       - name: Build as docker img
         id: build
         run: |
