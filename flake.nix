@@ -92,6 +92,9 @@
             doctest-driver-gen.source = "0.3.0.8";
             heist.source = "1.1.1.2";
             ixset-typed.source = "0.5.1.0";
+            safecopy.source = "0.10.4.2";
+            lens-action.source = "0.2.6";
+            pandoc-link-context.source = "1.4.1.0";
           };
 
           settings = {
@@ -201,9 +204,6 @@
         };
       };
       flake = {
-        json =
-          let schema = { };
-          in builtins.toJSON schema;
         homeManagerModule = import ./nix/home-manager-module.nix;
         flakeModule = ./nix/flake-module.nix;
         templates.default = {
