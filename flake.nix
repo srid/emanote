@@ -85,7 +85,6 @@
             heist.broken = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
-            ema.jailbreak = true;
             pandoc-link-context.broken = false;
             pandoc-link-context.jailbreak = true;
             tagtree.broken = false;
