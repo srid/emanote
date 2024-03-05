@@ -1,6 +1,6 @@
 <nav id="toc"
   class="hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto">
-  <div class="text-gray-600 text-sm">
+  <div class="text-gray-600 text-sm -mt-2">
     <ema:note:toc>
       <Toc>
         <ul class="ml-2">
