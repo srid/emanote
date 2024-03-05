@@ -10,7 +10,7 @@
             {
               name = "sridca/emanote";
               tag = "latest";
-              contents = [
+              copyToRoot = [
                 self'.packages.default
                 # These are required for the GitLab CI runner
                 pkgs.coreutils
