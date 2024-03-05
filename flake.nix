@@ -179,6 +179,7 @@
               layers = [ ./docs ];
               layersString = [ "./docs" ];
               allowBrokenLinks = true; # A couple, by design, in markdown.md
+              prettyUrls = true;
             };
           };
         };
