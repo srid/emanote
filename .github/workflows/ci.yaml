@@ -3,25 +3,60 @@ name: "CI"
 on:
   push:
     branches:
-      - "*"
+      - "master"
   pull_request:
 
 jobs:
-  build:
+  nix:
     runs-on: self-hosted
+    strategy:
+      matrix:
+        # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
+        # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
+        system: [aarch64-linux, aarch64-darwin]
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
-        id: build-nix
         run: |
-          nix run github:srid/nixci
+          nixci --build-systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
         run: |
           nix run .#check-closure-size
+
+  # TODO: Use self-hosted runner
+  website:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+            substituters = https://cache.garnix.io?priority=41 https://cache.nixos.org/
+      - name: Docs static site
+        id: docs
+        run: |
+          nix build .#docs -o docs-static
+          if ! [ -f ./docs-static/index.html ]; then
+            echo "ERROR: There is no index.html"
+            exit 2
+          fi
+      - name: Deploy docs to gh-pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs-static
+          cname: emanote.srid.ca
+
+  docker-build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
       - name: Build as docker img
         id: build
         run: |
-          nix build -j auto -o docker-img .#dockerImage
+          nix build -j auto -o docker-img .#packages.x86_64-linux.dockerImage
           # docker
           export DOCKERIMG=$(readlink ./docker-img)
           echo "::set-output name=docker-img::${DOCKERIMG}"
@@ -34,8 +69,8 @@ jobs:
           path: |
             ${{ steps.build.outputs.docker-img }}
 
-  docker:
-    needs: build
+  docker-push:
+    needs: docker-build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     env:
@@ -53,33 +88,3 @@ jobs:
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
           docker push sridca/emanote:latest
-
-  website:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-img
-      - name: Load Docker image
-        run: |
-          docker load -i *docker-image-emanote.tar.gz
-      - name: Generate website HTML 🔧
-        run: |
-          mkdir -p ./docs/.ci/output
-          # demo.md has broken links for demo
-          docker run \
-            -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 \
-            -v $PWD/docs:/data \
-            --tmpfs /tmp \
-            sridca/emanote emanote --layers /data --allow-broken-links gen /data/.ci/output
-          cp -r ./docs/.ci .
-      - name: Deploy to website to gh-pages 🚀
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .ci/output
-          cname: emanote.srid.ca

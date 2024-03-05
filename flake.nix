@@ -85,7 +85,6 @@
             heist.broken = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
-            ema.jailbreak = true;
             pandoc-link-context.broken = false;
             pandoc-link-context.jailbreak = true;
             tagtree.broken = false;
@@ -93,9 +92,6 @@
             tailwind.broken = false;
             tailwind.jailbreak = true;
             emanote = { name, pkgs, self, super, ... }: {
-              imports = [
-                ./nix/removeReferencesTo.nix
-              ];
               check = false;
               extraBuildDepends = [ pkgs.stork ];
               separateBinOutput = false; # removeReferencesTo.nix doesn't work otherwise

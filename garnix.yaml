@@ -1,9 +1,7 @@
 builds:
   include:
-    - "*.aarch64-darwin.*"
-    - "*.x86_64-linux.*"
+    - "packages.aarch64-darwin.default"
+    - "packages.x86_64-linux.default"
   exclude:
-    # https://github.com/srid/haskell-flake/issues/21
-    - "checks.*.main-hls"
-    # https://github.com/garnix-io/issues/issues/17
-    - "devShells.aarch64-darwin.*"
+    - "devShells.*.*"
+    - "checks.*.*"
