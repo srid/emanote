@@ -23,6 +23,20 @@ jobs:
         run: |
           # TODO: Check on all platforms?
           nix run .#check-closure-size
+      - name: Docs
+        id: docs
+        run: |
+          nix build .#docs -o docs-web
+          export DOCSWEB=./docs-web
+          echo "::set-output name=docs-web::${DOCSWEB}"
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/ci-docs-nix'
+        with:
+          name: docs-website
+          retention-days: 1
+          path: |
+            ${{ steps.docs.outputs.docs-web }}
 
   docker-build:
     runs-on: self-hosted
@@ -67,29 +81,16 @@ jobs:
   website:
     needs: docker-build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/ci-docs-nix'
     steps:
       - uses: actions/checkout@v4
-      - name: Download docker image
+      - name: Download built docs
         uses: actions/download-artifact@v4
         with:
-          name: docker-img
-      - name: Load Docker image
-        run: |
-          docker load -i *docker-image-emanote.tar.gz
-      - name: Generate website HTML 🔧
-        run: |
-          mkdir -p ./docs/.ci/output
-          # demo.md has broken links for demo
-          docker run \
-            -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 \
-            -v $PWD/docs:/data \
-            --tmpfs /tmp \
-            sridca/emanote emanote --layers /data --allow-broken-links gen /data/.ci/output
-          cp -r ./docs/.ci .
+          name: docs-website
       - name: Deploy to website to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .ci/output
+          publish_dir: ./docs-web
           cname: emanote.srid.ca
