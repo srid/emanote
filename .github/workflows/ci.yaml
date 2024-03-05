@@ -12,26 +12,27 @@ jobs:
     runs-on: self-hosted
     strategy:
       matrix:
-        # TODO: Disablig x86_64-linux for now, as it is causing qemu segfault.
+        # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
         # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
-        system: [aarch64-linux, aarch64-darwin]
+        system: [x86_64-linux, aarch64-linux, aarch64-darwin]
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
+        if: matrix.system /= 'x86_64-linux'
         run: |
           nixci --build-systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
+        if: matrix.system /= 'x86_64-linux'
         run: |
-          # TODO: Check on all platforms?
           nix run .#check-closure-size
       - name: Docs
         id: docs
-        if: matrix.system == 'aarch64-linux'
+        if: matrix.system == 'x86_64-linux'
         run: |
           nix build .#docs -o docs-static
       - name: Deploy docs to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
-        if: matrix.system == 'aarch64-linux'
+        if: matrix.system == 'x86_64-linux'
         # if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
