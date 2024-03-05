@@ -26,6 +26,7 @@ jobs:
 
   website:
     runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
         with:
