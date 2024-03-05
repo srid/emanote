@@ -59,3 +59,10 @@ tocSplices ctx (Node heading childs) = do
   "toc:title" ## HI.textSplice (headingName heading)
   "toc:anchor" ## HI.textSplice (headingId heading)
   "toc:childs" ## renderToc ctx childs
+
+-- | Return True only if the Toc has either has two or more headings (regardless of nesting levels)
+tocUnnecessaryToRender :: Toc -> Bool
+tocUnnecessaryToRender = \case
+  [] -> True
+  [Node _ []] -> True
+  _ -> False

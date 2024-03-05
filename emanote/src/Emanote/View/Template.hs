@@ -16,7 +16,7 @@ import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
-import Emanote.Model.Toc (newToc, renderToc)
+import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -165,7 +165,7 @@ renderLmlHtml model note = do
     -- Template flags
     forM_ ["uptree", "breadcrumbs", "sidebar", "toc"] $ \flag -> do
       let hasFlag' = Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model
-          hasFlag = if flag == "toc" then hasFlag' && not (null toc) else hasFlag'
+          hasFlag = if flag == "toc" then hasFlag' && not (tocUnnecessaryToRender toc) else hasFlag'
       "ema:has:" <> flag ## Heist.ifElseISplice hasFlag
     -- Sidebar navigation
     routeTreeSplices ctx (Just r) model
