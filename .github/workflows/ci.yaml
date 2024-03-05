@@ -24,7 +24,9 @@ jobs:
         run: |
           nix run .#check-closure-size
 
+  # TODO: Use self-hosted runner
   website:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,13 +35,16 @@ jobs:
           extra-conf: |
             trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
             substituters = https://cache.garnix.io?priority=41 https://cache.nixos.org/
-      - name: Docs
+      - name: Docs static site
         id: docs
         run: |
           nix build .#docs -o docs-static
+          if ! [ -f ./docs-static/index.html ]; then
+            echo "ERROR: There is no index.html"
+            exit 2
+          fi
       - name: Deploy docs to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
-        # if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs-static
