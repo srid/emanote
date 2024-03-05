@@ -29,7 +29,7 @@ jobs:
         if: matrix.system == 'aarch64-linux'
         run: |
           nix build .#docs -o docs-web
-          export DOCSWEB=./docs-web
+          export DOCSWEB=$(readlink ./docs-web)
           echo "::set-output name=docs-web::${DOCSWEB}"
       - name: Upload docs artifact
         uses: actions/upload-artifact@v4
@@ -39,6 +39,23 @@ jobs:
           retention-days: 1
           path: |
             ${{ steps.docs.outputs.docs-web }}
+
+  website:
+    needs: nix
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/ci-docs-nix'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download built docs
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-website
+      - name: Deploy to website to gh-pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs-web
+          cname: emanote.srid.ca
 
   docker-build:
     runs-on: self-hosted
@@ -79,20 +96,3 @@ jobs:
           echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
           set -x
           docker push sridca/emanote:latest
-
-  website:
-    needs: nix
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/ci-docs-nix'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download built docs
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-website
-      - name: Deploy to website to gh-pages 🚀
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs-web
-          cname: emanote.srid.ca
