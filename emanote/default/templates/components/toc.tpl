@@ -19,6 +19,7 @@
   </div>
   <script>
     // Highlight the TOC, based from https://stackoverflow.com/a/75346369
+    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
     function highlightTOC() {
       // Grab the toc links
       const links = document.querySelectorAll("ul > li > a.--ema-toc");

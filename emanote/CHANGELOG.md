@@ -4,6 +4,7 @@
 
 - Features
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
+  - TOC sidebar ([\#504](https://github.com/srid/emanote/pull/504))
   - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
   - Add query syntax for listing folgezetten children & parents ([\#476](https://github.com/srid/emanote/pull/476))
   - Native support for combining multiple notebooks
