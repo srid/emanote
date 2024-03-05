@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - ci-docs-nix
   pull_request:
 
 jobs:
@@ -79,7 +80,7 @@ jobs:
           docker push sridca/emanote:latest
 
   website:
-    needs: docker-build
+    needs: nix
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/ci-docs-nix'
     steps:
