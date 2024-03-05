@@ -28,33 +28,12 @@ jobs:
         id: docs
         if: matrix.system == 'aarch64-linux'
         run: |
-          nix build .#docs -o docs-web
-          export DOCSWEB=$(readlink ./docs-web)
-          echo "::set-output name=docs-web::${DOCSWEB}"
-      - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
-        if: github.ref == 'refs/heads/ci-docs-nix'
-        with:
-          name: docs-website
-          retention-days: 1
-          path: |
-            ${{ steps.docs.outputs.docs-web }}
-
-  website:
-    needs: nix
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/ci-docs-nix'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download built docs
-        uses: actions/download-artifact@v4
-        with:
-          name: docs-website
-      - name: Deploy to website to gh-pages 🚀
+          nix build .#docs -o docs-static
+      - name: Deploy docs to gh-pages 🚀
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs-web
+          publish_dir: ./docs-static
           cname: emanote.srid.ca
 
   docker-build:
