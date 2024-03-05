@@ -4,7 +4,7 @@
 {
   config = {
     perSystem = { config, self', inputs', pkgs, system, ... }: {
-      packages = pkgs.lib.optionalAttrs (system == "x86_64-linux")
+      packages = pkgs.lib.optionalAttrs (system == "x86_64-linux" || system == "aarch64-linux")
         {
           dockerImage = pkgs.dockerTools.buildImage
             {
