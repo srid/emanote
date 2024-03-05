@@ -88,7 +88,7 @@
     }
 
     a.--ema-toc:not(.toc-item-active) {
-      color: #333333 !important;
+      background-color: #ffffff !important;
     }
 
     /* External link icon */

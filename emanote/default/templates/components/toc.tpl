@@ -6,7 +6,8 @@
         <ul class="ml-2">
           <toc:entry>
             <li class="whitespace-nowrap truncate mt-2" title="${toc:title}">
-              <a href="${ema:note:url}#${toc:anchor}" class="--ema-toc text-${theme}-800">
+              <a href="${ema:note:url}#${toc:anchor}"
+                class="--ema-toc bg-${theme}-200 rounded-md p-0.5">
                 <toc:title />
               </a>
               <toc:childs />
