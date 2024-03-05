@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - ci-docs-nix
   pull_request:
 
 jobs:
