@@ -26,6 +26,7 @@ jobs:
           nix run .#check-closure-size
       - name: Docs
         id: docs
+        if: matrix.system == 'aarch64-linux'
         run: |
           nix build .#docs -o docs-web
           export DOCSWEB=./docs-web
