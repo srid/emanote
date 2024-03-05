@@ -18,11 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
-        if: matrix.system /= 'x86_64-linux'
+        if: matrix.system != 'x86_64-linux'
         run: |
           nixci --build-systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
-        if: matrix.system /= 'x86_64-linux'
+        if: matrix.system != 'x86_64-linux'
         run: |
           nix run .#check-closure-size
       - name: Docs
