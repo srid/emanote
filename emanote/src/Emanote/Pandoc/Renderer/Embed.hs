@@ -9,6 +9,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.StaticFile (CodeLanguage (..), StaticFileInfo (..), staticFileInfoTemplateName)
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
+import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
@@ -76,6 +77,8 @@ embedResourceRoute model ctx note = do
     "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
     "ema:note:pandoc" ##
       pandocSplice ctx (note ^. MN.noteDoc)
+    "ema:note:toc" ##
+      renderToc ctx (newToc $ note ^. MN.noteDoc)
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
