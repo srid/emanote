@@ -1,5 +1,6 @@
 module Emanote.Model.Toc where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
 import Data.Tree (Tree (Node))
 import Data.Tree qualified as Tree
@@ -9,7 +10,6 @@ import Heist.Extra.Splices.Pandoc (RenderCtx (rootNode))
 import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc
-import Text.Pandoc.Shared (stringify)
 import Text.XmlHtml qualified as X
 
 type Toc = Tree.Forest DocHeading
@@ -25,7 +25,7 @@ pandocToHeadings :: Pandoc -> [(Int, DocHeading)]
 pandocToHeadings (Pandoc _ blocks) = mapMaybe toHeading blocks
   where
     toHeading block = case block of
-      Header hlvl (oid, _, _) inlines -> Just (hlvl, DocHeading oid (stringify inlines))
+      Header hlvl (oid, _, _) inlines -> Just (hlvl, DocHeading oid (WL.plainify inlines))
       _ -> Nothing
 
 -- | Create the Toc
