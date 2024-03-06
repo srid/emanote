@@ -72,6 +72,7 @@ patchModel' ::
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
 patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+  print fp
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
@@ -91,6 +92,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
           case action of
             UM.Refresh refreshAction overlays -> do
               let fpAbs = head overlays
+              print fpAbs
               s <- readRefreshedFile refreshAction $ locResolve fpAbs
               note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
               pure $ M.modelInsertNote $ noteF note

@@ -17,7 +17,7 @@ import Relude
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
-  { layers :: NonEmpty FilePath
+  { layers :: NonEmpty (FilePath, Maybe FilePath)
   , allowBrokenLinks :: Bool
   , cmd :: Cmd
   }
@@ -28,7 +28,7 @@ data Cmd
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
-  layers <- pathList (one cwd)
+  layers <- pathList (one (cwd, Nothing))
   allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
@@ -44,10 +44,13 @@ cliParser cwd = do
           , value defaultPath
           , help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
           ]
-    pathListReader :: ReadM (NonEmpty FilePath)
-    pathListReader =
+    pathListReader :: ReadM (NonEmpty (FilePath, Maybe FilePath))
+    pathListReader = do
+      let partition s =
+            T.breakOn "@" s
+              & second (\x -> if T.null s then Nothing else Just $ T.drop 1 x)
       maybeReader $ \paths ->
-        nonEmpty $ fmap toString $ T.split (== ';') . toText $ paths
+        nonEmpty $ fmap (bimap toString (fmap toString) . partition) $ T.split (== ';') . toText $ paths
 
 parseCli' :: FilePath -> ParserInfo Cli
 parseCli' cwd =
