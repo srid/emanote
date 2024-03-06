@@ -48,6 +48,23 @@ in
                               description = ''Like `path` but local (not in Nix store)'';
                               default = builtins.toString config.path;
                             };
+                            mountPoint = mkOption {
+                              type = types.nullOr types.str;
+                              description = ''Mount point for the layer'';
+                              default = null;
+                            };
+                            outputs.layer = mkOption {
+                              type = types.str;
+                              description = ''Layer spec'';
+                              readOnly = true;
+                              default = if config.mountPoint == null then "${config.path}" else "${config.path}@${config.mountPoint}";
+                            };
+                            outputs.layerString = mkOption {
+                              type = types.str;
+                              description = ''Layer spec'';
+                              readOnly = true;
+                              default = if config.mountPoint == null then config.pathString else "${config.pathString}@${config.mountPoint}";
+                            };
                           };
                         }));
                       };
@@ -104,7 +121,7 @@ in
                   runtimeInputs = [ config.emanote.package ];
                   text =
                     let
-                      layers = lib.concatStringsSep ";" (builtins.map (x: x.pathString) cfg.layers);
+                      layers = lib.concatStringsSep ";" (builtins.map (x: x.outputs.layerString) cfg.layers);
                     in
                     ''
                       set -xe
@@ -131,7 +148,7 @@ in
                     mkdir -p $out
                     cp ${configFile} $out/index.yaml
                   '';
-                  layers = lib.concatStringsSep ";" (builtins.map (x: x.path) cfg.layers);
+                  layers = lib.concatStringsSep ";" (builtins.map (x: x.outputs.layer) cfg.layers);
                 in
                 pkgs.runCommand "emanote-static-website-${name}"
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
