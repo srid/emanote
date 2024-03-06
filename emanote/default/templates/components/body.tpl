@@ -2,11 +2,11 @@
   <main class="px-4 py-4">
     <apply template="note-title" />
     <ema:has:toc>
-      <div class="grid gap-4 md:grid-cols-8">
+      <div class="md:grid md:gap-4 md:grid-cols-8">
         <div class="md:col-span-6">
           <apply template="note-body" />
         </div>
-        <div class="md:col-span-2 border-l">
+        <div class="hidden md:block md:col-span-2 md:border-l">
           <apply template="toc" />
         </div>
       </div>
