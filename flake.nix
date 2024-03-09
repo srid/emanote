@@ -23,8 +23,7 @@
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
 
-    unionmount.url = "github:srid/unionmount/mount-point";
-    # unionmount.url = "path:/Users/srid/code/unionmount";
+    unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
 
     commonmark-simple.url = "github:srid/commonmark-simple";
