@@ -232,11 +232,11 @@
     "unionmount": {
       "flake": false,
       "locked": {
-        "lastModified": 1709758996,
-        "narHash": "sha256-jPiuBY4/k2VVWim9OHgDLf0Dcw2S6JRuSLCCNoclsZw=",
+        "lastModified": 1710009973,
+        "narHash": "sha256-hSj8Gx9d9dYabBRAkk0IXgeYWKEyiFxXSbbnQasoNWo=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "6bf00a91402562fcfe5cf49c62b7a4047fb82ff6",
+        "rev": "464c9e89ae1f0163c10dc28431d417952680144b",
         "type": "github"
       },
       "original": {
