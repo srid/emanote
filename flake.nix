@@ -90,6 +90,7 @@
             tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
+            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
             emanote = { name, pkgs, self, super, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork ];
