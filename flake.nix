@@ -42,7 +42,6 @@
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
         ./nix/flake-module.nix
-        ./nix/docker.nix
       ];
 
       perSystem = { pkgs, lib, config, system, ... }: {
