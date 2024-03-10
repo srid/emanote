@@ -1,4 +1,4 @@
-notebook := "../docs;/Users/srid/code/nixos-asia-website/en@asia"
+notebook := "../docs"
 
 default:
     @just --list
