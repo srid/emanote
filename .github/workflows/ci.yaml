@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - gh-action
   pull_request:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -37,7 +36,7 @@ jobs:
 
   # TODO: Use self-hosted runner
   website:
-    if: github.ref == 'refs/heads/gh-action'
+    if: github.ref == 'refs/heads/master'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
