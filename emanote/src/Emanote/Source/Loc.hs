@@ -15,7 +15,6 @@ module Emanote.Source.Loc (
   locMountPoint,
 
   -- * Dealing with layers of locs
-  LocLayers,
   userLayersToSearch,
 ) where
 
@@ -36,13 +35,11 @@ data Loc
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
 
-type LocLayers = Set Loc
-
 {- | List of user layers, highest precedent being at first.
 
 This is useful to delay searching for content in layers.
 -}
-userLayersToSearch :: LocLayers -> [FilePath]
+userLayersToSearch :: Set Loc -> [FilePath]
 userLayersToSearch =
   mapMaybe
     ( \case
@@ -56,9 +53,9 @@ defaultLayer = LocDefault
 
 userLayers :: NonEmpty (FilePath, Maybe FilePath) -> Set Loc
 userLayers paths =
-  fromList
-    $ zip [1 ..] (toList paths)
-    <&> (\(a, (b, c)) -> LocUser a b c)
+  fromList $
+    zip [1 ..] (toList paths)
+      <&> (\(a, (b, c)) -> LocUser a b c)
 
 -- | Return the effective path of a file.
 locResolve :: (Loc, FilePath) -> FilePath
