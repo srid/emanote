@@ -107,9 +107,9 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
             sData <-
-              liftIO $
-                either (throwIO . BadInput) pure $
-                  SD.parseSDataCascading r yamlContents
+              liftIO
+                $ either (throwIO . BadInput) pure
+                $ SD.parseSDataCascading r yamlContents
             pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
