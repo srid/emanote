@@ -12,7 +12,7 @@ order: 1
 Emanote is supported on all popular operating systems through [Nix]. If you are new to Nix, checkout [this tutorial](https://nixos.asia/en/nix-first).
 
 1. [Install Nix & enable Flakes](https://nixos.asia/en/install)
-   1. For Windows, see [[wsl]] or [the Docker approach](https://github.com/srid/emanote/issues/230)
+   1. For Windows, see [[wsl]]
    1. For NixOS, see [[nix]]
 2. Run `nix profile install github:srid/emanote` to install Emanote
 
@@ -32,13 +32,3 @@ emanote -L /path/to/notebook gen /tmp/output
 ```
 
 [Nix]: https://nixos.asia/en/nix
-
-## Non-nix methods
-
-If you do not wish to use Nix, you may use Emanote in one of the following ways:
-
-| Method     | Long-term support | Platforms         |
-| ---------- | ----------------- | ----------------- |
-| [[docker]] | Guaranteed        | Linux, WSL, macOS |
-
-Nix and [[docker]] are the only mechanisms the author intends to support in the long-term.
