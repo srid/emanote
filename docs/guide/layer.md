@@ -26,7 +26,7 @@ The default merge semantic is to replace with the file on the right layer. For s
 Layers can be mounted at a specific path. For example, if you want to mount `docs1` at `/D1` and `docs2` at `/D2`, you can do so with:
 
 ```sh
-emanote -L /docs1@D1;/docs2@D2 run
+emanote -L ./docs1@D1;./docs2@D2 run
 ```
 
 When two layers are mounted at distinct mount points it becomes impossible for there to be overlaps. This is useful to host sub-sites under a single site, such as in [this case](https://github.com/flake-parts/community.flake.parts).
