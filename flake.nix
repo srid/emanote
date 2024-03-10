@@ -90,6 +90,7 @@
             tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
+            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
             emanote = { name, pkgs, self, super, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork ];
@@ -175,8 +176,7 @@
           package = config.packages.default;
           sites = {
             "docs" = {
-              layers = [ ./docs ];
-              layersString = [ "./docs" ];
+              layers = [{ path = ./docs; pathString = "./docs"; }];
               allowBrokenLinks = true; # A couple, by design, in markdown.md
               prettyUrls = true;
             };

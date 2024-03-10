@@ -55,7 +55,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   storkIndex <- Stork.newIndex
-  let layers = Loc.userLayers (CLI.layers _emanoteConfigCli) <> one defaultLayer
+  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
       initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
   Dynamic

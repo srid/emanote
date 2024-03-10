@@ -31,17 +31,42 @@ in
                   description = "Emanote sites";
                   type = types.attrsOf (types.submodule {
                     options = {
-                      layers = mkOption {
-                        type = types.listOf types.path;
-                        description = ''List of directory paths to run Emanote on'';
-                      };
-                      # HACK: I can't seem to be able to convert `path` to a
-                      # relative local path; so this is necessary.
-                      #
-                      # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
-                      layersString = mkOption {
-                        type = types.listOf types.str;
-                        description = ''Like `layers` but local (not in Nix store)'';
+                      layers = lib.mkOption {
+                        description = "List of layers to use for the site";
+                        type = types.listOf (types.submodule ({ config, ... }: {
+                          options = {
+                            path = mkOption {
+                              type = types.path;
+                              description = ''Directory path to notes'';
+                            };
+                            # HACK: I can't seem to be able to convert `path` to a
+                            # relative local path; so this is necessary.
+                            #
+                            # cf. https://discourse.nixos.org/t/converting-from-types-path-to-types-str/19405?u=srid
+                            pathString = mkOption {
+                              type = types.str;
+                              description = ''Like `path` but local (not in Nix store)'';
+                              default = builtins.toString config.path;
+                            };
+                            mountPoint = mkOption {
+                              type = types.nullOr types.str;
+                              description = ''Mount point for the layer'';
+                              default = null;
+                            };
+                            outputs.layer = mkOption {
+                              type = types.str;
+                              description = ''Layer spec'';
+                              readOnly = true;
+                              default = if config.mountPoint == null then "${config.path}" else "${config.path}@${config.mountPoint}";
+                            };
+                            outputs.layerString = mkOption {
+                              type = types.str;
+                              description = ''Layer spec'';
+                              readOnly = true;
+                              default = if config.mountPoint == null then config.pathString else "${config.pathString}@${config.mountPoint}";
+                            };
+                          };
+                        }));
                       };
                       # TODO: Consolidate all these options below with those of home-manager-module.nix
                       port = mkOption {
@@ -96,7 +121,7 @@ in
                   runtimeInputs = [ config.emanote.package ];
                   text =
                     let
-                      layers = lib.concatStringsSep ";" cfg.layersString;
+                      layers = lib.concatStringsSep ";" (builtins.map (x: x.outputs.layerString) cfg.layers);
                     in
                     ''
                       set -xe
@@ -123,7 +148,7 @@ in
                     mkdir -p $out
                     cp ${configFile} $out/index.yaml
                   '';
-                  layers = lib.concatStringsSep ";" cfg.layers;
+                  layers = lib.concatStringsSep ";" (builtins.map (x: x.outputs.layer) cfg.layers);
                 in
                 pkgs.runCommand "emanote-static-website-${name}"
                   { meta.description = "Contents of the statically-generated Emanote website for ${name}"; }
