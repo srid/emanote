@@ -20,6 +20,9 @@ The default merge semantic is to replace with the file on the right layer. For s
 
 ## Mount point
 
+>[!tip] Composition
+> To learn more about composition of multiple notebooks, see [here](https://github.com/srid/emanote/issues/494).
+
 Layers can be mounted at a specific path. For example, if you want to mount `docs1` at `/D1` and `docs2` at `/D2`, you can do so with:
 
 ```sh
