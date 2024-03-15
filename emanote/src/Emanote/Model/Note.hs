@@ -387,7 +387,7 @@ applyNoteMetaFilters doc =
            )
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
-        B.Para is -> [WL.plainify is]
+        B.Para is -> [WL.plainify (mapMaybe removeInlineNotes is)]
         _ -> mempty
     -- FIXME this doesn't take splice rendering into account. Specifically,
     -- `![[foo.jpeg]]` is not handled at all.
@@ -405,5 +405,11 @@ applyNoteMetaFilters doc =
               val <- viaNonEmpty head $ W.query f doc
               pure $ SData.oneAesonText (toList key) val
           )
+
+-- TODO: apply this recursively
+removeInlineNotes :: B.Inline -> Maybe B.Inline
+removeInlineNotes = \case
+  B.Note{} -> Nothing
+  a -> Just a
 
 makeLenses ''Note
