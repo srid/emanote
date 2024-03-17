@@ -87,13 +87,19 @@
             feed.source = "1.3.2.1";
             xmlhtml.source = "0.2.5.4";
             map-syntax.source = "0.3";
-            pandoc-lua-engine.source = "0.2.1.3";
+            pandoc-lua-engine.source = "0.2.1";
+            hslua-repl.source = "0.1.1";
+            hslua-module-zip.source = "1.1.0";
+            isocline.source = "1.0.9";
             doctest-driver-gen.source = "0.3.0.8";
             heist.source = "1.1.1.2";
             ixset-typed.source = "0.5.1.0";
             safecopy.source = "0.10.4.2";
             lens-action.source = "0.2.6";
             pandoc-link-context.source = "1.4.1.0";
+            tagtree.source = "0.1.0.1";
+            tailwind.source = "0.3.0.0";
+            dir-traverse.source = "0.2.3.0";
           };
 
           settings = {
@@ -105,8 +111,6 @@
             ixset-typed.jailbreak = true;
             pandoc-link-context.broken = false;
             pandoc-link-context.jailbreak = true;
-            tagtree.broken = false;
-            tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
             unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
