@@ -107,6 +107,7 @@
           settings = {
             # Horizon stuff
             doctest-driver-gen.check = false;
+            aeson-extra.check = false;
 
             # Haskell packages in nixpkgs are often broken in many ways; ergo,
             # it is our responsibility to fix them here.
