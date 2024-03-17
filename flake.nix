@@ -112,6 +112,7 @@
             # it is our responsibility to fix them here.
             fsnotify.check = false;
             heist.broken = false;
+            heist.check = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
             pandoc-link-context.broken = false;
