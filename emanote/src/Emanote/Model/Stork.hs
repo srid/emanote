@@ -33,7 +33,7 @@ renderStorkIndex model = do
 storkFiles :: Model -> [File]
 storkFiles model =
   flip mapMaybe (Ix.toList (model ^. M.modelNotes)) $ \note -> do
-    baseDir <- Loc.locPath . fst <$> note ^. N.noteSource
+    baseDir <- fst . Loc.locPath . fst <$> note ^. N.noteSource
     let fp = ((baseDir </>) $ R.withLmlRoute R.encodeRoute $ note ^. N.noteRoute)
         ft = case note ^. N.noteRoute of
           R.LMLRoute_Md _ -> FileType_Markdown

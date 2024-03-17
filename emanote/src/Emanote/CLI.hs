@@ -3,6 +3,7 @@
 
 module Emanote.CLI (
   Cli (..),
+  Layer (..),
   Cmd (..),
   parseCli,
   cliParser,
@@ -17,9 +18,14 @@ import Relude
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
-  { layers :: NonEmpty FilePath
+  { layers :: NonEmpty Layer
   , allowBrokenLinks :: Bool
   , cmd :: Cmd
+  }
+
+data Layer = Layer
+  { path :: FilePath
+  , mountPoint :: Maybe FilePath
   }
 
 data Cmd
@@ -28,15 +34,15 @@ data Cmd
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
-  layers <- pathList (one cwd)
+  layers <- layerList $ one $ Layer cwd Nothing
   allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
       <|> subparser (command "export" (info (pure Cmd_Export) (progDesc "Export metadata JSON")))
   pure Cli {..}
   where
-    pathList defaultPath = do
-      option pathListReader
+    layerList defaultPath = do
+      option layerListReader
         $ mconcat
           [ long "layers"
           , short 'L'
@@ -44,10 +50,17 @@ cliParser cwd = do
           , value defaultPath
           , help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
           ]
-    pathListReader :: ReadM (NonEmpty FilePath)
-    pathListReader =
+    layerListReader :: ReadM (NonEmpty Layer)
+    layerListReader = do
+      let partition s =
+            T.breakOn "@" s
+              & second (\x -> if T.null s then Nothing else Just $ T.drop 1 x)
       maybeReader $ \paths ->
-        nonEmpty $ fmap toString $ T.split (== ';') . toText $ paths
+        nonEmpty
+          $ fmap (uncurry Layer . bimap toString (fmap toString) . partition)
+          $ T.split (== ';')
+          . toText
+          $ paths
 
 parseCli' :: FilePath -> ParserInfo Cli
 parseCli' cwd =

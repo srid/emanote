@@ -6,12 +6,23 @@ on:
       - "master"
   pull_request:
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   nix:
     runs-on: self-hosted
     strategy:
       matrix:
-        # TODO: Disablig x86_64-linux for now, as it is causing qemu segfault.
+        # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
         # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
         system: [aarch64-linux, aarch64-darwin]
     steps:
@@ -21,75 +32,31 @@ jobs:
           nixci --build-systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
         run: |
-          # TODO: Check on all platforms?
           nix run .#check-closure-size
 
-  docker-build:
+  # TODO: Use self-hosted runner
+  website:
+    if: github.ref == 'refs/heads/master'
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Build as docker img
-        id: build
+      - name: Docs static site
+        id: docs
         run: |
-          nix build -j auto -o docker-img .#packages.x86_64-linux.dockerImage
-          # docker
-          export DOCKERIMG=$(readlink ./docker-img)
-          echo "::set-output name=docker-img::${DOCKERIMG}"
-      - name: Upload docker image tgz
-        uses: actions/upload-artifact@v4
-        if: github.ref == 'refs/heads/master'
-        with:
-          name: docker-img
-          retention-days: 1
-          path: |
-            ${{ steps.build.outputs.docker-img }}
-
-  docker-push:
-    needs: docker-build
+          nix build .#docs -o ./_site
+          if ! [ -f ./_site/index.html ]; then
+            echo "ERROR: There is no index.html"
+            exit 2
+          fi
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    env:
-      DOCKERTAG: latest
+    needs: website
     steps:
-      - name: Download docker img
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-img
-      - name: Load Docker img
-        run: |
-          docker load -i *docker-image-emanote.tar.gz
-      - name: Publish Docker image to Docker Hub
-        run: |
-          echo ${{ secrets.DOCKER_PASS }} | docker login -u sridca --password-stdin
-          set -x
-          docker push sridca/emanote:latest
-
-  website:
-    needs: docker-build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download docker image
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-img
-      - name: Load Docker image
-        run: |
-          docker load -i *docker-image-emanote.tar.gz
-      - name: Generate website HTML 🔧
-        run: |
-          mkdir -p ./docs/.ci/output
-          # demo.md has broken links for demo
-          docker run \
-            -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 \
-            -v $PWD/docs:/data \
-            --tmpfs /tmp \
-            sridca/emanote emanote --layers /data --allow-broken-links gen /data/.ci/output
-          cp -r ./docs/.ci .
-      - name: Deploy to website to gh-pages 🚀
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .ci/output
-          cname: emanote.srid.ca
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

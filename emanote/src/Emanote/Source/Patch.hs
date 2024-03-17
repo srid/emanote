@@ -22,7 +22,7 @@ import Emanote.Prelude (
   logD,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, LocLayers, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~))
@@ -36,7 +36,7 @@ import UnliftIO.Directory (doesDirectoryExist)
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
-  LocLayers ->
+  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
   -- | Lua scripting engine
@@ -59,7 +59,7 @@ patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
-  LocLayers ->
+  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
   -- | Lua scripting engine

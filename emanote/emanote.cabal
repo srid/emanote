@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.3.13.0
+version:            1.3.16.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -175,6 +175,7 @@ library
     Emanote.Model.Stork.Index
     Emanote.Model.Task
     Emanote.Model.Title
+    Emanote.Model.Toc
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
     Emanote.Pandoc.ExternalLink
@@ -241,6 +242,7 @@ test-suite test
     other-modules:
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
+      Emanote.Model.TocSpec
       Emanote.Pandoc.ExternalLinkSpec
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec

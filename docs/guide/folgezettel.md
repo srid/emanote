@@ -21,7 +21,7 @@ Here is the [[target-note]]#
 ```
 
 {#folder}
-## Folder notes
+## [[folder-note|Folder notes]]
 
 By default, Emanote includes any directories in your note's path as vertices in the folgezettel graph. This makes the [[folder-note|folder note]] a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the [[folder-note|folder note]]. For eg., in `foo/bar/qux.md`, "foo" is a folgezettel parent of "bar", and "bar" is a folgezettel parent of "qux".
 

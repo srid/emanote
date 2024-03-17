@@ -4,12 +4,14 @@
 
 - Features
   - Obsidian-style callouts ([\#466](https://github.com/srid/emanote/pull/466))
+  - TOC sidebar ([\#504](https://github.com/srid/emanote/pull/504))
   - `emanote run --no-ws` option to disable WebSocket monitoring. This is useful for using Emanote to serve the HTML site directly on the internet, without needing to statically generate it.
   - Add query syntax for listing folgezetten children & parents ([\#476](https://github.com/srid/emanote/pull/476))
   - Native support for combining multiple notebooks
     - Resolve ambiguities based on closer common ancestor ([\#498](https://github.com/srid/emanote/pull/498))
     - Support for folder "index.md" notes ([\#512](https://github.com/srid/emanote/pull/512))
       - Instead of "foo/qux.md", you can now create "foo/qux/index.md"
+    - Layers can be mounted in sub-directories, enabling composition of distinct notebooks ([\#523](https://github.com/srid/emanote/pull/523))
   - **BACKWARDS INCOMPTABILE** changes
     - `feed.siteUrl` is now `page.siteUrl`
     - A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
@@ -27,6 +29,9 @@
   - Stork search fixes
     - Fix empty stork index generation when using more than 1 layer ([\#493](https://github.com/srid/emanote/issues/493))
     - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
+- UI
+  - prevent the external link icon from wrapping ([\#528](https://github.com/srid/emanote/pull/528))
+- Update ema, new use newer morphdom (2.7.2)
 
 ## 1.2.0.0 (2023-08-24)
 

@@ -44,7 +44,6 @@
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
         ./nix/flake-module.nix
-        ./nix/docker.nix
         (inputs.haskell-template.flakeModules.horizon-package-set)
       ];
 
@@ -104,13 +103,13 @@
             heist.broken = false;
             ixset-typed.broken = false;
             ixset-typed.jailbreak = true;
-            ema.jailbreak = true;
             pandoc-link-context.broken = false;
             pandoc-link-context.jailbreak = true;
             tagtree.broken = false;
             tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
+            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
             emanote = { name, pkgs, self, super, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork ];
@@ -196,9 +195,9 @@
           package = config.packages.default;
           sites = {
             "docs" = {
-              layers = [ ./docs ];
-              layersString = [ "./docs" ];
+              layers = [{ path = ./docs; pathString = "./docs"; }];
               allowBrokenLinks = true; # A couple, by design, in markdown.md
+              prettyUrls = true;
             };
           };
         };
