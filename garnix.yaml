@@ -4,4 +4,4 @@ builds:
     - "packages.aarch64-darwin.default"
     - "packages.x86_64-linux.default"
   exclude: []
-  branch: master
+  branch: horizon
