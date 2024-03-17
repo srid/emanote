@@ -1,7 +1,7 @@
 <bind tag="clickable-icon">
   <a href="${ema:note:url}#${header:id}" class="--ema-anchor">
     <span
-      class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
+      class="hover:text-${theme}-400 dark:text-slate-200 group-hover:visible invisible cursor-pointer text-sm align-middle"
       aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
@@ -16,7 +16,7 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 dark:text-slate-200</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -66,14 +66,15 @@
   </DefinitionList>
   <Note:Ref>
     <sup class="px-0.5">
-      <a class="text-${theme}-600 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
+      <a class="text-${theme}-600 dark:text-${theme}-200 hover:underline"
+        href="${ema:note:url}#fn${footnote:idx}">
         <footnote:idx />
       </a>
     </sup>
   </Note:Ref>
   <Note:List>
     <div title="Footnotes"
-      class="pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2">
+      class="pt-2 mt-8 space-y-1 text-gray-500 dark:text-slate-300 transform scale-x-90 border-t-2">
       <header class="font-semibold">Footnotes</header>
       <footnote>
         <div id="fn${footnote:idx}">
@@ -110,12 +111,12 @@
     <hr class="mb-3" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-${theme}-600">
+  <PandocLink class="text-${theme}-600 dark:text-${theme}-300">
     <Internal class="mavenLinkBold hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm" />
-  <Code class="py-0.5 px-0.5 bg-gray-100" />
+  <Code class="py-0.5 px-0.5 bg-gray-100 dark:bg-slate-200 dark:text-black" />
 
   <Header:1>
     <h1 id="${header:id}" class="${header-class} text-5xl">
