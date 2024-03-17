@@ -100,6 +100,7 @@
             tagtree.source = "0.1.0.1";
             tailwind.source = "0.3.0.0";
             dir-traverse.source = "0.2.3.0";
+            hinotify.source = "0.4.1";
           };
 
           settings = {
