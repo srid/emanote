@@ -98,7 +98,6 @@
               justStaticExecutables = true;
               removeReferencesTo = [
                 self.pandoc
-                self.pandoc_3_1_11
                 self.pandoc-types
                 self.warp
               ];
