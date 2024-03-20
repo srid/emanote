@@ -33,6 +33,9 @@ jobs:
       - name: Check closure size
         run: |
           nix run .#check-closure-size
+      - name: Docs for flake.parts
+        run: |
+          nix build github:hercules-ci/flake.parts-website#generated-docs-emanote --override-input emanote ../emanote/ --show-trace
 
   # TODO: Use self-hosted runner
   website:
