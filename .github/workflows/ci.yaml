@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "test"
   pull_request:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -24,7 +25,7 @@ jobs:
       matrix:
         # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
         # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
-        system: [aarch64-linux, aarch64-darwin]
+        system: [aarch64-darwin]
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
