@@ -25,14 +25,25 @@ jobs:
         # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
         # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
         system: [aarch64-linux, aarch64-darwin]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
         run: |
-          nixci --build-systems "github:nix-systems/${{ matrix.system }}"
+          nixci build --systems "github:nix-systems/${{ matrix.system }}"
       - name: Check closure size
         run: |
           nix run .#check-closure-size
+  flake-parts-docs:
+    runs-on: self-hosted
+    steps:
+      - name: Docs for flake.parts
+        run: |
+          # TODO: Define this in nixci itself.
+          nix build \
+            github:hercules-ci/flake.parts-website#generated-docs-emanote \
+            --override-input emanote ../emanote/ \
+            --show-trace
 
   # TODO: Use self-hosted runner
   website:
