@@ -31,7 +31,7 @@ See [architecture](https://emanote.srid.ca/architecture) for a high-level overvi
 
 ### PR contribution guidelines
 
-Run `nix run nixpkgs#nixci` before opening a PR.
+You may want to run `nix run github:srid/nixci` before opening a PR, but the CI will run it as well.
 
 ## Discussion
 

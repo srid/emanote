@@ -47,6 +47,7 @@ in
                               type = types.str;
                               description = ''Like `path` but local (not in Nix store)'';
                               default = builtins.toString config.path;
+                              defaultText = lib.literalMD "toString path";
                             };
                             mountPoint = mkOption {
                               type = types.nullOr types.str;
@@ -57,14 +58,18 @@ in
                               type = types.str;
                               description = ''Layer spec'';
                               readOnly = true;
-                              default = if config.mountPoint == null then "${config.path}" else "${config.path}@${config.mountPoint}";
                             };
                             outputs.layerString = mkOption {
                               type = types.str;
                               description = ''Layer spec'';
                               readOnly = true;
-                              default = if config.mountPoint == null then config.pathString else "${config.pathString}@${config.mountPoint}";
                             };
+                          };
+                          config = {
+                            outputs.layer =
+                              if config.mountPoint == null then "${config.path}" else "${config.path}@${config.mountPoint}";
+                            outputs.layerString =
+                              if config.mountPoint == null then config.pathString else "${config.pathString}@${config.mountPoint}";
                           };
                         }));
                       };
