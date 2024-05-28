@@ -328,6 +328,23 @@
         "type": "github"
       }
     },
+    "nix-health": {
+      "locked": {
+        "dir": "module",
+        "lastModified": 1716931776,
+        "narHash": "sha256-M4YqLtNAkj8pqG6dp7wHKz9EOecB3bWHp7WHyXIlMMc=",
+        "owner": "juspay",
+        "repo": "nix-health",
+        "rev": "2f8d8dc30121923192c78a8f5152c5c89fdf1809",
+        "type": "github"
+      },
+      "original": {
+        "dir": "module",
+        "owner": "juspay",
+        "repo": "nix-health",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1704842529,
@@ -406,6 +423,7 @@
         "flake-root": "flake-root_2",
         "haskell-flake": "haskell-flake_2",
         "heist-extra": "heist-extra_2",
+        "nix-health": "nix-health",
         "nixpkgs": "nixpkgs_2",
         "systems": "systems_2",
         "treefmt-nix": "treefmt-nix_2",
