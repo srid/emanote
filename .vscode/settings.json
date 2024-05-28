@@ -1,7 +1,6 @@
 {
   "editor.formatOnType": true,
   "editor.formatOnSave": true,
-  "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",
   "files.associations": {
     "*.tpl": "html"
   },
