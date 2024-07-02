@@ -118,7 +118,7 @@
           };
         };
 
-        # treefmt-nix configuration
+        # Autoformatter configuration: https://nixos.asia/en/treefmt
         treefmt.config = {
           inherit (config.flake-root) projectRootFile;
           package = pkgs.treefmt;

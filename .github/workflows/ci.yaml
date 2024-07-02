@@ -19,23 +19,22 @@ concurrency:
 
 jobs:
   nix:
-    runs-on: self-hosted
+    runs-on: ${{ matrix.system }}
     strategy:
       matrix:
-        # TODO: Disabling x86_64-linux for now, as it is causing qemu segfault.
-        # Fix treefmt check causing qemu segfault: https://nixos.zulipchat.com/#narrow/stream/413948-nixos/topic/QEMU.20internal.20SIGSEGV
-        system: [aarch64-linux, aarch64-darwin]
+        system: [aarch64-darwin, x86_64-linux]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
         run: |
-          nixci build --systems "github:nix-systems/${{ matrix.system }}"
+          nixci --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" build --systems "${{ matrix.system }}"
       - name: Check closure size
         run: |
           nix run .#check-closure-size
   flake-parts-docs:
-    runs-on: self-hosted
+    if: false  # Currently fails in CI
+    runs-on: x86_64-linux
     steps:
       - name: Docs for flake.parts
         run: |
@@ -48,7 +47,7 @@ jobs:
   # TODO: Use self-hosted runner
   website:
     if: github.ref == 'refs/heads/master'
-    runs-on: self-hosted
+    runs-on: x86_64-linux
     steps:
       - uses: actions/checkout@v4
       - name: Docs static site
