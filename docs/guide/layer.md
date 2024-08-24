@@ -8,7 +8,7 @@ For example,
 emanote -L ./docs1:./docs2 run
 ```
 
-Internally, Emante merges both `docs1` and `docs2` folders and treats them as a single directory. Thus, both `docs1` and `docs2` can contain the same file, and the one in `docs1` will take precedence.
+Internally, Emanote merges both `docs1` and `docs2` folders and treats them as a single directory. Thus, both `docs1` and `docs2` can contain the same file, and the one in `docs1` will take precedence.
 
 ## "Default" layer
 
