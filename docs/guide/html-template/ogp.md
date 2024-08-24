@@ -10,7 +10,7 @@ The [Open Graph protocol](https://ogp.me/) specifies what goes in `<meta>` attri
 
 Emanote generates OGP meta tags for each note, using the following rules:
 
-| Meta tag         | How the value is determinec          |
+| Meta tag         | How the value is determined          |
 | ---------------- | ------------------------------------ |
 | `og:title`       | The title of the note                |
 | `og:description` | The first paragraph of the note[^wl] |
