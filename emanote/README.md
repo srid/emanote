@@ -23,7 +23,7 @@ https://emanote.srid.ca/examples
 
 ## Developing
 
-Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code. 
+Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code.
 
 See https://srid.ca/haskell-template/start for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
 
@@ -31,7 +31,7 @@ See [architecture](https://emanote.srid.ca/architecture) for a high-level overvi
 
 ### PR contribution guidelines
 
-You may want to run `nix run github:srid/nixci build` before opening a PR, but the CI will run it as well.
+You may want to run `nix run github:juspay/omnix ci run` before opening a PR, but the CI will run it as well.
 
 ## Discussion
 
