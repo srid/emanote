@@ -29,11 +29,8 @@ jobs:
       - name: Build Nix
         run: |
           om ci --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" run --systems "${{ matrix.system }}"
-      - name: Check closure size
-        run: |
-          nix run .#check-closure-size
   flake-parts-docs:
-    if: false  # Currently fails in CI
+    if: false # Currently fails in CI
     runs-on: x86_64-linux
     steps:
       - name: Docs for flake.parts

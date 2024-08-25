@@ -92,7 +92,7 @@
             tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
-            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
+            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
             emanote = { name, pkgs, self, super, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork ];
@@ -108,7 +108,7 @@
                 longDescription = ''
                   Emanote is a tool for generating a structured view of your
                   plain-text notes on the web, as a statically generated
-                  website as well as a local live server. 
+                  website as well as a local live server.
 
                   For editing notes, you can use any text editor of your
                   choice including the likes of Obsidian.
@@ -191,6 +191,17 @@
         templates.default = {
           description = "A simple flake.nix template for emanote notebooks";
           path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
+        };
+        om.ci.default = {
+          emanote = {
+            dir = ".";
+            steps.custom = {
+              closure-size = {
+                type = "app";
+                name = "check-closure-size";
+              };
+            };
+          };
         };
       };
     };
