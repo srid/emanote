@@ -156,22 +156,25 @@
               ];
             });
 
-        apps.check-closure-size.program = pkgs.writeShellApplication {
-          name = "emanote-check-closure-size";
-          runtimeInputs = [ pkgs.jq pkgs.bc pkgs.nix ];
-          meta.description = "Check that emanote's nix closure size remains reasonably small";
-          text = ''
-            MAX_CLOSURE_SIZE=$(echo "600 * 1000000" | bc)
-            CLOSURE_SIZE=$(nix path-info --json -S .#default | jq '.[0]'.closureSize)
-            echo "Emanote closure size: $CLOSURE_SIZE"
-            echo "    Max closure size: $MAX_CLOSURE_SIZE"
-            if [ "$CLOSURE_SIZE" -gt "$MAX_CLOSURE_SIZE" ]; then
-                echo "ERROR: Emanote's nix closure size has increased"
-                exit 3
-            else
-                echo "OK: Emanote's nix closure size is within limits"
-            fi
-          '';
+        apps.check-closure-size = rec {
+          inherit (program) meta;
+          program = pkgs.writeShellApplication {
+            name = "emanote-check-closure-size";
+            runtimeInputs = [ pkgs.jq pkgs.bc pkgs.nix ];
+            meta.description = "Check that emanote's nix closure size remains reasonably small";
+            text = ''
+              MAX_CLOSURE_SIZE=$(echo "600 * 1000000" | bc)
+              CLOSURE_SIZE=$(nix path-info --json -S .#default | jq '.[0]'.closureSize)
+              echo "Emanote closure size: $CLOSURE_SIZE"
+              echo "    Max closure size: $MAX_CLOSURE_SIZE"
+              if [ "$CLOSURE_SIZE" -gt "$MAX_CLOSURE_SIZE" ]; then
+                  echo "ERROR: Emanote's nix closure size has increased"
+                  exit 3
+              else
+                  echo "OK: Emanote's nix closure size is within limits"
+              fi
+            '';
+          };
         };
 
         emanote = {

@@ -116,13 +116,15 @@ in
         sites =
           lib.mapAttrs
             (name: cfg: {
-              app = {
+              app = rec {
                 type = "app";
+
+                inherit (program) meta;
 
                 # '' is required for escaping ${} in nix
                 program = pkgs.writeShellApplication {
                   name = "emanote-with-layers-${name}";
-                  meta.description = "Live server for Emanote site ${name} (arbitrary arguments accepted)";
+                  meta.description = "Live server for Emanote site ${name}";
                   runtimeInputs = [ config.emanote.package ];
                   text =
                     let
