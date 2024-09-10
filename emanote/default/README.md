@@ -6,7 +6,7 @@ such as for [emanote-template](https://github.com/srid/emanote-template) and oth
 
 [index.yaml](index.yaml) file within this directory is licensed `SPDX-License-Identifier: CC0-1.0 OR AGPL-3.0-or-later`:
 
-- [CC0 LICENSE]([index.yaml.LICENSE])
+- [CC0 LICENSE]([LICENSE])
 - [AGPL3 LICENSE](../LICENSE)
 
 This means that you can choose to use [index.yaml](index.yaml) under either of the licenses.
@@ -19,7 +19,7 @@ such as for [emanote-template](https://github.com/srid/emanote-template) and oth
 
 [templates](templates) directory within this directory is licensed `SPDX-License-Identifier: CC0-1.0 OR AGPL-3.0-or-later`:
 
-- [CC0 LICENSE]([templates/LICENSE])
+- [CC0 LICENSE]([LICENSE])
 - [AGPL3 LICENSE](../LICENSE)
 
 This means that you can choose to use [templates](templates) under either of the licenses.
