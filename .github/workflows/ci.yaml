@@ -41,7 +41,6 @@ jobs:
             --override-input emanote ../emanote/ \
             --show-trace
 
-  # TODO: Use self-hosted runner
   website:
     if: github.ref == 'refs/heads/master'
     runs-on: x86_64-linux
