@@ -1,6 +1,7 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Aeson.Optics (key, _String)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.Map.Syntax ((##))
@@ -34,7 +35,8 @@ import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
 import Optics.Core (Prism', review)
-import Optics.Operators ((.~), (^.))
+import Optics.Operators ((.~), (^.), (^?))
+import Optics.Optic ((%))
 import Relude
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
@@ -174,6 +176,8 @@ renderLmlHtml model note = do
     -- Note stuff
     "ema:note:title" ##
       C.titleSplice ctx (note ^. MN.noteTitle)
+    forM_ (MN._noteMeta note ^? key "date" % _String) $ \date ->
+      "ema:note:date" ## HI.textSplice date
     "ema:note:source-path" ##
       HI.textSplice
         $ toText sourcePath
