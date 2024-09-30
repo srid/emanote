@@ -1,6 +1,8 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
+import Commonmark.Extensions.WikiLink qualified as WikiLink
 import Control.Monad.Logger (MonadLoggerIO)
+import Data.Aeson.Optics (key, _String)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
 import Data.Map.Syntax ((##))
@@ -33,8 +35,9 @@ import Heist.Extra.Splices.Pandoc.Ctx (emptyRenderCtx)
 import Heist.Extra.Splices.Tree qualified as Splices
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
+import Network.URI.Slug qualified as Slug
 import Optics.Core (Prism', review)
-import Optics.Operators ((.~), (^.))
+import Optics.Operators ((.~), (^.), (^?))
 import Relude
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
@@ -185,6 +188,17 @@ renderLmlHtml model note = do
         $ if MN.noteHasFeed note
           then feedDiscoveryLink model note
           else mempty
+
+    let mNext = getMetaList note "next"
+    forM_ mNext $ \nexts ->
+      "ema:note:next" ## navSplice model note nexts
+    "ema:has:next" ## Heist.ifElseISplice (isJust mNext)
+    let mPrev = getMetaList note "prev"
+    traceShowM (MN._noteMeta note)
+    forM_ mPrev $ \prevs ->
+      "ema:note:prev" ## navSplice model note prevs
+    "ema:has:prev" ## Heist.ifElseISplice (isJust mPrev)
+
     "ema:note:backlinks" ##
       backlinksSplice model (G.modelLookupBacklinks r model)
     let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
@@ -208,6 +222,30 @@ renderLmlHtml model note = do
       C.withBlockCtx ctx
         $ \ctx' ->
           renderToc ctx' toc
+
+-- | Return a meta top attribute as a single elem or a list of elem
+getMetaList :: MN.Note -> Aeson.Key -> Maybe [Text]
+getMetaList note k =
+  MN._noteMeta note
+    ^? key k >>= \v ->
+      let singleValue = (: []) <$> (v ^? _String)
+          listValue = Aeson.parseMaybe Aeson.parseJSON v -- Q: how to do that with aeson-optics?
+       in singleValue <|> listValue
+
+navSplice :: Model -> MN.Note -> [Text] -> HI.Splice Identity
+navSplice model note links = (HI.runChildrenWith . (navSplices model)) `foldMapM` routes
+  where
+    mkWikiLink = WikiLink.mkWikiLinkFromSlugs . pure . Slug.decodeSlug
+    routes = mapMaybe (G.lookupNoteByWikiLink model (note ^. MN.noteRoute) . mkWikiLink) links
+
+navSplices :: Model -> R.LMLRoute -> H.Splices (HI.Splice Identity)
+navSplices model source = do
+  "nav:title" ## C.titleSplice ctx (M.modelLookupTitle source model)
+  "nav:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
+  where
+    note = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
+    meta = Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) source model
+    ctx = C.mkTemplateRenderCtx model source meta
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =

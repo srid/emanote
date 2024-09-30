@@ -22,6 +22,23 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 - `page.image`: The image to use for the page. This is used for the [[ogp]] meta tag `og:image` meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if `page.siteUrl` is non-empty.
 
 
+- `next`, `prev`: Lists of wikilinks to be used for custom navigation. When set, the following template is available:
+
+```
+<ema:has:prev>
+  <div class="flex-1 p-4 mt-8 bg-gray-100 rounded">
+    <span class="mb-2 text-xl font-semibold text-gray-500">Next:
+      <ema:note:prev>
+        <a class="text-${theme}-600 mavenLinkBold hover:bg-${theme}-50 mr-2"
+           href="${nav:url}">
+          <nav:title />
+        </a>
+      </ema:note:prev>
+    </span>
+  </div>
+</ema:has:prev>
+```
+
 ## Examples
 
 - https://github.com/srid/srid/blob/master/index.yaml
