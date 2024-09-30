@@ -21,6 +21,9 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 
 - `page.image`: The image to use for the page. This is used for the [[ogp]] meta tag `og:image` meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if `page.siteUrl` is non-empty.
 
+- `date`: The note timestamp. This is used to order note chronologically, such as for the timeline [[query|query]].
+  The value can be set from the filename if it begins with `YYYY-MM-DD`, which is useful for including the date in the note URL.
+  In case of conflict, the date from the YAML configuration takes priority.
 
 ## Examples
 

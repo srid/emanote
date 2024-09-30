@@ -10,6 +10,7 @@ import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Optics qualified as AO
+import Data.Char (isDigit)
 import Data.Default (Default (def))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
@@ -29,7 +30,7 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import System.FilePath ((</>))
+import System.FilePath (takeFileName, (</>))
 import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -37,6 +38,7 @@ import Text.Pandoc.Extensions
 import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
+import Text.Parsec qualified as P
 import UnliftIO.Directory (doesPathExist)
 
 data Feed = Feed
@@ -316,7 +318,19 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
         parseNoteMarkdown scriptingEngine pluginBaseDir fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
-  pure $ mkNoteWith r (Just src) doc meta errs
+  let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
+        Left _ -> meta
+        Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
+  pure $ mkNoteWith r (Just src) doc metaWithDateFromPath errs
+  where
+    dateParser = do
+      year <- replicateM 4 P.digit
+      _ <- P.char '-'
+      month <- replicateM 2 P.digit
+      _ <- P.char '-'
+      day <- replicateM 2 P.digit
+      _ <- P.satisfy (not . isDigit)
+      pure $ toText $ mconcat [year, "-", month, "-", day]
 
 parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrg s =
