@@ -21,7 +21,7 @@
     ema.inputs.treefmt-nix.follows = "treefmt-nix";
     ema.inputs.flake-root.follows = "flake-root";
 
-    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.url = "github:srid/heist-extra/336ac51ead3b3b83fe28ee324689b287023fd69c";
     heist-extra.flake = false;
 
     unionmount.url = "github:srid/unionmount";
