@@ -12,7 +12,6 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
-    nix-health.url = "github:juspay/nix-health?dir=module";
 
     ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
@@ -42,7 +41,6 @@
         inputs.haskell-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        inputs.nix-health.flakeModule
         ./nix/flake-module.nix
       ];
 
@@ -149,7 +147,6 @@
               inputsFrom = [
                 config.haskellProjects.default.outputs.devShell
                 config.treefmt.build.devShell
-                config.nix-health.outputs.devShell
               ];
               packages = with pkgs; [
                 just
