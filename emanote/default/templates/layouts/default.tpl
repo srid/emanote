@@ -47,7 +47,7 @@
 
       <ema:has:sidebar>
         <div id="container"
-          class="flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8">
+          class="flex flex-nowrap flex-col md:flex-row bg-gray-50 dark:bg-slate-600 md:shadow-2xl md:mb-8">
           <!-- Sidebar column -->
           <apply template="components/sidebar" />
           <!-- Main body column -->
