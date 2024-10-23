@@ -1,6 +1,6 @@
 {
   perSystem = { pkgs, lib, config, system, ... }: {
-   devShells.default =
+    devShells.default =
       lib.addMetaAttrs { description = "Emanote development environment"; }
         (pkgs.mkShell {
           name = "emanote-dev";
@@ -12,5 +12,5 @@
             just
           ];
         });
- };
+  };
 }
