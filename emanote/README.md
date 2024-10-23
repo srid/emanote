@@ -23,7 +23,7 @@ https://emanote.srid.ca/examples
 
 ## Developing
 
-Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code. 
+Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code.
 
 See https://srid.ca/haskell-template/start for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
 
@@ -31,7 +31,7 @@ See [architecture](https://emanote.srid.ca/architecture) for a high-level overvi
 
 ### PR contribution guidelines
 
-You may want to run `nix run github:srid/nixci build` before opening a PR, but the CI will run it as well.
+You may want to run `nix run github:juspay/omnix ci run` before opening a PR, but the CI will run it as well.
 
 ## Discussion
 
@@ -41,7 +41,10 @@ To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discuss
 [ghdiscuss]: https://github.com/srid/emanote/discussions
 
 [^licenses]: Emanote uses software and resources that are licensed differently, viz.:
-    - [Logo](https://www.svgrepo.com/svg/267765/paper-plane)
-    - [Stork search](https://github.com/jameslittle230/stork/blob/master/license.txt)
-    - [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE)
-    - Various SVG icons are from [Heroicons](https://github.com/tailwindlabs/heroicons/blob/master/LICENSE)
+    - By default, emanote is licensed: `SPDX-License-Identifier: AGPL-3.0-or-later`
+    - [default/index.yaml](default/index.yaml) `SPDX-License-Identifier: CC0-1.0 OR AGPL-3.0-or-later`
+    - [default/templates](default/templates) `SPDX-License-Identifier: CC0-1.0 OR AGPL-3.0-or-later`
+    - [Logo](https://www.svgrepo.com/svg/267765/paper-plane) `SPDX-License-Identifier: CC0-1.0`
+    - [Stork search](https://github.com/jameslittle230/stork/blob/master/license.txt) `SPDX-License-Identifier: Apache-2.0`
+    - [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE) `SPDX-License-Identifier: MIT`
+    - Various SVG icons are from [Heroicons](https://github.com/tailwindlabs/heroicons/blob/master/LICENSE) `SPDX-License-Identifier: MIT`

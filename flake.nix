@@ -12,7 +12,6 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
-    nix-health.url = "github:juspay/nix-health?dir=module";
 
     ema.url = "github:srid/ema";
     ema.inputs.nixpkgs.follows = "nixpkgs";
@@ -42,7 +41,6 @@
         inputs.haskell-flake.flakeModule
         inputs.flake-root.flakeModule
         inputs.treefmt-nix.flakeModule
-        inputs.nix-health.flakeModule
         ./nix/flake-module.nix
       ];
 
@@ -92,7 +90,7 @@
             tagtree.jailbreak = true;
             tailwind.broken = false;
             tailwind.jailbreak = true;
-            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder 
+            unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
             emanote = { name, pkgs, self, super, ... }: {
               check = false;
               extraBuildDepends = [ pkgs.stork ];
@@ -108,7 +106,7 @@
                 longDescription = ''
                   Emanote is a tool for generating a structured view of your
                   plain-text notes on the web, as a statically generated
-                  website as well as a local live server. 
+                  website as well as a local live server.
 
                   For editing notes, you can use any text editor of your
                   choice including the likes of Obsidian.
@@ -149,29 +147,31 @@
               inputsFrom = [
                 config.haskellProjects.default.outputs.devShell
                 config.treefmt.build.devShell
-                config.nix-health.outputs.devShell
               ];
               packages = with pkgs; [
                 just
               ];
             });
 
-        apps.check-closure-size.program = pkgs.writeShellApplication {
-          name = "emanote-check-closure-size";
-          runtimeInputs = [ pkgs.jq pkgs.bc pkgs.nix ];
-          meta.description = "Check that emanote's nix closure size remains reasonably small";
-          text = ''
-            MAX_CLOSURE_SIZE=$(echo "600 * 1000000" | bc)
-            CLOSURE_SIZE=$(nix path-info --json -S .#default | jq '.[0]'.closureSize)
-            echo "Emanote closure size: $CLOSURE_SIZE"
-            echo "    Max closure size: $MAX_CLOSURE_SIZE"
-            if [ "$CLOSURE_SIZE" -gt "$MAX_CLOSURE_SIZE" ]; then
-                echo "ERROR: Emanote's nix closure size has increased"
-                exit 3
-            else
-                echo "OK: Emanote's nix closure size is within limits"
-            fi
-          '';
+        apps.check-closure-size = rec {
+          inherit (program) meta;
+          program = pkgs.writeShellApplication {
+            name = "emanote-check-closure-size";
+            runtimeInputs = [ pkgs.jq pkgs.bc pkgs.nix ];
+            meta.description = "Check that emanote's nix closure size remains reasonably small";
+            text = ''
+              MAX_CLOSURE_SIZE=$(echo "600 * 1000000" | bc)
+              CLOSURE_SIZE=$(nix path-info --json -S .#default | jq '.[0]'.closureSize)
+              echo "Emanote closure size: $CLOSURE_SIZE"
+              echo "    Max closure size: $MAX_CLOSURE_SIZE"
+              if [ "$CLOSURE_SIZE" -gt "$MAX_CLOSURE_SIZE" ]; then
+                  echo "ERROR: Emanote's nix closure size has increased"
+                  exit 3
+              else
+                  echo "OK: Emanote's nix closure size is within limits"
+              fi
+            '';
+          };
         };
 
         emanote = {
@@ -191,6 +191,17 @@
         templates.default = {
           description = "A simple flake.nix template for emanote notebooks";
           path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
+        };
+        om.ci.default = {
+          emanote = {
+            dir = ".";
+            steps.custom = {
+              closure-size = {
+                type = "app";
+                name = "check-closure-size";
+              };
+            };
+          };
         };
       };
     };
