@@ -2,22 +2,9 @@
 {
   imports = [
     inputs.haskell-flake.flakeModule
-    inputs.flake-root.flakeModule
-    inputs.treefmt-nix.flakeModule
   ];
 
   perSystem = { pkgs, lib, config, system, ... }: {
-    _module.args = import inputs.nixpkgs {
-      inherit system;
-      overlays = [
-        (self: super: {
-          # Stork is marked as broken on intel mac, but it does work.
-          # Unfortunately we cannot test this code PATH due to lack of CI for intel mac (#335).
-          stork = if system == "x86_64-darwin" then super.stork.overrideAttrs (_oa: { meta.broken = false; }) else super.stork;
-        })
-      ];
-    };
-
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -78,43 +65,8 @@
       };
     };
 
-    # Autoformatter configuration: https://nixos.asia/en/treefmt
-    treefmt.config = {
-      inherit (config.flake-root) projectRootFile;
-      package = pkgs.treefmt;
-
-      programs.ormolu.enable = true;
-      programs.nixpkgs-fmt.enable = true;
-      programs.cabal-fmt.enable = true;
-      programs.hlint.enable = true;
-
-      # We use fourmolu
-      programs.ormolu.package = pkgs.haskellPackages.fourmolu;
-      settings.formatter.ormolu = {
-        options = [
-          "--ghc-opt"
-          "-XImportQualifiedPost"
-          "--ghc-opt"
-          "-XTypeApplications"
-        ];
-      };
-    };
-
     packages.default = config.packages.emanote;
     apps.default = config.apps.emanote;
-    devShells.default =
-      lib.addMetaAttrs { description = "Emanote development environment"; }
-        (pkgs.mkShell {
-          name = "emanote-dev";
-          inputsFrom = [
-            config.haskellProjects.default.outputs.devShell
-            config.treefmt.build.devShell
-          ];
-          packages = with pkgs; [
-            just
-          ];
-        });
-
     apps.check-closure-size = rec {
       inherit (program) meta;
       program = pkgs.writeShellApplication {
@@ -133,38 +85,6 @@
               echo "OK: Emanote's nix closure size is within limits"
           fi
         '';
-      };
-    };
-
-    emanote = {
-      package = config.packages.default;
-      sites = {
-        "docs" = {
-          layers = [{ path = ./docs; pathString = "./docs"; }];
-          allowBrokenLinks = true; # A couple, by design, in markdown.md
-          prettyUrls = true;
-        };
-      };
-    };
-
-  };
-
-  flake = {
-    homeManagerModule = import (root + /nix/home-manager-module.nix);
-    flakeModule = (root + /nix/flake-module.nix);
-    templates.default = {
-      description = "A simple flake.nix template for emanote notebooks";
-      path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
-    };
-    om.ci.default = {
-      emanote = {
-        dir = ".";
-        steps.custom = {
-          closure-size = {
-            type = "app";
-            name = "check-closure-size";
-          };
-        };
       };
     };
   };
