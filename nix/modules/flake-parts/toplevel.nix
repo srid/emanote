@@ -1,7 +1,7 @@
 { root, inputs, ... }:
 {
   flake = {
-    homeManagerModule = import (root + /nix/home-manager-module.nix);
+    homeManagerModule = import (root + /nix/modules/home/emanote.nix);
     flakeModule = (root + /nix/modules/flake-parts/flake-module.nix);
     templates.default = {
       description = "A simple flake.nix template for emanote notebooks";
