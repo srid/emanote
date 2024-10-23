@@ -30,16 +30,12 @@ jobs:
         run: |
           om ci --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" run --systems "${{ matrix.system }}"
   flake-parts-docs:
-    if: false # Currently fails in CI
     runs-on: x86_64-linux
     steps:
       - name: Docs for flake.parts
         run: |
           # TODO: Define this in nixci itself.
-          nix build \
-            github:hercules-ci/flake.parts-website#generated-docs-emanote \
-            --override-input emanote ../emanote/ \
-            --show-trace
+          nix build github:hercules-ci/flake.parts-website#checks.x86_64-linux.linkcheck --override-input emanote .
 
   website:
     if: github.ref == 'refs/heads/master'
