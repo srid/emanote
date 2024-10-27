@@ -45,5 +45,4 @@ ignorePatterns =
     -- Any top-level Nix flake files
     "flake.nix"
   , "flake.lock"
-  , ".direnv"
   ]
