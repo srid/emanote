@@ -19,7 +19,7 @@
 
       # Run this script in the CI to publish a new image
       apps = lib.optionalAttrs pkgs.stdenv.isLinux { 
-        publish-container-release = pkgs.writeShellScriptBin "emanote-release" ''
+        publish-container-release.program = pkgs.writeShellScriptBin "emanote-release" ''
           set -e
           export PATH=$PATH:${pkgs.gzip}/bin:${pkgs.skopeo}/bin
           IMAGE="docker://${container-name}"
