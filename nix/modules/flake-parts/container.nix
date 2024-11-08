@@ -13,13 +13,13 @@
           "org.opencontainers.image.source" = "https://github.com/srid/emanote";
         };
       };
-    in lib.optionalAttrs pkgs.stdenv.isLinux {
+    in {
       # Load the container locally with: `nix build .#container && ./result | podman load`
-      packages.container = container;
+      packages = lib.optionalAttrs pkgs.stdenv.isLinux { container = container };
 
       # Run this script in the CI to publish a new image
-      apps.publish-container-release =
-        pkgs.writeShellScriptBin "emanote-release" ''
+      apps = lib.optionalAttrs pkgs.stdenv.isLinux { 
+        publish-container-release = pkgs.writeShellScriptBin "emanote-release" ''
           set -e
           export PATH=$PATH:${pkgs.gzip}/bin:${pkgs.skopeo}/bin
           IMAGE="docker://${container-name}"
@@ -33,5 +33,6 @@
           echo "Tagging latest"
           skopeo copy $IMAGE:${emanote.version} $IMAGE:latest
         '';
+      };
     };
 }
