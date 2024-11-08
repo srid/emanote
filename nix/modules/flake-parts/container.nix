@@ -1,5 +1,5 @@
 { root, ... }: {
-  perSystem = { pkgs, config, ... }:
+  perSystem = { pkgs, config, lib, ... }:
     let
       emanote = config.packages.emanote;
       container-name = "ghcr.io/srid/emanote";
@@ -13,7 +13,7 @@
           "org.opencontainers.image.source" = "https://github.com/srid/emanote";
         };
       };
-    in {
+    in lib.optionalAttrs pkgs.stdenv.isLinux {
       # Load the container locally with: `nix build .#container && ./result | podman load`
       packages.container = container;
 
