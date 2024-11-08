@@ -16,10 +16,10 @@
     in
     {
       # Load the container locally with: `nix build .#container && ./result | podman load`
-      packages = lib.optionalAttrs pkgs.stdenv.isLinux { container = container; };
+      packages = { container = container; };
 
       # Run this script in the CI to publish a new image
-      apps = lib.optionalAttrs pkgs.stdenv.isLinux {
+      apps = {
         publish-container-release.program = pkgs.writeShellScriptBin "emanote-release" ''
           set -e
           export PATH=$PATH:${pkgs.gzip}/bin:${pkgs.skopeo}/bin
