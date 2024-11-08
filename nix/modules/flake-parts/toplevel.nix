@@ -7,13 +7,15 @@
       description = "A simple flake.nix template for emanote notebooks";
       path = builtins.path { path = inputs.emanote-template; filter = path: _: baseNameOf path == "flake.nix"; };
     };
-    om.ci.default = {
-      emanote = {
-        dir = ".";
-        steps.custom = {
-          closure-size = {
-            type = "app";
-            name = "check-closure-size";
+    om = {
+      ci.default = {
+        emanote = {
+          dir = ".";
+          steps.custom = {
+            closure-size = {
+              type = "app";
+              name = "check-closure-size";
+            };
           };
         };
       };
