@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set XDG_RUNTIME_DIR
-        run: echo "XDG_RUNTIME_DIR=/run/user/$UID" >> $GITHUB_ENV
+        run: echo "XDG_RUNTIME_DIR=$HOME/.xdg-runtime" >> $GITHUB_ENV
       - name: Push Image
         run: nix run ".#publish-container-release"
         env:
