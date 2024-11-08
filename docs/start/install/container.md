@@ -1,3 +1,7 @@
+---
+slug: container
+---
+
 # Using Container
 
 Emanote provides a standalone container.
