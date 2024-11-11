@@ -6,8 +6,8 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -15,11 +15,7 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     ema.url = "github:srid/ema";
-    ema.inputs.nixpkgs.follows = "nixpkgs";
-    ema.inputs.haskell-flake.follows = "haskell-flake";
-    ema.inputs.flake-parts.follows = "flake-parts";
-    ema.inputs.treefmt-nix.follows = "treefmt-nix";
-    ema.inputs.flake-root.follows = "flake-root";
+    ema.flake = false;
 
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
