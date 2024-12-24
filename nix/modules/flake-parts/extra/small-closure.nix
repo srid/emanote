@@ -3,7 +3,12 @@
 let
   allowedSystems = [
     "x86_64-linux"
-    "aarch64-darwin"
+
+    # Disabling on macOS due to upstream bug:
+    # - https://github.com/NixOS/nixpkgs/issues/318013
+    # - https://github.com/NixOS/nixpkgs/pull/304352
+    # - Related: https://github.com/NixOS/nix/pull/10877
+    # "aarch64-darwin"
   ];
 in
 {
