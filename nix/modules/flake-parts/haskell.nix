@@ -76,7 +76,7 @@
         meta.description = "Check that emanote's nix closure size remains reasonably small";
         text = ''
           MAX_CLOSURE_SIZE=$(echo "600 * 1000000" | bc)
-          CLOSURE_SIZE=$(nix path-info --json -S .#default | jq '.[0]'.closureSize)
+          CLOSURE_SIZE=$(nix path-info --json -S .#default | jq 'first(.[])'.closureSize)
           echo "Emanote closure size: $CLOSURE_SIZE"
           echo "    Max closure size: $MAX_CLOSURE_SIZE"
           if [ "$CLOSURE_SIZE" -gt "$MAX_CLOSURE_SIZE" ]; then
