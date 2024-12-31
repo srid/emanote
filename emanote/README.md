@@ -2,7 +2,6 @@
 
 [![AGPL](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://en.wikipedia.org/wiki/Affero_General_Public_License)
 [![built with nix](https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos&labelColor=73C3D5)](https://builtwithnix.org)
-[![Matrix](https://img.shields.io/matrix/ema:matrix.org)](https://app.element.io/#/room/#ema:matrix.org "Chat on Matrix")
 [![Harmeless Code of Conduct](https://img.shields.io/badge/harmless-8A2BE2)](https://srid.ca/coc "This project follows the 'Harmlessness Code of Conduct'")
 
 Emanote emanates[^def] a structured view of your plain-text notes.
@@ -35,9 +34,8 @@ You may want to run `nix run github:juspay/omnix ci run` before opening a PR, bu
 
 ## Discussion
 
-To discuss the emanote project, [join Matrix][matrix] or post in [GitHub Discussions][ghdiscuss].
+To discuss the emanote project, post in [GitHub Discussions][ghdiscuss].
 
-[matrix]: https://matrix.to/#/#ema:matrix.org
 [ghdiscuss]: https://github.com/srid/emanote/discussions
 
 [^licenses]: Emanote uses software and resources that are licensed differently, viz.:
