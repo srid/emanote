@@ -14,7 +14,7 @@
     flake-root.url = "github:srid/flake-root";
     nixos-unified.url = "github:srid/nixos-unified";
 
-    ema.url = "github:srid/ema";
+    ema.url = "github:srid/ema/idiomorph";
     ema.flake = false;
 
     heist-extra.url = "github:srid/heist-extra";
