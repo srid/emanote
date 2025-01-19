@@ -31,6 +31,8 @@
   - Stork search fixes
     - Fix empty stork index generation when using more than 1 layer ([\#493](https://github.com/srid/emanote/issues/493))
     - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
+- Performance
+  - Browser-side performance improvement using `idiomorph` ([\#567](https://github.com/srid/emanote/pull/567))
 - UI
   - prevent the external link icon from wrapping ([\#528](https://github.com/srid/emanote/pull/528))
 - Update ema, new use newer morphdom (2.7.2)
