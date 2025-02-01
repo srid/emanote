@@ -33,9 +33,11 @@
     - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
 - Performance
   - Browser-side performance improvement using `idiomorph` ([\#567](https://github.com/srid/emanote/pull/567))
+  - Fix memory leak and performance gradation overtime in the browser due to Tailwind when using live server ([\#569](https://github.com/srid/emanote/pull/569))
 - UI
   - prevent the external link icon from wrapping ([\#528](https://github.com/srid/emanote/pull/528))
-- Update ema, new use newer morphdom (2.7.2)
+  - [live server] Update Tailwind CDN to 3.4.16
+- Update ema (2.7.2)
 
 ## 1.2.0.0 (2023-08-24)
 
@@ -73,7 +75,7 @@
 - UI
   - Index pages are no longer marked as 'experimental'
   - Add external link icon to external links (this behaviour is customizable). [\#189](https://github.com/srid/emanote/pull/189)
-  - `js.mermaid` snippet uses the "module" script tag approach, which is added to end of `<body>`. See [here](https://mermaid-js.github.io/mermaid/#/n00b-gettingStarted?id=_3-calling-the-javascript-api). 
+  - `js.mermaid` snippet uses the "module" script tag approach, which is added to end of `<body>`. See [here](https://mermaid-js.github.io/mermaid/#/n00b-gettingStarted?id=_3-calling-the-javascript-api).
   - Align dates in timeline queries
 - Configuration
   - Add `page.bodyHtml` option to inject custom HTML at the end of `<body>` tag.
