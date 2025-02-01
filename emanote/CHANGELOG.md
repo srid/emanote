@@ -33,6 +33,7 @@
     - Stork search index is now uses note path from their associated layer ([\#495](https://github.com/srid/emanote/pull/495))
 - Performance
   - Browser-side performance improvement using `idiomorph` ([\#567](https://github.com/srid/emanote/pull/567))
+  - Fix memory leak and performance gradation overtime in the browser due to Tailwind when using live server ([\#569](https://github.com/srid/emanote/pull/569))
 - UI
   - prevent the external link icon from wrapping ([\#528](https://github.com/srid/emanote/pull/528))
   - [live server] Update Tailwind CDN to 3.4.16

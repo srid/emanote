@@ -10,7 +10,8 @@ module Emanote.View.Common (
   TemplateRenderCtx (..),
   mkTemplateRenderCtx,
   defaultRouteMeta,
-) where
+)
+where
 
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Syntax ((##))
@@ -53,7 +54,7 @@ data TemplateRenderCtx n = TemplateRenderCtx
   }
 
 {- | Create the context in which Heist templates (notably `pandoc.tpl`) will be
- rendered.
+rendered.
 -}
 mkTemplateRenderCtx ::
   -- | Current model.
@@ -198,6 +199,7 @@ commonSplices withCtx model meta routeTitle = do
               $ SR.staticFileSiteRoute
               $ LiveServerFiles.tailwindJsFile model
       H.script
+        ! H.customAttribute "data-ema-skip" "true"
         ! A.src (H.toValue localCdnUrl)
         $ mempty
 
