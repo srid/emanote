@@ -191,9 +191,6 @@ On default theme, an anchor is displayed when you hover on the heading allowing 
 
 ###### Level 6
 
->[!warning] Live server behaviour
-> When running in the live server (not static site), you may find that scrolling to heading anchors is glitchy. This is a known issue that you can help resolve; [see here](https://github.com/srid/emanote/pull/500#issuecomment-1907363245).
-
 ## More extensions
 
 :::{.flex-row .space-y-8}
