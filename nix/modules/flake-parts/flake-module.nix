@@ -1,5 +1,5 @@
 # A flake-parts module for building and running Emanote sites
-{ self, config, lib, flake-parts-lib, ... }:
+{ lib, flake-parts-lib, ... }:
 
 let
   inherit (flake-parts-lib)

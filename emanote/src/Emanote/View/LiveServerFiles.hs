@@ -2,7 +2,8 @@ module Emanote.View.LiveServerFiles (
   isLiveServerFile,
   tailwindFullJsPath,
   tailwindJsFile,
-) where
+)
+where
 
 import Data.Text qualified as T
 import Emanote.Model.StaticFile (StaticFile)
@@ -15,7 +16,7 @@ baseDir :: FilePath
 baseDir = "_emanote-live-server"
 
 tailwindFullJsPath :: FilePath
-tailwindFullJsPath = baseDir <> "/tailwind/tailwind.min.js"
+tailwindFullJsPath = baseDir <> "/tailwind/tailwind.cdn.js"
 
 isLiveServerFile :: FilePath -> Bool
 isLiveServerFile (toText -> fp) =
