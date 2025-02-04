@@ -63,3 +63,15 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+  container:
+    # if: github.ref == 'refs/heads/master'
+    runs-on: x86_64-linux
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set XDG_RUNTIME_DIR
+        run: mkdir ~/.xdg-runtime && echo "XDG_RUNTIME_DIR=$HOME/.xdg-runtime" >> $GITHUB_ENV
+      - name: Push Image
+        run: nix run ".#publish-container-release"
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
