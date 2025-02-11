@@ -1,0 +1,5 @@
+{
+  imports = [
+    ./small-closure.nix
+  ];
+}
