@@ -82,6 +82,16 @@
       --callout-color: 233, 49, 71;
     }
 
+    .callout[data-callout="quote"] {
+      --callout-color: 158, 158, 158;
+    }
+
+    /* To prevent overemphasis of link styles in callout titles */
+    .callout .callout-title a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
     div.callout {
       background-color: rgba(var(--callout-color), 0.1);
     }

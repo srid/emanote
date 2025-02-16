@@ -169,6 +169,14 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 >
 > Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
+> [!quote]
+>
+> Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> [!quote] Richard [said](https://www.actualfreedom.com.au/library/topics/pce.htm),
+>
+> A PCE is when one’s sense of identity temporarily vacates the throne and apperception occurs. [Apperception](https://www.actualfreedom.com.au/sundry/frequentquestions/FAQ38.htm) is the mind’s perception of itself … it is a pure awareness.
+
 Callouts also work with [[orgmode]] syntax.
 
 {#hanchor}
