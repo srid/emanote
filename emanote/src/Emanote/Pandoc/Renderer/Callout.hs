@@ -52,6 +52,7 @@ data CalloutType
   | Tip
   | Warning
   | Failure
+  | Quote
   deriving stock (Eq, Ord, Show, Enum, Bounded)
 
 instance Default CalloutType where
