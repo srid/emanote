@@ -3,7 +3,7 @@
   href="${ema:emanoteStaticLayerUrl}/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf" as="font"
   type="font/ttf" crossorigin>
 
-<style>
+<style data-category="fonts">
   @font-face {
     font-family: 'WorkSans';
     /* FIXME: This ought to be: ${ema:emanoteStaticLayerUrl}/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf */
