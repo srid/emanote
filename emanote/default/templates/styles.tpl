@@ -74,7 +74,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 0.5em;
-    font-variation-settings: 'wght' 600;
+    font-variation-settings: var(--font-variation-bold);
   }
 
   div.callout-title div.callout-title-inner {
