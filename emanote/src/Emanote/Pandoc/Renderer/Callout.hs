@@ -33,10 +33,11 @@ calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
 calloutResolvingSplice _model _nr ctx _noteRoute blk = do
   B.BlockQuote blks <- pure blk
   callout <- parseCallout blks
+  let calloutType = T.toLower $ show $ type_ callout
   pure $ do
-    tpl <- HE.lookupHtmlTemplateMust "/templates/filters/callout"
+    tpl <- HE.lookupHtmlTemplateMust $ "/templates/filters/callout/" <> encodeUtf8 calloutType
     HE.runCustomTemplate tpl $ do
-      "callout:type" ## HI.textSplice (T.toLower $ show $ type_ callout)
+      "callout:type" ## HI.textSplice calloutType
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
       "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
       "query" ##
