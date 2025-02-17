@@ -24,31 +24,6 @@
 </style>
 
 <style data-category="callout">
-  /* Define colour variables */
-  .callout[data-callout="note"] {
-    --callout-color: 8, 109, 221;
-  }
-
-  .callout[data-callout="info"] {
-    --callout-color: 8, 109, 221;
-  }
-
-  .callout[data-callout="tip"] {
-    --callout-color: 8, 191, 188;
-  }
-
-  .callout[data-callout="warning"] {
-    --callout-color: 236, 117, 0;
-  }
-
-  .callout[data-callout="failure"] {
-    --callout-color: 233, 49, 71;
-  }
-
-  .callout[data-callout="quote"] {
-    --callout-color: 158, 158, 158;
-  }
-
   /* To prevent overemphasis of link styles in callout titles */
   .callout .callout-title a {
     color: inherit;
