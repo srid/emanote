@@ -11,7 +11,7 @@
               <span data-nosnippet class="mr-2 text-right text-gray-600">
               </span>
             </ema:note:metadata>
-            <a class="flex-1 text-${theme}-600 mavenLinkBold border-l-2 pl-2 hover:underline"
+            <a class="flex-1 text-${theme}-600 emanoteBoldLink border-l-2 pl-2 hover:underline"
               href="${ema:note:url}">
               <ema:note:title />
             </a>

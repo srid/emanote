@@ -25,12 +25,7 @@
 
 <style data-category="callout">
   /* Callouts */
-  div.callout {
-    background-color: #f5f5f5;
-    padding: 1em 1em 0.5em;
-    border-radius: 0.5em;
-    margin-bottom: 1em;
-  }
+
 
   .callout[data-callout="note"] {
     --callout-color: 8, 109, 221;
@@ -68,17 +63,6 @@
 
   .callout .callout-title {
     color: rgb(var(--callout-color));
-  }
-
-  div.callout-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5em;
-    font-variation-settings: var(--font-variation-bold);
-  }
-
-  div.callout-title div.callout-title-inner {
-    margin-left: 0.5em;
   }
 </style>
 

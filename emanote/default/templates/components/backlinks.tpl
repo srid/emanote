@@ -4,7 +4,7 @@
     <ul class="space-y-1">
       <backlink>
         <li>
-          <a class="text-${theme}-600 mavenLinkBold hover:bg-${theme}-50"
+          <a class="text-${theme}-600 emanoteBoldLink hover:bg-${theme}-50"
             href="${backlink:note:url}">
             <backlink:note:title />
           </a>

@@ -22,10 +22,11 @@
     --font-variation-link: 'wght' 400;
   }
 
-  a.mavenLinkBold {
+  .emanoteBoldLink {
     font-variation-settings: var(--font-variation-link);
   }
 
+  .emanoteBold,
   strong {
     font-variation-settings: var(--font-variation-bold);
   }
