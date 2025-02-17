@@ -9,7 +9,7 @@
     <div class="callout-icon">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
-        <apply template="/templates/filters/callout-icon-${callout:type}" />
+        <apply template="/templates/filters/callout/${callout:type}" />
       </svg>
     </div>
     <div class="ml-2">

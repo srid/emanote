@@ -34,13 +34,13 @@ calloutResolvingSplice _model _nr ctx _noteRoute blk = do
   B.BlockQuote blks <- pure blk
   callout <- parseCallout blks
   pure $ do
-    tpl <- HE.lookupHtmlTemplateMust "/templates/filters/callout"
+    tpl <- HE.lookupHtmlTemplateMust "/templates/filters/callout/_main"
     HE.runCustomTemplate tpl $ do
       "callout:type" ## HI.textSplice (T.toLower $ show $ type_ callout)
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
       "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
-      "query" ##
-        HI.textSplice (show blks)
+      "query"
+        ## HI.textSplice (show blks)
 
 {- | Obsidian callout type
 
