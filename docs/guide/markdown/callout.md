@@ -43,6 +43,6 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 
 Callouts also work with [[orgmode]] syntax.
 
-## Customizing callouts {#custom}
+## Custom callouts {#custom}
 
-To customize their structure and styling, change `callout.tpl` (and `base.tpl`) in [[html-template|HTML templates]]. Want to add additional callout types to Emanote? See [this PR](https://github.com/srid/emanote/pull/571) as example.
+To add a new custom callout named `foo` (viz.: `[!foo] ...`), create a `/templates/filters/callout/foo.tpl` file in your [[html-template|templates]] folder. You can also change the layout and styling of existing callout types in [`/templates/filters/callout/*.tpl`](https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout).
