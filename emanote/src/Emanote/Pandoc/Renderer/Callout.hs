@@ -40,8 +40,8 @@ calloutResolvingSplice _model _nr ctx _noteRoute blk = do
       "callout:type" ## HI.textSplice calloutType
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
       "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
-      "query"
-        ## HI.textSplice (show blks)
+      "query" ##
+        HI.textSplice (show blks)
 
 {- | Obsidian callout type
 
