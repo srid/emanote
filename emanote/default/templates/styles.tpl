@@ -24,9 +24,7 @@
 </style>
 
 <style data-category="callout">
-  /* Callouts */
-
-
+  /* Define colour variables */
   .callout[data-callout="note"] {
     --callout-color: 8, 109, 221;
   }
@@ -55,14 +53,6 @@
   .callout .callout-title a {
     color: inherit;
     text-decoration: underline;
-  }
-
-  div.callout {
-    background-color: rgba(var(--callout-color), 0.1);
-  }
-
-  .callout .callout-title {
-    color: rgb(var(--callout-color));
   }
 </style>
 
