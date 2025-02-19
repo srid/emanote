@@ -17,8 +17,9 @@ page:
 [Emanote][gh] enables you to **create beautiful websites** -- such as *personal webpage*, *blog*, *wiki*, *Zettelkasten*, *notebook*, *knowledge-base*, *documentation*, etc. from future-proof **plain-text notes** and arbitrary data -- with live preview that updates in real-time. It aims to be next-gen [neuron](https://neuron.zettel.page/) with powerful features.
 :::
 
-
-[[start|Get started]]{.flex .justify-center .items-center .my-8 .text-3xl}
+:::{.flex .justify-center .items-center .my-8 .text-3xl}
+[[start|Get started]]
+:::
 
 
 [gh]: https://github.com/srid/emanote
