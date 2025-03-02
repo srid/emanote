@@ -26,6 +26,7 @@
   - Enable auto identifier for org files ([\#502](https://github.com/srid/emanote/pull/502))
   - Support date metadata from the filename when it begins with YYYY-MM-DD ([\#552](https://github.com/srid/emanote/pull/552)).
   - Support for `<kbd>` rendering https://github.com/srid/heist-extra/pull/8
+  - Daily notes automatically get a hierarchical tag.
 - Bug fixes:
   - Emanote no longer crashes when run on an empty directory ([\#487](https://github.com/srid/emanote/issues/487))
   - Stork search fixes
