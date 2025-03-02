@@ -16,6 +16,8 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
+import Data.Time.Calendar (toGregorian)
+import Emanote.Model.Calendar.Parser qualified as Calendar
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
@@ -39,6 +41,7 @@ import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
 import Text.Parsec qualified as P
+import Text.Printf (printf)
 import UnliftIO.Directory (doesPathExist)
 
 data Feed = Feed
@@ -315,7 +318,7 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
-        parseNoteMarkdown scriptingEngine pluginBaseDir fp s
+        parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
@@ -345,8 +348,15 @@ parseNoteOrg s =
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]
 
-parseNoteMarkdown :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [FilePath] -> FilePath -> Text -> WriterT [Text] m (Pandoc, Aeson.Value)
-parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
+parseNoteMarkdown ::
+  (MonadIO m, MonadLogger m) =>
+  ScriptingEngine ->
+  [FilePath] ->
+  R.LMLRoute ->
+  FilePath ->
+  Text ->
+  WriterT [Text] m (Pandoc, Aeson.Value)
+parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
@@ -370,7 +380,7 @@ parseNoteMarkdown scriptingEngine pluginBaseDir fp md = do
           (x : _) -> pure $ Just x
 
       doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
-      let meta = applyNoteMetaFilters doc frontmatter
+      let meta = applyNoteMetaFilters doc r frontmatter
       pure (doc, meta)
   where
     withAesonDefault default_ mv =
@@ -381,24 +391,36 @@ defaultFrontMatter :: Aeson.Value
 defaultFrontMatter =
   Aeson.toJSON $ Map.fromList @Text @[Text] $ one ("tags", [])
 
-applyNoteMetaFilters :: Pandoc -> Aeson.Value -> Aeson.Value
-applyNoteMetaFilters doc =
-  addTagsFromBody
+applyNoteMetaFilters :: Pandoc -> R.LMLRoute -> Aeson.Value -> Aeson.Value
+applyNoteMetaFilters doc r =
+  addTagsFromMarkdown
     >>> addDescriptionFromBody
     >>> addImageFromBody
   where
-    -- Merge frontmatter tags with inline tags in Pandoc document.
     -- DESIGN: In retrospect, this is like a Pandoc lua filter?
-    addTagsFromBody frontmatter =
+    addTagsFromMarkdown frontmatter =
       frontmatter
         & AO.key "tags"
         % AO._Array
         .~ ( fromList
               . fmap Aeson.toJSON
               $ ordNub
-              $ SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
-              <> HT.inlineTagsInPandoc doc
+              $ mconcat
+                [ tagsFromFrontmatter frontmatter
+                , -- Include inline tags from note body
+                  tagsFromBody
+                , -- Include tags for daily notes
+                  tagsForDailyNote
+                ]
            )
+    tagsFromFrontmatter =
+      SData.lookupAeson @[HT.Tag] mempty (one "tags")
+    tagsFromBody = HT.inlineTagsInPandoc doc
+    tagsForDailyNote = maybe mempty dayTags $ Calendar.parseRouteDay r
+    dayTags day =
+      let (y, m, d) = toGregorian day
+          pad2 = toText @String . printf "%02d"
+       in [HT.Tag $ "calendar/" <> show y <> "/" <> pad2 m <> "/" <> pad2 d]
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
         B.Para is -> [WL.plainify is]
