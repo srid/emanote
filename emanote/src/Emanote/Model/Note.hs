@@ -418,9 +418,9 @@ applyNoteMetaFilters doc r =
     tagsFromBody = HT.inlineTagsInPandoc doc
     tagsForDailyNote = maybe mempty dayTags $ Calendar.parseRouteDay r
     dayTags day =
-      let (y, m, d) = toGregorian day
+      let (y, m, _d) = toGregorian day
           pad2 = toText @String . printf "%02d"
-       in [HT.Tag $ "calendar/" <> show y <> "/" <> pad2 m <> "/" <> pad2 d]
+       in [HT.Tag $ "calendar/" <> show y <> "/" <> pad2 m]
     addDescriptionFromBody =
       overrideAesonText ("page" :| ["description"]) $ \case
         B.Para is -> [WL.plainify is]
