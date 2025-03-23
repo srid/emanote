@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.system }}
     strategy:
       matrix:
-        system: [aarch64-darwin, x86_64-linux]
+        system: [aarch64-darwin, x86_64-linux, aarch64-linux]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
