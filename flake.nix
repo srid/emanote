@@ -14,7 +14,7 @@
     flake-root.url = "github:srid/flake-root";
     nixos-unified.url = "github:srid/nixos-unified";
 
-    ema.url = "github:srid/ema/lvar-simplified";
+    ema.url = "github:srid/ema";
     ema.flake = false;
     lvar.url = "github:srid/lvar";
     lvar.flake = false;
