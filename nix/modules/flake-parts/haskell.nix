@@ -25,6 +25,7 @@
         ema.source = inputs.ema + /ema;
         ema-generics.source = inputs.ema + /ema-generics;
         ema-extra.source = inputs.ema + /ema-extra;
+        lvar.source = inputs.lvar;
       };
 
       settings = {
