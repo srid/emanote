@@ -35,11 +35,11 @@
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1738428103,
-        "narHash": "sha256-vZgaNI0y6IKnWDSLFsl7mwSUZ3ONgduclQkB6WK0VMo=",
+        "lastModified": 1745123527,
+        "narHash": "sha256-FD6GJaiiKkH65N7iDjHtOtaEcWMf1P/t98kktILSkcg=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "4478e88d33126ef0b478b2980a71592b8f9afd6b",
+        "rev": "8590cc91e1f3dc3e10409d914c40a484645a2680",
         "type": "github"
       },
       "original": {
@@ -130,6 +130,22 @@
         "type": "github"
       }
     },
+    "lvar": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1745122737,
+        "narHash": "sha256-ZnYXkkPmnNvt4tA45JgSC7dpttmqhUo4AHfEjB1r1gE=",
+        "owner": "srid",
+        "repo": "lvar",
+        "rev": "047a24c4dcd7f85f9c18058f6be991cea531870e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "lvar",
+        "type": "github"
+      }
+    },
     "nixos-unified": {
       "locked": {
         "lastModified": 1729697921,
@@ -171,6 +187,7 @@
         "flake-root": "flake-root",
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
+        "lvar": "lvar",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix",
