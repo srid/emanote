@@ -17,9 +17,6 @@
     ema.url = "github:srid/ema/lvar-simplified";
     ema.flake = false;
 
-    lvar.url = "github:srid/lvar/simplify";
-    lvar.flake = false;
-
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
 
