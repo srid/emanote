@@ -21,6 +21,7 @@
         fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
         ghcid.source = "0.8.8";
         heist-extra.source = inputs.heist-extra;
+        lvar.source = inputs.lvar;
 
         ema.source = inputs.ema + /ema;
         ema-generics.source = inputs.ema + /ema-generics;

@@ -130,6 +130,23 @@
         "type": "github"
       }
     },
+    "lvar": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1745106020,
+        "narHash": "sha256-z0XLcs4uOolSOe3Flsxz81onlVqp5Ax25Y4+Gw0jcJE=",
+        "owner": "srid",
+        "repo": "lvar",
+        "rev": "317b1ff723ac4ebe8e5565d8001716e396011606",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "ref": "simplify",
+        "repo": "lvar",
+        "type": "github"
+      }
+    },
     "nixos-unified": {
       "locked": {
         "lastModified": 1729697921,
@@ -171,6 +188,7 @@
         "flake-root": "flake-root",
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
+        "lvar": "lvar",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix",
