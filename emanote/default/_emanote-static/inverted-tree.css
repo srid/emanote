@@ -9,18 +9,18 @@ body .tree.flipped {
   -o-transform: rotate(180deg);
   transform: rotate(180deg);
 }
+
 body .tree {
   overflow: auto;
   /* See more-head.tpl */
-  font-family: 'WorkSans', sans-serif;
-  font-variation-settings: 'wght' 475;
-
   font-size: 0.8em;
 }
+
 body .tree ul.root {
   padding-top: 0px;
   margin-top: 0px;
 }
+
 body .tree ul {
   position: relative;
   padding: 1em 0px 0px 0px;
@@ -28,14 +28,17 @@ body .tree ul {
   margin: 0px auto 0px auto;
   text-align: center;
 }
+
 body .tree ul::after {
   content: "";
   display: table;
   clear: both;
 }
+
 body .tree ul:last-child {
   padding-bottom: 0.1em;
 }
+
 body .tree li {
   display: inline-block;
   vertical-align: top;
@@ -44,6 +47,7 @@ body .tree li {
   position: relative;
   padding: 1em 0.5em 0em 0.5em;
 }
+
 body .tree li::before {
   content: "";
   position: absolute;
@@ -53,6 +57,7 @@ body .tree li::before {
   width: 60%;
   height: 1.19999em;
 }
+
 body .tree li::after {
   content: "";
   position: absolute;
@@ -62,35 +67,44 @@ body .tree li::after {
   width: 50%;
   height: 1.19999em;
 }
+
 body .tree li::after {
   right: auto;
   left: 50%;
   border-left: solid 2px #cccccc;
 }
+
 body .tree li:only-child {
   padding-top: 0em;
 }
+
 body .tree li:only-child::after {
   display: none;
 }
+
 body .tree li:only-child::before {
   display: none;
 }
+
 body .tree li:first-child::before {
   border-style: none;
   border-width: 0px;
 }
+
 body .tree li:first-child::after {
   border-radius: 5px 0px 0px 0px;
 }
+
 body .tree li:last-child::after {
   border-style: none;
   border-width: 0px;
 }
+
 body .tree li:last-child::before {
   border-right: solid 2px #cccccc;
   border-radius: 0px 5px 0px 0px;
 }
+
 body .tree ul ul::before {
   content: "";
   position: absolute;
@@ -100,6 +114,7 @@ body .tree ul ul::before {
   width: 0px;
   height: 1.19999em;
 }
+
 body .tree li div.forest-link {
   border: solid 2px #cccccc;
   padding: 0.2em 0.29999em 0.2em 0.29999em;
@@ -109,6 +124,7 @@ body .tree li div.forest-link {
   position: relative;
   top: 2px;
 }
+
 body .tree.flipped li div.forest-link {
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);

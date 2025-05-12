@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/flat.css" />
 <!-- Custom Stork-search styling for Emanote -->
-<style>
+<style data-category="stork">
   #stork-search-container {
     z-index: 1000;
     background-color: rgb(15 23 42/.8);

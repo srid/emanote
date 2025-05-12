@@ -1,11 +1,11 @@
 <!-- Variable bindings for this tree-->
 <bind tag="link-class">hover:bg-${theme}-200</bind>
 <node:active>
-  <bind tag="link-class">mavenLinkBold bg-${theme}-100 hover:bg-${theme}-200</bind>
+  <bind tag="link-class">font-bold bg-${theme}-100 hover:bg-${theme}-200</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">mavenLinkBold hover:bg-${theme}-200</bind>
+      <bind tag="link-class">font-bold hover:bg-${theme}-200</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>

@@ -22,13 +22,13 @@ jobs:
     runs-on: ${{ matrix.system }}
     strategy:
       matrix:
-        system: [aarch64-darwin, x86_64-linux]
+        system: [aarch64-darwin, x86_64-linux, aarch64-linux]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - name: Build Nix
         run: |
-          om ci --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" run --systems "${{ matrix.system }}"
+          om ci run --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" --systems "${{ matrix.system }}"
   flake-parts-docs:
     runs-on: x86_64-linux
     steps:

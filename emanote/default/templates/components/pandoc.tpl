@@ -16,7 +16,7 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 font-sans</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -111,11 +111,11 @@
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600">
-    <Internal class="mavenLinkBold hover:underline" />
+    <Internal class="font-semibold hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-0.5 mb-3 text-sm" />
-  <Code class="py-0.5 px-0.5 bg-gray-100" />
+  <CodeBlock class="py-0.5 mb-3 text-sm font-mono" />
+  <Code class="py-0.5 px-0.5 bg-gray-100 font-mono" />
 
   <Header:1>
     <h1 id="${header:id}" class="${header-class} text-5xl">

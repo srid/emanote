@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.3.23.0
+version:            1.3.28.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -21,7 +21,6 @@ extra-source-files:
 data-dir:           default
 data-files:
   _emanote-live-server/**/*.js
-  _emanote-static/**/*.ttf
   _emanote-static/*.css
   _emanote-static/*.svg
   _emanote-static/stork/flat.css
@@ -97,6 +96,7 @@ common library-common
     , base                   >=4.14    && <5
     , blaze-html
     , bytestring
+    , casing
     , commonmark
     , commonmark-extensions  >=0.2.3.4
     , commonmark-pandoc
@@ -117,7 +117,6 @@ common library-common
     , hspec
     , hspec-hedgehog
     , ixset-typed            >=0.5.1.0
-    , lvar
     , map-syntax
     , megaparsec
     , monad-logger
@@ -162,6 +161,7 @@ library
     Emanote.CLI
     Emanote.Model
     Emanote.Model.Calendar
+    Emanote.Model.Calendar.Parser
     Emanote.Model.Graph
     Emanote.Model.Link.Rel
     Emanote.Model.Link.Resolve
