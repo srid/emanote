@@ -8,7 +8,7 @@
         tag = "latest";
         created = "now";
         config.Entrypoint = [ "${emanote}/bin/emanote" ];
-        config.WorkingDir = "/site";
+        config.WorkingDir = "/notebook";
         config.Labels = {
           "org.opencontainers.image.source" = "https://github.com/srid/emanote";
         };
