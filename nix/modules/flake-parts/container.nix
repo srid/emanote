@@ -1,3 +1,4 @@
+# TODO: Make a flake-parts module out of this, for publish container images built in Nix to ghcr.io
 { root, ... }: {
   perSystem = { pkgs, config, lib, ... }:
     let
