@@ -36,7 +36,7 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.skopeo pkgs.nix ];
+          runtimeInputs = [ nix2containerPkgs.skopeo-nix2container pkgs.nix ];
           text = ''
             set -e
             IMAGE="${container-name}"
@@ -60,13 +60,10 @@
             CONTAINER_PATH=$(nix build --no-link --print-out-paths --system "$TARGET_SYSTEM" .#container)
             
             echo "Publishing $ARCH image..."
-            # nix2container produces OCI image manifest JSON files
-            # We need to use skopeo or nix2container's own tooling to push
             echo "Container manifest at: $CONTAINER_PATH"
             
-            # Use skopeo to copy from the nix2container output to the registry
-            ${pkgs.skopeo}/bin/skopeo copy \
-              --policy "${skopeoPolicy}" \
+            # Use skopeo-nix2container to copy from the nix2container output to the registry
+            skopeo --insecure-policy copy \
               "nix2container:$CONTAINER_PATH" \
               "docker://$IMAGE:${emanote.version}-$ARCH" \
               --dest-creds="$GH_USERNAME:$GH_TOKEN"
