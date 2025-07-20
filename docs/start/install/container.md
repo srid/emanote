@@ -15,30 +15,18 @@ The official Emanote container image is available at:
 
 ## Prerequisites
 
-You'll need either Docker or Podman installed on your system:
-- [Docker](https://docs.docker.com/get-docker/)
-- [Podman](https://podman.io/getting-started/installation) (recommended for rootless containers)
+You'll need [Podman](https://podman.io/getting-started/installation) installed on your system[^1].
+
+[^1]: Docker will also work, but Podman is recommended for rootless containers and better security.
 
 ## Running the Live Server
 
 To start Emanote's live development server with hot reloading:
 
-### Using Podman (Recommended)
-
 ```sh
 podman run -it --rm \
   -p 8080:8080 \
   -v ./docs:/notebook:z \
-  -e LANG=C.UTF-8 \
-  ghcr.io/srid/emanote run -p 8080 -h 0.0.0.0
-```
-
-### Using Docker
-
-```sh
-docker run -it --rm \
-  -p 8080:8080 \
-  -v ./docs:/notebook \
   -e LANG=C.UTF-8 \
   ghcr.io/srid/emanote run -p 8080 -h 0.0.0.0
 ```
@@ -66,23 +54,10 @@ mkdir -p ./output
 
 ### Generate Static Files
 
-#### Using Podman
-
 ```sh
 podman run -it --rm \
   -v ./docs:/notebook:z \
   -v ./output:/output:z \
-  -e LANG=C.UTF-8 \
-  --tmpfs /tmp:mode=1777 \
-  ghcr.io/srid/emanote gen /output
-```
-
-#### Using Docker
-
-```sh
-docker run -it --rm \
-  -v ./docs:/notebook \
-  -v ./output:/output \
   -e LANG=C.UTF-8 \
   --tmpfs /tmp:mode=1777 \
   ghcr.io/srid/emanote gen /output
