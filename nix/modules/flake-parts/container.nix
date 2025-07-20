@@ -67,7 +67,7 @@
             # Use skopeo to copy from the nix2container output to the registry
             ${pkgs.skopeo}/bin/skopeo copy \
               --policy "${skopeoPolicy}" \
-              "oci:$(dirname "$CONTAINER_PATH"):$(basename "$CONTAINER_PATH" .json)" \
+              "nix2container:$CONTAINER_PATH" \
               "docker://$IMAGE:${emanote.version}-$ARCH" \
               --dest-creds="$GH_USERNAME:$GH_TOKEN"
 
