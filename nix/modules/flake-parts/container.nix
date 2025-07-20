@@ -36,7 +36,7 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ nix2containerPkgs.skopeo-nix2container pkgs.nix ];
+          runtimeInputs = [ nix2containerPkgs.nix2container pkgs.nix ];
           text = ''
             set -euo pipefail
             IMAGE="${container-name}"
@@ -61,13 +61,12 @@
             
             echo "Publishing $ARCH image..."
             echo "Container manifest at: $CONTAINER_PATH"
-            echo "Using skopeo-nix2container version: $(skopeo --version)"
             
-            # Use skopeo-nix2container to copy from the nix2container output to the registry
-            echo "Running: skopeo --insecure-policy copy nix2container:$CONTAINER_PATH docker://$IMAGE:${emanote.version}-$ARCH"
-            skopeo --insecure-policy copy \
-              "nix2container:$CONTAINER_PATH" \
-              "docker://$IMAGE:${emanote.version}-$ARCH" \
+            # Use nix2container command to copy to registry
+            echo "Running: nix2container copy --to docker://$IMAGE:${emanote.version}-$ARCH --from $CONTAINER_PATH"
+            nix2container copy \
+              --to "docker://$IMAGE:${emanote.version}-$ARCH" \
+              --from "$CONTAINER_PATH" \
               --dest-creds="$GH_USERNAME:$GH_TOKEN"
 
             echo "$ARCH image pushed successfully!"
