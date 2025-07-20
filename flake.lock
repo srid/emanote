@@ -146,6 +146,26 @@
         "type": "github"
       }
     },
+    "nix2container": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752002763,
+        "narHash": "sha256-JYAkdZvpdSx9GUoHPArctYMypSONob4DYKRkOubUWtY=",
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "rev": "4f2437f6a1844b843b380d483087ae6d461240ee",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "type": "github"
+      }
+    },
     "nixos-unified": {
       "locked": {
         "lastModified": 1751174231,
@@ -188,6 +208,7 @@
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
         "lvar": "lvar",
+        "nix2container": "nix2container",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix",

@@ -13,6 +13,8 @@
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
     nixos-unified.url = "github:srid/nixos-unified";
+    nix2container.url = "github:nlewo/nix2container";
+    nix2container.inputs.nixpkgs.follows = "nixpkgs";
 
     ema.url = "github:srid/ema";
     ema.flake = false;

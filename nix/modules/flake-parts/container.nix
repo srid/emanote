@@ -1,31 +1,35 @@
 # TODO: Make a flake-parts module out of this, for publish container images built in Nix to ghcr.io
-{ root, ... }: {
+{ root, inputs, ... }: {
   perSystem = { pkgs, config, lib, system, ... }:
     let
       emanote = config.packages.emanote;
       container-name = "ghcr.io/srid/emanote";
+      nix2containerPkgs = inputs.nix2container.packages.${system};
 
-      container = pkgs.dockerTools.buildLayeredImage {
+      container = nix2containerPkgs.nix2container.buildImage {
         name = container-name;
         tag = "latest";
-        created = "now";
-        config.Entrypoint = [ "${emanote}/bin/emanote" ];
-        config.WorkingDir = "/notebook";
-        config.Env = [ "LANG=C.UTF-8" ];
-        config.Labels = {
-          "org.opencontainers.image.source" = "https://github.com/srid/emanote";
+        copyToRoot = [ emanote ];
+        config = {
+          Entrypoint = [ "${emanote}/bin/emanote" ];
+          WorkingDir = "/notebook";
+          Env = [ "LANG=C.UTF-8" ];
+          Labels = {
+            "org.opencontainers.image.source" = "https://github.com/srid/emanote";
+          };
         };
       };
     in
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
-      # Load the container locally with: `nix build .#container && podman load < ./result`
+      # Load the container locally with: `crane push /path/to/container.json <registry>` 
+      # or import into docker with: `crane push /path/to/container.json registry.local/emanote && docker pull registry.local/emanote`
       packages = { inherit container; };
 
       # Push single-arch image (called from CI matrix)
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.crane pkgs.file pkgs.nix ];
+          runtimeInputs = [ pkgs.crane pkgs.nix ];
           text = ''
             set -e
             IMAGE="${container-name}"
@@ -52,17 +56,8 @@
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
             echo "Publishing $ARCH image..."
-            # Check if the container output is gzipped and handle accordingly
-            if file -L "$CONTAINER_PATH" | grep -q "gzip compressed"; then
-              echo "Container is gzipped, decompressing to temporary location..."
-              TMPDIR=$(mktemp -d)
-              trap 'rm -rf $TMPDIR' EXIT
-              gunzip -c "$CONTAINER_PATH" > "$TMPDIR/image.tar"
-              crane push "$TMPDIR/image.tar" "$IMAGE:${emanote.version}-$ARCH"
-            else
-              echo "Container is already a tar file, pushing directly..."
-              crane push "$CONTAINER_PATH" "$IMAGE:${emanote.version}-$ARCH"
-            fi
+            # nix2container produces OCI image directories, not tar files
+            crane push "$CONTAINER_PATH" "$IMAGE:${emanote.version}-$ARCH"
 
             echo "$ARCH image pushed successfully!"
           '';
