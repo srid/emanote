@@ -14,7 +14,7 @@
         };
       };
     in
-    {
+    lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
       # Load the container locally with: `nix build .#container && podman load < ./result`
       packages = { container = container; };
 
