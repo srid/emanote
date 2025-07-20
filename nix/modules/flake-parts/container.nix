@@ -21,27 +21,30 @@
 
       # Run this script in the CI to publish a new image
       apps = {
-        publish-container-release.program = pkgs.writeShellScriptBin "emanote-release" ''
-          set -e
-          export PATH=$PATH:${pkgs.crane}/bin
-          IMAGE="${container-name}"
+        publish-container-release.program = pkgs.writeShellApplication {
+          name = "emanote-release";
+          runtimeInputs = [ pkgs.crane ];
+          text = ''
+            set -e
+            IMAGE="${container-name}"
 
-          printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
-          echo $GH_TOKEN | crane auth login --username $GH_USERNAME --password-stdin ghcr.io
+            echo "Logging to registry..."
+            printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
-          echo "Building container image..."
-          nix build .#container -o container-result
+            echo "Building container image..."
+            nix build .#container -o container-result
 
-          echo "Publishing the image..."
-          gunzip -c ./container-result > image.tar || cp ./container-result image.tar
-          crane push image.tar $IMAGE:${emanote.version}
+            echo "Publishing the image..."
+            gunzip -c ./container-result > image.tar || cp ./container-result image.tar
+            crane push image.tar "$IMAGE:${emanote.version}"
 
-          echo "Tagging latest"
-          crane tag $IMAGE:${emanote.version} latest
+            echo "Tagging latest"
+            crane tag "$IMAGE:${emanote.version}" latest
 
-          echo "Cleaning up..."
-          rm -f image.tar container-result
-        '';
+            echo "Cleaning up..."
+            rm -f image.tar container-result
+          '';
+        };
       };
     };
 }
