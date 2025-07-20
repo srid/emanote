@@ -3,7 +3,7 @@
     let
       emanote = config.packages.emanote;
       container-name = "ghcr.io/srid/emanote";
-      container = pkgs.dockerTools.streamLayeredImage {
+      container = pkgs.dockerTools.buildLayeredImage {
         name = container-name;
         tag = "latest";
         created = "now";
@@ -15,24 +15,31 @@
       };
     in
     {
-      # Load the container locally with: `nix build .#container && ./result | podman load`
+      # Load the container locally with: `nix build .#container && podman load < ./result`
       packages = { container = container; };
 
       # Run this script in the CI to publish a new image
       apps = {
         publish-container-release.program = pkgs.writeShellScriptBin "emanote-release" ''
           set -e
-          export PATH=$PATH:${pkgs.gzip}/bin:${pkgs.skopeo}/bin
-          IMAGE="docker://${container-name}"
+          export PATH=$PATH:${pkgs.crane}/bin
+          IMAGE="${container-name}"
 
           echo "Logging to registry..."
-          echo $GH_TOKEN | skopeo login --username $GH_USERNAME --password-stdin ghcr.io
+          echo $GH_TOKEN | crane auth login --username $GH_USERNAME --password-stdin ghcr.io
 
-          echo "Building and publishing the image..."
-          ${container} | gzip --fast | skopeo copy docker-archive:/dev/stdin $IMAGE:${emanote.version}
+          echo "Building container image..."
+          nix build .#container -o container-result
+
+          echo "Publishing the image..."
+          gunzip -c ./container-result > image.tar || cp ./container-result image.tar
+          crane push image.tar $IMAGE:${emanote.version}
 
           echo "Tagging latest"
-          skopeo copy $IMAGE:${emanote.version} $IMAGE:latest
+          crane tag $IMAGE:${emanote.version} latest
+
+          echo "Cleaning up..."
+          rm -f image.tar container-result
         '';
       };
     };
