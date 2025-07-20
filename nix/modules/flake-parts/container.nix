@@ -71,7 +71,7 @@
         # Create and push multi-arch manifest (run from single job after arch builds)
         publish-container-manifest.program = pkgs.writeShellApplication {
           name = "emanote-manifest";
-          runtimeInputs = [ pkgs.crane ];
+          runtimeInputs = [ pkgs.crane pkgs.docker ];
           text = ''
             set -e
             IMAGE="${container-name}"
@@ -79,18 +79,21 @@
             
             echo "Logging to registry..."
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
+            
+            # Also configure docker for buildx
+            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USERNAME" --password-stdin
 
             echo "Creating multi-arch manifest for version $VERSION..."
-            crane index create \
-              --tag "$IMAGE:$VERSION-amd64" \
-              --tag "$IMAGE:$VERSION-arm64" \
-              "$IMAGE:$VERSION"
+            docker buildx imagetools create \
+              -t "$IMAGE:$VERSION" \
+              "$IMAGE:$VERSION-amd64" \
+              "$IMAGE:$VERSION-arm64"
 
             echo "Creating multi-arch manifest for latest..."
-            crane index create \
-              --tag "$IMAGE:$VERSION-amd64" \
-              --tag "$IMAGE:$VERSION-arm64" \
-              "$IMAGE:latest"
+            docker buildx imagetools create \
+              -t "$IMAGE:latest" \
+              "$IMAGE:$VERSION-amd64" \
+              "$IMAGE:$VERSION-arm64"
 
             echo "Multi-arch manifest created successfully!"
           '';
