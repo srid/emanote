@@ -27,7 +27,6 @@ To start Emanote's live development server with hot reloading:
 podman run -it --rm \
   -p 8080:8080 \
   -v ./docs:/notebook:z \
-  -e LANG=C.UTF-8 \
   ghcr.io/srid/emanote run -p 8080 -h 0.0.0.0
 ```
 
@@ -36,7 +35,7 @@ podman run -it --rm \
 - Sets `/notebook` as the working directory (where Emanote commands run)
 - Exposes port 8080 for the web interface
 - Enables hot reloading when you edit files
-- Sets proper locale for Unicode support
+- Uses UTF-8 locale (built into the container image)
 
 Once running, open http://localhost:8080 in your browser to view your site.
 
@@ -58,7 +57,6 @@ mkdir -p ./output
 podman run -it --rm \
   -v ./docs:/notebook:z \
   -v ./output:/output:z \
-  -e LANG=C.UTF-8 \
   --tmpfs /tmp:mode=1777 \
   ghcr.io/srid/emanote gen /output
 ```

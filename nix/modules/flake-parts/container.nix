@@ -9,6 +9,7 @@
         created = "now";
         config.Entrypoint = [ "${emanote}/bin/emanote" ];
         config.WorkingDir = "/notebook";
+        config.Env = [ "LANG=C.UTF-8" ];
         config.Labels = {
           "org.opencontainers.image.source" = "https://github.com/srid/emanote";
         };
