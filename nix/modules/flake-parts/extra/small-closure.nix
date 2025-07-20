@@ -2,7 +2,9 @@
 { root, inputs, ... }:
 let
   allowedSystems = [
-    "x86_64-linux"
+    # Disabling size optimization because newer nixpkgs sucks for it.
+    # If you, the user, would like to see smaller closure size, feel free to open a PR>
+    # "x86_64-linux"
 
     # Disabling on macOS due to upstream bug:
     # - https://github.com/NixOS/nixpkgs/issues/318013
