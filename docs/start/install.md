@@ -31,4 +31,8 @@ mkdir /tmp/output
 emanote -L /path/to/notebook gen /tmp/output
 ```
 
+## Containers
+
+If you do not wish to use Nix, you may try Emanote through Docker or Podman; see [[container]].
+
 [Nix]: https://nixos.asia/en/nix

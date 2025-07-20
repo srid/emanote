@@ -1,9 +1,10 @@
 # TODO: Make a flake-parts module out of this, for publish container images built in Nix to ghcr.io
 { root, ... }: {
-  perSystem = { pkgs, config, lib, ... }:
+  perSystem = { pkgs, config, lib, system, ... }:
     let
       emanote = config.packages.emanote;
       container-name = "ghcr.io/srid/emanote";
+
       container = pkgs.dockerTools.buildLayeredImage {
         name = container-name;
         tag = "latest";
@@ -20,27 +21,78 @@
       # Load the container locally with: `nix build .#container && podman load < ./result`
       packages = { inherit container; };
 
-      # Run this script in the CI to publish a new image
+      # Push single-arch image (called from CI matrix)
       apps = {
-        publish-container-release.program = pkgs.writeShellApplication {
-          name = "emanote-release";
-          runtimeInputs = [ pkgs.crane ];
+        publish-container-arch.program = pkgs.writeShellApplication {
+          name = "emanote-release-arch";
+          runtimeInputs = [ pkgs.crane pkgs.file pkgs.nix ];
           text = ''
             set -e
             IMAGE="${container-name}"
-
+            TARGET_SYSTEM="$1"  # Pass target system as argument (e.g., x86_64-linux, aarch64-linux)
+            
+            # Map system to container architecture
+            case "$TARGET_SYSTEM" in
+              x86_64-linux)
+                ARCH="amd64"
+                ;;
+              aarch64-linux)
+                ARCH="arm64"
+                ;;
+              *)
+                echo "Unsupported system: $TARGET_SYSTEM"
+                exit 1
+                ;;
+            esac
+            
+            echo "Building container for $TARGET_SYSTEM ($ARCH)..."
+            CONTAINER_PATH=$(nix build --no-link --print-out-paths --system "$TARGET_SYSTEM" .#container)
+            
             echo "Logging to registry..."
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
-            echo "Publishing the image..."
-            gunzip -c ${container} > image.tar || cp ${container} image.tar
-            crane push image.tar "$IMAGE:${emanote.version}"
+            echo "Publishing $ARCH image..."
+            # Check if the container output is gzipped and handle accordingly
+            if file -L "$CONTAINER_PATH" | grep -q "gzip compressed"; then
+              echo "Container is gzipped, decompressing to temporary location..."
+              TMPDIR=$(mktemp -d)
+              trap 'rm -rf $TMPDIR' EXIT
+              gunzip -c "$CONTAINER_PATH" > "$TMPDIR/image.tar"
+              crane push "$TMPDIR/image.tar" "$IMAGE:${emanote.version}-$ARCH"
+            else
+              echo "Container is already a tar file, pushing directly..."
+              crane push "$CONTAINER_PATH" "$IMAGE:${emanote.version}-$ARCH"
+            fi
 
-            echo "Tagging latest"
-            crane tag "$IMAGE:${emanote.version}" latest
+            echo "$ARCH image pushed successfully!"
+          '';
+        };
 
-            echo "Cleaning up..."
-            rm -f image.tar
+        # Create and push multi-arch manifest (run from single job after arch builds)
+        publish-container-manifest.program = pkgs.writeShellApplication {
+          name = "emanote-manifest";
+          runtimeInputs = [ pkgs.docker ];
+          text = ''
+            set -e
+            IMAGE="${container-name}"
+            VERSION="${emanote.version}"
+            
+            echo "Logging to registry..."
+            echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USERNAME" --password-stdin
+
+            echo "Creating multi-arch manifest for version $VERSION..."
+            docker buildx imagetools create \
+              -t "$IMAGE:$VERSION" \
+              "$IMAGE:$VERSION-amd64" \
+              "$IMAGE:$VERSION-arm64"
+
+            echo "Creating multi-arch manifest for latest..."
+            docker buildx imagetools create \
+              -t "$IMAGE:latest" \
+              "$IMAGE:$VERSION-amd64" \
+              "$IMAGE:$VERSION-arm64"
+
+            echo "Multi-arch manifest created successfully!"
           '';
         };
       };
