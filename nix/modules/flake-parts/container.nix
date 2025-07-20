@@ -33,7 +33,7 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.crane ];
+          runtimeInputs = [ pkgs.crane pkgs.file ];
           text = ''
             set -e
             IMAGE="${container-name}"
@@ -43,11 +43,19 @@
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
             echo "Publishing $ARCH image..."
-            gunzip -c ${container} > image.tar || cp ${container} image.tar
-            crane push image.tar "$IMAGE:${emanote.version}-$ARCH"
+            # Check if the container output is gzipped and handle accordingly
+            if file -L ${container} | grep -q "gzip compressed"; then
+              echo "Container is gzipped, decompressing to temporary location..."
+              TMPDIR=$(mktemp -d)
+              trap 'rm -rf $TMPDIR' EXIT
+              gunzip -c ${container} > "$TMPDIR/image.tar"
+              crane push "$TMPDIR/image.tar" "$IMAGE:${emanote.version}-$ARCH"
+            else
+              echo "Container is already a tar file, pushing directly..."
+              crane push ${container} "$IMAGE:${emanote.version}-$ARCH"
+            fi
 
-            echo "Cleaning up..."
-            rm -f image.tar
+            echo "$ARCH image pushed successfully!"
           '';
         };
 
