@@ -8,7 +8,16 @@
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
-      projectRoot = root;
+
+      # Whitelist to avoid unnecessary rebuilds of Nix package.
+      projectRoot = builtins.toString (lib.fileset.toSource {
+        inherit root;
+        fileset = lib.fileset.unions [
+          (root + /emanote)
+          (root + /cabal.project)
+        ];
+      });
+
       devShell.tools = hp: {
         inherit (pkgs)
           stork;
