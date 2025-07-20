@@ -16,5 +16,6 @@ Then open http://localhost:8080
 
 Build the static pages:
 ```sh
-podman run -it --rm -v ./docs:/site:z -v ./output:/output:z ghcr.io/srid/emanote gen /output
+mkdir /output
+podman run -it --rm -v ./docs:/site:z -v ./output:/output:z --tmpfs /tmp:mode=1777 ghcr.io/srid/emanote gen /output
 ```
