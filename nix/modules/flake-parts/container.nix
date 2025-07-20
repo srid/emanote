@@ -5,14 +5,6 @@
       emanote = config.packages.emanote;
       container-name = "ghcr.io/srid/emanote-dev";
 
-      # Helper to get architecture string for container tagging
-      archFromSystem = sys:
-        if sys == "x86_64-linux" then "amd64"
-        else if sys == "aarch64-linux" then "arm64"
-        else throw "Unsupported system: ${sys}";
-
-      currentArch = archFromSystem system;
-
       container = pkgs.dockerTools.buildLayeredImage {
         name = container-name;
         tag = "latest";
@@ -33,26 +25,43 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.crane pkgs.file ];
+          runtimeInputs = [ pkgs.crane pkgs.file pkgs.nix ];
           text = ''
             set -e
             IMAGE="${container-name}"
-            ARCH="${currentArch}"
+            TARGET_SYSTEM="$1"  # Pass target system as argument (e.g., x86_64-linux, aarch64-linux)
+            
+            # Map system to container architecture
+            case "$TARGET_SYSTEM" in
+              x86_64-linux)
+                ARCH="amd64"
+                ;;
+              aarch64-linux)
+                ARCH="arm64"
+                ;;
+              *)
+                echo "Unsupported system: $TARGET_SYSTEM"
+                exit 1
+                ;;
+            esac
+            
+            echo "Building container for $TARGET_SYSTEM ($ARCH)..."
+            CONTAINER_PATH=$(nix build --no-link --print-out-paths --system "$TARGET_SYSTEM" .#container)
             
             echo "Logging to registry..."
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
             echo "Publishing $ARCH image..."
             # Check if the container output is gzipped and handle accordingly
-            if file -L ${container} | grep -q "gzip compressed"; then
+            if file -L "$CONTAINER_PATH" | grep -q "gzip compressed"; then
               echo "Container is gzipped, decompressing to temporary location..."
               TMPDIR=$(mktemp -d)
               trap 'rm -rf $TMPDIR' EXIT
-              gunzip -c ${container} > "$TMPDIR/image.tar"
+              gunzip -c "$CONTAINER_PATH" > "$TMPDIR/image.tar"
               crane push "$TMPDIR/image.tar" "$IMAGE:${emanote.version}-$ARCH"
             else
               echo "Container is already a tar file, pushing directly..."
-              crane push ${container} "$IMAGE:${emanote.version}-$ARCH"
+              crane push "$CONTAINER_PATH" "$IMAGE:${emanote.version}-$ARCH"
             fi
 
             echo "$ARCH image pushed successfully!"
@@ -72,13 +81,13 @@
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
 
             echo "Creating multi-arch manifest for version $VERSION..."
-            crane index append \
+            crane index create \
               --tag "$IMAGE:$VERSION-amd64" \
               --tag "$IMAGE:$VERSION-arm64" \
               "$IMAGE:$VERSION"
 
             echo "Creating multi-arch manifest for latest..."
-            crane index append \
+            crane index create \
               --tag "$IMAGE:$VERSION-amd64" \
               --tag "$IMAGE:$VERSION-arm64" \
               "$IMAGE:latest"
