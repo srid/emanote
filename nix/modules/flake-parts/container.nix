@@ -26,7 +26,7 @@
           export PATH=$PATH:${pkgs.crane}/bin
           IMAGE="${container-name}"
 
-          echo "Logging to registry..."
+          printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
           echo $GH_TOKEN | crane auth login --username $GH_USERNAME --password-stdin ghcr.io
 
           echo "Building container image..."
