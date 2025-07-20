@@ -2,22 +2,30 @@
 slug: container
 ---
 
-# Using Emanote with Containers
+# Container
 
-Emanote provides a pre-built container image that allows you to run Emanote without installing it locally. This is perfect for quick setups, CI/CD pipelines, or when you prefer containerized workflows.
+Emanote provides [a pre-built container image][ghcr] that allows you to run Emanote without installing it locally. This is perfect for quick setups, CI/CD pipelines, or when you prefer containerized workflows.
 
 ## Container Image
 
 The official Emanote container image is available at:
-- **Registry**: `ghcr.io/srid/emanote`
-- **Supported architectures**: `x86_64`, `aarch64`
+- **Registry**: [`ghcr.io/srid/emanote`][ghcr]
+- **Supported architectures**: `x86_64` (amd64), `aarch64` (arm64) - automatically detects your platform
 - **Working directory**: `/notebook` (container starts in this directory)
+
+The container images are built as multi-architecture manifests, so Docker/Podman will automatically pull the correct image for your platform (Intel/AMD64 or ARM64).
+
+[ghcr]: https://ghcr.io/srid/emanote
 
 ## Prerequisites
 
 You'll need [Podman](https://podman.io/getting-started/installation) installed on your system[^1].
 
 [^1]: Docker will also work, but Podman is recommended for rootless containers and better security.
+
+## Multi-Architecture Support
+
+Emanote container images support both Intel/AMD64 and ARM64 architectures (including Apple Silicon Macs and ARM-based servers). When you pull the image, the container runtime automatically selects the correct architecture for your platform - no special flags or tags needed.
 
 ## Running the Live Server
 
