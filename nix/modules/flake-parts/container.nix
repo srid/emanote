@@ -6,6 +6,13 @@
       container-name = "ghcr.io/srid/emanote";
       nix2containerPkgs = inputs.nix2container.packages.${system};
 
+      # Create a policy.json file for skopeo in the Nix store
+      skopeoPolicy = pkgs.writeText "policy.json" (builtins.toJSON {
+        default = [{
+          type = "insecureAcceptAnything";
+        }];
+      });
+
       container = nix2containerPkgs.nix2container.buildImage {
         name = container-name;
         tag = "latest";
@@ -21,15 +28,15 @@
       };
     in
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
-      # Load the container locally with: `crane push /path/to/container.json <registry>` 
-      # or import into docker with: `crane push /path/to/container.json registry.local/emanote && docker pull registry.local/emanote`
+      # Load the container locally with: `nix build .#container && skopeo copy nix2container:./result docker-daemon:emanote:latest`
+      # or import into docker with: `nix build .#container && skopeo copy nix2container:./result docker://registry.local/emanote && docker pull registry.local/emanote`
       packages = { inherit container; };
 
       # Push single-arch image (called from CI matrix)
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.crane pkgs.nix ];
+          runtimeInputs = [ pkgs.skopeo pkgs.nix ];
           text = ''
             set -e
             IMAGE="${container-name}"
@@ -52,12 +59,17 @@
             echo "Building container for $TARGET_SYSTEM ($ARCH)..."
             CONTAINER_PATH=$(nix build --no-link --print-out-paths --system "$TARGET_SYSTEM" .#container)
             
-            echo "Logging to registry..."
-            printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
-
             echo "Publishing $ARCH image..."
-            # nix2container produces OCI image directories, not tar files
-            crane push "$CONTAINER_PATH" "$IMAGE:${emanote.version}-$ARCH"
+            # nix2container produces OCI image manifest JSON files
+            # We need to use skopeo or nix2container's own tooling to push
+            echo "Container manifest at: $CONTAINER_PATH"
+            
+            # Use skopeo to copy from the nix2container output to the registry
+            ${pkgs.skopeo}/bin/skopeo copy \
+              --policy "${skopeoPolicy}" \
+              "oci:$(dirname "$CONTAINER_PATH"):$(basename "$CONTAINER_PATH" .json)" \
+              "docker://$IMAGE:${emanote.version}-$ARCH" \
+              --dest-creds="$GH_USERNAME:$GH_TOKEN"
 
             echo "$ARCH image pushed successfully!"
           '';
