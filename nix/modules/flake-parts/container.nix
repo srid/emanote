@@ -38,7 +38,7 @@
           name = "emanote-release-arch";
           runtimeInputs = [ nix2containerPkgs.skopeo-nix2container pkgs.nix ];
           text = ''
-            set -e
+            set -euo pipefail
             IMAGE="${container-name}"
             TARGET_SYSTEM="$1"  # Pass target system as argument (e.g., x86_64-linux, aarch64-linux)
             
@@ -61,8 +61,10 @@
             
             echo "Publishing $ARCH image..."
             echo "Container manifest at: $CONTAINER_PATH"
+            echo "Using skopeo-nix2container version: $(skopeo --version)"
             
             # Use skopeo-nix2container to copy from the nix2container output to the registry
+            echo "Running: skopeo --insecure-policy copy nix2container:$CONTAINER_PATH docker://$IMAGE:${emanote.version}-$ARCH"
             skopeo --insecure-policy copy \
               "nix2container:$CONTAINER_PATH" \
               "docker://$IMAGE:${emanote.version}-$ARCH" \
