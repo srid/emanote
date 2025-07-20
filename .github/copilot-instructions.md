@@ -1,3 +1,6 @@
+## Emanote
+
+- See architecture.md for high-level of Emanote's code architecture
 
 ## Your behaviour
 

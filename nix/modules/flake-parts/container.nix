@@ -36,7 +36,7 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ nix2containerPkgs.nix2container pkgs.nix ];
+          runtimeInputs = [ nix2containerPkgs.nix2container-bin pkgs.nix ];
           text = ''
             set -euo pipefail
             IMAGE="${container-name}"
