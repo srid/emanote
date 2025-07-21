@@ -29,9 +29,10 @@
           text = ''
             set -e
             IMAGE="${container-name}"
+            SYSTEM="${system}"
             
             # Map current system to container architecture
-            case "${system}" in
+            case "$SYSTEM" in
               x86_64-linux)
                 ARCH="amd64"
                 ;;
@@ -39,12 +40,12 @@
                 ARCH="arm64"
                 ;;
               *)
-                echo "Unsupported system: ${system}"
+                echo "Unsupported system: $SYSTEM"
                 exit 1
                 ;;
             esac
             
-            echo "Using pre-built container for ${system} ($ARCH)..."
+            echo "Using pre-built container for $SYSTEM ($ARCH)..."
             CONTAINER_PATH="${container}"
             
             echo "Logging to registry..."
