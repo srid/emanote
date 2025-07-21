@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Push ${{ matrix.system }} Image
-        run: nix run ".#publish-container-arch" -- ${{ matrix.system }}
+        run: nix run ".#publish-container-arch"
         env:
           GH_USERNAME: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
