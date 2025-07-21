@@ -3,7 +3,7 @@
   perSystem = { pkgs, config, lib, system, ... }:
     let
       emanote = config.packages.emanote;
-      container-name = "ghcr.io/srid/emanote";
+      container-name = "ghcr.io/srid/emanote-dev";
 
       container = pkgs.dockerTools.buildLayeredImage {
         name = container-name;
@@ -25,14 +25,13 @@
       apps = {
         publish-container-arch.program = pkgs.writeShellApplication {
           name = "emanote-release-arch";
-          runtimeInputs = [ pkgs.crane pkgs.file pkgs.nix ];
+          runtimeInputs = [ pkgs.crane pkgs.file ];
           text = ''
             set -e
             IMAGE="${container-name}"
-            TARGET_SYSTEM="$1"  # Pass target system as argument (e.g., x86_64-linux, aarch64-linux)
             
-            # Map system to container architecture
-            case "$TARGET_SYSTEM" in
+            # Map current system to container architecture
+            case "${system}" in
               x86_64-linux)
                 ARCH="amd64"
                 ;;
@@ -40,13 +39,13 @@
                 ARCH="arm64"
                 ;;
               *)
-                echo "Unsupported system: $TARGET_SYSTEM"
+                echo "Unsupported system: ${system}"
                 exit 1
                 ;;
             esac
             
-            echo "Building container for $TARGET_SYSTEM ($ARCH)..."
-            CONTAINER_PATH=$(nix build --no-link --print-out-paths --system "$TARGET_SYSTEM" .#container)
+            echo "Using pre-built container for ${system} ($ARCH)..."
+            CONTAINER_PATH="${container}"
             
             echo "Logging to registry..."
             printf '%s' "$GH_TOKEN" | crane auth login --username "$GH_USERNAME" --password-stdin ghcr.io
