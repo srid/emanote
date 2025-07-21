@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - "separm"
   pull_request:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -66,7 +65,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
   container:
-    if: github.ref == 'refs/heads/separm'
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{ matrix.system }}
     strategy:
       matrix:
@@ -81,7 +80,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   container-manifest:
-    if: github.ref == 'refs/heads/separm'
+    if: github.ref == 'refs/heads/master'
     runs-on: x86_64-linux
     needs: container
     steps:

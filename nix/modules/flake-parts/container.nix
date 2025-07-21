@@ -3,7 +3,7 @@
   perSystem = { pkgs, config, lib, system, ... }:
     let
       emanote = config.packages.emanote;
-      container-name = "ghcr.io/srid/emanote-dev";
+      container-name = "ghcr.io/srid/emanote";
 
       container = pkgs.dockerTools.buildLayeredImage {
         name = container-name;
