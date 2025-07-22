@@ -17,9 +17,8 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Optics.Operators ((^.))
 import Relude
-import Text.Pandoc (Pandoc, runPure)
+import Text.Pandoc (Pandoc, runPure, def)
 import Text.Pandoc.Writers.Markdown (writeMarkdown)
-import Text.Pandoc.Options (def)
 import Data.Tree (Tree(..))
 import Data.Tree qualified as Tree
 
