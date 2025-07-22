@@ -38,6 +38,7 @@ import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
 import Emanote.View.Common (generatedCssFile)
 import Emanote.View.Export qualified as Export
+import Emanote.View.Export.Content qualified as ExportContent
 import Emanote.View.Template qualified as View
 import Optics.Core ((%), (.~), (^.))
 import Relude
@@ -82,6 +83,11 @@ run cfg@EmanoteConfig {..} = do
             flip runLoggerLoggingT oneOffLogger
               $ siteInput @SiteRoute (Ema.CLI.action def) cfg
           putLBSLn $ Export.renderJSONExport model0
+        CLI.ExportCmd_Content {..} -> do
+          Dynamic (unModelEma -> model0, _) <-
+            flip runLoggerLoggingT oneOffLogger
+              $ siteInput @SiteRoute (Ema.CLI.action def) cfg
+          putLBSLn $ ExportContent.renderContentExport model0 exportContentDeployedSite
   where
     -- A logger suited for running one-off commands.
     oneOffLogger =

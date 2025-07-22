@@ -35,6 +35,9 @@ data Cmd
 
 data ExportCmd
   = ExportCmd_Metadata
+  | ExportCmd_Content
+      { exportContentDeployedSite :: Maybe Text
+      }
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
@@ -48,8 +51,19 @@ cliParser cwd = do
     exportParser :: Parser Cmd
     exportParser = do
       exportCmd <-
-        subparser (command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON")))
+        subparser 
+          ( command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON"))
+            <> command "content" (info contentExportParser (progDesc "Export all content to a single Markdown file"))
+          )
       pure $ Cmd_Export exportCmd
+    contentExportParser :: Parser ExportCmd
+    contentExportParser = do
+      deployedSite <- optional $ strOption
+        ( long "deployed-site"
+          <> metavar "URL"
+          <> help "Base URL of the deployed site for source references"
+        )
+      pure $ ExportCmd_Content deployedSite
     layerList defaultPath = do
       option layerListReader
         $ mconcat
