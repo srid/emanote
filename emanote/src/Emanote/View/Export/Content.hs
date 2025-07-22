@@ -51,7 +51,7 @@ getAllNotesInBFS model =
         let routePath = R.withLmlRoute R.encodeRoute (N._noteRoute note)
             depth = length $ filter (== '/') routePath
         in (depth, routePath)
-      ) realNotes
+        ) realNotes
    in sortedNotes
 
 -- | Render a single note's content with metadata
