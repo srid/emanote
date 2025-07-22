@@ -1,7 +1,7 @@
 module Emanote.View.Export.ContentSpec (spec) where
 
-import Test.Hspec
 import Emanote.View.Export.Content
+import Test.Hspec
 
 spec :: Spec
 spec = describe "Content Export" $ do

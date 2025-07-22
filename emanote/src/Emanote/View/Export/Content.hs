@@ -1,7 +1,7 @@
 -- | Export all notebook content to a single Markdown file
-module Emanote.View.Export.Content
-  ( renderContentExport,
-  )
+module Emanote.View.Export.Content (
+  renderContentExport,
+)
 where
 
 import Data.IxSet.Typed qualified as Ix

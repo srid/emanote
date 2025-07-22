@@ -58,11 +58,13 @@ cliParser cwd = do
       pure $ Cmd_Export exportCmd
     contentExportParser :: Parser ExportCmd
     contentExportParser = do
-      deployedSite <- optional $ strOption
-        ( long "deployed-site"
-          <> metavar "URL"
-          <> help "Base URL of the deployed site for source references"
-        )
+      deployedSite <-
+        optional
+          $ strOption
+            ( long "deployed-site"
+                <> metavar "URL"
+                <> help "Base URL of the deployed site for source references"
+            )
       pure $ ExportCmd_Content deployedSite
     layerList defaultPath = do
       option layerListReader
