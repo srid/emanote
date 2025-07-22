@@ -2,14 +2,14 @@
 
 The metadata of all content ([[markdown]] and [[orgmode]]), along with their link relationships, can be retrieved as `JSON` using one of the following means:
 
-1. `emanote export`: a CLI command that dumps the JSON export to stdout.
+1. `emanote export metadata`: a CLI command that dumps the JSON export to stdout.
 2. [-/export.json](-/export.json): an URL to retrieve the JSON via live server or from the statically generated site.
 
 Option (1) might be useful for text editor plugins, though option (2) is bound to be faster on larger notebooks when requested via the live server (`emanote run`).
 
 ## CLI examples
 
-Here are some examples of running `emanote export`. These commands are run on the `./docs` directory of the Emanote source repository.
+Here are some examples of running `emanote export metadata`. These commands are run on the `./docs` directory of the Emanote source repository.
 
 ```sh
 git clone https://github.com/srid/emanote.git
@@ -19,7 +19,7 @@ cd ./emanote/docs
 ### Get the list of files
 
 ```sh
-$ emanote export | jq .files | jq keys
+$ emanote export metadata | jq .files | jq keys
 [
   "architecture.md",
   "demo.md",
@@ -33,7 +33,7 @@ $ emanote export | jq .files | jq keys
 ### Get a single file
 
 ```sh
-$ emanote export | jq '.files | .[] | select(.filePath=="architecture.md")'   
+$ emanote export metadata | jq '.files | .[] | select(.filePath=="architecture.md")'   
 {
   "filePath": "architecture.md",
   "links": [],
@@ -55,7 +55,7 @@ $ emanote export | jq '.files | .[] | select(.filePath=="architecture.md")'
 ### Get all link targets from a note
 
 ```sh
-$ emanote export | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
+$ emanote export metadata | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
 "demo/neuron-layout"
 "demo/yaml-config"
 "demo/yaml-config"
@@ -66,7 +66,7 @@ $ emanote export | jq '.files | .[] | select(.filePath=="start/neuron.md") | .li
 ### Get the list of tags
 
 ```sh
-$ emanote export | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
+$ emanote export metadata | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
 [
   "emanote/dev",
   "emanote/syntax/demo",
@@ -80,7 +80,7 @@ $ emanote export | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
 ### Get all files associated with a tag
 
 ```sh
-$ emanote export | jq '.files | .[] | select( any( .meta.tags[]; . == "external" ))'   
+$ emanote export metadata | jq '.files | .[] | select( any( .meta.tags[]; . == "external" ))'   
 {
   "filePath": "examples.md",
   "links": [],
