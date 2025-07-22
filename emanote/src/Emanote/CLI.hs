@@ -5,6 +5,7 @@ module Emanote.CLI (
   Cli (..),
   Layer (..),
   Cmd (..),
+  ExportCmd (..),
   parseCli,
   cliParser,
 ) where
@@ -30,7 +31,10 @@ data Layer = Layer
 
 data Cmd
   = Cmd_Ema Ema.CLI.Cli
-  | Cmd_Export
+  | Cmd_Export ExportCmd
+
+data ExportCmd
+  = ExportCmd_Metadata
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
@@ -38,9 +42,14 @@ cliParser cwd = do
   allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
-      <|> subparser (command "export" (info (pure Cmd_Export) (progDesc "Export metadata JSON")))
+      <|> subparser (command "export" (info exportParser (progDesc "Export commands")))
   pure Cli {..}
   where
+    exportParser :: Parser Cmd
+    exportParser = do
+      exportCmd <-
+        subparser (command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON")))
+      pure $ Cmd_Export exportCmd
     layerList defaultPath = do
       option layerListReader
         $ mconcat

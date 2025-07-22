@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
+-- | Export an Emanote notebook to external formats.
 module Emanote.View.Export (
   renderJSONExport,
   Link (..),
@@ -21,8 +22,10 @@ import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Optics.Operators ((^.))
 import Relude
 
+-- | A JSON export of the notebook
 data Export = Export
   { version :: Word
+  -- ^ This JSON's schema version
   , files :: Map Text SourceFile
   }
   deriving stock (Generic, Show)
@@ -50,6 +53,7 @@ data Link = Link
   deriving stock (Generic, Eq, Ord, Show)
   deriving anyclass (ToJSON)
 
+--- | Export the notebook's metadata (not content) to JSON format.
 renderJSONExport :: Model -> LByteString
 renderJSONExport model =
   let notes_ =
