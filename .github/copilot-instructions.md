@@ -2,6 +2,10 @@
 
 - See architecture.md for high-level of Emanote's code architecture
 
+## Development ennvironment
+
+- The terminal should already be in direnv (with `nix develop` activated). You can also use `nix develop -c ...` to explicility run commands in the Nix shell. Never use legacy commands (like `nix-shell`).
+
 ## Your behaviour
 
 - Don't summarize the changes you make (to me, they are self-evident from diff); be brief. 
