@@ -62,11 +62,14 @@ renderNoteContent model mDeployedSite note =
   let route = note ^. N.noteRoute
       title = Tit.toPlain $ note ^. N.noteTitle
       routePath = R.withLmlRoute R.encodeRoute route
+      siteUrl = SR.siteRouteUrl model (lmlSiteRoute (R.LMLView_Html, route))
       noteUrl = case mDeployedSite of
         Just baseUrl ->
-          let siteUrl = SR.siteRouteUrl model (lmlSiteRoute (R.LMLView_Html, route))
-           in baseUrl <> (if "/" `T.isSuffixOf` baseUrl then "" else "/") <> siteUrl
-        Nothing -> SR.siteRouteUrl model (lmlSiteRoute (R.LMLView_Html, route))
+          -- Remove any leading slash from siteUrl to avoid double slashes
+          let cleanSiteUrl = T.dropWhile (== '/') siteUrl
+              cleanBaseUrl = T.dropWhileEnd (== '/') baseUrl
+           in cleanBaseUrl <> "/" <> cleanSiteUrl
+        Nothing -> siteUrl
       pandocDoc = note ^. N.noteDoc
       markdownContent = case runPure $ writeMarkdown def pandocDoc of
         Left err -> "<!-- Error converting note content: " <> show err <> " -->"
