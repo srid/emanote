@@ -1,0 +1,40 @@
+# GitHub Copilot Setup Steps for Emanote
+# This file helps GitHub Copilot agents understand how to set up the development environment
+
+steps:
+  - name: "Enter Nix development shell"
+    run: "nix develop"
+    description: "Activates the Nix development environment with all required dependencies including Haskell, cabal, and development tools"
+    
+  - name: "Verify development environment"
+    run: "which cabal && which ghc && which just"
+    description: "Confirms that essential development tools are available in the environment"
+
+environment:
+  shell: "nix develop"
+  description: "This project uses Nix flakes for reproducible development environments"
+  
+available_commands:
+  - command: "just"
+    description: "List all available development commands"
+  - command: "just run"
+    description: "Run emanote with auto-reload using ghcid"
+  - command: "just test"
+    description: "Run tests with auto-reload"
+  - command: "just repl"
+    description: "Start Haskell REPL"
+  - command: "just fmt"
+    description: "Format the codebase"
+  - command: "just docs"
+    description: "Run hoogle documentation server"
+  - command: "cabal build"
+    description: "Build the project"
+  - command: "cabal test"
+    description: "Run the test suite"
+
+project_info:
+  type: "Haskell"
+  build_system: "cabal"
+  package_manager: "nix"
+  framework: "ema"
+  description: "Emanote is a static site generator for plain-text notes with real-time hot-reload"
