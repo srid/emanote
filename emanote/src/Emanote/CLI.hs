@@ -51,9 +51,9 @@ cliParser cwd = do
     exportParser :: Parser Cmd
     exportParser = do
       exportCmd <-
-        subparser 
+        subparser
           ( command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON"))
-            <> command "content" (info contentExportParser (progDesc "Export all content to a single Markdown file"))
+              <> command "content" (info contentExportParser (progDesc "Export all content to a single Markdown file"))
           )
       pure $ Cmd_Export exportCmd
     contentExportParser :: Parser ExportCmd
