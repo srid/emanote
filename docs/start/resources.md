@@ -1,8 +1,5 @@
 ---
 order: 15
----
-
----
 slug: resources
 ---
 
