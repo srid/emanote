@@ -1,5 +1,5 @@
 ---
-slug: layers
+slug: layer
 ---
 
 # Layer system
