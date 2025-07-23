@@ -46,7 +46,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=1a7f254e-c1b6-4517-a4ea-f3a0031f78b6' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=63d42cd8-b5f8-4dc8-8a47-283f7c8f30d9' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -1138,7 +1138,9 @@
   </a>
 </h1>
     
-      <article class='overflow-auto'>
+      <div class='md:grid md:gap-4 md:grid-cols-8'>
+        <div class='md:col-span-6'>
+          <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
@@ -1150,16 +1152,35 @@
     <p class='mb-3'>
       <a href='https://www.vim.org/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Vim</a>, and its very popular fork <a href='https://neovim.io/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neovim</a>, are <a href='https://unix.stackexchange.com/a/57708' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>modal text editors</a> for editing plain text files. You can use it to edit <a href='markdown' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown</a> files.
     </p>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+    </path>
   
+      </svg>
+    </div>
+    <div class='ml-2'>
+      Tip
+    </div>
+  </div>
+  <div class='callout-content'>
+    
     <p class='mb-3'>
-      NOTE: If you are looking to write a Vim extension for Emanote, see <a href='export' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>JSON export</a>.
+      If you are looking to write a Vim extension for Emanote, see <a href='export' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>JSON export</a>.
     </p>
   
-    <h2 id='known-issue-glitches-when-saving-file' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+  </div>
+</div>
+    <h2 id='known-issues' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-  Known issue: glitches when saving file
+  Known issues
   
-  <a href='vim#known-issue-glitches-when-saving-file' class='--ema-anchor'>
+  <a href='vim#known-issues' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1169,8 +1190,22 @@
 
     </h2>
   
+    <h3 id='glitches' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Glitches when saving file
+  
+  <a href='vim#glitches' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
     <p class='mb-3'>
-      Vim editors has a feature that clashes with Emanote and can cause slight glitchy hickups when saving a file, while producing logs such as:
+      Vim editors have a feature that clashes with Emanote and can cause slight glitchy hickups when saving a file, while producing logs such as:
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='text language-text'>[Info#emanote] [15:52:41] Re-registering file: ./docs/4913 R[/4913]
 [Info#emanote] [15:52:41] Removing note: guide.md
@@ -1187,18 +1222,64 @@
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='text language-text'>[Info#emanote] [15:54:39] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:41] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:43] Reading file: ./docs/guide.md</code></pre></div>
+    <h4 id='temporary-workaround' class='group mt-6 mb-4 font-bold text-gray-700 text-2xl'>
+      
+  Temporary workaround
+  
+  <a href='vim#temporary-workaround' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h4>
+  
     <p class='mb-3'>
-      Temporary workaround (no longer applies after restarting Vim):
+      (No longer applies after restarting Vim)
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='vim language-vim'>:set backupcopy=yes</code></pre></div>
+    <h4 id='permanent-workaround' class='group mt-6 mb-4 font-bold text-gray-700 text-2xl'>
+      
+  Permanent workaround
+  
+  <a href='vim#permanent-workaround' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h4>
+  
     <p class='mb-3'>
-      Permanent workaround by adding this to your (Neo)vim config file, e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.vimrc</code> for Vim or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.config/nvim/init.vim</code> for Neovim (see <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help vimrc</code> for more info):
+      By adding this to your (Neo)vim config file, e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.vimrc</code> for Vim or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.config/nvim/init.vim</code> for Neovim (see <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help vimrc</code> for more info):
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='vim language-vim'>" Must be added AFTER `set nocompatible`, if any, as `set nocompatible`
 " resets the `backupcopy` setting.
-set backupcopy=yes</code></pre></div>
+set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fold data-callout='info' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #086DD320'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #086DD3'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <circle cx='12' cy='12' r='10'></circle>
+    <line x1='12' y1='16' x2='12' y2='12'></line>
+    <line x1='12' y1='8' x2='12.01' y2='8'></line>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+       Background
+    </div>
+  </div>
+  <div class='callout-content'>
+    
     <p class='mb-3'>
-      Background: Vim has this great feature called “backup copies” that ensure that your text isn’t lost in the case of a faulty write/save operation. To achieve this it uses some additional files, usually one with a 4-digit long integer and one with the same name but with a tilde at the end (e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md</code> vs <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md~</code>), that it does this little dance with these files before discarding them when the write/save operation succeeds.
+      Vim has this great feature called “backup copies” that ensure that your text isn’t lost in the case of a faulty write/save operation. To achieve this it uses some additional files, usually one with a 4-digit long integer and one with the same name but with a tilde at the end (e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md</code> vs <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md~</code>), that it does this little dance with these files before discarding them when the write/save operation succeeds.
     </p>
   
     <p class='mb-3'>
@@ -1213,6 +1294,8 @@ set backupcopy=yes</code></pre></div>
       Reference discussion: <a href='https://github.com/srid/emanote/issues/180#issuecomment-945049455' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/180#issuecomment-945049455</a>
     </p>
   
+  </div>
+</div>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/resources/editors/vim.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -1221,7 +1304,117 @@ set backupcopy=yes</code></pre></div>
   </a>
 </div>
 </article>
+        </div>
+        <div class='hidden md:block md:col-span-2 md:border-l'>
+          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
+  <div class='text-gray-600 text-sm -mt-2'>
     
+        <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Known issues'>
+              <a href='vim#known-issues' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Known issues
+              </a>
+              
+        <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Glitches when saving file'>
+              <a href='vim#glitches' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Glitches when saving file
+              </a>
+              
+        <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Temporary workaround'>
+              <a href='vim#temporary-workaround' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Temporary workaround
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Permanent workaround'>
+              <a href='vim#permanent-workaround' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Permanent workaround
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+  </div>
+  <script>
+    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
+    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
+    function highlightTOC() {
+      // Grab the toc links
+      const links = document.querySelectorAll("ul > li > a.--ema-toc");
+
+      // Find the matching anchors in the document body
+      const sections = [];
+      links.forEach((link) => {
+        let found = {};
+        for (section of document.querySelectorAll("a.--ema-anchor")) {
+          if (link.href == section.href) {
+            found = section;
+            break;
+          }
+        }
+        sections.push(found);
+      });
+
+      // Current toc link is marked with the following class
+      const mark = "toc-item-active";
+
+      // Set window scroll handler to update the toc mark.
+      window.onscroll = () => {
+        // Remove previous mark
+        links.forEach((link) => {
+          link.classList.remove(mark);
+        });
+
+        // Mark the link of the section that is in view, starting from the end
+        let marked = false;
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (window.scrollY > sections[i].offsetTop - 80) {
+            links[i].classList.add(mark);
+            marked = true;
+            break;
+          }
+        }
+
+        // Special case for the first and last section which might not reach the top
+        if (!marked && window.scrollY > 0) {
+          let i = 0;
+          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
+            // We are at the bottom
+            i = links.length - 1
+          }
+          links[i].classList.add(mark);
+        }
+      };
+    }
+    highlightTOC();
+  </script>
+</nav>
+        </div>
+      </div>
+      
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
