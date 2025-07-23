@@ -1,3 +1,12 @@
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/fonts/maven-pro.css" />
+
+<style data-category="global-font">
+  /* Maven Pro font for the entire site */
+  body {
+    font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+</style>
+
 <style data-category="error">
   /* Heist error element */
   strong.error {
