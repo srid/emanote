@@ -1,8 +1,5 @@
 ---
 order: 0
----
-
----
 slug: editors
 ---
 
