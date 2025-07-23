@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    HTML Templates – Emanote
+    Full-text search – Emanote
   </title>
   
     
-      <meta property='og:description' content='Unlike Neuron, Emanote’s generated HTML can be completely customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see here for a tutorial on its syntax.' />
+      <meta property='og:description' content='Emanote provides client-side full-text search using Stork. Search should work in both live server and the statically generated site.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='HTML Templates' />
+      <meta property='og:title' content='Full-text search' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -305,6 +305,15 @@
               </svg>
             </li>
           
+            <li class='inline-flex items-center'>
+              <a class='px-1 font-bold' href='templates'>
+                HTML Templates
+              </a>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
+              </svg>
+            </li>
+          
         
       </ul>
     </div>
@@ -476,7 +485,7 @@
     <span>
       
         
-          <a href='guide/markdown' title='View folgezettel children'>
+          <a href='markdown' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -488,7 +497,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='guide/markdown'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
@@ -533,7 +542,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='guide/yaml-config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
       YAML configuration
     </a>
     
@@ -575,7 +584,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='guide/query'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
       Queries
     </a>
     
@@ -659,7 +668,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='guide/export'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='export'>
       JSON export
     </a>
     
@@ -701,7 +710,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='guide/feed'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
@@ -803,7 +812,11 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
   
+
 
 
   
@@ -824,7 +837,7 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='guide/html-template'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
       HTML Templates
     </a>
     
@@ -839,7 +852,7 @@
       <!-- Variable bindings for this tree-->
 
   
-
+  
 
 
   
@@ -852,29 +865,27 @@
     <span>
       
         
-          
     
       <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
         </path>
       </svg>
-    
+      
   
         
-      
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Full-text search' href='guide/html-template/search'>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Full-text search' href='search'>
       Full-text search
     </a>
     
       
-        
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
+  
+    
   
 </div>
     
@@ -947,7 +958,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='External links' href='guide/html-template/external-links'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='External links' href='external-links'>
       External links
     </a>
     
@@ -1020,7 +1031,7 @@
     <span>
       
         
-          <a href='guide/html-template/neuron-layout' title='View folgezettel children'>
+          <a href='neuron-layout' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -1032,7 +1043,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='guide/html-template/neuron-layout'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='neuron-layout'>
       Neuron layout
     </a>
     
@@ -1119,7 +1130,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Sidebar' href='guide/html-template/sidebar'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Sidebar' href='sidebar'>
       Sidebar
     </a>
     
@@ -1203,7 +1214,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Uplink tree' href='guide/html-template/uptree'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Uplink tree' href='uptree'>
       Uplink tree
     </a>
     
@@ -1248,7 +1259,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='guide/layer'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='layers'>
       Layer system
     </a>
     
@@ -1290,7 +1301,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='guide/lua-filters'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -1378,8 +1389,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -1423,8 +1434,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -1465,8 +1476,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1488,7 +1499,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    HTML Templates
+    Full-text search
   </a>
 </h1>
     
@@ -1504,164 +1515,109 @@
 
 
     <p class='mb-3'>
-      Unlike <a href='start/neuron' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neuron</a>, Emanote’s generated HTML can be <strong>completely</strong> customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see <a href='http://snapframework.com/docs/tutorials/heist' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for a tutorial on its syntax.
+      Emanote provides client-side full-text search using <a href='https://stork-search.net/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Stork</a>
+    <sup class='px-0.5'>
+      <a class='text-blue-600 hover:underline' href='search#fn1'>
+        1
+      </a>
+    </sup>
+  . Search should work in both live server and the statically generated site.
     </p>
   
     <p class='mb-3'>
-      The default HTML templates are stored in the <a href='guide/layer' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>default layer</a>, which can you override either totally or in subset.
+      You can trigger search input in one of the following ways:
     </p>
   
-    <h2 id='default-layout' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Default Layout
-  
-  <a href='guide/html-template#default-layout' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      Emanote includes a default layout that includes a <a href='guide/html-template/sidebar' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='guide/html-template/neuron-layout' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.md</code></a> specifies this template as <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.name</code> in its YAML frontmatter (which could also be <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code>).
-    </p>
-  
-    <h2 id='features' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Features
-  
-  <a href='guide/html-template#features' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  <nav>
-  <div class='mb-8'>
-    <header data-nosnippet class='pb-2 mb-2 font-semibold text-gray-600'>
-      Folgezettel children
-    </header>
-    <ul>
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='breadcrumbs'>
-              Breadcrumbs
-            </a>
-          </div>
+          Press <span xmlhtmlRaw><kbd>Ctrl+K</kbd></span> (or <span xmlhtmlRaw><kbd>⌘K</kbd></span> on macOS).
         </li>
       
         <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='guide/html-template/external-links'>
-              External links
-            </a>
-          </div>
-        </li>
+          Click the lens icon on the sidebar
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='fonts'>
-              Fonts and Typography
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='guide/html-template/neuron-layout'>
-              Neuron-like layout
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='ogp'>
-              Open Graph Protocol (OGP)
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='guide/html-template/search'>
-              Full-text search
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='guide/html-template/sidebar'>
-              Sidebar
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='toc'>
-              Table of contents
-            </a>
-          </div>
-        </li>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600'>
-              </span>
-            
-            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='guide/html-template/uptree'>
-              Uplink tree
-            </a>
-          </div>
+          If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.
         </li>
       
     </ul>
-  </div>
-</nav>
+  
+        </li>
+      
+    </ul>
+  
+    <h2 id='including-frontmatter-in-the-search-index' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Including frontmatter in the search index
+  
+  <a href='search#including-frontmatter-in-the-search-index' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-3'>
+      By default, Stork doesn’t include the text in the frontmatter as searchable.
+    </p>
+  
+    <p class='mb-3'>
+      This can be changed by adding the following to <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>`index.yaml`</a>:
+    </p>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>template:
+  stork:
+    frontmatter-handling: ignore</code></pre></div>
+    <p class='mb-3'>
+      The possible values are <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>ignore</code>, <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>omit</code> and <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>parse</code>. Default <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>omit</code>. See the Stork <a href='https://stork-search.net/docs/config-ref#frontmatter_handling' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>docs</a>.
+    </p>
+  
+    <p class='mb-3'>
+      This allows you to search by your frontmatter metadata (eg: tags) instead of just markdown body. Note that you may also get undesired results when searching words including non-relevant parts of the YAML frontmatter, like <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>order</code> or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>date</code>; this is why the default is <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>omit</code>.
+    </p>
+  
+    <h2 id='known-issues' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Known issues
+  
+  <a href='search#known-issues' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          In live server mode, you may find that the browser will fetch remote assets (the wasm file) from files.stork-search.net. See details <a href='https://github.com/jameslittle230/stork/issues/317#issuecomment-1258682222' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>.
+        </li>
+      
+    </ul>
+  
+    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
+      <header class='font-semibold'>Footnotes</header>
+      
+        <div id='fn1'>
+          <header class='italic'>
+            1.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            The Stork index file can be accessed at <a href='-/stork.st' class='text-blue-600 font-semibold hover:underline'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>-/stork.st</code></a>.
+          </div>
+        </div>
+      
+    </div>
+  
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/search.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1675,9 +1631,9 @@
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Default Layout'>
-              <a href='guide/html-template#default-layout' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Default Layout
+            <li class='whitespace-nowrap truncate mt-2' title='Including frontmatter in the search index'>
+              <a href='search#including-frontmatter-in-the-search-index' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Including frontmatter in the search index
               </a>
               
         <ul class='ml-2'>
@@ -1686,9 +1642,9 @@
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Features'>
-              <a href='guide/html-template#features' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Features
+            <li class='whitespace-nowrap truncate mt-2' title='Known issues'>
+              <a href='search#known-issues' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Known issues
               </a>
               
         <ul class='ml-2'>
@@ -1765,138 +1721,14 @@
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/yaml-config'>
-            YAML configuration
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>[!tip] Using in HTML templates You can reference the YAML frontmatter config from <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>. See <a href='https://github.com/srid/emanote/discussions/131#discussioncomment-1382189' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for details.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template/uptree'>
-            Uplink tree
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>The <em>uplink tree</em> or “uptree”<sup>*</sup> is a feature available in <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkTag'>HTML Templates</a>, which visualizes hierarchical relationships between notes as a graph at the top of the page.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='toc'>
-            Table of contents
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>In <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>the default template</a>, the table of contents is rendered on the right side. TOC is rendered only if the page has more than one heading.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template/sidebar'>
-            Sidebar
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>In <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template/neuron-layout'>
-            Neuron-like layout
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote’s builtin <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='guide/html-template/sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='guide/html-template/uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='guide/yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/neuron'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron'>
             Migrating from neuron
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>Full theming (customize <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a> fully)</div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/layer'>
-            Layer system
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='guide/yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>template/hooks</code></a> of this documentation notbook.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template/external-links'>
-            External links
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Note that the attribute can also be used to display the icons in the <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='guide/markdown' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='guide/markdown/custom-style' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='callout'>
-            Callouts
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>To add a new custom callout named <code>foo</code> (viz.: <code>[!foo] ...</code>), create a <code>/templates/filters/callout/foo.tpl</code> file in your <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>templates</a> folder. You can also change the layout and styling of existing callout types in <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>/templates/filters/callout/*.tpl</code></a>.</p></div>
+      <div><a href='search' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Full-text search</a></div>
     </div>
   
 </div>

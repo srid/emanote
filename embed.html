@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    Sidebar – Emanote
+    Embedding – Emanote
   </title>
   
     
-      <meta property='og:description' content='In the default template, the sidebar is rendered on the left side. The sidebar tree is determined from folgezettel heterarchy.' />
+      <meta property='og:description' content='You can embed files, using ![[..]] - a syntax inspired by Obsidian. The HTML can be fully customized for each embed types.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Sidebar' />
+      <meta property='og:title' content='Embedding' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -306,8 +306,8 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide/html-template'>
-                HTML Templates
+              <a class='px-1 font-bold' href='markdown'>
+                Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -472,6 +472,10 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
@@ -485,27 +489,59 @@
     <span>
       
         
-          <a href='guide/markdown' title='View folgezettel children'>
-            
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
-    
-  
-          </a>
-          
       
+  
+        
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='guide/markdown'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
       
-        <span class='text-gray-300' title='4 children inside'>
-          4
-        </span>
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
       
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Callouts' href='callout'>
+      Callouts
+    </a>
+    
+      
+        
     
   </div>
 
@@ -542,7 +578,134 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='guide/yaml-config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Custom CSS styling' href='custom-style'>
+      Custom CSS styling
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        </path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Embedding' href='embed'>
+      Embedding
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='File WikiLinks' href='file-links'>
+      File WikiLinks
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
       YAML configuration
     </a>
     
@@ -584,7 +747,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='guide/query'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
       Queries
     </a>
     
@@ -668,7 +831,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='guide/export'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='export'>
       JSON export
     </a>
     
@@ -710,7 +873,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='guide/feed'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
@@ -812,10 +975,6 @@
       <!-- Variable bindings for this tree-->
 
   
-    
-      
-    
-  
 
 
 
@@ -829,211 +988,7 @@
     <span>
       
         
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='guide/html-template'>
-      HTML Templates
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Full-text search' href='guide/html-template/search'>
-      Full-text search
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Breadcrumbs' href='breadcrumbs'>
-      Breadcrumbs
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='External links' href='guide/html-template/external-links'>
-      External links
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Fonts and Typography' href='fonts'>
-      Fonts and Typography
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          <a href='guide/html-template/neuron-layout' title='View folgezettel children'>
+          <a href='templates' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -1045,13 +1000,13 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='guide/html-template/neuron-layout'>
-      Neuron layout
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
+      HTML Templates
     </a>
     
       
-        <span class='text-gray-300' title='1 children inside'>
-          1
+        <span class='text-gray-300' title='9 children inside'>
+          9
         </span>
       
     
@@ -1090,176 +1045,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Open Graph Protocol (OGP)' href='ogp'>
-      Open Graph Protocol (OGP)
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-  
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Sidebar' href='guide/html-template/sidebar'>
-      Sidebar
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Table of contents' href='toc'>
-      Table of contents
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Uplink tree' href='guide/html-template/uptree'>
-      Uplink tree
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='guide/layer'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='layers'>
       Layer system
     </a>
     
@@ -1301,7 +1087,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='guide/lua-filters'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -1389,8 +1175,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -1434,8 +1220,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -1476,8 +1262,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1499,7 +1285,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    Sidebar
+    Embedding
   </a>
 </h1>
     
@@ -1515,91 +1301,457 @@
 
 
     <p class='mb-3'>
-      In <a href='guide/html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.
+      You can embed files, using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[..]]</code> - a syntax inspired by <a href='https://help.obsidian.md/Linking+notes+and+files/Embedding+files' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Obsidian</a>. The HTML can be fully customized for each embed types.
+    </p>
+  <div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #EC750020'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
+    <line x1='12' y1='9' x2='12' y2='13'></line>
+    <line x1='12' y1='17' x2='12.01' y2='17'></line>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+      Warning
+    </div>
+  </div>
+  <div class='callout-content'>
+    
+    <p class='mb-3'>
+      The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.
+    <sup class='px-0.5'>
+      <a class='text-blue-600 hover:underline' href='embed#fn1'>
+        1
+      </a>
+    </sup>
+   Recursive embeds are supported.
+    </p>
+  
+    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
+      <header class='font-semibold'>Footnotes</header>
+      
+        <div id='fn1'>
+          <header class='italic'>
+            1.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
+          </div>
+        </div>
+      
+    </div>
+  
+  </div>
+</div>
+    <h2 id='notes' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Notes
+  
+  <a href='embed#notes' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-3'>
+      Embedding a note will simply inline it. For example, using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[start]]</code> displays the following:
+    </p>
+  <section title='Embedded note' class='p-4 mx-2 mb-2 bg-white border-2 rounded-lg shadow-inner'>
+  <header class='flex items-center justify-center text-2xl italic bg-blue-50 rounded py-1 px-2 mb-3'>
+    <a href='start'>
+      Getting Started
+    </a>
+  </header>
+  <div>
+    
+
+
+
+
+
+
+    <p class='mb-3'>
+      Follow these steps to get started with Emanote.
+    </p>
+  
+    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
+      
+        <li>
+          <a href='install' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Install Emanote</a>
+        </li>
+      
+        <li>
+          Use your existing notebook, or create one from <a href='template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>emanote-template</a>
+    <sup class='px-0.5'>
+      <a class='text-blue-600 hover:underline' href='start#fn1'>
+        1
+      </a>
+    </sup>
+  .
+        </li>
+      
+        <li>
+          Run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote run --port=8080</code> (or just <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote</code>) in terminal after <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>cd</code>’ing to that notebook folder; this will launch the live server.
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          Or, if you only want to generate the HTML files (for deployment), run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>mkdir /tmp/output; emanote gen /tmp/output</code>.
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          Visit <a href='guide' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>examples</a> to get inspired first.
+    <sup class='px-0.5'>
+      <a class='text-blue-600 hover:underline' href='start#fn2'>
+        2
+      </a>
+    </sup>
+  
+        </li>
+      
+    </ul>
+  
+    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
+      <header class='font-semibold'>Footnotes</header>
+      
+        <div id='fn1'>
+          <header class='italic'>
+            1.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            <a href='template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
+          </div>
+        </div>
+      
+        <div id='fn2'>
+          <header class='italic'>
+            2.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            If you are <a href='https://srid.ca/haskell' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>architecture</a>.
+          </div>
+        </div>
+      
+    </div>
+  
+  </div>
+</section>
+    <h2 id='files' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Files
+  
+  <a href='embed#files' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-3'>
+      Embedding of <a href='file-links' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.
+    </p>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+    </path>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+       Progress
+    </div>
+  </div>
+  <div class='callout-content'>
+    
+    <p class='mb-3'>
+      See <a href='https://github.com/srid/emanote/issues/24' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/24</a> for progress on this feature.
+    </p>
+  
+  </div>
+</div>
+    <h3 id='images' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Images
+  
+  <a href='embed#images' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-3'>
+      Embedding image files as, say, <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[disaster-girl.jpg]]</code> is equivalent to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![](path/to/disaster-girl.jpg)</code> (this example links to <a href='guide/markdown/disaster-girl.jpg' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>this image</a>).
+    </p>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+    </path>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+       See also
+    </div>
+  </div>
+  <div class='callout-content'>
+    
+    <p class='mb-3'>
+      <a href='images' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Adding Images</a>.
+    </p>
+  
+  </div>
+</div>
+    <p class='mb-3'>
+      <a href='https://knowyourmeme.com/memes/disaster-girl' class='text-blue-600 hover:underline' target='_blank' rel='noopener'><img class='inline mb-3' src='guide/markdown/disaster-girl.jpg' alt='[[disaster-girl.jpg]]' style='width: inherit;' /></a>
+    </p>
+  
+    <p class='mb-3'>
+      It is also posible to add images inline (example, here’s the site favicon: <span class='w-6'><img class='inline mb-3' src='favicon.svg' alt='[[favicon.svg]]' style='width: inherit;' /></span>) say in the middle of a paragraph.
+    </p>
+  
+    <h3 id='videos' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Videos
+  
+  <a href='embed#videos' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-3'>
+      The following is the result of using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[death-note.mp4]]</code> (note that <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![](death-note.mp4)</code> also works).
+    </p>
+  <video class='mb-3' autoplay loop muted>
+  <source src='guide/markdown/death-note.mp4' />
+  Your browser doesn't support HTML5 video. Here is a <a class='text-blue-600 hover:underline' href='guide/markdown/death-note.mp4'>link to the
+    video</a> instead.
+</video>
+    <h3 id='audio' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Audio
+  
+  <a href='embed#audio' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-3'>
+      The following is the result of using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[cat.ogg]]</code> (note that <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![](cat.ogg)</code> also works).
+    </p>
+  <audio controls preload='metadata' src='guide/markdown/cat.ogg'>
+  Your browser doesn't support HTML5 audio. Here is a
+  <a class='text-blue-600 hover:underline' href='guide/markdown/cat.ogg'>link to the audio</a>
+  instead.
+</audio>
+    <h3 id='pdfs' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  PDFs
+  
+  <a href='embed#pdfs' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-3'>
+      PDFs can be embedded using the same syntax. The following is the result of using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[git-cheat-sheet-education.pdf]]</code> (note that <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![](git-cheat-sheet-education.pdf)</code> also works):
+    </p>
+  <object class='mb-3 embedded-pdf w-full' type='application/pdf' data='guide/markdown/git-cheat-sheet-education.pdf' style='height: 800px'>
+  <a href='guide/markdown/git-cheat-sheet-education.pdf'>Open pdf</a>
+</object>
+    <h3 id='code-files' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Code files
+  
+  <a href='embed#code-files' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-3'>
+      Source code files can be embedded using the same syntax. The following is the result of using <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![[haskell-code.hs]]</code> (note that <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>![](haskell-code.hs)</code> also works):
+    </p>
+  <div class='py-0.5 mb-3 text-sm' title='/nix/store/y8m61j9grh0h9l9d8pyvil5v37k27gsq-docs/guide/markdown/haskell-code.hs'>
+  <pre><code class='haskell'>module HaskellCode where
+
+main :: IO ()
+main = do
+  print "Hello World"
+</code></pre>
+</div>
+    <p class='mb-3'>
+      A C file:
+    </p>
+  <div class='py-0.5 mb-3 text-sm' title='/nix/store/y8m61j9grh0h9l9d8pyvil5v37k27gsq-docs/guide/markdown/c-code.c'>
+  <pre><code class='c'>#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, World!\n");
+
+    return 0;
+}
+</code></pre>
+</div>
+    <p class='mb-3'>
+      The following file extensions are currently supported:
     </p>
   
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The sidebar tree is collapsed by default. But this can be disabled by setting <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.sidebar.collapsed</code> to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>false</code> in <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.hs</code>
         </li>
       
         <li>
-          The ordering of children in the tree is determined in the following order (this is also the order in which <a href='guide/query' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):
-    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
-      
-        <li>
-          if <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.sidebar.folders-first</code> is set to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>true</code> (default <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>false</code>), directories (see <a href='folder-note' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Folder notes</a>) are put before single notes, respecting the other order criteria. Otherwise, directories and notes will be interleaved.
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.sh</code>
         </li>
       
         <li>
-          If the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>order</code> <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata exists, use that as the primary sort key.
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.py</code>
         </li>
       
         <li>
-          If the note has a H1 title, use that as the secondary sort key; otherwise, use the note filename as the secondary sort key.
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.js</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.java</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.cpp</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.cs</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.rb</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.go</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.swift</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.kt</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.rs</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.ts</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.php</code>
+        </li>
+      
+        <li>
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>.c</code>
         </li>
       
     </ul>
   
-        </li>
-      
-    </ul>
-  
-    <h2 id='customizing-page-title' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Customizing page title
-  
-  <a href='guide/html-template/sidebar#customizing-page-title' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
     <p class='mb-3'>
-      The sidebar will use a page’s title by default, but you can override the sidebar item text by setting the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>short-title</code> <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> property.
+      To include a new one please see <a href='https://github.com/srid/emanote/pull/444' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>.
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='markdown language-markdown'>---
-short-title: hello
----
-
-# Hello World
-
-Foo bar ...</code></pre></div>
+  <div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #EC750020'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
+    <line x1='12' y1='9' x2='12' y2='13'></line>
+    <line x1='12' y1='17' x2='12.01' y2='17'></line>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+       Firefox users
+    </div>
+  </div>
+  <div class='callout-content'>
+    
     <p class='mb-3'>
-      This page will use “Hello World” as its title in the main view, but “hello” in the sidebar and index pages. For real-world example, see the page “<a href='guide/lua-filters' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>”.
+      Please note that the wrong syntax highlighting might be applied if you are on Firefox due to what appears to be a browser bug.
     </p>
   
-    <h2 id='disabling-the-sidebar' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+  </div>
+</div>
+    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
+      <header class='font-semibold'>Footnotes</header>
       
-  Disabling the sidebar
-  
-  <a href='guide/html-template/sidebar#disabling-the-sidebar' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      In <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,
-    </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>template:
-  sidebar:
-    enable: false</code></pre></div>
-    <p class='mb-3'>
+        <div id='fn1'>
+          <header class='italic'>
+            1.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
+          </div>
+        </div>
       
-    </p>
+    </div>
   
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/sidebar.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown/embed.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1613,9 +1765,9 @@ Foo bar ...</code></pre></div>
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Customizing page title'>
-              <a href='guide/html-template/sidebar#customizing-page-title' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Customizing page title
+            <li class='whitespace-nowrap truncate mt-2' title='Notes'>
+              <a href='embed#notes' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Notes
               </a>
               
         <ul class='ml-2'>
@@ -1624,12 +1776,67 @@ Foo bar ...</code></pre></div>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Disabling the sidebar'>
-              <a href='guide/html-template/sidebar#disabling-the-sidebar' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Disabling the sidebar
+            <li class='whitespace-nowrap truncate mt-2' title='Files'>
+              <a href='embed#files' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Files
               </a>
               
         <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Images'>
+              <a href='embed#images' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Images
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Videos'>
+              <a href='embed#videos' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Videos
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Audio'>
+              <a href='embed#audio' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Audio
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='PDFs'>
+              <a href='embed#pdfs' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                PDFs
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Code files'>
+              <a href='embed#code-files' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Code files
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
           
         </ul>
       
@@ -1703,18 +1910,14 @@ Foo bar ...</code></pre></div>
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template/neuron-layout'>
-            Neuron-like layout
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='file-links'>
+            File WikiLinks
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote’s builtin <a href='guide/html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='guide/html-template/sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='guide/html-template/uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='guide/yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>In the absence of <a href='guide/html-template/sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='guide/query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
+      <div><p>If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.</p></div>
     </div>
   
 </div>
@@ -1722,14 +1925,14 @@ Foo bar ...</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/markdown'>
-            Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='custom-style'>
+            Custom CSS styling
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>See <a href='folgezettel' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a> for a special type of wiki-link used to define the <a href='guide/html-template/sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a> (and <a href='guide/html-template/uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>) heirarchy.</p></div>
+      <div><p>Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement<sup>*</sup> you can make use of CSS grids as provided by Tailwind’s classes.</p></div>
     </div>
   
 </div>
@@ -1737,14 +1940,14 @@ Foo bar ...</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/html-template'>
-            HTML Templates
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='images'>
+            Adding Images
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote includes a default layout that includes a <a href='guide/html-template/sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='guide/html-template/neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='guide/yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+      <div><p>[!tip] The extension uses the traditional <code>![]()</code> syntax to link to the image, but you may switch to using the <a href='embed' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>wiki-link embedding syntax</a> (<code>![[]]</code>) as it has the advantage of not needing to specify the full path to the image (thus allowing you to the move the image around under the notebook without breaking referring links). <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> is already configured to do this by default.</p></div>
     </div>
   
 </div>
@@ -1757,6 +1960,15 @@ Foo bar ...</code></pre></div>
     </div>
     
   <section class='flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm'>
+    
+      <!-- FIXME: The use of -/tags is wrong, because we should use routeUrl using Ema's encoder 
+        Perhaps Emanote should inject tagMetas with urls.
+      -->
+      <a title='Tag' class='px-1 bg-gray-100 rounded hover:bg-gray-50 hover:text-blue-500' href='-/tags/emanote/syntax/demo'>
+        <!-- DoNotFormat -->
+        #emanote/syntax/demo
+        <!-- DoNotFormat -->
+      </a>
     
   </section>
 

@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    File WikiLinks – Emanote
+    Syntax Highlighting – Emanote
   </title>
   
     
-      <meta property='og:description' content='[[..]] style wikilinks can link to not only Markdown files, but also to any other files.' />
+      <meta property='og:description' content='In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as highlight.js by adding it to page.headHtml of YAML configuration or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your index.yaml (assuming you are enabling it on all routes):' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='File WikiLinks' />
+      <meta property='og:title' content='Syntax Highlighting' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -40,10 +40,9 @@
 <script>hljs.highlightAll();</script>
 
 
-
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -297,8 +296,8 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide'>
-                Guide
+              <a class='px-1 font-bold' href='tips'>
+                tips
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -306,8 +305,8 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide/markdown'>
-                Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
+              <a class='px-1 font-bold' href='tips/js'>
+                js
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -432,10 +431,6 @@
       <!-- Variable bindings for this tree-->
 
   
-    
-      
-    
-  
 
 
 
@@ -449,25 +444,35 @@
     <span>
       
         
+          <a href='guide' title='View folgezettel children'>
+            
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
-      
+    
   
-        
+          </a>
+          
+      
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
       Guide
     </a>
     
       
+        <span class='text-gray-300' title='12 children inside'>
+          12
+        </span>
+      
+    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
   
+</div>
     
       <!-- Variable bindings for this tree-->
 
@@ -497,8 +502,8 @@
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='guide/markdown'>
-      Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -536,8 +541,90 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Callouts' href='callout'>
-      Callouts
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Adding Images' href='images'>
+      Adding Images
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+    
+      
+    
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='JavaScript' href='tips/js'>
+      JavaScript
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Math' href='math'>
+      Math
     </a>
     
       
@@ -578,50 +665,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Custom CSS styling' href='guide/markdown/custom-style'>
-      Custom CSS styling
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Embedding' href='guide/markdown/embed'>
-      Embedding
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Mermaid Diagrams' href='mermaid'>
+      Mermaid Diagrams
     </a>
     
       
@@ -660,8 +705,8 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='File WikiLinks' href='guide/markdown/file-links'>
-      File WikiLinks
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Syntax Highlighting' href='syntax-highlighting'>
+      Syntax Highlighting
     </a>
     
       
@@ -705,8 +750,53 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='guide/yaml-config'>
-      YAML configuration
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
+      Syncthing sync
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -747,523 +837,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='guide/query'>
-      Queries
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
-      Daily Notes
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='guide/export'>
-      JSON export
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='guide/feed'>
-      ATOM feed
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
-      Folder notes
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
-      Folgezettel links
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          <a href='guide/html-template' title='View folgezettel children'>
-            
-    
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
-      </svg>
-    
-  
-          </a>
-          
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='guide/html-template'>
-      HTML Templates
-    </a>
-    
-      
-        <span class='text-gray-300' title='9 children inside'>
-          9
-        </span>
-      
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='guide/layer'>
-      Layer system
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='guide/lua-filters'>
-      Lua Filters
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
-      Org Mode ✍️
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          <a href='tips' title='View folgezettel children'>
-            
-    
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
-      </svg>
-    
-  
-          </a>
-          
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
-    </a>
-    
-      
-        <span class='text-gray-300' title='3 children inside'>
-          3
-        </span>
-      
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1285,11 +860,13 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    File WikiLinks
+    Syntax Highlighting
   </a>
 </h1>
     
-      <article class='overflow-auto'>
+      <div class='md:grid md:gap-4 md:grid-cols-8'>
+        <div class='md:col-span-6'>
+          <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
@@ -1299,50 +876,253 @@
 
 
     <p class='mb-3'>
-      <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>[[..]]</code> style wikilinks can link to not only Markdown files, but also to any <em>other</em> files.
+      In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as <a href='https://highlightjs.org/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>highlight.js</a> by adding it to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.headHtml</code> of <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code> (assuming you are enabling it on all routes):
     </p>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>page:
+  headHtml: |
+    &lt;snippet var="js.highlightjs" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #EC750020'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
+    <line x1='12' y1='9' x2='12' y2='13'></line>
+    <line x1='12' y1='17' x2='12.01' y2='17'></line>
+  
+      </svg>
+    </div>
+    <div class='ml-2'>
+      Warning
+    </div>
+  </div>
+  <div class='callout-content'>
+    
+    <p class='mb-3'>
+      Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and <a href='https://nixos.asia' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Nix</a> by default; otherwise, it is normally added as:
+    </p>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>page:
+  headHtml: |
+    &lt;snippet var="js.highlightjs" /&gt;
+    &lt;with var="js"&gt;
+    &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"&gt;&lt;/script&gt;
+    &lt;/with&gt;</code></pre></div>
+    <p class='mb-3'>
+      (The <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>highlightjs-ver</code> variable comes from the default <a href='https://github.com/srid/emanote/blob/master/emanote/default/index.yaml' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code></a>.)
+    </p>
+  
+  </div>
+</div>
+    <h2 id='example-highlightjs' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Example (highlight.js)
+  
+  <a href='syntax-highlighting#example-highlightjs' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <h3 id='python' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Python
+  
+  <a href='syntax-highlighting#python' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='python language-python'>def fib(n):
+    a, b = 0, 1
+    while a &lt; n:
+        print(a, end=' ')
+        a, b = b, a+b
+    print()
+fib(1000)</code></pre></div>
+    <h3 id='haskell' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+      
+  Haskell
+  
+  <a href='syntax-highlighting#haskell' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='haskell language-haskell'>fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)</code></pre></div>
+    <h2 id='prism' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Prism
+  
+  <a href='syntax-highlighting#prism' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
   
     <p class='mb-3'>
-      For example,
+      A predefined snippet also exists for another syntax highlighter called <a href='https://prismjs.com/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Prism</a>. To use it add the following to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.headHtml</code> of <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
     </p>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>page:
+  headHtml: |
+    &lt;snippet var="js.prism" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #EC750020'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
+    <div class='callout-icon'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
+    <line x1='12' y1='9' x2='12' y2='13'></line>
+    <line x1='12' y1='17' x2='12.01' y2='17'></line>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
-        </li>
-      
-        <li>
-          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
-        </li>
-      
-        <li>
-          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Some text file</a>
-        </li>
-      
-        <li>
-          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline'>normal linking</a>.
-        </li>
-      
-    </ul>
-  
-    <p class='mb-3'>
-      In the live server, links to static files will open in new browser tab.
-    </p>
-  
-    <p class='mb-3'>
-      If a wikilink refers to a display-able resource like image or video, it will appear <a href='guide/markdown/embed' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
-    </p>
-  
+      </svg>
+    </div>
+    <div class='ml-2'>
+       Prism does not cooperate well with Emanote’s live preview mode.
+    </div>
+  </div>
+  <div class='callout-content'>
+    
+  </div>
+</div>
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown/file-links.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/js/syntax-highlighting.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
   </a>
 </div>
 </article>
+        </div>
+        <div class='hidden md:block md:col-span-2 md:border-l'>
+          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
+  <div class='text-gray-600 text-sm -mt-2'>
     
+        <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Example (highlight.js)'>
+              <a href='syntax-highlighting#example-highlightjs' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Example (highlight.js)
+              </a>
+              
+        <ul class='ml-2'>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Python'>
+              <a href='syntax-highlighting#python' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Python
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Haskell'>
+              <a href='syntax-highlighting#haskell' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Haskell
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Prism'>
+              <a href='syntax-highlighting#prism' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Prism
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+  </div>
+  <script>
+    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
+    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
+    function highlightTOC() {
+      // Grab the toc links
+      const links = document.querySelectorAll("ul > li > a.--ema-toc");
+
+      // Find the matching anchors in the document body
+      const sections = [];
+      links.forEach((link) => {
+        let found = {};
+        for (section of document.querySelectorAll("a.--ema-anchor")) {
+          if (link.href == section.href) {
+            found = section;
+            break;
+          }
+        }
+        sections.push(found);
+      });
+
+      // Current toc link is marked with the following class
+      const mark = "toc-item-active";
+
+      // Set window scroll handler to update the toc mark.
+      window.onscroll = () => {
+        // Remove previous mark
+        links.forEach((link) => {
+          link.classList.remove(mark);
+        });
+
+        // Mark the link of the section that is in view, starting from the end
+        let marked = false;
+        for (var i = sections.length - 1; i >= 0; i--) {
+          if (window.scrollY > sections[i].offsetTop - 80) {
+            links[i].classList.add(mark);
+            marked = true;
+            break;
+          }
+        }
+
+        // Special case for the first and last section which might not reach the top
+        if (!marked && window.scrollY > 0) {
+          let i = 0;
+          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
+            // We are at the bottom
+            i = links.length - 1
+          }
+          links[i].classList.add(mark);
+        }
+      };
+    }
+    highlightTOC();
+  </script>
+</nav>
+        </div>
+      </div>
+      
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
@@ -1351,14 +1131,14 @@
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/neuron'>
-            Migrating from neuron
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/orgmode'>
+            Org Mode ✍️
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>Flexible WikiLinks (link to directories, or based on path, eg: <code>[[Foo/Bar]]</code>) including <a href='guide/markdown/file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.</div>
+      <div><p>See <a href='syntax-highlighting' class='text-gray-600 font-bold hover:bg-gray-50'>Syntax Highlighting</a> for general information.</p></div>
     </div>
   
 </div>
@@ -1366,29 +1146,14 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/markdown/embed'>
-            Embedding
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='markdown'>
+            Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Embedding of <a href='guide/markdown/file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='guide/markdown/custom-style'>
-            Custom CSS styling
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p><a href='guide/markdown/file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkEmbed'>File WikiLinks</a></p></div>
+      <div><p><a href='syntax-highlighting' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkEmbed'>Syntax Highlighting</a></p></div>
     </div>
   
 </div>

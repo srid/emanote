@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    ATOM feed – Emanote
+    File WikiLinks – Emanote
   </title>
   
     
-      <meta property='og:description' content='An atom feed can be generated for a given note query by adding the following to the note metadata:' />
+      <meta property='og:description' content='[[..]] style wikilinks can link to not only Markdown files, but also to any other files.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='ATOM feed' />
+      <meta property='og:title' content='File WikiLinks' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -305,6 +305,15 @@
               </svg>
             </li>
           
+            <li class='inline-flex items-center'>
+              <a class='px-1 font-bold' href='markdown'>
+                Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
+              </a>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
+              </svg>
+            </li>
+          
         
       </ul>
     </div>
@@ -463,6 +472,10 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
@@ -476,27 +489,59 @@
     <span>
       
         
-          <a href='guide/markdown' title='View folgezettel children'>
-            
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
-    
-  
-          </a>
-          
       
+  
+        
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='guide/markdown'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
       
-        <span class='text-gray-300' title='4 children inside'>
-          4
-        </span>
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
       
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Callouts' href='callout'>
+      Callouts
+    </a>
+    
+      
+        
     
   </div>
 
@@ -533,7 +578,134 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='guide/yaml-config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Custom CSS styling' href='custom-style'>
+      Custom CSS styling
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Embedding' href='embed'>
+      Embedding
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        </path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='File WikiLinks' href='file-links'>
+      File WikiLinks
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
       YAML configuration
     </a>
     
@@ -575,7 +747,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='guide/query'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
       Queries
     </a>
     
@@ -659,7 +831,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='guide/export'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='export'>
       JSON export
     </a>
     
@@ -677,7 +849,7 @@
       <!-- Variable bindings for this tree-->
 
   
-  
+
 
 
   
@@ -690,27 +862,29 @@
     <span>
       
         
+          
     
       <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
-      
+    
   
         
+      
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='guide/feed'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
       
+        
+    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
-  
-    
   
 </div>
     
@@ -814,7 +988,7 @@
     <span>
       
         
-          <a href='guide/html-template' title='View folgezettel children'>
+          <a href='templates' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -826,7 +1000,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='guide/html-template'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
       HTML Templates
     </a>
     
@@ -871,7 +1045,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='guide/layer'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='layers'>
       Layer system
     </a>
     
@@ -913,7 +1087,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='guide/lua-filters'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -1001,8 +1175,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -1046,8 +1220,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -1088,8 +1262,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1111,13 +1285,11 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    ATOM feed
+    File WikiLinks
   </a>
 </h1>
     
-      <div class='md:grid md:gap-4 md:grid-cols-8'>
-        <div class='md:col-span-6'>
-          <article class='overflow-auto'>
+      <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
@@ -1127,197 +1299,105 @@
 
 
     <p class='mb-3'>
-      An atom feed can be generated for a given note <a href='guide/query' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>note metadata</a>:
-    </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='markdown language-markdown'>---
-feed:
-  enable: true
----
-
-# My blog
-
-```query
-path:blog/*
-```</code></pre></div>
-    <p class='mb-3'>
-      If the note is named <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>blog.md</code>, then the feed will be available at <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>blog.xml</code>.
-    </p>
-  <div data-callout-metadata data-callout-fold data-callout='note' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #086DD320'>
-  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-  </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #086DD3'>
-    <div class='callout-icon'>
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-        
-    <line x1='18' y1='2' x2='22' y2='6'></line>
-    <path d='M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z'></path>
-  
-      </svg>
-    </div>
-    <div class='ml-2'>
-       <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.siteUrl</code>
-    </div>
-  </div>
-  <div class='callout-content'>
-    
-    <p class='mb-3'>
-      You must set <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.siteUrl</code> (see below) in the <a href='guide/yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> for the feed to be generated.
+      <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>[[..]]</code> style wikilinks can link to not only Markdown files, but also to any <em>other</em> files.
     </p>
   
-  </div>
-</div>
-    <h2 id='example' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Example
-  
-  <a href='guide/feed#example' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
     <p class='mb-3'>
-      An example is available in the <a href='guide/query' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='guide/query.xml' class='text-blue-600 font-semibold hover:underline'>query.xml</a>.
-    </p>
-  
-    <h2 id='configuration' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Configuration
-  
-  <a href='guide/feed#configuration' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      Here are the supported settings:
+      For example,
     </p>
   
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>feed.title</code>: the feed title, default to the note title.
+          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>feed.limit</code>: the maximum number of notes to include in the feed.
+          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
+        </li>
+      
+        <li>
+          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Some text file</a>
+        </li>
+      
+        <li>
+          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-blue-600 font-semibold hover:underline'>normal linking</a>.
         </li>
       
     </ul>
   
     <p class='mb-3'>
-      The feed is constructed from the first and only query of the note.
+      In the live server, links to static files will open in new browser tab.
+    </p>
+  
+    <p class='mb-3'>
+      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
     </p>
   
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/feed.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown/file-links.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
   </a>
 </div>
 </article>
-        </div>
-        <div class='hidden md:block md:col-span-2 md:border-l'>
-          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
-  <div class='text-gray-600 text-sm -mt-2'>
     
-        <ul class='ml-2'>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Example'>
-              <a href='guide/feed#example' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Example
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Configuration'>
-              <a href='guide/feed#configuration' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Configuration
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-  </div>
-  <script>
-    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
-    function highlightTOC() {
-      // Grab the toc links
-      const links = document.querySelectorAll("ul > li > a.--ema-toc");
-
-      // Find the matching anchors in the document body
-      const sections = [];
-      links.forEach((link) => {
-        let found = {};
-        for (section of document.querySelectorAll("a.--ema-anchor")) {
-          if (link.href == section.href) {
-            found = section;
-            break;
-          }
-        }
-        sections.push(found);
-      });
-
-      // Current toc link is marked with the following class
-      const mark = "toc-item-active";
-
-      // Set window scroll handler to update the toc mark.
-      window.onscroll = () => {
-        // Remove previous mark
-        links.forEach((link) => {
-          link.classList.remove(mark);
-        });
-
-        // Mark the link of the section that is in view, starting from the end
-        let marked = false;
-        for (var i = sections.length - 1; i >= 0; i--) {
-          if (window.scrollY > sections[i].offsetTop - 80) {
-            links[i].classList.add(mark);
-            marked = true;
-            break;
-          }
-        }
-
-        // Special case for the first and last section which might not reach the top
-        if (!marked && window.scrollY > 0) {
-          let i = 0;
-          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
-            // We are at the bottom
-            i = links.length - 1
-          }
-          links[i].classList.add(mark);
-        }
-      };
-    }
-    highlightTOC();
-  </script>
-</nav>
-        </div>
-      </div>
-      
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
+  <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
+    <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
+    <ul class='space-y-1'>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron'>
+            Migrating from neuron
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div>Flexible WikiLinks (link to directories, or based on path, eg: <code>[[Foo/Bar]]</code>) including <a href='file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.</div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='embed'>
+            Embedding
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>Embedding of <a href='file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='custom-style'>
+            Custom CSS styling
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p><a href='file-links' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkEmbed'>File WikiLinks</a></p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+    </ul>
+  </div>
+
     </div>
     
   <section class='flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm'>

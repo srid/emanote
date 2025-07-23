@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    External links – Emanote
+    Synchronizing notes using Syncthing – Emanote
   </title>
   
     
-      <meta property='og:description' content='A link whose address begins with an URI scheme component is considered an external link.' />
+      <meta property='og:description' content='Syncthing is an open-source and superior Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='External links' />
+      <meta property='og:title' content='Synchronizing notes using Syncthing' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -31,20 +31,19 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <script>
-  window.MathJax = {
-    startup: {
-      ready: () => {
-        MathJax.startup.defaultReady();
-      }
-    }
-  };
-</script>
-<script async id='MathJax-script' src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+    <!-- highlight.js -->
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
+<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
+<!-- Include languages that Emanote itself uses -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
+<script>hljs.highlightAll();</script>
+
+
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -298,17 +297,8 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide'>
-                Guide
-              </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
-                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
-              </svg>
-            </li>
-          
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide/html-template'>
-                HTML Templates
+              <a class='px-1 font-bold' href='tips'>
+                tips
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -387,6 +377,10 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
@@ -400,69 +394,19 @@
     <span>
       
         
-          <a href='start' title='View folgezettel children'>
-            
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
-    
-  
-          </a>
-          
       
+  
+        
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
       Getting Started
     </a>
     
       
-        <span class='text-gray-300' title='4 children inside'>
-          4
-        </span>
-      
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-    
-      
-    
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
-      Guide
-    </a>
-    
-      
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -486,7 +430,7 @@
     <span>
       
         
-          <a href='guide/markdown' title='View folgezettel children'>
+          <a href='install' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -498,8 +442,140 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='guide/markdown'>
-      Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='install'>
+      Installing
+    </a>
+    
+      
+        <span class='text-gray-300' title='3 children inside'>
+          3
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          <a href='neuron' title='View folgezettel children'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='neuron'>
+      Migrating from neuron
+    </a>
+    
+      
+        <span class='text-gray-300' title='1 children inside'>
+          1
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+    
+      
+    
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='resources' href='start/resources'>
+      resources
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          <a href='start/resources/editors' title='View folgezettel children'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='editors' href='start/resources/editors'>
+      editors
     </a>
     
       
@@ -543,8 +619,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='guide/yaml-config'>
-      YAML configuration
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='emanote-template' href='template'>
+      emanote-template
     </a>
     
       
@@ -585,342 +661,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='guide/query'>
-      Queries
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
-      Daily Notes
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='guide/export'>
-      JSON export
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='guide/feed'>
-      ATOM feed
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
-      Folder notes
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
-      Folgezettel links
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-    
-      
-    
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='guide/html-template'>
-      HTML Templates
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Full-text search' href='guide/html-template/search'>
-      Full-text search
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Breadcrumbs' href='breadcrumbs'>
-      Breadcrumbs
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='zk' href='zk'>
+      zk
     </a>
     
       
@@ -959,8 +701,8 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='External links' href='guide/html-template/external-links'>
-      External links
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
+      Syncthing sync
     </a>
     
       
@@ -970,6 +712,9 @@
     TODO: Use <details> to toggle visibility?
   -->
   
+    
+  
+</div>
     
   
 </div>
@@ -1001,8 +746,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Fonts and Typography' href='fonts'>
-      Fonts and Typography
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='known-issues' href='start/known-issues'>
+      known-issues
     </a>
     
       
@@ -1013,6 +758,9 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
+  
+</div>
+    
   
 </div>
     
@@ -1032,7 +780,7 @@
     <span>
       
         
-          <a href='guide/html-template/neuron-layout' title='View folgezettel children'>
+          <a href='guide' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -1044,13 +792,13 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='guide/html-template/neuron-layout'>
-      Neuron layout
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+      Guide
     </a>
     
       
-        <span class='text-gray-300' title='1 children inside'>
-          1
+        <span class='text-gray-300' title='12 children inside'>
+          12
         </span>
       
     
@@ -1065,11 +813,15 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -1078,31 +830,25 @@
     <span>
       
         
-          
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
-    
+      
   
         
-      
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Open Graph Protocol (OGP)' href='ogp'>
-      Open Graph Protocol (OGP)
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
-        
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
   
-</div>
     
       <!-- Variable bindings for this tree-->
 
@@ -1131,8 +877,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Sidebar' href='guide/html-template/sidebar'>
-      Sidebar
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Adding Images' href='images'>
+      Adding Images
     </a>
     
       
@@ -1153,222 +899,6 @@
 
 
   
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Table of contents' href='toc'>
-      Table of contents
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Uplink tree' href='guide/html-template/uptree'>
-      Uplink tree
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='guide/layer'>
-      Layer system
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='guide/lua-filters'>
-      Lua Filters
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
-      Org Mode ✍️
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
   
 
 <!-- Rendering of this tree -->
@@ -1378,7 +908,7 @@
     <span>
       
         
-          <a href='tips' title='View folgezettel children'>
+          <a href='tips/js' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -1390,8 +920,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JavaScript' href='tips/js'>
+      JavaScript
     </a>
     
       
@@ -1411,6 +941,49 @@
       <!-- Variable bindings for this tree-->
 
   
+  
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        </path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
+      Syncthing sync
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
 
 
 
@@ -1435,8 +1008,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -1477,8 +1050,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1500,7 +1073,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    External links
+    Synchronizing notes using Syncthing
   </a>
 </h1>
     
@@ -1516,60 +1089,20 @@
 
 
     <p class='mb-3'>
-      A link whose address begins with an <a href='https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>URI scheme</a> component is considered an <strong>external link</strong>.
-    </p>
-  
-    <h2 id='heuristic' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Heuristic
-  
-  <a href='guide/html-template/external-links#heuristic' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      Emanote displays an icon next to an external hyperlink if its description contains some text, including inline code and math formulas.
+      <a href='https://docs.syncthing.net/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Syncthing</a> is an open-source and superior
     <sup class='px-0.5'>
-      <a class='text-blue-600 hover:underline' href='guide/html-template/external-links#fn1'>
+      <a class='text-blue-600 hover:underline' href='sync#fn1'>
         1
       </a>
     </sup>
-   The heuristic is intended to make the site look good in most cases.
+   Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).
     </p>
   
-    <h3 id='overriding-the-heuristic' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+    <h2 id='mobile-editing' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-  Overriding the heuristic
+  Mobile editing
   
-  <a href='guide/html-template/external-links#overriding-the-heuristic' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-3'>
-      This behaviour can be overriden by setting the value of the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>data-linkicon</code> <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>data attribute</a> of a link:
-    </p>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Attribute to use</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Description</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>{data-linkicon=external}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><em>Force</em> displaying the icon next to the link</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>{data-linkicon=none}</code> or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>{data-linkicon=""}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><em>Prevent</em> displaying the icon next to the link</td></tr></tbody></table>
-    <p class='mb-3'>
-      Note that the attribute can also be used to display the icons in the <a href='guide/html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='guide/markdown' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.
-    </p>
-  
-    <h2 id='url-properties' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  URL properties
-  
-  <a href='guide/html-template/external-links#url-properties' class='--ema-anchor'>
+  <a href='sync#mobile-editing' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1580,14 +1113,20 @@
     </h2>
   
     <p class='mb-3'>
-      The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='guide/markdown/custom-style' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='guide/html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.
+      On Android
+    <sup class='px-0.5'>
+      <a class='text-blue-600 hover:underline' href='sync#fn2'>
+        2
+      </a>
+    </sup>
+   you can use the <a href='https://play.google.com/store/apps/details?id=md.obsidian&amp;hl=en&amp;gl=US' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Obsidian</a> app to edit your notes synced by Syncthing. <span class='bg-yellow-200 px-2 py-0.5 rounded-xl'>Changes made on desktop and mobile propagate both ways automatically.</span>
     </p>
   
-    <h2 id='demo' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+    <h2 id='dealing-with-data-loss' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-  Demo
+  Dealing with data loss
   
-  <a href='guide/html-template/external-links#demo' class='--ema-anchor'>
+  <a href='sync#dealing-with-data-loss' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1597,69 +1136,17 @@
 
     </h2>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          Default styling:
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          <a href='https://github.com/srid/emanote' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>the emanote repo</a>
-        </li>
-      
-        <li>
-          <a href='https://www.unicode.org/alloc/nonapprovals.html' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>why the external link symbol <img class='inline mb-3' src='guide/markdown/external-link-icon.svg' alt='[[external-link-icon.svg]]' style='width: inherit;' /> is not in Unicode</a>
-        </li>
-      
-        <li>
-          <a href='https://en.wikipedia.org/wiki/Euler%27s_identity' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><span class='math inline'>\(e^{i \pi} + 1 = 0\)</span></a>
-        </li>
-      
-        <li>
-          <a href='https://hackage.haskell.org/package/base/docs/Prelude.html#v:-62--62--61-' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>(&gt;&gt;=) :: forall a b. m a -&gt; (a -&gt; m b) -&gt; m b</code></a>
-        </li>
-      
-        <li>
-          <a href='https://emanote.srid.ca' class='text-blue-600 hover:underline' target='_blank' rel='noopener'><img class='inline mb-3' src='guide/markdown/hello-badge.svg' alt='[[hello-badge.svg]]' style='width: inherit;' /></a>
-        </li>
-      
-        <li>
-          <a href='mailto:mother_hetchel@weaversguild.com' class='text-blue-600 font-semibold hover:underline' data-linkicon='external'>mother_hetchel@weaversguild.com</a>
-        </li>
-      
-    </ul>
+    <p class='mb-3'>
+      Data loss is not uncommon when working with syncthing. For this reason, it is recommended to <em>also</em> track your notebook in a Git repository. Assuming you commit often (via <a href='vscode' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> extensions like <a href='https://marketplace.visualstudio.com/items?itemName=alfredbirk.git-add-commit-push' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>this</a>), if any file goes missing you can always recover it from Git.
+    </p>
   
-        </li>
-      
-        <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>{data-linkicon=none}</code> used to suppress the icon:
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          Water’s formula is <a href='https://en.wikipedia.org/wiki/Hydrogen' class='text-blue-600 hover:underline' data-linkicon='none' target='_blank' rel='noopener'>H</a>₂<a href='https://en.wikipedia.org/wiki/Oxygen' class='text-blue-600 hover:underline' data-linkicon='none' target='_blank' rel='noopener'>O</a>.
-        </li>
-      
-        <li>
-          A 90’s style hyperlink: <a href='https://emanote.srid.ca' class='shadow-lg border-8 rounded-md bg-yellow-400 border-red-200 text-blue-600 hover:underline' data-linkicon='none' target='_blank' rel='noopener'>➡➡➡ <strong>CLICK HERE!!!</strong> ⬅⬅⬅</a>
-        </li>
-      
-    </ul>
+    <p class='mb-3'>
+      Git also acts as backup if you push your repository to a remote location (GitHub or a private server via SSH).
+    </p>
   
-        </li>
-      
-        <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>{data-linkicon=external}</code> used to forcefully show the icon
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          <a href='https://en.wikipedia.org/wiki/Klingon_scripts' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><img class='inline mb-3' src='guide/markdown/pIqaD.svg' alt='[[pIqaD.svg]]' style='width: inherit;' /></a>
-        </li>
-      
-    </ul>
-  
-        </li>
-      
-    </ul>
+    <p class='mb-3'>
+      <a href='start/resources' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkTag'>resources</a>
+    </p>
   
     <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
       <header class='font-semibold'>Footnotes</header>
@@ -1669,14 +1156,23 @@
             1.
           </header>
           <div class='inline-block mb-2 ml-4'>
-            A common non-example is a hyperlink containing only an image in the description.
+            “superior” … because when using Dropbox, Android phones (unlike desktop computers) cannot have automatic full-sync of files on disk.
+          </div>
+        </div>
+      
+        <div id='fn2'>
+          <header class='italic'>
+            2.
+          </header>
+          <div class='inline-block mb-2 ml-4'>
+            Obsidian can also synchronize notes between iOS and macOS <a href='https://help.obsidian.md/Getting+started/Sync+your+notes+across+devices' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>via iCloud</a>.
           </div>
         </div>
       
     </div>
   
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/external-links.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/sync.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1690,16 +1186,9 @@
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Heuristic'>
-              <a href='guide/html-template/external-links#heuristic' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Heuristic
-              </a>
-              
-        <ul class='ml-2'>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Overriding the heuristic'>
-              <a href='guide/html-template/external-links#overriding-the-heuristic' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Overriding the heuristic
+            <li class='whitespace-nowrap truncate mt-2' title='Mobile editing'>
+              <a href='sync#mobile-editing' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Mobile editing
               </a>
               
         <ul class='ml-2'>
@@ -1708,24 +1197,9 @@
       
             </li>
           
-        </ul>
-      
-            </li>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='URL properties'>
-              <a href='guide/html-template/external-links#url-properties' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                URL properties
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Demo'>
-              <a href='guide/html-template/external-links#demo' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Demo
+            <li class='whitespace-nowrap truncate mt-2' title='Dealing with data loss'>
+              <a href='sync#dealing-with-data-loss' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Dealing with data loss
               </a>
               
         <ul class='ml-2'>
@@ -1797,6 +1271,28 @@
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
+  <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
+    <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
+    <ul class='space-y-1'>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='windows'>
+            Using on Windows
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p><em>See <a href='sync' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Synchronizing notes using Syncthing</a></em></p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+    </ul>
+  </div>
+
     </div>
     
   <section class='flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm'>

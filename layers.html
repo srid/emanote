@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    Installing – Emanote
+    Layer system – Emanote
   </title>
   
     
-      <meta property='og:description' content='[!info] Avoiding installation Emanote need not have to be installed if you are using the [[emanote-template]] flake to manage your content.' />
+      <meta property='og:description' content='Emanote’s layer system allows you to “merge” multiple notebook directories and treat them as if they were a single notebook directory. The -L option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Installing' />
+      <meta property='og:title' content='Layer system' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -297,8 +297,8 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='start'>
-                Getting Started
+              <a class='px-1 font-bold' href='guide'>
+                Guide
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -377,10 +377,6 @@
       <!-- Variable bindings for this tree-->
 
   
-    
-      
-    
-  
 
 
 
@@ -394,208 +390,7 @@
     <span>
       
         
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
-      Getting Started
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-  
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='start/install'>
-      Installing
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Container' href='container'>
-      Container
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Using on Nix/NixOS' href='start/install/nix'>
-      Using on Nix/NixOS
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Using on Windows' href='start/install/wsl'>
-      Using on Windows
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          <a href='start/neuron' title='View folgezettel children'>
+          <a href='start' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -607,13 +402,13 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='start/neuron'>
-      Migrating from neuron
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
+      Getting Started
     </a>
     
       
-        <span class='text-gray-300' title='1 children inside'>
-          1
+        <span class='text-gray-300' title='4 children inside'>
+          4
         </span>
       
     
@@ -628,6 +423,10 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
@@ -641,7 +440,43 @@
     <span>
       
         
-          <a href='start/resources' title='View folgezettel children'>
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+      Guide
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          <a href='markdown' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -653,8 +488,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Resources' href='start/resources'>
-      Resources
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
+      Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
       
@@ -698,8 +533,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Known Issues' href='start/known-issues'>
-      Known Issues
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
+      YAML configuration
     </a>
     
       
@@ -713,6 +548,255 @@
   
 </div>
     
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
+      Queries
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
+      Daily Notes
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='export'>
+      JSON export
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
+      ATOM feed
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
+      Folder notes
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
+      Folgezettel links
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
   
 </div>
     
@@ -732,7 +816,7 @@
     <span>
       
         
-          <a href='guide' title='View folgezettel children'>
+          <a href='templates' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -744,13 +828,13 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
-      Guide
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
+      HTML Templates
     </a>
     
       
-        <span class='text-gray-300' title='12 children inside'>
-          12
+        <span class='text-gray-300' title='9 children inside'>
+          9
         </span>
       
     
@@ -759,6 +843,133 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        </path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='layers'>
+      Layer system
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
+      Lua Filters
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
+      Org Mode ✍️
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
   
 </div>
     
@@ -790,8 +1001,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -835,8 +1046,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -877,8 +1088,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -900,7 +1111,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    Installing
+    Layer system
   </a>
 </h1>
     
@@ -915,11 +1126,23 @@
 
 
 
-    <h2 id='official-method' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Official method
+    <p class='mb-3'>
+      Emanote’s layer system allows you to “merge” multiple notebook directories and treat them as if they were a single notebook directory. The <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>-L</code> option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.
+    </p>
   
-  <a href='start/install#official-method' class='--ema-anchor'>
+    <p class='mb-3'>
+      For example,
+    </p>
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>emanote -L ./docs1:./docs2 run</code></pre></div>
+    <p class='mb-3'>
+      Internally, Emanote merges both <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs2</code> folders and treats them as a single directory. Thus, both <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs2</code> can contain the same file, and the one in <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs1</code> will take precedence.
+    </p>
+  
+    <h2 id='default-layer' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  “Default” layer
+  
+  <a href='layers#default-layer' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -928,58 +1151,42 @@
 
 
     </h2>
-  <div data-callout-metadata data-callout-fold data-callout='info' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #086DD320'>
-  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-  </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #086DD3'>
-    <div class='callout-icon'>
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-        
-    <circle cx='12' cy='12' r='10'></circle>
-    <line x1='12' y1='16' x2='12' y2='12'></line>
-    <line x1='12' y1='8' x2='12.01' y2='8'></line>
   
-      </svg>
-    </div>
-    <div class='ml-2'>
-       Avoiding installation
-    </div>
-  </div>
-  <div class='callout-content'>
-    
     <p class='mb-3'>
-      Emanote need not have to be installed if you are using the <a href='start/resources/emanote-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>emanote-template</a> <a href='https://nixos.asia/en/flakes' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>flake</a> to manage your content.
+      Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template/hooks</code></a> of this documentation notbook.
     </p>
   
-  </div>
-</div>
+    <h2 id='merge-semantics' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Merge semantics
+  
+  <a href='layers#merge-semantics' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
     <p class='mb-3'>
-      Emanote is supported on all popular operating systems through <a href='https://nixos.asia/en/nix' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Nix</a>. If you are new to Nix, checkout <a href='https://nixos.asia/en/nix-first' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>this tutorial</a>.
+      The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code> that overrides only a subset of the default configuration.
     </p>
   
-    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
+    <h2 id='mount-point' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-        <li>
-          <a href='https://nixos.asia/en/install' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Install Nix & enable Flakes</a>
-    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
-      
-        <li>
-          For Windows, see <a href='start/install/wsl' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Using on Windows</a>
-        </li>
-      
-        <li>
-          For NixOS, see <a href='start/install/nix' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Using on Nix/NixOS</a>
-        </li>
-      
-    </ul>
+  Mount point
   
-        </li>
-      
-        <li>
-          Run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>nix profile install github:srid/emanote</code> to install Emanote
-        </li>
-      
-    </ul>
+  <a href='layers#mount-point' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
   <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
@@ -993,47 +1200,27 @@
       </svg>
     </div>
     <div class='ml-2'>
-       Try before installing
+       Composition
     </div>
   </div>
   <div class='callout-content'>
     
     <p class='mb-3'>
-      You may also “try before installing” by running <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>nix run github:srid/emanote</code>. This still downloads emanote to your nix store (in <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>/nix/store</code>), but will not install it to the user profile like <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>nix profile install</code> does.
+      To learn more about composition of multiple notebooks, see <a href='https://github.com/srid/emanote/issues/494' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>.
     </p>
   
   </div>
 </div>
     <p class='mb-3'>
-      To test your Emanote install,
+      Layers can be mounted at a specific path. For example, if you want to mount <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs1</code> at <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>/D1</code> and <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>docs2</code> at <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>/D2</code>, you can do so with:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='bash language-bash'># Run live server
-cd /path/to/notebook
-emanote run
-
-# Generate static files (-L defaults to current directory)
-mkdir /tmp/output
-emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
-    <h2 id='containers' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Containers
-  
-  <a href='start/install#containers' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>emanote -L ./docs1@D1;./docs2@D2 run</code></pre></div>
     <p class='mb-3'>
-      If you do not wish to use Nix, you may try Emanote through Docker or Podman; see <a href='container' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Container</a>.
+      When two layers are mounted at distinct mount points it becomes impossible for there to be overlaps. This is useful to host sub-sites under a single site, such as in <a href='https://github.com/flake-parts/community.flake.parts' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>this case</a>.
     </p>
   
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/install.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/layer.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1047,9 +1234,9 @@ emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Official method'>
-              <a href='start/install#official-method' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Official method
+            <li class='whitespace-nowrap truncate mt-2' title='“Default” layer'>
+              <a href='layers#default-layer' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                “Default” layer
               </a>
               
         <ul class='ml-2'>
@@ -1058,9 +1245,20 @@ emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Containers'>
-              <a href='start/install#containers' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Containers
+            <li class='whitespace-nowrap truncate mt-2' title='Merge semantics'>
+              <a href='layers#merge-semantics' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Merge semantics
+              </a>
+              
+        <ul class='ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='whitespace-nowrap truncate mt-2' title='Mount point'>
+              <a href='layers#mount-point' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Mount point
               </a>
               
         <ul class='ml-2'>
@@ -1137,14 +1335,14 @@ emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/install/wsl'>
-            Using on Windows
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='architecture'>
+            architecture
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><a href='start/install' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Install Emanote</a> in Ubuntu.<sup>*</sup></div>
+      <div><code>./default</code>: The primary and first “<a href='layers' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.</div>
     </div>
   
 </div>
@@ -1152,14 +1350,48 @@ emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start'>
-            Getting Started
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron'>
+            Migrating from neuron
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><a href='start/install' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Install Emanote</a></div>
+      <div><a href='layers' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Layer system</a> (merge Zettelkastens, or overlay them)</div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='templates'>
+            HTML Templates
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>The default HTML templates are stored in the <a href='layers' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>default layer</a>, which can you override either totally or in subset.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='fonts'>
+            Fonts and Typography
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>Emanote uses <strong>Maven Pro</strong> as the default font family throughout the site. The font files are self-hosted in the <a href='layers' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>default layer</a> to keep sites self-contained. If you want to customize the typography:</p></div>
+    </div>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>To use a different font, create a <code>templates/styles.tpl</code> file in your notebook and override the global font styling (in <a href='layers' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>default layer</a>):</p></div>
     </div>
   
 </div>

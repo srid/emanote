@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    Using on Nix/NixOS – Emanote
+    Migrating from neuron – Emanote
   </title>
   
     
-      <meta property='og:description' content='Emanote can be easily built using the Nix expressions provided in its source repo.' />
+      <meta property='og:description' content='To use Emanote in your existing neuron notebook,' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Using on Nix/NixOS' />
+      <meta property='og:title' content='Migrating from neuron' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -305,15 +305,6 @@
               </svg>
             </li>
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='start/install'>
-                Installing
-              </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
-                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
-              </svg>
-            </li>
-          
         
       </ul>
     </div>
@@ -426,11 +417,53 @@
       <!-- Variable bindings for this tree-->
 
   
-    
-      
-    
+
+
+
+  
   
 
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          <a href='install' title='View folgezettel children'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='install'>
+      Installing
+    </a>
+    
+      
+        <span class='text-gray-300' title='3 children inside'>
+          3
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
 
 
   
@@ -451,8 +484,8 @@
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='start/install'>
-      Installing
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='neuron'>
+      Migrating from neuron
     </a>
     
       
@@ -470,133 +503,6 @@
 
 
   
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Container' href='container'>
-      Container
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-  
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Using on Nix/NixOS' href='start/install/nix'>
-      Using on Nix/NixOS
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Using on Windows' href='start/install/wsl'>
-      Using on Windows
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
   
 
 <!-- Rendering of this tree -->
@@ -606,7 +512,7 @@
     <span>
       
         
-          <a href='start/neuron' title='View folgezettel children'>
+          <a href='neuron-layout' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -618,8 +524,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='start/neuron'>
-      Migrating from neuron
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='neuron-layout'>
+      Neuron layout
     </a>
     
       
@@ -633,6 +539,9 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
+  
+</div>
+    
   
 </div>
     
@@ -664,8 +573,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Resources' href='start/resources'>
-      Resources
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='resources' href='start/resources'>
+      resources
     </a>
     
       
@@ -709,8 +618,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Known Issues' href='start/known-issues'>
-      Known Issues
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='known-issues' href='start/known-issues'>
+      known-issues
     </a>
     
       
@@ -801,8 +710,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -846,8 +755,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -888,8 +797,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -911,7 +820,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    Using on Nix/NixOS
+    Migrating from neuron
   </a>
 </h1>
     
@@ -927,18 +836,140 @@
 
 
     <p class='mb-3'>
-      Emanote can be easily built using the Nix expressions provided in its source repo.
+      To use Emanote in your existing <a href='https://github.com/srid/neuron' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>neuron</a> notebook,
     </p>
   
-    <p class='mb-3'>
-      You will need <a href='https://nixos.asia/en/install' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Nix</a> version 2.4 or greater.
-    </p>
-  
-    <h2 id='installing-with-nix-flakes' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
-  Installing with Nix Flakes
+        <li>
+          Configure it to use <a href='neuron-layout' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)
+        </li>
+      
+        <li>
+          In all notes, replace neuron’s <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>z:zettels</code>-style <a href='https://neuron.zettel.page/tag-queries' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>tag queries</a> with <a href='queries' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a>.
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          Note: Query results do not impact graph connections (thus backlinks). If you want to establish connections to multiple notes, do it by explicitly linking to them individually. Emanote chose this option, because it was simpler to implement. Users are encouraged to try to persuade the author otherwise if there is a compelling rationale.
+        </li>
+      
+    </ul>
   
-  <a href='start/install/nix#installing-with-nix-flakes' class='--ema-anchor'>
+        </li>
+      
+        <li>
+          If you have a <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>head.html</code>, transfer its contents to <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> (<a href='https://github.com/srid/emanote/discussions/116' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>see example and explanation</a>)
+        </li>
+      
+    </ul>
+  
+    <h2 id='capabilities-emanote-provides-but-neuron-does-not' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Capabilities Emanote provides, but neuron does not
+  
+  <a href='neuron#capabilities-emanote-provides-but-neuron-does-not' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          <a href='https://ema.srid.ca/topics/live-server' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Live server</a> (thanks to <a href='https://ema.srid.ca/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Ema</a>)
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          with <a href='https://ema.srid.ca/topics/hot-reload' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>hot reload</a>
+        </li>
+      
+        <li>
+          and faster incremental build
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          Better linking
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          Flexible WikiLinks (link to directories, or based on path, eg: <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>[[Foo/Bar]]</code>) including <a href='file-links' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.
+        </li>
+      
+        <li>
+          More lenient handling of malformed Markdown (eg: broken links)
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          <a href='queries' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a>
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          “Timeline backlinks” (Twitter-like registering of thoughts on any note)
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          <a href='search' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Full-text search</a>
+        </li>
+      
+        <li>
+          Better hierarchical directory tree integraion
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          Full path based URLs (unless <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>slug</code> is set)
+        </li>
+      
+        <li>
+          Static files can be placed anywhere (not just in <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>./static</code> folder)
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML based configuration</a> at per-route level
+        </li>
+      
+        <li>
+          <a href='layers' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Layer system</a> (merge Zettelkastens, or overlay them)
+    <ul class='my-3 ml-6 space-y-1 list-disc'>
+      
+        <li>
+          Full theming (customize <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a> fully)
+        </li>
+      
+    </ul>
+  
+        </li>
+      
+        <li>
+          Hierarchical tag index, and task index.
+        </li>
+      
+    </ul>
+  
+    <h2 id='porting-existing-vim-plugins' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Porting existing Vim plugins
+  
+  <a href='neuron#porting-existing-vim-plugins' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -949,84 +980,11 @@
     </h2>
   
     <p class='mb-3'>
-      This will provide the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote</code> command in your environment.
-    </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ nix profile install github:srid/emanote</code></pre></div>
-    <h2 id='using-as-flake-parts-module' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Using as <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>flake-parts</code> module
-  
-  <a href='start/install/nix#using-as-flake-parts-module' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      <a href='start/resources/emanote-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>emanote-template</a> uses this approach. See <a href='https://github.com/srid/emanote-template/blob/master/flake.nix' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote-template/blob/master/flake.nix</a>
+      See <a href='export' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>JSON export</a>.
     </p>
   
-    <h2 id='using-emanote-as-a-home-manager-service' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Using Emanote as a Home Manager service
-  
-  <a href='start/install/nix#using-emanote-as-a-home-manager-service' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-3'>
-      <a href='https://nixos.asia/en/home-manager' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Home Manager</a> is a Nix-based personal configuration manager. If you use Home Manager, then Emanote has a <a href='https://github.com/srid/emanote/blob/master/nix/home-manager-module.nix' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>module</a> that can be imported into your configuration.
-    </p>
-  
-    <p class='mb-3'>
-      Merge or import this config into your <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.config/nixpkgs/home.nix</code>:
-    </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='nix language-nix'>{ config, ... }:
-let
-  emanote = import (builtins.fetchTarball "https://github.com/srid/emanote/archive/master.tar.gz");
-in {
-  imports = [ emanote.homeManagerModule ];
-  services.emanote = {
-    enable = true;
-    # host = "127.0.0.1"; # default listen address is 127.0.0.1
-    # port = 7000;        # default http port is 7000
-    notes = [
-      "/home/user/notes"  # add as many layers as you like
-    ];
-    package = emanote.packages.${builtins.currentSystem}.default;
-  };
-}</code></pre></div>
-    <p class='mb-3'>
-      Re-apply your home-manager configuration the usual way (e.g. <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>home-manager switch</code>).
-    </p>
-  
-    <p class='mb-3'>
-      You will then have an <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote</code> command in your profile, and a systemd user service running a live-preview of your notes.
-    </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ home-manager switch
-...
-$ systemctl --user status emanote.service
-● emanote.service - Emanote web server
-     Loaded: loaded (/nix/store/i1af5hdydwcf7y0r55n7fd67dnw5habd-home-manager-files/.config/systemd/user/emanote.service; enabled; vendor preset: enabled)
-     Active: active (running) since Tue 2021-11-02 17:17:04 AWST; 17h ago
-   Main PID: 1705303 (emanote)
-      Tasks: 26 (limit: 38220)
-     Memory: 38.3M
-        CPU: 2.884s
-     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/emanote.service
-             └─1705303 /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote --layers /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config;/home/user/notes</code></pre></div>
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/install/nix.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/neuron.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1040,9 +998,9 @@ $ systemctl --user status emanote.service
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Installing with Nix Flakes'>
-              <a href='start/install/nix#installing-with-nix-flakes' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Installing with Nix Flakes
+            <li class='whitespace-nowrap truncate mt-2' title='Capabilities Emanote provides, but neuron does not'>
+              <a href='neuron#capabilities-emanote-provides-but-neuron-does-not' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Capabilities Emanote provides, but neuron does not
               </a>
               
         <ul class='ml-2'>
@@ -1051,20 +1009,9 @@ $ systemctl --user status emanote.service
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Using as flake-parts module'>
-              <a href='start/install/nix#using-as-flake-parts-module' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Using as flake-parts module
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Using Emanote as a Home Manager service'>
-              <a href='start/install/nix#using-emanote-as-a-home-manager-service' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Using Emanote as a Home Manager service
+            <li class='whitespace-nowrap truncate mt-2' title='Porting existing Vim plugins'>
+              <a href='neuron#porting-existing-vim-plugins' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Porting existing Vim plugins
               </a>
               
         <ul class='ml-2'>
@@ -1141,14 +1088,14 @@ $ systemctl --user status emanote.service
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/resources/emanote-template'>
-            emanote-template
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='markdown'>
+            Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p><a href='https://github.com/srid/emanote-template' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>emanote-template</a> is a Git repository that comes up with ready-made settings for editing notes in <a href='start/resources/editors/vscode' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> and publishing to GitHub Pages (using <a href='start/install/nix' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Nix</a>).</p></div>
+      <div><p>You can link to a note by placing the filename (without extension) inside double square brackets. For example, <code>[[neuron]]</code> links to the file <code>neuron.md</code> and it will be rendered as <a href='neuron' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Migrating from neuron</a>. Note that it is using the title of the note automatically; you can specify a custom title as <code>[[neuron|Moving off neuron]]</code> which renders as <a href='neuron' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Moving off neuron</a> or even force use of filename with <code>[[neuron|neuron]]</code> which renders as <a href='neuron' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>neuron</a>.</p></div>
     </div>
   
 </div>
@@ -1156,14 +1103,14 @@ $ systemctl --user status emanote.service
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/install'>
-            Installing
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='templates'>
+            HTML Templates
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>For NixOS, see <a href='start/install/nix' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Using on Nix/NixOS</a></div>
+      <div><p>Unlike <a href='neuron' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron</a>, Emanote’s generated HTML can be <strong>completely</strong> customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see <a href='http://snapframework.com/docs/tutorials/heist' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for a tutorial on its syntax.</p></div>
     </div>
   
 </div>

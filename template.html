@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    Synchronizing notes using Syncthing – Emanote
+    emanote-template – Emanote
   </title>
   
     
-      <meta property='og:description' content='Syncthing is an open-source and superior Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).' />
+      <meta property='og:description' content='emanote-template is a Git repository that comes up with ready-made settings for editing notes in [[vscode]] and publishing to GitHub Pages (using Nix).' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Synchronizing notes using Syncthing' />
+      <meta property='og:title' content='emanote-template' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -297,8 +297,17 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='tips'>
-                Tips
+              <a class='px-1 font-bold' href='start'>
+                Getting Started
+              </a>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
+              </svg>
+            </li>
+          
+            <li class='inline-flex items-center'>
+              <a class='px-1 font-bold' href='start/resources'>
+                resources
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -430,7 +439,7 @@
     <span>
       
         
-          <a href='start/install' title='View folgezettel children'>
+          <a href='install' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -442,7 +451,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='start/install'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='install'>
       Installing
     </a>
     
@@ -476,7 +485,7 @@
     <span>
       
         
-          <a href='start/neuron' title='View folgezettel children'>
+          <a href='neuron' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -488,7 +497,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='start/neuron'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='neuron'>
       Migrating from neuron
     </a>
     
@@ -534,8 +543,8 @@
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Resources' href='start/resources'>
-      Resources
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='resources' href='start/resources'>
+      resources
     </a>
     
       
@@ -574,8 +583,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Editors' href='start/resources/editors'>
-      Editors
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='editors' href='start/resources/editors'>
+      editors
     </a>
     
       
@@ -583,90 +592,6 @@
           4
         </span>
       
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='emanote-template' href='start/resources/emanote-template'>
-      emanote-template
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='zk' href='start/resources/zk'>
-      zk
-    </a>
-    
-      
-        
     
   </div>
 
@@ -701,8 +626,8 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='tips/sync'>
-      Syncthing sync
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='emanote-template' href='template'>
+      emanote-template
     </a>
     
       
@@ -713,6 +638,90 @@
   -->
   
     
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='zk' href='zk'>
+      zk
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
+      Syncthing sync
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
   
 </div>
     
@@ -746,8 +755,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Known Issues' href='start/known-issues'>
-      Known Issues
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='known-issues' href='start/known-issues'>
+      known-issues
     </a>
     
       
@@ -813,10 +822,6 @@
       <!-- Variable bindings for this tree-->
 
   
-    
-      
-    
-  
 
 
 
@@ -830,85 +835,7 @@
     <span>
       
         
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Adding Images' href='tips/adding-images'>
-      Adding Images
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-          <a href='tips/js' title='View folgezettel children'>
+          <a href='tips' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -920,8 +847,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JavaScript' href='tips/js'>
-      JavaScript
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -941,49 +868,6 @@
       <!-- Variable bindings for this tree-->
 
   
-  
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='tips/sync'>
-      Syncthing sync
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
 
 
 
@@ -1008,8 +892,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -1050,8 +934,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -1073,13 +957,11 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    Synchronizing notes using Syncthing
+    emanote-template
   </a>
 </h1>
     
-      <div class='md:grid md:gap-4 md:grid-cols-8'>
-        <div class='md:col-span-6'>
-          <article class='overflow-auto'>
+      <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
@@ -1089,20 +971,22 @@
 
 
     <p class='mb-3'>
-      <a href='https://docs.syncthing.net/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Syncthing</a> is an open-source and superior
-    <sup class='px-0.5'>
-      <a class='text-blue-600 hover:underline' href='tips/sync#fn1'>
-        1
-      </a>
-    </sup>
-   Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).
+      <a href='https://github.com/srid/emanote-template' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>emanote-template</a> is a Git repository that comes up with ready-made settings for editing notes in <a href='vscode' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> and publishing to GitHub Pages (using <a href='nix' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Nix</a>).
     </p>
   
-    <h2 id='mobile-editing' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Mobile editing
+    <p class='mb-3'>
+      If you already have a GitHub account, click <a href='https://github.com/srid/emanote-template' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>“Use this template”</a> to use it right away. Otherwise, simply download it <a href='https://github.com/srid/emanote-template/archive/refs/heads/master.zip' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>as a zip file</a> and then unzip it.
+    </p>
   
-  <a href='tips/sync#mobile-editing' class='--ema-anchor'>
+    <p class='mb-3'>
+      Open the notebook in <a href='vscode' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> and install the recommended extensions.
+    </p>
+  
+    <h2 id='nix-template' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  Nix template
+  
+  <a href='template#nix-template' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1113,161 +997,22 @@
     </h2>
   
     <p class='mb-3'>
-      On Android
-    <sup class='px-0.5'>
-      <a class='text-blue-600 hover:underline' href='tips/sync#fn2'>
-        2
-      </a>
-    </sup>
-   you can use the <a href='https://play.google.com/store/apps/details?id=md.obsidian&amp;hl=en&amp;gl=US' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Obsidian</a> app to edit your notes synced by Syncthing. <span class='bg-yellow-200 px-2 py-0.5 rounded-xl'>Changes made on desktop and mobile propagate both ways automatically.</span>
+      A Nix flake template is also provided if you want to do this in your existing notebook. Run:
     </p>
-  
-    <h2 id='dealing-with-data-loss' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Dealing with data loss
-  
-  <a href='tips/sync#dealing-with-data-loss' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
+  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='bash language-bash'>nix flake init -t github:srid/emanote</code></pre></div>
     <p class='mb-3'>
-      Data loss is not uncommon when working with syncthing. For this reason, it is recommended to <em>also</em> track your notebook in a Git repository. Assuming you commit often (via <a href='start/resources/editors/vscode' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> extensions like <a href='https://marketplace.visualstudio.com/items?itemName=alfredbirk.git-add-commit-push' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>this</a>), if any file goes missing you can always recover it from Git.
+      This add a <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>flake.nix</code> file. You can follow emanote-template’s README from this point.
     </p>
-  
-    <p class='mb-3'>
-      Git also acts as backup if you push your repository to a remote location (GitHub or a private server via SSH).
-    </p>
-  
-    <p class='mb-3'>
-      <a href='start/resources' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkTag'>Resources</a>
-    </p>
-  
-    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2'>
-      <header class='font-semibold'>Footnotes</header>
-      
-        <div id='fn1'>
-          <header class='italic'>
-            1.
-          </header>
-          <div class='inline-block mb-2 ml-4'>
-            “superior” … because when using Dropbox, Android phones (unlike desktop computers) cannot have automatic full-sync of files on disk.
-          </div>
-        </div>
-      
-        <div id='fn2'>
-          <header class='italic'>
-            2.
-          </header>
-          <div class='inline-block mb-2 ml-4'>
-            Obsidian can also synchronize notes between iOS and macOS <a href='https://help.obsidian.md/Getting+started/Sync+your+notes+across+devices' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>via iCloud</a>.
-          </div>
-        </div>
-      
-    </div>
   
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/sync.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/resources/emanote-template.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
   </a>
 </div>
 </article>
-        </div>
-        <div class='hidden md:block md:col-span-2 md:border-l'>
-          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
-  <div class='text-gray-600 text-sm -mt-2'>
     
-        <ul class='ml-2'>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Mobile editing'>
-              <a href='tips/sync#mobile-editing' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Mobile editing
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='whitespace-nowrap truncate mt-2' title='Dealing with data loss'>
-              <a href='tips/sync#dealing-with-data-loss' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
-                Dealing with data loss
-              </a>
-              
-        <ul class='ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-  </div>
-  <script>
-    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
-    function highlightTOC() {
-      // Grab the toc links
-      const links = document.querySelectorAll("ul > li > a.--ema-toc");
-
-      // Find the matching anchors in the document body
-      const sections = [];
-      links.forEach((link) => {
-        let found = {};
-        for (section of document.querySelectorAll("a.--ema-anchor")) {
-          if (link.href == section.href) {
-            found = section;
-            break;
-          }
-        }
-        sections.push(found);
-      });
-
-      // Current toc link is marked with the following class
-      const mark = "toc-item-active";
-
-      // Set window scroll handler to update the toc mark.
-      window.onscroll = () => {
-        // Remove previous mark
-        links.forEach((link) => {
-          link.classList.remove(mark);
-        });
-
-        // Mark the link of the section that is in view, starting from the end
-        let marked = false;
-        for (var i = sections.length - 1; i >= 0; i--) {
-          if (window.scrollY > sections[i].offsetTop - 80) {
-            links[i].classList.add(mark);
-            marked = true;
-            break;
-          }
-        }
-
-        // Special case for the first and last section which might not reach the top
-        if (!marked && window.scrollY > 0) {
-          let i = 0;
-          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
-            // We are at the bottom
-            i = links.length - 1
-          }
-          links[i].classList.add(mark);
-        }
-      };
-    }
-    highlightTOC();
-  </script>
-</nav>
-        </div>
-      </div>
-      
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
@@ -1276,14 +1021,97 @@
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start/install/wsl'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='vscode'>
+            Visual Studio Code
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p><a href='https://code.visualstudio.com/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Visual Studio Code</a> is an open source editor that you can use to edit your plain-text notes. See <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> for a template notebook that includes extensions pre-configured for VSCode.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='windows'>
             Using on Windows
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p><em>See <a href='tips/sync' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Synchronizing notes using Syncthing</a></em></p></div>
+      <div>Open the aforementioned <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> local copy</div>
+    </div>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div>Run <code>git clone https://github.com/srid/emanote-template.git</code> to make a local copy of <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> in your Ubuntu instance</div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='nix'>
+            Using on Nix/NixOS
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p><a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> uses this approach. See <a href='https://github.com/srid/emanote-template/blob/master/flake.nix' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote-template/blob/master/flake.nix</a></p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='install'>
+            Installing
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>[!info] Avoiding installation Emanote need not have to be installed if you are using the <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> <a href='https://nixos.asia/en/flakes' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>flake</a> to manage your content.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start'>
+            Getting Started
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div>Use your existing notebook, or create one from <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a><sup>*</sup>.</div>
+    </div>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p><a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='images'>
+            Adding Images
+          </a>
+          
+            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>[!tip] The extension uses the traditional <code>![]()</code> syntax to link to the image, but you may switch to using the <a href='embed' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>wiki-link embedding syntax</a> (<code>![[]]</code>) as it has the advantage of not needing to specify the full path to the image (thus allowing you to the move the image around under the notebook without breaking referring links). <a href='template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>emanote-template</a> is already configured to do this by default.</p></div>
     </div>
   
 </div>

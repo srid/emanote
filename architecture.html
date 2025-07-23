@@ -14,7 +14,7 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    Architecture – Emanote
+    architecture – Emanote
   </title>
   
     
@@ -22,7 +22,7 @@
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Architecture' />
+      <meta property='og:title' content='architecture' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=fcbea463-9f4f-4500-a0e9-0d8d7ded3f02' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=91cb59a0-3ea8-48d5-b4c5-37d73769bca6' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -485,8 +485,8 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
-      Tips
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='tips' href='tips'>
+      tips
     </a>
     
       
@@ -530,8 +530,8 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
-      Examples
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='examples' href='examples'>
+      examples
     </a>
     
       
@@ -570,8 +570,8 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
-      Architecture
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='architecture' href='architecture'>
+      architecture
     </a>
     
       
@@ -593,7 +593,7 @@
   <main class='px-4 py-4'>
     <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    Architecture
+    architecture
   </a>
 </h1>
     
@@ -606,6 +606,36 @@
 
 
 
+    <hr class='mb-3' />
+  
+    <h2 id='slug-architecture' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+      
+  slug: architecture
+  
+  <a href='architecture#slug-architecture' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <h1 id='architecture' class='group mt-6 mb-4 font-bold text-gray-700 text-5xl'>
+      
+  Architecture
+  
+  <a href='architecture#architecture' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h1>
+  
     <p class='mb-3'>
       Emanote is a <a href='https://srid.ca/haskell' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> program that, at its essense, transforms a bunch of “source files” (Markdown, static files, etc.) into a “target website”. It does that in a <a href='https://en.wikipedia.org/wiki/Reactive_programming' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>reactive</a> manner such that as the source files change the resultant website updates in real-time (thanks to <a href='https://ema.srid.ca/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Ema</a>’s <a href='https://ema.srid.ca/topics/hot-reload' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>hot-reload</a> via websocket).
     </p>
@@ -701,7 +731,7 @@
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>./default</code>: The primary and first “<a href='guide/layer' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
+          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>./default</code>: The primary and first “<a href='layers' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
         </li>
       
     </ul>
@@ -730,11 +760,11 @@
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>Visit <a href='guide' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup>*</sup></div>
+      <div>Visit <a href='guide' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>examples</a> to get inspired first.<sup>*</sup></div>
     </div>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>If you are <a href='https://srid.ca/haskell' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Architecture</a>.</p></div>
+      <div><p>If you are <a href='https://srid.ca/haskell' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>architecture</a>.</p></div>
     </div>
   
 </div>
