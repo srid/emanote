@@ -1,4 +1,5 @@
 ---
+slug: uptree
 template:
   uptree: 
     enable: true

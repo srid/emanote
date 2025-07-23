@@ -1,4 +1,5 @@
 ---
+slug: yaml-config
 order: -97
 template:
   theme: green

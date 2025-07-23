@@ -1,5 +1,6 @@
 ---
 order: 100
+slug: known-issues
 ---
 
 # Known Issues

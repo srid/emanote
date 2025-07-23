@@ -1,4 +1,5 @@
 ---
+slug: lua-filters
 short-title: Lua Filters
 pandoc:
   filters:

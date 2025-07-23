@@ -1,4 +1,5 @@
 ---
+slug: mermaid
 page:
   headHtml: |
     <snippet var="js.highlightjs" />

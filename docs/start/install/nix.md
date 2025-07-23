@@ -1,3 +1,7 @@
+---
+slug: nix
+---
+
 # Using on Nix/NixOS
 
 Emanote can be easily built using the Nix expressions provided in its source repo.

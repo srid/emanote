@@ -1,3 +1,7 @@
+---
+slug: file-links
+---
+
 # File WikiLinks
 
 `[[..]]` style wikilinks can link to not only Markdown files, but also to any *other* files.

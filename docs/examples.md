@@ -1,6 +1,7 @@
 ---
 order: 10
 tags: [external]
+slug: examples
 ---
 
 # Examples

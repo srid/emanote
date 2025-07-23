@@ -1,4 +1,5 @@
 ---
+slug: search
 order: -90
 ---
 # Full-text search

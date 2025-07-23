@@ -1,4 +1,5 @@
 ---
+slug: zk
 page:
   headHtml: |
     <snippet var="js.highlightjs" />

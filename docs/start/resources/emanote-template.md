@@ -1,3 +1,7 @@
+---
+slug: emanote-template
+---
+
 # emanote-template
 
 [emanote-template][gh] is a Git repository that comes up with ready-made settings for editing notes in [[vscode]] and publishing to GitHub Pages (using [[nix|Nix]]).

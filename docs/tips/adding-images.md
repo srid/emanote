@@ -1,3 +1,7 @@
+---
+slug: adding-images
+---
+
 # Adding Images
 
 >[!tip]
