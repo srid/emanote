@@ -45,7 +45,7 @@
 /start/resources/emanote-template /emanote-template 301
 /start/resources/zk /zk 301
 /start/resources/editors/nota /nota 301
-/start/resources/editors/obsmd /obsmd 301
+/start/resources/editors/obsmd /obsidian 301
 /start/resources/editors/vim /vim 301
 /start/resources/editors/vscode /vscode 301
 
