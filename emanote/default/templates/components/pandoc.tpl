@@ -16,7 +16,7 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 font-sans</bind>
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
 
 <ema:note:pandoc>
   <Para>

@@ -2,7 +2,7 @@
 <bind tag="nodeClass"><ema:metadata><value var="template.uptree.nodeClass" /></ema:metadata></bind>
 <!-- DoNotFormat -->
 
-<nav id="uptree" class="flipped tree font-sans font-medium" style="transform-origin: 50%;">
+<nav id="uptree" class="flipped tree font-medium" style="transform-origin: 50%;">
   <ul class="root">
     <li>
       <ema:note:uptree:nonempty>

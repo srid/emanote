@@ -1,5 +1,5 @@
 <nav id="sidebar"
-  class="flex-shrink hidden font-sans leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64">
+  class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64">
   <div class="px-2 py-2 text-gray-800">
     <div id="indexing-links" class="flex flex-row float-right p-2 space-x-2 text-gray-500">
       <a href="${ema:tagIndexUrl}" title="View tags">
