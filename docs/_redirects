@@ -50,8 +50,9 @@
 /start/resources/editors/vscode /vscode 301
 
 # Tips
-/tips/adding-images /images 301
+/tips/adding-images /adding-images 301
 /tips/js /js 301
 /tips/js/math /math 301
 /tips/js/mermaid /mermaid 301
 /tips/js/syntax-highlighting /syntax-highlighting 301
+/tips/sync /sync

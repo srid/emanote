@@ -1,5 +1,5 @@
 ---
-slug: template
+slug: emanote-template
 ---
 
 # emanote-template

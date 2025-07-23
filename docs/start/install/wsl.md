@@ -1,5 +1,5 @@
 ---
-slug: windows
+slug: wsl
 ---
 
 # Using on Windows

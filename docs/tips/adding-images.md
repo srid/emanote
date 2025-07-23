@@ -1,5 +1,5 @@
 ---
-slug: images
+slug: adding-images
 ---
 
 # Adding Images
