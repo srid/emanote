@@ -4,7 +4,7 @@ slug: fonts
 
 # Fonts and Typography
 
-Emanote uses **Maven Pro** as the default font family throughout the site. The font files are self-hosted in the default layer to keep sites self-contained. If you want to customize the typography:
+Emanote uses **Maven Pro** as the default font family throughout the site. The font files are self-hosted in the [[layer|default layer]] to keep sites self-contained. If you want to customize the typography:
 
 ## Changing the Font Family
 
