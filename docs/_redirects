@@ -1,4 +1,65 @@
 # Cloudflare Pages URL redirects
 # https://developers.cloudflare.com/pages/configuration/redirects/
 
-/umm /haskell
+# Guide sections
+/guide/html-template /html-template 301
+/guide/layer /layer 301
+/guide/query /query 301
+/guide/export /export 301
+/guide/feed /feed 301
+/guide/lua-filters /lua-filters 301
+/guide/yaml-config /yaml-config 301
+/guide/markdown /markdown 301
+/guide/folgezettel /folgezettel 301
+/guide/folder-note /folder-note 301
+/guide/daily-notes /daily-notes 301
+
+# HTML Template features
+/guide/html-template/external-links /external-links 301
+/guide/html-template/sidebar /sidebar 301
+/guide/html-template/neuron-layout /neuron-layout 301
+/guide/html-template/search /search 301
+/guide/html-template/uptree /uptree 301
+/guide/html-template/fonts /fonts 301
+/guide/html-template/breadcrumbs /breadcrumbs 301
+/guide/html-template/toc /toc 301
+/guide/html-template/ogp /ogp 301
+
+# Markdown features
+/guide/markdown/custom-style /custom-style 301
+/guide/markdown/embed /embed 301
+/guide/markdown/file-links /file-links 301
+/guide/markdown/callout /callout 301
+
+# Getting Started
+/start /start 301
+/start/install /install 301
+/start/install/nix /nix 301
+/start/install/wsl /wsl 301
+/start/install/container /container 301
+/start/neuron /neuron 301
+/start/known-issues /known-issues 301
+/start/resources /resources 301
+
+# Resources
+/start/resources/editors /editors 301
+/start/resources/emanote-template /emanote-template 301
+/start/resources/zk /zk 301
+/start/resources/editors/nota /nota 301
+/start/resources/editors/obsmd /obsmd 301
+/start/resources/editors/vim /vim 301
+/start/resources/editors/vscode /vscode 301
+
+# Tips
+/tips /tips 301
+/tips/adding-images /adding-images 301
+/tips/sync /sync 301
+/tips/js /js 301
+/tips/js/math /math 301
+/tips/js/mermaid /mermaid 301
+/tips/js/syntax-highlighting /syntax-highlighting 301
+
+# Top-level pages
+/architecture /architecture 301
+/examples /examples 301
+/guide /guide 301

@@ -1,4 +1,5 @@
 ---
+slug: markdown
 order: -100
 page:
   description: "Various non-standard Markdown features supported by Emanote"

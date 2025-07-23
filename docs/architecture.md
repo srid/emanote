@@ -3,6 +3,10 @@ order: 99
 tags: [emanote/dev]
 ---
 
+---
+slug: architecture
+---
+
 # Architecture
 
 Emanote is a [Haskell](https://srid.ca/haskell) program that, at its essense, transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website". It does that in a [reactive](https://en.wikipedia.org/wiki/Reactive_programming) manner such that as the source files change the resultant website updates in real-time (thanks to [Ema](https://ema.srid.ca/)'s [hot-reload](https://ema.srid.ca/topics/hot-reload) via websocket). 

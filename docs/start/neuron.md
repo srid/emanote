@@ -1,4 +1,5 @@
 ---
+slug: neuron
 order: 2
 ---
 

@@ -7,6 +7,10 @@ page:
     </with>
 ---
 
+---
+slug: vim
+---
+
 # Vim
 
 [Vim](https://www.vim.org/), and its very popular fork

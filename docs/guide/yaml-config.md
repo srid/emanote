@@ -1,4 +1,5 @@
 ---
+slug: config
 order: -97
 template:
   theme: green

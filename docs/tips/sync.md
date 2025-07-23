@@ -1,5 +1,6 @@
 ---
 short-title: Syncthing sync
+slug: sync
 ---
 
 # Synchronizing notes using Syncthing

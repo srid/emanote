@@ -1,4 +1,5 @@
 ---
+slug: guide
 order: 2
 ---
 

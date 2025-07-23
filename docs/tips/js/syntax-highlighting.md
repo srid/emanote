@@ -1,9 +1,11 @@
 ---
+slug: syntax-highlighting
 page:
   headHtml: |
     <snippet var="js.highlightjs" />
-
 ---
+
+
 # Syntax Highlighting
 
 In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):

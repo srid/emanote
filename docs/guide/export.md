@@ -1,3 +1,7 @@
+---
+slug: export
+---
+
 # JSON export
 
 The metadata of all content ([[markdown]] and [[orgmode]]), along with their link relationships, can be retrieved as `JSON` using one of the following means:

@@ -1,4 +1,5 @@
 ---
+slug: install
 order: 1
 ---
 

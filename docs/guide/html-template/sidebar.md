@@ -1,3 +1,7 @@
+---
+slug: sidebar
+---
+
 # Sidebar
 
 In [[html-template|the default template]], the sidebar is rendered on the left side. The sidebar tree is determined from [[folgezettel|folgezettel heterarchy]].

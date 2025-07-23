@@ -1,3 +1,7 @@
+---
+slug: feed
+---
+
 # ATOM feed
 
 An atom feed can be generated for a given note [[query|query]] by adding the following to the [[yaml-config|note metadata]]:

@@ -1,4 +1,5 @@
 ---
+slug: math
 page:
   headHtml: |
     <snippet var="js.highlightjs" />

@@ -1,4 +1,5 @@
 ---
+slug: neuron-layout
 short-title: Neuron layout
 template:
   uptree: 

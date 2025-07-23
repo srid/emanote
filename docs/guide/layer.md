@@ -1,3 +1,7 @@
+---
+slug: layers
+---
+
 # Layer system
 
 Emanote's layer system allows you to "merge" multiple notebook directories and treat them as if they were a single notebook directory. The `-L` option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.

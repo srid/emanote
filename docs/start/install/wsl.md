@@ -1,3 +1,7 @@
+---
+slug: windows
+---
+
 # Using on Windows
 
 To work with Markdown notes using Emanote on Windows, follow these steps.
