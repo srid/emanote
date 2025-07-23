@@ -1,0 +1,4 @@
+# Cloudflare Pages URL redirects
+# https://developers.cloudflare.com/pages/configuration/redirects/
+
+/umm /haskell
