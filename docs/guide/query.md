@@ -1,5 +1,5 @@
 ---
-slug: queries
+slug: query
 order: -95
 short-title: Queries
 feed:

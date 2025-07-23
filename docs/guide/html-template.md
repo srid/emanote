@@ -1,5 +1,5 @@
 ---
-slug: templates
+slug: html-template
 ---
 
 # HTML Templates
