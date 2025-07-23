@@ -32,7 +32,6 @@
 /guide/markdown/callout /callout 301
 
 # Getting Started
-/start /start 301
 /start/install /install 301
 /start/install/nix /nix 301
 /start/install/wsl /wsl 301
@@ -51,15 +50,8 @@
 /start/resources/editors/vscode /vscode 301
 
 # Tips
-/tips /tips 301
-/tips/adding-images /adding-images 301
-/tips/sync /sync 301
+/tips/adding-images /images 301
 /tips/js /js 301
 /tips/js/math /math 301
 /tips/js/mermaid /mermaid 301
 /tips/js/syntax-highlighting /syntax-highlighting 301
-
-# Top-level pages
-/architecture /architecture 301
-/examples /examples 301
-/guide /guide 301

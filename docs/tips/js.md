@@ -1,9 +1,6 @@
 ---
 short-title: JavaScript
----
-
----
-slug: javascript
+slug: js
 ---
 
 # JavaScript behaviours
