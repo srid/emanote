@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=860fed48-6252-4a90-ad5e-88f5dd0f8821' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=5da5bc5f-d2e5-4ff9-9605-7daa2d99f3b5' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -533,7 +533,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='yaml-config'>
       YAML configuration
     </a>
     
@@ -575,7 +575,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='query'>
       Queries
     </a>
     
@@ -816,7 +816,7 @@
     <span>
       
         
-          <a href='templates' title='View folgezettel children'>
+          <a href='html-template' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -828,7 +828,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='html-template'>
       HTML Templates
     </a>
     
@@ -1153,7 +1153,7 @@
     </h2>
   
     <p class='mb-3'>
-      Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template/hooks</code></a> of this documentation notbook.
+      Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template/hooks</code></a> of this documentation notbook.
     </p>
   
     <h2 id='merge-semantics' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
@@ -1171,7 +1171,7 @@
     </h2>
   
     <p class='mb-3'>
-      The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code> that overrides only a subset of the default configuration.
+      The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code> that overrides only a subset of the default configuration.
     </p>
   
     <h2 id='mount-point' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
@@ -1350,7 +1350,7 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='templates'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='html-template'>
             HTML Templates
           </a>
           

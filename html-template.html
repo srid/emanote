@@ -14,15 +14,15 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>
-    YAML configuration – Emanote
+    HTML Templates – Emanote
   </title>
   
     
-      <meta property='og:description' content='Configure your site metadata, rendering configuration and such using YAML configuration. Create a foo.yaml alongside foo.md (see [[folder-note]]) or foo/ folder, and those settings apply only to that route. The YAML structure is the same as your Markdown frontmatter, and vice-versa. Settings in the YAML frontmatter apply onto that Markdown route only; whereas settings in an individual .yaml file apply to that entire sub-route tree. Emanote does a deep-merge of the parent YAML configurations, so you can have children override only what’s necessary. This is sometimes known as “data cascade”. The final merged YAML structure is passed to the HTML templates, of which you have full rendering control over.' />
+      <meta property='og:description' content='Unlike Neuron, Emanote’s generated HTML can be completely customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see here for a tutorial on its syntax.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='YAML configuration' />
+      <meta property='og:title' content='HTML Templates' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=860fed48-6252-4a90-ad5e-88f5dd0f8821' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=5da5bc5f-d2e5-4ff9-9605-7daa2d99f3b5' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -309,12 +309,12 @@
       </ul>
     </div>
     <button class='inline px-2 py-1 bg-gray-50 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
-      <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-green-700' f
+      <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-2 py-1 text-white bg-green-600 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+    <button class='inline px-2 py-1 text-white bg-blue-600 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
@@ -335,19 +335,19 @@
   <div class='px-2 py-2 text-gray-800'>
     <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500'>
       <a href='-/tags' title='View tags'>
-        <svg style='width: 1rem;' class='hover:text-green-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
           <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
           </path>
         </svg>
       </a>
       <a href='-/all' title='Expand full tree'>
-        <svg style='width: 1rem;' class='hover:text-green-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
           <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'>
           </path>
         </svg>
       </a>
       <a title='Search (Ctrl+K)' class='cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
-        <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-green-700' f
+        <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
@@ -402,7 +402,7 @@
           
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
       Getting Started
     </a>
     
@@ -448,7 +448,7 @@
   
         
     </span>
-    <a class='font-bold hover:bg-green-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
       Guide
     </a>
     
@@ -488,7 +488,7 @@
           
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
@@ -503,46 +503,6 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-  
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
-      
-        
-    
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-bold bg-green-100 hover:bg-green-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
-      YAML configuration
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
   
 </div>
     
@@ -573,7 +533,49 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Queries' href='queries'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='yaml-config'>
+      YAML configuration
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='query'>
       Queries
     </a>
     
@@ -615,7 +617,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
       Daily Notes
     </a>
     
@@ -657,7 +659,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='JSON export' href='export'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='JSON export' href='export'>
       JSON export
     </a>
     
@@ -699,7 +701,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
@@ -741,7 +743,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
       Folder notes
     </a>
     
@@ -783,8 +785,212 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
       Folgezettel links
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='html-template'>
+      HTML Templates
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Full-text search' href='search'>
+      Full-text search
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Breadcrumbs' href='breadcrumbs'>
+      Breadcrumbs
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='External links' href='external-links'>
+      External links
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Fonts and Typography' href='fonts'>
+      Fonts and Typography
     </a>
     
       
@@ -814,7 +1020,7 @@
     <span>
       
         
-          <a href='templates' title='View folgezettel children'>
+          <a href='neuron-layout' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -826,13 +1032,13 @@
           
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
-      HTML Templates
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Neuron layout' href='neuron-layout'>
+      Neuron layout
     </a>
     
       
-        <span class='text-gray-300' title='9 children inside'>
-          9
+        <span class='text-gray-300' title='1 children inside'>
+          1
         </span>
       
     
@@ -871,7 +1077,178 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Layer system' href='layer'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Open Graph Protocol (OGP)' href='ogp'>
+      Open Graph Protocol (OGP)
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Sidebar' href='sidebar'>
+      Sidebar
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Table of contents' href='toc'>
+      Table of contents
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Uplink tree' href='uptree'>
+      Uplink tree
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Layer system' href='layer'>
       Layer system
     </a>
     
@@ -913,7 +1290,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -955,7 +1332,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
       Org Mode ✍️
     </a>
     
@@ -1001,7 +1378,7 @@
           
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Tips' href='tips'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
       Tips
     </a>
     
@@ -1046,7 +1423,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Examples' href='examples'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
       Examples
     </a>
     
@@ -1088,7 +1465,7 @@
         
       
     </span>
-    <a class='hover:bg-green-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
       Architecture
     </a>
     
@@ -1109,9 +1486,9 @@
           <!-- Main body column -->
           <div class='flex-1 w-full bg-white'>
   <main class='px-4 py-4'>
-    <h1 class='flex items-end justify-center mb-4 p-3 bg-green-100 text-5xl font-extrabold text-black rounded'>
+    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
   <a class='z-40 tracking-tighter '>
-    YAML configuration
+    HTML Templates
   </a>
 </h1>
     
@@ -1127,42 +1504,19 @@
 
 
     <p class='mb-3'>
-      Configure your site metadata, rendering configuration and such using YAML configuration. Create a <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>foo.yaml</code> alongside <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>foo.md</code> (see <a href='folder-note' class='text-green-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Folder notes</a>) or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>foo/</code> folder, and those settings apply only to that route. The YAML structure is the same as your Markdown frontmatter, and vice-versa. Settings in the YAML frontmatter apply onto that Markdown route only; whereas settings in an individual .yaml file apply to that entire sub-route tree. Emanote does a deep-merge of the parent YAML configurations, so you can have children override only what’s necessary. This is sometimes known as <a href='https://www.11ty.dev/docs/data-cascade/' class='text-green-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>“data cascade”</a>. The final merged YAML structure is passed to the HTML templates, of which you have full rendering control over.
+      Unlike <a href='neuron' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neuron</a>, Emanote’s generated HTML can be <strong>completely</strong> customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see <a href='http://snapframework.com/docs/tutorials/heist' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for a tutorial on its syntax.
     </p>
   
     <p class='mb-3'>
-      Notice how this page’s sidebar colorscheme has <span class='bg-green-100 text-green-700 font-bold text-3xl'>changed to green</span>? View <a href='https://github.com/srid/emanote/blob/master/docs/guide/yaml-config.md' class='text-green-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>the source of this page</a> to see the magic involved. That CSS greenery you just saw too comes from YAML.
-    </p>
-  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
-  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-  </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
-    <div class='callout-icon'>
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-        
-    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-    </path>
-  
-      </svg>
-    </div>
-    <div class='ml-2'>
-       Using in HTML templates
-    </div>
-  </div>
-  <div class='callout-content'>
-    
-    <p class='mb-3'>
-      You can reference the YAML frontmatter config from <a href='templates' class='text-green-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>. See <a href='https://github.com/srid/emanote/discussions/131#discussioncomment-1382189' class='text-green-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for details.
+      The default HTML templates are stored in the <a href='layer' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>default layer</a>, which can you override either totally or in subset.
     </p>
   
-  </div>
-</div>
-    <h2 id='special-properties' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+    <h2 id='default-layout' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-  Special properties
+  Default Layout
   
-  <a href='config#special-properties' class='--ema-anchor'>
-    <span class='hover:text-green-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='html-template#default-layout' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1171,32 +1525,16 @@
 
     </h2>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
-      
-        <li>
-          
     <p class='mb-3'>
-      <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.image</code>: The image to use for the page. This is used for the <a href='ogp' class='text-green-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Open Graph Protocol (OGP)</a> meta tag <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>og:image</code> meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>page.siteUrl</code> is non-empty.
+      Emanote includes a default layout that includes a <a href='sidebar' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.md</code></a> specifies this template as <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.name</code> in its YAML frontmatter (which could also be <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.yaml</code>).
     </p>
   
-        </li>
+    <h2 id='features' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
       
-        <li>
-          
-    <p class='mb-3'>
-      <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>date</code>: The note timestamp. This is used to order note chronologically, such as for the timeline <a href='queries' class='text-green-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>query</a>. The value can be set from the filename if it begins with <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>YYYY-MM-DD</code>, which is useful for including the date in the note URL. In case of conflict, the date from the YAML configuration takes priority.
-    </p>
+  Features
   
-        </li>
-      
-    </ul>
-  
-    <h2 id='examples' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
-      
-  Examples
-  
-  <a href='config#examples' class='--ema-anchor'>
-    <span class='hover:text-green-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='html-template#features' class='--ema-anchor'>
+    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1204,21 +1542,126 @@
 
 
     </h2>
-  
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+  <nav>
+  <div class='mb-8'>
+    <header data-nosnippet class='pb-2 mb-2 font-semibold text-gray-600'>
+      Folgezettel children
+    </header>
+    <ul>
       
         <li>
-          <a href='https://github.com/srid/srid/blob/master/index.yaml' class='text-green-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/srid/blob/master/index.yaml</a>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='breadcrumbs'>
+              Breadcrumbs
+            </a>
+          </div>
         </li>
       
         <li>
-          <a href='https://github.com/srid/emanote-template/blob/master/index.yaml' class='text-green-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote-template/blob/master/index.yaml</a>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='external-links'>
+              External links
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='fonts'>
+              Fonts and Typography
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='neuron-layout'>
+              Neuron-like layout
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='ogp'>
+              Open Graph Protocol (OGP)
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='search'>
+              Full-text search
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='sidebar'>
+              Sidebar
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='toc'>
+              Table of contents
+            </a>
+          </div>
+        </li>
+      
+        <li>
+          <div class='flex flex-wrap my-2'>
+            
+              <span data-nosnippet class='mr-2 text-right text-gray-600'>
+              </span>
+            
+            <a class='flex-1 text-blue-600 font-semibold border-l-2 pl-2 hover:underline' href='uptree'>
+              Uplink tree
+            </a>
+          </div>
         </li>
       
     </ul>
-  
+  </div>
+</nav>
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-green-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/yaml-config.md'>
+  <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -1232,9 +1675,9 @@
     
         <ul class='ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Special properties'>
-              <a href='config#special-properties' class='--ema-toc bg-green-200 rounded-md p-0.5'>
-                Special properties
+            <li class='whitespace-nowrap truncate mt-2' title='Default Layout'>
+              <a href='html-template#default-layout' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Default Layout
               </a>
               
         <ul class='ml-2'>
@@ -1243,9 +1686,9 @@
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Examples'>
-              <a href='config#examples' class='--ema-toc bg-green-200 rounded-md p-0.5'>
-                Examples
+            <li class='whitespace-nowrap truncate mt-2' title='Features'>
+              <a href='html-template#features' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+                Features
               </a>
               
         <ul class='ml-2'>
@@ -1322,14 +1765,14 @@
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='tips/js'>
-            js
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='yaml-config'>
+            YAML configuration
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>Improve your Emanote website using custom JavaScript code. Emanote provides some predefined behaviours, like syntax highlighting or rendering of mathematical formulas. They can be accessed by including appropriate snippets in <code>page.headHtml</code> or <code>page.bodyHtml</code> of <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration files</a> (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). The source code for the snippets can be found in the default <a href='https://github.com/srid/emanote/blob/master/emanote/default/index.yaml' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.yaml</code></a> under the <code>js:</code> YAML map.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>[!tip] Using in HTML templates You can reference the YAML frontmatter config from <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>. See <a href='https://github.com/srid/emanote/discussions/131#discussioncomment-1382189' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a> for details.</p></div>
     </div>
   
 </div>
@@ -1337,14 +1780,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='uptree'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='uptree'>
             Uplink tree
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>To enable the uptree, add the following to your <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>The <em>uplink tree</em> or “uptree”<sup>*</sup> is a feature available in <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkTag'>HTML Templates</a>, which visualizes hierarchical relationships between notes as a graph at the top of the page.</p></div>
     </div>
   
 </div>
@@ -1352,14 +1795,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='toc'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='toc'>
             Table of contents
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>In <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>In <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>the default template</a>, the table of contents is rendered on the right side. TOC is rendered only if the page has more than one heading.</p></div>
     </div>
   
 </div>
@@ -1367,45 +1810,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='syntax-highlighting'>
-            Syntax Highlighting
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>A predefined snippet also exists for another syntax highlighter called <a href='https://prismjs.com/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Prism</a>. To use it add the following to <code>page.headHtml</code> of <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as <a href='https://highlightjs.org/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>highlight.js</a> by adding it to <code>page.headHtml</code> of <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your <code>index.yaml</code> (assuming you are enabling it on all routes):</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='sidebar'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='sidebar'>
             Sidebar
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>If the <code>order</code> <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata exists, use that as the primary sort key.</div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>The sidebar tree is collapsed by default. But this can be disabled by setting <code>template.sidebar.collapsed</code> to <code>false</code> in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>In <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>The sidebar will use a page’s title by default, but you can override the sidebar item text by setting the <code>short-title</code> <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>frontmatter</a> property.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>In <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.</p></div>
     </div>
   
 </div>
@@ -1413,67 +1825,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='guide/orgmode'>
-            Org Mode ✍️
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>While <code class='verbatim'>#+TITLE</code> is recognized, other metadata are not recognized (yet). Therefore you must store file-associated metadata in a separate <a href='config' class='text-gray-600 font-bold hover:bg-gray-50'>YAML file</a>.</div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='ogp'>
-            Open Graph Protocol (OGP)
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>The first image<sup>*</sup> in the note, if any; otherwise, use the <code>image</code> <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML metadata</a></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>The site name from <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>page.siteTitle</a></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p><a href='https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Twitter Card</a> style can be set using <code>page.twitter.card</code> <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML metadata</a>. It it set to <code>summary_large_image</code> by default.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='queries'>
-            Obsidian-style queries
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>This will use the <code>date</code> <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata to sort the results, as well as display the date alongside it. A live demo of that snippet above is presented below:</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='neuron-layout'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron-layout'>
             Neuron-like layout
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>Emanote’s builtin <a href='templates' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>Emanote’s builtin <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
     </div>
   
 </div>
@@ -1481,18 +1840,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='neuron'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron'>
             Migrating from neuron
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div>If you have a <code>head.html</code>, transfer its contents to <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> (<a href='https://github.com/srid/emanote/discussions/116' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>see example and explanation</a>)</div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML based configuration</a> at per-route level</div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div>Full theming (customize <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a> fully)</div>
     </div>
   
 </div>
@@ -1500,63 +1855,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='mermaid'>
-            Mermaid Diagrams
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>To enable this, add the following to <code>page.bodyHtml</code> of <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='math'>
-            Math
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>To enable it, add the following to <code>page.headHtml</code> of <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='markdown'>
-            Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML frontmatter</a>. Hash tags can also be “hierarchical”, for instance: <span class='font-bold bg-gray-100 py-0.5 px-2 rounded-lg emanote:inline-tag:emanote/syntax/demo' title='Tag' data-tag='emanote/syntax/demo'><a href='-/tags/emanote/syntax/demo' title='Tag' class='text-gray-600 font-bold hover:bg-gray-50'>#emanote/syntax/demo</a></span></p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='layer'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='layer'>
             Layer system
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='templates' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='templates' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>template/hooks</code></a> of this documentation notbook.</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code>index.yaml</code> that overrides only a subset of the default configuration.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>template/hooks</code></a> of this documentation notbook.</p></div>
     </div>
   
 </div>
@@ -1564,14 +1870,18 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='templates'>
-            HTML Templates
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='external-links'>
+            External links
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>Note that the attribute can also be used to display the icons in the <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='markdown' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.</p></div>
+    </div>
+  
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
     </div>
   
 </div>
@@ -1579,116 +1889,14 @@
         </li>
       
         <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='guide'>
-            Guide
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='callout'>
+            Callouts
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>You probably want to start from <a href='markdown' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>, then <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> and thereon to <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. See also <a href='tips/js' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>js</a>.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='search'>
-            Full-text search
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>This can be changed by adding the following to <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>`index.yaml`</a>:</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='folgezettel'>
-            Folgezettel links
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>your configuration</a> to <code>false</code> as shown here:</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>[!tip] Put this configuration in <code>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folder note</a> <code>foo/</code>. Put it in <code>foo.yaml</code> if you want to disable it for <code>foo/</code> and all subfolders under it recursively. Put it in top-level <code>index.yaml</code> to disable it for all folders. See <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='folder-note'>
-            Folder notes
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>For every folder <code>foo/</code> in your notebook, if a <code>foo.md</code> exists alongside it, it is consider a “folder note” that is associated with the folder. Likewise, an associated <code>foo.yaml</code> servers as the <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the entire folder and its contents recursively.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='custom-style'>
-            Custom CSS styling
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>The <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>attributes extension</a> provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a “class map” in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a>, the default value of which provides some builtin-in styles.</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>You should expect the above text to appear styled like a yellow sticky note, because the default <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> specifies a “sticky-note” class, which rewrites to a list of Tailwind classes, and that class in turn is (re)used in Markdown notes.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='breadcrumbs'>
-            Breadcrumbs
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li>
-          <a class='text-green-600 font-semibold hover:bg-green-50' href='feed'>
-            ATOM feed
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>An atom feed can be generated for a given note <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>note metadata</a>:</p></div>
-    </div>
-  
-    <div class='pl-2 mt-2 border-l-2 border-green-200 hover:border-green-500'>
-      <div><p>[!note] <code>page.siteUrl</code> You must set <code>page.siteUrl</code> (see below) in the <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>index.yaml</a> for the feed to be generated.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
+      <div><p>To add a new custom callout named <code>foo</code> (viz.: <code>[!foo] ...</code>), create a <code>/templates/filters/callout/foo.tpl</code> file in your <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>templates</a> folder. You can also change the layout and styling of existing callout types in <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>/templates/filters/callout/*.tpl</code></a>.</p></div>
     </div>
   
 </div>
@@ -1702,15 +1910,6 @@
     
   <section class='flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm'>
     
-      <!-- FIXME: The use of -/tags is wrong, because we should use routeUrl using Ema's encoder 
-        Perhaps Emanote should inject tagMetas with urls.
-      -->
-      <a title='Tag' class='px-1 bg-gray-100 rounded hover:bg-gray-50 hover:text-green-500' href='-/tags/emanote/yaml/demo'>
-        <!-- DoNotFormat -->
-        #emanote/yaml/demo
-        <!-- DoNotFormat -->
-      </a>
-    
   </section>
 
     <!-- What goes in this file will at the very end of the main div -->
@@ -1722,26 +1921,26 @@
   
   <div>
     <a href='' title='Go to Home page'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-green-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
       </svg>
     </a>
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-green-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
     <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.3.30.0'>
-      <img class='w-6 h-6 hover:text-green-700' src='_emanote-static/emanote-logo.svg' />
+      <img class='w-6 h-6 hover:text-blue-700' src='_emanote-static/emanote-logo.svg' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-green-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-6 h-6 hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -1749,7 +1948,7 @@
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-green-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>

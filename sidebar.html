@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=860fed48-6252-4a90-ad5e-88f5dd0f8821' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=5da5bc5f-d2e5-4ff9-9605-7daa2d99f3b5' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -306,7 +306,7 @@
             </li>
           
             <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='templates'>
+              <a class='px-1 font-bold' href='html-template'>
                 HTML Templates
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
@@ -542,7 +542,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='yaml-config'>
       YAML configuration
     </a>
     
@@ -584,7 +584,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='query'>
       Queries
     </a>
     
@@ -837,7 +837,7 @@
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
+    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='html-template'>
       HTML Templates
     </a>
     
@@ -1515,17 +1515,17 @@
 
 
     <p class='mb-3'>
-      In <a href='templates' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.
+      In <a href='html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.
     </p>
   
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The sidebar tree is collapsed by default. But this can be disabled by setting <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.sidebar.collapsed</code> to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>false</code> in <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>
+          The sidebar tree is collapsed by default. But this can be disabled by setting <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>template.sidebar.collapsed</code> to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>false</code> in <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>
         </li>
       
         <li>
-          The ordering of children in the tree is determined in the following order (this is also the order in which <a href='queries' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):
+          The ordering of children in the tree is determined in the following order (this is also the order in which <a href='query' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):
     <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
         <li>
@@ -1533,7 +1533,7 @@
         </li>
       
         <li>
-          If the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>order</code> <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata exists, use that as the primary sort key.
+          If the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>order</code> <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata exists, use that as the primary sort key.
         </li>
       
         <li>
@@ -1561,7 +1561,7 @@
     </h2>
   
     <p class='mb-3'>
-      The sidebar will use a page’s title by default, but you can override the sidebar item text by setting the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>short-title</code> <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> property.
+      The sidebar will use a page’s title by default, but you can override the sidebar item text by setting the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>short-title</code> <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> property.
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='markdown language-markdown'>---
 short-title: hello
@@ -1589,7 +1589,7 @@ Foo bar ...</code></pre></div>
     </h2>
   
     <p class='mb-3'>
-      In <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,
+      In <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>template:
   sidebar:
@@ -1710,11 +1710,11 @@ Foo bar ...</code></pre></div>
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote’s builtin <a href='templates' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
+      <div><p>Emanote’s builtin <a href='html-template' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
     </div>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>In the absence of <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
+      <div><p>In the absence of <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
     </div>
   
 </div>
@@ -1737,14 +1737,14 @@ Foo bar ...</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='templates'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='html-template'>
             HTML Templates
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
     </div>
   
 </div>

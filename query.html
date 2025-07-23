@@ -42,8 +42,8 @@
 
 
   
-  <link href='/queries.xml' rel='alternate' type='application/atom+xml' title='Atom Feed' />
-  <link href='tailwind.css?instanceId=860fed48-6252-4a90-ad5e-88f5dd0f8821' rel='stylesheet' type='text/css' />
+  <link href='/query.xml' rel='alternate' type='application/atom+xml' title='Atom Feed' />
+  <link href='tailwind.css?instanceId=5da5bc5f-d2e5-4ff9-9605-7daa2d99f3b5' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -533,7 +533,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='config'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='YAML configuration' href='yaml-config'>
       YAML configuration
     </a>
     
@@ -573,7 +573,7 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='queries'>
+    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Queries' href='query'>
       Queries
     </a>
     
@@ -814,7 +814,7 @@
     <span>
       
         
-          <a href='templates' title='View folgezettel children'>
+          <a href='html-template' title='View folgezettel children'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
@@ -826,7 +826,7 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='templates'>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='HTML Templates' href='html-template'>
       HTML Templates
     </a>
     
@@ -1161,7 +1161,7 @@
       
   Examples
   
-  <a href='queries#examples' class='--ema-anchor'>
+  <a href='query#examples' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1179,7 +1179,7 @@
       
   List notes in current folder
   
-  <a href='queries#list-notes-in-current-folder' class='--ema-anchor'>
+  <a href='query#list-notes-in-current-folder' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1195,7 +1195,7 @@ path:./*
       
   List notes in an arbitrary folder
   
-  <a href='queries#list-notes-in-an-arbitrary-folder' class='--ema-anchor'>
+  <a href='query#list-notes-in-an-arbitrary-folder' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1211,7 +1211,7 @@ path:foo/bar/*
       
   List notes by a tag
   
-  <a href='queries#list-notes-by-a-tag' class='--ema-anchor'>
+  <a href='query#list-notes-by-a-tag' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1227,7 +1227,7 @@ tag:#foo
       
   List notes by a tag pattern
   
-  <a href='queries#list-notes-by-a-tag-pattern' class='--ema-anchor'>
+  <a href='query#list-notes-by-a-tag-pattern' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1243,7 +1243,7 @@ tag:foo/*/qux
       
   List folgezettel children of current note
   
-  <a href='queries#list-folgezettel-children-of-current-note' class='--ema-anchor'>
+  <a href='query#list-folgezettel-children-of-current-note' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1259,7 +1259,7 @@ children:.
       
   List folgezettel parents of current note
   
-  <a href='queries#list-folgezettel-parents-of-current-note' class='--ema-anchor'>
+  <a href='query#list-folgezettel-parents-of-current-note' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1275,7 +1275,7 @@ parents:.
       
   Timeline queries
   
-  <a href='queries#timeline-queries' class='--ema-anchor'>
+  <a href='query#timeline-queries' class='--ema-anchor'>
     <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1292,7 +1292,7 @@ parents:.
 tag:emanote/syntax/**
 ```</code></pre></div>
     <p class='mb-3'>
-      This will use the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>date</code> <a href='config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata to sort the results, as well as display the date alongside it. A live demo of that snippet above is presented below:
+      This will use the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>date</code> <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata to sort the results, as well as display the date alongside it. A live demo of that snippet above is presented below:
     </p>
   <!-- TODO: DRY (same as query-default.tpl, except for date column)--><nav>
   <div class='mb-8'>
@@ -1359,14 +1359,14 @@ tag:emanote/syntax/**
         <ul class='ml-2'>
           
             <li class='whitespace-nowrap truncate mt-2' title='Examples'>
-              <a href='queries#examples' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#examples' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 Examples
               </a>
               
         <ul class='ml-2'>
           
             <li class='whitespace-nowrap truncate mt-2' title='List notes in current folder'>
-              <a href='queries#list-notes-in-current-folder' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-notes-in-current-folder' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List notes in current folder
               </a>
               
@@ -1377,7 +1377,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='List notes in an arbitrary folder'>
-              <a href='queries#list-notes-in-an-arbitrary-folder' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-notes-in-an-arbitrary-folder' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List notes in an arbitrary folder
               </a>
               
@@ -1388,7 +1388,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='List notes by a tag'>
-              <a href='queries#list-notes-by-a-tag' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-notes-by-a-tag' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List notes by a tag
               </a>
               
@@ -1399,7 +1399,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='List notes by a tag pattern'>
-              <a href='queries#list-notes-by-a-tag-pattern' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-notes-by-a-tag-pattern' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List notes by a tag pattern
               </a>
               
@@ -1410,7 +1410,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='List folgezettel children of current note'>
-              <a href='queries#list-folgezettel-children-of-current-note' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-folgezettel-children-of-current-note' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List folgezettel children of current note
               </a>
               
@@ -1421,7 +1421,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='List folgezettel parents of current note'>
-              <a href='queries#list-folgezettel-parents-of-current-note' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#list-folgezettel-parents-of-current-note' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 List folgezettel parents of current note
               </a>
               
@@ -1436,7 +1436,7 @@ tag:emanote/syntax/**
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='Timeline queries'>
-              <a href='queries#timeline-queries' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='query#timeline-queries' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
                 Timeline queries
               </a>
               
@@ -1514,14 +1514,14 @@ tag:emanote/syntax/**
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='config'>
+          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='yaml-config'>
             YAML configuration
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p><code>date</code>: The note timestamp. This is used to order note chronologically, such as for the timeline <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>query</a>. The value can be set from the filename if it begins with <code>YYYY-MM-DD</code>, which is useful for including the date in the note URL. In case of conflict, the date from the YAML configuration takes priority.</p></div>
+      <div><p><code>date</code>: The note timestamp. This is used to order note chronologically, such as for the timeline <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>query</a>. The value can be set from the filename if it begins with <code>YYYY-MM-DD</code>, which is useful for including the date in the note URL. In case of conflict, the date from the YAML configuration takes priority.</p></div>
     </div>
   
 </div>
@@ -1536,7 +1536,7 @@ tag:emanote/syntax/**
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>The ordering of children in the tree is determined in the following order (this is also the order in which <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):</div>
+      <div>The ordering of children in the tree is determined in the following order (this is also the order in which <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):</div>
     </div>
   
 </div>
@@ -1551,7 +1551,7 @@ tag:emanote/syntax/**
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>In the absence of <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
+      <div><p>In the absence of <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
     </div>
   
 </div>
@@ -1566,11 +1566,11 @@ tag:emanote/syntax/**
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>In all notes, replace neuron’s <code>z:zettels</code>-style <a href='https://neuron.zettel.page/tag-queries' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>tag queries</a> with <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a>.</div>
+      <div>In all notes, replace neuron’s <code>z:zettels</code>-style <a href='https://neuron.zettel.page/tag-queries' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>tag queries</a> with <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a>.</div>
     </div>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a></div>
+      <div><a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a></div>
     </div>
   
 </div>
@@ -1585,7 +1585,7 @@ tag:emanote/syntax/**
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>You probably want to start from <a href='markdown' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>, then <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> and thereon to <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. See also <a href='tips/js' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>js</a>.</p></div>
+      <div><p>You probably want to start from <a href='markdown' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>, then <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> and thereon to <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. See also <a href='tips/js' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>js</a>.</p></div>
     </div>
   
 </div>
@@ -1600,11 +1600,11 @@ tag:emanote/syntax/**
             <div class='mb-4 overflow-auto text-sm text-gray-500'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>An atom feed can be generated for a given note <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>note metadata</a>:</p></div>
+      <div><p>An atom feed can be generated for a given note <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>note metadata</a>:</p></div>
     </div>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>An example is available in the <a href='queries' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='queries.xml' class='text-gray-600 font-bold hover:bg-gray-50'>query.xml</a>.</p></div>
+      <div><p>An example is available in the <a href='query' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='query.xml' class='text-gray-600 font-bold hover:bg-gray-50'>query.xml</a>.</p></div>
     </div>
   
 </div>
