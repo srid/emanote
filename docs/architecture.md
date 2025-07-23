@@ -1,9 +1,6 @@
 ---
 order: 99
 tags: [emanote/dev]
----
-
----
 slug: architecture
 ---
 
