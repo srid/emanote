@@ -1,0 +1,134 @@
+/* Adapted from https://neuron.zettel.page/uplink-tree
+   Originally from https://codepen.io/philippkuehn/pen/QbrOaN
+*/
+
+body .tree.flipped {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+body .tree {
+  overflow: auto;
+  /* See more-head.tpl */
+  font-size: 0.8em;
+}
+
+body .tree ul.root {
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+body .tree ul {
+  position: relative;
+  padding: 1em 0px 0px 0px;
+  white-space: nowrap;
+  margin: 0px auto 0px auto;
+  text-align: center;
+}
+
+body .tree ul::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+body .tree ul:last-child {
+  padding-bottom: 0.1em;
+}
+
+body .tree li {
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  list-style-type: none;
+  position: relative;
+  padding: 1em 0.5em 0em 0.5em;
+}
+
+body .tree li::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 50%;
+  border-top: solid 2px #cccccc;
+  width: 60%;
+  height: 1.19999em;
+}
+
+body .tree li::after {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 50%;
+  border-top: solid 2px #cccccc;
+  width: 50%;
+  height: 1.19999em;
+}
+
+body .tree li::after {
+  right: auto;
+  left: 50%;
+  border-left: solid 2px #cccccc;
+}
+
+body .tree li:only-child {
+  padding-top: 0em;
+}
+
+body .tree li:only-child::after {
+  display: none;
+}
+
+body .tree li:only-child::before {
+  display: none;
+}
+
+body .tree li:first-child::before {
+  border-style: none;
+  border-width: 0px;
+}
+
+body .tree li:first-child::after {
+  border-radius: 5px 0px 0px 0px;
+}
+
+body .tree li:last-child::after {
+  border-style: none;
+  border-width: 0px;
+}
+
+body .tree li:last-child::before {
+  border-right: solid 2px #cccccc;
+  border-radius: 0px 5px 0px 0px;
+}
+
+body .tree ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  border-left: solid 2px #cccccc;
+  width: 0px;
+  height: 1.19999em;
+}
+
+body .tree li div.forest-link {
+  border: solid 2px #cccccc;
+  padding: 0.2em 0.29999em 0.2em 0.29999em;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 5px 5px 5px 5px;
+  position: relative;
+  top: 2px;
+}
+
+body .tree.flipped li div.forest-link {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}

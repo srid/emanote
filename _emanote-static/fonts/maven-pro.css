@@ -1,0 +1,32 @@
+/* Maven Pro font-face definitions */
+@font-face {
+  font-family: 'Maven Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./maven-pro-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Maven Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./maven-pro-500.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Maven Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./maven-pro-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Maven Pro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./maven-pro-700.ttf') format('truetype');
+}
