@@ -8,7 +8,7 @@ Emanote uses **Maven Pro** as the default font family throughout the site. The f
 
 ## Changing the Font Family
 
-To use a different font, create a `templates/styles.tpl` file in your notebook and override the global font styling:
+To use a different font, create a `templates/styles.tpl` file in your notebook and override the global font styling (in [[layer|default layer]]):
 
 ```html
 <style data-category="global-font">
@@ -19,7 +19,7 @@ To use a different font, create a `templates/styles.tpl` file in your notebook a
 </style>
 ```
 
-## Using Google Fonts
+## Using Google Fonts {#google}
 
 Create `templates/styles.tpl` with both the font import and the styling:
 
@@ -35,7 +35,7 @@ Create `templates/styles.tpl` with both the font import and the styling:
 </style>
 ```
 
-## Self-hosting Custom Fonts
+## Self-hosting Custom Fonts {#custom}
 
 To self-host your own fonts like Maven Pro:
 
