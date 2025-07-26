@@ -8,6 +8,7 @@ module Emanote.View.Export (
   modelRels,
 ) where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
@@ -104,13 +105,32 @@ lmlSourcePath :: LMLRoute -> FilePath
 lmlSourcePath =
   R.withLmlRoute R.encodeRoute
 
+-- | Check if a note has a source file (i.e., it's an actual .md file from the notebook)
+hasSourceFile :: Note.Note -> Bool
+hasSourceFile note = isJust (Note._noteSource note)
+
 -- | Export all notes to a single Markdown file, separated by delimiters
 renderContentExport :: Text -> Model -> Text
 renderContentExport baseUrl model =
   let notes_ = model ^. M.modelNotes
-      noteList = sortOn (lmlSourcePath . Note._noteRoute) $ toList notes_
+      -- Only include notes that have a source file (actual .md files from the notebook)
+      sourceNotes = filter hasSourceFile $ toList notes_
+      noteList = sortOn (lmlSourcePath . Note._noteRoute) sourceNotes
       exportedNotes = mapMaybe (exportNote baseUrl model) noteList
-   in T.intercalate "\n\n---\n\n" exportedNotes
+      llmPrompt = T.unlines
+        [ "<!-- LLM PROMPT: This document contains all notes from an Emanote notebook."
+        , "Each note is separated by '---' delimiters and includes metadata headers."
+        , "- Source: The original file path in the notebook"
+        , "- URL: The full URL where this note can be accessed"
+        , "- Title: The note's title"
+        , "- Wikilinks: All possible ways to reference this note using [[wikilink]] syntax"
+        , ""
+        , "When referencing notes, you can use any of the wikilinks provided."
+        , "The base URL is: " <> baseUrl
+        , "-->"
+        , ""
+        ]
+   in llmPrompt <> T.intercalate "\n\n---\n\n" exportedNotes
 
 -- | Export a single note with metadata header
 exportNote :: Text -> Model -> Note.Note -> Maybe Text
@@ -120,6 +140,8 @@ exportNote baseUrl model note = do
       noteUrl = baseUrl <> "/" <> toText (SR.siteRouteUrlStatic model $ lmlSiteRoute (R.LMLView_Html, route))
       noteTitle = Tit.toPlain $ Note._noteTitle note
       doc = Note._noteDoc note
+      wikilinks = Note.noteSelfRefs note
+      wikilinkTexts = toList $ fmap (toText . (show :: WL.WikiLink -> String)) wikilinks
   
   -- Convert Pandoc document to Markdown
   markdownContent <- case runPure $ writeMarkdown def doc of
@@ -130,6 +152,7 @@ exportNote baseUrl model note = do
         [ "<!-- Source: " <> toText sourcePath <> " -->"
         , "<!-- URL: " <> noteUrl <> " -->"
         , "<!-- Title: " <> noteTitle <> " -->"
+        , "<!-- Wikilinks: " <> T.intercalate ", " wikilinkTexts <> " -->"
         , ""
         ]
   
