@@ -16,6 +16,7 @@ import Ema.CLI qualified
 import Options.Applicative hiding (action)
 import Paths_emanote qualified
 import Relude
+import System.FilePath (takeExtension)
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
@@ -35,6 +36,7 @@ data Cmd
 
 data ExportCmd
   = ExportCmd_Metadata
+  | ExportCmd_Content Text FilePath
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
@@ -48,8 +50,29 @@ cliParser cwd = do
     exportParser :: Parser Cmd
     exportParser = do
       exportCmd <-
-        subparser (command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON")))
+        subparser 
+          ( command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON"))
+         <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
+          )
       pure $ Cmd_Export exportCmd
+    contentParser :: Parser ExportCmd
+    contentParser = ExportCmd_Content 
+      <$> strOption 
+        ( long "base-url"
+       <> metavar "URL"
+       <> help "Base URL for the exported content (e.g., https://emanote.srid.ca/)"
+        )
+      <*> filenameArgument
+    filenameArgument :: Parser FilePath
+    filenameArgument = argument filenameReader
+      ( metavar "FILENAME"
+     <> help "Output filename (must have .md extension)"
+      )
+    filenameReader :: ReadM FilePath
+    filenameReader = eitherReader $ \s ->
+      if takeExtension s == ".md"
+        then Right s
+        else Left $ "Output filename must have .md extension, got: " <> s
     layerList defaultPath = do
       option layerListReader
         $ mconcat

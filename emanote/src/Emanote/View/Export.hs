@@ -3,6 +3,7 @@
 -- | Export an Emanote notebook to external formats.
 module Emanote.View.Export (
   renderJSONExport,
+  renderContentExport,
   Link (..),
   modelRels,
 ) where
@@ -10,10 +11,12 @@ module Emanote.View.Export (
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Note qualified as Note
 import Emanote.Model.Title qualified as Tit
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
@@ -21,6 +24,9 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Optics.Operators ((^.))
 import Relude
+import Text.Pandoc.Writers.Markdown (writeMarkdown)
+import Text.Pandoc.Options (def)
+import Text.Pandoc (runPure)
 
 -- | A JSON export of the notebook
 data Export = Export
@@ -97,3 +103,34 @@ lmlRouteKey =
 lmlSourcePath :: LMLRoute -> FilePath
 lmlSourcePath =
   R.withLmlRoute R.encodeRoute
+
+-- | Export all notes to a single Markdown file, separated by delimiters
+renderContentExport :: Text -> Model -> Text
+renderContentExport baseUrl model =
+  let notes_ = model ^. M.modelNotes
+      noteList = sortOn (lmlSourcePath . Note._noteRoute) $ toList notes_
+      exportedNotes = mapMaybe (exportNote baseUrl model) noteList
+   in T.intercalate "\n\n---\n\n" exportedNotes
+
+-- | Export a single note with metadata header
+exportNote :: Text -> Model -> Note.Note -> Maybe Text
+exportNote baseUrl model note = do
+  let route = Note._noteRoute note
+      sourcePath = lmlSourcePath route
+      noteUrl = baseUrl <> "/" <> toText (SR.siteRouteUrlStatic model $ lmlSiteRoute (R.LMLView_Html, route))
+      noteTitle = Tit.toPlain $ Note._noteTitle note
+      doc = Note._noteDoc note
+  
+  -- Convert Pandoc document to Markdown
+  markdownContent <- case runPure $ writeMarkdown def doc of
+    Right md -> Just md
+    Left _ -> Nothing
+  
+  let header = T.unlines
+        [ "<!-- Source: " <> toText sourcePath <> " -->"
+        , "<!-- URL: " <> noteUrl <> " -->"
+        , "<!-- Title: " <> noteTitle <> " -->"
+        , ""
+        ]
+  
+  pure $ header <> markdownContent
