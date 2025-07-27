@@ -50,24 +50,27 @@ cliParser cwd = do
     exportParser :: Parser Cmd
     exportParser = do
       exportCmd <-
-        subparser 
+        subparser
           ( command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON"))
-         <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
+              <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
           )
       pure $ Cmd_Export exportCmd
     contentParser :: Parser ExportCmd
-    contentParser = ExportCmd_Content 
-      <$> strOption 
-        ( long "base-url"
-       <> metavar "URL"
-       <> help "Base URL for the exported content (e.g., https://emanote.srid.ca/)"
-        )
-      <*> filenameArgument
+    contentParser =
+      ExportCmd_Content
+        <$> strOption
+          ( long "base-url"
+              <> metavar "URL"
+              <> help "Base URL for the exported content (e.g., https://emanote.srid.ca/)"
+          )
+        <*> filenameArgument
     filenameArgument :: Parser FilePath
-    filenameArgument = argument filenameReader
-      ( metavar "FILENAME"
-     <> help "Output filename (must have .md extension)"
-      )
+    filenameArgument =
+      argument
+        filenameReader
+        ( metavar "FILENAME"
+            <> help "Output filename (must have .md extension)"
+        )
     filenameReader :: ReadM FilePath
     filenameReader = eitherReader $ \s ->
       if takeExtension s == ".md"
