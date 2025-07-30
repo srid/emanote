@@ -113,14 +113,14 @@ encodeVirtualRoute = \case
   VirtualRoute_Index ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
   VirtualRoute_Export exportRoute ->
-    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| [encodeExportRoute exportRoute]
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| [encodeExportR exportRoute]
   VirtualRoute_StorkIndex ->
     R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["stork.st"]
   VirtualRoute_TaskIndex ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
 
-encodeExportRoute :: ExportRoute -> Slug.Slug
-encodeExportRoute = \case
+encodeExportR :: ExportRoute -> Slug.Slug
+encodeExportR = \case
   ExportRoute_Metadata -> fromString "export.json"
   ExportRoute_Content -> fromString "export.md"
 
