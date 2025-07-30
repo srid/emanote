@@ -114,8 +114,8 @@ renderVirtualRoute m = \case
     SR.ExportRoute_Metadata ->
       pure $ Ema.AssetGenerated Ema.Other $ renderJSONExport m
     SR.ExportRoute_Content -> do
-      let baseUrl = getBaseUrlFromModel m
-      content <- liftIO $ renderContentExport baseUrl m
+      let mBaseUrl = getBaseUrlFromModel m
+      content <- liftIO $ renderContentExport mBaseUrl m
       pure $ Ema.AssetGenerated Ema.Other $ encodeUtf8 content
   SR.VirtualRoute_StorkIndex ->
     Ema.AssetGenerated Ema.Other <$> renderStorkIndex m

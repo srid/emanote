@@ -43,17 +43,16 @@ runExport exportFormat model =
     ExportFormat_Metadata -> do
       putLBSLn $ renderJSONExport model
     ExportFormat_Content filename -> do
-      let baseUrl = getBaseUrlFromModel model
-      content <- renderContentExport baseUrl model
+      let mBaseUrl = getBaseUrlFromModel model
+      content <- renderContentExport mBaseUrl model
       writeFileText filename content
 
--- | Get base URL from model configuration
-getBaseUrlFromModel :: Model -> Text
+-- | Get base URL from model configuration (returns Nothing if not configured)
+getBaseUrlFromModel :: Model -> Maybe Text
 getBaseUrlFromModel model =
   let indexRoute = M.modelIndexRoute model
       feedMeta = getEffectiveRouteMeta indexRoute model
-      mBaseUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
-   in fromMaybe "http://localhost:8080" mBaseUrl
+   in lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
 
 -- | A JSON export of the notebook
 data Export = Export
@@ -136,32 +135,38 @@ hasSourceFile :: Note.Note -> Bool
 hasSourceFile note = isJust (Note._noteSource note)
 
 -- | Export all notes to a single Markdown file, separated by delimiters
-renderContentExport :: Text -> Model -> IO Text
-renderContentExport baseUrl model = do
+renderContentExport :: Maybe Text -> Model -> IO Text
+renderContentExport mBaseUrl model = do
   let notes_ = model ^. M.modelNotes
       -- Only include notes that have a source file (actual .md files from the notebook)
       sourceNotes = filter hasSourceFile $ toList notes_
       noteList = sortOn (lmlSourcePath . Note._noteRoute) sourceNotes
-  exportedNotes <- catMaybes <$> mapM (exportNote baseUrl model) noteList
-  let llmPrompt =
+  exportedNotes <- catMaybes <$> mapM (exportNote mBaseUrl model) noteList
+  let baseUrlLine = case mBaseUrl of
+        Just baseUrl -> ["The base URL is: " <> baseUrl]
+        Nothing -> ["No base URL configured (set page.siteUrl in notebook config)"]
+      llmPrompt =
         unlines
-          [ "<!-- LLM PROMPT: This document contains all notes from an Emanote notebook."
-          , "Each note is separated by '---' delimiters and includes metadata headers."
-          , "- Source: The original file path in the notebook"
-          , "- URL: The full URL where this note can be accessed"
-          , "- Title: The note's title"
-          , "- Wikilinks: All possible ways to reference this note using [[wikilink]] syntax"
-          , ""
-          , "When referencing notes, you can use any of the wikilinks provided."
-          , "The base URL is: " <> baseUrl
-          , "-->"
-          , ""
-          ]
+          $ [ "<!-- LLM PROMPT: This document contains all notes from an Emanote notebook."
+            , "Each note is separated by '---' delimiters and includes metadata headers."
+            , "- Source: The original file path in the notebook"
+            ]
+          <> ( case mBaseUrl of
+                Just _ -> ["- URL: The full URL where this note can be accessed"]
+                Nothing -> ["- URL: Not included (no base URL configured)"]
+             )
+          <> [ "- Title: The note's title"
+             , "- Wikilinks: All possible ways to reference this note using [[wikilink]] syntax"
+             , ""
+             , "When referencing notes, you can use any of the wikilinks provided."
+             ]
+          <> baseUrlLine
+          <> ["-->", ""]
   pure $ llmPrompt <> T.intercalate "\n\n---\n\n" exportedNotes
 
 -- | Export a single note with metadata header
-exportNote :: Text -> Model -> Note.Note -> IO (Maybe Text)
-exportNote baseUrl model note = do
+exportNote :: Maybe Text -> Model -> Note.Note -> IO (Maybe Text)
+exportNote mBaseUrl model note = do
   case Note._noteSource note of
     Nothing -> pure Nothing -- Note has no source file (auto-generated)
     Just locAndFile -> do
@@ -169,18 +174,24 @@ exportNote baseUrl model note = do
       markdownContent <- decodeUtf8 <$> readFileBS actualFilePath
       let route = Note._noteRoute note
           sourcePath = lmlSourcePath route
-          noteUrl = baseUrl <> "/" <> toText (SR.siteRouteUrlStatic model $ lmlSiteRoute (R.LMLView_Html, route))
           noteTitle = Tit.toPlain $ Note._noteTitle note
           wikilinks = Note.noteSelfRefs note
           wikilinkTexts = toList $ fmap (toText . (show :: WL.WikiLink -> String)) wikilinks
 
+          urlLine = case mBaseUrl of
+            Just baseUrl ->
+              let noteUrl = baseUrl <> "/" <> toText (SR.siteRouteUrlStatic model $ lmlSiteRoute (R.LMLView_Html, route))
+               in ["<!-- URL: " <> noteUrl <> " -->"]
+            Nothing -> []
+
           header =
             unlines
-              [ "<!-- Source: " <> toText sourcePath <> " -->"
-              , "<!-- URL: " <> noteUrl <> " -->"
-              , "<!-- Title: " <> noteTitle <> " -->"
-              , "<!-- Wikilinks: " <> T.intercalate ", " wikilinkTexts <> " -->"
-              , ""
-              ]
+              $ [ "<!-- Source: " <> toText sourcePath <> " -->"
+                ]
+              <> urlLine
+              <> [ "<!-- Title: " <> noteTitle <> " -->"
+                 , "<!-- Wikilinks: " <> T.intercalate ", " wikilinkTexts <> " -->"
+                 , ""
+                 ]
 
       pure $ Just $ header <> markdownContent
