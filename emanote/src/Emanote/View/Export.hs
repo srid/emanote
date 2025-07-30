@@ -4,7 +4,6 @@
 module Emanote.View.Export (
   ExportFormat (..),
   renderExport,
-  getBaseUrlFromModel,
   Link (..),
   modelRels,
 ) where
