@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- | Export an Emanote notebook to external formats.
 module Emanote.View.Export (
@@ -27,6 +28,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Emanote.Route.SiteRoute.Type (ExportFormat (..))
 import Emanote.Source.Loc (locResolve)
+import NeatInterpolation (text)
 import Optics.Operators ((^.))
 import Relude
 
@@ -136,26 +138,26 @@ renderContentExport mBaseUrl model = do
       sourceNotes = filter hasSourceFile $ toList notes_
       noteList = sortOn (lmlSourcePath . Note._noteRoute) sourceNotes
   exportedNotes <- catMaybes <$> mapM (exportNote mBaseUrl model) noteList
-  let baseUrlLine = case mBaseUrl of
-        Just baseUrl -> ["The base URL is: " <> baseUrl]
-        Nothing -> ["No base URL configured (set page.siteUrl in notebook config)"]
+  let urlHelpText = case mBaseUrl of
+        Just _ -> "- URL: The full URL where this note can be accessed"
+        Nothing -> "- URL: Not included (no base URL configured)"
+      baseUrlText = case mBaseUrl of
+        Just baseUrl -> "The base URL is: " <> baseUrl
+        Nothing -> "No base URL configured (set page.siteUrl in notebook config)"
       llmPrompt =
-        unlines
-          $ [ "<!-- LLM PROMPT: This document contains all notes from an Emanote notebook."
-            , "Each note is separated by '---' delimiters and includes metadata headers."
-            , "- Source: The original file path in the notebook"
-            ]
-          <> ( case mBaseUrl of
-                Just _ -> ["- URL: The full URL where this note can be accessed"]
-                Nothing -> ["- URL: Not included (no base URL configured)"]
-             )
-          <> [ "- Title: The note's title"
-             , "- Wikilinks: All possible ways to reference this note using [[wikilink]] syntax"
-             , ""
-             , "When referencing notes, you can use any of the wikilinks provided."
-             ]
-          <> baseUrlLine
-          <> ["-->", ""]
+        [text|
+        <!-- LLM PROMPT: This document contains all notes from an Emanote notebook.
+        Each note is separated by '---' delimiters and includes metadata headers.
+        - Source: The original file path in the notebook
+        ${urlHelpText}
+        - Title: The note's title
+        - Wikilinks: All possible ways to reference this note using [[wikilink]] syntax
+
+        When referencing notes, you can use any of the wikilinks provided.
+        ${baseUrlText}
+        -->
+        |]
+          <> "\n\n"
   pure $ llmPrompt <> T.intercalate "\n\n---\n\n" exportedNotes
 
 -- | Export a single note with metadata header
@@ -172,20 +174,26 @@ exportNote mBaseUrl model note = do
           wikilinks = Note.noteSelfRefs note
           wikilinkTexts = toList $ fmap (toText . (show :: WL.WikiLink -> String)) wikilinks
 
-          urlLine = case mBaseUrl of
+          wikilinkList = T.intercalate ", " wikilinkTexts
+
+          sourcePathText = toText sourcePath
+
+          header = case mBaseUrl of
             Just baseUrl ->
               let noteUrl = baseUrl <> "/" <> toText (SR.siteRouteUrlStatic model $ lmlSiteRoute (R.LMLView_Html, route))
-               in ["<!-- URL: " <> noteUrl <> " -->"]
-            Nothing -> []
-
-          header =
-            unlines
-              $ [ "<!-- Source: " <> toText sourcePath <> " -->"
-                ]
-              <> urlLine
-              <> [ "<!-- Title: " <> noteTitle <> " -->"
-                 , "<!-- Wikilinks: " <> T.intercalate ", " wikilinkTexts <> " -->"
-                 , ""
-                 ]
+               in [text|
+                 <!-- Source: ${sourcePathText} -->
+                 <!-- URL: ${noteUrl} -->
+                 <!-- Title: ${noteTitle} -->
+                 <!-- Wikilinks: ${wikilinkList} -->
+                 |]
+                    <> "\n\n"
+            Nothing ->
+              [text|
+              <!-- Source: ${sourcePathText} -->
+              <!-- Title: ${noteTitle} -->
+              <!-- Wikilinks: ${wikilinkList} -->
+              |]
+                <> "\n\n"
 
       pure $ Just $ header <> markdownContent
