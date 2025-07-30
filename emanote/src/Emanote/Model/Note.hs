@@ -110,7 +110,10 @@ noteSelfRefs =
   where
     routeSelfRefs :: R.LMLRoute -> NonEmpty WL.WikiLink
     routeSelfRefs =
-      fmap snd
+      fromList
+        . ordNub
+        . toList
+        . fmap snd
         . R.withLmlRoute (WL.allowedWikiLinks . R.unRoute)
 
 noteAncestors :: Note -> [RAncestor]

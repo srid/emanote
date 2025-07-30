@@ -2,3 +2,5 @@ dist-newstyle
 result
 result-*
 .direnv
+
+/.claude/*.local.*

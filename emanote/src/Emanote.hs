@@ -38,6 +38,7 @@ import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
 import Emanote.View.Common (generatedCssFile)
 import Emanote.View.Export qualified as Export
+import Emanote.View.Export.JSON qualified as ExportJSON
 import Emanote.View.Template qualified as View
 import Optics.Core ((%), (.~), (^.))
 import Relude
@@ -75,13 +76,12 @@ run cfg@EmanoteConfig {..} = do
       let emaCfg = SiteConfig emaCli def
       Ema.runSiteWith @SiteRoute emaCfg cfg
         >>= postRun cfg
-    CLI.Cmd_Export exportCmd -> do
-      case exportCmd of
-        CLI.ExportCmd_Metadata -> do
-          Dynamic (unModelEma -> model0, _) <-
-            flip runLoggerLoggingT oneOffLogger
-              $ siteInput @SiteRoute (Ema.CLI.action def) cfg
-          putLBSLn $ Export.renderJSONExport model0
+    CLI.Cmd_Export exportFormat -> do
+      Dynamic (unModelEma -> model0, _) <-
+        flip runLoggerLoggingT oneOffLogger
+          $ siteInput @SiteRoute (Ema.CLI.action def) cfg
+      content <- Export.renderExport exportFormat model0
+      putLBSLn content
   where
     -- A logger suited for running one-off commands.
     oneOffLogger =
@@ -98,7 +98,7 @@ postRun :: EmanoteConfig -> (Model.ModelEma, (FilePath, [FilePath])) -> IO ()
 postRun EmanoteConfig {..} (unModelEma -> model0, (outPath, genPaths)) = do
   when (model0 ^. modelCompileTailwind)
     $ compileTailwindCss (outPath </> generatedCssFile) genPaths
-  checkBrokenLinks _emanoteConfigCli $ Export.modelRels model0
+  checkBrokenLinks _emanoteConfigCli $ ExportJSON.modelRels model0
   checkBadMarkdownFiles $ Model.modelNoteErrors model0
 
 unModelEma :: Model.ModelEma -> Model.Model
@@ -114,12 +114,12 @@ checkBadMarkdownFiles noteErrs = runStderrLoggingT $ do
     logE "Errors found."
     exitFailure
 
-checkBrokenLinks :: CLI.Cli -> Map LMLRoute [Export.Link] -> IO ()
+checkBrokenLinks :: CLI.Cli -> Map LMLRoute [ExportJSON.Link] -> IO ()
 checkBrokenLinks cli modelRels = runStderrLoggingT $ do
   ((), res :: Sum Int) <- runWriterT
     $ forM_ (Map.toList modelRels)
     $ \(noteRoute, rels) ->
-      forM_ (sortNub rels) $ \(Export.Link urt rrt) ->
+      forM_ (sortNub rels) $ \(ExportJSON.Link urt rrt) ->
         case rrt of
           RRTFound _ -> pass
           RRTMissing -> do

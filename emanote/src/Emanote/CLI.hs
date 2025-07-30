@@ -5,7 +5,6 @@ module Emanote.CLI (
   Cli (..),
   Layer (..),
   Cmd (..),
-  ExportCmd (..),
   parseCli,
   cliParser,
 ) where
@@ -13,6 +12,7 @@ module Emanote.CLI (
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema.CLI qualified
+import Emanote.Route.SiteRoute.Type (ExportFormat (..))
 import Options.Applicative hiding (action)
 import Paths_emanote qualified
 import Relude
@@ -31,10 +31,19 @@ data Layer = Layer
 
 data Cmd
   = Cmd_Ema Ema.CLI.Cli
-  | Cmd_Export ExportCmd
+  | Cmd_Export ExportFormat
 
-data ExportCmd
-  = ExportCmd_Metadata
+exportParser :: Parser Cmd
+exportParser = do
+  exportCmd <-
+    subparser
+      ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
+          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file to stdout (uses baseUrl from notebook config)"))
+      )
+  pure $ Cmd_Export exportCmd
+  where
+    contentParser :: Parser ExportFormat
+    contentParser = pure ExportFormat_Content
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
@@ -45,11 +54,6 @@ cliParser cwd = do
       <|> subparser (command "export" (info exportParser (progDesc "Export commands")))
   pure Cli {..}
   where
-    exportParser :: Parser Cmd
-    exportParser = do
-      exportCmd <-
-        subparser (command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON")))
-      pure $ Cmd_Export exportCmd
     layerList defaultPath = do
       option layerListReader
         $ mconcat
