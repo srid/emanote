@@ -5,6 +5,7 @@ module Emanote.View.Export (
   ExportFormat (..),
   runExport,
   renderJSONExport,
+  renderContentExport,
   Link (..),
   modelRels,
 ) where
@@ -96,15 +97,15 @@ renderJSONExport model =
 
 modelRels :: Model -> Map LMLRoute [Link]
 modelRels model =
-  Map.fromListWith (<>) $
-    M.modelNoteRels model
-      <&> \rel ->
-        let from_ = rel ^. Rel.relFrom
-            to_ = rel ^. Rel.relTo
-            toTarget =
-              Resolve.resolveUnresolvedRelTarget model from_ to_
-                <&> SR.siteRouteUrlStatic model
-         in (from_, one $ Link to_ toTarget)
+  Map.fromListWith (<>)
+    $ M.modelNoteRels model
+    <&> \rel ->
+      let from_ = rel ^. Rel.relFrom
+          to_ = rel ^. Rel.relTo
+          toTarget =
+            Resolve.resolveUnresolvedRelTarget model from_ to_
+              <&> SR.siteRouteUrlStatic model
+       in (from_, one $ Link to_ toTarget)
 
 -- An unique key to represent this LMLRoute in the exported JSON
 --
