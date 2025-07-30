@@ -22,7 +22,7 @@ import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
-import Emanote.View.Export (getBaseUrlFromModel, renderContentExport, renderJSONExport)
+import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
@@ -110,13 +110,9 @@ renderVirtualRoute m = \case
     pure $ Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
   SR.VirtualRoute_Index ->
     pure $ Ema.AssetGenerated Ema.Html $ renderSRIndex m
-  SR.VirtualRoute_Export exportRoute -> case exportRoute of
-    SR.ExportRoute_Metadata ->
-      pure $ Ema.AssetGenerated Ema.Other $ renderJSONExport m
-    SR.ExportRoute_Content -> do
-      let mBaseUrl = getBaseUrlFromModel m
-      content <- liftIO $ renderContentExport mBaseUrl m
-      pure $ Ema.AssetGenerated Ema.Other $ encodeUtf8 content
+  SR.VirtualRoute_Export exportFormat -> do
+    content <- liftIO $ renderExport exportFormat m
+    pure $ Ema.AssetGenerated Ema.Other content
   SR.VirtualRoute_StorkIndex ->
     Ema.AssetGenerated Ema.Other <$> renderStorkIndex m
   SR.VirtualRoute_TaskIndex ->

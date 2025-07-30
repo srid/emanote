@@ -3,9 +3,7 @@
 -- | Export an Emanote notebook to external formats.
 module Emanote.View.Export (
   ExportFormat (..),
-  runExport,
-  renderJSONExport,
-  renderContentExport,
+  renderExport,
   getBaseUrlFromModel,
   Link (..),
   modelRels,
@@ -28,24 +26,21 @@ import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
+import Emanote.Route.SiteRoute.Type (ExportFormat (..))
 import Emanote.Source.Loc (locResolve)
 import Optics.Operators ((^.))
 import Relude
 
-data ExportFormat
-  = ExportFormat_Metadata
-  | ExportFormat_Content
-
--- | Run the specified export format
-runExport :: ExportFormat -> Model -> IO ()
-runExport exportFormat model =
+-- | Render the specified export format to LByteString
+renderExport :: ExportFormat -> Model -> IO LByteString
+renderExport exportFormat model =
   case exportFormat of
     ExportFormat_Metadata -> do
-      putLBSLn $ renderJSONExport model
+      pure $ renderJSONExport model
     ExportFormat_Content -> do
       let mBaseUrl = getBaseUrlFromModel model
       content <- renderContentExport mBaseUrl model
-      putTextLn content
+      pure $ encodeUtf8 content
 
 -- | Get base URL from model configuration (returns Nothing if not configured)
 getBaseUrlFromModel :: Model -> Maybe Text

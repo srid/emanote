@@ -1,7 +1,7 @@
 module Emanote.Route.SiteRoute (
   SiteRoute (..),
   VirtualRoute (..),
-  ExportRoute (..),
+  ExportFormat (..),
   ResourceRoute (..),
   decodeVirtualRoute,
   noteFileSiteRoute,
