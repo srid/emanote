@@ -34,7 +34,7 @@ import Relude
 
 data ExportFormat
   = ExportFormat_Metadata
-  | ExportFormat_Content FilePath
+  | ExportFormat_Content
 
 -- | Run the specified export format
 runExport :: ExportFormat -> Model -> IO ()
@@ -42,10 +42,10 @@ runExport exportFormat model =
   case exportFormat of
     ExportFormat_Metadata -> do
       putLBSLn $ renderJSONExport model
-    ExportFormat_Content filename -> do
+    ExportFormat_Content -> do
       let mBaseUrl = getBaseUrlFromModel model
       content <- renderContentExport mBaseUrl model
-      writeFileText filename content
+      putTextLn content
 
 -- | Get base URL from model configuration (returns Nothing if not configured)
 getBaseUrlFromModel :: Model -> Maybe Text

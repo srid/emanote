@@ -16,7 +16,6 @@ import Emanote.View.Export (ExportFormat (..))
 import Options.Applicative hiding (action)
 import Paths_emanote qualified
 import Relude
-import System.FilePath (takeExtension)
 import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
@@ -39,25 +38,12 @@ exportParser = do
   exportCmd <-
     subparser
       ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
-          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file (uses baseUrl from notebook config)"))
+          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file to stdout (uses baseUrl from notebook config)"))
       )
   pure $ Cmd_Export exportCmd
   where
     contentParser :: Parser ExportFormat
-    contentParser =
-      ExportFormat_Content <$> filenameArgument
-    filenameArgument :: Parser FilePath
-    filenameArgument =
-      argument
-        filenameReader
-        ( metavar "FILENAME"
-            <> help "Output filename (must have .md extension)"
-        )
-    filenameReader :: ReadM FilePath
-    filenameReader = eitherReader $ \s ->
-      if takeExtension s == ".md"
-        then Right s
-        else Left $ "Output filename must have .md extension, got: " <> s
+    contentParser = pure ExportFormat_Content
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
