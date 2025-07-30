@@ -6,6 +6,7 @@ module Emanote.View.Export (
   runExport,
   renderJSONExport,
   renderContentExport,
+  getBaseUrlFromModel,
   Link (..),
   modelRels,
 ) where
@@ -19,7 +20,9 @@ import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
+import Emanote.Model.Meta (getEffectiveRouteMeta)
 import Emanote.Model.Note qualified as Note
+import Emanote.Model.SData (lookupAeson)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
@@ -31,7 +34,7 @@ import Relude
 
 data ExportFormat
   = ExportFormat_Metadata
-  | ExportFormat_Content Text FilePath
+  | ExportFormat_Content FilePath
 
 -- | Run the specified export format
 runExport :: ExportFormat -> Model -> IO ()
@@ -39,9 +42,18 @@ runExport exportFormat model =
   case exportFormat of
     ExportFormat_Metadata -> do
       putLBSLn $ renderJSONExport model
-    ExportFormat_Content baseUrl filename -> do
+    ExportFormat_Content filename -> do
+      let baseUrl = getBaseUrlFromModel model
       content <- renderContentExport baseUrl model
       writeFileText filename content
+
+-- | Get base URL from model configuration
+getBaseUrlFromModel :: Model -> Text
+getBaseUrlFromModel model =
+  let indexRoute = M.modelIndexRoute model
+      feedMeta = getEffectiveRouteMeta indexRoute model
+      mBaseUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
+   in fromMaybe "http://localhost:8080" mBaseUrl
 
 -- | A JSON export of the notebook
 data Export = Export

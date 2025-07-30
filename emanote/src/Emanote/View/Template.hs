@@ -12,10 +12,8 @@ import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
-import Emanote.Model.Meta (getEffectiveRouteMeta)
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
-import Emanote.Model.SData (lookupAeson)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
@@ -24,7 +22,7 @@ import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
-import Emanote.View.Export (renderContentExport, renderJSONExport)
+import Emanote.View.Export (getBaseUrlFromModel, renderContentExport, renderJSONExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
@@ -116,10 +114,7 @@ renderVirtualRoute m = \case
     SR.ExportRoute_Metadata ->
       pure $ Ema.AssetGenerated Ema.Other $ renderJSONExport m
     SR.ExportRoute_Content -> do
-      let modelIndexRoute = M.modelIndexRoute m
-          feedMeta = getEffectiveRouteMeta modelIndexRoute m
-          mBaseUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
-          baseUrl = fromMaybe "http://localhost:8080" mBaseUrl
+      let baseUrl = getBaseUrlFromModel m
       content <- liftIO $ renderContentExport baseUrl m
       pure $ Ema.AssetGenerated Ema.Other $ encodeUtf8 content
   SR.VirtualRoute_StorkIndex ->

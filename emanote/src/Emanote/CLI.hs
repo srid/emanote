@@ -39,19 +39,13 @@ exportParser = do
   exportCmd <-
     subparser
       ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
-          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
+          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file (uses baseUrl from notebook config)"))
       )
   pure $ Cmd_Export exportCmd
   where
     contentParser :: Parser ExportFormat
     contentParser =
-      ExportFormat_Content
-        <$> strOption
-          ( long "base-url"
-              <> metavar "URL"
-              <> help "Base URL for the exported content (e.g., https://emanote.srid.ca/)"
-          )
-        <*> filenameArgument
+      ExportFormat_Content <$> filenameArgument
     filenameArgument :: Parser FilePath
     filenameArgument =
       argument
