@@ -118,29 +118,11 @@ modelRels model =
               <&> SR.siteRouteUrlStatic model
        in (from_, one $ Link to_ toTarget)
 
--- An unique key to represent this LMLRoute in the exported JSON
---
--- We use the source path consistently.
-lmlRouteKey :: LMLRoute -> Text
-lmlRouteKey =
-  toText . R.withLmlRoute R.encodeRoute
-
--- Path of the LML note
-lmlSourcePath :: LMLRoute -> FilePath
-lmlSourcePath =
-  R.withLmlRoute R.encodeRoute
-
--- | Check if a note has a source file (i.e., it's an actual .md file from the notebook)
-hasSourceFile :: Note.Note -> Bool
-hasSourceFile note = isJust (Note._noteSource note)
-
 -- | Export all notes to a single Markdown file, separated by delimiters
 renderContentExport :: Maybe Text -> Model -> IO Text
 renderContentExport mBaseUrl model = do
   let notes_ = model ^. M.modelNotes
-      -- Only include notes that have a source file (actual .md files from the notebook)
-      sourceNotes = filter hasSourceFile $ toList notes_
-      noteList = sortOn (lmlSourcePath . Note._noteRoute) sourceNotes
+      noteList = sortOn (lmlSourcePath . Note._noteRoute) $ toList notes_
   exportedNotes <- catMaybes <$> mapM (exportNote mBaseUrl model) noteList
   let urlHelpText = case mBaseUrl of
         Just _ -> "- URL: The full URL where this note can be accessed"
@@ -201,3 +183,15 @@ exportNote mBaseUrl model note = do
                 <> "\n\n"
 
       pure $ Just $ header <> markdownContent
+
+-- An unique key to represent this LMLRoute in the exported JSON
+--
+-- We use the source path consistently.
+lmlRouteKey :: LMLRoute -> Text
+lmlRouteKey =
+  toText . R.withLmlRoute R.encodeRoute
+
+-- Path of the LML note
+lmlSourcePath :: LMLRoute -> FilePath
+lmlSourcePath =
+  R.withLmlRoute R.encodeRoute
