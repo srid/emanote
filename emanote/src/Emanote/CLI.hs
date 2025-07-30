@@ -5,7 +5,6 @@ module Emanote.CLI (
   Cli (..),
   Layer (..),
   Cmd (..),
-  ExportCmd (..),
   parseCli,
   cliParser,
 ) where
@@ -13,6 +12,7 @@ module Emanote.CLI (
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema.CLI qualified
+import Emanote.View.Export (ExportFormat (..))
 import Options.Applicative hiding (action)
 import Paths_emanote qualified
 import Relude
@@ -32,32 +32,20 @@ data Layer = Layer
 
 data Cmd
   = Cmd_Ema Ema.CLI.Cli
-  | Cmd_Export ExportCmd
+  | Cmd_Export ExportFormat
 
-data ExportCmd
-  = ExportCmd_Metadata
-  | ExportCmd_Content Text FilePath
-
-cliParser :: FilePath -> Parser Cli
-cliParser cwd = do
-  layers <- layerList $ one $ Layer cwd Nothing
-  allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
-  cmd <-
-    fmap Cmd_Ema Ema.CLI.cliParser
-      <|> subparser (command "export" (info exportParser (progDesc "Export commands")))
-  pure Cli {..}
+exportParser :: Parser Cmd
+exportParser = do
+  exportCmd <-
+    subparser
+      ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
+          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
+      )
+  pure $ Cmd_Export exportCmd
   where
-    exportParser :: Parser Cmd
-    exportParser = do
-      exportCmd <-
-        subparser
-          ( command "metadata" (info (pure ExportCmd_Metadata) (progDesc "Export metadata JSON"))
-              <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file"))
-          )
-      pure $ Cmd_Export exportCmd
-    contentParser :: Parser ExportCmd
+    contentParser :: Parser ExportFormat
     contentParser =
-      ExportCmd_Content
+      ExportFormat_Content
         <$> strOption
           ( long "base-url"
               <> metavar "URL"
@@ -76,6 +64,16 @@ cliParser cwd = do
       if takeExtension s == ".md"
         then Right s
         else Left $ "Output filename must have .md extension, got: " <> s
+
+cliParser :: FilePath -> Parser Cli
+cliParser cwd = do
+  layers <- layerList $ one $ Layer cwd Nothing
+  allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
+  cmd <-
+    fmap Cmd_Ema Ema.CLI.cliParser
+      <|> subparser (command "export" (info exportParser (progDesc "Export commands")))
+  pure Cli {..}
+  where
     layerList defaultPath = do
       option layerListReader
         $ mconcat

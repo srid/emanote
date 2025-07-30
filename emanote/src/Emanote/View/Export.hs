@@ -2,8 +2,9 @@
 
 -- | Export an Emanote notebook to external formats.
 module Emanote.View.Export (
+  ExportFormat (..),
+  runExport,
   renderJSONExport,
-  renderContentExport,
   Link (..),
   modelRels,
 ) where
@@ -26,6 +27,20 @@ import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Emanote.Source.Loc (locResolve)
 import Optics.Operators ((^.))
 import Relude
+
+data ExportFormat
+  = ExportFormat_Metadata
+  | ExportFormat_Content Text FilePath
+
+-- | Run the specified export format
+runExport :: ExportFormat -> Model -> IO ()
+runExport exportFormat model =
+  case exportFormat of
+    ExportFormat_Metadata -> do
+      putLBSLn $ renderJSONExport model
+    ExportFormat_Content baseUrl filename -> do
+      content <- renderContentExport baseUrl model
+      writeFileText filename content
 
 -- | A JSON export of the notebook
 data Export = Export
@@ -81,15 +96,15 @@ renderJSONExport model =
 
 modelRels :: Model -> Map LMLRoute [Link]
 modelRels model =
-  Map.fromListWith (<>)
-    $ M.modelNoteRels model
-    <&> \rel ->
-      let from_ = rel ^. Rel.relFrom
-          to_ = rel ^. Rel.relTo
-          toTarget =
-            Resolve.resolveUnresolvedRelTarget model from_ to_
-              <&> SR.siteRouteUrlStatic model
-       in (from_, one $ Link to_ toTarget)
+  Map.fromListWith (<>) $
+    M.modelNoteRels model
+      <&> \rel ->
+        let from_ = rel ^. Rel.relFrom
+            to_ = rel ^. Rel.relTo
+            toTarget =
+              Resolve.resolveUnresolvedRelTarget model from_ to_
+                <&> SR.siteRouteUrlStatic model
+         in (from_, one $ Link to_ toTarget)
 
 -- An unique key to represent this LMLRoute in the exported JSON
 --
