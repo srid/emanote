@@ -32,6 +32,10 @@ import NeatInterpolation (text)
 import Optics.Operators ((^.))
 import Relude
 
+-- | Delimiter used to separate notes in content export
+noteDelimiter :: Text
+noteDelimiter = "==="
+
 -- | Render the specified export format to LByteString
 renderExport :: ExportFormat -> Model -> IO LByteString
 renderExport exportFormat model =
@@ -147,7 +151,7 @@ renderContentExport mBaseUrl model = do
       llmPrompt =
         [text|
         <!-- LLM PROMPT: This document contains all notes from an Emanote notebook.
-        Each note is separated by '---' delimiters and includes metadata headers.
+        Each note is separated by '${noteDelimiter}' delimiters and includes metadata headers.
         - Source: The original file path in the notebook
         ${urlHelpText}
         - Title: The note's title
@@ -158,7 +162,7 @@ renderContentExport mBaseUrl model = do
         -->
         |]
           <> "\n\n"
-  pure $ llmPrompt <> T.intercalate "\n\n---\n\n" exportedNotes
+  pure $ llmPrompt <> T.intercalate ("\n\n" <> noteDelimiter <> "\n\n") exportedNotes
 
 -- | Export a single note with metadata header
 exportNote :: Maybe Text -> Model -> Note.Note -> IO (Maybe Text)
