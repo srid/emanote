@@ -3,6 +3,7 @@
 module Emanote.Route.SiteRoute.Type (
   SiteRoute (..),
   VirtualRoute (..),
+  ExportRoute (..),
   ResourceRoute (..),
   decodeVirtualRoute,
   encodeVirtualRoute,
@@ -18,12 +19,17 @@ import Network.URI.Slug qualified as Slug
 import Relude hiding (show)
 import Text.Show (show)
 
+data ExportRoute
+  = ExportRoute_Metadata
+  | ExportRoute_Content
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (ToJSON)
+
 -- | A route to a virtual resource (not in `Model`)
 data VirtualRoute
   = VirtualRoute_Index
   | VirtualRoute_TagIndex [HT.TagNode]
-  | VirtualRoute_Export
-  | VirtualRoute_ContentExport
+  | VirtualRoute_Export ExportRoute
   | VirtualRoute_StorkIndex
   | VirtualRoute_TaskIndex
   deriving stock (Eq, Ord, Show, Generic)
@@ -66,8 +72,7 @@ decodeVirtualRoute :: FilePath -> Maybe VirtualRoute
 decodeVirtualRoute fp =
   (VirtualRoute_Index <$ decodeIndexR fp)
     <|> (VirtualRoute_TagIndex <$> decodeTagIndexR fp)
-    <|> (VirtualRoute_Export <$ decodeExportR fp)
-    <|> (VirtualRoute_ContentExport <$ decodeContentExportR fp)
+    <|> (VirtualRoute_Export <$> decodeExportR fp)
     <|> (VirtualRoute_StorkIndex <$ decodeStorkIndexR fp)
     <|> (VirtualRoute_TaskIndex <$ decodeTaskIndexR fp)
 
@@ -76,15 +81,13 @@ decodeIndexR fp = do
   "-" :| ["all"] <- pure $ R.unRoute $ R.decodeHtmlRoute fp
   pass
 
-decodeExportR :: FilePath -> Maybe ()
+decodeExportR :: FilePath -> Maybe ExportRoute
 decodeExportR fp = do
-  "-" :| ["export.json"] <- R.unRoute <$> R.decodeAnyRoute fp
-  pass
-
-decodeContentExportR :: FilePath -> Maybe ()
-decodeContentExportR fp = do
-  "-" :| ["export.md"] <- R.unRoute <$> R.decodeAnyRoute fp
-  pass
+  "-" :| [file] <- R.unRoute <$> R.decodeAnyRoute fp
+  case file of
+    "export.json" -> pure ExportRoute_Metadata
+    "export.md" -> pure ExportRoute_Content
+    _ -> Nothing
 
 decodeStorkIndexR :: FilePath -> Maybe ()
 decodeStorkIndexR fp = do
@@ -109,14 +112,17 @@ encodeVirtualRoute = \case
     R.encodeRoute $ encodeTagIndexR tagNodes
   VirtualRoute_Index ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["all"]
-  VirtualRoute_Export ->
-    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.json"]
-  VirtualRoute_ContentExport ->
-    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["export.md"]
+  VirtualRoute_Export exportRoute ->
+    R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| [encodeExportRoute exportRoute]
   VirtualRoute_StorkIndex ->
     R.encodeRoute $ R.R @Ext.SourceExt @'Ext.AnyExt $ "-" :| ["stork.st"]
   VirtualRoute_TaskIndex ->
     R.encodeRoute $ R.R @() @'Ext.Html $ "-" :| ["tasks"]
+
+encodeExportRoute :: ExportRoute -> Slug.Slug
+encodeExportRoute = \case
+  ExportRoute_Metadata -> fromString "export.json"
+  ExportRoute_Content -> fromString "export.md"
 
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =

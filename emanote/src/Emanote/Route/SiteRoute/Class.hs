@@ -70,8 +70,8 @@ emanoteGeneratableRoutes model =
                   )
                   tags
          in VirtualRoute_Index
-              : VirtualRoute_Export
-              : VirtualRoute_ContentExport
+              : VirtualRoute_Export ExportRoute_Metadata
+              : VirtualRoute_Export ExportRoute_Content
               : VirtualRoute_StorkIndex
               : VirtualRoute_TaskIndex
               : (VirtualRoute_TagIndex <$> toList tagPaths)

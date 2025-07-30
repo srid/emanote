@@ -112,15 +112,16 @@ renderVirtualRoute m = \case
     pure $ Ema.AssetGenerated Ema.Html $ TagIndex.renderTagIndex m mtag
   SR.VirtualRoute_Index ->
     pure $ Ema.AssetGenerated Ema.Html $ renderSRIndex m
-  SR.VirtualRoute_Export ->
-    pure $ Ema.AssetGenerated Ema.Other $ renderJSONExport m
-  SR.VirtualRoute_ContentExport -> do
-    let modelIndexRoute = M.modelIndexRoute m
-        feedMeta = getEffectiveRouteMeta modelIndexRoute m
-        mBaseUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
-        baseUrl = fromMaybe "http://localhost:8080" mBaseUrl
-    content <- liftIO $ renderContentExport baseUrl m
-    pure $ Ema.AssetGenerated Ema.Other $ encodeUtf8 content
+  SR.VirtualRoute_Export exportRoute -> case exportRoute of
+    SR.ExportRoute_Metadata ->
+      pure $ Ema.AssetGenerated Ema.Other $ renderJSONExport m
+    SR.ExportRoute_Content -> do
+      let modelIndexRoute = M.modelIndexRoute m
+          feedMeta = getEffectiveRouteMeta modelIndexRoute m
+          mBaseUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
+          baseUrl = fromMaybe "http://localhost:8080" mBaseUrl
+      content <- liftIO $ renderContentExport baseUrl m
+      pure $ Ema.AssetGenerated Ema.Other $ encodeUtf8 content
   SR.VirtualRoute_StorkIndex ->
     Ema.AssetGenerated Ema.Other <$> renderStorkIndex m
   SR.VirtualRoute_TaskIndex ->
