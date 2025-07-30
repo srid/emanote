@@ -205,6 +205,8 @@ library
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export
+    Emanote.View.Export.Content
+    Emanote.View.Export.JSON
     Emanote.View.Feed
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
