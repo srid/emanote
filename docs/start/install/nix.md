@@ -18,7 +18,7 @@ $ nix profile install github:srid/emanote
 
 ## Using as `flake-parts` module
 
-[[emanote-template]] uses this approach. See https://github.com/srid/emanote-template/blob/master/flake.nix
+See [[flake-module]]# for detailed documentation on using Emanote's flake-parts module.
 
 ## Using Emanote as a Home Manager service
 
