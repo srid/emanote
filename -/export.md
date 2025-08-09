@@ -388,7 +388,7 @@ slug: html-template
 
 # HTML Templates
 
-Unlike [[neuron|Neuron]], Emanote's generated HTML can be **completely** customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see [here](http://snapframework.com/docs/tutorials/heist) for a tutorial on its syntax. 
+Unlike [[neuron|Neuron]], Emanote's generated HTML can be **completely** customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see [here](https://snapframework.com/docs/tutorials/heist) for a tutorial on its syntax. 
 
 The default HTML templates are stored in the [[layer|default layer]], which can you override either totally or in subset. 
 
@@ -1524,7 +1524,7 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 ===
 
 <!-- Source: index.md -->
-<!-- URL: https://emanote.srid.ca/ -->
+<!-- URL: https://emanote.srid.ca// -->
 <!-- Title: Emanote -->
 <!-- Wikilinks: [[index]] -->
 
@@ -2079,7 +2079,7 @@ them when the write/save operation succeeds.
 [`:help backupcopy`](https://vimhelp.org/options.txt.html#%27backupcopy%27),
 and [`:help writebackup`](https://vimhelp.org/options.txt.html#%27writebackup%27).
 > 
-> This also affects good 'ol [vi](http://ex-vi.sourceforge.net/).
+> This also affects good 'ol [vi](https://ex-vi.sourceforge.net/).
 > 
 > Reference discussion: <https://github.com/srid/emanote/issues/180#issuecomment-945049455>
 
