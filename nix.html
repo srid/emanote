@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=3fa52d82-2038-4a33-a308-d61208c8242c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=76375e15-0125-4ad8-bd44-48bd777c943d' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -512,7 +512,7 @@
 
 
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -522,9 +522,8 @@
       
         
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
@@ -541,6 +540,48 @@
     TODO: Use <details> to toggle visibility?
   -->
   
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-2 space-x-2 justify-left'>
+    <span>
+      
+        
+          
+    
+      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Using as flake-parts module' href='flake-module'>
+      Using as <code>flake-parts</code> module
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
     
   
 </div>
@@ -967,7 +1008,7 @@
     </h2>
   
     <p class='mb-3'>
-      <a href='emanote-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>emanote-template</a> uses this approach. See <a href='https://github.com/srid/emanote-template/blob/master/flake.nix' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote-template/blob/master/flake.nix</a>
+      See <a href='flake-module' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkBranch'>Using as <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>flake-parts</code> module</a> for detailed documentation on using Emanote’s flake-parts module.
     </p>
   
     <h2 id='using-emanote-as-a-home-manager-service' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
@@ -1139,21 +1180,6 @@ $ systemctl --user status emanote.service
   <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
     <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
     <ul class='space-y-1'>
-      
-        <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='emanote-template'>
-            emanote-template
-          </a>
-          
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
-  
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p><a href='https://github.com/srid/emanote-template' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>emanote-template</a> is a Git repository that comes up with ready-made settings for editing notes in <a href='vscode' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a> and publishing to GitHub Pages (using <a href='nix' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Nix</a>).</p></div>
-    </div>
-  
-</div>
-          
-        </li>
       
         <li>
           <a class='text-blue-600 font-semibold hover:bg-blue-50' href='install'>
