@@ -8,7 +8,7 @@
               <ema:tagcrumbs>
                 <ema:each-crumb>
                   <li class="inline-flex items-center">
-                    <a class="px-1 font-mono font-semibold text-${theme}-600 "
+                    <a class="px-1 font-mono font-semibold text-${theme}-600"
                       href="${ema:tagcrumb:url}">
                       <ema:tagcrumb:title />
                     </a>
@@ -21,9 +21,9 @@
                 </ema:each-crumb>
               </ema:tagcrumbs>
               <li class="inline-flex items-center text-black">
-                <a class="px-1 font-mono">
+                <span class="px-1 font-mono">
                   <ema:tag:title />
-                </a>
+                </span>
               </li>
             </ul>
           </div>

@@ -27,9 +27,9 @@ template:
   theme: blue
   # Value of the <base> tag.
   baseUrl: /
+  iconUrl: favicon.svg
   # Change this to 'pretty' if you want URLs without the '.html' suffix.
   urlStrategy: direct
-  iconUrl: ${ema:homeUrl}favicon.svg
   sidebar:
     enable: true
     # Whether this node in the sidebar tree should remain collapsed by default

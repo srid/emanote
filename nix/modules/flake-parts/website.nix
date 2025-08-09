@@ -2,12 +2,16 @@
 {
   perSystem = { pkgs, lib, config, system, ... }: {
     emanote = {
-      package = config.packages.default;
       sites = {
         "docs" = {
+          package = config.packages.default;
           layers = [{ path = (root + /docs); pathString = "./docs"; }];
-          allowBrokenLinks = true; # A couple, by design, in markdown.md
-          prettyUrls = true;
+          allowBrokenInternalLinks = true; # A couple, by design, in markdown.md
+          extraConfig = {
+            template = {
+              urlStrategy = "pretty";
+            };
+          };
         };
       };
     };

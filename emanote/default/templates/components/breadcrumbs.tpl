@@ -5,7 +5,7 @@
         <li class="inline-flex items-center">
           <ema:metadata>
             <with var="template">
-              <img style="width: 1rem;" src="${value:iconUrl}" />
+              <img style="width: 1rem;" src="${value:iconUrl}" alt="Site Icon" />
             </with>
           </ema:metadata>
         </li>

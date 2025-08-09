@@ -11,9 +11,9 @@
             <main class="px-4 py-4 bg-red-100">
               <h1
                 class="flex items-end justify-center mb-4 p-3 bg-red-500 text-5xl font-extrabold text-gray-100 rounded">
-                <a class="z-40 tracking-tighter ">
+                <span class="z-40 tracking-tighter ">
                   <ema:note:title />
-                </a>
+                </span>
               </h1>
               <div class="flex items-center justify-center font-bold text-lg">
                 Your notebook has an issue.
@@ -22,9 +22,14 @@
                 <apply template="/templates/components/pandoc" />
               </div>
               <div class="flex items-center justify-center text-xl">
-                <div>Fix it (this page will reload), or <a class="font-bold underline" href="/">go
-                    to /</a>.
-                </div>
+                <ema:metadata>
+                  <with var="template">
+                    <div>Fix it (this page will reload), or <a class="font-bold underline"
+                        href="${value:baseUrl}">go
+                        to /</a>.
+                    </div>
+                  </with>
+                </ema:metadata>
               </div>
               <div class="transform scale-95 opacity-50 hover:opacity-100">
                 <apply template="components/timeline" />

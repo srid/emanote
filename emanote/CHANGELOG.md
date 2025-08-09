@@ -14,6 +14,7 @@
       - Instead of "foo/qux.md", you can now create "foo/qux/index.md"
     - Layers can be mounted in sub-directories, enabling composition of distinct notebooks ([\#523](https://github.com/srid/emanote/pull/523))
   - **BACKWARDS INCOMPTABILE** changes
+    - Removed `ema:homeUrl` (use `baseUrl` instead)
     - `feed.siteUrl` is now `page.siteUrl`
     - A new HTML template layout "default" (unifies and) replaces both "book" and "note" layout. ([\#483](https://github.com/srid/emanote/pull/483))
       - Sidebar tree is now computed from the folgezettel graph, which is a superset of the folder hierarchy. The index page's tree inherits the same.
@@ -40,6 +41,10 @@
   - prevent the external link icon from wrapping ([\#528](https://github.com/srid/emanote/pull/528))
   - [live server] Update Tailwind CDN to 3.4.16
 - Update ema (2.7.2)
+- Nix
+  - flake module
+    - Add link checker based on `html-proofer`
+    - Replace `baseUrl` and `prettyUrls` with `extraConfig`
 
 ## 1.2.0.0 (2023-08-24)
 

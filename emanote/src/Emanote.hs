@@ -131,9 +131,9 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
   if res == 0
     then do
       log "No broken links detected."
-    else unless (CLI.allowBrokenLinks cli) $ do
-      logE $ "Found " <> show (getSum res) <> " broken links! Emanote generated the site, but the generated site has broken links."
-      log "(Tip: use `--allow-broken-links` to ignore this check.)"
+    else unless (CLI.allowBrokenInternalLinks cli) $ do
+      logE $ "Found " <> show (getSum res) <> " broken internal links! Emanote generated the site, but the generated site has broken internal links."
+      log "(Tip: use `--allow-broken-internal-links` to ignore this check.)"
       exitFailure
 
 compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()

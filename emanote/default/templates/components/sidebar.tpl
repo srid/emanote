@@ -18,30 +18,30 @@
           </path>
         </svg>
       </a>
-      <a title="Search (Ctrl+K)" class="cursor-pointer"
+      <button title="Search (Ctrl+K)" class="cursor-pointer"
         onclick="window.emanote.stork.toggleSearch()">
         <apply template="stork/stork-icon" />
-      </a>
+      </button>
     </div>
 
     <div id="site-logo" class="pl-2">
       <div class="flex items-center my-2 space-x-2 justify-left">
-        <a href="${ema:homeUrl}" title="Go to Home">
-          <ema:metadata>
-            <with var="template">
+        <ema:metadata>
+          <with var="template">
+            <a href="${value:baseUrl}" title="Go to Home">
               <!-- The style width attribute here is to prevent huge
                       icon from displaying at those rare occasions when Tailwind
                       hasn't kicked in immediately on page load 
                       -->
               <img style="width: 1rem;"
-                class="transition transform hover:scale-110 hover:opacity-80"
-                src="${value:iconUrl}" />
-            </with>
-          </ema:metadata>
-        </a>
-        <a class="font-bold truncate" title="Go to Home" href="${ema:homeUrl}">
-          Home
-        </a>
+                class="transition transform hover:scale-110 hover:opacity-80" src="${value:iconUrl}"
+                alt="Site Icon" />
+            </a>
+            <a class="font-bold truncate" title="Go to Home" href="${value:baseUrl}">
+              Home
+            </a>
+          </with>
+        </ema:metadata>
       </div>
     </div>
 

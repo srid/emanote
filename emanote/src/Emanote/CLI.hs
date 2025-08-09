@@ -20,7 +20,7 @@ import UnliftIO.Directory (getCurrentDirectory)
 
 data Cli = Cli
   { layers :: NonEmpty Layer
-  , allowBrokenLinks :: Bool
+  , allowBrokenInternalLinks :: Bool
   , cmd :: Cmd
   }
 
@@ -48,7 +48,7 @@ exportParser = do
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- layerList $ one $ Layer cwd Nothing
-  allowBrokenLinks <- switch (long "allow-broken-links" <> help "Report but do not fail on broken links")
+  allowBrokenInternalLinks <- switch (long "allow-broken-internal-links" <> help "Report but do not fail on broken internal links")
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
       <|> subparser (command "export" (info exportParser (progDesc "Export commands")))

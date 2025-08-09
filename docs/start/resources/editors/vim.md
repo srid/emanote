@@ -76,6 +76,6 @@ them when the write/save operation succeeds.
 [`:help backupcopy`](https://vimhelp.org/options.txt.html#%27backupcopy%27),
 and [`:help writebackup`](https://vimhelp.org/options.txt.html#%27writebackup%27).
 > 
-> This also affects good 'ol [vi](http://ex-vi.sourceforge.net/).
+> This also affects good 'ol [vi](https://ex-vi.sourceforge.net/).
 > 
 > Reference discussion: <https://github.com/srid/emanote/issues/180#issuecomment-945049455>

@@ -4,7 +4,7 @@ slug: html-template
 
 # HTML Templates
 
-Unlike [[neuron|Neuron]], Emanote's generated HTML can be **completely** customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see [here](http://snapframework.com/docs/tutorials/heist) for a tutorial on its syntax. 
+Unlike [[neuron|Neuron]], Emanote's generated HTML can be **completely** customized. Emanote uses the Heist HTML template system that supports non-trivial constructs like recursion; see [here](https://snapframework.com/docs/tutorials/heist) for a tutorial on its syntax. 
 
 The default HTML templates are stored in the [[layer|default layer]], which can you override either totally or in subset. 
 
