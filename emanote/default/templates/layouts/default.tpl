@@ -4,9 +4,9 @@
 
 <bind tag="storkSearchButtonTopRight">
   <div class="absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center">
-    <a title="Search (Ctrl+K)" class="cursor-pointer" onclick="window.emanote.stork.toggleSearch()">
+    <button title="Search (Ctrl+K)" class="cursor-pointer" onclick="window.emanote.stork.toggleSearch()">
       <apply template="components/stork/stork-icon" />
-    </a>
+    </button>
   </div>
 </bind>
 

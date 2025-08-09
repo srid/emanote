@@ -171,17 +171,35 @@ staticFileSiteRoute =
     staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
     staticResourceRoute = uncurry ResourceRoute_StaticFile
 
--- | Like `siteRouteUrl` but avoids any dynamism in the URL
+{- | Generate the static URL for a site route, including special handling for html-proofer compatibility.
+
+This function builds static URLs by:
+1. Getting the base URL using the configured URL strategy (pretty vs direct)
+2. For home routes that would result in empty URLs, using the template's baseUrl instead
+   to avoid empty href attributes that cause issues with HTML validation tools like html-proofer
+3. Handling all route types: resource routes (notes, static files), virtual routes, missing/ambiguous routes
+-}
 siteRouteUrlStatic :: (HasCallStack) => Model -> SiteRoute -> Text
-siteRouteUrlStatic model =
-  Ema.routeUrlWith (urlStrategy model) rp
+siteRouteUrlStatic model sr =
+  -- For the home route, if the base URL is empty,
+  -- use baseUrl from template to avoid empty href attributes which can
+  -- cause issues with HTML validation tools like html-proofer
+  if url == ""
+    then getBaseUrl model
+    else url
   where
     (rp, _) = M.withoutRoutePrism model
 
+    url = Ema.routeUrlWith (urlStrategy model) rp sr
+
+    getBaseUrl :: Model -> Text
+    getBaseUrl m =
+      Model.lookupRouteMeta "/" ("template" :| ["baseUrl"]) (M.modelIndexRoute m) m
+
+-- | Like siteRouteUrlStatic but live-server friendly
 siteRouteUrl :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
-  siteRouteUrlStatic model sr
-    <> siteRouteQuery
+  siteRouteUrlStatic model sr <> siteRouteQuery
   where
     siteRouteQuery =
       maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime

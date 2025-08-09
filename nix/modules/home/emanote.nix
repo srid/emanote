@@ -51,7 +51,7 @@ in
         '';
       };
 
-      # TODO: Consolidate all these options below with those of nix/flake-module.nix
+      # TODO: Consolidate all these options below with those of nix/flake-module
 
       host = mkOption {
         type = types.str;
