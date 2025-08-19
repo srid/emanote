@@ -14,20 +14,18 @@
     flake-root.url = "github:srid/flake-root";
     nixos-unified.url = "github:srid/nixos-unified";
 
-    # TODO: Switch to nixpkgs once upstreamed.
+    # These are not (necessarily) upstreamed to nixpkgs, yet.
     ema.url = "github:srid/ema/0.12.0.0";
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
-
-    # TODO: Release to hackage, and then switch to nixpkgs ones.
-    heist-extra.url = "github:srid/heist-extra";
+    heist-extra.url = "github:srid/heist-extra/0.4.0.0";
     heist-extra.flake = false;
-    unionmount.url = "github:srid/unionmount";
+    unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;
-    commonmark-simple.url = "github:srid/commonmark-simple";
+    commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
     commonmark-simple.flake = false;
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink";
+    commonmark-wikilink.url = "github:srid/commonmark-wikilink/0.2.0.0";
     commonmark-wikilink.flake = false;
 
     emanote-template.url = "github:srid/emanote-template";

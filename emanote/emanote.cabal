@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.3.32.0
+version:            1.3.32.1
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -144,7 +144,7 @@ common library-common
     , text
     , time
     , tomland
-    , unionmount             >=0.2
+    , unionmount             >=0.3
     , unliftio
     , unordered-containers
     , uri-encode
