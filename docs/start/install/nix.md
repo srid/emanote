@@ -2,18 +2,14 @@
 slug: nix
 ---
 
-# Using on Nix/NixOS
+# Advanced Nix Usage
 
-Emanote can be easily built using the Nix expressions provided in its source repo.
+For advanced Nix users who want deeper integration with the Nix ecosystem.
 
-You will need [Nix](https://nixos.asia/en/install) version 2.4 or greater.
-
-## Installing with Nix Flakes
-
-This will provide the `emanote` command in your environment.
+## Basic Installation
 
 ```sh
-$ nix profile install github:srid/emanote
+nix profile install github:srid/emanote
 ```
 
 ## Using as `flake-parts` module

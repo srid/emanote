@@ -2,7 +2,9 @@
 slug: container
 ---
 
-# Container
+# Container Installation
+
+**Perfect for users who don't want to install Nix or prefer containerized workflows.**
 
 Emanote provides [a pre-built container image][ghcr] that allows you to run Emanote without installing it locally. This is perfect for quick setups, CI/CD pipelines, or when you prefer containerized workflows.
 
