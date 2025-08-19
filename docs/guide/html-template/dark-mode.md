@@ -17,6 +17,7 @@ Emanote includes built-in dark mode support using Tailwind CSS. The dark mode fe
 Dark mode automatically follows your system's color scheme preference. To manually toggle dark mode, we recommend using a browser extension like:
 
 - **Chrome**: [Dark Mode Toggle](https://chromewebstore.google.com/detail/chrome-dark-mode-toggle/idnbggfpadjhjicgjmhlpeilafaplnhd?hl=en)
+  - Note: You may need to enable the "Experimental Web Platform Features" flag at `chrome://flags` for the extension to work properly
 - **Firefox**: Similar extensions available in Firefox Add-ons
 
 These extensions override the system preference and allow you to toggle dark mode for any website.
