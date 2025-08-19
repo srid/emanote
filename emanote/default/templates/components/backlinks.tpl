@@ -1,10 +1,10 @@
 <ema:note:backlinks:nodaily>
-  <div class="flex-1 p-4 mt-8 bg-gray-100 rounded">
-    <header class="mb-2 text-xl font-semibold text-gray-500">Links to this page</header>
+  <div class="flex-1 p-4 mt-8 bg-gray-100 dark:bg-gray-800 rounded">
+    <header class="mb-2 text-xl font-semibold text-gray-500 dark:text-gray-400">Links to this page</header>
     <ul class="space-y-1">
       <backlink>
         <li>
-          <a class="text-${theme}-600 font-semibold hover:bg-${theme}-50"
+          <a class="text-${theme}-600 dark:text-${theme}-400 font-semibold hover:bg-${theme}-50 dark:hover:bg-${theme}-900"
             href="${backlink:note:url}">
             <backlink:note:title />
           </a>

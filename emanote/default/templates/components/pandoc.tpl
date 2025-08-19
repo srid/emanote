@@ -16,7 +16,7 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700</bind>
+<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -42,7 +42,7 @@
   </Cite>
   <BlockQuote>
     <blockquote
-      class="py-0.5 px-4 mb-3 italic border-l-4 bg-gray-50 text-gray-600 border-gray-400 quote">
+      class="py-0.5 px-4 mb-3 italic border-l-4 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-400 dark:border-gray-600 quote">
       <blocks />
     </blockquote>
   </BlockQuote>
@@ -55,7 +55,7 @@
           </dt>
           <DefinitionList:Item:DescList>
             <div class="flex flex-col pl-1">
-              <dd class="pl-2 my-1 text-gray-700 border-l-2">
+              <dd class="pl-2 my-1 text-gray-700 dark:text-gray-300 border-l-2 border-gray-300 dark:border-gray-600">
                 <DefinitionList:Item:Desc />
               </dd>
             </div>
@@ -66,14 +66,14 @@
   </DefinitionList>
   <Note:Ref>
     <sup class="px-0.5">
-      <a class="text-${theme}-600 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
+      <a class="text-${theme}-600 dark:text-${theme}-400 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
         <footnote:idx />
       </a>
     </sup>
   </Note:Ref>
   <Note:List>
     <div title="Footnotes"
-      class="pt-2 mt-8 space-y-1 text-gray-500 transform scale-x-90 border-t-2">
+      class="pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700">
       <header class="font-semibold">Footnotes</header>
       <footnote>
         <div id="fn${footnote:idx}">
@@ -110,12 +110,12 @@
     <hr class="mb-3" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-${theme}-600">
+  <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
     <Internal class="font-semibold hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-0.5 mb-3 text-sm font-mono" />
-  <Code class="py-0.5 px-0.5 bg-gray-100 font-mono" />
+  <Code class="py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono" />
 
   <Header:1>
     <h1 id="${header:id}" class="${header-class} text-5xl">
