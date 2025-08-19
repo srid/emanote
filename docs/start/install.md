@@ -5,35 +5,48 @@ order: 1
 
 # Installing
 
-## Official method
+## Quick Start
 
->[!info] Avoiding installation
-> Emanote need not have to be installed if you are using the [[emanote-template]] [flake](https://nixos.asia/en/flakes) to manage your content.
+Choose the option that works best for you:
 
-Emanote is supported on all popular operating systems through [Nix]. If you are new to Nix, checkout [this tutorial](https://nixos.asia/en/nix-first).
+### Nix
 
-1. [Install Nix & enable Flakes](https://nixos.asia/en/install)
-   1. For Windows, see [[wsl]]
-   1. For NixOS, see [[nix]]
-2. Run `nix profile install github:srid/emanote` to install Emanote
+1. Install Nix [using these instructions](https://nixos.asia/en/install).
+2. Run `nix profile install github:srid/emanote`[^nixpkgs]
 
->[!tip] Try before installing
->  You may also "try before installing" by running `nix run github:srid/emanote`. This still downloads emanote to your nix store (in `/nix/store`), but will not install it to the user profile like `nix profile install` does.
+[^nixpkgs]: Avoid using the Emanote version from `nixpkgs` repository, as that is **out-of-date**, and furthermore the author is [prohibited](https://srid.ca/nixos-mod) from updating it.
 
-To test your Emanote install,
+### No Nix? Use containers {#container}
+
+If you prefer Docker/Podman or don't want to install Nix:
+
+```bash
+# Run live server
+podman run -it --rm \
+  -p 8080:8080 \
+  -v ./docs:/notebook:z \
+  ghcr.io/srid/emanote run -p 8080 -h 0.0.0.0
+```
+
+Open http://localhost:8080 to view your site. See [[container]] for more details.
+
+## Platform-specific guides
+
+- **Windows users**: See [[wsl]] for Windows Subsystem for Linux setup
+- **Advanced Nix users**: See [[nix]] for Home Manager, flake-parts, and other advanced options
+
+## Testing your installation {#test}
+
+Once installed, test Emanote with:
 
 ```bash
 # Run live server
 cd /path/to/notebook
 emanote run
 
-# Generate static files (-L defaults to current directory)
+# Generate static files
 mkdir /tmp/output
 emanote -L /path/to/notebook gen /tmp/output
 ```
-
-## Containers
-
-If you do not wish to use Nix, you may try Emanote through Docker or Podman; see [[container]].
 
 [Nix]: https://nixos.asia/en/nix
