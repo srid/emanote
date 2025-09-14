@@ -16,19 +16,6 @@ Choose the option that works best for you:
 
 [^nixpkgs]: Avoid using the Emanote version from `nixpkgs` repository, as that is **out-of-date**, and furthermore the author is [prohibited](https://srid.ca/nixos-mod) from updating it.
 
-### No Nix? Use containers {#container}
-
-If you prefer Docker/Podman or don't want to install Nix:
-
-```bash
-# Run live server
-podman run -it --rm \
-  -p 8080:8080 \
-  -v ./docs:/notebook:z \
-  ghcr.io/srid/emanote run -p 8080 -h 0.0.0.0
-```
-
-Open http://localhost:8080 to view your site. See [[container]] for more details.
 
 ## Platform-specific guides
 
