@@ -42,29 +42,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./result/
-  container:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ${{ matrix.system }}
-    strategy:
-      matrix:
-        system: [x86_64-linux, aarch64-linux]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-      - name: Push ${{ matrix.system }} Image
-        run: nix run ".#publish-container-arch"
-        env:
-          GH_USERNAME: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  container-manifest:
-    if: github.ref == 'refs/heads/master'
-    runs-on: x86_64-linux
-    needs: container
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Multi-arch Manifest
-        run: nix run ".#publish-container-manifest"
-        env:
-          GH_USERNAME: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
