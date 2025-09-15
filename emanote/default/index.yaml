@@ -132,8 +132,17 @@ js:
     <!-- mermaid.js -->
     <script type="module">
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
-      mermaid.initialize({ startOnLoad: false });
-      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
+      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDarkMode ? 'dark' : 'base'
+      });
+      mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+      
+      // Listen for theme changes and reload page (simple approach)
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        window.location.reload();
+      });
     </script>
   mathjax: |
     <script>
