@@ -7,6 +7,7 @@
   }
 </style>
 
+
 <style data-category="error">
   /* Heist error element */
   strong.error {
@@ -30,6 +31,16 @@
     padding: 2px 4px;
     white-space: nowrap;
   }
+  
+  /* Dark mode kbd styling */
+  .dark kbd {
+    background-color: #374151;
+    border: 1px solid #6b7280;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+    color: #f3f4f6;
+  }
 </style>
 
 <style data-category="callout">
@@ -41,8 +52,8 @@
 </style>
 
 <style data-category="toc">
-  a.--ema-toc:not(.toc-item-active) {
-    background-color: #ffffff !important;
+  a.--ema-toc {
+    background-color: transparent !important;
   }
 </style>
 
@@ -76,6 +87,21 @@
       </svg>');
   }
 
+  .dark a[data-linkicon="external"]::after {
+    content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:lightgray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
+  }
+
   a[data-linkicon="external"][href^="mailto:"]::after {
     content: url('data:image/svg+xml,\
         <svg \
@@ -84,6 +110,22 @@
           fill="none" \
           viewBox="0 0 24 24" \
           stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
+  }
+
+  .dark a[data-linkicon="external"][href^="mailto:"]::after {
+    content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="lightgray" \
           stroke-width="2"> \
           <path \
             stroke-linecap="round" \

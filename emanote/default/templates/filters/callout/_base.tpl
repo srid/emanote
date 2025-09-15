@@ -1,5 +1,5 @@
 <div data-callout-metadata="" data-callout-fold="" data-callout="${callout:type}"
-  class="callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4" role="note"
+  class="callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700" role="note"
   style="background-color: ${color}20">
   <path
     d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
@@ -15,7 +15,7 @@
       <callout:title />
     </div>
   </div>
-  <div class="callout-content">
+  <div class="callout-content dark:text-gray-200">
     <callout:body />
   </div>
 </div>

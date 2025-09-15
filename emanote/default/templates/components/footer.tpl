@@ -1,5 +1,5 @@
-<footer class="flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800">
-  <bind tag="iconClass">w-6 h-6 hover:text-${theme}-700</bind>
+<footer class="flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200">
+  <bind tag="iconClass">w-6 h-6 hover:text-${theme}-700 dark:hover:text-${theme}-300</bind>
   <div>
     <ema:metadata>
       <with var="template">
