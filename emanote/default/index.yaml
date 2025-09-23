@@ -15,14 +15,14 @@ template:
   # Base settings for our default layout.
   base:
     # The class to apply for <body> element when
-    bodyClass: bg-gray-400 overflow-y-scroll
+    bodyClass: bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll
     containerClass: container mx-auto
   error:
     containerClass: container mx-auto max-w-prose
   uptree:
     enable: false
     # Class to apply for uptree's nodes
-    nodeClass: text-gray-900 hover:bg-${theme}-500 hover:text-white cursor-pointer
+    nodeClass: text-gray-900 dark:text-gray-100 hover:bg-${theme}-500 hover:text-white cursor-pointer
   # List of available colors: https://tailwindcss.com/docs/customizing-colors#default-color-palette
   theme: blue
   # Value of the <base> tag.
@@ -53,19 +53,19 @@ pandoc:
   # Markdown text, especially when using Tailwind.
   rewriteClass:
     # How to style inline tags. Tag-specific styles can be applied as well.
-    emanote:inline-tag: font-bold bg-gray-100 py-0.5 px-2 rounded-lg
+    emanote:inline-tag: font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-0.5 px-2 rounded-lg
     # This style is used by `#a/red/tag` in addition to the generic style above.
     # As this class comes *after* the generic class, it can override the styles
     # in the generic class.
-    emanote:inline-tag:a/red/tag: bg-red-100
-    emanote:placeholder-message: text-gray-400 border-t-2 inline-block pt-0.5
+    emanote:inline-tag:a/red/tag: bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+    emanote:placeholder-message: text-gray-400 dark:text-gray-500 border-t-2 border-gray-200 dark:border-gray-700 inline-block pt-0.5
     emanote:error: text-l bg-red-100 p-2 border-2 border-black m-2 font-mono
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
-    note: p-2 mb-3 rounded shadow bg-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both
+    note: p-2 mb-3 rounded shadow bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both
     highlight-block: px-3 py-1 mb-3 rounded bg-${theme}-100 hover:border-${theme}-400 hover:shadow border-t-8 border-${theme}-200
-    highlight-inline: bg-yellow-200 px-2 py-0.5 rounded-xl
+    highlight-inline: bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-xl
     center: flex justify-center items-center mx-auto
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
@@ -132,8 +132,17 @@ js:
     <!-- mermaid.js -->
     <script type="module">
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
-      mermaid.initialize({ startOnLoad: false });
-      mermaid.init(undefined,document.querySelectorAll(".mermaid"));
+      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDarkMode ? 'dark' : 'base'
+      });
+      mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+      
+      // Listen for theme changes and reload page (simple approach)
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        window.location.reload();
+      });
     </script>
   mathjax: |
     <script>
