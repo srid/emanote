@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=40db2469-4e5c-4335-b2b4-4cd559d60041' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=490e7216-aaa4-4532-93d8-ed91946d6db4' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -53,6 +53,7 @@
     font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 </style>
+
 
 <style data-category='error'>
   /* Heist error element */
@@ -77,6 +78,16 @@
     padding: 2px 4px;
     white-space: nowrap;
   }
+  
+  /* Dark mode kbd styling */
+  .dark kbd {
+    background-color: #374151;
+    border: 1px solid #6b7280;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+    color: #f3f4f6;
+  }
 </style>
 
 <style data-category='callout'>
@@ -88,8 +99,8 @@
 </style>
 
 <style data-category='toc'>
-  a.--ema-toc:not(.toc-item-active) {
-    background-color: #ffffff !important;
+  a.--ema-toc {
+    background-color: transparent !important;
   }
 </style>
 
@@ -123,6 +134,21 @@
       </svg>');
   }
 
+  .dark a[data-linkicon="external"]::after {
+    content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:lightgray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
+  }
+
   a[data-linkicon="external"][href^="mailto:"]::after {
     content: url('data:image/svg+xml,\
         <svg \
@@ -131,6 +157,22 @@
           fill="none" \
           viewBox="0 0 24 24" \
           stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
+  }
+
+  .dark a[data-linkicon="external"][href^="mailto:"]::after {
+    content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="lightgray" \
           stroke-width="2"> \
           <path \
             stroke-linecap="round" \
@@ -270,7 +312,7 @@
 
 <!-- DoNotFormat -->
 
-<body class='bg-gray-400 overflow-y-scroll'>
+<body class='bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll'>
   
     <div class='container mx-auto max-w-prose mt-2 md:mt-4  '>
       
@@ -286,7 +328,7 @@
             <li>
 
   <a href='neuron'>
-    <div class='text-gray-900 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
+    <div class='text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
       Migrating from neuron
     </div>
   </a>
@@ -297,7 +339,7 @@
         <li>
 
   <a href='start'>
-    <div class='text-gray-900 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
+    <div class='text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
       Getting Started
     </div>
   </a>
@@ -308,7 +350,7 @@
         <li>
 
   <a href='/'>
-    <div class='text-gray-900 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
+    <div class='text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
       Emanote
     </div>
   </a>
@@ -327,7 +369,7 @@
             <li>
 
   <a href='html-template'>
-    <div class='text-gray-900 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
+    <div class='text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
       HTML Templates
     </div>
   </a>
@@ -338,7 +380,7 @@
         <li>
 
   <a href='guide'>
-    <div class='text-gray-900 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
+    <div class='text-gray-900 dark:text-gray-100 hover:bg-blue-500 hover:text-white cursor-pointer forest-link'>
       Guide
     </div>
   </a>
@@ -372,9 +414,9 @@
   </div>
 
           <!-- Main body column -->
-          <div class='flex-1 w-full bg-white'>
+          <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-4 py-4'>
-    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
+    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 dark:bg-blue-800 text-5xl font-extrabold text-black dark:text-white rounded'>
   <span class='z-40 tracking-tighter '>
     Neuron-like layout
   </span>
@@ -390,7 +432,7 @@
 
 
     <p class='mb-3'>
-      Emanote’s builtin <a href='html-template' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
+      Emanote’s builtin <a href='html-template' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yml language-yml'>template:
   uptree: 
@@ -404,9 +446,9 @@
   base:
     containerClass: container mx-auto max-w-prose</code></pre></div>
     <p class='mb-3'>
-      This includes the <a href='uptree' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
+      This includes the <a href='uptree' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #08BFBC20'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
@@ -422,7 +464,7 @@
        Demo
     </div>
   </div>
-  <div class='callout-content'>
+  <div class='callout-content dark:text-gray-200'>
     
     <p class='mb-3'>
       As a demo, the very page you are viewing is rendered using this template configuration (whilst leaving the rest of the site to use the default configuration)
@@ -430,7 +472,7 @@
   
   </div>
 </div>
-    <h2 id='in-lieu-of-sidebar' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+    <h2 id='in-lieu-of-sidebar' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
       
   In lieu of sidebar
   
@@ -445,7 +487,7 @@
     </h2>
   
     <p class='mb-3'>
-      In the absence of <a href='sidebar' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
+      In the absence of <a href='sidebar' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
     </p>
   <nav>
   <div class='mb-8'>
@@ -485,19 +527,19 @@
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
-  <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
-    <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
+  <div class='flex-1 p-4 mt-8 bg-gray-100 dark:bg-gray-700 rounded'>
+    <header class='mb-2 text-xl font-semibold text-gray-500 dark:text-gray-200'>Links to this page</header>
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='uptree'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='uptree'>
             Uplink tree
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>[!tip] See also <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div><p>[!tip] See also <a href='neuron-layout' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
     </div>
   
 </div>
@@ -505,14 +547,14 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='neuron'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='neuron'>
             Migrating from neuron
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>Configure it to use <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div>Configure it to use <a href='neuron-layout' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
     </div>
   
 </div>
@@ -520,14 +562,14 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='html-template'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='html-template'>
             HTML Templates
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
     </div>
   
 </div>
@@ -535,14 +577,14 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='search'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='search'>
             Full-text search
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
     </div>
   
 </div>
@@ -550,14 +592,14 @@
         </li>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='breadcrumbs'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='breadcrumbs'>
             Breadcrumbs
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
     </div>
   
 </div>
@@ -578,13 +620,13 @@
 </div>
         </div>
       
-      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800'>
+      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200'>
   
   <div>
     
       
         <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
           </svg>
         </a>
@@ -593,19 +635,19 @@
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.4.0.1'>
-      <img class='w-6 h-6 hover:text-blue-700' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.0.0'>
+      <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -613,7 +655,7 @@
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>

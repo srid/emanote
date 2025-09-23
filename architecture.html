@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=40db2469-4e5c-4335-b2b4-4cd559d60041' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=490e7216-aaa4-4532-93d8-ed91946d6db4' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -53,6 +53,7 @@
     font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 </style>
+
 
 <style data-category='error'>
   /* Heist error element */
@@ -77,6 +78,16 @@
     padding: 2px 4px;
     white-space: nowrap;
   }
+  
+  /* Dark mode kbd styling */
+  .dark kbd {
+    background-color: #374151;
+    border: 1px solid #6b7280;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+    color: #f3f4f6;
+  }
 </style>
 
 <style data-category='callout'>
@@ -88,8 +99,8 @@
 </style>
 
 <style data-category='toc'>
-  a.--ema-toc:not(.toc-item-active) {
-    background-color: #ffffff !important;
+  a.--ema-toc {
+    background-color: transparent !important;
   }
 </style>
 
@@ -123,6 +134,21 @@
       </svg>');
   }
 
+  .dark a[data-linkicon="external"]::after {
+    content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:lightgray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
+  }
+
   a[data-linkicon="external"][href^="mailto:"]::after {
     content: url('data:image/svg+xml,\
         <svg \
@@ -131,6 +157,22 @@
           fill="none" \
           viewBox="0 0 24 24" \
           stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
+  }
+
+  .dark a[data-linkicon="external"][href^="mailto:"]::after {
+    content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="lightgray" \
           stroke-width="2"> \
           <path \
             stroke-linecap="round" \
@@ -268,15 +310,15 @@
 
 <!-- DoNotFormat -->
 
-<body class='bg-gray-400 overflow-y-scroll'>
+<body class='bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll'>
   
     <div class='container mx-auto md:mt-8 '>
       
 
       
-        <nav id='breadcrumbs' class='w-full text-gray-700 md:hidden'>
+        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden'>
   <div class='flex justify-left'>
-    <div class='w-full px-2 py-2 bg-gray-50'>
+    <div class='w-full px-2 py-2 bg-gray-50 dark:bg-gray-800'>
       <ul class='flex flex-wrap text-lg'>
         <li class='inline-flex items-center'>
           
@@ -291,7 +333,7 @@
               <a class='px-1 font-bold' href='/'>
                 Emanote
               </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
               </svg>
             </li>
@@ -299,13 +341,13 @@
         
       </ul>
     </div>
-    <button class='inline px-2 py-1 bg-gray-50 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
+    <button class='inline px-2 py-1 bg-gray-50 dark:bg-gray-800 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-2 py-1 text-white bg-blue-600 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+    <button class='inline px-2 py-1 text-white bg-blue-600 dark:bg-blue-700 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
@@ -320,11 +362,11 @@
       
 
       
-        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8'>
+        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-gray-50 dark:bg-gray-800 md:shadow-2xl md:mb-8'>
           <!-- Sidebar column -->
           <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64'>
-  <div class='px-2 py-2 text-gray-800'>
-    <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500'>
+  <div class='px-2 py-2 text-gray-800 dark:text-gray-200'>
+    <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500 dark:text-gray-400'>
       <a href='-/tags' title='View tags'>
         <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
           <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
@@ -384,7 +426,7 @@
           <a href='start' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -393,12 +435,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Getting Started' href='start'>
       Getting Started
     </a>
     
       
-        <span class='text-gray-300' title='4 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='4 children inside'>
           4
         </span>
       
@@ -430,7 +472,7 @@
           <a href='guide' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -439,12 +481,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Guide' href='guide'>
       Guide
     </a>
     
       
-        <span class='text-gray-300' title='12 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='12 children inside'>
           12
         </span>
       
@@ -476,7 +518,7 @@
           <a href='tips' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -485,12 +527,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Tips' href='tips'>
       Tips
     </a>
     
       
-        <span class='text-gray-300' title='3 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='3 children inside'>
           3
         </span>
       
@@ -530,7 +572,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Examples' href='examples'>
       Examples
     </a>
     
@@ -570,7 +612,7 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
+    <a class='font-bold bg-blue-100 dark:bg-blue-800 hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Architecture' href='architecture'>
       Architecture
     </a>
     
@@ -589,9 +631,9 @@
   </div>
 </nav>
           <!-- Main body column -->
-          <div class='flex-1 w-full bg-white'>
+          <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-4 py-4'>
-    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
+    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 dark:bg-blue-800 text-5xl font-extrabold text-black dark:text-white rounded'>
   <span class='z-40 tracking-tighter '>
     Architecture
   </span>
@@ -607,7 +649,7 @@
 
 
     <p class='mb-3'>
-      Emanote is a <a href='https://srid.ca/haskell' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> program that, at its essense, transforms a bunch of “source files” (Markdown, static files, etc.) into a “target website”. It does that in a <a href='https://en.wikipedia.org/wiki/Reactive_programming' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>reactive</a> manner such that as the source files change the resultant website updates in real-time (thanks to <a href='https://ema.srid.ca/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Ema</a>’s <a href='https://ema.srid.ca/topics/hot-reload' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>hot-reload</a> via websocket).
+      Emanote is a <a href='https://srid.ca/haskell' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> program that, at its essense, transforms a bunch of “source files” (Markdown, static files, etc.) into a “target website”. It does that in a <a href='https://en.wikipedia.org/wiki/Reactive_programming' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>reactive</a> manner such that as the source files change the resultant website updates in real-time (thanks to <a href='https://ema.srid.ca/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Ema</a>’s <a href='https://ema.srid.ca/topics/hot-reload' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>hot-reload</a> via websocket).
     </p>
   
     <p class='mb-3'>
@@ -617,11 +659,11 @@
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Source</code>: manages source files and communicates them to <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Model</code>.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source</code>: manages source files and communicates them to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>.
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The key concept here is the notion of “union mount”, implemented by <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
+          The key concept here is the notion of “union mount”, implemented by <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
         </li>
       
     </ul>
@@ -629,11 +671,11 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The individual modules in this package should be <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>import</code>ed separately to use the specific model types.
+          The individual modules in this package should be <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>import</code>ed separately to use the specific model types.
         </li>
       
     </ul>
@@ -641,15 +683,15 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Route</code>: Route types
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route</code>: Route types
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
         </li>
       
     </ul>
@@ -657,19 +699,19 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
         </li>
       
     </ul>
@@ -685,11 +727,11 @@
     <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Model</code> in sync with what’s on disk
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Model</code> in sync with what’s on disk
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Emanote.View.render</code> which, whilst querying the <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>Model</code>, is responsible for producing the final HTML for every <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>SiteRoute</code> in the target website.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View.render</code> which, whilst querying the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Model</code>, is responsible for producing the final HTML for every <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>SiteRoute</code> in the target website.
         </li>
       
     </ul>
@@ -701,7 +743,7 @@
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>./default</code>: The primary and first “<a href='layer' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>./default</code>: The primary and first “<a href='layer' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
         </li>
       
     </ul>
@@ -718,23 +760,23 @@
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
-  <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
-    <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
+  <div class='flex-1 p-4 mt-8 bg-gray-100 dark:bg-gray-700 rounded'>
+    <header class='mb-2 text-xl font-semibold text-gray-500 dark:text-gray-200'>Links to this page</header>
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='start'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='start'>
             Getting Started
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div>Visit <a href='guide' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup>*</sup></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div>Visit <a href='guide' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup>*</sup></div>
     </div>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><p>If you are <a href='https://srid.ca/haskell' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Architecture</a>.</p></div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div><p>If you are <a href='https://srid.ca/haskell' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Architecture</a>.</p></div>
     </div>
   
 </div>
@@ -751,7 +793,7 @@
       <!-- FIXME: The use of -/tags is wrong, because we should use routeUrl using Ema's encoder 
         Perhaps Emanote should inject tagMetas with urls.
       -->
-      <a title='Tag' class='px-1 bg-gray-100 rounded hover:bg-gray-50 hover:text-blue-500' href='-/tags/emanote/dev'>
+      <a title='Tag' class='px-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-blue-500' href='-/tags/emanote/dev'>
         <!-- DoNotFormat -->
         #emanote/dev
         <!-- DoNotFormat -->
@@ -764,13 +806,13 @@
 </div>
         </div>
         
-      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800'>
+      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200'>
   
   <div>
     
       
         <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
           </svg>
         </a>
@@ -779,19 +821,19 @@
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.4.0.1'>
-      <img class='w-6 h-6 hover:text-blue-700' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.0.0'>
+      <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -799,7 +841,7 @@
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>

@@ -37,7 +37,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 
   
   <emaNoteFeedUrl></emaNoteFeedUrl>
-  <link href='tailwind.css?instanceId=40db2469-4e5c-4335-b2b4-4cd559d60041' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=490e7216-aaa4-4532-93d8-ed91946d6db4' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -47,6 +47,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
     font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 </style>
+
 
 <style data-category='error'>
   /* Heist error element */
@@ -71,6 +72,16 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
     padding: 2px 4px;
     white-space: nowrap;
   }
+  
+  /* Dark mode kbd styling */
+  .dark kbd {
+    background-color: #374151;
+    border: 1px solid #6b7280;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+    color: #f3f4f6;
+  }
 </style>
 
 <style data-category='callout'>
@@ -82,8 +93,8 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 </style>
 
 <style data-category='toc'>
-  a.--ema-toc:not(.toc-item-active) {
-    background-color: #ffffff !important;
+  a.--ema-toc {
+    background-color: transparent !important;
   }
 </style>
 
@@ -117,6 +128,21 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
       </svg>');
   }
 
+  .dark a[data-linkicon="external"]::after {
+    content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:lightgray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
+  }
+
   a[data-linkicon="external"][href^="mailto:"]::after {
     content: url('data:image/svg+xml,\
         <svg \
@@ -125,6 +151,22 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
           fill="none" \
           viewBox="0 0 24 24" \
           stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
+  }
+
+  .dark a[data-linkicon="external"][href^="mailto:"]::after {
+    content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="lightgray" \
           stroke-width="2"> \
           <path \
             stroke-linecap="round" \
@@ -243,7 +285,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 
 <!-- DoNotFormat -->
 
-<body class='bg-gray-400 overflow-y-scroll'>
+<body class='bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll'>
   
     <div class='container mx-auto '>
       <main class='flex-col items-center justify-center mx-2'>
@@ -339,13 +381,13 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   
         </div>
       </main>
-      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800'>
+      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200'>
   
   <div>
     
       
         <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
           </svg>
         </a>
@@ -354,19 +396,19 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.4.0.1'>
-      <img class='w-6 h-6 hover:text-blue-700' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.0.0'>
+      <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -374,7 +416,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>

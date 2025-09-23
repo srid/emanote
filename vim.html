@@ -46,7 +46,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=40db2469-4e5c-4335-b2b4-4cd559d60041' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=490e7216-aaa4-4532-93d8-ed91946d6db4' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -56,6 +56,7 @@
     font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 </style>
+
 
 <style data-category='error'>
   /* Heist error element */
@@ -80,6 +81,16 @@
     padding: 2px 4px;
     white-space: nowrap;
   }
+  
+  /* Dark mode kbd styling */
+  .dark kbd {
+    background-color: #374151;
+    border: 1px solid #6b7280;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+    color: #f3f4f6;
+  }
 </style>
 
 <style data-category='callout'>
@@ -91,8 +102,8 @@
 </style>
 
 <style data-category='toc'>
-  a.--ema-toc:not(.toc-item-active) {
-    background-color: #ffffff !important;
+  a.--ema-toc {
+    background-color: transparent !important;
   }
 </style>
 
@@ -126,6 +137,21 @@
       </svg>');
   }
 
+  .dark a[data-linkicon="external"]::after {
+    content: url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
+        <g style="stroke:lightgray;stroke-width:1"> \
+          <line x1="5" y1="5" x2="5" y2="14" /> \
+          <line x1="14" y1="9" x2="14" y2="14" /> \
+          <line x1="5" y1="14" x2="14" y2="14" /> \
+          <line x1="5" y1="5" x2="9" y2="5"  /> \
+          <line x1="10" y1="2" x2="17" y2="2"  /> \
+          <line x1="17" y1="2" x2="17" y2="9" /> \
+          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
+        </g> \
+      </svg>');
+  }
+
   a[data-linkicon="external"][href^="mailto:"]::after {
     content: url('data:image/svg+xml,\
         <svg \
@@ -134,6 +160,22 @@
           fill="none" \
           viewBox="0 0 24 24" \
           stroke="gray" \
+          stroke-width="2"> \
+          <path \
+            stroke-linecap="round" \
+            stroke-linejoin="round" \
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
+        </svg>');
+  }
+
+  .dark a[data-linkicon="external"][href^="mailto:"]::after {
+    content: url('data:image/svg+xml,\
+        <svg \
+          xmlns="http://www.w3.org/2000/svg" \
+          height="0.7em" \
+          fill="none" \
+          viewBox="0 0 24 24" \
+          stroke="lightgray" \
           stroke-width="2"> \
           <path \
             stroke-linecap="round" \
@@ -271,15 +313,15 @@
 
 <!-- DoNotFormat -->
 
-<body class='bg-gray-400 overflow-y-scroll'>
+<body class='bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll'>
   
     <div class='container mx-auto md:mt-8 '>
       
 
       
-        <nav id='breadcrumbs' class='w-full text-gray-700 md:hidden'>
+        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden'>
   <div class='flex justify-left'>
-    <div class='w-full px-2 py-2 bg-gray-50'>
+    <div class='w-full px-2 py-2 bg-gray-50 dark:bg-gray-800'>
       <ul class='flex flex-wrap text-lg'>
         <li class='inline-flex items-center'>
           
@@ -294,7 +336,7 @@
               <a class='px-1 font-bold' href='/'>
                 Emanote
               </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
               </svg>
             </li>
@@ -303,7 +345,7 @@
               <a class='px-1 font-bold' href='start'>
                 Getting Started
               </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
               </svg>
             </li>
@@ -312,7 +354,7 @@
               <a class='px-1 font-bold' href='resources'>
                 Resources
               </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
               </svg>
             </li>
@@ -321,7 +363,7 @@
               <a class='px-1 font-bold' href='editors'>
                 Editors
               </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400'>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
               </svg>
             </li>
@@ -329,13 +371,13 @@
         
       </ul>
     </div>
-    <button class='inline px-2 py-1 bg-gray-50 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
+    <button class='inline px-2 py-1 bg-gray-50 dark:bg-gray-800 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-2 py-1 text-white bg-blue-600 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+    <button class='inline px-2 py-1 text-white bg-blue-600 dark:bg-blue-700 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
@@ -350,11 +392,11 @@
       
 
       
-        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-gray-50 md:shadow-2xl md:mb-8'>
+        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-gray-50 dark:bg-gray-800 md:shadow-2xl md:mb-8'>
           <!-- Sidebar column -->
           <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64'>
-  <div class='px-2 py-2 text-gray-800'>
-    <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500'>
+  <div class='px-2 py-2 text-gray-800 dark:text-gray-200'>
+    <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500 dark:text-gray-400'>
       <a href='-/tags' title='View tags'>
         <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
           <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
@@ -416,14 +458,14 @@
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Getting Started' href='start'>
+    <a class='font-bold hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Getting Started' href='start'>
       Getting Started
     </a>
     
@@ -454,7 +496,7 @@
           <a href='install' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -463,12 +505,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Installing' href='install'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Installing' href='install'>
       Installing
     </a>
     
       
-        <span class='text-gray-300' title='2 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='2 children inside'>
           2
         </span>
       
@@ -500,7 +542,7 @@
           <a href='neuron' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -509,12 +551,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Migrating from neuron' href='neuron'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Migrating from neuron' href='neuron'>
       Migrating from neuron
     </a>
     
       
-        <span class='text-gray-300' title='1 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='1 children inside'>
           1
         </span>
       
@@ -548,14 +590,14 @@
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Resources' href='resources'>
+    <a class='font-bold hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Resources' href='resources'>
       Resources
     </a>
     
@@ -588,14 +630,14 @@
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 rounded px-1.5 truncate' title='Editors' href='editors'>
+    <a class='font-bold hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Editors' href='editors'>
       Editors
     </a>
     
@@ -634,7 +676,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Nota' href='nota'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Nota' href='nota'>
       Nota
     </a>
     
@@ -676,7 +718,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Obsidian' href='obsidian'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Obsidian' href='obsidian'>
       Obsidian
     </a>
     
@@ -716,7 +758,7 @@
   
         
     </span>
-    <a class='font-bold bg-blue-100 hover:bg-blue-200 rounded px-1.5 truncate' title='Vim' href='vim'>
+    <a class='font-bold bg-blue-100 dark:bg-blue-800 hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Vim' href='vim'>
       Vim
     </a>
     
@@ -758,7 +800,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Visual Studio Code' href='vscode'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Visual Studio Code' href='vscode'>
       Visual Studio Code
     </a>
     
@@ -803,7 +845,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='emanote-template' href='emanote-template'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='emanote-template' href='emanote-template'>
       emanote-template
     </a>
     
@@ -845,7 +887,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='zk' href='zk'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='zk' href='zk'>
       zk
     </a>
     
@@ -887,7 +929,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Syncthing sync' href='sync'>
       Syncthing sync
     </a>
     
@@ -932,7 +974,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Known Issues' href='known-issues'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Known Issues' href='known-issues'>
       Known Issues
     </a>
     
@@ -969,7 +1011,7 @@
           <a href='guide' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -978,12 +1020,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Guide' href='guide'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Guide' href='guide'>
       Guide
     </a>
     
       
-        <span class='text-gray-300' title='12 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='12 children inside'>
           12
         </span>
       
@@ -1015,7 +1057,7 @@
           <a href='tips' title='View folgezettel children'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -1024,12 +1066,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Tips' href='tips'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Tips' href='tips'>
       Tips
     </a>
     
       
-        <span class='text-gray-300' title='3 children inside'>
+        <span class='text-gray-300 dark:text-gray-600' title='3 children inside'>
           3
         </span>
       
@@ -1069,7 +1111,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Examples' href='examples'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Examples' href='examples'>
       Examples
     </a>
     
@@ -1111,7 +1153,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 rounded px-1.5 truncate' title='Architecture' href='architecture'>
+    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Architecture' href='architecture'>
       Architecture
     </a>
     
@@ -1130,9 +1172,9 @@
   </div>
 </nav>
           <!-- Main body column -->
-          <div class='flex-1 w-full bg-white'>
+          <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-4 py-4'>
-    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 text-5xl font-extrabold text-black rounded'>
+    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 dark:bg-blue-800 text-5xl font-extrabold text-black dark:text-white rounded'>
   <span class='z-40 tracking-tighter '>
     Vim
   </span>
@@ -1150,9 +1192,9 @@
 
 
     <p class='mb-3'>
-      <a href='https://www.vim.org/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Vim</a>, and its very popular fork <a href='https://neovim.io/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neovim</a>, are <a href='https://unix.stackexchange.com/a/57708' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>modal text editors</a> for editing plain text files. You can use it to edit <a href='markdown' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown</a> files.
+      <a href='https://www.vim.org/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Vim</a>, and its very popular fork <a href='https://neovim.io/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neovim</a>, are <a href='https://unix.stackexchange.com/a/57708' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>modal text editors</a> for editing plain text files. You can use it to edit <a href='markdown' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown</a> files.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #08BFBC20'>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #08BFBC20'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-2 font-bold' style='color: #08BFBC'>
@@ -1168,15 +1210,15 @@
       Tip
     </div>
   </div>
-  <div class='callout-content'>
+  <div class='callout-content dark:text-gray-200'>
     
     <p class='mb-3'>
-      If you are looking to write a Vim extension for Emanote, see <a href='export' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Export</a>.
+      If you are looking to write a Vim extension for Emanote, see <a href='export' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Export</a>.
     </p>
   
   </div>
 </div>
-    <h2 id='known-issues' class='group mt-6 mb-4 font-bold text-gray-700 text-4xl'>
+    <h2 id='known-issues' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
       
   Known issues
   
@@ -1190,7 +1232,7 @@
 
     </h2>
   
-    <h3 id='glitches' class='group mt-6 mb-4 font-bold text-gray-700 text-3xl'>
+    <h3 id='glitches' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
       
   Glitches when saving file
   
@@ -1217,12 +1259,12 @@
 [Info#emanote] [15:52:50] Removing note: guide.md
 [Info#emanote] [15:52:50] Reading file: ./docs/guide.md</code></pre></div>
     <p class='mb-3'>
-      Compared to the much slimmer logs from when using for example <a href='vscode' class='text-blue-600 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a>:
+      Compared to the much slimmer logs from when using for example <a href='vscode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a>:
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='text language-text'>[Info#emanote] [15:54:39] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:41] Reading file: ./docs/guide.md
 [Info#emanote] [15:54:43] Reading file: ./docs/guide.md</code></pre></div>
-    <h4 id='temporary-workaround' class='group mt-6 mb-4 font-bold text-gray-700 text-2xl'>
+    <h4 id='temporary-workaround' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-2xl'>
       
   Temporary workaround
   
@@ -1240,7 +1282,7 @@
       (No longer applies after restarting Vim)
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='vim language-vim'>:set backupcopy=yes</code></pre></div>
-    <h4 id='permanent-workaround' class='group mt-6 mb-4 font-bold text-gray-700 text-2xl'>
+    <h4 id='permanent-workaround' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-2xl'>
       
   Permanent workaround
   
@@ -1255,11 +1297,11 @@
     </h4>
   
     <p class='mb-3'>
-      By adding this to your (Neo)vim config file, e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.vimrc</code> for Vim or <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>~/.config/nvim/init.vim</code> for Neovim (see <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help vimrc</code> for more info):
+      By adding this to your (Neo)vim config file, e.g <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>~/.vimrc</code> for Vim or <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>~/.config/nvim/init.vim</code> for Neovim (see <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>:help vimrc</code> for more info):
     </p>
   <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='vim language-vim'>" Must be added AFTER `set nocompatible`, if any, as `set nocompatible`
 " resets the `backupcopy` setting.
-set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fold data-callout='info' class='callout bg-opacity-10 bg-[#f5f5f5] p-4 pt-4 pb-2 rounded-lg mb-4' role='note' style='background-color: #086DD320'>
+set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fold data-callout='info' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #086DD320'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-2 font-bold' style='color: #086DD3'>
@@ -1276,22 +1318,22 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
        Background
     </div>
   </div>
-  <div class='callout-content'>
+  <div class='callout-content dark:text-gray-200'>
     
     <p class='mb-3'>
-      Vim has this great feature called “backup copies” that ensure that your text isn’t lost in the case of a faulty write/save operation. To achieve this it uses some additional files, usually one with a 4-digit long integer and one with the same name but with a tilde at the end (e.g <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md</code> vs <code class='py-0.5 px-0.5 bg-gray-100 font-mono'>myfile.md~</code>), that it does this little dance with these files before discarding them when the write/save operation succeeds.
+      Vim has this great feature called “backup copies” that ensure that your text isn’t lost in the case of a faulty write/save operation. To achieve this it uses some additional files, usually one with a 4-digit long integer and one with the same name but with a tilde at the end (e.g <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>myfile.md</code> vs <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>myfile.md~</code>), that it does this little dance with these files before discarding them when the write/save operation succeeds.
     </p>
   
     <p class='mb-3'>
-      For more info about this feature, see <a href='https://vimhelp.org/editing.txt.html#backup' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help backup</code></a>, <a href='https://vimhelp.org/options.txt.html#%27backupcopy%27' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help backupcopy</code></a>, and <a href='https://vimhelp.org/options.txt.html#%27writebackup%27' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 font-mono'>:help writebackup</code></a>.
+      For more info about this feature, see <a href='https://vimhelp.org/editing.txt.html#backup' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>:help backup</code></a>, <a href='https://vimhelp.org/options.txt.html#%27backupcopy%27' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>:help backupcopy</code></a>, and <a href='https://vimhelp.org/options.txt.html#%27writebackup%27' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>:help writebackup</code></a>.
     </p>
   
     <p class='mb-3'>
-      This also affects good ’ol <a href='https://ex-vi.sourceforge.net/' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>vi</a>.
+      This also affects good ’ol <a href='https://ex-vi.sourceforge.net/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>vi</a>.
     </p>
   
     <p class='mb-3'>
-      Reference discussion: <a href='https://github.com/srid/emanote/issues/180#issuecomment-945049455' class='text-blue-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/180#issuecomment-945049455</a>
+      Reference discussion: <a href='https://github.com/srid/emanote/issues/180#issuecomment-945049455' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/180#issuecomment-945049455</a>
     </p>
   
   </div>
@@ -1305,28 +1347,28 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
 </div>
 </article>
         </div>
-        <div class='hidden md:block md:col-span-2 md:border-l'>
+        <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-300 dark:md:border-gray-600'>
           <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
-  <div class='text-gray-600 text-sm -mt-2'>
+  <div class='text-gray-600 dark:text-gray-400 text-sm -mt-2'>
     
         <ul class='ml-2'>
           
             <li class='whitespace-nowrap truncate mt-2' title='Known issues'>
-              <a href='vim#known-issues' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='vim#known-issues' class='--ema-toc rounded-md p-0.5'>
                 Known issues
               </a>
               
         <ul class='ml-2'>
           
             <li class='whitespace-nowrap truncate mt-2' title='Glitches when saving file'>
-              <a href='vim#glitches' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='vim#glitches' class='--ema-toc rounded-md p-0.5'>
                 Glitches when saving file
               </a>
               
         <ul class='ml-2'>
           
             <li class='whitespace-nowrap truncate mt-2' title='Temporary workaround'>
-              <a href='vim#temporary-workaround' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='vim#temporary-workaround' class='--ema-toc rounded-md p-0.5'>
                 Temporary workaround
               </a>
               
@@ -1337,7 +1379,7 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
             </li>
           
             <li class='whitespace-nowrap truncate mt-2' title='Permanent workaround'>
-              <a href='vim#permanent-workaround' class='--ema-toc bg-blue-200 rounded-md p-0.5'>
+              <a href='vim#permanent-workaround' class='--ema-toc rounded-md p-0.5'>
                 Permanent workaround
               </a>
               
@@ -1418,19 +1460,19 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
     <div class='flex flex-col lg:flex-row lg:space-x-2'>
       
       
-  <div class='flex-1 p-4 mt-8 bg-gray-100 rounded'>
-    <header class='mb-2 text-xl font-semibold text-gray-500'>Links to this page</header>
+  <div class='flex-1 p-4 mt-8 bg-gray-100 dark:bg-gray-700 rounded'>
+    <header class='mb-2 text-xl font-semibold text-gray-500 dark:text-gray-200'>Links to this page</header>
     <ul class='space-y-1'>
       
         <li>
-          <a class='text-blue-600 font-semibold hover:bg-blue-50' href='zk'>
+          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='zk'>
             zk
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500'>
+            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-blue-200 hover:border-blue-500'>
-      <div><a href='https://github.com/mickael-menu/zk-nvim' class='text-gray-600 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>zk-nvim</code></a> for <a href='vim' class='text-gray-600 font-bold hover:bg-gray-50' data-wikilink-type='WikiLinkNormal'>Neovim</a> 0.5+</div>
+    <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
+      <div><a href='https://github.com/mickael-menu/zk-nvim' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code>zk-nvim</code></a> for <a href='vim' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Neovim</a> 0.5+</div>
     </div>
   
 </div>
@@ -1451,13 +1493,13 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
 </div>
         </div>
         
-      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800'>
+      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200'>
   
   <div>
     
       
         <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
           </svg>
         </a>
@@ -1466,19 +1508,19 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.4.0.1'>
-      <img class='w-6 h-6 hover:text-blue-700' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.0.0'>
+      <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -1486,7 +1528,7 @@ set backupcopy=yes</code></pre></div><div data-callout-metadata data-callout-fol
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>
