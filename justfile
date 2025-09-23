@@ -14,7 +14,7 @@ repl *ARGS:
 
 # Autoformat the project tree
 fmt:
-    treefmt
+    pre-commit run --all-files
 
 # Run the app using ghcid (with auto-reload / recompile)
 # To run against a custom notebook:

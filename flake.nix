@@ -9,9 +9,9 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    flake-root.url = "github:srid/flake-root";
+    fourmolu-nix.url = "github:jedimahdi/fourmolu-nix";
+    git-hooks.url = "github:bmrips/git-hooks.nix";
+    git-hooks.flake = false;
     nixos-unified.url = "github:srid/nixos-unified";
 
     # These are not (necessarily) upstreamed to nixpkgs, yet.
