@@ -7,24 +7,13 @@ on:
   pull_request:
 
 jobs:
-  nix:
-    runs-on: ${{ matrix.system }}
-    strategy:
-      matrix:
-        system: [aarch64-darwin, x86_64-linux, aarch64-linux]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Nix
-        run: |
-          om ci run --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" --systems "${{ matrix.system }}"
   flake-parts-docs:
     runs-on: x86_64-linux
     steps:
       - uses: actions/checkout@v4
       - name: Docs for flake.parts
         run: |
-          # TODO: Define this in nixci itself.
+          # TODO: Define this in Vira or make it part of our flake?
           nix build github:hercules-ci/flake.parts-website#checks.x86_64-linux.linkcheck --override-input emanote .
 
   website:
