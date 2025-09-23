@@ -4,7 +4,7 @@
 
 **Notable features**
 
-- Dark mode
+- Dark mode (#605)
 
 ## 1.4.0.0 (2025-08-18)
 
