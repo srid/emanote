@@ -1,11 +1,11 @@
 <!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-${theme}-200</bind>
+<bind tag="link-class">hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
 <node:active>
-  <bind tag="link-class">font-bold bg-${theme}-100 hover:bg-${theme}-200</bind>
+  <bind tag="link-class">font-bold bg-${theme}-100 dark:bg-${theme}-800 hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">font-bold hover:bg-${theme}-200</bind>
+      <bind tag="link-class">font-bold hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>
@@ -14,13 +14,13 @@
   <bind tag="icon">
     <tree:open>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-        class="${iconSize} inline text-gray-700" fill="currentColor">
+        class="${iconSize} inline text-gray-700 dark:text-gray-300" fill="currentColor">
         <path fill-rule="evenodd"
           d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
           clip-rule="evenodd" />
       </svg>
       <else />
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500"
+      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500 dark:text-gray-400"
         viewBox="0 0 24 24" fill="currentColor">
         <path fill-rule="evenodd"
           d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
@@ -72,7 +72,7 @@
       <else />
       <node:terminal>
         <else />
-        <span class="text-gray-300" title="${tree:childrenCount} children inside">
+        <span class="text-gray-300 dark:text-gray-600" title="${tree:childrenCount} children inside">
           <tree:childrenCount />
         </span>
       </node:terminal>

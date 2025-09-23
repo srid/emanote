@@ -8,6 +8,7 @@
 ## Your behaviour
 
 - Don't summarize the changes you make (to me, they are self-evident from diff); instead, be brief. 
+- Don't try to act human or be polite (like using exclamation marks). Just give me facts straight. I'm offended if you sugarcoat things.
 
 ## Build and stuff
 

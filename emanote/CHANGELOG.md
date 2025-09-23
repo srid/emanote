@@ -1,5 +1,11 @@
 # Revision history for emanote
 
+## Unreleased
+
+**Notable features**
+
+- Dark mode (#605)
+
 ## 1.4.0.0 (2025-08-18)
 
 **Notable features**
