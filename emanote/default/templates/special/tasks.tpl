@@ -1,6 +1,6 @@
 <apply template="/templates/special/base">
   <bind tag="special-main">
-    <div class="w-full bg-gray-300">
+    <div class="w-full bg-gray-300 dark:bg-gray-700">
       <div class="w-full px-3 py-1">
         <ema:taskGroups>
           <taskGroup>
@@ -9,16 +9,16 @@
                 <t:note:breadcrumbs>
                   <each-crumb>
                     <li class="inline-flex items-center">
-                      <a class="text-gray-900 opacity-50 hover:opacity-100" href="${crumb:url}">
+                      <a class="text-gray-900 dark:text-gray-100 opacity-50 hover:opacity-100" href="${crumb:url}">
                         <crumb:title />
                       </a>
-                      <span class="text-gray-700 px-2">\</span>
+                      <span class="text-gray-700 dark:text-gray-300 px-2">\</span>
                     </li>
                   </each-crumb>
                 </t:note:breadcrumbs>
 
                 <div class="flex-1">
-                  <a class="font-bold text-${theme}-700  hover:underline" href="${t:note:url}">
+                  <a class="font-bold text-${theme}-700 dark:text-${theme}-300 hover:underline" href="${t:note:url}">
                     <t:note:title />
                   </a>
                 </div>
@@ -27,11 +27,11 @@
                 <t:tasks>
                   <task>
                     <div
-                      class="bg-white py-1.5 px-2 my-1 rounded shadow border-2 hover:border-${theme}-600">
+                      class="bg-white dark:bg-gray-800 py-1.5 px-2 my-1 rounded shadow border-2 border-gray-200 dark:border-gray-600 hover:border-${theme}-600 dark:hover:border-${theme}-400">
                       <apply template="/templates/components/checkbox-unchecked">
                         <task:description>
-                          <PandocLink class="text-gray-600">
-                            <Internal class="font-bold hover:bg-gray-50" />
+                          <PandocLink class="text-gray-600 dark:text-gray-400">
+                            <Internal class="font-bold hover:bg-gray-50 dark:hover:bg-gray-700" />
                             <External class="hover:underline" target="_blank" rel="noopener" />
                           </PandocLink>
                           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
