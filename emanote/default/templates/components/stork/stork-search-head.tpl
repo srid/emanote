@@ -54,7 +54,7 @@
           return baseUrl;
         },
         registerIndex: function (options) {
-          const indexName = 'emanote-search';  // used to match input[data-stork] attribute value
+          const indexName = 'emanote-search'; // used to match input[data-stork] attribute value
           const indexUrl = window.emanote.stork.getBaseUrl() + '-/stork.st';
           stork.register(
             indexName,
