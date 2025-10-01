@@ -67,6 +67,14 @@
               }
             });
           } else {
+            // This section is called during Ema's hot reload.
+            //
+            // Mark the current index as stale, and refresh it *only when* the
+            // user actually invokes search.
+            //
+            // We do not refresh the index *right away*, as that will cause
+            // memory leaks in the browser. See
+            // https://github.com/srid/emanote/issues/411#issuecomment-1402056235
             console.log("stork: Marking index as stale");
             window.emanote.stork.markIndexAsStale();
           }
@@ -78,14 +86,6 @@
 
         refreshIndex: function () {
           if (window.emanote.stork.indexIsStale) {
-            // This section is called during Ema's hot reload.
-            //
-            // Mark the current index as stale, and refresh it *only when* the
-            // user actually invokes search.
-            //
-            // We do not refresh the index *right away*, as that will cause
-            // memory leaks in the browser. See
-            // https://github.com/srid/emanote/issues/411#issuecomment-1402056235
             console.log("stork: Reloading index");
             window.emanote.stork.indexIsStale = false;
             window.emanote.stork.registerIndex({ forceOverwrite: true });
