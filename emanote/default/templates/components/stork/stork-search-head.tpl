@@ -1,33 +1,18 @@
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/flat.css" />
-<!-- Custom Stork-search styling for Emanote -->
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible.css" media="(prefers-color-scheme: light)" />
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible-dark.css" media="(prefers-color-scheme: dark)" />
+
 <style data-category="stork">
   #stork-search-container {
     z-index: 1000;
     background-color: rgb(15 23 42/.8);
   }
+
   .stork-overflow-hidden-important {
     overflow: hidden !important;
   }
-  @media (prefers-color-scheme: dark) {
-    .stork-input {
-      background-color: rgb(31 41 55);
-      color: white;
-      border-color: rgb(75 85 99);
-    }
-    .stork-output {
-      background-color: rgb(31 41 55);
-      color: white;
-      border-color: rgb(75 85 99);
-    }
-    .stork-output .stork-result {
-      background-color: rgb(31 41 55);
-      border-color: rgb(75 85 99);
-    }
-    .stork-output .stork-result:hover {
-      background-color: rgb(55 65 81);
-    }
-  }
 </style>
+
+
 <script src="${ema:emanoteStaticLayerUrl}/stork/stork.js"></script>
 <ema:metadata>
   <with var="template">
@@ -49,24 +34,28 @@
           document.body.classList.remove('stork-overflow-hidden-important');
           window.emanote.stork.searchShown = false;
         },
+
         getBaseUrl: function () {
           const baseUrl = document.getElementById("emanote-stork").getAttribute('data-emanote-base-url') || '/';
           return baseUrl;
         },
+
         registerIndex: function (options) {
-          const indexName = 'emanote-search'; // used to match input[data-stork] attribute value
+          const indexName = 'emanote-search';
           const indexUrl = window.emanote.stork.getBaseUrl() + '-/stork.st';
           stork.register(
             indexName,
             indexUrl,
             options);
         },
+
         init: function () {
           if (document.readyState !== 'complete') {
             window.addEventListener('load', function () {
               stork.initialize(window.emanote.stork.getBaseUrl() + '_emanote-static/stork/stork.wasm');
               window.emanote.stork.registerIndex();
             });
+
             document.addEventListener('keydown', event => {
               if (window.emanote.stork.searchShown && event.key === 'Escape') {
                 window.emanote.stork.clearSearch();
@@ -77,30 +66,25 @@
               }
             });
           } else {
-            // This section is called during Ema's hot reload.
-            //
-            // Mark the current index as stale, and refresh it *only when* the
-            // user actually invokes search.
-            //
-            // We do not refresh the index *right away*, as that will cause
-            // memory leaks in the browser. See
-            // https://github.com/srid/emanote/issues/411#issuecomment-1402056235
             console.log("stork: Marking index as stale");
             window.emanote.stork.markIndexAsStale();
           }
         },
+
         markIndexAsStale: function () {
           window.emanote.stork.indexIsStale = true;
         },
+
         refreshIndex: function () {
           if (window.emanote.stork.indexIsStale) {
             console.log("stork: Reloading index");
             window.emanote.stork.indexIsStale = false;
-            // NOTE: This will leak memory. See the comment above.
             window.emanote.stork.registerIndex({ forceOverwrite: true });
           }
         }
+
       };
+
       window.emanote.stork.init();
     </script>
   </with>

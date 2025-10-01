@@ -20,23 +20,6 @@
   --stork-input-height: 2.4em;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stork-wrapper-flat {
-    --stork-blue-2: #1e3a5f;
-    --stork-blue-3: #2d4d6f;
-    --stork-blue-4: #3b6080;
-    --stork-blue-5: #4a7390;
-    --stork-blue-7: #5a86a0;
-    --stork-gray-8: #d1d5db;
-    --stork-gray-9: #e5e7eb;
-    --stork-yellow-2: #78350f;
-
-    --stork-border-color: rgb(75, 85, 99);
-    --stork-background-color: rgb(31, 41, 55);
-    --stork-text-color: rgb(229, 231, 235);
-  }
-}
-
 .stork-wrapper-flat *,
 .stork-wrapper-flat *:before,
 .stork-wrapper-flat *:after {
@@ -144,6 +127,7 @@
   font-size: 0.95em;
   margin: 0;
   color: var(--stork-text-color);
+
   /* Flexbox container for the title and the score, when debugging */
   display: flex;
   justify-content: space-between;
@@ -158,6 +142,7 @@
   line-height: 1;
   margin: 0;
   color: var(--stork-gray-8);
+
   /* Flexbox container for the title and the score, when debugging */
   display: flex;
   justify-content: space-between;
@@ -182,29 +167,13 @@
   margin: 0.5em 0.5em;
   height: 1.4em;
   width: 1.4em;
-  padding: 0;
+  padding: 0px;
   background: hsl(0, 0%, 85%);
   border: 1px solid hsla(0, 0%, 70%);
   font-size: 1em;
   color: hsl(0, 0%, 50%);
   border-radius: 50%;
   line-height: 1;
-}
-
-@media (prefers-color-scheme: dark) {
-  .stork-wrapper-flat .stork-close-button {
-    background: rgb(55, 65, 81);
-    border: 1px solid rgb(75, 85, 99);
-    color: rgb(156, 163, 175);
-  }
-
-  .stork-wrapper-flat .stork-close-button:hover {
-    background: rgb(75, 85, 99);
-  }
-
-  .stork-wrapper-flat .stork-close-button:active {
-    background: rgb(107, 114, 128);
-  }
 }
 
 .stork-wrapper-flat .stork-close-button svg {
