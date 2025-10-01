@@ -47,7 +47,7 @@
           stork.register(
             indexName,
             indexUrl,
-            ...options, theme: 'edible' );
+            {...options, theme: 'edible' });
         },
 
         init: function () {
