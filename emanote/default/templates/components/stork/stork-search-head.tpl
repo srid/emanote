@@ -42,7 +42,7 @@
         },
 
         registerIndex: function (options) {
-          const indexName = 'emanote-search';  // used to match input[data-stork] attribute value
+          const indexName = 'emanote-search'; // used to match input[data-stork] attribute value
           const indexUrl = window.emanote.stork.getBaseUrl() + '-/stork.st';
           stork.register(
             indexName,
@@ -88,6 +88,7 @@
           if (window.emanote.stork.indexIsStale) {
             console.log("stork: Reloading index");
             window.emanote.stork.indexIsStale = false;
+            // NOTE: This will leak memory. See the comment above.
             window.emanote.stork.registerIndex({ forceOverwrite: true });
           }
         }
