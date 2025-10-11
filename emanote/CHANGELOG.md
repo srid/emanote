@@ -4,7 +4,7 @@
 
 **Notable features**
 
-- Dark mode (#605)
+- Dark mode (#605, #617)
 - Mermaid: add `elk` layout (#618)
 
 ## 1.4.0.0 (2025-08-18)

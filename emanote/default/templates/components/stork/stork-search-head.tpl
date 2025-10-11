@@ -1,5 +1,7 @@
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/flat.css" />
 <!-- Custom Stork-search styling for Emanote -->
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible.css" media="(prefers-color-scheme: light)" />
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible-dark.css" media="(prefers-color-scheme: dark)" />
+
 <style data-category="stork">
   #stork-search-container {
     z-index: 1000;
@@ -66,10 +68,10 @@
             });
           } else {
             // This section is called during Ema's hot reload.
-            // 
+            //
             // Mark the current index as stale, and refresh it *only when* the
             // user actually invokes search.
-            // 
+            //
             // We do not refresh the index *right away*, as that will cause
             // memory leaks in the browser. See
             // https://github.com/srid/emanote/issues/411#issuecomment-1402056235
