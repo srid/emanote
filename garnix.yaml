@@ -1,7 +1,0 @@
-# Only building to provide package cache
-builds:
-  include:
-    - "packages.aarch64-darwin.default"
-    - "packages.x86_64-linux.default"
-  exclude: []
-  branch: master
