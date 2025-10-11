@@ -2638,6 +2638,50 @@ gantt
     Add another diagram to demo page    :48h
 ```
 
+### Layout
+Modify the layout via the config `layout`.
+The [elk layouts](https://www.npmjs.com/package/@mermaid-js/layout-elk) are supported.
+
+~~~markdown
+```mermaid
+---
+config:
+  layout: elk
+---
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+~~~
+
+```mermaid
+---
+config:
+  layout: elk
+---
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+The same graph with `dagre` layout:
+
+```mermaid
+---
+config:
+  layout: dagre
+---
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
 
 ===
 
