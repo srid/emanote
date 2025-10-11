@@ -8,9 +8,14 @@ on:
 
 jobs:
   flake-parts-docs:
-    runs-on: x86_64-linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+      - name: Install Omnix
+        run: |
+          nix profile install nixpkgs#omnix
       - name: Docs for flake.parts
         run: |
           # TODO: Define this in Vira or make it part of our flake?
@@ -18,9 +23,14 @@ jobs:
 
   website:
     if: github.ref == 'refs/heads/master'
-    runs-on: x86_64-linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+      - name: Install Omnix
+        run: |
+          nix profile install nixpkgs#omnix
       - name: Docs static site
         id: docs
         run: |
