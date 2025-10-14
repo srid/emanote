@@ -79,13 +79,7 @@
           muslHaskellPackages = muslPkgs.haskell.packages.ghc98;
         in
         muslHaskellPackages.callCabal2nix "emanote"
-          (builtins.toString (lib.fileset.toSource {
-            inherit root;
-            fileset = lib.fileset.unions [
-              (root + /emanote)
-              (root + /cabal.project)
-            ];
-          }))
+          (root + /emanote)
           {
             stork = muslPkgs.stork;
           }
