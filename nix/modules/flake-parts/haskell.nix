@@ -76,7 +76,7 @@
       if pkgs.stdenv.isLinux then
         let
           muslPkgs = pkgs.pkgsMusl;
-          muslHaskellPackages = muslPkgs.haskell.packages.ghc98;
+          muslHaskellPackages = muslPkgs.haskellPackages;
         in
         muslHaskellPackages.callCabal2nix "emanote"
           (root + /emanote)
