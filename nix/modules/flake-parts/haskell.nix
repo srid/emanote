@@ -81,7 +81,7 @@
         muslHaskellPackages.callCabal2nix "emanote"
           (root + /emanote)
           {
-            stork = muslPkgs.stork;
+            # stork = muslPkgs.stork;
           }
       else
         config.packages.emanote;
