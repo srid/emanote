@@ -70,6 +70,28 @@
     };
 
     packages.default = config.packages.emanote;
+
+    # Static binary built with musl (Linux only)
+    packages.emanote-static =
+      if pkgs.stdenv.isLinux then
+        let
+          muslPkgs = pkgs.pkgsMusl;
+          muslHaskellPackages = muslPkgs.haskell.packages.ghc98;
+        in
+        muslHaskellPackages.callCabal2nix "emanote"
+          (builtins.toString (lib.fileset.toSource {
+            inherit root;
+            fileset = lib.fileset.unions [
+              (root + /emanote)
+              (root + /cabal.project)
+            ];
+          }))
+          {
+            stork = muslPkgs.stork;
+          }
+      else
+        config.packages.emanote;
+
     apps.default = config.apps.emanote;
   };
 }
