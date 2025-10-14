@@ -22,6 +22,9 @@ fmt:
 run:
   ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L {{notebook}} run --port=9010"
 
+ghcid:
+  ghcid --outputfile=ghcid.log -c 'cabal repl exe:emanote --flags=ghcid' --warnings
+
 # Run tests (with auto-reload / recompile)
 test:
     ghcid -c "cabal repl test:test --flags=ghcid" --warnings -T :main

@@ -6,3 +6,5 @@ result-*
 /.claude/*.local.*
 
 /.pre-commit-config.yaml
+
+/ghcid.log
