@@ -27,7 +27,7 @@
         unionmount.source = inputs.unionmount;
         commonmark-simple.source = inputs.commonmark-simple;
         commonmark-wikilink.source = inputs.commonmark-wikilink;
-        fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
+        # fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
         ghcid.source = "0.8.8";
         heist-extra.source = inputs.heist-extra;
 
@@ -41,7 +41,7 @@
         attoparsec.check = false;
         # Haskell packages in nixpkgs are often broken in many ways; ergo,
         # it is our responsibility to fix them here.
-        fsnotify.check = false;
+        # fsnotify.check = false;
         heist.broken = false;
         ixset-typed.broken = false;
         ixset-typed.jailbreak = true;
@@ -72,18 +72,34 @@
 
     packages.default = config.packages.emanote;
 
-    # Static binary built with musl (Linux only)
+    # Static binary (Linux only)
     packages.emanote-static =
       if pkgs.stdenv.isLinux then
-        let
-          muslPkgs = pkgs.pkgsMusl;
-          muslHaskellPackages = muslPkgs.haskellPackages;
-        in
-        muslHaskellPackages.callCabal2nix "emanote"
-          (root + /emanote)
-          {
-            # stork = muslPkgs.stork;
-          }
+        pkgs.haskell.lib.overrideCabal
+          (pkgs.haskellPackages.callCabal2nix "emanote" (root + /emanote) {})
+          (_drv: {
+            isLibrary = false;
+            isExecutable = true;
+            enableSharedExecutables = false;
+            enableSharedLibraries = false;
+            configureFlags = [
+              "--ghc-option=-split-sections"
+              "--ghc-option=-optl=-static"
+              "--ghc-option=-optl=-lbz2"
+              "--ghc-option=-optl=-lz"
+              "--ghc-option=-optl=-lelf"
+              "--ghc-option=-optl=-llzma"
+              "--ghc-option=-optl=-lzstd"
+              "--extra-lib-dirs=${pkgs.glibc.static}/lib"
+              "--extra-lib-dirs=${pkgs.gmp6.override { withStatic = true; }}/lib"
+              "--extra-lib-dirs=${pkgs.zlib.static}/lib"
+              "--extra-lib-dirs=${(pkgs.xz.override { enableStatic = true; }).out}/lib"
+              "--extra-lib-dirs=${(pkgs.zstd.override { enableStatic = true; }).out}/lib"
+              "--extra-lib-dirs=${(pkgs.bzip2.override { enableStatic = true; }).out}/lib"
+              "--extra-lib-dirs=${(pkgs.elfutils.overrideAttrs (old: { dontDisableStatic = true; })).out}/lib"
+              "--extra-lib-dirs=${pkgs.libffi.overrideAttrs (old: { dontDisableStatic = true; })}/lib"
+            ];
+          })
       else
         config.packages.emanote;
 
