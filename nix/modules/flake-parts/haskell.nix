@@ -76,7 +76,7 @@
     packages.emanote-static =
       if pkgs.stdenv.isLinux then
         pkgs.haskell.lib.overrideCabal
-          (pkgs.haskellPackages.callCabal2nix "emanote" (root + /emanote) {})
+          (pkgs.haskellPackages.callCabal2nix "emanote" (root + /emanote) { })
           (_drv: {
             isLibrary = false;
             isExecutable = true;
