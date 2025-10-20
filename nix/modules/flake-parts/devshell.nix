@@ -6,7 +6,6 @@
           name = "emanote-dev";
           inputsFrom = [
             config.haskellProjects.default.outputs.devShell
-            config.pre-commit.devShell
           ];
           packages = with pkgs; [
             just
