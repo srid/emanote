@@ -42,6 +42,7 @@
         # Haskell packages in nixpkgs are often broken in many ways; ergo,
         # it is our responsibility to fix them here.
         # fsnotify.check = false;
+	typst.check = false;
         heist.broken = false;
         ixset-typed.broken = false;
         ixset-typed.jailbreak = true;
