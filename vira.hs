@@ -2,6 +2,7 @@
 \ctx pipeline ->
   let isMaster = ctx.branch == "master"
   in pipeline
-    { signoff.enable = True
+    { build.systems = [ "x86_64-linux", "aarch64-darwin" ]
+    , signoff.enable = True
     , cache.url = if isMaster then Just "https://cache.nixos.asia/oss" else Nothing
     }
