@@ -43,7 +43,7 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/ini.min.js'></script>
   
   
-  <link href='tailwind.css?instanceId=5fba51fa-4a99-4886-a7c7-4f0511f5256c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -1016,7 +1016,7 @@
 
 
     <p class='mb-3'>
-      <a href='https://github.com/mickael-menu/zk' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk</code></a> is a command-line tool for working with Zettelkasten projects. It focuses on being easy for automation and is generic in the sense that it does not lock in to only supporting a certain note taking tool, which makes it useful for <a href='https://obsidian.md/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Obsidian</a>, <a href='https://neuron.zettel.page/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, and Emanote notes collections.
+      <a href='https://github.com/mickael-menu/zk' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk</code></a> is a command-line tool for working with Zettelkasten projects. It focuses on being easy for automation and is generic in the sense that it does not lock in to only supporting a certain note taking tool, which makes it useful for <a href='https://obsidian.md/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Obsidian</a>, <a href='https://neuron.zettel.page/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, and Emanote notes collections.
     </p>
   
     <h2 id='configuring-repo' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
@@ -1034,13 +1034,13 @@
     </h2>
   
     <p class='mb-3'>
-      Inside your notes root folder (such as your repository root if you’re using Git), run the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk init</code> command:
+      Inside your notes root folder (such as your repository root if you’re using Git), run the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk init</code> command:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>zk init --no-input</code></pre></div>
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>zk init --no-input</code></pre></div>
     <p class='mb-3'>
-      Edit your newly created config file at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>.zk/config.toml</code> and change it to the following:
+      Edit your newly created config file at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>.zk/config.toml</code> and change it to the following:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='toml language-toml'># .zk/config.toml
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='toml language-toml'># .zk/config.toml
 
 [note]
 default-title = "untitled"
@@ -1069,13 +1069,13 @@ wiki-title = "hint"
 # Warn for dead links between notes.
 dead-link = "error"</code></pre></div>
     <p class='mb-3'>
-      There are a lot more configs available. Above only focuses on the minimal for configs related to Emanote integration. Full documentation of the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk</code> config file: <a href='https://github.com/mickael-menu/zk/blob/main/docs/config.md' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/mickael-menu/zk/blob/main/docs/config.md</a>
+      There are a lot more configs available. Above only focuses on the minimal for configs related to Emanote integration. Full documentation of the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk</code> config file: <a href='https://github.com/mickael-menu/zk/blob/main/docs/config.md' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/mickael-menu/zk/blob/main/docs/config.md</a>
     </p>
   
     <p class='mb-3'>
       Such as the editor and FZF settings:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='toml language-toml'>[tool]
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='toml language-toml'>[tool]
 
 # Default editor used to open notes. When not set, the EDITOR or VISUAL
 # environment variables are used.
@@ -1099,7 +1099,7 @@ fzf-preview = "bat -p --color always {-1}"</code></pre></div>
     </h2>
   
     <p class='mb-3'>
-      <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk</code> provides a LSP (Language Server Protocol) server to allow auto-completion when writing <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>[[wiki links]]</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>#tags</code>.
+      <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk</code> provides a LSP (Language Server Protocol) server to allow auto-completion when writing <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>[[wiki links]]</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>#tags</code>.
     </p>
   
     <p class='mb-3'>
@@ -1109,17 +1109,17 @@ fzf-preview = "bat -p --color always {-1}"</code></pre></div>
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <a href='https://github.com/mickael-menu/zk-nvim' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk-nvim</code></a> for <a href='vim' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neovim</a> 0.5+
+          <a href='https://github.com/mickael-menu/zk-nvim' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk-nvim</code></a> for <a href='vim' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Neovim</a> 0.5+
         </li>
       
         <li>
-          <a href='https://github.com/mickael-menu/zk-vscode' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk-vscode</code></a> for <a href='vscode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a>
+          <a href='https://github.com/mickael-menu/zk-vscode' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk-vscode</code></a> for <a href='vscode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Visual Studio Code</a>
         </li>
       
     </ul>
   
     <p class='mb-3'>
-      If you’re already using an editor plugin such as <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>coc.nvim</code>, or otherwise have a different editor that already supports LSP (such as SublimeText) then checkout <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>zk</code>’s <a href='https://github.com/mickael-menu/zk/blob/main/docs/editors-integration.md#editor-lsp-configurations' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Editor LSP configurations</a>
+      If you’re already using an editor plugin such as <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>coc.nvim</code>, or otherwise have a different editor that already supports LSP (such as SublimeText) then checkout <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>zk</code>’s <a href='https://github.com/mickael-menu/zk/blob/main/docs/editors-integration.md#editor-lsp-configurations' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Editor LSP configurations</a>
     </p>
   
   <div class='flex items-center justify-center mt-2'>
@@ -1254,7 +1254,7 @@ fzf-preview = "bat -p --color always {-1}"</code></pre></div>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.0'>
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
       <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>

@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=5fba51fa-4a99-4886-a7c7-4f0511f5256c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -1170,15 +1170,15 @@
 
 
     <p class='mb-3'>
-      Emanote’s layer system allows you to “merge” multiple notebook directories and treat them as if they were a single notebook directory. The <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>-L</code> option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.
+      Emanote’s layer system allows you to “merge” multiple notebook directories and treat them as if they were a single notebook directory. The <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>-L</code> option in the command line accepts layers, and you can specify multiple of them with the leftmost taking the most precedence.
     </p>
   
     <p class='mb-3'>
       For example,
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>emanote -L ./docs1:./docs2 run</code></pre></div>
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>emanote -L ./docs1:./docs2 run</code></pre></div>
     <p class='mb-3'>
-      Internally, Emanote merges both <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> folders and treats them as a single directory. Thus, both <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> can contain the same file, and the one in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> will take precedence.
+      Internally, Emanote merges both <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> folders and treats them as a single directory. Thus, both <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> can contain the same file, and the one in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> will take precedence.
     </p>
   
     <h2 id='default-layer' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
@@ -1196,7 +1196,7 @@
     </h2>
   
     <p class='mb-3'>
-      Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='html-template' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='html-template' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>template/hooks</code></a> of this documentation notbook.
+      Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='html-template' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='html-template' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>template/hooks</code></a> of this documentation notbook.
     </p>
   
     <h2 id='merge-semantics' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
@@ -1214,7 +1214,7 @@
     </h2>
   
     <p class='mb-3'>
-      The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code> that overrides only a subset of the default configuration.
+      The default merge semantic is to replace with the file on the right layer. For some file types, special merge semantic applies. For example, <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML files</a> are merged by deep merge, not file-level replacement. This is what allows you to create <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code> that overrides only a subset of the default configuration.
     </p>
   
     <h2 id='mount-point' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
@@ -1255,9 +1255,9 @@
   </div>
 </div>
     <p class='mb-3'>
-      Layers can be mounted at a specific path. For example, if you want to mount <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>/D1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>/D2</code>, you can do so with:
+      Layers can be mounted at a specific path. For example, if you want to mount <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs1</code> at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>/D1</code> and <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>docs2</code> at <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>/D2</code>, you can do so with:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>emanote -L ./docs1@D1;./docs2@D2 run</code></pre></div>
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>emanote -L ./docs1@D1;./docs2@D2 run</code></pre></div>
     <p class='mb-3'>
       When two layers are mounted at distinct mount points it becomes impossible for there to be overlaps. This is useful to host sub-sites under a single site, such as in <a href='https://github.com/flake-parts/community.flake.parts' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>this case</a>.
     </p>
@@ -1476,7 +1476,7 @@
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.0'>
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
       <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>

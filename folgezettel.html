@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=5fba51fa-4a99-4886-a7c7-4f0511f5256c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -1190,7 +1190,7 @@
 
 
     </h2>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='markdown language-markdown'>## A folgezettel link from another page to this one:
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='markdown language-markdown'>## A folgezettel link from another page to this one:
 
 Here is the #[[source-note]]
 
@@ -1212,7 +1212,7 @@ Here is the [[target-note]]#</code></pre></div>
     </h2>
   
     <p class='mb-3'>
-      By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.
+      By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.
     </p>
   <div data-callout-metadata data-callout-fold data-callout='note' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #086DD320'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
@@ -1239,9 +1239,9 @@ Here is the [[target-note]]#</code></pre></div>
   </div>
 </div>
     <p class='mb-3'>
-      This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>your configuration</a> to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>false</code> as shown here:
+      This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>your configuration</a> to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>false</code> as shown here:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='yaml language-yaml'>emanote:
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='yaml language-yaml'>emanote:
   # Whether to automatically treat the contents of this 
   # folder note as its folgezettel children
   folder-folgezettel: false</code></pre></div><div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #08BFBC20'>
@@ -1263,7 +1263,7 @@ Here is the [[target-note]]#</code></pre></div>
   <div class='callout-content dark:text-gray-200'>
     
     <p class='mb-3'>
-      Put this configuration in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a> <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>foo/</code>. Put it in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>foo.yaml</code> if you want to disable it for <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>foo/</code> and all subfolders under it recursively. Put it in top-level <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code> to disable it for all folders. See <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.
+      Put this configuration in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>folder note</a> <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>foo/</code>. Put it in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>foo.yaml</code> if you want to disable it for <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>foo/</code> and all subfolders under it recursively. Put it in top-level <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code> to disable it for all folders. See <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.
     </p>
   
   </div>
@@ -1497,7 +1497,7 @@ Here is the [[target-note]]#</code></pre></div>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.0'>
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
       <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>

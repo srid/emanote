@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=5fba51fa-4a99-4886-a7c7-4f0511f5256c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -660,11 +660,11 @@
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source</code>: manages source files and communicates them to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source</code>: manages source files and communicates them to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>.
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The key concept here is the notion of “union mount”, implemented by <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
+          The key concept here is the notion of “union mount”, implemented by <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
         </li>
       
     </ul>
@@ -672,11 +672,11 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          The individual modules in this package should be <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>import</code>ed separately to use the specific model types.
+          The individual modules in this package should be <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>import</code>ed separately to use the specific model types.
         </li>
       
     </ul>
@@ -684,15 +684,15 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route</code>: Route types
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route</code>: Route types
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
         </li>
       
     </ul>
@@ -700,19 +700,19 @@
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
         </li>
       
     </ul>
@@ -728,11 +728,11 @@
     <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Model</code> in sync with what’s on disk
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Model</code> in sync with what’s on disk
         </li>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View.render</code> which, whilst querying the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>Model</code>, is responsible for producing the final HTML for every <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>SiteRoute</code> in the target website.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Emanote.View.render</code> which, whilst querying the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>Model</code>, is responsible for producing the final HTML for every <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>SiteRoute</code> in the target website.
         </li>
       
     </ul>
@@ -744,7 +744,7 @@
     <ul class='my-3 ml-6 space-y-1 list-disc'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>./default</code>: The primary and first “<a href='layer' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>./default</code>: The primary and first “<a href='layer' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
         </li>
       
     </ul>
@@ -828,7 +828,7 @@
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.0'>
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
       <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>

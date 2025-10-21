@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=5fba51fa-4a99-4886-a7c7-4f0511f5256c' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
 
@@ -1188,13 +1188,13 @@
     </h2>
   
     <p class='mb-3'>
-      The metadata of all content (<a href='markdown' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>JSON</code> using one of the following means:
+      The metadata of all content (<a href='markdown' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>JSON</code> using one of the following means:
     </p>
   
     <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>emanote export metadata</code>: a CLI command that dumps the JSON export to stdout.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>emanote export metadata</code>: a CLI command that dumps the JSON export to stdout.
         </li>
       
         <li>
@@ -1224,7 +1224,7 @@
     <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
       
         <li>
-          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>emanote export content</code>: a CLI command that dumps the content export to stdout.
+          <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>emanote export content</code>: a CLI command that dumps the content export to stdout.
         </li>
       
         <li>
@@ -1248,7 +1248,7 @@
         </li>
       
         <li>
-          Optional URLs (when <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>page.siteUrl</code> is configured in your notebook)
+          Optional URLs (when <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>page.siteUrl</code> is configured in your notebook)
         </li>
       
         <li>
@@ -1286,9 +1286,9 @@
     </h3>
   
     <p class='mb-3'>
-      Here are some examples of running <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>emanote export metadata</code>. These commands are run on the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono'>./docs</code> directory of the Emanote source repository.
+      Here are some examples of running <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>emanote export metadata</code>. These commands are run on the <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>./docs</code> directory of the Emanote source repository.
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>git clone https://github.com/srid/emanote.git
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>git clone https://github.com/srid/emanote.git
 cd ./emanote/docs</code></pre></div>
     <h4 id='get-the-list-of-files' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-2xl'>
       
@@ -1303,7 +1303,7 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ emanote export metadata | jq .files | jq keys
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>$ emanote export metadata | jq .files | jq keys
 [
   "architecture.md",
   "demo.md",
@@ -1325,7 +1325,7 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="architecture.md")'   
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="architecture.md")'   
 {
   "filePath": "architecture.md",
   "links": [],
@@ -1355,7 +1355,7 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
 "demo/neuron-layout"
 "demo/yaml-config"
 "demo/yaml-config"
@@ -1374,7 +1374,7 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
 [
   "emanote/dev",
   "emanote/syntax/demo",
@@ -1396,7 +1396,7 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-0.5 mb-3 text-sm font-mono'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select( any( .meta.tags[]; . == "external" ))'   
+  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select( any( .meta.tags[]; . == "external" ))'   
 {
   "filePath": "examples.md",
   "links": [],
@@ -1663,7 +1663,7 @@ cd ./emanote/docs</code></pre></div>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.0'>
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
       <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
