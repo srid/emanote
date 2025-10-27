@@ -1,3 +1,3 @@
-<div class="py-0.5 mb-3 text-sm" title="${ema:alt}">
-  <pre class="bg-gray-50 dark:bg-gray-900"><code class="${ema:code:language} text-gray-900 dark:text-gray-100" ><ema:code:content /></code></pre>
+<div class="mb-6" title="${ema:alt}">
+  <pre class="py-4 pr-4 text-sm font-mono rounded-lg overflow-x-auto"><code class="${ema:code:language}"><ema:code:content /></code></pre>
 </div>

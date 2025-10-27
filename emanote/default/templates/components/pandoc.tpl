@@ -1,8 +1,8 @@
 <bind tag="clickable-icon">
-  <a href="${ema:note:url}#${header:id}" class="--ema-anchor">
+  <a href="${ema:note:url}#${header:id}" class="--ema-anchor ml-2">
     <span
-      class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
-      aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
+      class="text-gray-400 hover:text-${theme}-500 dark:hover:text-${theme}-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
+      aria-label="Copy link" title="Copy link to heading"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -16,11 +16,15 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200</bind>
+<bind tag="h2-class">group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800</bind>
+<bind tag="h3-class">group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h4-class">group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h5-class">group mt-6 mb-3 font-semibold text-gray-800 dark:text-gray-100</bind>
+<bind tag="h6-class">group mt-6 mb-3 font-semibold text-gray-700 dark:text-gray-200</bind>
 
 <ema:note:pandoc>
   <Para>
-    <p class="mb-3">
+    <p class="mb-4 leading-relaxed">
       <inlines />
     </p>
   </Para>
@@ -42,7 +46,7 @@
   </Cite>
   <BlockQuote>
     <blockquote
-      class="py-0.5 px-4 mb-3 italic border-l-4 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-400 dark:border-gray-600 quote">
+      class="py-3 px-6 mb-6 italic border-l-4 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 quote rounded-r-lg">
       <blocks />
     </blockquote>
   </BlockQuote>
@@ -89,7 +93,7 @@
   </Note:List>
 
   <BulletList>
-    <ul class="my-3 ml-6 space-y-1 list-disc">
+    <ul class="my-4 ml-6 space-y-2 list-disc leading-relaxed">
       <BulletList:Items>
         <li>
           <BulletList:Item />
@@ -98,7 +102,7 @@
     </ul>
   </BulletList>
   <OrderedList>
-    <ul class="my-3 ml-6 space-y-1 list-decimal list-inside">
+    <ul class="my-4 ml-6 space-y-2 list-decimal list-inside leading-relaxed">
       <OrderedList:Items>
         <li>
           <OrderedList:Item />
@@ -107,43 +111,43 @@
     </ul>
   </OrderedList>
   <HorizontalRule>
-    <hr class="mb-3" />
+    <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-    <Internal class="font-semibold hover:underline" />
-    <External class="hover:underline" target="_blank" rel="noopener" />
+    <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
+    <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
-  <Code class="py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono" />
+  <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
+  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]" />
 
   <Header:1>
-    <h1 id="${header:id}" class="${header-class} text-5xl">
+    <h1 id="${header:id}" class="group mt-12 mb-8 font-bold text-gray-900 dark:text-gray-50 text-5xl">
       <heading-inlines-with-anchor />
     </h1>
   </Header:1>
   <Header:2>
-    <h2 id="${header:id}" class="${header-class} text-4xl">
+    <h2 id="${header:id}" class="${h2-class} text-4xl">
       <heading-inlines-with-anchor />
     </h2>
   </Header:2>
   <Header:3>
-    <h3 id="${header:id}" class="${header-class} text-3xl">
+    <h3 id="${header:id}" class="${h3-class} text-3xl">
       <heading-inlines-with-anchor />
     </h3>
   </Header:3>
   <Header:4>
-    <h4 id="${header:id}" class="${header-class} text-2xl">
+    <h4 id="${header:id}" class="${h4-class} text-2xl">
       <heading-inlines-with-anchor />
     </h4>
   </Header:4>
   <Header:5>
-    <h5 id="${header:id}" class="${header-class} text-xl">
+    <h5 id="${header:id}" class="${h5-class} text-xl">
       <heading-inlines-with-anchor />
     </h5>
   </Header:5>
   <Header:6>
-    <h6 id="${header:id}" class="${header-class} text-lg">
+    <h6 id="${header:id}" class="${h6-class} text-lg">
       <heading-inlines-with-anchor />
     </h6>
   </Header:6>

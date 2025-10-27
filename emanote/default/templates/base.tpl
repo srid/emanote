@@ -41,7 +41,7 @@
 
 <!-- DoNotFormat -->
 <bind tag="theme"><ema:metadata><value var="template.theme" /></ema:metadata></bind>
-<bind tag="iconSize">w-4 h-4 flex-shrink-0</bind>
+<bind tag="iconSize">w-5 h-5 flex-shrink-0</bind>
 <bind tag="bodyClass"><ema:metadata><value var="template.base.bodyClass" /></ema:metadata></bind>
 <!-- DoNotFormat -->
 

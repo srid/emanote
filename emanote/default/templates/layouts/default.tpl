@@ -15,17 +15,17 @@
   <bind tag="head-main">
     <style>
       /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-48  */
+      /* md:min-w-52  */
       @media (min-width: 768px) {
         #sidebar {
-          min-width: 12rem;
+          min-width: 13rem;
         }
       }
 
-      /* xl:min-w-64  */
+      /* xl:min-w-72  */
       @media (min-width: 1280px) {
         #sidebar {
-          min-width: 16rem;
+          min-width: 18rem;
         }
       }
     </style>
@@ -47,14 +47,14 @@
 
       <ema:has:sidebar>
         <div id="container"
-          class="flex flex-nowrap flex-col md:flex-row bg-gray-50 dark:bg-gray-800 md:shadow-2xl md:mb-8">
+          class="flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
           <!-- Sidebar column -->
           <apply template="components/sidebar" />
           <!-- Main body column -->
           <apply template="components/body" />
         </div>
         <else />
-        <div id="container" class="relative md:shadow-2xl md:mb-8">
+        <div id="container" class="relative md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
           <storkSearchButtonTopRight />
           <!-- Main body column -->
           <apply template="components/body" />
