@@ -4,7 +4,7 @@
     <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2">On this page</h3>
     <ema:note:toc>
       <Toc>
-        <ul class="space-y-1">
+        <ul class="space-y-1 ml-2">
           <toc:entry>
             <li class="truncate" title="${toc:title}">
               <a href="${ema:note:url}#${toc:anchor}"
