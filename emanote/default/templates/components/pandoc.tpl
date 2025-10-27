@@ -114,7 +114,7 @@
     <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900 transition-all" />
     <External class="underline decoration-1 hover:decoration-2 transition-all" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-4 px-4 mb-6 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto shadow-inner" />
+  <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
   <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-sm" />
 
   <Header:1>
