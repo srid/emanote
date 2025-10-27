@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/fonts/maven-pro.css" />
-
 <style data-category="global-font">
   /* Refined typography with system font stack */
   body {
