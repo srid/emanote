@@ -1,5 +1,6 @@
-<footer class="flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200">
-  <bind tag="iconClass">w-6 h-6 hover:text-${theme}-700 dark:hover:text-${theme}-300</bind>
+<footer class="flex items-center justify-center mt-10 mb-10">
+  <div class="inline-flex items-center justify-center space-x-6 px-8 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+    <bind tag="iconClass">w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-${theme}-600 dark:hover:text-${theme}-400 hover:bg-${theme}-50 dark:hover:bg-${theme}-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5</bind>
   <div>
     <ema:metadata>
       <with var="template">
@@ -46,5 +47,6 @@
           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     </a>
+  </div>
   </div>
 </footer>
