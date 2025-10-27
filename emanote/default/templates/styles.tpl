@@ -174,18 +174,23 @@
       button.className = 'code-copy-button';
       button.innerHTML = copyIcon;
       button.setAttribute('aria-label', 'Copy code to clipboard');
+      button.setAttribute('title', 'Copy code');
 
       button.addEventListener('click', function() {
         const text = codeBlock.textContent;
         navigator.clipboard.writeText(text).then(function() {
           button.innerHTML = checkIcon;
+          button.setAttribute('title', 'Copied!');
           setTimeout(function() {
             button.innerHTML = copyIcon;
+            button.setAttribute('title', 'Copy code');
           }, 2000);
         }).catch(function(err) {
           console.error('Copy failed:', err);
+          button.setAttribute('title', 'Copy failed');
           setTimeout(function() {
             button.innerHTML = copyIcon;
+            button.setAttribute('title', 'Copy code');
           }, 2000);
         });
       });
