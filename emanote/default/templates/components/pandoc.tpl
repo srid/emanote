@@ -114,8 +114,8 @@
     <Internal class="hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-4 px-4 mb-6 text-sm font-mono bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-800 overflow-x-auto" />
-  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono rounded text-sm" />
+  <CodeBlock class="py-4 px-4 mb-6 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto shadow-inner" />
+  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-sm" />
 
   <Header:1>
     <h1 id="${header:id}" class="${header-class} text-5xl">

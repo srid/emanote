@@ -85,6 +85,16 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  /* Code block enhancements */
+  pre {
+    position: relative;
+  }
+
+  pre code {
+    display: block;
+    line-height: 1.6;
+  }
 </style>
 
 <style data-category="external-link">
