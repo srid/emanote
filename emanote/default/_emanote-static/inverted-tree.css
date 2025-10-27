@@ -58,6 +58,10 @@ body .tree li::before {
   height: 1.19999em;
 }
 
+.dark body .tree li::before {
+  border-top-color: #4b5563;
+}
+
 body .tree li::after {
   content: "";
   position: absolute;
@@ -68,10 +72,18 @@ body .tree li::after {
   height: 1.19999em;
 }
 
+.dark body .tree li::after {
+  border-top-color: #4b5563;
+}
+
 body .tree li::after {
   right: auto;
   left: 50%;
   border-left: solid 2px #d1d5db;
+}
+
+.dark body .tree li::after {
+  border-left-color: #4b5563;
 }
 
 body .tree li:only-child {
@@ -105,6 +117,10 @@ body .tree li:last-child::before {
   border-radius: 0px 6px 0px 0px;
 }
 
+.dark body .tree li:last-child::before {
+  border-right-color: #4b5563;
+}
+
 body .tree ul ul::before {
   content: "";
   position: absolute;
@@ -115,21 +131,29 @@ body .tree ul ul::before {
   height: 1.19999em;
 }
 
+.dark body .tree ul ul::before {
+  border-left-color: #4b5563;
+}
+
 body .tree li div.forest-link {
   border: solid 1px #d1d5db;
   padding: 0.4em 0.6em 0.4em 0.6em;
   text-decoration: none;
   display: inline-block;
-  border-radius: 8px 8px 8px 8px;
+  border-radius: 8px;
   position: relative;
   top: 2px;
-  background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease;
 }
 
+/* Dark mode borders */
+.dark body .tree li div.forest-link {
+  border-color: #4b5563;
+}
+
 body .tree li div.forest-link:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
 }
 
