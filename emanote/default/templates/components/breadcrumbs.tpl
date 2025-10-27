@@ -1,7 +1,7 @@
 <nav id="breadcrumbs" class="w-full text-gray-700 dark:text-gray-300 md:hidden">
   <div class="flex justify-left">
-    <div class="w-full px-2 py-2 bg-gray-50 dark:bg-gray-800">
-      <ul class="flex flex-wrap text-lg">
+    <div class="w-full px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <ul class="flex flex-wrap text-base">
         <li class="inline-flex items-center">
           <ema:metadata>
             <with var="template">
@@ -25,12 +25,12 @@
         </ema:breadcrumbs>
       </ul>
     </div>
-    <button class="inline px-2 py-1 bg-gray-50 dark:bg-gray-800 outline-none cursor-pointer focus:outline-none"
+    <button class="inline px-3 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 outline-none cursor-pointer focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       title="Search (Ctrl+K)" type="button" onclick="window.emanote.stork.toggleSearch()">
       <apply template="stork/stork-icon" />
     </button>
     <button
-      class="inline px-2 py-1 text-white bg-${theme}-600 dark:bg-${theme}-700 outline-none cursor-pointer focus:outline-none"
+      class="inline px-3 py-2 text-white bg-${theme}-600 dark:bg-${theme}-700 outline-none cursor-pointer focus:outline-none hover:bg-${theme}-700 dark:hover:bg-${theme}-800 transition-colors"
       title="Toggle sidebar" type="button" onclick="toggleHidden('sidebar')">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">

@@ -16,11 +16,11 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200</bind>
+<bind tag="header-class">group mt-8 mb-6 font-bold text-gray-900 dark:text-gray-50</bind>
 
 <ema:note:pandoc>
   <Para>
-    <p class="mb-3">
+    <p class="mb-4 leading-relaxed">
       <inlines />
     </p>
   </Para>
@@ -42,7 +42,7 @@
   </Cite>
   <BlockQuote>
     <blockquote
-      class="py-0.5 px-4 mb-3 italic border-l-4 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-400 dark:border-gray-600 quote">
+      class="py-3 px-6 mb-6 italic border-l-4 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 quote rounded-r-lg">
       <blocks />
     </blockquote>
   </BlockQuote>
@@ -89,7 +89,7 @@
   </Note:List>
 
   <BulletList>
-    <ul class="my-3 ml-6 space-y-1 list-disc">
+    <ul class="my-4 ml-6 space-y-2 list-disc leading-relaxed">
       <BulletList:Items>
         <li>
           <BulletList:Item />
@@ -98,7 +98,7 @@
     </ul>
   </BulletList>
   <OrderedList>
-    <ul class="my-3 ml-6 space-y-1 list-decimal list-inside">
+    <ul class="my-4 ml-6 space-y-2 list-decimal list-inside leading-relaxed">
       <OrderedList:Items>
         <li>
           <OrderedList:Item />
@@ -107,15 +107,15 @@
     </ul>
   </OrderedList>
   <HorizontalRule>
-    <hr class="mb-3" />
+    <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-    <Internal class="font-semibold hover:underline" />
+  <PandocLink class="text-${theme}-600 dark:text-${theme}-400 font-medium">
+    <Internal class="hover:underline" />
     <External class="hover:underline" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100" />
-  <Code class="py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono" />
+  <CodeBlock class="py-4 px-4 mb-6 text-sm font-mono bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-200 dark:border-gray-800 overflow-x-auto" />
+  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono rounded text-sm" />
 
   <Header:1>
     <h1 id="${header:id}" class="${header-class} text-5xl">

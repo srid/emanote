@@ -15,14 +15,14 @@ template:
   # Base settings for our default layout.
   base:
     # The class to apply for <body> element when
-    bodyClass: bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll
+    bodyClass: bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-50 overflow-y-scroll
     containerClass: container mx-auto
   error:
     containerClass: container mx-auto max-w-prose
   uptree:
     enable: false
     # Class to apply for uptree's nodes
-    nodeClass: text-gray-900 dark:text-gray-100 hover:bg-${theme}-500 hover:text-white cursor-pointer
+    nodeClass: text-gray-900 dark:text-gray-50 hover:bg-${theme}-500 hover:text-white cursor-pointer transition-colors duration-150
   # List of available colors: https://tailwindcss.com/docs/customizing-colors#default-color-palette
   theme: blue
   # Value of the <base> tag.
@@ -53,19 +53,19 @@ pandoc:
   # Markdown text, especially when using Tailwind.
   rewriteClass:
     # How to style inline tags. Tag-specific styles can be applied as well.
-    emanote:inline-tag: font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-0.5 px-2 rounded-lg
+    emanote:inline-tag: font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm
     # This style is used by `#a/red/tag` in addition to the generic style above.
     # As this class comes *after* the generic class, it can override the styles
     # in the generic class.
-    emanote:inline-tag:a/red/tag: bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
-    emanote:placeholder-message: text-gray-400 dark:text-gray-500 border-t-2 border-gray-200 dark:border-gray-700 inline-block pt-0.5
-    emanote:error: text-l bg-red-100 p-2 border-2 border-black m-2 font-mono
+    emanote:inline-tag:a/red/tag: bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300
+    emanote:placeholder-message: text-gray-400 dark:text-gray-500 border-t-2 border-gray-200 dark:border-gray-800 inline-block pt-1
+    emanote:error: text-l bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
     # You can also add your own class -> style mappings. We provide a sample below.
-    sticky-note: px-3 py-1 rounded shadow bg-yellow-100 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-lg border-t-8 border-yellow-200 mb-8 mt-8
-    note: p-2 mb-3 rounded shadow bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full float-none md:float-right md:w-1/2 md:clear-both
-    highlight-block: px-3 py-1 mb-3 rounded bg-${theme}-100 hover:border-${theme}-400 hover:shadow border-t-8 border-${theme}-200
-    highlight-inline: bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-xl
+    sticky-note: px-4 py-3 rounded-lg shadow-md bg-yellow-50 dark:bg-yellow-900 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-xl border-l-4 border-yellow-400 mb-8 mt-8 transition-all duration-200
+    note: p-4 mb-4 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 w-full float-none md:float-right md:w-1/2 md:clear-both border border-gray-200 dark:border-gray-800
+    highlight-block: px-4 py-3 mb-4 rounded-lg bg-${theme}-50 dark:bg-${theme}-950 hover:border-${theme}-400 hover:shadow-md border-l-4 border-${theme}-400 transition-all duration-200
+    highlight-inline: bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md
     center: flex justify-center items-center mx-auto
 
 # Put page-specific metadata here. Override them in Markdown frontmatter or
