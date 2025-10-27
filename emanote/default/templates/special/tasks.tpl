@@ -18,7 +18,7 @@
                 </t:note:breadcrumbs>
 
                 <div class="flex-1">
-                  <a class="font-bold text-${theme}-700 dark:text-${theme}-300 hover:underline" href="${t:note:url}">
+                  <a class="font-bold text-${theme}-700 dark:text-${theme}-300" href="${t:note:url}">
                     <t:note:title />
                   </a>
                 </div>
@@ -31,7 +31,7 @@
                       <apply template="/templates/components/checkbox-unchecked">
                         <task:description>
                           <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-                            <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
+                            <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
                             <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
                           </PandocLink>
                           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />

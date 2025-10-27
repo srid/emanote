@@ -5,7 +5,7 @@
     <ul class="space-y-2">
       <backlink>
         <li>
-          <a class="text-${theme}-600 dark:text-${theme}-400 bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900 inline-block"
+          <a class="text-${theme}-600 dark:text-${theme}-400 bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900 inline-block"
             href="${backlink:note:url}">
             <backlink:note:title />
           </a>

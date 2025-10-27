@@ -115,7 +115,7 @@
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
   <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-    <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
+    <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
     <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
