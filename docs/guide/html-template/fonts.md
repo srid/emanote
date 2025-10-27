@@ -4,7 +4,7 @@ slug: fonts
 
 # Fonts and Typography
 
-Emanote uses **Maven Pro** as the default font family throughout the site. The font files are self-hosted in the [[layer|default layer]] to keep sites self-contained. If you want to customize the typography:
+Emanote uses a **system font stack** as the default font family throughout the site. This provides excellent performance and native appearance across all platforms without requiring any font downloads. If you want to customize the typography:
 
 ## Changing the Font Family
 
@@ -12,7 +12,7 @@ To use a different font, create a `templates/styles.tpl` file in your notebook a
 
 ```html
 <style data-category="global-font">
-  /* Replace Maven Pro with your preferred font */
+  /* Replace system fonts with your preferred font */
   body {
     font-family: 'Your Font Name', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
@@ -37,11 +37,23 @@ Create `templates/styles.tpl` with both the font import and the styling:
 
 ## Self-hosting Custom Fonts {#custom}
 
-To self-host your own fonts like Maven Pro:
+To self-host your own fonts:
 
 1. Create a `_emanote-static/fonts/` directory in your notebook
 2. Add your font files (`.ttf`, `.woff2`, etc.)
-3. Create a CSS file with `@font-face` declarations
-4. Import it in your `templates/styles.tpl`
+3. Create `templates/styles.tpl` with `@font-face` declarations:
 
-See the [Maven Pro font setup](https://github.com/srid/emanote/tree/master/emanote/default/_emanote-static/fonts) in the default layer for reference.
+```html
+<style data-category="custom-fonts">
+  @font-face {
+    font-family: 'YourFont';
+    src: url('${ema:emanoteStaticLayerUrl}/fonts/YourFont.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  body {
+    font-family: 'YourFont', sans-serif;
+  }
+</style>
+```
