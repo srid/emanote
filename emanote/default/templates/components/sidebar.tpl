@@ -1,5 +1,5 @@
 <nav id="sidebar"
-  class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 xl:w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800">
+  class="flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 xl:w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800">
   <div class="px-4 py-5 text-gray-800 dark:text-gray-200">
     <div class="flex items-center justify-between mb-4">
       <div id="site-logo" class="flex items-center space-x-2.5 min-w-0">

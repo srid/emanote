@@ -1,4 +1,4 @@
-<div class="flex-1 w-full bg-white dark:bg-gray-900 shadow-sm">
+<div class="flex-1 w-full bg-white dark:bg-gray-900">
   <main class="px-6 py-8 max-w-7xl mx-auto">
     <apply template="note-title" />
     <ema:has:toc>
@@ -6,7 +6,7 @@
         <div class="md:col-span-6">
           <apply template="note-body" />
         </div>
-        <div class="hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6">
+        <div class="hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6 md:bg-gray-50/50 dark:md:bg-gray-950/50 md:-mr-6 md:pr-6 md:-my-8 md:py-8">
           <apply template="toc" />
         </div>
       </div>
