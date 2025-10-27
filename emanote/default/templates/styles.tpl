@@ -63,6 +63,26 @@
   a.--ema-toc {
     background-color: transparent !important;
   }
+
+  /* Active TOC item styling */
+  a.--ema-toc.toc-item-active {
+    font-weight: 600;
+    border-left: 3px solid #3b82f6;
+    padding-left: calc(0.5rem - 3px) !important;
+  }
+
+  /* Light mode active state */
+  a.--ema-toc.toc-item-active {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+  }
+
+  /* Dark mode active state */
+  .dark a.--ema-toc.toc-item-active {
+    background-color: #172554 !important;
+    color: #93c5fd !important;
+    border-left-color: #3b82f6;
+  }
 </style>
 
 <style data-category="global-improvements">

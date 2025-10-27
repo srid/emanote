@@ -1,11 +1,11 @@
 <!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
+<bind tag="link-class">hover:bg-${theme}-50 dark:hover:bg-${theme}-950 hover:text-${theme}-700 dark:hover:text-${theme}-300 transition-colors</bind>
 <node:active>
-  <bind tag="link-class">font-bold bg-${theme}-100 dark:bg-${theme}-800 hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
+  <bind tag="link-class">font-semibold bg-${theme}-50 dark:bg-${theme}-950 text-${theme}-700 dark:text-${theme}-300 hover:bg-${theme}-100 dark:hover:bg-${theme}-900 transition-colors</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">font-bold hover:bg-${theme}-200 dark:hover:bg-${theme}-700</bind>
+      <bind tag="link-class">font-semibold hover:bg-${theme}-50 dark:hover:bg-${theme}-950 hover:text-${theme}-700 dark:hover:text-${theme}-300 transition-colors</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>
@@ -51,13 +51,13 @@
 <!-- Rendering of this tree -->
 <div class="pl-2">
   <!-- Node's rootLabel-->
-  <div class="flex items-center my-2 space-x-2 justify-left">
-    <span>
+  <div class="flex items-center my-1.5 space-x-2 justify-left">
+    <span class="flex-shrink-0">
       <tree:open>
         <icon />
         <else />
         <has-children>
-          <a href="${node:url}" title="View folgezettel children">
+          <a href="${node:url}" title="View folgezettel children" class="hover:opacity-70 transition-opacity">
             <icon />
           </a>
           <else />
@@ -65,14 +65,14 @@
         </has-children>
       </tree:open>
     </span>
-    <a class="${link-class} rounded px-1.5 truncate" title="${node:text}" href="${node:url}">
+    <a class="${link-class} rounded-md px-2 py-1 truncate flex-1" title="${node:text}" href="${node:url}">
       <node:text />
     </a>
     <tree:open>
       <else />
       <node:terminal>
         <else />
-        <span class="text-gray-300 dark:text-gray-600" title="${tree:childrenCount} children inside">
+        <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0" title="${tree:childrenCount} children inside">
           <tree:childrenCount />
         </span>
       </node:terminal>
