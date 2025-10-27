@@ -86,11 +86,6 @@
 </style>
 
 <style data-category="global-improvements">
-  /* Smooth transitions for interactive elements */
-  a, button {
-    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-  }
-
   /* Link improvements */
   a {
     text-decoration-thickness: 1px;
