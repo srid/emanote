@@ -119,16 +119,22 @@
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    padding: 0.375rem 0.75rem;
+    padding: 0.5rem;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 600;
     color: #374151;
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.15s ease, background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .code-copy-button svg {
+    width: 1rem;
+    height: 1rem;
   }
 
   .dark .code-copy-button {
@@ -157,26 +163,29 @@
 <script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
+    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
+    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+
     document.querySelectorAll('pre code').forEach(function(codeBlock) {
       const pre = codeBlock.parentElement;
 
       // Create copy button
       const button = document.createElement('button');
       button.className = 'code-copy-button';
-      button.textContent = 'Copy';
+      button.innerHTML = copyIcon;
       button.setAttribute('aria-label', 'Copy code to clipboard');
 
       button.addEventListener('click', function() {
         const text = codeBlock.textContent;
         navigator.clipboard.writeText(text).then(function() {
-          button.textContent = 'Copied!';
+          button.innerHTML = checkIcon;
           setTimeout(function() {
-            button.textContent = 'Copy';
+            button.innerHTML = copyIcon;
           }, 2000);
         }).catch(function(err) {
-          button.textContent = 'Failed';
+          console.error('Copy failed:', err);
           setTimeout(function() {
-            button.textContent = 'Copy';
+            button.innerHTML = copyIcon;
           }, 2000);
         });
       });
