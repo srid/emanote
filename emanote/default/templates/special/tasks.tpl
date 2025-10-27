@@ -31,8 +31,8 @@
                       <apply template="/templates/components/checkbox-unchecked">
                         <task:description>
                           <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-                            <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900 transition-all" />
-                            <External class="underline decoration-1 hover:decoration-2 transition-all" target="_blank" rel="noopener" />
+                            <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
+                            <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
                           </PandocLink>
                           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
                           <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
