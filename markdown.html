@@ -43,14 +43,21 @@
 
   
   
-  <link href='tailwind.css?instanceId=d0f9472e-4090-4a36-8d87-ea2d141c9b25' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=46048681-f3ba-4a7d-8d41-63a4ec1029fb' rel='stylesheet' type='text/css' />
 
-  <link rel='stylesheet' href='_emanote-static/fonts/maven-pro.css' />
-
-<style data-category='global-font'>
-  /* Maven Pro font for the entire site */
+  <style data-category='global-font'>
+  /* Refined typography with system font stack */
   body {
-    font-family: 'Maven Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    font-weight: 700;
   }
 </style>
 
@@ -67,25 +74,26 @@
 <style data-category='kbd'>
   /* <kbd> styling */
   kbd {
-    background-color: #eee;
-    border-radius: 3px;
-    border: 1px solid #b4b4b4;
+    background-color: #f7f7f7;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
     box-shadow:
-      0 1px 1px rgba(0, 0, 0, 0.2),
-      0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      0 2px 0 0 rgba(255, 255, 255, 0.8) inset;
     display: inline-block;
-    line-height: 1;
-    padding: 2px 4px;
+    line-height: 1.2;
+    padding: 3px 6px;
     white-space: nowrap;
+    font-size: 0.9em;
   }
-  
+
   /* Dark mode kbd styling */
   .dark kbd {
     background-color: #374151;
-    border: 1px solid #6b7280;
+    border: 1px solid #4b5563;
     box-shadow:
-      0 1px 1px rgba(0, 0, 0, 0.4),
-      0 2px 0 0 rgba(255, 255, 255, 0.1) inset;
+      0 1px 2px rgba(0, 0, 0, 0.4),
+      0 2px 0 0 rgba(255, 255, 255, 0.08) inset;
     color: #f3f4f6;
   }
 </style>
@@ -102,7 +110,137 @@
   a.--ema-toc {
     background-color: transparent !important;
   }
+
+  /* Active TOC item styling */
+  a.--ema-toc.toc-item-active {
+    font-weight: 600;
+    border-left: 3px solid #3b82f6;
+    padding-left: calc(0.5rem - 3px) !important;
+  }
+
+  /* Light mode active state */
+  a.--ema-toc.toc-item-active {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+  }
+
+  /* Dark mode active state */
+  .dark a.--ema-toc.toc-item-active {
+    background-color: #172554 !important;
+    color: #93c5fd !important;
+    border-left-color: #3b82f6;
+  }
 </style>
+
+<style data-category='global-improvements'>
+  /* Link improvements */
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* Focus states for accessibility */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Code block enhancements */
+  pre {
+    position: relative;
+  }
+
+  pre code {
+    display: block;
+    line-height: 1.6;
+  }
+
+  /* Copy button for code blocks */
+  .code-copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    color: #374151;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .code-copy-button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .dark .code-copy-button {
+    background: rgba(31, 41, 55, 0.9);
+    border-color: #4b5563;
+    color: #d1d5db;
+  }
+
+  pre:hover .code-copy-button {
+    opacity: 1;
+  }
+
+  .code-copy-button:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .dark .code-copy-button:hover {
+    background: rgba(31, 41, 55, 1);
+  }
+
+  .code-copy-button:active {
+    transform: scale(0.95);
+  }
+</style>
+
+<script>
+  // Add copy buttons to code blocks
+  document.addEventListener('DOMContentLoaded', function() {
+    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
+    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+
+    document.querySelectorAll('pre code').forEach(function(codeBlock) {
+      const pre = codeBlock.parentElement;
+
+      // Create copy button
+      const button = document.createElement('button');
+      button.className = 'code-copy-button';
+      button.innerHTML = copyIcon;
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+      button.setAttribute('title', 'Copy code');
+
+      button.addEventListener('click', function() {
+        const text = codeBlock.textContent;
+        navigator.clipboard.writeText(text).then(function() {
+          button.innerHTML = checkIcon;
+          button.setAttribute('title', 'Copied!');
+          setTimeout(function() {
+            button.innerHTML = copyIcon;
+            button.setAttribute('title', 'Copy code');
+          }, 2000);
+        }).catch(function(err) {
+          console.error('Copy failed:', err);
+          button.setAttribute('title', 'Copy failed');
+          setTimeout(function() {
+            button.innerHTML = copyIcon;
+            button.setAttribute('title', 'Copy code');
+          }, 2000);
+        });
+      });
+
+      pre.appendChild(button);
+    });
+  });
+</script>
 
 <style data-category='external-link'>
   /* External link icon */
@@ -186,17 +324,17 @@
   
     <style>
       /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-48  */
+      /* md:min-w-52  */
       @media (min-width: 768px) {
         #sidebar {
-          min-width: 12rem;
+          min-width: 13rem;
         }
       }
 
-      /* xl:min-w-64  */
+      /* xl:min-w-72  */
       @media (min-width: 1280px) {
         #sidebar {
-          min-width: 16rem;
+          min-width: 18rem;
         }
       }
     </style>
@@ -311,7 +449,7 @@
 
 <!-- DoNotFormat -->
 
-<body class='bg-gray-400 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-y-scroll'>
+<body class='bg-gray-200 dark:bg-black text-gray-900 dark:text-gray-50 overflow-y-scroll'>
   
     <div class='container mx-auto md:mt-8 '>
       
@@ -319,8 +457,8 @@
       
         <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden'>
   <div class='flex justify-left'>
-    <div class='w-full px-2 py-2 bg-gray-50 dark:bg-gray-800'>
-      <ul class='flex flex-wrap text-lg'>
+    <div class='w-full px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'>
+      <ul class='flex flex-wrap text-base'>
         <li class='inline-flex items-center'>
           
             
@@ -351,13 +489,13 @@
         
       </ul>
     </div>
-    <button class='inline px-2 py-1 bg-gray-50 dark:bg-gray-800 outline-none cursor-pointer focus:outline-none' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
+    <button class='inline px-3 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 outline-none cursor-pointer focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-2 py-1 text-white bg-blue-600 dark:bg-blue-700 outline-none cursor-pointer focus:outline-none' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+    <button class='inline px-3 py-2 text-white bg-blue-600 dark:bg-blue-700 outline-none cursor-pointer focus:outline-none hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
       <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
@@ -372,47 +510,47 @@
       
 
       
-        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-gray-50 dark:bg-gray-800 md:shadow-2xl md:mb-8'>
+        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800'>
           <!-- Sidebar column -->
-          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-48 xl:w-64'>
-  <div class='px-2 py-2 text-gray-800 dark:text-gray-200'>
-    <div id='indexing-links' class='flex flex-row float-right p-2 space-x-2 text-gray-500 dark:text-gray-400'>
-      <a href='-/tags' title='View tags'>
-        <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
-          </path>
-        </svg>
-      </a>
-      <a href='-/all' title='Expand full tree'>
-        <svg style='width: 1rem;' class='hover:text-blue-700' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'>
-          </path>
-        </svg>
-      </a>
-      <button title='Search (Ctrl+K)' class='cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
-        <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
- fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
-  <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
-</svg>
-      </button>
-    </div>
-
-    <div id='site-logo' class='pl-2'>
-      <div class='flex items-center my-2 space-x-2 justify-left'>
+          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 xl:w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
+  <div class='px-4 py-5 text-gray-800 dark:text-gray-200'>
+    <div class='flex items-center justify-between mb-4'>
+      <div id='site-logo' class='flex items-center space-x-2.5 min-w-0'>
         
           
-            <a href='/' title='Go to Home'>
+            <a href='/' title='Go to Home' class='flex-shrink-0'>
               <!-- The style width attribute here is to prevent huge
                       icon from displaying at those rare occasions when Tailwind
-                      hasn't kicked in immediately on page load 
+                      hasn't kicked in immediately on page load
                       -->
-              <img style='width: 1rem;' class='transition transform hover:scale-110 hover:opacity-80' src='favicon.svg' alt='Site Icon' />
+              <img style='width: 1.25rem;' class='transition transform hover:scale-110 hover:opacity-80' src='favicon.svg' alt='Site Icon' />
             </a>
-            <a class='font-bold truncate' title='Go to Home' href='/'>
+            <a class='font-semibold text-base truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors' title='Go to Home' href='/'>
               Home
             </a>
           
         
+      </div>
+
+      <div id='indexing-links' class='flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0'>
+        <a href='-/tags' title='View tags' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors'>
+          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
+            </path>
+          </svg>
+        </a>
+        <a href='-/all' title='Expand full tree' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors'>
+          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'>
+            </path>
+          </svg>
+        </a>
+        <button title='Search (Ctrl+K)' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
+          <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-blue-700' f
+ fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
+  <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
+</svg>
+        </button>
       </div>
     </div>
 
@@ -429,14 +567,14 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
-          <a href='start' title='View folgezettel children'>
+          <a href='start' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -445,12 +583,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Getting Started' href='start'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start'>
       Getting Started
     </a>
     
       
-        <span class='text-gray-300 dark:text-gray-600' title='4 children inside'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
           4
         </span>
       
@@ -479,19 +617,19 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
         
     </span>
-    <a class='font-bold hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Guide' href='guide'>
+    <a class='font-semibold hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
       Guide
     </a>
     
@@ -515,19 +653,19 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-4 h-4 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
       </svg>
       
   
         
     </span>
-    <a class='font-bold bg-blue-100 dark:bg-blue-800 hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Markdown ✍️' href='markdown'>
+    <a class='font-semibold bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
@@ -551,13 +689,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -566,7 +704,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Callouts' href='callout'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Callouts' href='callout'>
       Callouts
     </a>
     
@@ -593,13 +731,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -608,7 +746,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Custom CSS styling' href='custom-style'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Custom CSS styling' href='custom-style'>
       Custom CSS styling
     </a>
     
@@ -635,13 +773,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -650,7 +788,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Embedding' href='embed'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Embedding' href='embed'>
       Embedding
     </a>
     
@@ -677,13 +815,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -692,7 +830,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='File WikiLinks' href='file-links'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='File WikiLinks' href='file-links'>
       File WikiLinks
     </a>
     
@@ -722,13 +860,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -737,7 +875,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='YAML configuration' href='yaml-config'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config'>
       YAML configuration
     </a>
     
@@ -764,13 +902,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -779,7 +917,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Queries' href='query'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query'>
       Queries
     </a>
     
@@ -806,13 +944,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -821,7 +959,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Daily Notes' href='daily-notes'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
       Daily Notes
     </a>
     
@@ -848,13 +986,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -863,7 +1001,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Export' href='export'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export'>
       Export
     </a>
     
@@ -890,13 +1028,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -905,7 +1043,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='ATOM feed' href='feed'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
@@ -932,13 +1070,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -947,7 +1085,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Folder notes' href='folder-note'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note'>
       Folder notes
     </a>
     
@@ -974,13 +1112,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -989,7 +1127,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Folgezettel links' href='folgezettel'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel'>
       Folgezettel links
     </a>
     
@@ -1016,14 +1154,14 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
-          <a href='html-template' title='View folgezettel children'>
+          <a href='html-template' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -1032,12 +1170,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='HTML Templates' href='html-template'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template'>
       HTML Templates
     </a>
     
       
-        <span class='text-gray-300 dark:text-gray-600' title='10 children inside'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='10 children inside'>
           10
         </span>
       
@@ -1062,13 +1200,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -1077,7 +1215,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Layer system' href='layer'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer'>
       Layer system
     </a>
     
@@ -1104,13 +1242,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -1119,7 +1257,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Lua Filters' href='lua-filters'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -1146,13 +1284,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -1161,7 +1299,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Org Mode ✍️' href='guide/orgmode'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode'>
       Org Mode ✍️
     </a>
     
@@ -1191,14 +1329,14 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
-          <a href='tips' title='View folgezettel children'>
+          <a href='tips' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
         <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
@@ -1207,12 +1345,12 @@
           
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Tips' href='tips'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
       Tips
     </a>
     
       
-        <span class='text-gray-300 dark:text-gray-600' title='3 children inside'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
           3
         </span>
       
@@ -1237,13 +1375,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -1252,7 +1390,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Examples' href='examples'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples'>
       Examples
     </a>
     
@@ -1279,13 +1417,13 @@
 <!-- Rendering of this tree -->
 <div class='pl-2'>
   <!-- Node's rootLabel-->
-  <div class='flex items-center my-2 space-x-2 justify-left'>
-    <span>
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
         
           
     
-      <svg class='w-4 h-4 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
         </path>
       </svg>
@@ -1294,7 +1432,7 @@
         
       
     </span>
-    <a class='hover:bg-blue-200 dark:hover:bg-blue-700 rounded px-1.5 truncate' title='Architecture' href='architecture'>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Architecture' href='architecture'>
       Architecture
     </a>
     
@@ -1314,14 +1452,12 @@
 </nav>
           <!-- Main body column -->
           <div class='flex-1 w-full bg-white dark:bg-gray-800'>
-  <main class='px-4 py-4'>
-    <h1 class='flex items-end justify-center mb-4 p-3 bg-blue-100 dark:bg-blue-800 text-5xl font-extrabold text-black dark:text-white rounded'>
-  <span class='z-40 tracking-tighter '>
-    Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-  </span>
+  <main class='px-6 py-8 max-w-7xl mx-auto'>
+    <h1 class='mb-10 px-8 py-5 bg-blue-600 dark:bg-blue-800 text-5xl font-bold text-white text-center rounded-2xl'>
+  Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
 </h1>
     
-      <div class='md:grid md:gap-4 md:grid-cols-8'>
+      <div class='md:grid md:gap-8 md:grid-cols-8'>
         <div class='md:col-span-6'>
           <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
@@ -1332,16 +1468,20 @@
 
 
 
-    <p class='mb-3'>
-      Emanote notes are primarily written in <strong>Markdown</strong> format, but <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a> is also supported in a basic form. A tutorial is <a href='https://commonmark.org/help/tutorial/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>available here</a>. Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
+
+
+
+
+    <p class='mb-4 leading-relaxed'>
+      Emanote notes are primarily written in <strong>Markdown</strong> format, but <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a> is also supported in a basic form. A tutorial is <a href='https://commonmark.org/help/tutorial/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>available here</a>. Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
     </p>
   
-    <h2 id='wikilink' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='wikilink' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Wiki Links
   
-  <a href='markdown#wikilink' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#wikilink' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1350,16 +1490,16 @@
 
     </h2>
   
-    <p class='mb-3'>
-      You can link to a note by placing the filename (without extension) inside double square brackets. For example, <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>[[neuron]]</code> links to the file <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>neuron.md</code> and it will be rendered as <a href='neuron' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Migrating from neuron</a>. Note that it is using the title of the note automatically; you can specify a custom title as <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>[[neuron|Moving off neuron]]</code> which renders as <a href='neuron' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Moving off neuron</a> or even force use of filename with <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>[[neuron|neuron]]</code> which renders as <a href='neuron' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>neuron</a>.
+    <p class='mb-4 leading-relaxed'>
+      You can link to a note by placing the filename (without extension) inside double square brackets. For example, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>[[neuron]]</code> links to the file <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>neuron.md</code> and it will be rendered as <a href='neuron' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Migrating from neuron</a>. Note that it is using the title of the note automatically; you can specify a custom title as <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>[[neuron|Moving off neuron]]</code> which renders as <a href='neuron' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Moving off neuron</a> or even force use of filename with <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>[[neuron|neuron]]</code> which renders as <a href='neuron' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>neuron</a>.
     </p>
   
-    <h3 id='structural-links' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='structural-links' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Structural links
   
-  <a href='markdown#structural-links' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#structural-links' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1368,16 +1508,16 @@
 
     </h3>
   
-    <p class='mb-3'>
-      See <a href='folgezettel' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a> for a special type of wiki-link used to define the <a href='sidebar' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Sidebar</a> (and <a href='uptree' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>) heirarchy.
+    <p class='mb-4 leading-relaxed'>
+      See <a href='folgezettel' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a> for a special type of wiki-link used to define the <a href='sidebar' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a> (and <a href='uptree' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>) heirarchy.
     </p>
   
-    <h3 id='anchors' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='anchors' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Anchors
   
-  <a href='markdown#anchors' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#anchors' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1386,16 +1526,16 @@
 
     </h3>
   
-    <p class='mb-3'>
-      Wiki-links <a href='https://github.com/srid/emanote/discussions/105' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>do not yet</a> support anchor links, but they work for regular links (<a href='markdown#lists' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline'>example link</a>).
+    <p class='mb-4 leading-relaxed'>
+      Wiki-links <a href='https://github.com/srid/emanote/discussions/105' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>do not yet</a> support anchor links, but they work for regular links (<a href='markdown#lists' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900'>example link</a>).
     </p>
   
-    <h3 id='broken-links' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='broken-links' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Broken links
   
-  <a href='markdown#broken-links' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#broken-links' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1404,16 +1544,16 @@
 
     </h3>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Broken links render differently, for example: <span title='Link is broken'><s>[[Foo bar]]</s>❌</span> (if a wiki-link) or <span title='Link is broken'><s>[Foo bar](foo-bar.md)</s>❌</span> (if a regular Markdown link).
     </p>
   
-    <h3 id='ambiguous-links' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='ambiguous-links' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Ambiguous links
   
-  <a href='markdown#ambiguous-links' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#ambiguous-links' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1422,7 +1562,7 @@
 
     </h3>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.
     <sup class='px-0.5'>
       <a class='text-blue-600 dark:text-blue-400 hover:underline' href='markdown#fn1'>
@@ -1432,12 +1572,12 @@
   
     </p>
   
-    <h2 id='emojis' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='emojis' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Emojis
   
-  <a href='markdown#emojis' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#emojis' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1446,24 +1586,24 @@
 
     </h2>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       <span class='emoji' data-emoji='smile' style='font-family: emoji'>😄</span>
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       <span class='emoji' data-emoji='runner' style='font-family: emoji'>🏃</span> <span class='emoji' data-emoji='ant' style='font-family: emoji'>🐜</span>
     </p>
   
-    <p class='mb-3'>
-      See <a href='https://gist.github.com/rxaviers/7360908' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>list of available emojis</a> for reference.
+    <p class='mb-4 leading-relaxed'>
+      See <a href='https://gist.github.com/rxaviers/7360908' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>list of available emojis</a> for reference.
     </p>
   
-    <h2 id='footnotes' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='footnotes' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Footnotes
   
-  <a href='markdown#footnotes' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#footnotes' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1472,11 +1612,11 @@
 
     </h2>
   
-    <p class='mb-3'>
-      <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md</a>
+    <p class='mb-4 leading-relaxed'>
+      <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/footnotes.md</a>
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Demo: Checkout this note
     <sup class='px-0.5'>
       <a class='text-blue-600 dark:text-blue-400 hover:underline' href='markdown#fn2'>
@@ -1498,12 +1638,12 @@
    footnotes.
     </p>
   
-    <h2 id='tasks' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='tasks' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Task lists
   
-  <a href='markdown#tasks' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#tasks' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1512,7 +1652,7 @@
 
     </h2>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           
@@ -1543,7 +1683,7 @@
     <svg xmlns='http://www.w3.org/2000/svg' class='inline h-4 w-4 mb-1 text-gray-600 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='3' x='2' y='2' width='24' height='24' rx='3'></rect></svg>
 <span>
   
-      Task with <em>Markdown</em> and links (eg: <a href='lua-filters' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>)
+      Task with <em>Markdown</em> and links (eg: <a href='lua-filters' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>)
     
 </span>
 
@@ -1556,11 +1696,11 @@
       
     </ul>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Tasks can also be written outside of list context, such as paragraphs:
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       
     <svg xmlns='http://www.w3.org/2000/svg' class='inline h-4 w-4 mb-1 text-gray-600 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='3' x='2' y='2' width='24' height='24' rx='3'></rect></svg>
 <span>
@@ -1572,7 +1712,7 @@
   
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       
     <!-- FIXME: Fix list styling to use flexbox, so task lists don't botch them up -->
     <svg xmlns='http://www.w3.org/2000/svg' class='inline h-4 w-4 mb-1 text-gray-600 stroke-current fill-current' viewBox='0 0 28 28'><desc>☑</desc><rect stroke-width='3' x='2' y='2' width='24' height='24' rx='3'></rect><path stroke='white' fill='none' stroke-linejoin='round' stroke-width='3.5' d='M7 14 l6 5L22 8'></path></svg>
@@ -1584,16 +1724,16 @@
   
     </p>
   
-    <p class='mb-3'>
-      Unchecked tasks will appear in the task index available at <a href='-/tasks' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline'>/-/tasks</a>.
+    <p class='mb-4 leading-relaxed'>
+      Unchecked tasks will appear in the task index available at <a href='-/tasks' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900'>/-/tasks</a>.
     </p>
   
-    <h2 id='dl' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='dl' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Definition lists
   
-  <a href='markdown#dl' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#dl' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1602,8 +1742,8 @@
 
     </h2>
   
-    <p class='mb-3'>
-      <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md</a>
+    <p class='mb-4 leading-relaxed'>
+      <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/definition_lists.md</a>
     </p>
   
     <dl class='flex flex-col mb-3'>
@@ -1660,12 +1800,12 @@
       
     </dl>
   
-    <h2 id='lists' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='lists' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Lists
   
-  <a href='markdown#lists' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#lists' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1674,11 +1814,11 @@
 
     </h2>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Simple lists,
     </p>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           Apple
@@ -1694,11 +1834,11 @@
       
     </ul>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Lists with sub-lists,
     </p>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           Muscle meat
@@ -1706,7 +1846,7 @@
       
         <li>
           Offal
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           Liver
@@ -1722,7 +1862,7 @@
       
         <li>
           Misc
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           Bone Marrow
@@ -1742,27 +1882,27 @@
       
     </ul>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       List items can contain multiple block elements (eg: paragraph),
     </p>
   
-    <ul class='my-3 ml-6 space-y-1 list-disc'>
+    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
       
         <li>
           
-    <p class='mb-3'>
-      <a href='https://www.diagnosisdiet.com/full-article/meat' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Meat</a> is the only nutritionally complete food
+    <p class='mb-4 leading-relaxed'>
+      <a href='https://www.diagnosisdiet.com/full-article/meat' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Meat</a> is the only nutritionally complete food
     </p>
   
         </li>
       
         <li>
           
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Animal foods contain all of the protein, fat, vitamins and minerals that humans need to function.
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       They contain absolutely everything we need in just the right proportions.
     </p>
   
@@ -1770,7 +1910,7 @@
       
         <li>
           
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       In contrast to vegetables, meat does not contain any “anti-nutrients”
     </p>
   
@@ -1778,11 +1918,11 @@
       
     </ul>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Ordered lists,
     </p>
   
-    <ul class='my-3 ml-6 space-y-1 list-decimal list-inside'>
+    <ul class='my-4 ml-6 space-y-2 list-decimal list-inside leading-relaxed'>
       
         <li>
           Be happy
@@ -1798,12 +1938,12 @@
       
     </ul>
   
-    <h2 id='tables' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='tables' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Tables
   
-  <a href='markdown#tables' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#tables' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1811,17 +1951,17 @@
 
 
     </h2>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Category</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Favourite</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Web Browser</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://brave.com/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Brave</a></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Search Engine</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://search.brave.com/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Brave Search</a></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Chat</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://element.io/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Element</a></td></tr></tbody></table>
-    <p class='mb-3'>
-      (Note that wiki links with a custom text must have their <a href='https://github.com/srid/emanote/issues/113#issuecomment-894808721' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>pipe escaped</a> when used inside tables.)
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Category</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Favourite</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Web Browser</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://brave.com/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Brave</a></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Search Engine</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://search.brave.com/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Brave Search</a></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Chat</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://element.io/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Element</a></td></tr></tbody></table>
+    <p class='mb-4 leading-relaxed'>
+      (Note that wiki links with a custom text must have their <a href='https://github.com/srid/emanote/issues/113#issuecomment-894808721' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>pipe escaped</a> when used inside tables.)
     </p>
   
-    <h2 id='hash-tags' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='hash-tags' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Hash Tags
   
-  <a href='markdown#hash-tags' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#hash-tags' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1830,16 +1970,16 @@
 
     </h2>
   
-    <p class='mb-3'>
-      Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML frontmatter</a>. Hash tags can also be “hierarchical”, for instance: <span class='font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-0.5 px-2 rounded-lg emanote:inline-tag:emanote/syntax/demo' title='Tag' data-tag='emanote/syntax/demo'><a href='-/tags/emanote/syntax/demo' title='Tag' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline'>#emanote/syntax/demo</a></span>
+    <p class='mb-4 leading-relaxed'>
+      Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML frontmatter</a>. Hash tags can also be “hierarchical”, for instance: <span class='font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm emanote:inline-tag:emanote/syntax/demo' title='Tag' data-tag='emanote/syntax/demo'><a href='-/tags/emanote/syntax/demo' title='Tag' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900'>#emanote/syntax/demo</a></span>
     </p>
   
-    <h2 id='highlighting' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='highlighting' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Highlighting
   
-  <a href='markdown#highlighting' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#highlighting' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1848,22 +1988,22 @@
 
     </h2>
   
-    <p class='mb-3'>
-      You can highlight any <span class='bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-xl'>inline text</span> by wraping them in <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>==</code> (ie. <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>==inline text==</code>).
+    <p class='mb-4 leading-relaxed'>
+      You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>==</code> (ie. <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>==inline text==</code>).
     <sup class='px-0.5'>
       <a class='text-blue-600 dark:text-blue-400 hover:underline' href='markdown#fn4'>
         4
       </a>
     </sup>
-   The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-xl'>🍓 give a <strong>distinction</strong> on top</span> of it all.
+   The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.
     </p>
   
-    <h2 id='callouts' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='callouts' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Callouts
   
-  <a href='markdown#callouts' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#callouts' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1872,14 +2012,14 @@
 
     </h2>
   
-    <p class='mb-3'>
-      See <a href='callout' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Callouts</a> for details.
+    <p class='mb-4 leading-relaxed'>
+      See <a href='callout' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Callouts</a> for details.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='note' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #086DD320'>
+  <div data-callout-metadata data-callout-fold data-callout='note' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #086DD310; border-left-color: #086DD3'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #086DD3'>
-    <div class='callout-icon'>
+  <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
+    <div class='callout-icon flex-shrink-0'>
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
         
     <line x1='18' y1='2' x2='22' y2='6'></line>
@@ -1887,28 +2027,28 @@
   
       </svg>
     </div>
-    <div class='ml-2'>
+    <div class='ml-3'>
       Note
     </div>
   </div>
-  <div class='callout-content dark:text-gray-200'>
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
     
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       This is a note callout
     </p>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     </p>
   
   </div>
 </div>
-    <h2 id='hanchor' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='hanchor' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Heading anchors
   
-  <a href='markdown#hanchor' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#hanchor' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1917,21 +2057,21 @@
 
     </h2>
   
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       You can use the following syntax to override the default heading anchors:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='markdown language-markdown'>{#head}
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>{#head}
 ## Some heading</code></pre></div>
-    <p class='mb-3'>
+    <p class='mb-4 leading-relaxed'>
       On default theme, an anchor is displayed when you hover on the heading allowing you to copy the link to the heading. Here are all heading levels for comparison:
     </p>
   
-    <h3 id='level-3' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='heading-level-3' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
-  Level 3
+  Heading <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>level</code> 3
   
-  <a href='markdown#level-3' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#heading-level-3' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1940,12 +2080,12 @@
 
     </h3>
   
-    <h4 id='level-4' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-2xl'>
+    <h4 id='heading-level-4' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
-  Level 4
+  Heading <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>level</code> 4
   
-  <a href='markdown#level-4' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#heading-level-4' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1954,12 +2094,12 @@
 
     </h4>
   
-    <h5 id='level-5' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-xl'>
+    <h5 id='heading-level-5' class='group mt-6 mb-3 font-semibold text-gray-800 dark:text-gray-100 text-xl'>
       
-  Level 5
+  Heading <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>level</code> 5
   
-  <a href='markdown#level-5' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#heading-level-5' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1968,12 +2108,12 @@
 
     </h5>
   
-    <h6 id='level-6' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-lg'>
+    <h6 id='heading-level-6' class='group mt-6 mb-3 font-semibold text-gray-700 dark:text-gray-200 text-lg'>
       
-  Level 6
+  Heading <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>level</code> 6
   
-  <a href='markdown#level-6' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#heading-level-6' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -1982,12 +2122,12 @@
 
     </h6>
   
-    <h2 id='more-extensions' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='more-extensions' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   More extensions
   
-  <a href='markdown#more-extensions' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='markdown#more-extensions' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -2009,16 +2149,20 @@
 
 
 
-    <p class='mb-3'>
-      In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as <a href='https://highlightjs.org/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>highlight.js</a> by adding it to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>page.headHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code> (assuming you are enabling it on all routes):
+
+
+
+
+    <p class='mb-4 leading-relaxed'>
+      In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as <a href='https://highlightjs.org/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>highlight.js</a> by adding it to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>page.headHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code> (assuming you are enabling it on all routes):
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='yaml language-yaml'>page:
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>page:
   headHtml: |
-    &lt;snippet var="js.highlightjs" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #EC750020'>
+    &lt;snippet var="js.highlightjs" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #EC750010; border-left-color: #EC7500'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
-    <div class='callout-icon'>
+  <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>
+    <div class='callout-icon flex-shrink-0'>
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
         
     <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
@@ -2027,33 +2171,33 @@
   
       </svg>
     </div>
-    <div class='ml-2'>
+    <div class='ml-3'>
       Warning
     </div>
   </div>
-  <div class='callout-content dark:text-gray-200'>
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
     
-    <p class='mb-3'>
-      Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and <a href='https://nixos.asia' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Nix</a> by default; otherwise, it is normally added as:
+    <p class='mb-4 leading-relaxed'>
+      Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and <a href='https://nixos.asia' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Nix</a> by default; otherwise, it is normally added as:
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='yaml language-yaml'>page:
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>page:
   headHtml: |
     &lt;snippet var="js.highlightjs" /&gt;
     &lt;with var="js"&gt;
     &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"&gt;&lt;/script&gt;
     &lt;/with&gt;</code></pre></div>
-    <p class='mb-3'>
-      (The <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>highlightjs-ver</code> variable comes from the default <a href='https://github.com/srid/emanote/blob/master/emanote/default/index.yaml' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>index.yaml</code></a>.)
+    <p class='mb-4 leading-relaxed'>
+      (The <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>highlightjs-ver</code> variable comes from the default <a href='https://github.com/srid/emanote/blob/master/emanote/default/index.yaml' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code></a>.)
     </p>
   
   </div>
 </div>
-    <h2 id='example-highlightjs' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='example-highlightjs' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Example (highlight.js)
   
-  <a href='syntax-highlighting#example-highlightjs' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='syntax-highlighting#example-highlightjs' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -2062,12 +2206,12 @@
 
     </h2>
   
-    <h3 id='python' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='python' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Python
   
-  <a href='syntax-highlighting#python' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='syntax-highlighting#python' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -2075,19 +2219,19 @@
 
 
     </h3>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='python language-python'>def fib(n):
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='python language-python'>def fib(n):
     a, b = 0, 1
     while a &lt; n:
         print(a, end=' ')
         a, b = b, a+b
     print()
 fib(1000)</code></pre></div>
-    <h3 id='haskell' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-3xl'>
+    <h3 id='haskell' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Haskell
   
-  <a href='syntax-highlighting#haskell' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='syntax-highlighting#haskell' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -2095,15 +2239,15 @@ fib(1000)</code></pre></div>
 
 
     </h3>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='haskell language-haskell'>fib 0 = 0
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='haskell language-haskell'>fib 0 = 0
 fib 1 = 1
 fib n = fib (n-1) + fib (n-2)</code></pre></div>
-    <h2 id='prism' class='group mt-6 mb-4 font-bold text-gray-700 dark:text-gray-200 text-4xl'>
+    <h2 id='prism' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Prism
   
-  <a href='syntax-highlighting#prism' class='--ema-anchor'>
-    <span class='hover:text-blue-400 group-hover:visible invisible cursor-pointer text-sm align-middle' aria-label='Copy link'><svg class='inline w-4' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+  <a href='syntax-highlighting#prism' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
       </svg></span>
@@ -2112,16 +2256,16 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
 
     </h2>
   
-    <p class='mb-3'>
-      A predefined snippet also exists for another syntax highlighter called <a href='https://prismjs.com/' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Prism</a>. To use it add the following to <code class='py-0.5 px-0.5 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-mono'>page.headHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
+    <p class='mb-4 leading-relaxed'>
+      A predefined snippet also exists for another syntax highlighter called <a href='https://prismjs.com/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Prism</a>. To use it add the following to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>page.headHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
     </p>
-  <div class='py-0.5 mb-3 text-sm font-mono bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'><pre><code class='yaml language-yaml'>page:
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>page:
   headHtml: |
-    &lt;snippet var="js.prism" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-10 bg-[#f5f5f5] dark:bg-gray-800 p-4 pt-4 pb-2 rounded-lg mb-4 border border-gray-200 dark:border-gray-700' role='note' style='background-color: #EC750020'>
+    &lt;snippet var="js.prism" /&gt;</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #EC750010; border-left-color: #EC7500'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
-  <div class='callout-title flex items-center mb-2 font-bold' style='color: #EC7500'>
-    <div class='callout-icon'>
+  <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>
+    <div class='callout-icon flex-shrink-0'>
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
         
     <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
@@ -2130,18 +2274,18 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
   
       </svg>
     </div>
-    <div class='ml-2'>
+    <div class='ml-3'>
        Prism does not cooperate well with Emanote’s live preview mode.
     </div>
   </div>
-  <div class='callout-content dark:text-gray-200'>
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
     
   </div>
 </div>
   </div>
 </section>
-    <p class='mb-3'>
-      <a href='mermaid' class='text-blue-600 dark:text-blue-400 font-semibold hover:underline' data-wikilink-type='WikiLinkNormal'>Mermaid Diagrams</a>
+    <p class='mb-4 leading-relaxed'>
+      <a href='mermaid' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Mermaid Diagrams</a>
     </p>
   </div>
     <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700'>
@@ -2152,7 +2296,7 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
             1.
           </header>
           <div class='inline-block mb-2 ml-4'>
-            This particular selection process <a href='https://github.com/srid/emanote/pull/498' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>was choosen</a> in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
+            This particular selection process <a href='https://github.com/srid/emanote/pull/498' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>was choosen</a> in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
           </div>
         </div>
       
@@ -2179,7 +2323,7 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
             4.
           </header>
           <div class='inline-block mb-2 ml-4'>
-            See original proposal for this syntax <a href='https://talk.commonmark.org/t/highlighting-text-with-the-mark-element/840' class='text-blue-600 dark:text-blue-400 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>here</a>.
+            See original proposal for this syntax <a href='https://talk.commonmark.org/t/highlighting-text-with-the-mark-element/840' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>here</a>.
           </div>
         </div>
       
@@ -2194,58 +2338,59 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
 </div>
 </article>
         </div>
-        <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-300 dark:md:border-gray-600'>
+        <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6 md:bg-gray-50/50 dark:md:bg-gray-950/50 md:-mr-6 md:pr-6 md:-my-8 md:py-8'>
           <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
-  <div class='text-gray-600 dark:text-gray-400 text-sm -mt-2'>
+  <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
+    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
     
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Wiki Links'>
-              <a href='markdown#wikilink' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Wiki Links'>
+              <a href='markdown#wikilink' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Wiki Links
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Structural links'>
-              <a href='markdown#structural-links' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Structural links'>
+              <a href='markdown#structural-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Structural links
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Anchors'>
-              <a href='markdown#anchors' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Anchors'>
+              <a href='markdown#anchors' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Anchors
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Broken links'>
-              <a href='markdown#broken-links' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Broken links'>
+              <a href='markdown#broken-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Broken links
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Ambiguous links'>
-              <a href='markdown#ambiguous-links' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Ambiguous links'>
+              <a href='markdown#ambiguous-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Ambiguous links
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
@@ -2255,139 +2400,139 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Emojis'>
-              <a href='markdown#emojis' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Emojis'>
+              <a href='markdown#emojis' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Emojis
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Footnotes'>
-              <a href='markdown#footnotes' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Footnotes'>
+              <a href='markdown#footnotes' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Footnotes
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Task lists'>
-              <a href='markdown#tasks' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Task lists'>
+              <a href='markdown#tasks' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Task lists
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Definition lists'>
-              <a href='markdown#dl' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Definition lists'>
+              <a href='markdown#dl' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Definition lists
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Lists'>
-              <a href='markdown#lists' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Lists'>
+              <a href='markdown#lists' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Lists
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Tables'>
-              <a href='markdown#tables' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Tables'>
+              <a href='markdown#tables' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Tables
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Hash Tags'>
-              <a href='markdown#hash-tags' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Hash Tags'>
+              <a href='markdown#hash-tags' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Hash Tags
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Highlighting'>
-              <a href='markdown#highlighting' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Highlighting'>
+              <a href='markdown#highlighting' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Highlighting
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Callouts'>
-              <a href='markdown#callouts' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Callouts'>
+              <a href='markdown#callouts' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Callouts
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Heading anchors'>
-              <a href='markdown#hanchor' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='Heading anchors'>
+              <a href='markdown#hanchor' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 Heading anchors
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Level 3'>
-              <a href='markdown#level-3' class='--ema-toc rounded-md p-0.5'>
-                Level 3
+            <li class='truncate' title='Heading level 3'>
+              <a href='markdown#heading-level-3' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Heading level 3
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Level 4'>
-              <a href='markdown#level-4' class='--ema-toc rounded-md p-0.5'>
-                Level 4
+            <li class='truncate' title='Heading level 4'>
+              <a href='markdown#heading-level-4' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Heading level 4
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Level 5'>
-              <a href='markdown#level-5' class='--ema-toc rounded-md p-0.5'>
-                Level 5
+            <li class='truncate' title='Heading level 5'>
+              <a href='markdown#heading-level-5' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Heading level 5
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
-            <li class='whitespace-nowrap truncate mt-2' title='Level 6'>
-              <a href='markdown#level-6' class='--ema-toc rounded-md p-0.5'>
-                Level 6
+            <li class='truncate' title='Heading level 6'>
+              <a href='markdown#heading-level-6' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Heading level 6
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
@@ -2409,12 +2554,12 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
       
             </li>
           
-            <li class='whitespace-nowrap truncate mt-2' title='More extensions'>
-              <a href='markdown#more-extensions' class='--ema-toc rounded-md p-0.5'>
+            <li class='truncate' title='More extensions'>
+              <a href='markdown#more-extensions' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
                 More extensions
               </a>
               
-        <ul class='ml-2'>
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
@@ -2480,22 +2625,22 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </div>
       </div>
       
-    <div class='flex flex-col lg:flex-row lg:space-x-2'>
+    <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
       
-  <div class='flex-1 p-4 mt-8 bg-gray-100 dark:bg-gray-700 rounded'>
-    <header class='mb-2 text-xl font-semibold text-gray-500 dark:text-gray-200'>Links to this page</header>
-    <ul class='space-y-1'>
+  <div class='flex-1 p-5 mt-8 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm'>
+    <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
+    <ul class='space-y-2'>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='vim'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='vim'>
             Vim
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p><a href='https://www.vim.org/' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Vim</a>, and its very popular fork <a href='https://neovim.io/' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Neovim</a>, are <a href='https://unix.stackexchange.com/a/57708' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>modal text editors</a> for editing plain text files. You can use it to edit <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown</a> files.</p></div>
+      <div><p><a href='https://www.vim.org/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Vim</a>, and its very popular fork <a href='https://neovim.io/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Neovim</a>, are <a href='https://unix.stackexchange.com/a/57708' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>modal text editors</a> for editing plain text files. You can use it to edit <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown</a> files.</p></div>
     </div>
   
 </div>
@@ -2503,14 +2648,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='guide/orgmode'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='guide/orgmode'>
             Org Mode ✍️
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>Emanote provides first-class support for <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600'>Markdown</a>. But it also supports secondary formats (albeit not necessarily with the same level of support) beginning with <a href='https://orgmode.org/' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Org Mode</a>. See Pandoc's <a href='https://pandoc.org/org.html' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Org section</a> for information on controlling the parsing.</p></div>
+      <div><p>Emanote provides first-class support for <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900'>Markdown</a>. But it also supports secondary formats (albeit not necessarily with the same level of support) beginning with <a href='https://orgmode.org/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Org Mode</a>. See Pandoc's <a href='https://pandoc.org/org.html' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Org section</a> for information on controlling the parsing.</p></div>
     </div>
   
 </div>
@@ -2518,14 +2663,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='nota'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='nota'>
             Nota
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p><a href='https://nota.md/' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>Nota</a> is a WIP macOS app for editing plain-text <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> files.</p></div>
+      <div><p><a href='https://nota.md/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Nota</a> is a WIP macOS app for editing plain-text <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> files.</p></div>
     </div>
   
 </div>
@@ -2533,14 +2678,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='markdown'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='markdown'>
             Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>Wiki-links <a href='https://github.com/srid/emanote/discussions/105' class='text-gray-600 dark:text-gray-200 hover:underline' data-linkicon='external' target='_blank' rel='noopener'>do not yet</a> support anchor links, but they work for regular links (<a href='markdown#lists' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600'>example link</a>).</p></div>
+      <div><p>Wiki-links <a href='https://github.com/srid/emanote/discussions/105' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>do not yet</a> support anchor links, but they work for regular links (<a href='markdown#lists' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900'>example link</a>).</p></div>
     </div>
   
 </div>
@@ -2548,14 +2693,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='guide'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='guide'>
             Guide
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>You probably want to start from <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>, then <a href='query' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> and thereon to <a href='yaml-config' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. See also <a href='js' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>JavaScript behaviours</a>.</p></div>
+      <div><p>You probably want to start from <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>, then <a href='query' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> and thereon to <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. See also <a href='js' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>JavaScript behaviours</a>.</p></div>
     </div>
   
 </div>
@@ -2563,14 +2708,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='external-links'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='external-links'>
             External links
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>Note that the attribute can also be used to display the icons in the <a href='html-template' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.</p></div>
+      <div><p>Note that the attribute can also be used to display the icons in the <a href='html-template' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.</p></div>
     </div>
   
 </div>
@@ -2578,14 +2723,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='export'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='export'>
             Export
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>The metadata of all content (<a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
+      <div><p>The metadata of all content (<a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
     </div>
   
 </div>
@@ -2593,14 +2738,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
         </li>
       
         <li>
-          <a class='text-blue-600 dark:text-white font-semibold hover:bg-blue-50 dark:hover:bg-blue-900' href='editors'>
+          <a class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900 inline-block' href='editors'>
             Editors
           </a>
           
             <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
   
     <div class='pl-2 mt-2 border-l-2 border-blue-200 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-400'>
-      <div><p>While Emacs is the usual way to edit <a href='guide/orgmode' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='text-gray-600 dark:text-gray-200 font-bold hover:bg-gray-50 dark:hover:bg-gray-600' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
+      <div><p>While Emacs is the usual way to edit <a href='guide/orgmode' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
     </div>
   
 </div>
@@ -2630,13 +2775,14 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
 </div>
         </div>
         
-      <footer class='flex items-center justify-center mt-2 mb-8 space-x-4 text-center text-gray-800 dark:text-gray-200'>
-  
+      <footer class='flex items-center justify-center mt-10 mb-10'>
+  <div class='inline-flex items-center justify-center space-x-6 px-8 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg'>
+    
   <div>
     
       
         <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
           </svg>
         </a>
@@ -2645,19 +2791,19 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
   </div>
   <div>
     <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
       </svg>
     </a>
   </div>
   <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.2.1'>
-      <img class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.5.3.0'>
+      <img class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
     </a>
   </div>
   <div>
     <a href='-/tags' title='View tags'>
-      <svg class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+      <svg class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
         </path>
       </svg>
@@ -2665,10 +2811,11 @@ fib n = fib (n-1) + fib (n-2)</code></pre></div>
   </div>
   <div>
     <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-6 h-6 hover:text-blue-700 dark:hover:text-blue-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
       </svg>
     </a>
+  </div>
   </div>
 </footer>
     </div>

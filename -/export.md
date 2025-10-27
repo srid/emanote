@@ -1117,13 +1117,13 @@ You can use the following syntax to override the default heading anchors:
 
 On default theme, an anchor is displayed when you hover on the heading allowing you to copy the link to the heading. Here are all heading levels for comparison:
 
-### Level 3
+### Heading `level` 3
 
-#### Level 4
+#### Heading `level` 4
 
-##### Level 5
+##### Heading `level` 5
 
-###### Level 6
+###### Heading `level` 6
 
 ## More extensions
 
@@ -2770,10 +2770,10 @@ slug: sync
 
 # Synchronizing notes using Syncthing
 
-[Syncthing](https://docs.syncthing.net/) is an open-source and superior[^sup] Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).
+[Syncthing](https://docs.syncthing.net/) is an open-source and superior-in-some-sense[^sup] Dropbox alternative that provides end-to-end and full-sync functionality on Windows, Mac, Linux and Android (but not iPhone).
 
 > [!WARNING]
-> Please bea adviced that Syncthing is known to cause **data loss**. See below.
+> Please note that Syncthing is known to cause **data loss**. See below.
 
 ## Mobile editing
 

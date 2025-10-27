@@ -53,9 +53,13 @@ body .tree li::before {
   position: absolute;
   top: 0px;
   right: 50%;
-  border-top: solid 2px #cccccc;
+  border-top: solid 2px #d1d5db;
   width: 60%;
   height: 1.19999em;
+}
+
+.dark body .tree li::before {
+  border-top-color: #4b5563;
 }
 
 body .tree li::after {
@@ -63,15 +67,23 @@ body .tree li::after {
   position: absolute;
   top: 0px;
   right: 50%;
-  border-top: solid 2px #cccccc;
+  border-top: solid 2px #d1d5db;
   width: 50%;
   height: 1.19999em;
+}
+
+.dark body .tree li::after {
+  border-top-color: #4b5563;
 }
 
 body .tree li::after {
   right: auto;
   left: 50%;
-  border-left: solid 2px #cccccc;
+  border-left: solid 2px #d1d5db;
+}
+
+.dark body .tree li::after {
+  border-left-color: #4b5563;
 }
 
 body .tree li:only-child {
@@ -101,8 +113,12 @@ body .tree li:last-child::after {
 }
 
 body .tree li:last-child::before {
-  border-right: solid 2px #cccccc;
-  border-radius: 0px 5px 0px 0px;
+  border-right: solid 2px #d1d5db;
+  border-radius: 0px 6px 0px 0px;
+}
+
+.dark body .tree li:last-child::before {
+  border-right-color: #4b5563;
 }
 
 body .tree ul ul::before {
@@ -110,19 +126,35 @@ body .tree ul ul::before {
   position: absolute;
   top: 0px;
   left: 50%;
-  border-left: solid 2px #cccccc;
+  border-left: solid 2px #d1d5db;
   width: 0px;
   height: 1.19999em;
 }
 
+.dark body .tree ul ul::before {
+  border-left-color: #4b5563;
+}
+
 body .tree li div.forest-link {
-  border: solid 2px #cccccc;
-  padding: 0.2em 0.29999em 0.2em 0.29999em;
+  border: solid 1px #d1d5db;
+  padding: 0.4em 0.6em 0.4em 0.6em;
   text-decoration: none;
   display: inline-block;
-  border-radius: 5px 5px 5px 5px;
+  border-radius: 8px;
   position: relative;
   top: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+
+/* Dark mode borders */
+.dark body .tree li div.forest-link {
+  border-color: #4b5563;
+}
+
+body .tree li div.forest-link:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 body .tree.flipped li div.forest-link {
