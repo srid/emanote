@@ -163,13 +163,13 @@ You can use the following syntax to override the default heading anchors:
 
 On default theme, an anchor is displayed when you hover on the heading allowing you to copy the link to the heading. Here are all heading levels for comparison:
 
-### Level 3
+### Heading `level` 3
 
-#### Level 4
+#### Heading `level` 4
 
-##### Level 5
+##### Heading `level` 5
 
-###### Level 6
+###### Heading `level` 6
 
 ## More extensions
 

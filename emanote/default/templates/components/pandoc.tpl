@@ -119,7 +119,7 @@
     <External class="underline decoration-1 hover:decoration-2 transition-all" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
-  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-sm" />
+  <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]" />
 
   <Header:1>
     <h1 id="${header:id}" class="group mt-12 mb-8 font-bold text-gray-900 dark:text-gray-50 text-5xl">
