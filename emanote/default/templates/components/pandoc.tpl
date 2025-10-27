@@ -1,8 +1,8 @@
 <bind tag="clickable-icon">
-  <a href="${ema:note:url}#${header:id}" class="--ema-anchor">
+  <a href="${ema:note:url}#${header:id}" class="--ema-anchor ml-2">
     <span
-      class="hover:text-${theme}-400 group-hover:visible invisible cursor-pointer text-sm align-middle"
-      aria-label="Copy link"><svg class="inline w-4" xmlns="http://www.w3.org/2000/svg"
+      class="text-gray-400 hover:text-${theme}-500 dark:hover:text-${theme}-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
+      aria-label="Copy link" title="Copy link to heading"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -16,7 +16,11 @@
   <clickable-icon />
 </bind>
 
-<bind tag="header-class">group mt-8 mb-6 font-bold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h2-class">group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800</bind>
+<bind tag="h3-class">group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h4-class">group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h5-class">group mt-6 mb-3 font-semibold text-gray-800 dark:text-gray-100</bind>
+<bind tag="h6-class">group mt-6 mb-3 font-semibold text-gray-700 dark:text-gray-200</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -118,32 +122,32 @@
   <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-sm" />
 
   <Header:1>
-    <h1 id="${header:id}" class="${header-class} text-5xl">
+    <h1 id="${header:id}" class="group mt-12 mb-8 font-bold text-gray-900 dark:text-gray-50 text-5xl">
       <heading-inlines-with-anchor />
     </h1>
   </Header:1>
   <Header:2>
-    <h2 id="${header:id}" class="${header-class} text-4xl">
+    <h2 id="${header:id}" class="${h2-class} text-4xl">
       <heading-inlines-with-anchor />
     </h2>
   </Header:2>
   <Header:3>
-    <h3 id="${header:id}" class="${header-class} text-3xl">
+    <h3 id="${header:id}" class="${h3-class} text-3xl">
       <heading-inlines-with-anchor />
     </h3>
   </Header:3>
   <Header:4>
-    <h4 id="${header:id}" class="${header-class} text-2xl">
+    <h4 id="${header:id}" class="${h4-class} text-2xl">
       <heading-inlines-with-anchor />
     </h4>
   </Header:4>
   <Header:5>
-    <h5 id="${header:id}" class="${header-class} text-xl">
+    <h5 id="${header:id}" class="${h5-class} text-xl">
       <heading-inlines-with-anchor />
     </h5>
   </Header:5>
   <Header:6>
-    <h6 id="${header:id}" class="${header-class} text-lg">
+    <h6 id="${header:id}" class="${h6-class} text-lg">
       <heading-inlines-with-anchor />
     </h6>
   </Header:6>
