@@ -15,7 +15,7 @@ template:
   # Base settings for our default layout.
   base:
     # The class to apply for <body> element when
-    bodyClass: bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-50 overflow-y-scroll
+    bodyClass: bg-gray-200 dark:bg-black text-gray-900 dark:text-gray-50 overflow-y-scroll
     containerClass: container mx-auto
   error:
     containerClass: container mx-auto max-w-prose

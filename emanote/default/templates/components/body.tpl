@@ -1,4 +1,4 @@
-<div class="flex-1 w-full bg-white dark:bg-gray-900">
+<div class="flex-1 w-full bg-white dark:bg-gray-800">
   <main class="px-6 py-8 max-w-7xl mx-auto">
     <apply template="note-title" />
     <ema:has:toc>
