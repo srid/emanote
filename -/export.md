@@ -1777,7 +1777,7 @@ $ systemctl --user status emanote.service
 ```
 
 [home-manager]: https://nixos.asia/en/home-manager
-[module]: https://github.com/srid/emanote/blob/master/nix/home-manager-module.nix
+[module]: https://github.com/srid/emanote/blob/master/nix/modules/home/emanote.nix
 
 
 ===
