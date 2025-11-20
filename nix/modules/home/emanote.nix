@@ -100,7 +100,7 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ cfg.package ];
 
-    systemd.user.services.emanote = {
+    systemd.user.services.emanote = lib.mkIf pkgs.stdenv.isLinux {
       Unit = {
         Description = "Emanote web server";
         PartOf = [ cfg.systemdTarget ];
@@ -113,6 +113,24 @@ in
             --layers "${lib.concatStringsSep ";" layers}" \
             run --host=${cfg.host} --port=${builtins.toString cfg.port}
         '';
+      };
+    };
+
+    launchd.agents.emanote = lib.mkIf pkgs.stdenv.isDarwin {
+      enable = true;
+      config = {
+        ProgramArguments = [
+          "${pkgs.lib.getExe cfg.package}"
+          "--layers"
+          "${lib.concatStringsSep ";" layers}"
+          "run"
+          "--host=${cfg.host}"
+          "--port=${builtins.toString cfg.port}"
+        ];
+        KeepAlive = true;
+        RunAtLoad = true;
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/emanote.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/emanote.log";
       };
     };
   };
