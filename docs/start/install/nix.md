@@ -44,9 +44,10 @@ in {
 
 Re-apply your home-manager configuration the usual way (e.g. `home-manager switch`).
 
-You will then have an `emanote` command in your profile, and a systemd
-user service running a live-preview of your notes.
+You will then have an `emanote` command in your profile, and a background
+service running a live-preview of your notes (systemd on Linux, launchd on macOS).
 
+On Linux:
 ```sh
 $ home-manager switch
 ...
@@ -60,6 +61,15 @@ $ systemctl --user status emanote.service
         CPU: 2.884s
      CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/emanote.service
              └─1705303 /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote --layers /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config;/home/user/notes
+```
+
+On macOS:
+```sh
+$ home-manager switch
+...
+$ launchctl list | grep emanote
+-	0	org.nix-community.home.emanote
+$ tail ~/Library/Logs/emanote.log
 ```
 
 [home-manager]: https://nixos.asia/en/home-manager

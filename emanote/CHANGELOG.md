@@ -7,6 +7,7 @@
 - UI revamp (#622)
   - Dark mode (#605, #617)
 - Mermaid: add `elk` layout (#618)
+- Home Manager module: macOS support via launchd (#623)
 
 ## 1.4.0.0 (2025-08-18)
 
