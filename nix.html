@@ -43,7 +43,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=1581ec0b-c26b-4c88-a9cd-ccc50d5a02a5' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1185,7 +1185,11 @@ in {
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      You will then have an <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote</code> command in your profile, and a systemd user service running a live-preview of your notes.
+      You will then have an <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote</code> command in your profile, and a background service running a live-preview of your notes (systemd on Linux, launchd on macOS).
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      On Linux:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ home-manager switch
 ...
@@ -1199,6 +1203,14 @@ $ systemctl --user status emanote.service
         CPU: 2.884s
      CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/emanote.service
              └─1705303 /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote --layers /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config;/home/user/notes</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      On macOS:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ home-manager switch
+...
+$ launchctl list | grep emanote
+-	0	org.nix-community.home.emanote
+$ tail ~/Library/Logs/emanote.log</code></pre></div>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/install/nix.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
