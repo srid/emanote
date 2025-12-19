@@ -1,5 +1,9 @@
 # Revision history for emanote
 
+## 1.5.4.0 (2025-12-18)
+
+- Built-in static syntax highlighting using skylighting (replaces client-side JS highlighters)
+
 ## Unreleased
 
 **Notable features**
