@@ -35,7 +35,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=92b6b692-3012-4ed3-abb7-a4ad0483d6c3' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=09d84ef5-100c-44bc-8b3e-3f5a6cfab112' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
@@ -1060,7 +1060,7 @@
     <p class='mb-4 leading-relaxed'>
       To enable this, add the following to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>page.bodyHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'><span class='fu'>page</span><span class='kw'>:</span>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
 <span class='fu'>  bodyHtml</span><span class='kw'>: </span><span class='ch'>|</span>
     &lt;snippet var="js.mermaid" /&gt;
 </code></pre></div>
@@ -1095,7 +1095,7 @@
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown'><span class='in'>```mermaid</span>
 <span class='in'>%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%</span>
 <span class='in'>graph TD;</span>
 <span class='in'>    A--&gt;B;</span>
@@ -1107,7 +1107,7 @@
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid'>%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
 graph TD;
     A--&gt;B;
     A--&gt;C;
@@ -1126,7 +1126,7 @@ graph TD;
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown'><span class='in'>```mermaid</span>
 <span class='in'>stateDiagram</span>
 <span class='in'>    direction LR</span>
 <span class='in'>    [*] --&gt; A</span>
@@ -1142,7 +1142,7 @@ graph TD;
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>stateDiagram
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid'>stateDiagram
     direction LR
     [*] --&gt; A
     A --&gt; B
@@ -1165,7 +1165,7 @@ graph TD;
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown'><span class='in'>```mermaid</span>
 <span class='in'>gantt</span>
 <span class='in'>    dateFormat  YYYY-MM-DD</span>
 <span class='in'>    title       Adding GANTT diagram functionality to mermaid</span>
@@ -1200,7 +1200,7 @@ graph TD;
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>gantt
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid'>gantt
     dateFormat  YYYY-MM-DD
     title       Adding GANTT diagram functionality to mermaid
     excludes    weekends
@@ -1246,7 +1246,7 @@ graph TD;
     <p class='mb-4 leading-relaxed'>
       Modify the layout via the config <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>layout</code>. The <a href='https://www.npmjs.com/package/@mermaid-js/layout-elk' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>elk layouts</a> are supported.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown'><span class='in'>```mermaid</span>
 <span class='in'>---</span>
 <span class='in'>config:</span>
 <span class='in'>  layout: elk</span>
@@ -1257,7 +1257,7 @@ graph TD;
 <span class='in'>    B--&gt;D;</span>
 <span class='in'>    C--&gt;D;</span>
 <span class='in'>```</span>
-</code></pre></div><div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>---
+</code></pre></div><div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid'>---
 config:
   layout: elk
 ---
@@ -1269,7 +1269,7 @@ graph TD;
     <p class='mb-4 leading-relaxed'>
       The same graph with <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>dagre</code> layout:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>---
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid'>---
 config:
   layout: dagre
 ---

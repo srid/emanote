@@ -35,7 +35,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=92b6b692-3012-4ed3-abb7-a4ad0483d6c3' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=09d84ef5-100c-44bc-8b3e-3f5a6cfab112' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
@@ -1119,7 +1119,7 @@
 
 
     </h2>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>nix</span> profile install github:srid/emanote
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>nix</span> profile install github:srid/emanote
 </code></pre></div>
     <h2 id='using-as-flake-parts-module' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
@@ -1160,7 +1160,7 @@
     <p class='mb-4 leading-relaxed'>
       Merge or import this config into your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>~/.config/nixpkgs/home.nix</code>:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'><span class='op'>{</span> <span class='va'>config</span><span class='op'>,</span> <span class='op'>...</span> <span class='op'>}</span>:
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix'><span class='op'>{</span> <span class='va'>config</span><span class='op'>,</span> <span class='op'>...</span> <span class='op'>}</span>:
 <span class='kw'>let</span>
   <span class='va'>emanote</span> <span class='op'>=</span> <span class='bu'>import</span> <span class='op'>(</span><span class='bu'>builtins</span><span class='op'>.</span>fetchTarball <span class='st'>"https://github.com/srid/emanote/archive/master.tar.gz"</span><span class='op'>);</span>
 <span class='kw'>in</span> <span class='op'>{</span>
@@ -1187,7 +1187,7 @@
     <p class='mb-4 leading-relaxed'>
       On Linux:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> home-manager switch
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>$</span> home-manager switch
 <span class='ex'>...</span>
 <span class='ex'>$</span> systemctl <span class='at'>--user</span> status emanote.service
 <span class='ex'>●</span> emanote.service <span class='at'>-</span> Emanote web server
@@ -1203,7 +1203,7 @@
     <p class='mb-4 leading-relaxed'>
       On macOS:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> home-manager switch
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>$</span> home-manager switch
 <span class='ex'>...</span>
 <span class='ex'>$</span> launchctl list <span class='kw'>|</span> <span class='fu'>grep</span> emanote
 <span class='ex'>-</span>	0	org.nix-community.home.emanote

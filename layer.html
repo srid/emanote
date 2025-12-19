@@ -35,7 +35,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=92b6b692-3012-4ed3-abb7-a4ad0483d6c3' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=09d84ef5-100c-44bc-8b3e-3f5a6cfab112' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
@@ -1310,7 +1310,7 @@
     <p class='mb-4 leading-relaxed'>
       For example,
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>emanote</span> <span class='at'>-L</span> ./docs1:./docs2 run
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>emanote</span> <span class='at'>-L</span> ./docs1:./docs2 run
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Internally, Emanote merges both <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs1</code> and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs2</code> folders and treats them as a single directory. Thus, both <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs1</code> and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs2</code> can contain the same file, and the one in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs1</code> will take precedence.
@@ -1392,7 +1392,7 @@
     <p class='mb-4 leading-relaxed'>
       Layers can be mounted at a specific path. For example, if you want to mount <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs1</code> at <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>/D1</code> and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>docs2</code> at <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>/D2</code>, you can do so with:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>emanote</span> <span class='at'>-L</span> ./docs1@D1<span class='kw'>;</span><span class='ex'>./docs2@D2</span> run
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>emanote</span> <span class='at'>-L</span> ./docs1@D1<span class='kw'>;</span><span class='ex'>./docs2@D2</span> run
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
       When two layers are mounted at distinct mount points it becomes impossible for there to be overlaps. This is useful to host sub-sites under a single site, such as in <a href='https://github.com/flake-parts/community.flake.parts' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>this case</a>.
