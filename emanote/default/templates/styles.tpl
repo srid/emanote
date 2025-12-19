@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/_emanote-static/skylighting.css" />
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/skylighting.css" />
 
 <style data-category="global-font">
   /* Refined typography with system font stack */
