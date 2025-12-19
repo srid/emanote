@@ -35,7 +35,7 @@
 
   
   
-  <link href='tailwind.css?instanceId=e6ff4ec9-da33-4e56-889d-b840af67c405' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=e4a9cd01-a461-477e-9dd7-5d11ab7ffee0' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
@@ -1054,6 +1054,26 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
       
     </ul>
   
+    <h2 id='disabling-syntax-highlighting' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Disabling Syntax Highlighting
+  
+  <a href='syntax-highlighting#disabling-syntax-highlighting' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      To disable built-in syntax highlighting (for example, to use a client-side highlighter like highlight.js instead), set in your <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>emanote</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>syntaxHighlighting</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+</code></pre></div>
     <h2 id='customizing-the-theme' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Customizing the Theme
@@ -1073,7 +1093,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      Alternatively, add custom styles in your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code>:
+      Alternatively, add custom styles in your <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
 <span class='fu'>  headHtml</span><span class='kw'>: </span><span class='ch'>|</span>
@@ -1084,20 +1104,10 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
     code span.st { color: #f1fa8c; }
     &lt;/style&gt;
 </code></pre></div>
-    <h3 id='token-classes' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
-      
-  Token Classes
+    <p class='mb-4 leading-relaxed'>
+      See the <a href='https://hackage.haskell.org/package/skylighting-core/docs/Skylighting-Types.html#t:TokenType' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>skylighting documentation</a> for a full list of token classes and their meanings.
+    </p>
   
-  <a href='syntax-highlighting#token-classes' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Class</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Token Type</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Example</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>kw</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Keyword</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>if</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>then</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>else</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>dt</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Data Type</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Int</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>String</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>dv</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Decimal Value</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>42</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>100</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>st</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>String</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>"hello"</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>ch</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Character</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>'a'</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>co</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Comment</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>-- comment</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>fu</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Function</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>function names</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>op</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Operator</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>+</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>-</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>*</code></td></tr></tbody></table>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/syntax-highlighting.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -1147,16 +1157,9 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
       
             </li>
           
-            <li class='truncate' title='Customizing the Theme'>
-              <a href='syntax-highlighting#customizing-the-theme' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
-                Customizing the Theme
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='Token Classes'>
-              <a href='syntax-highlighting#token-classes' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
-                Token Classes
+            <li class='truncate' title='Disabling Syntax Highlighting'>
+              <a href='syntax-highlighting#disabling-syntax-highlighting' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Disabling Syntax Highlighting
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -1164,6 +1167,13 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
         </ul>
       
             </li>
+          
+            <li class='truncate' title='Customizing the Theme'>
+              <a href='syntax-highlighting#customizing-the-theme' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors'>
+                Customizing the Theme
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
           
         </ul>
       
