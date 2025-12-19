@@ -90,9 +90,13 @@ mkTemplateRenderCtx model r meta =
           classRules
           model
           r
+          enableSyntaxHighlighting
     classRules :: Map Text Text
     classRules =
       SData.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
+    enableSyntaxHighlighting :: Bool
+    enableSyntaxHighlighting =
+      SData.lookupAeson True ("emanote" :| ["syntaxHighlighting"]) meta
 
 defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
 defaultRouteMeta model =

@@ -19,7 +19,7 @@
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
-    heist-extra.url = "github:srid/heist-extra/0.4.0.0";
+    heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;

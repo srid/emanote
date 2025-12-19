@@ -1,10 +1,4 @@
 ---
-page: 
-  headHtml: |
-    <snippet var="js.highlightjs" />
-    <with var="js">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/vim.min.js"></script>
-    </with>
 slug: vim
 ---
 

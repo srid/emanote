@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="/_emanote-static/skylighting.css" />
+
 <style data-category="global-font">
   /* Refined typography with system font stack */
   body {

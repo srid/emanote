@@ -1,9 +1,5 @@
 ---
 slug: zk
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/ini.min.js"></script>
 ---
 
 # zk
