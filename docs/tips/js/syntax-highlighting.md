@@ -41,7 +41,7 @@ def fibonacci(n):
 
 ## Supported Languages
 
-Skylighting supports [over 140 languages](https://github.com/jgm/skylighting#supported-languages) including:
+Skylighting supports [over 140 languages](https://github.com/jgm/skylighting/tree/master/skylighting-core/xml) including:
 
 - Haskell, Python, JavaScript, TypeScript, Rust, Go
 - Nix, Shell/Bash, YAML, JSON, TOML
@@ -50,7 +50,9 @@ Skylighting supports [over 140 languages](https://github.com/jgm/skylighting#sup
 
 ## Customizing the Theme
 
-The default theme is included in `index.yaml` with both light and dark mode support. To customize, override the CSS classes in your own `index.yaml`:
+The default theme is in `_emanote-static/skylighting.css`. To customize, create your own `_emanote-static/skylighting.css` in your notes directory to override the default.
+
+Alternatively, add custom styles in your `index.yaml`:
 
 ```yaml
 page:
