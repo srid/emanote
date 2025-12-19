@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1187,8 +1180,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1339,9 +1332,10 @@
     <p class='mb-4 leading-relaxed'>
       To enable a <a href='https://pandoc.org/lua-filters.html' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Pandoc Lua filter</a> for a particular Markdown file, put that filter in your notebook and add the following to the Markdown file’s YAML frontmatter:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>pandoc:
-  filters:
-    - path/to/your.lua</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #EC750010; border-left-color: #EC7500'>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='kw'>-</span><span class='at'> path/to/your.lua</span>
+</code></pre></div><div data-callout-metadata data-callout-fold data-callout='warning' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #EC750010; border-left-color: #EC7500'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>

@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
-
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/ini.min.js'></script>
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1033,8 +1026,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1176,38 +1169,40 @@
     <p class='mb-4 leading-relaxed'>
       Inside your notes root folder (such as your repository root if you’re using Git), run the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>zk init</code> command:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>zk init --no-input</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>zk</span> init <span class='at'>--no-input</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Edit your newly created config file at <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.zk/config.toml</code> and change it to the following:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml language-toml'># .zk/config.toml
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml language-toml'><span class='co'># .zk/config.toml</span>
 
-[note]
-default-title = "untitled"
-filename = "{{title}}"
-extension = "md"
-template = "default.md"
+<span class='kw'>[note]</span>
+<span class='dt'>default-title</span> <span class='op'>=</span> <span class='st'>"untitled"</span>
+<span class='dt'>filename</span> <span class='op'>=</span> <span class='st'>"{{title}}"</span>
+<span class='dt'>extension</span> <span class='op'>=</span> <span class='st'>"md"</span>
+<span class='dt'>template</span> <span class='op'>=</span> <span class='st'>"default.md"</span>
 
-# If using https://github.com/srid/emanote-template then you can set the
-# following to ignore everything except what's inside the "content" dir,
-# such as the root README.md file:
-#ignore = [
-#	"!content/"
-#]
+<span class='co'># If using https://github.com/srid/emanote-template then you can set the</span>
+<span class='co'># following to ignore everything except what's inside the "content" dir,</span>
+<span class='co'># such as the root README.md file:</span>
+<span class='co'>#ignore = [</span>
+<span class='co'>#	"!content/"</span>
+<span class='co'>#]</span>
 
-[format.markdown]
+<span class='kw'>[format.markdown]</span>
 
-# zk has a "wiki" link mode, but it includes the full paths.
-# Emanote only needs the filename.
-link-format = "[[{{filename}}]]"
+<span class='co'># zk has a "wiki" link mode, but it includes the full paths.</span>
+<span class='co'># Emanote only needs the filename.</span>
+<span class='dt'>link-format</span> <span class='op'>=</span> <span class='st'>"[[{{filename}}]]"</span>
 
-[lsp.diagnostics]
-# Each diagnostic can have for value: none, hint, info, warning, error
+<span class='kw'>[lsp.diagnostics]</span>
+<span class='co'># Each diagnostic can have for value: none, hint, info, warning, error</span>
 
-# Report titles of wiki-links as hints.
-wiki-title = "hint"
-# Warn for dead links between notes.
-dead-link = "error"</code></pre></div>
+<span class='co'># Report titles of wiki-links as hints.</span>
+<span class='dt'>wiki-title</span> <span class='op'>=</span> <span class='st'>"hint"</span>
+<span class='co'># Warn for dead links between notes.</span>
+<span class='dt'>dead-link</span> <span class='op'>=</span> <span class='st'>"error"</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       There are a lot more configs available. Above only focuses on the minimal for configs related to Emanote integration. Full documentation of the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>zk</code> config file: <a href='https://github.com/mickael-menu/zk/blob/main/docs/config.md' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/mickael-menu/zk/blob/main/docs/config.md</a>
     </p>
@@ -1215,15 +1210,16 @@ dead-link = "error"</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Such as the editor and FZF settings:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml language-toml'>[tool]
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml language-toml'><span class='kw'>[tool]</span>
 
-# Default editor used to open notes. When not set, the EDITOR or VISUAL
-# environment variables are used.
-editor = "code --wait"
-#editor = "nvim"
+<span class='co'># Default editor used to open notes. When not set, the EDITOR or VISUAL</span>
+<span class='co'># environment variables are used.</span>
+<span class='dt'>editor</span> <span class='op'>=</span> <span class='st'>"code --wait"</span>
+<span class='co'>#editor = "nvim"</span>
 
-# Syntax highlighting when in commands such as "zk edit -i"
-fzf-preview = "bat -p --color always {-1}"</code></pre></div>
+<span class='co'># Syntax highlighting when in commands such as "zk edit -i"</span>
+<span class='dt'>fzf-preview</span> <span class='op'>=</span> <span class='st'>"bat -p --color always {-1}"</span>
+</code></pre></div>
     <h2 id='editor-integration' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Editor integration

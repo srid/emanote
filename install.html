@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -938,8 +931,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1135,13 +1128,14 @@
     <p class='mb-4 leading-relaxed'>
       Once installed, test Emanote with:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'># Run live server
-cd /path/to/notebook
-emanote run
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'><span class='co'># Run live server</span>
+<span class='bu'>cd</span> /path/to/notebook
+<span class='ex'>emanote</span> run
 
-# Generate static files
-mkdir /tmp/output
-emanote -L /path/to/notebook gen /tmp/output</code></pre></div>
+<span class='co'># Generate static files</span>
+<span class='fu'>mkdir</span> /tmp/output
+<span class='ex'>emanote</span> <span class='at'>-L</span> /path/to/notebook gen /tmp/output
+</code></pre></div>
     <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700'>
       <header class='font-semibold'>Footnotes</header>
       

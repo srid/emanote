@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1187,8 +1180,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1428,8 +1421,9 @@
     <p class='mb-4 leading-relaxed'>
       Here are some examples of running <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote export metadata</code>. These commands are run on the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>./docs</code> directory of the Emanote source repository.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>git clone https://github.com/srid/emanote.git
-cd ./emanote/docs</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='fu'>git</span> clone https://github.com/srid/emanote.git
+<span class='bu'>cd</span> ./emanote/docs
+</code></pre></div>
     <h4 id='get-the-list-of-files' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
   Get the list of files
@@ -1443,15 +1437,16 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ emanote export metadata | jq .files | jq keys
-[
-  "architecture.md",
-  "demo.md",
-  "demo/custom-style.md",
-  "demo/embed.md",
-  "demo/file-links.md",
-  [..]
-]</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> emanote export metadata <span class='kw'>|</span> <span class='ex'>jq</span> .files <span class='kw'>|</span> <span class='ex'>jq</span> keys
+<span class='bu'>[</span>
+  <span class='st'>"architecture.md"</span>,
+  <span class='st'>"demo.md"</span>,
+  <span class='st'>"demo/custom-style.md"</span>,
+  <span class='er'>"demo/embed.md",</span>
+  <span class='er'>"demo/file-links.md",</span>
+  <span class='er'>[..</span><span class='bu'>]</span>
+<span class='ex'>]</span>
+</code></pre></div>
     <h4 id='get-a-single-file' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
   Get a single file
@@ -1465,23 +1460,24 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="architecture.md")'   
-{
-  "filePath": "architecture.md",
-  "links": [],
-  "meta": {
-    "order": 99,
-    "page": {
-      "description": "Emanote is a Haskell program that, at its essense, transforms a bunch of source files (Markdown, static files, etc.) into a target website. It does that in a reactive manner such that as the source files change the resultant website updates in real-time (thanks to Ema's hot-reload via websocket)."
-    },
-    "tags": [
-      "emanote/dev"
-    ]
-  },
-  "parentNote": "index.md",
-  "title": "Architecture",
-  "url": "architecture"
-}</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> emanote export metadata <span class='kw'>|</span> <span class='ex'>jq</span> <span class='st'>'.files | .[] | select(.filePath=="architecture.md")'</span>   
+<span class='kw'>{</span>
+  <span class='st'>"filePath"</span><span class='ex'>:</span> <span class='st'>"architecture.md"</span>,
+  <span class='st'>"links"</span><span class='ex'>:</span> [],
+  <span class='st'>"meta"</span><span class='ex'>:</span> {
+    <span class='st'>"order"</span><span class='ex'>:</span> 99,
+    <span class='st'>"page"</span><span class='ex'>:</span> {
+      <span class='st'>"description"</span><span class='ex'>:</span> <span class='st'>"Emanote is a Haskell program that, at its essense, transforms a bunch of source files (Markdown, static files, etc.) into a target website. It does that in a reactive manner such that as the source files change the resultant website updates in real-time (thanks to Ema's hot-reload via websocket)."</span>
+    <span class='ex'>},</span>
+    <span class='st'>"tags"</span><span class='ex'>:</span> [
+      <span class='st'>"emanote/dev"</span>
+    <span class='ex'>]</span>
+  <span class='ex'>},</span>
+  <span class='st'>"parentNote"</span><span class='ex'>:</span> <span class='st'>"index.md"</span>,
+  <span class='st'>"title"</span><span class='ex'>:</span> <span class='st'>"Architecture"</span>,
+  <span class='st'>"url"</span><span class='ex'>:</span> <span class='st'>"architecture"</span>
+<span class='kw'>}</span>
+</code></pre></div>
     <h4 id='get-all-link-targets-from-a-note' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
   Get all link targets from a note
@@ -1495,12 +1491,13 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'
-"demo/neuron-layout"
-"demo/yaml-config"
-"demo/yaml-config"
-"demo/file-links"
-"demo"</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> emanote export metadata <span class='kw'>|</span> <span class='ex'>jq</span> <span class='st'>'.files | .[] | select(.filePath=="start/neuron.md") | .links | .[] | .resolvedRelTarget.contents'</span>
+<span class='st'>"demo/neuron-layout"</span>
+<span class='st'>"demo/yaml-config"</span>
+<span class='st'>"demo/yaml-config"</span>
+<span class='st'>"demo/file-links"</span>
+<span class='st'>"demo"</span>
+</code></pre></div>
     <h4 id='get-the-list-of-tags' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
   Get the list of tags
@@ -1514,15 +1511,16 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | .meta.tags' | jq -s 'flatten(1)'
-[
-  "emanote/dev",
-  "emanote/syntax/demo",
-  "emanote/syntax/demo",
-  "emanote/syntax/demo",
-  "emanote/yaml/demo",
-  "external"
-]</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> emanote export metadata <span class='kw'>|</span> <span class='ex'>jq</span> <span class='st'>'.files | .[] | .meta.tags'</span> <span class='kw'>|</span> <span class='ex'>jq</span> <span class='at'>-s</span> <span class='st'>'flatten(1)'</span>
+<span class='bu'>[</span>
+  <span class='st'>"emanote/dev"</span>,
+  <span class='st'>"emanote/syntax/demo"</span>,
+  <span class='st'>"emanote/syntax/demo"</span>,
+  <span class='er'>"emanote/syntax/demo",</span>
+  <span class='er'>"emanote/yaml/demo",</span>
+  <span class='er'>"external"</span>
+<span class='bu'>]</span>
+</code></pre></div>
     <h4 id='get-all-files-associated-with-a-tag' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
   Get all files associated with a tag
@@ -1536,23 +1534,24 @@ cd ./emanote/docs</code></pre></div>
 
 
     </h4>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ emanote export metadata | jq '.files | .[] | select( any( .meta.tags[]; . == "external" ))'   
-{
-  "filePath": "examples.md",
-  "links": [],
-  "meta": {
-    "order": 10,
-    "page": {
-      "description": "Here is an assorted collection of websites generated by Emanote, sorted alphabetically:"
-    },
-    "tags": [
-      "external"
-    ]
-  },
-  "parentNote": "index.md",
-  "title": "Examples",
-  "url": "examples"
-}</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> emanote export metadata <span class='kw'>|</span> <span class='ex'>jq</span> <span class='st'>'.files | .[] | select( any( .meta.tags[]; . == "external" ))'</span>   
+<span class='kw'>{</span>
+  <span class='st'>"filePath"</span><span class='ex'>:</span> <span class='st'>"examples.md"</span>,
+  <span class='st'>"links"</span><span class='ex'>:</span> [],
+  <span class='st'>"meta"</span><span class='ex'>:</span> {
+    <span class='st'>"order"</span><span class='ex'>:</span> 10,
+    <span class='st'>"page"</span><span class='ex'>:</span> {
+      <span class='st'>"description"</span><span class='ex'>:</span> <span class='st'>"Here is an assorted collection of websites generated by Emanote, sorted alphabetically:"</span>
+    <span class='ex'>},</span>
+    <span class='st'>"tags"</span><span class='ex'>:</span> [
+      <span class='st'>"external"</span>
+    <span class='ex'>]</span>
+  <span class='ex'>},</span>
+  <span class='st'>"parentNote"</span><span class='ex'>:</span> <span class='st'>"index.md"</span>,
+  <span class='st'>"title"</span><span class='ex'>:</span> <span class='st'>"Examples"</span>,
+  <span class='st'>"url"</span><span class='ex'>:</span> <span class='st'>"examples"</span>
+<span class='kw'>}</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       
     </p>

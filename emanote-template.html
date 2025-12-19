@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1033,8 +1026,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1182,7 +1175,8 @@
     <p class='mb-4 leading-relaxed'>
       A Nix flake template is also provided if you want to do this in your existing notebook. Run:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'>nix flake init -t github:srid/emanote</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'><span class='ex'>nix</span> flake init <span class='at'>-t</span> github:srid/emanote
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This add a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>flake.nix</code> file. You can follow emanote-template’s README from this point.
     </p>

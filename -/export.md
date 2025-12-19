@@ -2152,12 +2152,6 @@ The freeware software [Obsidian](https://obsidian.md/) can be used to edit Markd
 <!-- Wikilinks: [[start/resources/editors/vim]], [[resources/editors/vim]], [[editors/vim]], [[vim]] -->
 
 ---
-page: 
-  headHtml: |
-    <snippet var="js.highlightjs" />
-    <with var="js">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/vim.min.js"></script>
-    </with>
 slug: vim
 ---
 
@@ -2289,10 +2283,6 @@ This add a `flake.nix` file.  You can follow emanote-template's README from this
 
 ---
 slug: zk
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/ini.min.js"></script>
 ---
 
 # zk
@@ -2458,9 +2448,7 @@ path:./*
 slug: math
 page:
   headHtml: |
-    <snippet var="js.highlightjs" />
     <snippet var="js.mathjax" />
-
 ---
 
 # Math
@@ -2507,8 +2495,6 @@ page:
 ---
 slug: mermaid
 page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
   bodyHtml: |
     <snippet var="js.mermaid" />
 ---
@@ -2702,79 +2688,6 @@ graph TD;
 
 ===
 
-<!-- Source: tips/js/syntax-highlighting.md -->
-<!-- URL: https://emanote.srid.ca/syntax-highlighting -->
-<!-- Title: Syntax Highlighting -->
-<!-- Wikilinks: [[tips/js/syntax-highlighting]], [[js/syntax-highlighting]], [[syntax-highlighting]] -->
-
----
-slug: syntax-highlighting
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
----
-
-
-# Syntax Highlighting
-
-In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):
-
-```yaml
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
-```
-
-> [!warning] 
-> Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and [Nix](https://nixos.asia) by default; otherwise, it is normally added as:
->
-> ```yaml
-> page:
->   headHtml: |
->     <snippet var="js.highlightjs" />
->     <with var="js">
->     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
->     </with>
-> ```
-> 
-> (The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
-
-## Example (highlight.js)
-
-### Python
-
-```python
-def fib(n):
-    a, b = 0, 1
-    while a < n:
-        print(a, end=' ')
-        a, b = b, a+b
-    print()
-fib(1000)
-```
-
-### Haskell
-
-```haskell
-fib 0 = 0
-fib 1 = 1
-fib n = fib (n-1) + fib (n-2)
-```
-
-## Prism
-
-A predefined snippet also exists for another syntax highlighter called [Prism](https://prismjs.com/). To use it add the following to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
-
-```yaml
-page:
-  headHtml: |
-    <snippet var="js.prism" />
-```
-
-> [!warning] Prism does not cooperate well with Emanote's live preview mode.
-
-===
-
 <!-- Source: tips/sync.md -->
 <!-- URL: https://emanote.srid.ca/sync -->
 <!-- Title: Synchronizing notes using Syncthing -->
@@ -2807,3 +2720,91 @@ Git also acts as backup if you push your repository to a remote location (GitHub
 [^ios]: Obsidian can also synchronize notes between iOS and macOS [via iCloud](https://help.obsidian.md/Getting+started/Sync+your+notes+across+devices).
 
 #[[resources]]
+
+
+===
+
+<!-- Source: tips/syntax-highlighting.md -->
+<!-- URL: https://emanote.srid.ca/syntax-highlighting -->
+<!-- Title: Syntax Highlighting -->
+<!-- Wikilinks: [[tips/syntax-highlighting]], [[syntax-highlighting]] -->
+
+---
+slug: syntax-highlighting
+order: -1
+---
+
+# Syntax Highlighting
+
+Emanote includes built-in syntax highlighting powered by [skylighting](https://github.com/jgm/skylighting), the same library used by Pandoc. Code blocks are highlighted at build time—no JavaScript required.
+
+## How it Works
+
+Code blocks are automatically tokenized during rendering. Each token gets a CSS class (like `kw` for keywords, `st` for strings, `co` for comments) and styled via CSS included in emanote's default theme.
+
+### Example
+
+```haskell
+-- A simple factorial function
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+```
+
+```python
+def fibonacci(n):
+    """Generate fibonacci sequence up to n"""
+    a, b = 0, 1
+    while a < n:
+        yield a
+        a, b = b, a + b
+```
+
+```nix
+{ pkgs, ... }:
+{
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+  ];
+}
+```
+
+## Supported Languages
+
+Skylighting supports [over 140 languages](https://github.com/jgm/skylighting/tree/master/skylighting-core/xml) including:
+
+- Haskell, Python, JavaScript, TypeScript, Rust, Go
+- Nix, Shell/Bash, YAML, JSON, TOML
+- HTML, CSS, SQL, Markdown
+- And many more...
+
+## Customizing the Theme
+
+The default theme is in `_emanote-static/skylighting.css`. To customize, create your own `_emanote-static/skylighting.css` in your notes directory to override the default.
+
+Alternatively, add custom styles in your `index.yaml`:
+
+```yaml
+page:
+  headHtml: |
+    <style>
+    /* Override keyword color */
+    code span.kw { color: #ff79c6; font-weight: bold; }
+    /* Override string color */
+    code span.st { color: #f1fa8c; }
+    </style>
+```
+
+### Token Classes
+
+| Class | Token Type    | Example              |
+| ----- | ------------- | -------------------- |
+| `kw`  | Keyword       | `if`, `then`, `else` |
+| `dt`  | Data Type     | `Int`, `String`      |
+| `dv`  | Decimal Value | `42`, `100`          |
+| `st`  | String        | `"hello"`            |
+| `ch`  | Character     | `'a'`                |
+| `co`  | Comment       | `-- comment`         |
+| `fu`  | Function      | function names       |
+| `op`  | Operator      | `+`, `-`, `*`        |

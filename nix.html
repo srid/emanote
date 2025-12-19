@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -986,8 +979,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1125,7 +1118,8 @@
 
 
     </h2>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>nix profile install github:srid/emanote</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>nix</span> profile install github:srid/emanote
+</code></pre></div>
     <h2 id='using-as-flake-parts-module' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Using as <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>flake-parts</code> module
@@ -1165,21 +1159,22 @@
     <p class='mb-4 leading-relaxed'>
       Merge or import this config into your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>~/.config/nixpkgs/home.nix</code>:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>{ config, ... }:
-let
-  emanote = import (builtins.fetchTarball "https://github.com/srid/emanote/archive/master.tar.gz");
-in {
-  imports = [ emanote.homeManagerModule ];
-  services.emanote = {
-    enable = true;
-    # host = "127.0.0.1"; # default listen address is 127.0.0.1
-    # port = 7000;        # default http port is 7000
-    notes = [
-      "/home/user/notes"  # add as many layers as you like
-    ];
-    package = emanote.packages.${builtins.currentSystem}.default;
-  };
-}</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'><span class='op'>{</span> <span class='va'>config</span><span class='op'>,</span> <span class='op'>...</span> <span class='op'>}</span>:
+<span class='kw'>let</span>
+  <span class='va'>emanote</span> <span class='op'>=</span> <span class='bu'>import</span> <span class='op'>(</span><span class='bu'>builtins</span><span class='op'>.</span>fetchTarball <span class='st'>"https://github.com/srid/emanote/archive/master.tar.gz"</span><span class='op'>);</span>
+<span class='kw'>in</span> <span class='op'>{</span>
+  <span class='va'>imports</span> <span class='op'>=</span> <span class='op'>[</span> emanote<span class='op'>.</span>homeManagerModule <span class='op'>];</span>
+  <span class='va'>services</span>.<span class='va'>emanote</span> <span class='op'>=</span> <span class='op'>{</span>
+    <span class='va'>enable</span> <span class='op'>=</span> <span class='cn'>true</span><span class='op'>;</span>
+    <span class='co'># host = "127.0.0.1"; # default listen address is 127.0.0.1</span>
+    <span class='co'># port = 7000;        # default http port is 7000</span>
+    <span class='va'>notes</span> <span class='op'>=</span> <span class='op'>[</span>
+      <span class='st'>"/home/user/notes"</span>  <span class='co'># add as many layers as you like</span>
+    <span class='op'>];</span>
+    <span class='va'>package</span> <span class='op'>=</span> emanote<span class='op'>.</span>packages<span class='op'>.</span><span class='sc'>${</span><span class='bu'>builtins</span><span class='op'>.</span>currentSystem<span class='sc'>}</span><span class='op'>.</span>default<span class='op'>;</span>
+  <span class='op'>};</span>
+<span class='op'>}</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Re-apply your home-manager configuration the usual way (e.g. <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>home-manager switch</code>).
     </p>
@@ -1191,26 +1186,28 @@ in {
     <p class='mb-4 leading-relaxed'>
       On Linux:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ home-manager switch
-...
-$ systemctl --user status emanote.service
-● emanote.service - Emanote web server
-     Loaded: loaded (/nix/store/i1af5hdydwcf7y0r55n7fd67dnw5habd-home-manager-files/.config/systemd/user/emanote.service; enabled; vendor preset: enabled)
-     Active: active (running) since Tue 2021-11-02 17:17:04 AWST; 17h ago
-   Main PID: 1705303 (emanote)
-      Tasks: 26 (limit: 38220)
-     Memory: 38.3M
-        CPU: 2.884s
-     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/emanote.service
-             └─1705303 /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote --layers /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config;/home/user/notes</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> home-manager switch
+<span class='ex'>...</span>
+<span class='ex'>$</span> systemctl <span class='at'>--user</span> status emanote.service
+<span class='ex'>●</span> emanote.service <span class='at'>-</span> Emanote web server
+     <span class='ex'>Loaded:</span> loaded <span class='er'>(</span><span class='ex'>/nix/store/i1af5hdydwcf7y0r55n7fd67dnw5habd-home-manager-files/.config/systemd/user/emanote.service</span><span class='kw'>;</span> <span class='ex'>enabled</span><span class='kw'>;</span> <span class='ex'>vendor</span> preset: enabled<span class='kw'>)</span>
+     <span class='ex'>Active:</span> active <span class='er'>(</span><span class='ex'>running</span><span class='kw'>)</span> <span class='ex'>since</span> Tue 2021-11-02 17:17:04 AWST<span class='kw'>;</span> <span class='ex'>17h</span> ago
+   <span class='ex'>Main</span> PID: 1705303 <span class='er'>(</span><span class='ex'>emanote</span><span class='kw'>)</span>
+      <span class='ex'>Tasks:</span> 26 <span class='er'>(</span><span class='ex'>limit:</span> 38220<span class='kw'>)</span>
+     <span class='ex'>Memory:</span> 38.3M
+        <span class='ex'>CPU:</span> 2.884s
+     <span class='ex'>CGroup:</span> /user.slice/user-1000.slice/user@1000.service/app.slice/emanote.service
+             <span class='ex'>└─1705303</span> /nix/store/9hj2cwk1jakfws0d1hpwa221kcni3j45-emanote-0.3.12.1/bin/emanote <span class='at'>--layers</span> /nix/store/hr7wp1xvqn48b8gy16sdq6k2csrvr8c1-emanote-config<span class='kw'>;</span><span class='ex'>/home/user/notes</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       On macOS:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'>$ home-manager switch
-...
-$ launchctl list | grep emanote
--	0	org.nix-community.home.emanote
-$ tail ~/Library/Logs/emanote.log</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh language-sh'><span class='ex'>$</span> home-manager switch
+<span class='ex'>...</span>
+<span class='ex'>$</span> launchctl list <span class='kw'>|</span> <span class='fu'>grep</span> emanote
+<span class='ex'>-</span>	0	org.nix-community.home.emanote
+<span class='ex'>$</span> tail ~/Library/Logs/emanote.log
+</code></pre></div>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/install/nix.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>

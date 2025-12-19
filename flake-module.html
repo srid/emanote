@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -997,8 +990,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1140,32 +1133,33 @@
     <p class='mb-4 leading-relaxed'>
       Add the following to your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>flake.nix</code> assuming your Markdown content lives under the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>./content</code> subdirectory:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>{
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    emanote.url = "github:srid/emanote";
-  };
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'><span class='op'>{</span>
+  <span class='va'>inputs</span> <span class='op'>=</span> <span class='op'>{</span>
+    <span class='va'>nixpkgs</span>.<span class='va'>url</span> <span class='op'>=</span> <span class='st'>"github:nixos/nixpkgs/nixpkgs-unstable"</span><span class='op'>;</span>
+    <span class='va'>flake-parts</span>.<span class='va'>url</span> <span class='op'>=</span> <span class='st'>"github:hercules-ci/flake-parts"</span><span class='op'>;</span>
+    <span class='va'>emanote</span>.<span class='va'>url</span> <span class='op'>=</span> <span class='st'>"github:srid/emanote"</span><span class='op'>;</span>
+  <span class='op'>};</span>
 
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
-      imports = [
-        inputs.emanote.flakeModule
-      ];
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
-        emanote = {
-          sites = {
-            "my-site" = {
-              layers = [
-                { path = ./content; pathString = "./content"; }
-              ];
-            };
-          };
-        };
-      };
-    };
-}</code></pre></div>
+  <span class='va'>outputs</span> <span class='op'>=</span> <span class='va'>inputs</span><span class='op'>:</span>
+    inputs<span class='op'>.</span>flake<span class='op'>-</span>parts<span class='op'>.</span>lib<span class='op'>.</span>mkFlake <span class='op'>{</span> <span class='kw'>inherit</span> <span class='va'>inputs</span><span class='op'>;</span> <span class='op'>}</span> <span class='op'>{</span>
+      <span class='va'>systems</span> <span class='op'>=</span> <span class='op'>[</span> <span class='st'>"x86_64-linux"</span> <span class='st'>"aarch64-darwin"</span> <span class='op'>];</span>
+      <span class='va'>imports</span> <span class='op'>=</span> <span class='op'>[</span>
+        inputs<span class='op'>.</span>emanote<span class='op'>.</span>flakeModule
+      <span class='op'>];</span>
+      <span class='va'>perSystem</span> <span class='op'>=</span> <span class='op'>{</span> <span class='va'>config</span><span class='op'>,</span> <span class='va'>self'</span><span class='op'>,</span> <span class='va'>inputs'</span><span class='op'>,</span> <span class='va'>pkgs</span><span class='op'>,</span> <span class='va'>system</span><span class='op'>,</span> <span class='op'>...</span> <span class='op'>}</span>: <span class='op'>{</span>
+        <span class='va'>emanote</span> <span class='op'>=</span> <span class='op'>{</span>
+          <span class='va'>sites</span> <span class='op'>=</span> <span class='op'>{</span>
+            <span class='st'>"my-site"</span> <span class='op'>=</span> <span class='op'>{</span>
+              <span class='va'>layers</span> <span class='op'>=</span> <span class='op'>[</span>
+                <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./content</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./content"</span><span class='op'>;</span> <span class='op'>}</span>
+              <span class='op'>];</span>
+            <span class='op'>};</span>
+          <span class='op'>};</span>
+        <span class='op'>};</span>
+      <span class='op'>};</span>
+    <span class='op'>};</span>
+<span class='op'>}</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This creates:
     </p>
@@ -1187,15 +1181,18 @@
     <p class='mb-4 leading-relaxed'>
       Run the Emanote live server for a specific site:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'>nix run .#my-site</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'><span class='ex'>nix</span> run .#my-site
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Build the static site:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'>nix build .#my-site</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'><span class='ex'>nix</span> build .#my-site
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Run all checks:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'>nix flake check</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='bash language-bash'><span class='ex'>nix</span> flake check
+</code></pre></div>
     <h2 id='configuration-options' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Configuration Options
@@ -1285,32 +1282,33 @@
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>emanote = {
-  sites = {
-    "docs" = {
-      package = config.packages.default;
-      layers = [
-        { path = ./docs; pathString = "./docs"; }
-        { path = ./shared; pathString = "./shared"; }
-      ];
-      port = 8080;
-      basePath = "documentation";
-      allowBrokenInternalLinks = true;
-      check = false;  # Disable htmlproofer for this site
-      extraConfig = {
-        template = {
-          urlStrategy = "pretty";
-          theme = "red";
-        };
-        pandoc = {
-          rewriteClass = {
-            "callout-note" = "bg-blue-100";
-          };
-        };
-      };
-    };
-  };
-};</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>emanote = <span class='op'>{</span>
+  <span class='va'>sites</span> <span class='op'>=</span> <span class='op'>{</span>
+    <span class='st'>"docs"</span> <span class='op'>=</span> <span class='op'>{</span>
+      <span class='va'>package</span> <span class='op'>=</span> config<span class='op'>.</span>packages<span class='op'>.</span>default<span class='op'>;</span>
+      <span class='va'>layers</span> <span class='op'>=</span> <span class='op'>[</span>
+        <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./docs</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./docs"</span><span class='op'>;</span> <span class='op'>}</span>
+        <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./shared</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./shared"</span><span class='op'>;</span> <span class='op'>}</span>
+      <span class='op'>];</span>
+      <span class='va'>port</span> <span class='op'>=</span> <span class='dv'>8080</span><span class='op'>;</span>
+      <span class='va'>basePath</span> <span class='op'>=</span> <span class='st'>"documentation"</span><span class='op'>;</span>
+      <span class='va'>allowBrokenInternalLinks</span> <span class='op'>=</span> <span class='cn'>true</span><span class='op'>;</span>
+      <span class='va'>check</span> <span class='op'>=</span> <span class='cn'>false</span><span class='op'>;</span>  <span class='co'># Disable htmlproofer for this site</span>
+      <span class='va'>extraConfig</span> <span class='op'>=</span> <span class='op'>{</span>
+        <span class='va'>template</span> <span class='op'>=</span> <span class='op'>{</span>
+          <span class='va'>urlStrategy</span> <span class='op'>=</span> <span class='st'>"pretty"</span><span class='op'>;</span>
+          <span class='va'>theme</span> <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>;</span>
+        <span class='op'>};</span>
+        <span class='va'>pandoc</span> <span class='op'>=</span> <span class='op'>{</span>
+          <span class='va'>rewriteClass</span> <span class='op'>=</span> <span class='op'>{</span>
+            <span class='st'>"callout-note"</span> <span class='op'>=</span> <span class='st'>"bg-blue-100"</span><span class='op'>;</span>
+          <span class='op'>};</span>
+        <span class='op'>};</span>
+      <span class='op'>};</span>
+    <span class='op'>};</span>
+  <span class='op'>};</span>
+<span class='op'>}</span>;
+</code></pre></div>
     <h2 id='multi' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Multiple Sites
@@ -1328,28 +1326,29 @@
     <p class='mb-4 leading-relaxed'>
       You can define multiple sites in the same flake:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>emanote = {
-  sites = {
-    "blog" = {
-      layers = [{ path = ./blog; pathString = "./blog"; }];
-      extraConfig.template.urlStrategy = "pretty";
-    };
-    "docs" = {
-      layers = [
-        { path = ./documentation; pathString = "./documentation"; }
-      ];
-      allowBrokenInternalLinks = true;
-      check = false;  # Skip checks for docs site
-    };
-    "wiki" = {
-      layers = [
-        { path = ./wiki; pathString = "./wiki"; }
-        { path = ./shared-assets; pathString = "./shared-assets"; }
-      ];
-      port = 9000;
-    };
-  };
-};</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix language-nix'>emanote = <span class='op'>{</span>
+  <span class='va'>sites</span> <span class='op'>=</span> <span class='op'>{</span>
+    <span class='st'>"blog"</span> <span class='op'>=</span> <span class='op'>{</span>
+      <span class='va'>layers</span> <span class='op'>=</span> <span class='op'>[{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./blog</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./blog"</span><span class='op'>;</span> <span class='op'>}];</span>
+      <span class='va'>extraConfig</span>.<span class='va'>template</span>.<span class='va'>urlStrategy</span> <span class='op'>=</span> <span class='st'>"pretty"</span><span class='op'>;</span>
+    <span class='op'>};</span>
+    <span class='st'>"docs"</span> <span class='op'>=</span> <span class='op'>{</span>
+      <span class='va'>layers</span> <span class='op'>=</span> <span class='op'>[</span>
+        <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./documentation</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./documentation"</span><span class='op'>;</span> <span class='op'>}</span>
+      <span class='op'>];</span>
+      <span class='va'>allowBrokenInternalLinks</span> <span class='op'>=</span> <span class='cn'>true</span><span class='op'>;</span>
+      <span class='va'>check</span> <span class='op'>=</span> <span class='cn'>false</span><span class='op'>;</span>  <span class='co'># Skip checks for docs site</span>
+    <span class='op'>};</span>
+    <span class='st'>"wiki"</span> <span class='op'>=</span> <span class='op'>{</span>
+      <span class='va'>layers</span> <span class='op'>=</span> <span class='op'>[</span>
+        <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./wiki</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./wiki"</span><span class='op'>;</span> <span class='op'>}</span>
+        <span class='op'>{</span> <span class='va'>path</span> <span class='op'>=</span> <span class='ss'>./shared-assets</span><span class='op'>;</span> <span class='va'>pathString</span> <span class='op'>=</span> <span class='st'>"./shared-assets"</span><span class='op'>;</span> <span class='op'>}</span>
+      <span class='op'>];</span>
+      <span class='va'>port</span> <span class='op'>=</span> <span class='dv'>9000</span><span class='op'>;</span>
+    <span class='op'>};</span>
+  <span class='op'>};</span>
+<span class='op'>}</span>;
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This creates outputs for each site:
     </p>

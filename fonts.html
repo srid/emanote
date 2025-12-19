@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1617,8 +1610,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1760,12 +1753,13 @@
     <p class='mb-4 leading-relaxed'>
       To use a different font, create a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> file in your notebook and override the global font styling (in <a href='layer' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>default layer</a>):
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'>&lt;style data-category="global-font"&gt;
-  /* Replace system fonts with your preferred font */
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'><span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"global-font"</span><span class='dt'>&gt;</span>
+  <span class='co'>/* Replace system fonts with your preferred font */</span>
   body {
-    font-family: 'Your Font Name', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'Your Font Name'</span><span class='op'>,</span> <span class='dv'>-apple-system</span><span class='op'>,</span> <span class='dv'>BlinkMacSystemFont</span><span class='op'>,</span> <span class='st'>'Segoe UI'</span><span class='op'>,</span> <span class='dv'>Roboto</span><span class='op'>,</span> <span class='dv'>Oxygen</span><span class='op'>,</span> <span class='dv'>Ubuntu</span><span class='op'>,</span> <span class='dv'>Cantarell</span><span class='op'>,</span> <span class='dv'>sans-serif</span><span class='op'>;</span>
   }
-&lt;/style&gt;</code></pre></div>
+<span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
+</code></pre></div>
     <h2 id='google' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Using Google Fonts
@@ -1783,15 +1777,16 @@
     <p class='mb-4 leading-relaxed'>
       Create <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> with both the font import and the styling:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
-&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
-&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'><span class='dt'>&lt;</span><span class='kw'>link</span><span class='ot'> rel</span><span class='op'>=</span><span class='st'>"preconnect"</span><span class='ot'> href</span><span class='op'>=</span><span class='st'>"https://fonts.googleapis.com"</span><span class='dt'>&gt;</span>
+<span class='dt'>&lt;</span><span class='kw'>link</span><span class='ot'> rel</span><span class='op'>=</span><span class='st'>"preconnect"</span><span class='ot'> href</span><span class='op'>=</span><span class='st'>"https://fonts.gstatic.com"</span><span class='ot'> crossorigin</span><span class='dt'>&gt;</span>
+<span class='dt'>&lt;</span><span class='kw'>link</span><span class='ot'> href</span><span class='op'>=</span><span class='st'>"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700</span><span class='er'>&</span><span class='st'>display=swap"</span><span class='ot'> rel</span><span class='op'>=</span><span class='st'>"stylesheet"</span><span class='dt'>&gt;</span>
 
-&lt;style data-category="global-font"&gt;
+<span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"global-font"</span><span class='dt'>&gt;</span>
   body {
-    font-family: 'Inter', sans-serif;
+    <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'Inter'</span><span class='op'>,</span> <span class='dv'>sans-serif</span><span class='op'>;</span>
   }
-&lt;/style&gt;</code></pre></div>
+<span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
+</code></pre></div>
     <h2 id='custom' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Self-hosting Custom Fonts
@@ -1825,18 +1820,19 @@
         </li>
       
     </ul>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'>&lt;style data-category="custom-fonts"&gt;
-  @font-face {
-    font-family: 'YourFont';
-    src: url('${ema:emanoteStaticLayerUrl}/fonts/YourFont.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html language-html'><span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"custom-fonts"</span><span class='dt'>&gt;</span>
+  <span class='im'>@font-face</span> {
+    <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>;</span>
+    <span class='kw'>src</span><span class='ch'>:</span> <span class='fu'>url(</span><span class='st'>'${ema:emanoteStaticLayerUrl}/fonts/YourFont.woff2'</span><span class='fu'>)</span> <span class='fu'>format(</span><span class='st'>'woff2'</span><span class='fu'>)</span><span class='op'>;</span>
+    <span class='kw'>font-weight</span><span class='ch'>:</span> <span class='dv'>400</span><span class='op'>;</span>
+    <span class='kw'>font-style</span><span class='ch'>:</span> <span class='dv'>normal</span><span class='op'>;</span>
   }
 
   body {
-    font-family: 'YourFont', sans-serif;
+    <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>,</span> <span class='dv'>sans-serif</span><span class='op'>;</span>
   }
-&lt;/style&gt;</code></pre></div>
+<span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
+</code></pre></div>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-blue-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/fonts.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>

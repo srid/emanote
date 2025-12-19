@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   <link href='/query.xml' rel='alternate' type='application/atom+xml' title='Atom Feed' />
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1187,8 +1180,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1371,9 +1364,10 @@
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-path:./*
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>path:./*</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h3 id='list-notes-in-an-arbitrary-folder' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   List notes in an arbitrary folder
@@ -1387,9 +1381,10 @@ path:./*
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-path:foo/bar/*
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>path:foo/bar/*</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h3 id='list-notes-by-a-tag' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   List notes by a tag
@@ -1403,9 +1398,10 @@ path:foo/bar/*
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-tag:#foo
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>tag:#foo</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h3 id='list-notes-by-a-tag-pattern' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   List notes by a tag pattern
@@ -1419,9 +1415,10 @@ tag:#foo
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-tag:foo/*/qux
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>tag:foo/*/qux</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h3 id='list-folgezettel-children-of-current-note' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   List folgezettel children of current note
@@ -1435,9 +1432,10 @@ tag:foo/*/qux
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-children:.
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>children:.</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h3 id='list-folgezettel-parents-of-current-note' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   List folgezettel parents of current note
@@ -1451,9 +1449,10 @@ children:.
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query
-parents:.
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query</span>
+<span class='in'>parents:.</span>
+<span class='in'>```</span>
+</code></pre></div>
     <h2 id='timeline-queries' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Timeline queries
@@ -1471,9 +1470,10 @@ parents:.
     <p class='mb-4 leading-relaxed'>
       Queries can be rendered as a timeline by using the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>timeline</code> code block attribute.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```query {.timeline}
-tag:emanote/syntax/**
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```query {.timeline}</span>
+<span class='in'>tag:emanote/syntax/**</span>
+<span class='in'>```</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This will use the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>date</code> <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>frontmatter</a> metadata to sort the results, as well as display the date alongside it. A live demo of that snippet above is presented below:
     </p>

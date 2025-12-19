@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -723,6 +716,48 @@
         
       
     </span>
+    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syntax Highlighting' href='syntax-highlighting'>
+      Syntax Highlighting
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
     <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Adding Images' href='adding-images'>
       Adding Images
     </a>
@@ -857,48 +892,6 @@
   -->
   
     
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-blue-50 dark:hover:bg-blue-950 hover:text-blue-700 dark:hover:text-blue-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syntax Highlighting' href='syntax-highlighting'>
-      Syntax Highlighting
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
   
 </div>
     
@@ -1066,9 +1059,10 @@
     <p class='mb-4 leading-relaxed'>
       To enable this, add the following to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>page.bodyHtml</code> of <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>page:
-  bodyHtml: |
-    &lt;snippet var="js.mermaid" /&gt;</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'><span class='fu'>page</span><span class='kw'>:</span>
+<span class='fu'>  bodyHtml</span><span class='kw'>: </span><span class='ch'>|</span>
+    &lt;snippet var="js.mermaid" /&gt;
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       The above alias will add Mermaid <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>&lt;style&gt;</code> and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>&lt;script&gt;</code> tags based on Emanote’s defaults.
     </p>
@@ -1100,14 +1094,15 @@
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```mermaid
-%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%
-graph TD;
-    A--&gt;B;
-    A--&gt;C;
-    B--&gt;D;
-    C--&gt;D;
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+<span class='in'>%%{init: {'theme': 'forest', "flowchart" : { "curve" : "basis" } } }%%</span>
+<span class='in'>graph TD;</span>
+<span class='in'>    A--&gt;B;</span>
+<span class='in'>    A--&gt;C;</span>
+<span class='in'>    B--&gt;D;</span>
+<span class='in'>    C--&gt;D;</span>
+<span class='in'>```</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
@@ -1130,18 +1125,19 @@ graph TD;
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```mermaid
-stateDiagram
-    direction LR
-    [*] --&gt; A
-    A --&gt; B
-    B --&gt; C
-    state B {
-      direction LR
-      a --&gt; b
-    }
-    B --&gt; D
-```</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+<span class='in'>stateDiagram</span>
+<span class='in'>    direction LR</span>
+<span class='in'>    [*] --&gt; A</span>
+<span class='in'>    A --&gt; B</span>
+<span class='in'>    B --&gt; C</span>
+<span class='in'>    state B {</span>
+<span class='in'>      direction LR</span>
+<span class='in'>      a --&gt; b</span>
+<span class='in'>    }</span>
+<span class='in'>    B --&gt; D</span>
+<span class='in'>```</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
@@ -1168,37 +1164,38 @@ stateDiagram
 
 
     </h3>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```mermaid
-gantt
-    dateFormat  YYYY-MM-DD
-    title       Adding GANTT diagram functionality to mermaid
-    excludes    weekends
-    %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+<span class='in'>gantt</span>
+<span class='in'>    dateFormat  YYYY-MM-DD</span>
+<span class='in'>    title       Adding GANTT diagram functionality to mermaid</span>
+<span class='in'>    excludes    weekends</span>
+<span class='in'>    %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)</span>
 
-    section A section
-    Completed task            :done,    des1, 2014-01-06,2014-01-08
-    Active task               :active,  des2, 2014-01-09, 3d
-    Future task               :         des3, after des2, 5d
-    Future task2              :         des4, after des3, 5d
+<span class='in'>    section A section</span>
+<span class='in'>    Completed task            :done,    des1, 2014-01-06,2014-01-08</span>
+<span class='in'>    Active task               :active,  des2, 2014-01-09, 3d</span>
+<span class='in'>    Future task               :         des3, after des2, 5d</span>
+<span class='in'>    Future task2              :         des4, after des3, 5d</span>
 
-    section Critical tasks
-    Completed task in the critical line :crit, done, 2014-01-06,24h
-    Implement parser and jison          :crit, done, after des1, 2d
-    Create tests for parser             :crit, active, 3d
-    Future task in critical line        :crit, 5d
-    Create tests for renderer           :2d
-    Add to mermaid                      :1d
+<span class='in'>    section Critical tasks</span>
+<span class='in'>    Completed task in the critical line :crit, done, 2014-01-06,24h</span>
+<span class='in'>    Implement parser and jison          :crit, done, after des1, 2d</span>
+<span class='in'>    Create tests for parser             :crit, active, 3d</span>
+<span class='in'>    Future task in critical line        :crit, 5d</span>
+<span class='in'>    Create tests for renderer           :2d</span>
+<span class='in'>    Add to mermaid                      :1d</span>
 
-    section Documentation
-    Describe gantt syntax               :active, a1, after des1, 3d
-    Add gantt diagram to demo page      :after a1  , 20h
-    Add another diagram to demo page    :doc1, after a1  , 48h
+<span class='in'>    section Documentation</span>
+<span class='in'>    Describe gantt syntax               :active, a1, after des1, 3d</span>
+<span class='in'>    Add gantt diagram to demo page      :after a1  , 20h</span>
+<span class='in'>    Add another diagram to demo page    :doc1, after a1  , 48h</span>
 
-    section Last section
-    Describe gantt syntax               :after doc1, 3d
-    Add gantt diagram to demo page      :20h
-    Add another diagram to demo page    :48h
-```</code></pre></div>
+<span class='in'>    section Last section</span>
+<span class='in'>    Describe gantt syntax               :after doc1, 3d</span>
+<span class='in'>    Add gantt diagram to demo page      :20h</span>
+<span class='in'>    Add another diagram to demo page    :48h</span>
+<span class='in'>```</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       Results in:
     </p>
@@ -1248,17 +1245,18 @@ gantt
     <p class='mb-4 leading-relaxed'>
       Modify the layout via the config <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>layout</code>. The <a href='https://www.npmjs.com/package/@mermaid-js/layout-elk' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>elk layouts</a> are supported.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>```mermaid
----
-config:
-  layout: elk
----
-graph TD;
-    A--&gt;B;
-    A--&gt;C;
-    B--&gt;D;
-    C--&gt;D;
-```</code></pre></div><div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>---
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='in'>```mermaid</span>
+<span class='in'>---</span>
+<span class='in'>config:</span>
+<span class='in'>  layout: elk</span>
+<span class='in'>---</span>
+<span class='in'>graph TD;</span>
+<span class='in'>    A--&gt;B;</span>
+<span class='in'>    A--&gt;C;</span>
+<span class='in'>    B--&gt;D;</span>
+<span class='in'>    C--&gt;D;</span>
+<span class='in'>```</span>
+</code></pre></div><div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='mermaid language-mermaid'>---
 config:
   layout: elk
 ---

@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -1617,8 +1610,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
-          3
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -1788,13 +1781,14 @@
     <p class='mb-4 leading-relaxed'>
       The sidebar will use a page’s title by default, but you can override the sidebar item text by setting the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>short-title</code> <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>frontmatter</a> property.
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'>---
-short-title: hello
----
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown language-markdown'><span class='co'>---</span>
+<span class='an'>short-title:</span><span class='co'> hello</span>
+<span class='co'>---</span>
 
-# Hello World
+<span class='fu'># Hello World</span>
 
-Foo bar ...</code></pre></div>
+Foo bar ...
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This page will use “Hello World” as its title in the main view, but “hello” in the sidebar and index pages. For real-world example, see the page “<a href='lua-filters' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>”.
     </p>
@@ -1816,9 +1810,10 @@ Foo bar ...</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       In <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>,
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'>template:
-  sidebar:
-    enable: false</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml language-yaml'><span class='fu'>template</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>sidebar</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       
     </p>

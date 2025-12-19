@@ -31,19 +31,12 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <!-- highlight.js -->
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css' />
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js'></script>
-<!-- Include languages that Emanote itself uses -->
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/haskell.min.js'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/nix.min.js'></script>
-<script>hljs.highlightAll();</script>
-
-
+    <meta name='generator' content='Emanote' />
+<link rel='stylesheet' href='/_emanote-static/skylighting.css' />
 
   
   
-  <link href='tailwind.css?instanceId=b44b6d1c-095b-44d9-b628-3a7a954eacf7' rel='stylesheet' type='text/css' />
+  <link href='tailwind.css?instanceId=edfa51dc-4a77-48a9-aa02-fe780fb54243' rel='stylesheet' type='text/css' />
 
   <style data-category='global-font'>
   /* Refined typography with system font stack */
@@ -575,17 +568,18 @@
     <p class='mb-4 leading-relaxed'>
       Emanote’s builtin <a href='html-template' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-blue-600 dark:text-blue-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yml language-yml'>template:
-  uptree: 
-    enable: true
-  sidebar: 
-    enable: false
-  breadcrumbs: 
-    enable: false
-  toc:
-    enable: false
-  base:
-    containerClass: container mx-auto max-w-prose</code></pre></div>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yml language-yml'><span class='fu'>template</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>uptree</span><span class='kw'>:</span><span class='at'> </span>
+<span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>true</span>
+<span class='at'>  </span><span class='fu'>sidebar</span><span class='kw'>:</span><span class='at'> </span>
+<span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+<span class='at'>  </span><span class='fu'>breadcrumbs</span><span class='kw'>:</span><span class='at'> </span>
+<span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+<span class='at'>  </span><span class='fu'>toc</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+<span class='at'>  </span><span class='fu'>base</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='fu'>containerClass</span><span class='kw'>:</span><span class='at'> container mx-auto max-w-prose</span>
+</code></pre></div>
     <p class='mb-4 leading-relaxed'>
       This includes the <a href='uptree' class='text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-blue-100 dark:hover:bg-blue-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
     </p>
