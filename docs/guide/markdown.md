@@ -26,7 +26,7 @@ Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support
 
 ### Broken links
 
-Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [Foo bar](foo-bar.md) (if a regular Markdown link).
+Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
 
 ### Ambiguous links
 
