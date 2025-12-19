@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - "sky"
   pull_request:
 
 jobs:
@@ -20,7 +19,7 @@ jobs:
           nix build github:hercules-ci/flake.parts-website#checks.x86_64-linux.linkcheck --override-input emanote .
 
   website:
-    if: github.ref == 'refs/heads/sky'
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
