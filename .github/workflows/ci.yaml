@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "sky"
   pull_request:
 
 jobs:
