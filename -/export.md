@@ -100,7 +100,13 @@ order: 2
 
 # Guide
 
-You probably want to start from [[markdown]], then [[query]] and thereon to [[yaml-config]]. See also [[js]].
+This guide covers Emanote's core features:
+
+- **[[markdown]]** — Markdown extensions: wiki-links, callouts, task lists, emojis
+- **[[query]]** — Obsidian-style embed queries for dynamic content
+- **[[yaml-config]]** — Site metadata and per-page configuration
+- **[[html-template]]** — Full HTML customization with Heist templates
+- **[[layer]]** — Merging multiple notebook directories
 
 ```query
 path:./*
@@ -992,7 +998,7 @@ Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support
 
 ### Broken links
 
-Broken links render differently, for example: [[Foo bar]] (if a wiki-link) or [Foo bar](foo-bar.md) (if a regular Markdown link).
+Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
 
 ### Ambiguous links
 
@@ -2017,6 +2023,9 @@ slug: known-issues
 
 # Known Issues
 
+> [!note]
+> Emanote is stable software. This page documents rare edge cases.
+
 ## Unicode issues
 
 If the generated site (or the Nix build) does not use the expected Unicode characters, you can try setting the `LC_ALL=C.UTF-8` environment variable before running emanote. See [\#125](https://github.com/srid/emanote/issues/125) for details.
@@ -2382,6 +2391,8 @@ slug: tips
 ---
 
 # Tips
+
+Practical tips and recipes for common Emanote workflows.
 
 ```query
 path:./*
