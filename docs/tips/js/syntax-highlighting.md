@@ -1,65 +1,77 @@
 ---
 slug: syntax-highlighting
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
+order: -1
 ---
-
 
 # Syntax Highlighting
 
-In order to enable syntax highlighting, you must use a client-side JavaScript highlighter, such as [highlight.js](https://highlightjs.org/) by adding it to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter. Emanote already provides a snippet, so you may directly include the following in your `index.yaml` (assuming you are enabling it on all routes):
+Emanote includes built-in syntax highlighting powered by [skylighting](https://github.com/jgm/skylighting), the same library used by Pandoc. Code blocks are highlighted at build time—no JavaScript required.
 
-```yaml
-page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
-```
+## How it Works
 
-> [!warning] 
-> Bear in mind that when using highlight.js you must manually add language support. The above snippet includes Haskell and [Nix](https://nixos.asia) by default; otherwise, it is normally added as:
->
-> ```yaml
-> page:
->   headHtml: |
->     <snippet var="js.highlightjs" />
->     <with var="js">
->     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${value:highlightjs-ver}/languages/haskell.min.js"></script>
->     </with>
-> ```
-> 
-> (The `highlightjs-ver` variable comes from the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml).)
+Code blocks are automatically tokenized during rendering. Each token gets a CSS class (like `kw` for keywords, `st` for strings, `co` for comments) and styled via CSS included in emanote's default theme.
 
-## Example (highlight.js)
-
-### Python
-
-```python
-def fib(n):
-    a, b = 0, 1
-    while a < n:
-        print(a, end=' ')
-        a, b = b, a+b
-    print()
-fib(1000)
-```
-
-### Haskell
+### Example
 
 ```haskell
-fib 0 = 0
-fib 1 = 1
-fib n = fib (n-1) + fib (n-2)
+-- A simple factorial function
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
 ```
 
-## Prism
+```python
+def fibonacci(n):
+    """Generate fibonacci sequence up to n"""
+    a, b = 0, 1
+    while a < n:
+        yield a
+        a, b = b, a + b
+```
 
-A predefined snippet also exists for another syntax highlighter called [Prism](https://prismjs.com/). To use it add the following to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
+```nix
+{ pkgs, ... }:
+{
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+  ];
+}
+```
+
+## Supported Languages
+
+Skylighting supports [over 140 languages](https://github.com/jgm/skylighting#supported-languages) including:
+
+- Haskell, Python, JavaScript, TypeScript, Rust, Go
+- Nix, Shell/Bash, YAML, JSON, TOML
+- HTML, CSS, SQL, Markdown
+- And many more...
+
+## Customizing the Theme
+
+The default theme is included in `index.yaml` with both light and dark mode support. To customize, override the CSS classes in your own `index.yaml`:
 
 ```yaml
 page:
   headHtml: |
-    <snippet var="js.prism" />
+    <style>
+    /* Override keyword color */
+    code span.kw { color: #ff79c6; font-weight: bold; }
+    /* Override string color */
+    code span.st { color: #f1fa8c; }
+    </style>
 ```
 
-> [!warning] Prism does not cooperate well with Emanote's live preview mode.
+### Token Classes
+
+| Class | Token Type    | Example              |
+| ----- | ------------- | -------------------- |
+| `kw`  | Keyword       | `if`, `then`, `else` |
+| `dt`  | Data Type     | `Int`, `String`      |
+| `dv`  | Decimal Value | `42`, `100`          |
+| `st`  | String        | `"hello"`            |
+| `ch`  | Character     | `'a'`                |
+| `co`  | Comment       | `-- comment`         |
+| `fu`  | Function      | function names       |
+| `op`  | Operator      | `+`, `-`, `*`        |

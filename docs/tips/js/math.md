@@ -2,9 +2,7 @@
 slug: math
 page:
   headHtml: |
-    <snippet var="js.highlightjs" />
     <snippet var="js.mathjax" />
-
 ---
 
 # Math

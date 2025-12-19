@@ -1,8 +1,6 @@
 ---
 slug: mermaid
 page:
-  headHtml: |
-    <snippet var="js.highlightjs" />
   bodyHtml: |
     <snippet var="js.mermaid" />
 ---
