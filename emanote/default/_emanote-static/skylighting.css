@@ -1,5 +1,30 @@
 /* Skylighting syntax highlighting theme */
-/* To override, create your own _emanote-static/syntax-highlighting.css */
+/* To override, create your own _emanote-static/skylighting.css */
+
+/* Code block container styling */
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Dark mode code block */
+@media (prefers-color-scheme: dark) {
+  pre {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+}
+
+/* Token colors */
 
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
