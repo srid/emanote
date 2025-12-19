@@ -98,7 +98,6 @@ page:
   # Or use the JS behaviour library below.
   headHtml: |
     <meta name="generator" content="Emanote" />
-    <link rel="stylesheet" href="/_emanote-static/skylighting.css" />
 
   # Put anything that should below the <body> of these routes here:
   # You can reference other metadata keys using <snippet var=".." />
