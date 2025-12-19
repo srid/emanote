@@ -48,11 +48,20 @@ Skylighting supports [over 140 languages](https://github.com/jgm/skylighting/tre
 - HTML, CSS, SQL, Markdown
 - And many more...
 
+## Disabling Syntax Highlighting
+
+To disable built-in syntax highlighting (for example, to use a client-side highlighter like highlight.js instead), set in your [[yaml-config|index.yaml]]:
+
+```yaml
+emanote:
+  syntaxHighlighting: false
+```
+
 ## Customizing the Theme
 
 The default theme is in `_emanote-static/skylighting.css`. To customize, create your own `_emanote-static/skylighting.css` in your notes directory to override the default.
 
-Alternatively, add custom styles in your `index.yaml`:
+Alternatively, add custom styles in your [[yaml-config|index.yaml]]:
 
 ```yaml
 page:
@@ -65,15 +74,4 @@ page:
     </style>
 ```
 
-### Token Classes
-
-| Class | Token Type    | Example              |
-| ----- | ------------- | -------------------- |
-| `kw`  | Keyword       | `if`, `then`, `else` |
-| `dt`  | Data Type     | `Int`, `String`      |
-| `dv`  | Decimal Value | `42`, `100`          |
-| `st`  | String        | `"hello"`            |
-| `ch`  | Character     | `'a'`                |
-| `co`  | Comment       | `-- comment`         |
-| `fu`  | Function      | function names       |
-| `op`  | Operator      | `+`, `-`, `*`        |
+See the [skylighting documentation](https://hackage.haskell.org/package/skylighting-core/docs/Skylighting-Types.html#t:TokenType) for a full list of token classes and their meanings.
