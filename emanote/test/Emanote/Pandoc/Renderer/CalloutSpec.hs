@@ -10,6 +10,6 @@ spec :: Spec
 spec = do
   describe "callout" $ do
     it "type" . hedgehog $ do
-      parseCalloutType "[!tip]" === Just Tip
-      parseCalloutType "[!Note]" === Just Note
-      parseCalloutType "[!INFO]" === Just Info
+      parseCalloutType "[!tip]" === Just (CalloutType "tip")
+      parseCalloutType "[!Note]" === Just (CalloutType "note")
+      parseCalloutType "[!INFO]" === Just (CalloutType "info")
