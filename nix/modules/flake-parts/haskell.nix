@@ -1,10 +1,10 @@
-{ root, inputs, ... }:
 let
-  sources = import (root + /npins);
+  sources = import ../../../npins;
 in
+{ root, ... }:
 {
   imports = [
-    inputs.haskell-flake.flakeModule
+    (sources.haskell-flake + /nix/modules)
   ];
 
   perSystem = { pkgs, lib, config, system, ... }: {

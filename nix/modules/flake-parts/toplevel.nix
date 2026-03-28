@@ -1,4 +1,4 @@
-{ root, inputs, ... }:
+{ root, ... }:
 {
   flake = {
     homeManagerModule = import (root + /nix/modules/home/emanote.nix);

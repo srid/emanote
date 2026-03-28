@@ -58,6 +58,19 @@
       "url": "https://github.com/srid/emanote-template/archive/f1a0195a6cfb44591aa511a2c66aa3b16abebb90.tar.gz",
       "hash": "sha256-Z+oUGhsMgI+vVjVpkUX+gCRSyWxjXQGtfP9NtlU53YQ="
     },
+    "fourmolu-nix": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "jedimahdi",
+        "repo": "fourmolu-nix"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b",
+      "url": "https://github.com/jedimahdi/fourmolu-nix/archive/717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b.tar.gz",
+      "hash": "sha256-tCFzZQJicDdYjnuJiNK4hiiRAH7c2wQzMhOCdUMbVKE="
+    },
     "git-hooks": {
       "type": "Git",
       "repository": {
@@ -70,6 +83,19 @@
       "revision": "2749fc9197fd12231746ef685225eaf85fe087fd",
       "url": "https://github.com/bmrips/git-hooks.nix/archive/2749fc9197fd12231746ef685225eaf85fe087fd.tar.gz",
       "hash": "sha256-KVgK2PB1h5RNhHJzGn090XcW1i9Mq0FVh6qTVKsg2RU="
+    },
+    "haskell-flake": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "haskell-flake"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "39065472d2587af93a502423276bfb98c2c6fb09",
+      "url": "https://github.com/srid/haskell-flake/archive/39065472d2587af93a502423276bfb98c2c6fb09.tar.gz",
+      "hash": "sha256-Yif99ho8GNgXP0l9vxPHCKi7X16Cf7rwVd+HW1cMVeQ="
     },
     "heist-extra": {
       "type": "Git",
@@ -96,6 +122,19 @@
       "revision": "cd110d4823ee7b8bbbf115a47c79bc304c3309cd",
       "url": "https://github.com/srid/lvar/archive/cd110d4823ee7b8bbbf115a47c79bc304c3309cd.tar.gz",
       "hash": "sha256-Uwg5s0SlxLp83bXHA+6TIQV+L+lu8lwMpBdNuiuk7hg="
+    },
+    "nixpkgs": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nixos",
+        "repo": "nixpkgs"
+      },
+      "branch": "nixpkgs-unstable",
+      "submodules": false,
+      "revision": "6b4955211758ba47fac850c040a27f23b9b4008f",
+      "url": "https://github.com/nixos/nixpkgs/archive/6b4955211758ba47fac850c040a27f23b9b4008f.tar.gz",
+      "hash": "sha256-dPALCtmik9Wr14MGqVXm+OQcv7vhPBXcWNIOThGnB/Q="
     },
     "unionmount": {
       "type": "GitRelease",

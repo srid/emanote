@@ -1,7 +1,10 @@
-{ inputs, ... }:
+{ root, ... }:
+let
+  sources = import (root + /npins);
+in
 {
   perSystem = { pkgs, lib, config, system, ... }: {
-    _module.args = import inputs.nixpkgs {
+    _module.args = import sources.nixpkgs {
       inherit system;
       overlays = [
         (self: super: {

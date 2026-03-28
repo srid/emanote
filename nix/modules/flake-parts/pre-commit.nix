@@ -1,8 +1,11 @@
-{ inputs, ... }:
+let
+  sources = import ../../../npins;
+in
+{ ... }:
 {
   imports = [
-    ((import ../../../npins).git-hooks + /flake-module.nix)
-    inputs.fourmolu-nix.flakeModule
+    (sources.git-hooks + /flake-module.nix)
+    (sources.fourmolu-nix + /flake-module.nix)
   ];
   perSystem = { config, ... }: {
     pre-commit.settings = {

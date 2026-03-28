@@ -5,13 +5,14 @@
     extra-trusted-public-keys = "oss:KO872wNJkCDgmGN3xy9dT89WAhvv13EiKncTtHDItVU=";
   };
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-    haskell-flake.url = "github:srid/haskell-flake";
-    fourmolu-nix.url = "github:jedimahdi/fourmolu-nix";
-    nixos-unified.url = "github:srid/nixos-unified";
   };
   outputs = inputs:
-    inputs.nixos-unified.lib.mkFlake { inherit inputs; root = ./.; };
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
+      _module.args.root = ./.;
+      imports =
+        map (fn: ./nix/modules/flake-parts/${fn})
+          (builtins.attrNames (builtins.readDir ./nix/modules/flake-parts));
+    };
 }
