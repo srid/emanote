@@ -58,19 +58,6 @@
       "url": "https://github.com/srid/emanote-template/archive/f1a0195a6cfb44591aa511a2c66aa3b16abebb90.tar.gz",
       "hash": "sha256-Z+oUGhsMgI+vVjVpkUX+gCRSyWxjXQGtfP9NtlU53YQ="
     },
-    "fourmolu-nix": {
-      "type": "Git",
-      "repository": {
-        "type": "GitHub",
-        "owner": "jedimahdi",
-        "repo": "fourmolu-nix"
-      },
-      "branch": "main",
-      "submodules": false,
-      "revision": "717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b",
-      "url": "https://github.com/jedimahdi/fourmolu-nix/archive/717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b.tar.gz",
-      "hash": "sha256-tCFzZQJicDdYjnuJiNK4hiiRAH7c2wQzMhOCdUMbVKE="
-    },
     "git-hooks": {
       "type": "Git",
       "repository": {
@@ -84,6 +71,19 @@
       "url": "https://github.com/bmrips/git-hooks.nix/archive/2749fc9197fd12231746ef685225eaf85fe087fd.tar.gz",
       "hash": "sha256-KVgK2PB1h5RNhHJzGn090XcW1i9Mq0FVh6qTVKsg2RU="
     },
+    "gitignore-nix": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "cb5e3fdca1de58ccbc3ef53de65bd372b48f567c",
+      "url": "https://github.com/hercules-ci/gitignore.nix/archive/cb5e3fdca1de58ccbc3ef53de65bd372b48f567c.tar.gz",
+      "hash": "sha256-XmjITeZNMTQXGhhww6ed/Wacy2KzD6svioyCX7pkUu4="
+    },
     "haskell-flake": {
       "type": "Git",
       "repository": {
@@ -91,11 +91,11 @@
         "owner": "srid",
         "repo": "haskell-flake"
       },
-      "branch": "master",
+      "branch": "standalone-lib",
       "submodules": false,
-      "revision": "39065472d2587af93a502423276bfb98c2c6fb09",
-      "url": "https://github.com/srid/haskell-flake/archive/39065472d2587af93a502423276bfb98c2c6fb09.tar.gz",
-      "hash": "sha256-Yif99ho8GNgXP0l9vxPHCKi7X16Cf7rwVd+HW1cMVeQ="
+      "revision": "e3b05a7b07f9e6311904e409925a60a20b2b4638",
+      "url": "https://github.com/srid/haskell-flake/archive/e3b05a7b07f9e6311904e409925a60a20b2b4638.tar.gz",
+      "hash": "sha256-sYK5K7E+QO/D0NMi5WJvZYzeN0tlLur0+JJtmnfE874="
     },
     "heist-extra": {
       "type": "Git",
