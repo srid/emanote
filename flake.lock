@@ -1,72 +1,5 @@
 {
   "nodes": {
-    "commonmark-simple": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1755566927,
-        "narHash": "sha256-2WE5SjwgwjKdsHxDRfQIb2WRrVYoNPiCIyG4HZd8Znk=",
-        "owner": "srid",
-        "repo": "commonmark-simple",
-        "rev": "81dc7a66b2490a701bfc87e6e892307665e6336e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "ref": "0.2.0.0",
-        "repo": "commonmark-simple",
-        "type": "github"
-      }
-    },
-    "commonmark-wikilink": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1755567049,
-        "narHash": "sha256-MWOb0Ojc4EQd9fOnQEveRDdbH5Cr6kjUt04uWzBPLGQ=",
-        "owner": "srid",
-        "repo": "commonmark-wikilink",
-        "rev": "5ab01515939047b58943cc1234e7ee0cb82d1c22",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "ref": "0.2.0.0",
-        "repo": "commonmark-wikilink",
-        "type": "github"
-      }
-    },
-    "ema": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1753226458,
-        "narHash": "sha256-vDhjw+Cm7HniaiIHirwM0B2yzzLYLO3HHMaZsQRL3uw=",
-        "owner": "srid",
-        "repo": "ema",
-        "rev": "7ff434cf8f494c62de7fe6c1a36d8681929beb93",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "ref": "0.12.0.0",
-        "repo": "ema",
-        "type": "github"
-      }
-    },
-    "emanote-template": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1745726040,
-        "narHash": "sha256-cLL9ylGe1OoN/KSX7+FRW3j8rm5iPTCleOJGSdOfdE0=",
-        "owner": "srid",
-        "repo": "emanote-template",
-        "rev": "1475b182fc136fc5da3a3b3e2b9be90795af19bb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "emanote-template",
-        "type": "github"
-      }
-    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -102,22 +35,6 @@
         "type": "github"
       }
     },
-    "git-hooks": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1748731907,
-        "narHash": "sha256-KVgK2PB1h5RNhHJzGn090XcW1i9Mq0FVh6qTVKsg2RU=",
-        "owner": "bmrips",
-        "repo": "git-hooks.nix",
-        "rev": "2749fc9197fd12231746ef685225eaf85fe087fd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "bmrips",
-        "repo": "git-hooks.nix",
-        "type": "github"
-      }
-    },
     "haskell-flake": {
       "locked": {
         "lastModified": 1752499668,
@@ -130,39 +47,6 @@
       "original": {
         "owner": "srid",
         "repo": "haskell-flake",
-        "type": "github"
-      }
-    },
-    "heist-extra": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1766109391,
-        "narHash": "sha256-ytHgIoRlkI5K0SDq33znlY0wjlqcwoQCe1z9JfHT/Fw=",
-        "owner": "srid",
-        "repo": "heist-extra",
-        "rev": "81f1ea0cf1226215430171dbe613a2988c6cc46a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "repo": "heist-extra",
-        "type": "github"
-      }
-    },
-    "lvar": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1753226155,
-        "narHash": "sha256-Uwg5s0SlxLp83bXHA+6TIQV+L+lu8lwMpBdNuiuk7hg=",
-        "owner": "srid",
-        "repo": "lvar",
-        "rev": "cd110d4823ee7b8bbbf115a47c79bc304c3309cd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "ref": "0.2.0.0",
-        "repo": "lvar",
         "type": "github"
       }
     },
@@ -199,36 +83,11 @@
     },
     "root": {
       "inputs": {
-        "commonmark-simple": "commonmark-simple",
-        "commonmark-wikilink": "commonmark-wikilink",
-        "ema": "ema",
-        "emanote-template": "emanote-template",
         "flake-parts": "flake-parts",
         "fourmolu-nix": "fourmolu-nix",
-        "git-hooks": "git-hooks",
         "haskell-flake": "haskell-flake",
-        "heist-extra": "heist-extra",
-        "lvar": "lvar",
         "nixos-unified": "nixos-unified",
-        "nixpkgs": "nixpkgs",
-        "unionmount": "unionmount"
-      }
-    },
-    "unionmount": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1755566785,
-        "narHash": "sha256-1TBIhcgbQxBF48ET7Dy+PM3U2lCROBDVg5PhOtm2Q/M=",
-        "owner": "srid",
-        "repo": "unionmount",
-        "rev": "4387cdeca64d22ff02da318b1527ff8817123ced",
-        "type": "github"
-      },
-      "original": {
-        "owner": "srid",
-        "ref": "0.3.0.0",
-        "repo": "unionmount",
-        "type": "github"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

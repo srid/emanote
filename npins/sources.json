@@ -1,0 +1,118 @@
+{
+  "pins": {
+    "commonmark-simple": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-simple"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "0.2.0.0",
+      "revision": "81dc7a66b2490a701bfc87e6e892307665e6336e",
+      "url": "https://api.github.com/repos/srid/commonmark-simple/tarball/refs/tags/0.2.0.0",
+      "hash": "sha256-2WE5SjwgwjKdsHxDRfQIb2WRrVYoNPiCIyG4HZd8Znk="
+    },
+    "commonmark-wikilink": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-wikilink"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "0.2.0.0",
+      "revision": "5ab01515939047b58943cc1234e7ee0cb82d1c22",
+      "url": "https://api.github.com/repos/srid/commonmark-wikilink/tarball/refs/tags/0.2.0.0",
+      "hash": "sha256-MWOb0Ojc4EQd9fOnQEveRDdbH5Cr6kjUt04uWzBPLGQ="
+    },
+    "ema": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "ema"
+      },
+      "branch": "0.12.0.0",
+      "submodules": false,
+      "revision": "7ff434cf8f494c62de7fe6c1a36d8681929beb93",
+      "url": "https://github.com/srid/ema/archive/7ff434cf8f494c62de7fe6c1a36d8681929beb93.tar.gz",
+      "hash": "sha256-vDhjw+Cm7HniaiIHirwM0B2yzzLYLO3HHMaZsQRL3uw="
+    },
+    "emanote-template": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "emanote-template"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "f1a0195a6cfb44591aa511a2c66aa3b16abebb90",
+      "url": "https://github.com/srid/emanote-template/archive/f1a0195a6cfb44591aa511a2c66aa3b16abebb90.tar.gz",
+      "hash": "sha256-Z+oUGhsMgI+vVjVpkUX+gCRSyWxjXQGtfP9NtlU53YQ="
+    },
+    "git-hooks": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "bmrips",
+        "repo": "git-hooks.nix"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "2749fc9197fd12231746ef685225eaf85fe087fd",
+      "url": "https://github.com/bmrips/git-hooks.nix/archive/2749fc9197fd12231746ef685225eaf85fe087fd.tar.gz",
+      "hash": "sha256-KVgK2PB1h5RNhHJzGn090XcW1i9Mq0FVh6qTVKsg2RU="
+    },
+    "heist-extra": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "heist-extra"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "81f1ea0cf1226215430171dbe613a2988c6cc46a",
+      "url": "https://github.com/srid/heist-extra/archive/81f1ea0cf1226215430171dbe613a2988c6cc46a.tar.gz",
+      "hash": "sha256-ytHgIoRlkI5K0SDq33znlY0wjlqcwoQCe1z9JfHT/Fw="
+    },
+    "lvar": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "lvar"
+      },
+      "branch": "0.2.0.0",
+      "submodules": false,
+      "revision": "cd110d4823ee7b8bbbf115a47c79bc304c3309cd",
+      "url": "https://github.com/srid/lvar/archive/cd110d4823ee7b8bbbf115a47c79bc304c3309cd.tar.gz",
+      "hash": "sha256-Uwg5s0SlxLp83bXHA+6TIQV+L+lu8lwMpBdNuiuk7hg="
+    },
+    "unionmount": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "unionmount"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "0.3.0.0",
+      "revision": "4387cdeca64d22ff02da318b1527ff8817123ced",
+      "url": "https://api.github.com/repos/srid/unionmount/tarball/refs/tags/0.3.0.0",
+      "hash": "sha256-1TBIhcgbQxBF48ET7Dy+PM3U2lCROBDVg5PhOtm2Q/M="
+    }
+  },
+  "version": 7
+}

@@ -1,4 +1,7 @@
 { root, inputs, ... }:
+let
+  sources = import (root + /npins);
+in
 {
   imports = [
     inputs.haskell-flake.flakeModule
@@ -24,17 +27,17 @@
       };
       autoWire = [ "packages" "apps" "checks" ];
       packages = {
-        unionmount.source = inputs.unionmount;
-        commonmark-simple.source = inputs.commonmark-simple;
-        commonmark-wikilink.source = inputs.commonmark-wikilink;
+        unionmount.source = sources.unionmount;
+        commonmark-simple.source = sources.commonmark-simple;
+        commonmark-wikilink.source = sources.commonmark-wikilink;
         fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
         ghcid.source = "0.8.8";
-        heist-extra.source = inputs.heist-extra;
+        heist-extra.source = sources.heist-extra;
 
-        ema.source = inputs.ema + /ema;
-        ema-generics.source = inputs.ema + /ema-generics;
-        ema-extra.source = inputs.ema + /ema-extra;
-        lvar.source = inputs.lvar;
+        ema.source = sources.ema + /ema;
+        ema-generics.source = sources.ema + /ema-generics;
+        ema-extra.source = sources.ema + /ema-extra;
+        lvar.source = sources.lvar;
       };
 
       settings = {
