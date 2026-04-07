@@ -27,8 +27,6 @@
         unionmount.source = inputs.unionmount;
         commonmark-simple.source = inputs.commonmark-simple;
         commonmark-wikilink.source = inputs.commonmark-wikilink;
-        fsnotify.source = "0.4.1.0"; # Not in nixpkgs, yet.
-        ghcid.source = "0.8.8";
         heist-extra.source = inputs.heist-extra;
 
         ema.source = inputs.ema + /ema;
@@ -40,7 +38,6 @@
       settings = {
         # Haskell packages in nixpkgs are often broken in many ways; ergo,
         # it is our responsibility to fix them here.
-        fsnotify.check = false;
         heist.broken = false;
         ixset-typed.broken = false;
         ixset-typed.jailbreak = true;

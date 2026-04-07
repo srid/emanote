@@ -11,9 +11,9 @@ import Test.Hspec.Hedgehog (hedgehog)
 
 spec :: Spec
 spec = do
-  describe "tags" $ do
-    it "tags can begin with hash" . hedgehog $ do
-      s <- forAll $ Gen.text (Range.linear 2 20) Gen.alphaNum
-      let q = "tag:#" <> s
-          tag = Tag s
-      parseQuery q === Just (QueryByTag tag)
+    describe "tags" $ do
+        it "tags can begin with hash" . hedgehog $ do
+            s <- forAll $ Gen.text (Range.linear 2 20) Gen.alphaNum
+            let q = "tag:#" <> s
+                tag = Tag s
+            parseQuery q === Just (QueryByTag tag)

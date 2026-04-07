@@ -16,37 +16,37 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 
 data Task = Task
-  { _taskRoute :: R.LMLRoute
-  , -- Index of this task within the containing note. Used to sort tasks by
-    -- their original order of appearance in the Markdown file.
-    _taskNum :: Word
-  , _taskDescription :: [B.Inline]
-  , _taskChecked :: Bool
-  }
-  deriving stock (Eq, Show, Generic)
-  deriving anyclass (Aeson.ToJSON)
+    { _taskRoute :: R.LMLRoute
+    , -- Index of this task within the containing note. Used to sort tasks by
+      -- their original order of appearance in the Markdown file.
+      _taskNum :: Word
+    , _taskDescription :: [B.Inline]
+    , _taskChecked :: Bool
+    }
+    deriving stock (Eq, Show, Generic)
+    deriving anyclass (Aeson.ToJSON)
 
 instance Ord Task where
-  (<=) = (<=) `on` (_taskRoute &&& _taskNum)
+    (<=) = (<=) `on` (_taskRoute &&& _taskNum)
 
 type TaskIxs =
-  '[ -- Route to the note containing this task
-     R.LMLRoute
-   ]
+    '[ -- Route to the note containing this task
+       R.LMLRoute
+     ]
 
 type IxTask = IxSet TaskIxs Task
 
 instance Indexable TaskIxs Task where
-  indices =
-    ixList
-      (ixFun $ one . _taskRoute)
+    indices =
+        ixList
+            (ixFun $ one . _taskRoute)
 
 noteTasks :: Note -> IxTask
 noteTasks note =
-  let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
-   in Ix.fromList
-        $ zip [1 ..] taskListItems
-        <&> \(idx, (checked, doc)) ->
-          Task (note ^. N.noteRoute) idx doc checked
+    let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
+     in Ix.fromList
+            $ zip [1 ..] taskListItems
+            <&> \(idx, (checked, doc)) ->
+                Task (note ^. N.noteRoute) idx doc checked
 
 makeLenses ''Task

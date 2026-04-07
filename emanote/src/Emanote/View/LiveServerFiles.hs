@@ -1,7 +1,7 @@
 module Emanote.View.LiveServerFiles (
-  isLiveServerFile,
-  tailwindFullJsPath,
-  tailwindJsFile,
+    isLiveServerFile,
+    tailwindFullJsPath,
+    tailwindJsFile,
 )
 where
 
@@ -20,8 +20,8 @@ tailwindFullJsPath = baseDir <> "/tailwind/tailwind.cdn.js"
 
 isLiveServerFile :: FilePath -> Bool
 isLiveServerFile (toText -> fp) =
-  toText baseDir `T.isPrefixOf` fp
+    toText baseDir `T.isPrefixOf` fp
 
 tailwindJsFile :: M.Model -> StaticFile
 tailwindJsFile model =
-  fromMaybe (error "model not ready?") $ M.modelLookupStaticFile tailwindFullJsPath model
+    fromMaybe (error "model not ready?") $ M.modelLookupStaticFile tailwindFullJsPath model

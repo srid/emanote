@@ -8,8 +8,8 @@ import Test.Hspec.Hedgehog
 
 spec :: Spec
 spec = do
-  describe "callout" $ do
-    it "type" . hedgehog $ do
-      parseCalloutType "[!tip]" === Just (CalloutType "tip")
-      parseCalloutType "[!Note]" === Just (CalloutType "note")
-      parseCalloutType "[!INFO]" === Just (CalloutType "info")
+    describe "callout" $ do
+        it "type" . hedgehog $ do
+            parseCalloutType "[!tip]" === Just (CalloutType "tip")
+            parseCalloutType "[!Note]" === Just (CalloutType "note")
+            parseCalloutType "[!INFO]" === Just (CalloutType "info")

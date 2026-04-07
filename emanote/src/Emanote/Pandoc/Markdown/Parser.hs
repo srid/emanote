@@ -1,5 +1,5 @@
 module Emanote.Pandoc.Markdown.Parser (
-  parseMarkdown,
+    parseMarkdown,
 ) where
 
 import Commonmark qualified as CM
@@ -14,38 +14,38 @@ import Text.Pandoc.Definition (Pandoc)
 
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, Pandoc)
 parseMarkdown =
-  parseMarkdownWithFrontMatter @Aeson.Value
-    $
-    -- As the commonmark documentation states, pipeTableSpec should be placed after
-    -- fancyListSpec and defaultSyntaxSpec to avoid bad results when parsing
-    -- non-table lines.
-    -- see https://github.com/jgm/commonmark-hs/issues/52
-    baseExtsSansPipeTable
-    <> gfmExtensionsSansPipeTable
-    <> CE.pipeTableSpec
-    <> WL.wikilinkSpec
-    -- ASK: Can we conditionally disable this?
-    -- cf. https://github.com/srid/emanote/issues/167
-    <> IT.hashTagSpec
-    <> IH.highlightSpec
+    parseMarkdownWithFrontMatter @Aeson.Value
+        $
+        -- As the commonmark documentation states, pipeTableSpec should be placed after
+        -- fancyListSpec and defaultSyntaxSpec to avoid bad results when parsing
+        -- non-table lines.
+        -- see https://github.com/jgm/commonmark-hs/issues/52
+        baseExtsSansPipeTable
+        <> gfmExtensionsSansPipeTable
+        <> CE.pipeTableSpec
+        <> WL.wikilinkSpec
+        -- ASK: Can we conditionally disable this?
+        -- cf. https://github.com/srid/emanote/issues/167
+        <> IT.hashTagSpec
+        <> IH.highlightSpec
   where
     baseExtsSansPipeTable =
-      mconcat
-        [ CE.fancyListSpec
-        , CE.footnoteSpec
-        , CE.mathSpec
-        , CE.smartPunctuationSpec
-        , CE.definitionListSpec
-        , CE.attributesSpec
-        , CE.rawAttributeSpec
-        , CE.fencedDivSpec
-        , CE.bracketedSpanSpec
-        , CE.autolinkSpec
-        , CM.defaultSyntaxSpec
-        ]
+        mconcat
+            [ CE.fancyListSpec
+            , CE.footnoteSpec
+            , CE.mathSpec
+            , CE.smartPunctuationSpec
+            , CE.definitionListSpec
+            , CE.attributesSpec
+            , CE.rawAttributeSpec
+            , CE.fencedDivSpec
+            , CE.bracketedSpanSpec
+            , CE.autolinkSpec
+            , CM.defaultSyntaxSpec
+            ]
     gfmExtensionsSansPipeTable =
-      CE.emojiSpec
-        <> CE.strikethroughSpec
-        <> CE.autolinkSpec
-        <> CE.autoIdentifiersSpec
-        <> CE.taskListSpec
+        CE.emojiSpec
+            <> CE.strikethroughSpec
+            <> CE.autolinkSpec
+            <> CE.autoIdentifiersSpec
+            <> CE.taskListSpec

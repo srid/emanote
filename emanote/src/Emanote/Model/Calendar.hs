@@ -13,14 +13,14 @@ import Relude
 -- HACK: This is so that calendar backlinks are sorted properly.
 backlinkSortKey :: Model -> LMLRoute -> Down Title
 backlinkSortKey model =
-  Down . flip modelLookupTitle model
+    Down . flip modelLookupTitle model
 
 -- HACK: Until we have a proper search support. This sorts query results for
 -- timeline
 noteSortKey :: N.Note -> (Down (Maybe Text), LMLRoute)
 noteSortKey note =
-  (Down $ N.lookupMeta @Text (one "date") note, N._noteRoute note)
+    (Down $ N.lookupMeta @Text (one "date") note, N._noteRoute note)
 
 isDailyNote :: LMLRoute -> Bool
 isDailyNote =
-  isJust . parseRouteDay
+    isJust . parseRouteDay
