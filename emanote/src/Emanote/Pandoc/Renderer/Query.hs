@@ -1,6 +1,6 @@
 module Emanote.Pandoc.Renderer.Query (
-    queryResolvingSplice,
-    noteSpliceMap,
+  queryResolvingSplice,
+  noteSpliceMap,
 ) where
 
 import Data.List qualified as List
@@ -24,29 +24,29 @@ import Text.Pandoc.Definition qualified as B
 
 queryResolvingSplice :: PandocBlockRenderer Model LMLRoute
 queryResolvingSplice model _nr ctx noteRoute blk = do
-    B.CodeBlock
-        (_id', classes, _attrs)
-        (Q.parseQuery -> Just q) <-
-        pure blk
-    guard $ List.elem "query" classes
-    let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
-        queryTpl = encodeUtf8 $ "/templates/filters/query-" <> fromMaybe "default" mOtherCls
-    pure $ do
-        tpl <- HE.lookupHtmlTemplateMust queryTpl
-        HE.runCustomTemplate tpl $ do
-            "query" ##
-                HI.textSplice (show q)
-            "result" ##
-                (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
-                    `foldMapM` Q.runQuery noteRoute model q
+  B.CodeBlock
+    (_id', classes, _attrs)
+    (Q.parseQuery -> Just q) <-
+    pure blk
+  guard $ List.elem "query" classes
+  let mOtherCls = nonEmpty (List.delete "query" classes) <&> T.intercalate " " . toList
+      queryTpl = encodeUtf8 $ "/templates/filters/query-" <> fromMaybe "default" mOtherCls
+  pure $ do
+    tpl <- HE.lookupHtmlTemplateMust queryTpl
+    HE.runCustomTemplate tpl $ do
+      "query" ##
+        HI.textSplice (show q)
+      "result" ##
+        (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
+          `foldMapM` Q.runQuery noteRoute model q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::
-    ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
-    Model ->
-    MN.Note ->
-    H.Splices (HI.Splice Identity)
+  ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
+  Model ->
+  MN.Note ->
+  H.Splices (HI.Splice Identity)
 noteSpliceMap withCtx model note = do
-    "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx id (MN._noteTitle note)
-    "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (LMLView_Html, note ^. MN.noteRoute))
-    "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)
+  "ema:note:title" ## withCtx $ \ctx -> Tit.titleSplice ctx id (MN._noteTitle note)
+  "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (LMLView_Html, note ^. MN.noteRoute))
+  "ema:note:metadata" ## HJ.bindJson (note ^. MN.noteMeta)

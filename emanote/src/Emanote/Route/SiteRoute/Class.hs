@@ -1,20 +1,20 @@
 module Emanote.Route.SiteRoute.Class (
-    decodeVirtualRoute,
-    noteFileSiteRoute,
-    noteFileSiteRoute',
-    noteFeedSiteRoute,
-    staticFileSiteRoute,
-    lmlSiteRoute,
-    indexRoute,
-    tagIndexRoute,
-    taskIndexRoute,
-    siteRouteUrl,
-    siteRouteUrlStatic,
-    urlStrategySuffix,
+  decodeVirtualRoute,
+  noteFileSiteRoute,
+  noteFileSiteRoute',
+  noteFeedSiteRoute,
+  staticFileSiteRoute,
+  lmlSiteRoute,
+  indexRoute,
+  tagIndexRoute,
+  taskIndexRoute,
+  siteRouteUrl,
+  siteRouteUrlStatic,
+  urlStrategySuffix,
 
-    -- * Ema stuff
-    emanoteRouteEncoder,
-    emanoteGeneratableRoutes,
+  -- * Ema stuff
+  emanoteRouteEncoder,
+  emanoteGeneratableRoutes,
 ) where
 
 import Data.IxSet.Typed qualified as Ix
@@ -39,134 +39,134 @@ import Relude
 
 emanoteGeneratableRoutes :: ModelEma -> [SiteRoute]
 emanoteGeneratableRoutes model =
-    let htmlRoutes =
-            model
-                ^. M.modelNotes
-                    & Ix.toList
-                    <&> noteFileSiteRoute'
-        feedRoutes =
-            model
-                ^. M.modelNotes
-                    & Ix.toList
-                    & filter N.noteHasFeed
-                    <&> noteFeedSiteRoute
-        staticRoutes =
-            let includeFile f =
-                    not (LiveServerFile.isLiveServerFile f)
-                        || (f == LiveServerFile.tailwindFullJsPath && not (model ^. M.modelCompileTailwind))
-             in model
-                    ^. M.modelStaticFiles
-                        & Ix.toList
-                        & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
-                        <&> staticFileSiteRoute
-        virtualRoutes :: [VirtualRoute] =
-            let tags = fst <$> M.modelTags model
-                tagPaths =
-                    Set.fromList
-                        $ ([] :)
-                        $ concatMap -- [] Triggers generation of main tag index.
-                            ( \(HT.deconstructTag -> tagPath) ->
-                                NE.filter (not . null) $ NE.inits tagPath
-                            )
-                            tags
-             in VirtualRoute_Index
-                    : VirtualRoute_Export ExportFormat_Metadata
-                    : VirtualRoute_Export ExportFormat_Content
-                    : VirtualRoute_StorkIndex
-                    : VirtualRoute_TaskIndex
-                    : (VirtualRoute_TagIndex <$> toList tagPaths)
-     in htmlRoutes
-            <> feedRoutes
-            <> staticRoutes
-            <> fmap SiteRoute_VirtualRoute virtualRoutes
+  let htmlRoutes =
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            <&> noteFileSiteRoute'
+      feedRoutes =
+        model
+          ^. M.modelNotes
+            & Ix.toList
+            & filter N.noteHasFeed
+            <&> noteFeedSiteRoute
+      staticRoutes =
+        let includeFile f =
+              not (LiveServerFile.isLiveServerFile f)
+                || (f == LiveServerFile.tailwindFullJsPath && not (model ^. M.modelCompileTailwind))
+         in model
+              ^. M.modelStaticFiles
+                & Ix.toList
+                & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
+                <&> staticFileSiteRoute
+      virtualRoutes :: [VirtualRoute] =
+        let tags = fst <$> M.modelTags model
+            tagPaths =
+              Set.fromList
+                $ ([] :)
+                $ concatMap -- [] Triggers generation of main tag index.
+                  ( \(HT.deconstructTag -> tagPath) ->
+                      NE.filter (not . null) $ NE.inits tagPath
+                  )
+                  tags
+         in VirtualRoute_Index
+              : VirtualRoute_Export ExportFormat_Metadata
+              : VirtualRoute_Export ExportFormat_Content
+              : VirtualRoute_StorkIndex
+              : VirtualRoute_TaskIndex
+              : (VirtualRoute_TagIndex <$> toList tagPaths)
+   in htmlRoutes
+        <> feedRoutes
+        <> staticRoutes
+        <> fmap SiteRoute_VirtualRoute virtualRoutes
 
 emanoteRouteEncoder :: (HasCallStack) => ModelEma -> Prism' FilePath SiteRoute
 emanoteRouteEncoder model =
-    prism' enc dec
+  prism' enc dec
   where
     enc = \case
-        SiteRoute_MissingR s ->
-            -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
-            -- Unfortunately, since ema:multisite does isomorphism check of
-            -- encoder, we can't just error out here.
-            s
-        SiteRoute_AmbiguousR fp _ ->
-            -- FIXME: See note above.
-            error $ "emanote: attempt to encode an ambiguous route: " <> toText fp
-        SiteRoute_ResourceRoute r ->
-            encodeResourceRoute model r
-        SiteRoute_VirtualRoute r ->
-            encodeVirtualRoute r
+      SiteRoute_MissingR s ->
+        -- error $ toText $ "emanote: attempt to encode a 404 route: " <> s
+        -- Unfortunately, since ema:multisite does isomorphism check of
+        -- encoder, we can't just error out here.
+        s
+      SiteRoute_AmbiguousR fp _ ->
+        -- FIXME: See note above.
+        error $ "emanote: attempt to encode an ambiguous route: " <> toText fp
+      SiteRoute_ResourceRoute r ->
+        encodeResourceRoute model r
+      SiteRoute_VirtualRoute r ->
+        encodeVirtualRoute r
 
     dec fp =
-        fmap SiteRoute_VirtualRoute (decodeVirtualRoute fp)
-            <|> decodeGeneratedRoute model fp
-            <|> pure (SiteRoute_MissingR fp)
+      fmap SiteRoute_VirtualRoute (decodeVirtualRoute fp)
+        <|> decodeGeneratedRoute model fp
+        <|> pure (SiteRoute_MissingR fp)
 
 encodeResourceRoute :: (HasCallStack) => ModelEma -> ResourceRoute -> FilePath
 encodeResourceRoute model = \case
-    ResourceRoute_LML view r ->
-        -- HACK: This should never fail ... but *if* it does, consult
-        -- https://github.com/srid/emanote/issues/148
-        fromMaybe
-            -- FIXME: See note above.
-            (error $ "emanote: attempt to encode missing note resource: " <> show r)
-            ( do
-                (_, note) <- M.modelLookupNoteByRoute (view, r) model
-                case view of
-                    R.LMLView_Atom -> R.encodeRoute <$> N.noteXmlRoute note
-                    R.LMLView_Html -> pure $ R.encodeRoute $ N.noteHtmlRoute note
-            )
-    ResourceRoute_StaticFile r _fpAbs ->
-        R.encodeRoute r
+  ResourceRoute_LML view r ->
+    -- HACK: This should never fail ... but *if* it does, consult
+    -- https://github.com/srid/emanote/issues/148
+    fromMaybe
+      -- FIXME: See note above.
+      (error $ "emanote: attempt to encode missing note resource: " <> show r)
+      ( do
+          (_, note) <- M.modelLookupNoteByRoute (view, r) model
+          case view of
+            R.LMLView_Atom -> R.encodeRoute <$> N.noteXmlRoute note
+            R.LMLView_Html -> pure $ R.encodeRoute $ N.noteHtmlRoute note
+      )
+  ResourceRoute_StaticFile r _fpAbs ->
+    R.encodeRoute r
 
 -- | Decode a route that is known to refer to a resource in the model
 decodeGeneratedRoute :: ModelEma -> FilePath -> Maybe SiteRoute
 decodeGeneratedRoute model fp =
-    fmap
-        staticFileSiteRoute
-        (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
-        <|> mFeedRoute
-        <|> noteHtmlSiteRoute
-            (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
+  fmap
+    staticFileSiteRoute
+    (flip M.modelLookupStaticFileByRoute model =<< R.decodeAnyRoute fp)
+    <|> mFeedRoute
+    <|> noteHtmlSiteRoute
+      (flip M.modelLookupNoteByHtmlRoute model $ R.decodeHtmlRoute fp)
   where
     mFeedRoute :: Maybe SiteRoute
     mFeedRoute = case R.decodeXmlRoute fp of
-        Nothing -> Nothing
-        Just r -> noteFeedSiteRoute <$> M.modelLookupFeedNoteByHtmlRoute r model
+      Nothing -> Nothing
+      Just r -> noteFeedSiteRoute <$> M.modelLookupFeedNoteByHtmlRoute r model
     noteHtmlSiteRoute :: Rel.ResolvedRelTarget N.Note -> Maybe SiteRoute
     noteHtmlSiteRoute = \case
-        Rel.RRTMissing ->
-            Nothing
-        Rel.RRTFound note ->
-            Just $ noteFileSiteRoute' note
-        Rel.RRTAmbiguous notes ->
-            Just $ ambiguousNoteURLsRoute notes
+      Rel.RRTMissing ->
+        Nothing
+      Rel.RRTFound note ->
+        Just $ noteFileSiteRoute' note
+      Rel.RRTAmbiguous notes ->
+        Just $ ambiguousNoteURLsRoute notes
     ambiguousNoteURLsRoute :: NonEmpty N.Note -> SiteRoute
     ambiguousNoteURLsRoute ns =
-        SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
+      SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
 noteFeedSiteRoute :: N.Note -> SiteRoute
 noteFeedSiteRoute = SiteRoute_ResourceRoute . ResourceRoute_LML R.LMLView_Atom . N._noteRoute
 
 noteFileSiteRoute :: (R.LMLView, N.Note) -> SiteRoute
 noteFileSiteRoute =
-    lmlSiteRoute . fmap N._noteRoute
+  lmlSiteRoute . fmap N._noteRoute
 
 noteFileSiteRoute' :: N.Note -> SiteRoute
 noteFileSiteRoute' =
-    noteFileSiteRoute . (R.LMLView_Html,)
+  noteFileSiteRoute . (R.LMLView_Html,)
 
 lmlSiteRoute :: (R.LMLView, LMLRoute) -> SiteRoute
 lmlSiteRoute =
-    SiteRoute_ResourceRoute . uncurry lmlResourceRoute
+  SiteRoute_ResourceRoute . uncurry lmlResourceRoute
 
 lmlResourceRoute :: R.LMLView -> LMLRoute -> ResourceRoute
 lmlResourceRoute = ResourceRoute_LML
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-    (SiteRoute_ResourceRoute . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
+  (SiteRoute_ResourceRoute . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
   where
     staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
     staticResourceRoute = uncurry ResourceRoute_StaticFile
@@ -181,12 +181,12 @@ This function builds static URLs by:
 -}
 siteRouteUrlStatic :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrlStatic model sr =
-    -- For the home route, if the base URL is empty,
-    -- use baseUrl from template to avoid empty href attributes which can
-    -- cause issues with HTML validation tools like html-proofer
-    if url == ""
-        then getBaseUrl model
-        else url
+  -- For the home route, if the base URL is empty,
+  -- use baseUrl from template to avoid empty href attributes which can
+  -- cause issues with HTML validation tools like html-proofer
+  if url == ""
+    then getBaseUrl model
+    else url
   where
     (rp, _) = M.withoutRoutePrism model
 
@@ -194,54 +194,54 @@ siteRouteUrlStatic model sr =
 
     getBaseUrl :: Model -> Text
     getBaseUrl m =
-        Model.lookupRouteMeta "/" ("template" :| ["baseUrl"]) (M.modelIndexRoute m) m
+      Model.lookupRouteMeta "/" ("template" :| ["baseUrl"]) (M.modelIndexRoute m) m
 
 -- | Like siteRouteUrlStatic but live-server friendly
 siteRouteUrl :: (HasCallStack) => Model -> SiteRoute -> Text
 siteRouteUrl model sr =
-    siteRouteUrlStatic model sr <> siteRouteQuery
+  siteRouteUrlStatic model sr <> siteRouteQuery
   where
     siteRouteQuery =
-        maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime
+      maybe "" (("?t=" <>) . toText . formatTime defaultTimeLocale "%s") staticFileModifiedTime
     staticFileModifiedTime = do
-        -- In live server model, we append a ?t=.. to trigger the browser into
-        -- reloading (or invalidating its cache of) this embed static file.
-        guard $ M.inLiveServer model
-        sfRoute <- staticFileRouteCase sr
-        sf <- M.modelLookupStaticFileByRoute sfRoute model
-        pure $ sf ^. SF.staticFileTime
+      -- In live server model, we append a ?t=.. to trigger the browser into
+      -- reloading (or invalidating its cache of) this embed static file.
+      guard $ M.inLiveServer model
+      sfRoute <- staticFileRouteCase sr
+      sf <- M.modelLookupStaticFileByRoute sfRoute model
+      pure $ sf ^. SF.staticFileTime
     staticFileRouteCase :: SiteRoute -> Maybe StaticFileRoute
     staticFileRouteCase = \case
-        SiteRoute_MissingR _fp ->
+      SiteRoute_MissingR _fp ->
+        Nothing
+      SiteRoute_AmbiguousR _ _ ->
+        Nothing
+      SiteRoute_ResourceRoute rr ->
+        case rr of
+          ResourceRoute_StaticFile sfR _fp ->
+            Just sfR
+          ResourceRoute_LML _ _ ->
             Nothing
-        SiteRoute_AmbiguousR _ _ ->
-            Nothing
-        SiteRoute_ResourceRoute rr ->
-            case rr of
-                ResourceRoute_StaticFile sfR _fp ->
-                    Just sfR
-                ResourceRoute_LML _ _ ->
-                    Nothing
-        SiteRoute_VirtualRoute _ -> Nothing
+      SiteRoute_VirtualRoute _ -> Nothing
 
 urlStrategySuffix :: Model -> Text
 urlStrategySuffix model =
-    case urlStrategy model of
-        Ema.UrlDirect -> ".html"
-        Ema.UrlPretty -> ""
+  case urlStrategy model of
+    Ema.UrlDirect -> ".html"
+    Ema.UrlPretty -> ""
 
 urlStrategy :: ModelT f -> UrlStrategy
 urlStrategy model =
-    Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
+  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
 indexRoute :: SiteRoute
 indexRoute =
-    SiteRoute_VirtualRoute VirtualRoute_Index
+  SiteRoute_VirtualRoute VirtualRoute_Index
 
 tagIndexRoute :: [HT.TagNode] -> SiteRoute
 tagIndexRoute =
-    SiteRoute_VirtualRoute . VirtualRoute_TagIndex
+  SiteRoute_VirtualRoute . VirtualRoute_TagIndex
 
 taskIndexRoute :: SiteRoute
 taskIndexRoute =
-    SiteRoute_VirtualRoute VirtualRoute_TaskIndex
+  SiteRoute_VirtualRoute VirtualRoute_TaskIndex

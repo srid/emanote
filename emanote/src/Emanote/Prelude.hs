@@ -11,7 +11,7 @@ import Relude
 -- | Monadic version of `chain`
 chainM :: (Monad m) => (b -> m (a -> a)) -> [b] -> m (a -> a)
 chainM f =
-    fmap chain . mapM f
+  fmap chain . mapM f
   where
     -- Apply the list of actions in the given order to an initial argument.
     --
@@ -21,8 +21,8 @@ chainM f =
 
 -- | User-provided input is malformed.
 newtype BadInput = BadInput Text
-    deriving stock (Show)
-    deriving anyclass (Exception)
+  deriving stock (Show)
+  deriving anyclass (Exception)
 
 -------------
 -- Logging

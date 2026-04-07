@@ -2,12 +2,12 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Emanote.Source.Dynamic (
-    emanoteSiteInput,
-    EmanoteConfig (..),
-    emanoteCompileTailwind,
-    emanoteConfigCli,
-    emanoteConfigNoteFn,
-    emanoteConfigPandocRenderers,
+  emanoteSiteInput,
+  EmanoteConfig (..),
+  emanoteCompileTailwind,
+  emanoteConfigCli,
+  emanoteConfigNoteFn,
+  emanoteConfigPandocRenderers,
 ) where
 
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
@@ -36,62 +36,62 @@ import UnliftIO (MonadUnliftIO)
 
 -- | Everything that's required to run an Emanote site.
 data EmanoteConfig = EmanoteConfig
-    { _emanoteConfigCli :: CLI.Cli
-    -- ^ CLI arguments (includes layers)
-    , _emanoteConfigNoteFn :: Note -> Note
-    -- ^ A function to filter the `Note` before it gets added to the model.
-    , _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
-    -- ^ How to render Pandoc to Heist HTML.
-    , _emanoteCompileTailwind :: Bool
-    -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
-    }
+  { _emanoteConfigCli :: CLI.Cli
+  -- ^ CLI arguments (includes layers)
+  , _emanoteConfigNoteFn :: Note -> Note
+  -- ^ A function to filter the `Note` before it gets added to the model.
+  , _emanoteConfigPandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
+  -- ^ How to render Pandoc to Heist HTML.
+  , _emanoteCompileTailwind :: Bool
+  -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
+  }
 
 {- | Make an Ema `Dynamic` for the Emanote model.
 
  The bulk of logic for building the Dynamic is in `Patch.hs`.
 -}
 emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
-emanoteSiteInput cliAct EmanoteConfig{..} = do
-    defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
-    instanceId <- liftIO UUID.nextRandom
-    storkIndex <- Stork.newIndex
-    let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-        initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
-    scriptingEngine <- getEngine
-    Dynamic
-        <$> UM.unionMount
-            (layers & Set.map (id &&& Loc.locPath))
-            Pattern.filePatterns
-            Pattern.ignorePatterns
-            initialModel
-            (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+emanoteSiteInput cliAct EmanoteConfig {..} = do
+  defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
+  instanceId <- liftIO UUID.nextRandom
+  storkIndex <- Stork.newIndex
+  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
+  scriptingEngine <- getEngine
+  Dynamic
+    <$> UM.unionMount
+      (layers & Set.map (id &&& Loc.locPath))
+      Pattern.filePatterns
+      Pattern.ignorePatterns
+      initialModel
+      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
 
 type ChangeHandler tag model m =
-    tag ->
-    FilePath ->
-    UM.FileAction (NonEmpty (Loc, FilePath)) ->
-    m (model -> model)
+  tag ->
+  FilePath ->
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (model -> model)
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
 mapFsChanges h ch = do
-    uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
+  uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
   where
     -- Temporarily use block buffering before calling an IO action that is
     -- known ahead to log rapidly, so as to not hamper serial processing speed.
     -- FIXME: This buffers warnings and errors (when parsing .md file) without
     -- dumping them to console. So disabling for now. But we need a proper fix.
     _withBlockBuffering f =
-        (hSetBuffering stdout (BlockBuffering Nothing) >> hSetBuffering stderr LineBuffering)
-            *> f
-            <* (hFlush stdout >> hFlush stderr >> hSetBuffering stdout LineBuffering)
+      (hSetBuffering stdout (BlockBuffering Nothing) >> hSetBuffering stderr LineBuffering)
+        *> f
+        <* (hFlush stdout >> hFlush stderr >> hSetBuffering stdout LineBuffering)
 
 mapFsChangesOnExt ::
-    (MonadIO m, MonadLogger m) =>
-    ChangeHandler tag model m ->
-    tag ->
-    Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
-    m (model -> model)
+  (MonadIO m, MonadLogger m) =>
+  ChangeHandler tag model m ->
+  tag ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
+  m (model -> model)
 mapFsChangesOnExt h fpType fps = do
-    uncurry (h fpType) `chainM` Map.toList fps
+  uncurry (h fpType) `chainM` Map.toList fps
 
 makeLenses ''EmanoteConfig

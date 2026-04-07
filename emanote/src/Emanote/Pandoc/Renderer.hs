@@ -11,11 +11,11 @@
  supported using a traditional whole-AST extension API.
 -}
 module Emanote.Pandoc.Renderer (
-    PandocRenderers (PandocRenderers),
-    PandocInlineRenderer,
-    PandocBlockRenderer,
-    mkRenderCtxWithPandocRenderers,
-    EmanotePandocRenderers (..),
+  PandocRenderers (PandocRenderers),
+  PandocInlineRenderer,
+  PandocBlockRenderer,
+  mkRenderCtxWithPandocRenderers,
+  EmanotePandocRenderers (..),
 ) where
 
 import Heist (HeistT)
@@ -27,56 +27,56 @@ import Text.Pandoc.Definition qualified as B
 
 -- | Custom Heist renderer function for specific Pandoc AST nodes
 type PandocRenderF model route astNode =
-    model ->
-    PandocRenderers model route ->
-    Splices.RenderCtx ->
-    route ->
-    astNode ->
-    Maybe (HI.Splice Identity)
+  model ->
+  PandocRenderers model route ->
+  Splices.RenderCtx ->
+  route ->
+  astNode ->
+  Maybe (HI.Splice Identity)
 
 type PandocInlineRenderer model route = PandocRenderF model route B.Inline
 
 type PandocBlockRenderer model route = PandocRenderF model route B.Block
 
 data PandocRenderers model route = PandocRenderers
-    { pandocInlineRenderers :: [PandocInlineRenderer model route]
-    , pandocBlockRenderers :: [PandocBlockRenderer model route]
-    }
+  { pandocInlineRenderers :: [PandocInlineRenderer model route]
+  , pandocBlockRenderers :: [PandocBlockRenderer model route]
+  }
 
 mkRenderCtxWithPandocRenderers ::
-    forall model route m.
-    (Monad m) =>
-    PandocRenderers model route ->
-    Map Text Text ->
-    model ->
-    route ->
-    -- | Enable syntax highlighting for code blocks
-    Bool ->
-    HeistT Identity m Splices.RenderCtx
-mkRenderCtxWithPandocRenderers nr@PandocRenderers{..} classRules model x =
-    Splices.mkRenderCtx
-        classRules
-        ( \ctx blk ->
-            asum
-                $ pandocBlockRenderers
-                <&> \f ->
-                    f model nr ctx x blk
-        )
-        ( \ctx blk ->
-            asum
-                $ pandocInlineRenderers
-                <&> \f ->
-                    f model nr ctx x blk
-        )
+  forall model route m.
+  (Monad m) =>
+  PandocRenderers model route ->
+  Map Text Text ->
+  model ->
+  route ->
+  -- | Enable syntax highlighting for code blocks
+  Bool ->
+  HeistT Identity m Splices.RenderCtx
+mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
+  Splices.mkRenderCtx
+    classRules
+    ( \ctx blk ->
+        asum
+          $ pandocBlockRenderers
+          <&> \f ->
+            f model nr ctx x blk
+    )
+    ( \ctx blk ->
+        asum
+          $ pandocInlineRenderers
+          <&> \f ->
+            f model nr ctx x blk
+    )
 
 data EmanotePandocRenderers a r = EmanotePandocRenderers
-    { blockRenderers :: PandocRenderers a r
-    , inlineRenderers :: PandocRenderers a r
-    {- ^ Like `blockRenderers` but for use in inline contexts.
+  { blockRenderers :: PandocRenderers a r
+  , inlineRenderers :: PandocRenderers a r
+  {- ^ Like `blockRenderers` but for use in inline contexts.
 
     Backlinks and titles constitute an example of inline context, where we don't
     care about block elements.
-    -}
-    , linkInlineRenderers :: PandocRenderers a r
-    -- ^ Like `inlineRenderers` but suitable for use inside links (<a> tags).
-    }
+  -}
+  , linkInlineRenderers :: PandocRenderers a r
+  -- ^ Like `inlineRenderers` but suitable for use inside links (<a> tags).
+  }

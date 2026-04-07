@@ -1,5 +1,5 @@
 module Emanote.Pandoc.Markdown.Syntax.Highlight (
-    highlightSpec,
+  highlightSpec,
 ) where
 
 import Commonmark qualified as CM
@@ -9,19 +9,19 @@ import Relude
 import Text.Pandoc.Builder qualified as B
 
 highlightSpec ::
-    (Monad m, CM.IsInline il, HasHighlight il) =>
-    CM.SyntaxSpec m il bl
+  (Monad m, CM.IsInline il, HasHighlight il) =>
+  CM.SyntaxSpec m il bl
 highlightSpec =
-    mempty
-        { CM.syntaxFormattingSpecs =
-            [ CM.FormattingSpec '=' True True Nothing (Just highlight) '='
-            ]
-        }
+  mempty
+    { CM.syntaxFormattingSpecs =
+        [ CM.FormattingSpec '=' True True Nothing (Just highlight) '='
+        ]
+    }
 
 class HasHighlight a where
-    highlight :: a -> a
+  highlight :: a -> a
 
 instance HasHighlight (CP.Cm a B.Inlines) where
-    highlight il = B.spanWith attr <$> il
-      where
-        attr = ("", one "highlight-inline", [])
+  highlight il = B.spanWith attr <$> il
+    where
+      attr = ("", one "highlight-inline", [])

@@ -19,89 +19,89 @@ import Text.Megaparsec.Char qualified as M
 import Text.Show qualified as Show
 
 data Query
-    = QueryByTag HT.Tag
-    | QueryByTagPattern TagPattern
-    | QueryByPath FilePath
-    | QueryByPathPattern FilePattern
-    | QueryFolgezettelChildren
-    | QueryFolgezettelParents
-    deriving stock (Eq)
+  = QueryByTag HT.Tag
+  | QueryByTagPattern TagPattern
+  | QueryByPath FilePath
+  | QueryByPathPattern FilePattern
+  | QueryFolgezettelChildren
+  | QueryFolgezettelParents
+  deriving stock (Eq)
 
 instance Show.Show Query where
-    show = \case
-        QueryByTag tag ->
-            toString $ "Pages tagged #" <> HT.unTag tag
-        QueryByTagPattern pat ->
-            toString $ "Pages tagged by '" <> HT.unTagPattern pat <> "'"
-        QueryByPath p ->
-            "Pages under path '/" <> p <> "'"
-        QueryByPathPattern pat ->
-            "Pages matching path '" <> pat <> "'"
-        QueryFolgezettelChildren ->
-            "Folgezettel children"
-        QueryFolgezettelParents ->
-            "Folgezettel parents"
+  show = \case
+    QueryByTag tag ->
+      toString $ "Pages tagged #" <> HT.unTag tag
+    QueryByTagPattern pat ->
+      toString $ "Pages tagged by '" <> HT.unTagPattern pat <> "'"
+    QueryByPath p ->
+      "Pages under path '/" <> p <> "'"
+    QueryByPathPattern pat ->
+      "Pages matching path '" <> pat <> "'"
+    QueryFolgezettelChildren ->
+      "Folgezettel children"
+    QueryFolgezettelParents ->
+      "Folgezettel parents"
 
 parseQuery :: Text -> Maybe Query
 parseQuery = do
-    rightToMaybe . parse queryParser "<pandoc:code:query>"
+  rightToMaybe . parse queryParser "<pandoc:code:query>"
   where
     parse :: M.Parsec Void Text a -> String -> Text -> Either Text a
     parse p fn =
-        first (toText . M.errorBundlePretty)
-            . M.parse (p <* M.eof) fn
+      first (toText . M.errorBundlePretty)
+        . M.parse (p <* M.eof) fn
 
 queryParser :: M.Parsec Void Text Query
 queryParser = do
-    (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
-        <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
-        <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
-        <|> (M.string "children:." $> QueryFolgezettelChildren)
-        <|> (M.string "parents:." $> QueryFolgezettelParents)
+  (M.string "tag:#" *> fmap (QueryByTag . HT.Tag . T.strip) M.takeRest)
+    <|> (M.string "tag:" *> fmap (QueryByTagPattern . HT.mkTagPattern . T.strip) M.takeRest)
+    <|> (M.string "path:" *> fmap (fromUserPath . T.strip) M.takeRest)
+    <|> (M.string "children:." $> QueryFolgezettelChildren)
+    <|> (M.string "parents:." $> QueryFolgezettelParents)
   where
     fromUserPath s =
-        if
-            | "*" `T.isInfixOf` s ->
-                QueryByPathPattern (toString s)
-            | "/" `T.isPrefixOf` s ->
-                QueryByPath (toString $ T.drop 1 s)
-            | otherwise ->
-                QueryByPathPattern (toString $ "**/" <> s <> "/**")
+      if
+        | "*" `T.isInfixOf` s ->
+            QueryByPathPattern (toString s)
+        | "/" `T.isPrefixOf` s ->
+            QueryByPath (toString $ T.drop 1 s)
+        | otherwise ->
+            QueryByPathPattern (toString $ "**/" <> s <> "/**")
 
 runQuery :: R.LMLRoute -> Model -> Query -> [Note]
 runQuery currentRoute model =
-    sortOn Calendar.noteSortKey . \case
-        QueryByTag tag ->
-            Ix.toList $ (model ^. modelNotes) @= tag
-        QueryByTagPattern pat ->
-            let allTags = fst <$> modelTags model
-                matchingTags = filter (HT.tagMatch pat) allTags
-             in Ix.toList $ (model ^. modelNotes) @+ matchingTags
-        QueryByPath path ->
-            maybeToMonoid $ do
-                r <- R.mkRouteFromFilePath path
-                pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
-        QueryByPathPattern (resolveDotInFilePattern -> pat) ->
-            let notes = Ix.toList $ model ^. modelNotes
-             in flip mapMaybe notes $ \note -> do
-                    guard $ pat ?== R.withLmlRoute R.encodeRoute (note ^. N.noteRoute)
-                    pure note
-        QueryFolgezettelChildren ->
-            let rs = G.folgezettelChildrenFor model currentRoute
-             in Ix.toList $ (model ^. modelNotes) @+ rs
-        QueryFolgezettelParents ->
-            let rs = G.folgezettelParentsFor model currentRoute
-             in Ix.toList $ (model ^. modelNotes) @+ rs
+  sortOn Calendar.noteSortKey . \case
+    QueryByTag tag ->
+      Ix.toList $ (model ^. modelNotes) @= tag
+    QueryByTagPattern pat ->
+      let allTags = fst <$> modelTags model
+          matchingTags = filter (HT.tagMatch pat) allTags
+       in Ix.toList $ (model ^. modelNotes) @+ matchingTags
+    QueryByPath path ->
+      maybeToMonoid $ do
+        r <- R.mkRouteFromFilePath path
+        pure $ Ix.toList $ (model ^. modelNotes) @= N.RAncestor r
+    QueryByPathPattern (resolveDotInFilePattern -> pat) ->
+      let notes = Ix.toList $ model ^. modelNotes
+       in flip mapMaybe notes $ \note -> do
+            guard $ pat ?== R.withLmlRoute R.encodeRoute (note ^. N.noteRoute)
+            pure note
+    QueryFolgezettelChildren ->
+      let rs = G.folgezettelChildrenFor model currentRoute
+       in Ix.toList $ (model ^. modelNotes) @+ rs
+    QueryFolgezettelParents ->
+      let rs = G.folgezettelParentsFor model currentRoute
+       in Ix.toList $ (model ^. modelNotes) @+ rs
   where
     -- Resolve the ./ prefix substituting it with "$PWD" in current note's route
     -- context.
     resolveDotInFilePattern (toText -> pat) =
-        if "./" `T.isPrefixOf` pat
-            then
-                let folderR :: R.R 'R.Folder = R.withLmlRoute coerce currentRoute
-                 in if folderR == R.indexRoute
-                        then -- If in "index.md", discard the ./
-                            toString (T.drop 2 pat)
-                        else -- If in "$folder.md", discard the ./ and prepend with folder path prefix
-                            R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
-            else toString pat
+      if "./" `T.isPrefixOf` pat
+        then
+          let folderR :: R.R 'R.Folder = R.withLmlRoute coerce currentRoute
+           in if folderR == R.indexRoute
+                then -- If in "index.md", discard the ./
+                  toString (T.drop 2 pat)
+                else -- If in "$folder.md", discard the ./ and prepend with folder path prefix
+                  R.encodeRoute folderR <> "/" <> toString (T.drop 2 pat)
+        else toString pat
