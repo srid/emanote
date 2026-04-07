@@ -45,8 +45,14 @@
         pandoc-link-context.jailbreak = true;
         tagtree.broken = false;
         tagtree.jailbreak = true;
-        tailwind.broken = false;
-        tailwind.jailbreak = true;
+        tailwind = { pkgs, ... }: {
+          broken = false;
+          jailbreak = true;
+          extraBuildDepends = [
+            # tailwind Haskell package uses TH (staticWhich) to find "tailwind" binary
+            (pkgs.writeShellScriptBin "tailwind" ''exec ${pkgs.tailwindcss}/bin/tailwindcss "$@"'')
+          ];
+        };
         unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
         emanote = { name, pkgs, self, super, ... }: {
           check = false;
