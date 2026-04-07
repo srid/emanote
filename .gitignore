@@ -3,8 +3,13 @@ result
 result-*
 .direnv
 
-/.claude/*.local.*
+# We use apm
+/.claude/
 
 /.pre-commit-config.yaml
 
 /ghcid.log
+
+
+# APM dependencies
+apm_modules/
