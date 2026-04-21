@@ -18,7 +18,7 @@
 <ema:metadata>
   <with var="template">
     <script id="emanote-stork" data-emanote-base-url="${value:baseUrl}">
-      window.emanote = {};
+      window.emanote = window.emanote || {};
       window.emanote.stork = {
         searchShown: false,
         indexIsStale: false,

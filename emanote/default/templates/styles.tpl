@@ -33,7 +33,7 @@
   main dd,
   main blockquote,
   main td {
-    font-variation-settings: 'opsz' 24, 'SOFT' 50;
+    font-variation-settings: 'opsz' 14, 'SOFT' 60;
   }
 
   #sidebar, #breadcrumbs, #toc, #footer, .callout-title,
@@ -215,6 +215,24 @@
     transform: scale(0.95);
   }
 </style>
+
+<script>
+  // Theme toggle: persist choice in localStorage; the early-load script in
+  // base.tpl applies it before first paint so there's no FOUC on reload.
+  (function () {
+    window.emanote = window.emanote || {};
+    window.emanote.theme = {
+      toggle: function () {
+        var root = document.documentElement;
+        var isDark = root.classList.toggle('dark');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
+        if (document.querySelector('.mermaid')) window.location.reload();
+      }
+    };
+  })();
+</script>
 
 <script>
   // Add copy buttons to code blocks
