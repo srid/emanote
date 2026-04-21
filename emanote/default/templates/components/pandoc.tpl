@@ -69,7 +69,7 @@
   </DefinitionList>
   <Note:Ref>
     <sup id="fnref${footnote:idx}" class="footnote-ref">
-      <a href="${ema:note:url}#fn${footnote:idx}">[<footnote:idx />]</a>
+      <a href="${ema:note:url}#fn${footnote:idx}"><footnote:idx /></a>
     </sup>
   </Note:Ref>
   <Note:List>

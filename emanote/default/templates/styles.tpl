@@ -113,7 +113,7 @@
   .dark { --footnote-flash-start: var(--color-primary-900); }
   ol.footnote-list li:target,
   sup.footnote-ref:target a {
-    animation: footnote-flash 1.2s ease-out;
+    animation: footnote-flash 0.5s ease-out;
   }
   @keyframes footnote-flash {
     0%   { background-color: var(--footnote-flash-start); }
