@@ -15,12 +15,42 @@
     let
       sources = import ./npins;
       systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
-      forEachSystem = f: builtins.listToAttrs (map
+
+      # Compute every per-system output once. `default.nix` instantiates
+      # the haskell-flake project and is too expensive to re-import per
+      # output attribute.
+      perSystem = pkgs:
+        let outs = import ./default.nix { inherit pkgs; }; in
+        {
+          packages = {
+            default = outs.default;
+            emanote = outs.emanote;
+            docs = outs.docs;
+          };
+          apps = {
+            default = {
+              type = "app";
+              program = pkgs.lib.getExe outs.emanote;
+              meta.description = "Emanote live server";
+            };
+            docs = outs.docs-app;
+          };
+          devShells.default = import ./shell.nix { inherit pkgs; };
+          checks = {
+            closure-size = outs.closure-size;
+          } // pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
+            docs-linkCheck = outs.docs-linkCheck;
+          };
+        };
+
+      perSystemOutputs = builtins.listToAttrs (map
         (system: {
           name = system;
-          value = f (import ./nix/nixpkgs.nix { inherit system; });
+          value = perSystem (import ./nix/nixpkgs.nix { inherit system; });
         })
         systems);
+
+      project = attr: builtins.mapAttrs (_: s: s.${attr}) perSystemOutputs;
     in
     {
       homeManagerModules.default = import ./nix/home/emanote.nix;
@@ -36,35 +66,9 @@
         };
       };
 
-      packages = forEachSystem (pkgs:
-        let outs = import ./default.nix { inherit pkgs; };
-        in {
-          default = outs.default;
-          emanote = outs.emanote;
-          docs = outs.docs;
-        });
-
-      apps = forEachSystem (pkgs:
-        let outs = import ./default.nix { inherit pkgs; };
-        in {
-          default = {
-            type = "app";
-            program = pkgs.lib.getExe outs.emanote;
-            meta.description = "Emanote live server";
-          };
-          docs = outs.docs-app;
-        });
-
-      devShells = forEachSystem (pkgs: {
-        default = import ./shell.nix { inherit pkgs; };
-      });
-
-      checks = forEachSystem (pkgs:
-        let outs = import ./default.nix { inherit pkgs; };
-        in {
-          closure-size = outs.closure-size;
-        } // pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
-          docs-linkCheck = outs.docs-linkCheck;
-        });
+      packages = project "packages";
+      apps = project "apps";
+      devShells = project "devShells";
+      checks = project "checks";
     };
 }
