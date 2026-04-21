@@ -18,6 +18,47 @@ jobs:
           # TODO: Define this in Vira or make it part of our flake?
           nix build github:hercules-ci/flake.parts-website#checks.x86_64-linux.linkcheck --override-input emanote .
 
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [live, static]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      # Playwright bundles browser binaries (~150MB chromium + deps).
+      # The cache key pins the playwright package version so a bump in
+      # package.json invalidates the cache and a fresh `install` runs.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('tests/package-lock.json') }}
+      - name: Build emanote
+        id: build
+        run: |
+          BIN="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
+          echo "bin=$BIN" >> "$GITHUB_OUTPUT"
+      - name: Install test dependencies
+        working-directory: tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: E2E (${{ matrix.mode }})
+        working-directory: tests
+        env:
+          EMANOTE_BIN: ${{ steps.build.outputs.bin }}
+          EMANOTE_MODE: ${{ matrix.mode }}
+        run: npm test
+
   website:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest

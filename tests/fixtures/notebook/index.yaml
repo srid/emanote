@@ -1,0 +1,5 @@
+template:
+  theme: blue
+
+page:
+  siteTitle: E2E Fixture
