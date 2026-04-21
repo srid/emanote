@@ -3,9 +3,6 @@ result
 result-*
 .direnv
 
-# We use apm
-/.claude/
-
 /.pre-commit-config.yaml
 
 /ghcid.log
