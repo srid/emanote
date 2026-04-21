@@ -1,4 +1,4 @@
-<div class="backlink-context overflow-x-auto text-sm text-gray-500 dark:text-gray-300">
+<div class="overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&_p]:m-0 [&_p+p]:mt-[0.35em]">
   <context>
     <div>
       <context:body>
