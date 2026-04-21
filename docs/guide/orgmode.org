@@ -15,7 +15,7 @@ Here is a handpicked selection of syntatic features of Org Mode as particularly 
 
 *** Code blocks 
 
-See [[file:../tips/js/syntax-highlighting.md][Syntax Highlighting]] for general information.
+See [[file:../tips/syntax-highlighting.md][Syntax Highlighting]] for general information.
 
 #+NAME: factorial
 #+BEGIN_SRC haskell :results silent :exports code :var n=0

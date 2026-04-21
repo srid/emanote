@@ -27,6 +27,70 @@ Then(
   },
 );
 
+// texmath emits `<math xmlns="…" display="…">` for every expression. The HTML
+// parser places `<math>` in the MathML namespace automatically, so
+// `element.namespaceURI` is the reliable check — the `xmlns=` attribute is a
+// namespace declaration that CSS `[xmlns=…]` selectors don't see. We assert
+// the `display` attribute via a CSS selector and the namespace via JS.
+const MATHML_NS = "http://www.w3.org/1998/Math/MathML";
+
+async function assertMathMLCount(
+  page: EmanoteWorld["page"],
+  display: "inline" | "block",
+  msgSuffix: string,
+) {
+  const count = await page.evaluate(
+    ({ display, ns }) =>
+      [...document.querySelectorAll(`math[display="${display}"]`)].filter(
+        (el) => el.namespaceURI === ns,
+      ).length,
+    { display, ns: MATHML_NS },
+  );
+  assert.ok(
+    count > 0,
+    `Expected at least one ${display} MathML element; found ${count}. ${msgSuffix}`,
+  );
+}
+
+Then(
+  "the page contains an inline <math> element in the MathML namespace",
+  async function (this: EmanoteWorld) {
+    await assertMathMLCount(
+      this.page,
+      "inline",
+      "emanote.staticMath default may have regressed, or texmath's InlineMath → display=\"inline\" mapping changed.",
+    );
+  },
+);
+
+Then(
+  "the page contains a block <math> element in the MathML namespace",
+  async function (this: EmanoteWorld) {
+    await assertMathMLCount(
+      this.page,
+      "block",
+      "The $$…$$ display-math path is broken.",
+    );
+  },
+);
+
+Then(
+  "no KaTeX stylesheet is referenced",
+  async function (this: EmanoteWorld) {
+    // The js.katex snippet was removed from the default config in the same PR
+    // that flipped staticMath on. Default-config sites should therefore never
+    // emit a katex stylesheet link.
+    const count = await this.page
+      .locator('link[href*="katex"], script[src*="katex"]')
+      .count();
+    assert.strictEqual(
+      count,
+      0,
+      `Default config should not pull in KaTeX; found ${count} katex asset reference(s). Did the js.katex snippet or a default \`page.headHtml\` leak back in?`,
+    );
+  },
+);
+
 Then(
   "the resolved primary palette differs from the noted value",
   async function (this: EmanoteWorld) {
