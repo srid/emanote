@@ -30,7 +30,7 @@
   </title>
   
     
-      <meta property='og:description' content='MathJax can be used to render Math formulas. For example, a^2 + b ^ 2 = c.' />
+      <meta property='og:description' content='Emanote renders $...$ and $$...$$ to MathML at build time by default via texmath. Modern browsers (Firefox, Safari, Chrome ≥109) render MathML natively, so the page ships no math JS bundle.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
@@ -43,16 +43,7 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <script>
-  window.MathJax = {
-    startup: {
-      ready: () => {
-        MathJax.startup.defaultReady();
-      }
-    }
-  };
-</script>
-<script async id='MathJax-script' src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+    <meta name='generator' content='Emanote' />
 
   
   
@@ -69,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=00dcccf1-fa06-4240-8499-aa1dc309e7a8' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=b70796f0-6d7d-4098-bc07-542b10ae50d4' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1171,32 +1162,11 @@
 
 
 
-    <h2 id='mathjax' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
-      
-  MathJax
-  
-  <a href='math#mathjax' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
     <p class='mb-4 leading-relaxed'>
-      <a href='https://www.mathjax.org' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>MathJax</a> can be used to render Math formulas. For example, <span class='math inline'>\(a^2 + b ^ 2 = c\)</span>.
+      Emanote renders <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>$...$</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>$$...$$</code> to <strong>MathML at build time</strong> by default via <a href='https://hackage.haskell.org/package/texmath' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>texmath</code></a>. Modern browsers (Firefox, Safari, Chrome ≥109) render MathML natively, so the page ships no math JS bundle.
     </p>
   
-    <p class='mb-4 leading-relaxed'>
-      To enable it, add the following to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.headHtml</code> of <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> or Markdown frontmatter.
-    </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
-<span class='fu'>  headHtml</span><span class='kw'>: </span><span class='ch'>|</span>
-    &lt;snippet var="js.mathjax" /&gt;
-</code></pre></div>
-    <h3 id='demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
+    <h2 id='demo' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Demo
   
@@ -1208,13 +1178,58 @@
   </a>
 
 
-    </h3>
+    </h2>
   
     <p class='mb-4 leading-relaxed'>
-      When <span class='math inline'>\(a \ne 0\)</span>, there are two solutions to <span class='math inline'>\(ax^2 + bx + c = 0\)</span> and they are <span class='math display'>$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</span>
+      When <math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>a</mi><mo>≠</mo><mn>0</mn></mrow></math>, there are two solutions to <math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>a</mi><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow></math> and they are <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mi>−</mi><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac><mi>.</mi></mrow></math>
     </p>
   
-    <h2 id='katex' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+    <h2 id='opting-out' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Opting out
+  
+  <a href='math#opting-out' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      If you prefer KaTeX’s typography or need to support a very old browser, disable static rendering in your site’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code>:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>emanote</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>staticMath</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Then enable a client-side renderer per page (or globally via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.headHtml</code> in your root <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code>).
+    </p>
+  
+    <h3 id='mathjax' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
+      
+  MathJax
+  
+  <a href='math#mathjax' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
+<span class='fu'>  headHtml</span><span class='kw'>: </span><span class='ch'>|</span>
+    &lt;snippet var="js.mathjax" /&gt;
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      The <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>js.mathjax</code> snippet is shipped in the default config.
+    </p>
+  
+    <h3 id='katex' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   KaTeX
   
@@ -1226,18 +1241,23 @@
   </a>
 
 
-    </h2>
+    </h3>
   
     <p class='mb-4 leading-relaxed'>
-      <a href='https://katex.org/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>KaTeX</a> can be used as an alternative to MathJax. Just like MathJax, it renders math specified between dollar signs.
-    </p>
-  
-    <p class='mb-4 leading-relaxed'>
-      To enable it:
+      Paste the KaTeX loader directly into <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.headHtml</code> — Emanote’s default config no longer defines a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>js.katex</code> snippet:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
 <span class='fu'>  headHtml</span><span class='kw'>: </span><span class='ch'>|</span>
-    &lt;snippet var="js.katex" /&gt;
+    &lt;link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          crossorigin="anonymous"&gt;
+    &lt;script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+            crossorigin="anonymous"&gt;&lt;/script&gt;
+    &lt;script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"&gt;&lt;/script&gt;
 </code></pre></div>
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/js/math.md'>
@@ -1255,13 +1275,6 @@
     
         <ul class='space-y-1 ml-2'>
           
-            <li class='truncate' title='MathJax'>
-              <a href='math#mathjax' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
-                MathJax
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
             <li class='truncate' title='Demo'>
               <a href='math#demo' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Demo
@@ -1273,6 +1286,20 @@
       
             </li>
           
+            <li class='truncate' title='Opting out'>
+              <a href='math#opting-out' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Opting out
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='MathJax'>
+              <a href='math#mathjax' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                MathJax
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
         </ul>
       
             </li>
@@ -1283,6 +1310,10 @@
               </a>
               
         <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
           
         </ul>
       

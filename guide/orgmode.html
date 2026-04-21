@@ -43,17 +43,7 @@
       <base href='/' />
       <link href='favicon.svg' rel='icon' />
     
-    <script>
-  window.MathJax = {
-    startup: {
-      ready: () => {
-        MathJax.startup.defaultReady();
-      }
-    }
-  };
-</script>
-<script async id='MathJax-script' src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
-
+    <meta name='generator' content='Emanote' />
 
   
   
@@ -70,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=00dcccf1-fa06-4240-8499-aa1dc309e7a8' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=b70796f0-6d7d-4098-bc07-542b10ae50d4' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1501,7 +1491,7 @@
     </h3>
   
     <p class='mb-4 leading-relaxed'>
-      See <span title='Link is broken'><s>[Syntax Highlighting](../tips/js/syntax-highlighting.md)</s>❌</span> for general information.
+      See <a href='syntax-highlighting' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>Syntax Highlighting</a> for general information.
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code id='factorial' class='haskell' results='silent' exports='code' var='n=0'>fac <span class='dv'>0</span> <span class='ot'>=</span> <span class='dv'>1</span>
 fac n <span class='ot'>=</span> n <span class='op'>*</span> fac (n<span class='op'>-</span><span class='dv'>1</span>)
@@ -1532,7 +1522,7 @@ x=\sqrt{b}                              % even tables, figures
 \end{equation}
 </pre>
     <p class='mb-4 leading-relaxed'>
-      If <span class='math inline'>\(a^2=b\)</span> and <span class='math inline'>\( b=2 \)</span>, then the solution must be either <span class='math display'>$$ a=+\sqrt{2} $$</span> or <span class='math display'>$$ a=-\sqrt{2} $$</span>
+      If <math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>=</mo><mi>b</mi></mrow></math> and <math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>b</mi><mo>=</mo><mn>2</mn></mrow></math>, then the solution must be either <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>a</mi><mo>=</mo><mi>+</mi><msqrt><mn>2</mn></msqrt></mrow></math> or <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'><mrow><mi>a</mi><mo>=</mo><mi>−</mi><msqrt><mn>2</mn></msqrt></mrow></math>
     </p>
   
     <h2 id='limitations' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>

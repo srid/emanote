@@ -496,9 +496,6 @@ Mermaid reads the active colour scheme at initialization, so toggling the theme 
 
 ---
 slug: external-links
-page:
-  headHtml: |
-    <snippet var="js.mathjax" />
 ---
 
 # External links
@@ -1447,7 +1444,7 @@ Here is a handpicked selection of syntatic features of Org Mode as particularly 
 
 *** Code blocks 
 
-See [[file:../tips/js/syntax-highlighting.md][Syntax Highlighting]] for general information.
+See [[file:../tips/syntax-highlighting.md][Syntax Highlighting]] for general information.
 
 #+NAME: factorial
 #+BEGIN_SRC haskell :results silent :exports code :var n=0
@@ -2458,18 +2455,29 @@ path:./*
 
 ---
 slug: math
-page:
-  headHtml: |
-    <snippet var="js.mathjax" />
 ---
 
 # Math
 
-## MathJax
+Emanote renders `$...$` and `$$...$$` to **MathML at build time** by default via [`texmath`](https://hackage.haskell.org/package/texmath). Modern browsers (Firefox, Safari, Chrome ≥109) render MathML natively, so the page ships no math JS bundle.
 
-[MathJax](https://www.mathjax.org) can be used to render Math formulas.  For example, $a^2 + b ^ 2 = c$.
+## Demo
 
-To enable it, add the following to `page.headHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
+When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}.$$
+
+## Opting out
+
+If you prefer KaTeX's typography or need to support a very old browser, disable static rendering in your site's `index.yaml`:
+
+```yaml
+emanote:
+  staticMath: false
+```
+
+Then enable a client-side renderer per page (or globally via `page.headHtml` in your root `index.yaml`).
+
+### MathJax
 
 ```yaml
 page:
@@ -2477,22 +2485,25 @@ page:
     <snippet var="js.mathjax" />
 ```
 
-### Demo
+The `js.mathjax` snippet is shipped in the default config.
 
-When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
-$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+### KaTeX
 
-
-## KaTeX
-
-[KaTeX](https://katex.org/) can be used as an alternative to MathJax. Just like MathJax, it renders math specified between dollar signs.
-
-To enable it:
+Paste the KaTeX loader directly into `page.headHtml` — Emanote's default config no longer defines a `js.katex` snippet:
 
 ```yaml
 page:
   headHtml: |
-    <snippet var="js.katex" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          crossorigin="anonymous">
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+            crossorigin="anonymous"></script>
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
 ```
 
 
