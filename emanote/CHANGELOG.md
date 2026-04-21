@@ -6,7 +6,10 @@
 
 - **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
 - Built-in static syntax highlighting using skylighting, replacing client-side JS highlighters ([#624](https://github.com/srid/emanote/pull/624))
-- Built-in static math rendering (LaTeX → MathML at build time via `texmath`), closes [#626](https://github.com/srid/emanote/issues/626). KaTeX snippet removed from default config; MathJax snippet retained.
+- **Built-in static math rendering**: `$...$` / `$$...$$` are now converted to MathML at build time via `texmath`, so no runtime math JS is needed on a default site ([#639](https://github.com/srid/emanote/pull/639), closes [#626](https://github.com/srid/emanote/issues/626)).
+  - Controlled by `emanote.staticMath` (default: `true`). Set to `false` to fall back to client-side JS renderers.
+  - **Breaking**: the `js.katex` snippet has been removed from the default config. Existing sites referencing `<snippet var="js.katex" />` must inline the KaTeX loader into `page.headHtml` — see `docs/tips/js/math` for the exact lines. The `js.mathjax` snippet is retained.
+  - **API change** (only affects consumers of the `heist-extra` library directly): `mkRenderCtxWithPandocRenderers` now takes a `RenderFeatures` record instead of a lone `Bool`; `CodeBackend` / `MathBackend` sum types replace per-feature booleans.
 - UI revamp (#622, [#636](https://github.com/srid/emanote/pull/636))
   - New self-hosted typography: Lora + Space Grotesk + Space Mono.
   - Manual dark/light theme toggle (#605, #617) with `localStorage` persistence.
