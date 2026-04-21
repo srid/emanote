@@ -12,3 +12,4 @@ result-*
 apm_modules/
 
 /.worktrees
+/.do-results.json

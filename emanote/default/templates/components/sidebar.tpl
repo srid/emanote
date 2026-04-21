@@ -14,7 +14,7 @@
                 class="transition transform hover:scale-110 hover:opacity-80" src="${value:iconUrl}"
                 alt="Site Icon" />
             </a>
-            <a class="font-semibold text-base truncate hover:text-${theme}-600 dark:hover:text-${theme}-400 transition-colors" title="Go to Home" href="${value:baseUrl}">
+            <a class="font-semibold text-base truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors" title="Go to Home" href="${value:baseUrl}">
               Home
             </a>
           </with>
@@ -22,7 +22,7 @@
       </div>
 
       <div id="indexing-links" class="flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0">
-        <a href="${ema:tagIndexUrl}" title="View tags" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-${theme}-600 dark:hover:text-${theme}-400 transition-colors">
+        <a href="${ema:tagIndexUrl}" title="View tags" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
           <svg style="width: 1.125rem;" fill="none" stroke="currentColor"
             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -30,7 +30,7 @@
             </path>
           </svg>
         </a>
-        <a href="${ema:indexUrl}" title="Expand full tree" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-${theme}-600 dark:hover:text-${theme}-400 transition-colors">
+        <a href="${ema:indexUrl}" title="Expand full tree" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
           <svg style="width: 1.125rem;" fill="none" stroke="currentColor"
             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -38,7 +38,7 @@
             </path>
           </svg>
         </a>
-        <button title="Search (Ctrl+K)" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-${theme}-600 dark:hover:text-${theme}-400 transition-colors cursor-pointer"
+        <button title="Search (Ctrl+K)" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
           onclick="window.emanote.stork.toggleSearch()">
           <apply template="stork/stork-icon" />
         </button>

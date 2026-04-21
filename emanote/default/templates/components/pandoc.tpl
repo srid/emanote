@@ -1,7 +1,7 @@
 <bind tag="clickable-icon">
   <a href="${ema:note:url}#${header:id}" class="--ema-anchor ml-2">
     <span
-      class="text-gray-400 hover:text-${theme}-500 dark:hover:text-${theme}-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
+      class="text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
       aria-label="Copy link" title="Copy link to heading"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
@@ -70,7 +70,7 @@
   </DefinitionList>
   <Note:Ref>
     <sup class="px-0.5">
-      <a class="text-${theme}-600 dark:text-${theme}-400 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
+      <a class="text-primary-600 dark:text-primary-400 hover:underline" href="${ema:note:url}#fn${footnote:idx}">
         <footnote:idx />
       </a>
     </sup>
@@ -114,8 +114,8 @@
     <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-${theme}-600 dark:text-${theme}-400">
-    <Internal class="bg-${theme}-50 dark:bg-${theme}-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900" />
+  <PandocLink class="text-primary-600 dark:text-primary-400">
+    <Internal class="bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900" />
     <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />

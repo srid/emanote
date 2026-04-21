@@ -22,7 +22,7 @@ template:
   uptree:
     enable: false
     # Class to apply for uptree's nodes
-    nodeClass: bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-${theme}-500 dark:hover:bg-${theme}-600 hover:text-white cursor-pointer transition-all duration-150
+    nodeClass: bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-primary-500 dark:hover:bg-primary-600 hover:text-white cursor-pointer transition-all duration-150
   # List of available colors: https://tailwindcss.com/docs/customizing-colors#default-color-palette
   theme: blue
   # Value of the <base> tag.
@@ -64,7 +64,7 @@ pandoc:
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-4 py-3 rounded-lg shadow-md bg-yellow-50 dark:bg-yellow-900 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-xl border-l-4 border-yellow-400 mb-8 mt-8 transition-all duration-200
     note: p-4 mb-4 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 w-full float-none md:float-right md:w-1/2 md:clear-both border border-gray-200 dark:border-gray-800
-    highlight-block: px-4 py-3 mb-4 rounded-lg bg-${theme}-50 dark:bg-${theme}-950 hover:border-${theme}-400 hover:shadow-md border-l-4 border-${theme}-400 transition-all duration-200
+    highlight-block: px-4 py-3 mb-4 rounded-lg bg-primary-50 dark:bg-primary-950 hover:border-primary-400 hover:shadow-md border-l-4 border-primary-400 transition-all duration-200
     highlight-inline: bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md
     center: flex justify-center items-center mx-auto
 

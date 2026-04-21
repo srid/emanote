@@ -8,7 +8,7 @@
           <toc:entry>
             <li class="truncate" title="${toc:title}">
               <a href="${ema:note:url}#${toc:anchor}"
-                class="--ema-toc block rounded-md px-2 py-1.5 hover:bg-${theme}-50 dark:hover:bg-${theme}-950 hover:text-${theme}-700 dark:hover:text-${theme}-300 transition-colors">
+                class="--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
                 <toc:title />
               </a>
               <toc:childs />

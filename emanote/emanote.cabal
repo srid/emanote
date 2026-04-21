@@ -139,7 +139,6 @@ common library-common
     , stm
     , tagged
     , tagtree
-    , tailwind               >=0.3
     , text
     , time
     , tomland

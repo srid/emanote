@@ -8,7 +8,7 @@
               <ema:tagcrumbs>
                 <ema:each-crumb>
                   <li class="inline-flex items-center">
-                    <a class="px-1 font-mono font-semibold text-${theme}-600 dark:text-${theme}-400"
+                    <a class="px-1 font-mono font-semibold text-primary-600 dark:text-primary-400"
                       href="${ema:tagcrumb:url}">
                       <ema:tagcrumb:title />
                     </a>
@@ -40,7 +40,7 @@
                 </path>
               </svg>
               <span class="">
-                <a href="${ema:childTag:url}" class="font-mono font-bold hover:text-${theme}-700 dark:text-white dark:hover:text-${theme}-300">
+                <a href="${ema:childTag:url}" class="font-mono font-bold hover:text-primary-700 dark:text-white dark:hover:text-primary-300">
                   <ema:childTag:title />
                 </a>
                 <span class="font-mono text-sm text-gray-400 dark:text-gray-500">
@@ -63,7 +63,7 @@
               </svg>
 
               <!-- TODO: DRY -->
-              <a class="text-${theme}-600 dark:text-${theme}-400 hover:underline truncate" href="${ema:note:url}">
+              <a class="text-primary-600 dark:text-primary-400 hover:underline truncate" href="${ema:note:url}">
                 <ema:note:title />
               </a>
             </div>

@@ -1,4 +1,6 @@
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Emanote (
@@ -9,6 +11,7 @@ module Emanote (
 import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdoutLoggingT)
 import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
+import Data.ByteString qualified as BS
 import Data.Default (def)
 import Data.Map.Strict qualified as Map
 import Ema (
@@ -36,15 +39,19 @@ import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
-import Emanote.View.Common (generatedCssFile)
+import Emanote.View.Common (generatedCssFile, tailwindInputCss)
 import Emanote.View.Export qualified as Export
 import Emanote.View.Export.JSON qualified as ExportJSON
 import Emanote.View.Template qualified as View
-import Optics.Core ((%), (.~), (^.))
+import NeatInterpolation (text)
+import Optics.Core ((.~), (^.))
 import Relude
 import System.FilePath ((</>))
+import System.IO (hClose)
+import System.Which (staticWhich)
 import UnliftIO (MonadUnliftIO)
-import Web.Tailwind qualified as Tailwind
+import UnliftIO.Process (callProcess)
+import UnliftIO.Temporary (withSystemTempFile)
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.ModelEma
@@ -136,19 +143,24 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
       log "(Tip: use `--allow-broken-internal-links` to ignore this check.)"
       exitFailure
 
+tailwindBin :: FilePath
+tailwindBin = $(staticWhich "tailwindcss")
+
 compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = do
   runStdoutLoggingT $ do
-    log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
-    Tailwind.runTailwind
-      $ def
-      & Tailwind.tailwindConfig
-      % Tailwind.tailwindConfigContent
-      .~ genPaths
-      & Tailwind.tailwindOutput
-      .~ cssPath
-      & Tailwind.tailwindMode
-      .~ Tailwind.Production
+    log $ "Running Tailwind CSS v4 compiler to generate: " <> toText cssPath
+    withSystemTempFile "emanote-tailwind-input.css" $ \inputPath h -> do
+      let sources = unlines $ map (\p -> "@source \"" <> toText p <> "\";") genPaths
+          input =
+            [text|
+              ${tailwindInputCss}
+              $sources
+            |]
+      liftIO $ do
+        BS.hPut h (encodeUtf8 input)
+        hClose h
+      callProcess tailwindBin ["-i", inputPath, "-o", cssPath, "--minify"]
 
 defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =

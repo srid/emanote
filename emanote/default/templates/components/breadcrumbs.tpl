@@ -30,7 +30,7 @@
       <apply template="stork/stork-icon" />
     </button>
     <button
-      class="inline px-3 py-2 text-white bg-${theme}-600 dark:bg-${theme}-700 outline-none cursor-pointer focus:outline-none hover:bg-${theme}-700 dark:hover:bg-${theme}-800 transition-colors"
+      class="inline px-3 py-2 text-white bg-primary-600 dark:bg-primary-700 outline-none cursor-pointer focus:outline-none hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors"
       title="Toggle sidebar" type="button" onclick="toggleHidden('sidebar')">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">

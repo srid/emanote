@@ -13,7 +13,7 @@
                 <value var="date" />
               </span>
             </ema:note:metadata>
-            <a class="flex-1 text-${theme}-600 dark:text-${theme}-400 bg-${theme}-50 dark:bg-${theme}-950 px-2 py-1 rounded-md font-semibold border-l-2 no-underline hover:bg-${theme}-100 dark:hover:bg-${theme}-900"
+            <a class="flex-1 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-2 py-1 rounded-md font-semibold border-l-2 no-underline hover:bg-primary-100 dark:hover:bg-primary-900"
               href="${ema:note:url}">
               <ema:note:title />
             </a>
