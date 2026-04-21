@@ -6,7 +6,7 @@ about how Emanote talks to Tailwind — if Tailwind v5 lands with different
 CLI flags or directive syntax, this is the one module that needs to change.
 -}
 module Emanote.View.Tailwind (
-  tailwindInputCss,
+  tailwindBrowserConfig,
   themeRemapStyle,
   compileTailwindCss,
   generatedCssFile,
@@ -27,25 +27,41 @@ import UnliftIO.Temporary (withSystemTempFile)
 generatedCssFile :: FilePath
 generatedCssFile = "tailwind.css"
 
-{- | Base Tailwind v4 input CSS.
+{- | The @\@theme@ block registering the 'primary' color token.
 
-Registers a 'primary' color token (all eleven scale levels) as CSS variables
-aliased to the Tailwind blue palette at compile time. At runtime, a per-site
-@\<style\>@ block ('themeRemapStyle') overrides the aliases to the site's
-configured @template.theme@ palette, so a site's theme color changes without
-regenerating the compiled CSS.
+Aliased to the Tailwind blue palette at compile time; a per-site runtime
+@\<style\>@ ('themeRemapStyle') overrides these to the site's configured
+@template.theme@ palette, so theme color changes without recompiling.
 -}
-tailwindInputCss :: Text
-tailwindInputCss =
+tailwindThemeBlock :: Text
+tailwindThemeBlock =
   let aliases = primaryColorAliases "blue"
    in [text|
-        @import "tailwindcss";
-        @plugin "@tailwindcss/typography";
-
         @theme {
         $aliases
         }
       |]
+
+{- | Config block for the Tailwind v4 browser CDN shim (dev mode).
+
+The browser build explicitly rejects @\@plugin@ and @\@config@, so this is
+@\@theme@-only. The CDN script itself provides the @\@import \"tailwindcss\"@.
+-}
+tailwindBrowserConfig :: Text
+tailwindBrowserConfig = tailwindThemeBlock
+
+{- | Full input CSS fed to the Tailwind v4 CLI (prod compile).
+
+Includes @\@import@, @\@plugin@s, and the shared @\@theme@ block.
+-}
+tailwindCliInputCss :: Text
+tailwindCliInputCss =
+  [text|
+    @import "tailwindcss";
+    @plugin "@tailwindcss/typography";
+
+    ${tailwindThemeBlock}
+  |]
 
 -- | Per-site @\<style\>@ that re-aliases @--color-primary-*@ to the user's theme.
 themeRemapStyle :: Text -> H.Html
@@ -73,8 +89,8 @@ tailwindBin = $(staticWhich "tailwindcss")
 
 {- | Compile the production @tailwind.css@ from the generated HTML files.
 
-Writes a temp input CSS combining 'tailwindInputCss' with one @\@source@ line
-per generated path, then invokes @tailwindcss@ v4 with @--minify@.
+Writes a temp input CSS combining 'tailwindCliInputCss' with one @\@source@
+line per generated path, then invokes @tailwindcss@ v4 with @--minify@.
 -}
 compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = runStdoutLoggingT $ do
@@ -83,7 +99,7 @@ compileTailwindCss cssPath genPaths = runStdoutLoggingT $ do
     let sources = unlines $ map (\p -> "@source \"" <> toText p <> "\";") genPaths
         input =
           [text|
-            ${tailwindInputCss}
+            ${tailwindCliInputCss}
             $sources
           |]
     liftIO $ do

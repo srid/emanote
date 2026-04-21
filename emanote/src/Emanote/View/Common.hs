@@ -28,7 +28,7 @@ import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
-import Emanote.View.Tailwind (generatedCssFile, tailwindInputCss, themeRemapStyle)
+import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
@@ -131,7 +131,7 @@ commonSplices withCtx model meta routeTitle = do
           if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
             then do
               cachedTailwindCdn
-              H.style ! A.type_ "text/tailwindcss" $ H.toHtml tailwindInputCss
+              H.style ! A.type_ "text/tailwindcss" $ H.toHtml tailwindBrowserConfig
             else do
               -- TODO: Use ?md5 to prevent stale browser caching of CSS.
               -- TODO: This should go through Ema route encoder!
