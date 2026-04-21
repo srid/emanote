@@ -148,7 +148,13 @@ async function startStatic(): Promise<{
   };
 }
 
-BeforeAll(async () => {
+/** BeforeAll owns the slowest work in the run: the emanote cold start
+ *  in live mode is bounded by `waitForHtml`'s internal 60s, after which
+ *  we still need to launch Chromium. The default cucumber timeout
+ *  (`setDefaultTimeout` above) is the step-level budget, not adequate
+ *  here — so give this hook a deliberate 180s ceiling instead of racing
+ *  the ~60s default. */
+BeforeAll({ timeout: 180_000 }, async () => {
   const started = mode === "live" ? await startLive() : await startStatic();
   baseUrl = started.url;
   backend = started.resource;
