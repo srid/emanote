@@ -13,21 +13,19 @@ full motivation.
 
 ## Running
 
-From the repo root:
+This suite runs in GitHub Actions (`.github/workflows/ci.yaml`, job
+`e2e-tests`) as a matrix over `{live, static}`. There's deliberately no
+`just` recipe — Playwright's downloaded Chromium binary depends on
+glibc system libs that aren't on `PATH` in a NixOS or plain Nix
+devshell, and `npx playwright install --with-deps` shells out to `sudo
+apt-get` which doesn't apply on NixOS either. CI (ubuntu-latest) has
+both, so that's where this suite runs.
 
-```sh
-just test-e2e
-```
-
-That recipe builds `emanote` (Nix), then runs the suite twice — once
-with `EMANOTE_MODE=live`, once with `EMANOTE_MODE=static`. CI does the
-same via `.github/workflows/ci.yaml`.
-
-For iteration, run a single mode directly:
+If you do want to iterate locally on a Debian/Ubuntu-like host:
 
 ```sh
 cd tests
-npm install
+npm ci
 npx playwright install --with-deps chromium   # one-time
 EMANOTE_BIN=$(command -v emanote) EMANOTE_MODE=live npm test
 ```
