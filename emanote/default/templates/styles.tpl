@@ -2,15 +2,16 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
 
 <style data-category="global-font">
-  /* Fraunces variable serif everywhere, JetBrains Mono for code.
-     Per-context opsz/SOFT/WONK tuning gives display vs. prose vs. UI voices. */
+  /* Display/prose voice: Fraunces (variable serif).
+     UI chrome voice: Inter (sans) — sidebar, breadcrumbs, TOC, metadata.
+     Code: JetBrains Mono. */
   :root {
     --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --font-sans: var(--font-serif);
   }
 
   body {
@@ -35,8 +36,9 @@
     font-variation-settings: 'opsz' 24, 'SOFT' 50;
   }
 
-  #sidebar, #breadcrumbs, #toc, .callout-title {
-    font-variation-settings: 'opsz' 12, 'SOFT' 30;
+  #sidebar, #breadcrumbs, #toc, #footer, .callout-title,
+  ema\:metadata, section[class*="font-mono"] {
+    font-family: var(--font-sans);
   }
 
   code, pre, kbd, samp, .font-mono {
