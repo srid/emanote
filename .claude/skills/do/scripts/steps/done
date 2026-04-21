@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# /do workflow's done step — extracted to a script so the LLM doesn't do
+# timestamp arithmetic over every step. Reads .do-results.json and emits a
+# ready-to-paste markdown timing table plus a FACTS block the agent uses to
+# compose optimization suggestions.
+#
+# Usage:
+#   done
+#
+# Stdout layout:
+#   <markdown timing table>
+#
+#   <slowest-step line>
+#
+#   <<<FACTS
+#   totalSeconds=<int>
+#   slowestStep=<name>
+#   slowestSeconds=<int>
+#   dominantSteps=<comma-separated step names that took >=30% of total>
+#   skippedSteps=<comma-separated name:reason pairs>
+#   failedSteps=<comma-separated step names>
+#   FACTS
+
+set -euo pipefail
+
+FILE=".do-results.json"
+[ -f "$FILE" ] || { echo "done: $FILE not found — cannot produce summary" >&2; exit 1; }
+
+if command -v jq &>/dev/null; then
+  JQ=jq
+else
+  JQ="nix run nixpkgs#jq --"
+fi
+
+# Portable ISO-8601 -> unix seconds. Supports GNU and BSD date.
+iso_to_epoch() {
+  local iso="$1"
+  if date -u -d "$iso" +%s 2>/dev/null; then
+    return
+  fi
+  date -u -j -f "%Y-%m-%dT%H:%M:%SZ" "$iso" +%s
+}
+
+fmt_dur() {
+  local s=$1
+  if [ "$s" -lt 60 ]; then
+    echo "${s}s"
+  else
+    printf "%dm %ds" $(( s / 60 )) $(( s % 60 ))
+  fi
+}
+
+total_start="$($JQ -r '[.steps[].startedAt] | first // .startedAt' "$FILE")"
+total_start_epoch="$(iso_to_epoch "$total_start")"
+
+last_end="$($JQ -r '[.steps[].completedAt] | last // .startedAt' "$FILE")"
+last_end_epoch="$(iso_to_epoch "$last_end")"
+
+total_dur=$(( last_end_epoch - total_start_epoch ))
+[ "$total_dur" -lt 0 ] && total_dur=0
+
+# Walk steps once; compute durations, icons, dominance, and aggregates.
+slowest_name=""
+slowest_dur=0
+dominant=()
+skipped=()
+failed=()
+rows=()
+
+while IFS=$'\t' read -r name status start end verif reason; do
+  start_e="$(iso_to_epoch "$start")"
+  end_e="$(iso_to_epoch "$end")"
+  d=$(( end_e - start_e ))
+  [ "$d" -lt 0 ] && d=0
+
+  case "$status" in
+    passed)  icon="✓" ;;
+    failed)  icon="✗"; failed+=("$name") ;;
+    skipped) icon="—"; skipped+=("$name:${reason:-unspecified}") ;;
+    *)       icon="?" ;;
+  esac
+
+  # Only count non-skipped steps toward slowest / dominance — a skipped
+  # step has 0 duration and would drown out real timing noise.
+  if [ "$status" != "skipped" ]; then
+    if [ "$d" -gt "$slowest_dur" ]; then
+      slowest_dur=$d
+      slowest_name=$name
+    fi
+    if [ "$total_dur" -gt 0 ] && [ $(( d * 100 / total_dur )) -ge 30 ]; then
+      dominant+=("$name")
+    fi
+  fi
+
+  dur_str="$(fmt_dur "$d")"
+  if [ "$status" != "skipped" ] && [ "$total_dur" -gt 0 ] && [ $(( d * 100 / total_dur )) -ge 30 ]; then
+    dur_str="**$dur_str**"
+  fi
+
+  verif_clean="$(echo "${verif:-}" | tr '\n' ' ' | sed 's/|/\\|/g')"
+  rows+=("| $name | $icon | $dur_str | $verif_clean |")
+done < <(
+  $JQ -r '.steps[] | [.name, .status, .startedAt, .completedAt, (.verification // ""), (.reason // "")] | @tsv' "$FILE"
+)
+
+# Emit markdown table
+echo "| Step | Status | Duration | Verification |"
+echo "|------|--------|----------|--------------|"
+for row in "${rows[@]}"; do
+  echo "$row"
+done
+echo "| **Total** | | **$(fmt_dur "$total_dur")** | |"
+echo
+
+if [ -n "$slowest_name" ]; then
+  echo "**Slowest step**: \`$slowest_name\` ($(fmt_dur "$slowest_dur"))"
+fi
+
+# FACTS block — parsed by the agent to compose optimization suggestions.
+join_csv() { local IFS=,; echo "$*"; }
+echo
+echo "<<<FACTS"
+echo "totalSeconds=$total_dur"
+echo "slowestStep=$slowest_name"
+echo "slowestSeconds=$slowest_dur"
+echo "dominantSteps=$(join_csv "${dominant[@]+${dominant[@]}}")"
+echo "skippedSteps=$(join_csv "${skipped[@]+${skipped[@]}}")"
+echo "failedSteps=$(join_csv "${failed[@]+${failed[@]}}")"
+echo "FACTS"

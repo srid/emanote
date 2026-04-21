@@ -1,11 +1,11 @@
 ---
-name: github-pr
-description: Write engaging GitHub PR titles and descriptions. Use when creating or updating PRs. Avoids boring bullet lists; uses narrative paragraphs with bold/italic for emphasis.
+name: forge-pr
+description: Write engaging PR titles and descriptions for any forge (GitHub today; Bitbucket planned). Use when creating or updating PRs. Avoids boring bullet lists; uses narrative paragraphs with bold/italic for emphasis.
 ---
 
-# GitHub PR Writing
+# Forge PR Writing
 
-Write PR descriptions that fellow devs actually want to read.
+Write PR descriptions that fellow devs actually want to read. The writing guidance below is forge-agnostic — only the `gh` commands in the "Updating existing PRs" section are GitHub-specific today. Bitbucket support is tracked in [srid/agency#10](https://github.com/srid/agency/issues/10).
 
 ## Anti-patterns (what LLMs typically produce)
 
@@ -40,21 +40,37 @@ Write PR descriptions that fellow devs actually want to read.
 
 ## Try it locally
 
-If the repo is a Nix flake and the PR branch contains a buildable output (package, NixOS config, etc.), include a "Try it locally" section at the end of the body. Use the GitHub owner/repo and branch name to construct the command:
+If the repo is a **GitHub** Nix flake and the PR branch contains a buildable output (package, NixOS config, etc.), include a "Try it locally" section at the end of the body. Use the GitHub owner/repo and branch name to construct the command, and put it in a **fenced `sh` code block** (not inline backticks) so GitHub renders a copy button and the command doesn't line-wrap awkwardly:
 
-```
+````
 ### Try it locally
-`nix run github:<owner>/<repo>/<branch>`
+
+```sh
+nix run github:<owner>/<repo>/<branch>
+```
+````
+
+Adjust the command as needed — `nix build` for non-runnable outputs, add `#<output>` if the default package isn't the relevant one. Omit this section entirely if the change isn't meaningfully testable via `nix run/build` (e.g., CI-only changes, documentation, non-Nix repos, or non-GitHub forges where flake refs would be awkward).
+
+## Passing the body to `gh` safely
+
+**MANDATORY**: Always pass `--body` to `gh pr create` / `gh pr edit` / `gh pr comment` via a **single-quoted heredoc** so backticks, `$`, and `!` survive unescaped. Double-quoted `--body "..."` triggers shell command substitution on backticks, and escaping them with `\`` produces literal backslashes in the rendered PR (breaking code fences — see [juspay/kolu#402](https://github.com/juspay/kolu/pull/402)).
+
+```sh
+gh pr create --draft --title "..." --body "$(cat <<'EOF'
+...body with ```sh fenced blocks``` intact...
+EOF
+)"
 ```
 
-Adjust the command as needed — `nix build` for non-runnable outputs, add `#<output>` if the default package isn't the relevant one. Omit this section entirely if the change isn't meaningfully testable via `nix run/build` (e.g., CI-only changes, documentation, non-Nix repos).
+The `'EOF'` (quoted delimiter) is load-bearing — it disables interpolation inside the heredoc. Never write backticks in the body as `\``.
 
 ## Updating existing PRs
 
 When the user pushes further changes to an already-PR'd branch:
 
 1. Check if the PR title/description still accurately reflects the full scope
-2. If new commits meaningfully change what the PR does, update the title and/or body via `gh pr edit`
+2. If new commits meaningfully change what the PR does, update the title and/or body via the forge's edit command (`gh pr edit` on GitHub)
 3. Don't rewrite from scratch — amend the existing description to cover new ground
 4. Add a brief note about what changed if the scope expanded significantly
 
