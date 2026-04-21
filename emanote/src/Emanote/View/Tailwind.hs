@@ -21,8 +21,9 @@ module Emanote.View.Tailwind (
   generatedCssFile,
 ) where
 
-import Control.Monad.Logger (MonadLogger, logInfoN)
+import Control.Monad.Logger (runStdoutLoggingT)
 import Data.ByteString qualified as BS
+import Emanote.Prelude (log)
 import NeatInterpolation (text)
 import Relude
 import System.IO (hClose)
@@ -85,9 +86,9 @@ tailwindBin = $(staticWhich "tailwindcss")
 Writes a temp input CSS combining 'tailwindInputCss' with one @\@source@ line
 per generated path, then invokes @tailwindcss@ v4 with @--minify@.
 -}
-compileTailwindCss :: (MonadUnliftIO m, MonadLogger m) => FilePath -> [FilePath] -> m ()
-compileTailwindCss cssPath genPaths = do
-  logInfoN $ "Running Tailwind CSS v4 compiler to generate: " <> toText cssPath
+compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
+compileTailwindCss cssPath genPaths = runStdoutLoggingT $ do
+  log $ "Running Tailwind CSS v4 compiler to generate: " <> toText cssPath
   withSystemTempFile "emanote-tailwind-input.css" $ \inputPath h -> do
     let sources = unlines $ map (\p -> "@source \"" <> toText p <> "\";") genPaths
         input =

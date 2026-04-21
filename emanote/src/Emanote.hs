@@ -6,7 +6,7 @@ module Emanote (
   defaultEmanoteConfig,
 ) where
 
-import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdoutLoggingT)
+import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT)
 import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
@@ -95,7 +95,6 @@ run cfg@EmanoteConfig {..} = do
 postRun :: EmanoteConfig -> (Model.ModelEma, (FilePath, [FilePath])) -> IO ()
 postRun EmanoteConfig {..} (unModelEma -> model0, (outPath, genPaths)) = do
   when (model0 ^. modelCompileTailwind)
-    $ runStdoutLoggingT
     $ compileTailwindCss (outPath </> generatedCssFile) genPaths
   checkBrokenLinks _emanoteConfigCli $ ExportJSON.modelRels model0
   checkBadMarkdownFiles $ Model.modelNoteErrors model0
