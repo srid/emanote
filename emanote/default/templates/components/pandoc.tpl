@@ -80,7 +80,7 @@
         <footnote>
           <li id="fn${footnote:idx}" class="pl-2">
             <footnote:content />
-            <a href="#fnref${footnote:idx}" class="footnote-backref" aria-label="Back to content">↩</a>
+            <a href="${ema:note:url}#fnref${footnote:idx}" class="footnote-backref" aria-label="Back to content">↩</a>
           </li>
         </footnote>
       </ol>
