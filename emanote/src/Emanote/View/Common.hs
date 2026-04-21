@@ -1,12 +1,9 @@
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Emanote.View.Common (
   commonSplices,
   renderModelTemplate,
   routeBreadcrumbs,
-  generatedCssFile,
-  tailwindInputCss,
 
   -- * Render context
   TemplateRenderCtx (..),
@@ -31,6 +28,7 @@ import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
+import Emanote.View.Tailwind (generatedCssFile, tailwindInputCss, themeRemapStyle)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
@@ -39,7 +37,6 @@ import Heist.Interpreted qualified as HI
 import Heist.Splices.Apply qualified as HA
 import Heist.Splices.Bind qualified as HB
 import Heist.Splices.Json qualified as HJ
-import NeatInterpolation (text)
 import Optics.Operators ((^.))
 import Paths_emanote qualified
 import Relude
@@ -106,38 +103,6 @@ defaultRouteMeta model =
   let r = M.modelIndexRoute model
       meta = Meta.getEffectiveRouteMeta r model
    in (r, meta)
-
-generatedCssFile :: FilePath
-generatedCssFile = "tailwind.css"
-
-{- | Base Tailwind v4 input CSS.
-
-Registers a 'primary' color token (all eleven scale levels) as CSS variables
-aliased to the Tailwind blue palette at compile time. At runtime, a
-per-site @<style>@ block (emitted by 'tailwindCssShim') overrides the aliases
-to the site's configured @template.theme@ palette, so a site's theme color
-changes without regenerating the compiled CSS.
--}
-tailwindInputCss :: Text
-tailwindInputCss =
-  [text|
-    @import "tailwindcss";
-    @plugin "@tailwindcss/typography";
-
-    @theme {
-      --color-primary-50:  var(--color-blue-50);
-      --color-primary-100: var(--color-blue-100);
-      --color-primary-200: var(--color-blue-200);
-      --color-primary-300: var(--color-blue-300);
-      --color-primary-400: var(--color-blue-400);
-      --color-primary-500: var(--color-blue-500);
-      --color-primary-600: var(--color-blue-600);
-      --color-primary-700: var(--color-blue-700);
-      --color-primary-800: var(--color-blue-800);
-      --color-primary-900: var(--color-blue-900);
-      --color-primary-950: var(--color-blue-950);
-    }
-  |]
 
 commonSplices ::
   (HasCallStack) =>
@@ -234,14 +199,6 @@ commonSplices withCtx model meta routeTitle = do
         ! H.customAttribute "data-ema-skip" "true"
         ! A.src (H.toValue localCdnUrl)
         $ mempty
-    themeRemapStyle themeName =
-      let remap =
-            unlines
-              [ "  --color-primary-" <> lvl <> ": var(--color-" <> themeName <> "-" <> lvl <> ");"
-              | lvl <- ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"]
-              ]
-          css = ":root {\n" <> remap <> "}\n"
-       in H.style $ H.toHtml css
 
 renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
 renderModelTemplate model templateName =
