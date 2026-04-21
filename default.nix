@@ -1,8 +1,4 @@
-# Root composer for Emanote Nix outputs.
-#
-# Used by flake.nix (thin wrapper), by `nix-build` directly, and by shell.nix.
-# Emits the same package graph whether the caller uses flakes or traditional
-# Nix, so there is exactly one build definition.
+# Root composer: same package graph for flake and non-flake consumers.
 { pkgs ? import ./nix/nixpkgs.nix { }
 , project ? import ./nix/haskell-project.nix { inherit pkgs; }
 }:

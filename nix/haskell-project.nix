@@ -24,8 +24,6 @@ haskellFlakeLib.evalHaskellProject {
       devShell.tools = hp: {
         inherit (pkgs) stork tailwindcss_4;
         inherit (hp) cabal-fmt;
-        # hlint is useful during development; fourmolu is kept out since we
-        # no longer enforce formatting.
       };
 
       packages = {

@@ -1,9 +1,7 @@
-# ZERO flake inputs, by design.
-#
-# nixpkgs and the rest are pinned by npins (`npins/sources.json`) and
-# loaded through `nix/nixpkgs.nix`. Flake inputs are costly to resolve on
-# `nix develop` eval; zero inputs keeps it snappy, and the same pins are
-# also usable from `nix-build`/`nix-shell` (default.nix, shell.nix).
+# Zero flake inputs by design: flake input resolution on `nix develop`
+# eval is expensive. All pins live in `npins/sources.json` and are loaded
+# through `nix/nixpkgs.nix`, which default.nix and shell.nix reuse for
+# the non-flake path.
 {
   description = "emanote: Emanate a structured view of your plain-text notes";
   nixConfig = {
@@ -16,9 +14,8 @@
       sources = import ./npins;
       systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
 
-      # `haskell-flake.evalHaskellProject` is the expensive step — evaluate
-      # it once per system and thread the result through both default.nix
-      # (packages/apps/checks) and shell.nix (devShell).
+      # haskell-flake's `evalHaskellProject` is the expensive step; share
+      # it across default.nix (packages/apps/checks) and shell.nix (devShell).
       perSystem = pkgs:
         let
           project = import ./nix/haskell-project.nix { inherit pkgs; };
