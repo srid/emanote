@@ -29,6 +29,7 @@ import * as http from "node:http";
 import * as os from "node:os";
 import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
+import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
 
 type Mode = "live" | "static";
@@ -50,7 +51,7 @@ const emanoteBin = (() => {
 })();
 
 const fixtureDir = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname),
+  import.meta.dirname,
   "..",
   "fixtures",
   "notebook",
@@ -92,7 +93,7 @@ async function waitForHtml(
     } catch (e) {
       lastErr = e;
     }
-    await new Promise((r) => setTimeout(r, 500));
+    await sleep(500);
   }
   throw new Error(
     `Backend did not serve ${url} containing ${JSON.stringify(needle)} within ${timeoutMs}ms (last error: ${String(lastErr)})`,
