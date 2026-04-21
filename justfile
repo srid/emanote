@@ -14,7 +14,8 @@ repl *ARGS:
 
 # Autoformat the project tree
 fmt:
-    pre-commit run --all-files
+    nixpkgs-fmt *.nix nix/**/*.nix npins/default.nix
+    cabal-fmt --inplace emanote/emanote.cabal
 
 # Run the app using ghcid (with auto-reload / recompile)
 # To run against a custom notebook:

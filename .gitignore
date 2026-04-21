@@ -3,8 +3,6 @@ result
 result-*
 .direnv
 
-/.pre-commit-config.yaml
-
 /ghcid.log
 
 
@@ -13,3 +11,4 @@ apm_modules/
 
 /.worktrees
 /.do-results.json
+/.claude/scheduled_tasks.lock

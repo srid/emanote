@@ -1,0 +1,122 @@
+{
+  "pins": {
+    "commonmark-simple": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-simple"
+      },
+      "branch": "0.2.0.0",
+      "submodules": false,
+      "revision": "81dc7a66b2490a701bfc87e6e892307665e6336e",
+      "url": "https://github.com/srid/commonmark-simple/archive/81dc7a66b2490a701bfc87e6e892307665e6336e.tar.gz",
+      "hash": "sha256-2WE5SjwgwjKdsHxDRfQIb2WRrVYoNPiCIyG4HZd8Znk="
+    },
+    "commonmark-wikilink": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-wikilink"
+      },
+      "branch": "0.2.0.0",
+      "submodules": false,
+      "revision": "5ab01515939047b58943cc1234e7ee0cb82d1c22",
+      "url": "https://github.com/srid/commonmark-wikilink/archive/5ab01515939047b58943cc1234e7ee0cb82d1c22.tar.gz",
+      "hash": "sha256-MWOb0Ojc4EQd9fOnQEveRDdbH5Cr6kjUt04uWzBPLGQ="
+    },
+    "ema": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "ema"
+      },
+      "branch": "0.12.0.0",
+      "submodules": false,
+      "revision": "7ff434cf8f494c62de7fe6c1a36d8681929beb93",
+      "url": "https://github.com/srid/ema/archive/7ff434cf8f494c62de7fe6c1a36d8681929beb93.tar.gz",
+      "hash": "sha256-vDhjw+Cm7HniaiIHirwM0B2yzzLYLO3HHMaZsQRL3uw="
+    },
+    "emanote-template": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "emanote-template"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "1475b182fc136fc5da3a3b3e2b9be90795af19bb",
+      "url": "https://github.com/srid/emanote-template/archive/1475b182fc136fc5da3a3b3e2b9be90795af19bb.tar.gz",
+      "hash": "sha256-cLL9ylGe1OoN/KSX7+FRW3j8rm5iPTCleOJGSdOfdE0="
+    },
+    "haskell-flake": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "haskell-flake"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "d7420f050709bf906f310555e4c58811e0e78058",
+      "url": "https://github.com/srid/haskell-flake/archive/d7420f050709bf906f310555e4c58811e0e78058.tar.gz",
+      "hash": "sha256-RLYunFIDic+wFEKEqLlD65f0pSMm7jZnyQm6UlJNy+k="
+    },
+    "heist-extra": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "heist-extra"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "81f1ea0cf1226215430171dbe613a2988c6cc46a",
+      "url": "https://github.com/srid/heist-extra/archive/81f1ea0cf1226215430171dbe613a2988c6cc46a.tar.gz",
+      "hash": "sha256-ytHgIoRlkI5K0SDq33znlY0wjlqcwoQCe1z9JfHT/Fw="
+    },
+    "lvar": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "lvar"
+      },
+      "branch": "0.2.0.0",
+      "submodules": false,
+      "revision": "cd110d4823ee7b8bbbf115a47c79bc304c3309cd",
+      "url": "https://github.com/srid/lvar/archive/cd110d4823ee7b8bbbf115a47c79bc304c3309cd.tar.gz",
+      "hash": "sha256-Uwg5s0SlxLp83bXHA+6TIQV+L+lu8lwMpBdNuiuk7hg="
+    },
+    "nixpkgs": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nixos",
+        "repo": "nixpkgs"
+      },
+      "branch": "nixpkgs-unstable",
+      "submodules": false,
+      "revision": "6b4955211758ba47fac850c040a27f23b9b4008f",
+      "url": "https://github.com/nixos/nixpkgs/archive/6b4955211758ba47fac850c040a27f23b9b4008f.tar.gz",
+      "hash": "sha256-dPALCtmik9Wr14MGqVXm+OQcv7vhPBXcWNIOThGnB/Q="
+    },
+    "unionmount": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "unionmount"
+      },
+      "branch": "0.3.0.0",
+      "submodules": false,
+      "revision": "4387cdeca64d22ff02da318b1527ff8817123ced",
+      "url": "https://github.com/srid/unionmount/archive/4387cdeca64d22ff02da318b1527ff8817123ced.tar.gz",
+      "hash": "sha256-1TBIhcgbQxBF48ET7Dy+PM3U2lCROBDVg5PhOtm2Q/M="
+    }
+  },
+  "version": 7
+}

@@ -7,5 +7,5 @@ TODO: Document this module in ./docs
 To test the changes made to this Nix code, run:
 
 ```sh
-nix build -L .#checks.x86_64-linux.docs --option substitute false
+nix build -L .#checks.x86_64-linux.docs-linkCheck --option substitute false
 ```

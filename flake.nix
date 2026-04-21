@@ -1,36 +1,68 @@
+# ZERO flake inputs, by design.
+#
+# nixpkgs and the rest are pinned by npins (`npins/sources.json`) and
+# loaded through `nix/nixpkgs.nix`. Flake inputs are costly to resolve on
+# `nix develop` eval; zero inputs keeps it snappy, and the same pins are
+# also usable from `nix-build`/`nix-shell` (default.nix, shell.nix).
 {
   description = "emanote: Emanate a structured view of your plain-text notes";
   nixConfig = {
     extra-substituters = "https://cache.nixos.asia/oss";
     extra-trusted-public-keys = "oss:KO872wNJkCDgmGN3xy9dT89WAhvv13EiKncTtHDItVU=";
   };
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-    haskell-flake.url = "github:srid/haskell-flake";
-    fourmolu-nix.url = "github:jedimahdi/fourmolu-nix";
-    git-hooks.url = "github:bmrips/git-hooks.nix";
-    git-hooks.flake = false;
-    nixos-unified.url = "github:srid/nixos-unified";
 
-    # These are not (necessarily) upstreamed to nixpkgs, yet.
-    ema.url = "github:srid/ema/0.12.0.0";
-    ema.flake = false;
-    lvar.url = "github:srid/lvar/0.2.0.0";
-    lvar.flake = false;
-    heist-extra.url = "github:srid/heist-extra";
-    heist-extra.flake = false;
-    unionmount.url = "github:srid/unionmount/0.3.0.0";
-    unionmount.flake = false;
-    commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
-    commonmark-simple.flake = false;
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink/0.2.0.0";
-    commonmark-wikilink.flake = false;
+  outputs = { self }:
+    let
+      sources = import ./npins;
+      systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
+      forEachSystem = f: builtins.listToAttrs (map
+        (system: {
+          name = system;
+          value = f (import ./nix/nixpkgs.nix { inherit system; });
+        })
+        systems);
+    in
+    {
+      homeManagerModules.default = import ./nix/home/emanote.nix;
+      homeManagerModule = self.homeManagerModules.default; # legacy alias
 
-    emanote-template.url = "github:srid/emanote-template";
-    emanote-template.flake = false;
-  };
-  outputs = inputs:
-    inputs.nixos-unified.lib.mkFlake { inherit inputs; root = ./.; };
+      flakeModule = ./nix/flake-module;
+
+      templates.default = {
+        description = "A simple flake.nix template for emanote notebooks";
+        path = builtins.path {
+          path = sources.emanote-template;
+          filter = path: _: baseNameOf path == "flake.nix";
+        };
+      };
+
+      packages = forEachSystem (pkgs:
+        let outs = import ./default.nix { inherit pkgs; };
+        in {
+          default = outs.default;
+          emanote = outs.emanote;
+          docs = outs.docs;
+        });
+
+      apps = forEachSystem (pkgs:
+        let outs = import ./default.nix { inherit pkgs; };
+        in {
+          default = {
+            type = "app";
+            program = pkgs.lib.getExe outs.emanote;
+            meta.description = "Emanote live server";
+          };
+          docs = outs.docs-app;
+        });
+
+      devShells = forEachSystem (pkgs: {
+        default = import ./shell.nix { inherit pkgs; };
+      });
+
+      checks = forEachSystem (pkgs:
+        let outs = import ./default.nix { inherit pkgs; };
+        in pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
+          docs-linkCheck = outs.docs-linkCheck;
+        });
+    };
 }

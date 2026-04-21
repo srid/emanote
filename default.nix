@@ -1,10 +1,28 @@
-(import
-  (
-    fetchTarball {
-      url = "https://github.com/edolstra/flake-compat/archive/12c64ca55c1014cdc1b16ed5a804aa8576601ff2.tar.gz";
-      sha256 = "0jm6nzb83wa6ai17ly9fzpqc40wg1viib8klq8lby54agpl213w5";
-    }
-  )
-  {
-    src = ./.;
-  }).defaultNix
+# Root composer for Emanote Nix outputs.
+#
+# Used by flake.nix (thin wrapper), by `nix-build` directly, and by shell.nix.
+# Emits the same package graph whether the caller uses flakes or traditional
+# Nix, so there is exactly one build definition.
+{ pkgs ? import ./nix/nixpkgs.nix { } }:
+let
+  project = import ./nix/haskell-project.nix { inherit pkgs; };
+
+  emanote = project.packages.emanote.package;
+
+  mkSite = import ./nix/emanote-site.nix { inherit pkgs; };
+
+  docs = mkSite {
+    name = "docs";
+    package = emanote;
+    layers = [{ path = ./docs; pathString = "./docs"; }];
+    allowBrokenInternalLinks = true; # A couple, by design, in markdown.md
+    extraConfig.template.urlStrategy = "pretty";
+  };
+in
+{
+  inherit emanote project;
+  default = emanote;
+  docs = docs.package;
+  docs-app = docs.app;
+  docs-linkCheck = docs.check;
+}
