@@ -1,6 +1,6 @@
-<div class="mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300">
+<div class="backlink-context overflow-x-auto text-sm text-gray-500 dark:text-gray-300">
   <context>
-    <div class="mt-2">
+    <div>
       <context:body>
         <PandocLink class="text-primary-700 dark:text-primary-300">
           <Internal class="font-semibold no-underline hover:underline decoration-primary-500" />

@@ -71,6 +71,109 @@
   }
 </style>
 
+<style data-category="footnotes">
+  /* Body-side ref: show as [N] with subtle background so it reads as a
+     footnote marker and is easier to click. */
+  sup.footnote-ref {
+    font-size: 0.75em;
+    padding: 0 0.15em;
+  }
+  sup.footnote-ref a {
+    color: var(--color-primary-700);
+    text-decoration: none;
+    padding: 0.05em 0.25em;
+    border-radius: 3px;
+    background-color: var(--color-primary-50);
+    transition: background-color 0.15s;
+  }
+  sup.footnote-ref a:hover {
+    background-color: var(--color-primary-100);
+    text-decoration: underline;
+  }
+  .dark sup.footnote-ref a {
+    color: var(--color-primary-300);
+    background-color: var(--color-primary-950);
+  }
+  .dark sup.footnote-ref a:hover {
+    background-color: var(--color-primary-900);
+  }
+
+  /* Back-reference arrow at end of footnote item. */
+  a.footnote-backref {
+    margin-left: 0.35em;
+    color: var(--color-gray-400);
+    text-decoration: none;
+  }
+  a.footnote-backref:hover {
+    color: var(--color-primary-600);
+  }
+  .dark a.footnote-backref {
+    color: var(--color-gray-600);
+  }
+  .dark a.footnote-backref:hover {
+    color: var(--color-primary-400);
+  }
+
+  /* :target highlight — flash the landed footnote (and the ref, when
+     jumped back to) so the destination is obvious. */
+  ol.footnote-list li:target,
+  sup.footnote-ref:target a {
+    animation: footnote-flash 1.2s ease-out;
+  }
+  @keyframes footnote-flash {
+    0%   { background-color: var(--color-primary-100); }
+    100% { background-color: transparent; }
+  }
+  .dark ol.footnote-list li:target,
+  .dark sup.footnote-ref:target a {
+    animation: footnote-flash-dark 1.2s ease-out;
+  }
+  @keyframes footnote-flash-dark {
+    0%   { background-color: var(--color-primary-900); }
+    100% { background-color: transparent; }
+  }
+</style>
+
+<style data-category="backlinks">
+  /* Tighten context spacing — the default block margins from the global
+     prose rules make each card feel sparse. */
+  .backlink-context p,
+  .backlink-context div {
+    margin: 0;
+  }
+  .backlink-context p + p {
+    margin-top: 0.35em;
+  }
+
+  /* Embed vs mention: if the card's context contains a WikiLinkEmbed, the
+     source page *transcludes* this one — a stronger relationship. Surface
+     it with a thicker, more saturated left rail and a small badge. */
+  li.backlink-card:has([data-wikilink-type="WikiLinkEmbed"]) {
+    border-left-width: 4px;
+    border-left-color: var(--color-primary-600);
+  }
+  .dark li.backlink-card:has([data-wikilink-type="WikiLinkEmbed"]) {
+    border-left-color: var(--color-primary-400);
+  }
+  li.backlink-card:has([data-wikilink-type="WikiLinkEmbed"]) .backlink-title::after {
+    content: "embeds";
+    margin-left: 0.5em;
+    padding: 0.05em 0.45em;
+    font-size: 0.65em;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-primary-700);
+    background-color: var(--color-primary-50);
+    border-radius: 3px;
+    vertical-align: 0.15em;
+  }
+  .dark li.backlink-card:has([data-wikilink-type="WikiLinkEmbed"]) .backlink-title::after {
+    color: var(--color-primary-200);
+    background-color: var(--color-primary-900);
+  }
+</style>
+
 <style data-category="callout">
   /* To prevent overemphasis of link styles in callout titles */
   .callout .callout-title a {
