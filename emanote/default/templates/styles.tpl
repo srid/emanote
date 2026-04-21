@@ -131,9 +131,9 @@
 
 <style data-category="backlinks">
   /* Tighten context spacing — the default block margins from the global
-     prose rules make each card feel sparse. */
-  .backlink-context p,
-  .backlink-context div {
+     prose rules make each card feel sparse. Scoped to <p> only so nested
+     content (blockquotes, callouts, embed wrappers) keeps its own layout. */
+  .backlink-context p {
     margin: 0;
   }
   .backlink-context p + p {
