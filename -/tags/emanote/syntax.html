@@ -6,6 +6,18 @@
 <head>
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <script>
+    // Apply theme before first paint to avoid FOUC.
+    // Priority: explicit user choice (localStorage) > OS preference.
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      if (isDark) document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    })();
+  </script>
   <title>
     #emanote/syntax - Tag Index – Emanote
   </title>
@@ -42,23 +54,45 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=a5da3971-1942-41c8-a994-8ed3a4a15ef3' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=845730bd-c471-473b-9c63-e818ab975200' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
+<!-- Fonts are self-hosted under _emanote-static/fonts to keep the
+     generated static site fully offline-capable. See the README in
+     that directory for how to refresh. -->
+<link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
 <style data-category='global-font'>
-  /* Refined typography with system font stack */
+  /* Font option C (trial):
+     Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
+     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  :root {
+    --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-serif);
     line-height: 1.7;
-    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
-    line-height: 1.3;
-    font-weight: 700;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  ema\:metadata, section[class*="font-mono"] {
+    font-family: var(--font-sans);
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: var(--font-mono);
   }
 </style>
 
@@ -73,29 +107,25 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 </style>
 
 <style data-category='kbd'>
-  /* <kbd> styling */
+  /* <kbd> styling — flat with a subtle baseline, theme-variable colours */
   kbd {
-    background-color: #f7f7f7;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.1),
-      0 2px 0 0 rgba(255, 255, 255, 0.8) inset;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--color-gray-800);
     display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
     line-height: 1.2;
-    padding: 3px 6px;
+    padding: 2px 6px;
     white-space: nowrap;
-    font-size: 0.9em;
   }
 
-  /* Dark mode kbd styling */
   .dark kbd {
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.4),
-      0 2px 0 0 rgba(255, 255, 255, 0.08) inset;
-    color: #f3f4f6;
+    background-color: var(--color-gray-800);
+    border-color: var(--color-gray-700);
+    color: var(--color-gray-100);
   }
 </style>
 
@@ -107,29 +137,105 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   }
 </style>
 
+<style data-category='lists'>
+  /* Tighten nested list margins so a bulleted sub-list inside a numbered
+     item doesn't push its parent's siblings apart. */
+  main li > ul,
+  main li > ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+</style>
+
+<style data-category='task-list'>
+  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
+  main li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-left: -1rem;
+  }
+
+  main li:has(> svg.--ema-checkbox) > span {
+    flex: 1;
+  }
+</style>
+
+<style data-category='sidebar-tree'>
+  /* Folgezettel depth rails: nested tree levels get a subtle left border */
+  #sidebar .pl-2 .pl-2 {
+    border-left: 1px solid var(--color-gray-200);
+    margin-left: 0.25rem;
+  }
+
+  .dark #sidebar .pl-2 .pl-2 {
+    border-left-color: var(--color-gray-800);
+  }
+</style>
+
 <style data-category='toc'>
   a.--ema-toc {
     background-color: transparent !important;
   }
 
-  /* Active TOC item styling */
-  a.--ema-toc.toc-item-active {
+  /* Visual hierarchy by depth: each nested level (H3, H4, ...) is
+     progressively smaller, lighter, and more muted so a long TOC
+     stays scannable at a glance. Top-level (H2) items keep full
+     weight and contrast. */
+  #toc ul a.--ema-toc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .dark #toc ul a.--ema-toc {
+    color: var(--color-gray-300);
+  }
+
+  #toc ul ul a.--ema-toc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  .dark #toc ul ul a.--ema-toc {
+    color: var(--color-gray-400);
+  }
+
+  #toc ul ul ul a.--ema-toc {
+    font-size: 0.78125rem;
+    color: var(--color-gray-500);
+  }
+
+  .dark #toc ul ul ul a.--ema-toc {
+    color: var(--color-gray-500);
+  }
+
+  #toc ul ul ul ul a.--ema-toc {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+  }
+
+  .dark #toc ul ul ul ul a.--ema-toc {
+    color: var(--color-gray-600);
+  }
+
+  /* Active TOC item — uses theme primary palette so per-site theme overrides
+     flow through without hardcoding a colour here. The selector is scoped
+     under #toc so it beats the per-depth color rules above. */
+  #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
   }
 
-  /* Light mode active state */
-  a.--ema-toc.toc-item-active {
-    background-color: #eff6ff !important;
-    color: #1d4ed8 !important;
-  }
-
-  /* Dark mode active state */
-  .dark a.--ema-toc.toc-item-active {
-    background-color: #172554 !important;
-    color: #93c5fd !important;
-    border-left-color: #3b82f6;
+  .dark #toc a.--ema-toc.toc-item-active {
+    background-color: var(--color-primary-950) !important;
+    color: var(--color-primary-300) !important;
+    border-left-color: var(--color-primary-400);
   }
 </style>
 
@@ -204,6 +310,24 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 </style>
 
 <script>
+  // Theme toggle: persist choice in localStorage; the early-load script in
+  // base.tpl applies it before first paint so there's no FOUC on reload.
+  (function () {
+    window.emanote = window.emanote || {};
+    window.emanote.theme = {
+      toggle: function () {
+        var root = document.documentElement;
+        var isDark = root.classList.toggle('dark');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
+        if (document.querySelector('.mermaid')) window.location.reload();
+      }
+    };
+  })();
+</script>
+
+<script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
     const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
@@ -244,87 +368,45 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 </script>
 
 <style data-category='external-link'>
-  /* External link icon */
-  a[data-linkicon=""]::after {
-    content: ""
-  }
-
-  a[data-linkicon=none]::after {
-    content: ""
-  }
-
+  /* External/mail link glyphs — drawn with mask-image so they inherit the
+     link's currentColor (one rule for both light and dark themes). */
   a[data-linkicon="external"] {
-    padding-right: 24px;
+    padding-right: 1.1em;
   }
 
   a[data-linkicon="external"]::after {
-    margin-right: -24px;
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:gray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
-  }
-
-  .dark a[data-linkicon="external"]::after {
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:lightgray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.15em;
+    margin-right: -1.1em;
+    vertical-align: baseline;
+    background-color: currentColor;
+    opacity: 0.55;
+    -webkit-mask: var(--icon-external) no-repeat center / contain;
+    mask: var(--icon-external) no-repeat center / contain;
   }
 
   a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="gray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+    width: 0.9em;
+    height: 0.9em;
+    -webkit-mask: var(--icon-mail) no-repeat center / contain;
+    mask: var(--icon-mail) no-repeat center / contain;
   }
 
-  .dark a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="lightgray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+  :root {
+    --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g style="stroke:black;stroke-width:1;fill:none"><line x1="5" y1="5" x2="5" y2="14"/><line x1="14" y1="9" x2="14" y2="14"/><line x1="5" y1="14" x2="14" y2="14"/><line x1="5" y1="5" x2="9" y2="5"/><line x1="10" y1="2" x2="17" y2="2"/><line x1="17" y1="2" x2="17" y2="9"/><line x1="10" y1="9" x2="17" y2="2"/></g></svg>');
+    --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
   <!-- What goes in this file will appear on near the end of <head>-->
 
   <head-main></head-main>
-  <!-- Custom Stork-search styling for Emanote --><link rel='stylesheet' href='_emanote-static/stork/edible.css' media='(prefers-color-scheme: light)' />
-<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' media='(prefers-color-scheme: dark)' />
+  <!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
+     unconditionally; the active one is picked by toggling the wrapper's
+     CSS class, driven by the same .dark class the theme toggle manages. --><link rel='stylesheet' href='_emanote-static/stork/edible.css' />
+<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
 
 <style data-category='stork'>
   #stork-search-container {
@@ -342,7 +424,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 
   
     <script id='emanote-stork' data-emanote-base-url='/'>
-      window.emanote = {};
+      window.emanote = window.emanote || {};
       window.emanote.stork = {
         searchShown: false,
         indexIsStale: false,
@@ -563,12 +645,16 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   // without hitting "Identifier 'wrapper' has already been declared".
   {
     const wrapper = document.getElementById('stork-wrapper');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
       wrapper.classList.remove('stork-wrapper-edible', 'stork-wrapper-edible-dark');
-      wrapper.classList.add(e.matches ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+      wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+    };
+    applyTheme();
+    // Theme toggle mutates the .dark class on <html>; mirror it onto the
+    // stork wrapper so the search dialog re-skins live without a reload.
+    new MutationObserver(applyTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class']
     });
   }
 </script>

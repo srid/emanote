@@ -13,6 +13,18 @@
 <head>
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <script>
+    // Apply theme before first paint to avoid FOUC.
+    // Priority: explicit user choice (localStorage) > OS preference.
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      if (isDark) document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    })();
+  </script>
   <title>
     Custom CSS styling – Emanote
   </title>
@@ -48,23 +60,45 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=a5da3971-1942-41c8-a994-8ed3a4a15ef3' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=845730bd-c471-473b-9c63-e818ab975200' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
+<!-- Fonts are self-hosted under _emanote-static/fonts to keep the
+     generated static site fully offline-capable. See the README in
+     that directory for how to refresh. -->
+<link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
 <style data-category='global-font'>
-  /* Refined typography with system font stack */
+  /* Font option C (trial):
+     Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
+     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  :root {
+    --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-serif);
     line-height: 1.7;
-    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
-    line-height: 1.3;
-    font-weight: 700;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  ema\:metadata, section[class*="font-mono"] {
+    font-family: var(--font-sans);
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: var(--font-mono);
   }
 </style>
 
@@ -79,29 +113,25 @@
 </style>
 
 <style data-category='kbd'>
-  /* <kbd> styling */
+  /* <kbd> styling — flat with a subtle baseline, theme-variable colours */
   kbd {
-    background-color: #f7f7f7;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.1),
-      0 2px 0 0 rgba(255, 255, 255, 0.8) inset;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--color-gray-800);
     display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
     line-height: 1.2;
-    padding: 3px 6px;
+    padding: 2px 6px;
     white-space: nowrap;
-    font-size: 0.9em;
   }
 
-  /* Dark mode kbd styling */
   .dark kbd {
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.4),
-      0 2px 0 0 rgba(255, 255, 255, 0.08) inset;
-    color: #f3f4f6;
+    background-color: var(--color-gray-800);
+    border-color: var(--color-gray-700);
+    color: var(--color-gray-100);
   }
 </style>
 
@@ -113,29 +143,105 @@
   }
 </style>
 
+<style data-category='lists'>
+  /* Tighten nested list margins so a bulleted sub-list inside a numbered
+     item doesn't push its parent's siblings apart. */
+  main li > ul,
+  main li > ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+</style>
+
+<style data-category='task-list'>
+  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
+  main li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-left: -1rem;
+  }
+
+  main li:has(> svg.--ema-checkbox) > span {
+    flex: 1;
+  }
+</style>
+
+<style data-category='sidebar-tree'>
+  /* Folgezettel depth rails: nested tree levels get a subtle left border */
+  #sidebar .pl-2 .pl-2 {
+    border-left: 1px solid var(--color-gray-200);
+    margin-left: 0.25rem;
+  }
+
+  .dark #sidebar .pl-2 .pl-2 {
+    border-left-color: var(--color-gray-800);
+  }
+</style>
+
 <style data-category='toc'>
   a.--ema-toc {
     background-color: transparent !important;
   }
 
-  /* Active TOC item styling */
-  a.--ema-toc.toc-item-active {
+  /* Visual hierarchy by depth: each nested level (H3, H4, ...) is
+     progressively smaller, lighter, and more muted so a long TOC
+     stays scannable at a glance. Top-level (H2) items keep full
+     weight and contrast. */
+  #toc ul a.--ema-toc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .dark #toc ul a.--ema-toc {
+    color: var(--color-gray-300);
+  }
+
+  #toc ul ul a.--ema-toc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  .dark #toc ul ul a.--ema-toc {
+    color: var(--color-gray-400);
+  }
+
+  #toc ul ul ul a.--ema-toc {
+    font-size: 0.78125rem;
+    color: var(--color-gray-500);
+  }
+
+  .dark #toc ul ul ul a.--ema-toc {
+    color: var(--color-gray-500);
+  }
+
+  #toc ul ul ul ul a.--ema-toc {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+  }
+
+  .dark #toc ul ul ul ul a.--ema-toc {
+    color: var(--color-gray-600);
+  }
+
+  /* Active TOC item — uses theme primary palette so per-site theme overrides
+     flow through without hardcoding a colour here. The selector is scoped
+     under #toc so it beats the per-depth color rules above. */
+  #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
   }
 
-  /* Light mode active state */
-  a.--ema-toc.toc-item-active {
-    background-color: #eff6ff !important;
-    color: #1d4ed8 !important;
-  }
-
-  /* Dark mode active state */
-  .dark a.--ema-toc.toc-item-active {
-    background-color: #172554 !important;
-    color: #93c5fd !important;
-    border-left-color: #3b82f6;
+  .dark #toc a.--ema-toc.toc-item-active {
+    background-color: var(--color-primary-950) !important;
+    color: var(--color-primary-300) !important;
+    border-left-color: var(--color-primary-400);
   }
 </style>
 
@@ -210,6 +316,24 @@
 </style>
 
 <script>
+  // Theme toggle: persist choice in localStorage; the early-load script in
+  // base.tpl applies it before first paint so there's no FOUC on reload.
+  (function () {
+    window.emanote = window.emanote || {};
+    window.emanote.theme = {
+      toggle: function () {
+        var root = document.documentElement;
+        var isDark = root.classList.toggle('dark');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
+        if (document.querySelector('.mermaid')) window.location.reload();
+      }
+    };
+  })();
+</script>
+
+<script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
     const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
@@ -250,106 +374,47 @@
 </script>
 
 <style data-category='external-link'>
-  /* External link icon */
-  a[data-linkicon=""]::after {
-    content: ""
-  }
-
-  a[data-linkicon=none]::after {
-    content: ""
-  }
-
+  /* External/mail link glyphs — drawn with mask-image so they inherit the
+     link's currentColor (one rule for both light and dark themes). */
   a[data-linkicon="external"] {
-    padding-right: 24px;
+    padding-right: 1.1em;
   }
 
   a[data-linkicon="external"]::after {
-    margin-right: -24px;
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:gray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
-  }
-
-  .dark a[data-linkicon="external"]::after {
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:lightgray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.15em;
+    margin-right: -1.1em;
+    vertical-align: baseline;
+    background-color: currentColor;
+    opacity: 0.55;
+    -webkit-mask: var(--icon-external) no-repeat center / contain;
+    mask: var(--icon-external) no-repeat center / contain;
   }
 
   a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="gray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+    width: 0.9em;
+    height: 0.9em;
+    -webkit-mask: var(--icon-mail) no-repeat center / contain;
+    mask: var(--icon-mail) no-repeat center / contain;
   }
 
-  .dark a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="lightgray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+  :root {
+    --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g style="stroke:black;stroke-width:1;fill:none"><line x1="5" y1="5" x2="5" y2="14"/><line x1="14" y1="9" x2="14" y2="14"/><line x1="5" y1="14" x2="14" y2="14"/><line x1="5" y1="5" x2="9" y2="5"/><line x1="10" y1="2" x2="17" y2="2"/><line x1="17" y1="2" x2="17" y2="9"/><line x1="10" y1="9" x2="17" y2="2"/></g></svg>');
+    --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
   <!-- What goes in this file will appear on near the end of <head>-->
 
   
-    <style id='emanote-sidebar-sizing'>
-      /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-52  */
-      @media (min-width: 768px) {
-        #sidebar {
-          min-width: 13rem;
-        }
-      }
-
-      /* xl:min-w-72  */
-      @media (min-width: 1280px) {
-        #sidebar {
-          min-width: 18rem;
-        }
-      }
-    </style>
-
     
   
-  <!-- Custom Stork-search styling for Emanote --><link rel='stylesheet' href='_emanote-static/stork/edible.css' media='(prefers-color-scheme: light)' />
-<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' media='(prefers-color-scheme: dark)' />
+  <!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
+     unconditionally; the active one is picked by toggling the wrapper's
+     CSS class, driven by the same .dark class the theme toggle manages. --><link rel='stylesheet' href='_emanote-static/stork/edible.css' />
+<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
 
 <style data-category='stork'>
   #stork-search-container {
@@ -367,7 +432,7 @@
 
   
     <script id='emanote-stork' data-emanote-base-url='/'>
-      window.emanote = {};
+      window.emanote = window.emanote || {};
       window.emanote.stork = {
         searchShown: false,
         indexIsStale: false,
@@ -462,21 +527,21 @@
       
 
       
-        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden'>
-  <div class='flex justify-left'>
-    <div class='w-full px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'>
-      <ul class='flex flex-wrap text-base'>
-        <li class='inline-flex items-center'>
+        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'>
+  <div class='flex items-stretch'>
+    <div class='flex-1 min-w-0 px-4 py-3 overflow-x-auto'>
+      <ul class='flex items-center text-base whitespace-nowrap'>
+        <li class='inline-flex items-center shrink-0'>
           
             
-              <img style='width: 1rem;' src='favicon.svg' alt='Site Icon' />
+              <img class='w-4 h-4' src='favicon.svg' alt='Site Icon' />
             
           
         </li>
         
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='/'>
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='/'>
                 Emanote
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
@@ -484,8 +549,8 @@
               </svg>
             </li>
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide'>
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='guide'>
                 Guide
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
@@ -493,8 +558,8 @@
               </svg>
             </li>
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='markdown'>
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='markdown'>
                 Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
@@ -505,14 +570,14 @@
         
       </ul>
     </div>
-    <button class='inline px-3 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 outline-none cursor-pointer focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
+    <button class='shrink-0 px-3 border-l border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-primary-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-3 py-2 text-white bg-primary-600 dark:bg-primary-700 outline-none cursor-pointer focus:outline-none hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <button class='shrink-0 px-3 text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors cursor-pointer' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
     </button>
@@ -523,12 +588,13 @@
     </script>
   </div>
 </nav>
+
       
 
       
         <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800'>
           <!-- Sidebar column -->
-          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 xl:w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
+          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
   <div class='px-4 py-5 text-gray-800 dark:text-gray-200'>
     <div class='flex items-center justify-between mb-4'>
       <div id='site-logo' class='flex items-center space-x-2.5 min-w-0'>
@@ -549,23 +615,19 @@
       </div>
 
       <div id='indexing-links' class='flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0'>
-        <a href='-/tags' title='View tags' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors'>
-          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
-            </path>
-          </svg>
-        </a>
-        <a href='-/all' title='Expand full tree' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors'>
-          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'>
-            </path>
-          </svg>
-        </a>
         <button title='Search (Ctrl+K)' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
           <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-primary-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
+        </button>
+        <button title='Toggle dark mode' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer' onclick='window.emanote.theme.toggle()'>
+          <svg class='hidden dark:block' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'></path>
+          </svg>
+          <svg class='block dark:hidden' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -1471,9 +1533,10 @@
           <!-- Main body column -->
           <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-6 py-8 max-w-7xl mx-auto'>
-    <h1 class='mb-10 px-8 py-5 bg-primary-600 dark:bg-primary-800 text-5xl font-bold text-white text-center rounded-2xl'>
+    <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
   Custom CSS styling
 </h1>
+
     
       <div class='md:grid md:gap-8 md:grid-cols-8'>
         <div class='md:col-span-6'>
@@ -1495,7 +1558,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      The <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>attributes extension</a> provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a “class map” in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>, the default value of which provides some builtin-in styles.
+      The <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes extension</a> provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a “class map” in <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>index.yaml</a>, the default value of which provides some builtin-in styles.
     </p>
   
     <h2 id='built-in-styles' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1539,7 +1602,7 @@
     </p>
   </div>
     <p class='mb-4 leading-relaxed'>
-      You should expect the above text to appear styled like a yellow sticky note, because the default <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a> specifies a “sticky-note” class, which rewrites to a list of Tailwind classes, and that class in turn is (re)used in Markdown notes.
+      You should expect the above text to appear styled like a yellow sticky note, because the default <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>index.yaml</a> specifies a “sticky-note” class, which rewrites to a list of Tailwind classes, and that class in turn is (re)used in Markdown notes.
     </p>
   
     <h3 id='highlight-block' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
@@ -1575,7 +1638,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement
+      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement
     <sup class='px-0.5'>
       <a class='text-primary-600 dark:text-primary-400 hover:underline' href='custom-style#fn1'>
         1
@@ -1605,72 +1668,72 @@
       Here is an assorted collection of websites generated by Emanote:
     </p>
   
-    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <a href='https://midirus.com/website' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://midirus.com/website</a> (view <a href='https://github.com/TristanCacqueray/TristanCacqueray.github.io' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://midirus.com/website' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://midirus.com/website</a> (view <a href='https://github.com/TristanCacqueray/TristanCacqueray.github.io' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://ema.srid.ca' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://ema.srid.ca</a> (view <a href='https://github.com/srid/ema/tree/master/docs' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://ema.srid.ca' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ema.srid.ca</a> (view <a href='https://github.com/srid/ema/tree/master/docs' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://blog.hemera.systems/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://blog.hemera.systems/</a> (view <a href='https://github.com/TheNeikos/hemera.systems' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://blog.hemera.systems/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://blog.hemera.systems/</a> (view <a href='https://github.com/TheNeikos/hemera.systems' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://fiatjaf.com/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://fiatjaf.com/</a> (view <a href='https://github.com/fiatjaf/z' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://fiatjaf.com/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://fiatjaf.com/</a> (view <a href='https://github.com/fiatjaf/z' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://srid.ca/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca/</a> (view <a href='https://github.com/srid/srid' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://srid.ca/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca/</a> (view <a href='https://github.com/srid/srid' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://coda-coda.github.io/zettels/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://coda-coda.github.io/zettels/</a> (view <a href='https://github.com/coda-coda/zettels' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://coda-coda.github.io/zettels/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://coda-coda.github.io/zettels/</a> (view <a href='https://github.com/coda-coda/zettels' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://gil0mendes.io/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://gil0mendes.io/</a> (view <a href='https://gitlab.com/gil0mendes/website' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://gil0mendes.io/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://gil0mendes.io/</a> (view <a href='https://gitlab.com/gil0mendes/website' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://input-output-hk.github.io/adrestia/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://input-output-hk.github.io/adrestia/</a> (view <a href='https://github.com/input-output-hk/adrestia/tree/master/docs' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://input-output-hk.github.io/adrestia/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://input-output-hk.github.io/adrestia/</a> (view <a href='https://github.com/input-output-hk/adrestia/tree/master/docs' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://inspirativity.zettel.page/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://inspirativity.zettel.page/</a> (view <a href='https://github.com/srid/inspirativity.zettel.page' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://inspirativity.zettel.page/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://inspirativity.zettel.page/</a> (view <a href='https://github.com/srid/inspirativity.zettel.page' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://themotte.zettel.page/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://themotte.zettel.page/</a> (view <a href='https://github.com/Kuratoro/TheMotte.zettel.page' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://themotte.zettel.page/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://themotte.zettel.page/</a> (view <a href='https://github.com/Kuratoro/TheMotte.zettel.page' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://vanceism7.ml' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://vanceism7.ml</a> (view <a href='https://gitlab.com/vanceism7/site' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://vanceism7.ml' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://vanceism7.ml</a> (view <a href='https://gitlab.com/vanceism7/site' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://plutonomicon.github.io/plutonomicon/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://plutonomicon.github.io/plutonomicon/</a> (view <a href='https://github.com/Plutonomicon/plutonomicon' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://plutonomicon.github.io/plutonomicon/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://plutonomicon.github.io/plutonomicon/</a> (view <a href='https://github.com/Plutonomicon/plutonomicon' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://haskell-game.dev/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://haskell-game.dev/</a> (view <a href='https://gitlab.com/dpwiz/haskell-game.dev' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://haskell-game.dev/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://haskell-game.dev/</a> (view <a href='https://gitlab.com/dpwiz/haskell-game.dev' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://ners.ch/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://ners.ch/</a> (view <a href='https://github.com/ners/ners.ch' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://ners.ch/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ners.ch/</a> (view <a href='https://github.com/ners/ners.ch' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://zettel.theobori.cafe/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://zettel.theobori.cafe/</a> (view <a href='https://github.com/theobori/zettel' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://zettel.theobori.cafe/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://zettel.theobori.cafe/</a> (view <a href='https://github.com/theobori/zettel' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      Wish to add your Emanote website to the above list? <a href='https://github.com/srid/emanote/discussions/new?category=show-and-tell' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Tell us here</a>.
+      Wish to add your Emanote website to the above list? <a href='https://github.com/srid/emanote/discussions/new?category=show-and-tell' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Tell us here</a>.
     </p>
   
   </div>
@@ -1696,14 +1759,14 @@
       Follow these steps to get started with Emanote.
     </p>
   
-    <ul class='my-4 ml-6 space-y-2 list-decimal list-inside leading-relaxed'>
+    <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
-        <li>
-          <a href='install' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Install Emanote</a>
+        <li class='pl-1'>
+          <a href='install' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Install Emanote</a>
         </li>
       
-        <li>
-          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>emanote-template</a>
+        <li class='pl-1'>
+          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a>
     <sup class='px-0.5'>
       <a class='text-primary-600 dark:text-primary-400 hover:underline' href='start#fn1'>
         1
@@ -1712,9 +1775,9 @@
   .
         </li>
       
-        <li>
+        <li class='pl-1'>
           Run <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote run --port=8080</code> (or just <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote</code>) in terminal after <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>cd</code>’ing to that notebook folder; this will launch the live server.
-    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
           Or, if you only want to generate the HTML files (for deployment), run <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>mkdir /tmp/output; emanote gen /tmp/output</code>.
@@ -1724,8 +1787,8 @@
   
         </li>
       
-        <li>
-          Visit <a href='guide' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.
+        <li class='pl-1'>
+          Visit <a href='guide' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.
     <sup class='px-0.5'>
       <a class='text-primary-600 dark:text-primary-400 hover:underline' href='start#fn2'>
         2
@@ -1734,30 +1797,22 @@
   
         </li>
       
-    </ul>
+    </ol>
   
-    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700'>
-      <header class='font-semibold'>Footnotes</header>
-      
-        <div id='fn1'>
-          <header class='italic'>
-            1.
-          </header>
-          <div class='inline-block mb-2 ml-4'>
-            <a href='emanote-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
-          </div>
-        </div>
-      
-        <div id='fn2'>
-          <header class='italic'>
-            2.
-          </header>
-          <div class='inline-block mb-2 ml-4'>
-            If you are <a href='https://srid.ca/haskell' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Architecture</a>.
-          </div>
-        </div>
-      
-    </div>
+    <aside title='Footnotes' class='mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800'>
+      <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Footnotes</header>
+      <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
+        
+          <li id='fn1' class='pl-2'>
+            <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
+          </li>
+        
+          <li id='fn2' class='pl-2'>
+            If you are <a href='https://srid.ca/haskell' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Architecture</a>.
+          </li>
+        
+      </ol>
+    </aside>
   
   </div>
 </section><section title='Embedded note' class='p-4 mx-2 mb-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner'>
@@ -1786,22 +1841,22 @@
       For example,
     </p>
   
-    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
+          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
         </li>
       
         <li>
-          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
+          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
         </li>
       
         <li>
-          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Some text file</a>
+          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Some text file</a>
         </li>
       
         <li>
-          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900'>normal linking</a>.
+          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>normal linking</a>.
         </li>
       
     </ul>
@@ -1811,7 +1866,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
+      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
     </p>
   
   </div>
@@ -1835,9 +1890,9 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      To start customizing, create a templates directory in your notebook. From there, you can override any templates you wish by copying them from Emanote’s default templates into your notebook’s templates directory. For example, if you want to customize the default pandoc styling, you can copy the <a href='https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>pandoc.tpl</a> file from Emanote’s GitHub repository into your templates/components directory and edit it accordingly.
+      To start customizing, create a templates directory in your notebook. From there, you can override any templates you wish by copying them from Emanote’s default templates into your notebook’s templates directory. For example, if you want to customize the default pandoc styling, you can copy the <a href='https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc.tpl</a> file from Emanote’s GitHub repository into your templates/components directory and edit it accordingly.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='info' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #086DD310; border-left-color: #086DD3'>
+  <div data-callout-metadata data-callout-fold data-callout='info' class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
@@ -1857,7 +1912,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
+      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
     </p>
   
   </div>
@@ -1866,43 +1921,40 @@
       Several users have successfully implemented this customization approach in their projects. Refer to the following examples for inspiration:
     </p>
   
-    <ul class='my-4 ml-6 space-y-2 list-disc leading-relaxed'>
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <a href='https://github.com/srid/srid/tree/master/templates' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>srid/srid</a>
+          <a href='https://github.com/srid/srid/tree/master/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/srid</a>
         </li>
       
         <li>
-          <a href='https://github.com/TheNeikos/hemera.systems/tree/master/content/templates' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>TheNeikos/hemera.systems</a>
+          <a href='https://github.com/TheNeikos/hemera.systems/tree/master/content/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>TheNeikos/hemera.systems</a>
         </li>
       
         <li>
-          <a href='https://gitlab.com/gil0mendes/website/-/tree/live/content/templates' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>gil0mendes</a>
+          <a href='https://gitlab.com/gil0mendes/website/-/tree/live/content/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>gil0mendes</a>
         </li>
       
         <li>
-          <a href='https://github.com/ChenghaoMou/chenghaomou.github.io/tree/master/templates' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>ChenghaoMou/chenghaomou</a>
+          <a href='https://github.com/ChenghaoMou/chenghaomou.github.io/tree/master/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>ChenghaoMou/chenghaomou</a>
         </li>
       
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      For additional information and discussion on this topic, check out <a href='https://github.com/srid/emanote/discussions/438' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>this discussion on GitHub</a>.
+      For additional information and discussion on this topic, check out <a href='https://github.com/srid/emanote/discussions/438' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>this discussion on GitHub</a>.
     </p>
   
-    <div title='Footnotes' class='pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700'>
-      <header class='font-semibold'>Footnotes</header>
-      
-        <div id='fn1'>
-          <header class='italic'>
-            1.
-          </header>
-          <div class='inline-block mb-2 ml-4'>
-            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{class=".."}</code> syntax, rather than the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>lg:grid-cols-2</code>).
-          </div>
-        </div>
-      
-    </div>
+    <aside title='Footnotes' class='mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800'>
+      <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Footnotes</header>
+      <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
+        
+          <li id='fn1' class='pl-2'>
+            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{class=".."}</code> syntax, rather than the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>lg:grid-cols-2</code>).
+          </li>
+        
+      </ol>
+    </aside>
   
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown/custom-style.md'>
@@ -1979,93 +2031,94 @@
       
   </div>
   <script>
-    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
-    function highlightTOC() {
-      // Grab the toc links
-      const links = document.querySelectorAll("ul > li > a.--ema-toc");
+    // Highlight the TOC link for the section currently in view.
+    // Uses Intersection Observer (passive, no scroll-loop layout thrashing);
+    // replaces the old window.onscroll approach from issue #520.
+    (function () {
+      const tocLinks = document.querySelectorAll("a.--ema-toc");
+      if (tocLinks.length === 0) return;
 
-      // Find the matching anchors in the document body
-      const sections = [];
-      links.forEach((link) => {
-        let found = {};
-        for (section of document.querySelectorAll("a.--ema-anchor")) {
-          if (link.href == section.href) {
-            found = section;
-            break;
-          }
-        }
-        sections.push(found);
+      const anchors = {};
+      document.querySelectorAll("a.--ema-anchor").forEach((a) => {
+        anchors[a.href] = a;
       });
 
-      // Current toc link is marked with the following class
+      const observed = [];
+      const visibility = new Map();
+      tocLinks.forEach((link) => {
+        const anchor = anchors[link.href];
+        if (!anchor) return;
+        const section = anchor.closest("h1, h2, h3, h4, h5, h6") || anchor;
+        observed.push({ section, link });
+        visibility.set(section, false);
+      });
+
       const mark = "toc-item-active";
-
-      // Set window scroll handler to update the toc mark.
-      window.onscroll = () => {
-        // Remove previous mark
-        links.forEach((link) => {
-          link.classList.remove(mark);
-        });
-
-        // Mark the link of the section that is in view, starting from the end
-        let marked = false;
-        for (var i = sections.length - 1; i >= 0; i--) {
-          if (window.scrollY > sections[i].offsetTop - 80) {
-            links[i].classList.add(mark);
-            marked = true;
-            break;
-          }
-        }
-
-        // Special case for the first and last section which might not reach the top
-        if (!marked && window.scrollY > 0) {
-          let i = 0;
-          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
-            // We are at the bottom
-            i = links.length - 1
-          }
-          links[i].classList.add(mark);
-        }
+      const setActive = (activeLink) => {
+        tocLinks.forEach((l) => l.classList.remove(mark));
+        if (activeLink) activeLink.classList.add(mark);
       };
-    }
-    highlightTOC();
+
+      const pickActive = () => {
+        let firstVisible = null;
+        let lastAbove = null;
+        for (const { section, link } of observed) {
+          if (visibility.get(section)) {
+            if (!firstVisible) firstVisible = link;
+          } else if (section.getBoundingClientRect().top < 0) {
+            lastAbove = link;
+          }
+        }
+        setActive(firstVisible || lastAbove || observed[0]?.link);
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          visibility.set(entry.target, entry.isIntersecting);
+        }
+        pickActive();
+      }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
+
+      for (const { section } of observed) observer.observe(section);
+      pickActive();
+    })();
   </script>
 </nav>
+
         </div>
       </div>
       
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
       
-  <div class='flex-1 p-5 mt-8 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm'>
+  <div id='backlinks' class='flex-1 mt-8'>
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
-    <ul class='space-y-2'>
+    <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='markdown'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='markdown'>
             Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code>==</code> (ie. <code>==inline text==</code>).<sup>*</sup> The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.</p></div>
+    <div class='mt-2'>
+      <div><p>You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code>==</code> (ie. <code>==inline text==</code>).<sup>*</sup> The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='external-links'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='external-links'>
             External links
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
+    <div class='mt-2'>
+      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
     </div>
   
 </div>
@@ -2074,6 +2127,7 @@
       
     </ul>
   </div>
+
 
     </div>
     
@@ -2156,12 +2210,16 @@
   // without hitting "Identifier 'wrapper' has already been declared".
   {
     const wrapper = document.getElementById('stork-wrapper');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
       wrapper.classList.remove('stork-wrapper-edible', 'stork-wrapper-edible-dark');
-      wrapper.classList.add(e.matches ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+      wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+    };
+    applyTheme();
+    // Theme toggle mutates the .dark class on <html>; mirror it onto the
+    // stork wrapper so the search dialog re-skins live without a reload.
+    new MutationObserver(applyTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class']
     });
   }
 </script>

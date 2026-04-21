@@ -13,6 +13,18 @@
 <head>
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <script>
+    // Apply theme before first paint to avoid FOUC.
+    // Priority: explicit user choice (localStorage) > OS preference.
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      if (isDark) document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    })();
+  </script>
   <title>
     Neuron-like layout – Emanote
   </title>
@@ -48,23 +60,45 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=a5da3971-1942-41c8-a994-8ed3a4a15ef3' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=845730bd-c471-473b-9c63-e818ab975200' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
+<!-- Fonts are self-hosted under _emanote-static/fonts to keep the
+     generated static site fully offline-capable. See the README in
+     that directory for how to refresh. -->
+<link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
 <style data-category='global-font'>
-  /* Refined typography with system font stack */
+  /* Font option C (trial):
+     Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
+     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  :root {
+    --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-serif);
     line-height: 1.7;
-    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
-    line-height: 1.3;
-    font-weight: 700;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  ema\:metadata, section[class*="font-mono"] {
+    font-family: var(--font-sans);
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: var(--font-mono);
   }
 </style>
 
@@ -79,29 +113,25 @@
 </style>
 
 <style data-category='kbd'>
-  /* <kbd> styling */
+  /* <kbd> styling — flat with a subtle baseline, theme-variable colours */
   kbd {
-    background-color: #f7f7f7;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.1),
-      0 2px 0 0 rgba(255, 255, 255, 0.8) inset;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--color-gray-800);
     display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
     line-height: 1.2;
-    padding: 3px 6px;
+    padding: 2px 6px;
     white-space: nowrap;
-    font-size: 0.9em;
   }
 
-  /* Dark mode kbd styling */
   .dark kbd {
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.4),
-      0 2px 0 0 rgba(255, 255, 255, 0.08) inset;
-    color: #f3f4f6;
+    background-color: var(--color-gray-800);
+    border-color: var(--color-gray-700);
+    color: var(--color-gray-100);
   }
 </style>
 
@@ -113,29 +143,105 @@
   }
 </style>
 
+<style data-category='lists'>
+  /* Tighten nested list margins so a bulleted sub-list inside a numbered
+     item doesn't push its parent's siblings apart. */
+  main li > ul,
+  main li > ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+</style>
+
+<style data-category='task-list'>
+  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
+  main li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-left: -1rem;
+  }
+
+  main li:has(> svg.--ema-checkbox) > span {
+    flex: 1;
+  }
+</style>
+
+<style data-category='sidebar-tree'>
+  /* Folgezettel depth rails: nested tree levels get a subtle left border */
+  #sidebar .pl-2 .pl-2 {
+    border-left: 1px solid var(--color-gray-200);
+    margin-left: 0.25rem;
+  }
+
+  .dark #sidebar .pl-2 .pl-2 {
+    border-left-color: var(--color-gray-800);
+  }
+</style>
+
 <style data-category='toc'>
   a.--ema-toc {
     background-color: transparent !important;
   }
 
-  /* Active TOC item styling */
-  a.--ema-toc.toc-item-active {
+  /* Visual hierarchy by depth: each nested level (H3, H4, ...) is
+     progressively smaller, lighter, and more muted so a long TOC
+     stays scannable at a glance. Top-level (H2) items keep full
+     weight and contrast. */
+  #toc ul a.--ema-toc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .dark #toc ul a.--ema-toc {
+    color: var(--color-gray-300);
+  }
+
+  #toc ul ul a.--ema-toc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  .dark #toc ul ul a.--ema-toc {
+    color: var(--color-gray-400);
+  }
+
+  #toc ul ul ul a.--ema-toc {
+    font-size: 0.78125rem;
+    color: var(--color-gray-500);
+  }
+
+  .dark #toc ul ul ul a.--ema-toc {
+    color: var(--color-gray-500);
+  }
+
+  #toc ul ul ul ul a.--ema-toc {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+  }
+
+  .dark #toc ul ul ul ul a.--ema-toc {
+    color: var(--color-gray-600);
+  }
+
+  /* Active TOC item — uses theme primary palette so per-site theme overrides
+     flow through without hardcoding a colour here. The selector is scoped
+     under #toc so it beats the per-depth color rules above. */
+  #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
   }
 
-  /* Light mode active state */
-  a.--ema-toc.toc-item-active {
-    background-color: #eff6ff !important;
-    color: #1d4ed8 !important;
-  }
-
-  /* Dark mode active state */
-  .dark a.--ema-toc.toc-item-active {
-    background-color: #172554 !important;
-    color: #93c5fd !important;
-    border-left-color: #3b82f6;
+  .dark #toc a.--ema-toc.toc-item-active {
+    background-color: var(--color-primary-950) !important;
+    color: var(--color-primary-300) !important;
+    border-left-color: var(--color-primary-400);
   }
 </style>
 
@@ -210,6 +316,24 @@
 </style>
 
 <script>
+  // Theme toggle: persist choice in localStorage; the early-load script in
+  // base.tpl applies it before first paint so there's no FOUC on reload.
+  (function () {
+    window.emanote = window.emanote || {};
+    window.emanote.theme = {
+      toggle: function () {
+        var root = document.documentElement;
+        var isDark = root.classList.toggle('dark');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
+        if (document.querySelector('.mermaid')) window.location.reload();
+      }
+    };
+  })();
+</script>
+
+<script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
     const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
@@ -250,108 +374,49 @@
 </script>
 
 <style data-category='external-link'>
-  /* External link icon */
-  a[data-linkicon=""]::after {
-    content: ""
-  }
-
-  a[data-linkicon=none]::after {
-    content: ""
-  }
-
+  /* External/mail link glyphs — drawn with mask-image so they inherit the
+     link's currentColor (one rule for both light and dark themes). */
   a[data-linkicon="external"] {
-    padding-right: 24px;
+    padding-right: 1.1em;
   }
 
   a[data-linkicon="external"]::after {
-    margin-right: -24px;
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:gray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
-  }
-
-  .dark a[data-linkicon="external"]::after {
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:lightgray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.15em;
+    margin-right: -1.1em;
+    vertical-align: baseline;
+    background-color: currentColor;
+    opacity: 0.55;
+    -webkit-mask: var(--icon-external) no-repeat center / contain;
+    mask: var(--icon-external) no-repeat center / contain;
   }
 
   a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="gray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+    width: 0.9em;
+    height: 0.9em;
+    -webkit-mask: var(--icon-mail) no-repeat center / contain;
+    mask: var(--icon-mail) no-repeat center / contain;
   }
 
-  .dark a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="lightgray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+  :root {
+    --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g style="stroke:black;stroke-width:1;fill:none"><line x1="5" y1="5" x2="5" y2="14"/><line x1="14" y1="9" x2="14" y2="14"/><line x1="5" y1="14" x2="14" y2="14"/><line x1="5" y1="5" x2="9" y2="5"/><line x1="10" y1="2" x2="17" y2="2"/><line x1="17" y1="2" x2="17" y2="9"/><line x1="10" y1="9" x2="17" y2="2"/></g></svg>');
+    --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
   <!-- What goes in this file will appear on near the end of <head>-->
 
   
-    <style id='emanote-sidebar-sizing'>
-      /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-52  */
-      @media (min-width: 768px) {
-        #sidebar {
-          min-width: 13rem;
-        }
-      }
-
-      /* xl:min-w-72  */
-      @media (min-width: 1280px) {
-        #sidebar {
-          min-width: 18rem;
-        }
-      }
-    </style>
-
     
       <link rel='stylesheet' href='_emanote-static/inverted-tree.css' />
     
   
-  <!-- Custom Stork-search styling for Emanote --><link rel='stylesheet' href='_emanote-static/stork/edible.css' media='(prefers-color-scheme: light)' />
-<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' media='(prefers-color-scheme: dark)' />
+  <!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
+     unconditionally; the active one is picked by toggling the wrapper's
+     CSS class, driven by the same .dark class the theme toggle manages. --><link rel='stylesheet' href='_emanote-static/stork/edible.css' />
+<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
 
 <style data-category='stork'>
   #stork-search-container {
@@ -369,7 +434,7 @@
 
   
     <script id='emanote-stork' data-emanote-base-url='/'>
-      window.emanote = {};
+      window.emanote = window.emanote || {};
       window.emanote.stork = {
         searchShown: false,
         indexIsStale: false,
@@ -550,21 +615,30 @@
       
         <div id='container' class='relative md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800'>
           
-  <div class='absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center'>
+  <div class='absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center space-x-2 text-gray-500 dark:text-gray-400'>
     <button title='Search (Ctrl+K)' class='cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-primary-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
+    <button title='Toggle dark mode' class='cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors' onclick='window.emanote.theme.toggle()'>
+      <svg class='hidden dark:block' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'></path>
+      </svg>
+      <svg class='block dark:hidden' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'></path>
+      </svg>
+    </button>
   </div>
 
           <!-- Main body column -->
           <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-6 py-8 max-w-7xl mx-auto'>
-    <h1 class='mb-10 px-8 py-5 bg-primary-600 dark:bg-primary-800 text-5xl font-bold text-white text-center rounded-2xl'>
+    <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
   Neuron-like layout
 </h1>
+
     
       <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
@@ -580,7 +654,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote’s builtin <a href='html-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
+      Emanote’s builtin <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yml'><span class='fu'>template</span><span class='kw'>:</span>
 <span class='at'>  </span><span class='fu'>uptree</span><span class='kw'>:</span><span class='at'> </span>
@@ -595,9 +669,9 @@
 <span class='at'>    </span><span class='fu'>containerClass</span><span class='kw'>:</span><span class='at'> container mx-auto max-w-prose</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      This includes the <a href='uptree' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
+      This includes the <a href='uptree' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #08BFBC10; border-left-color: #08BFBC'>
+  <div data-callout-metadata data-callout-fold data-callout='tip' class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
@@ -636,7 +710,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      In the absence of <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
+      In the absence of <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
     </p>
   <nav>
   <div class='mb-8'>
@@ -676,79 +750,79 @@
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
       
-  <div class='flex-1 p-5 mt-8 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm'>
+  <div id='backlinks' class='flex-1 mt-8'>
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
-    <ul class='space-y-2'>
+    <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='uptree'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='uptree'>
             Uplink tree
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>[!tip] See also <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
+    <div class='mt-2'>
+      <div><p>[!tip] See also <a href='neuron-layout' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='neuron'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='neuron'>
             Migrating from neuron
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div>Configure it to use <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
+    <div class='mt-2'>
+      <div>Configure it to use <a href='neuron-layout' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='html-template'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='html-template'>
             HTML Templates
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+    <div class='mt-2'>
+      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='search'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='search'>
             Full-text search
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
+    <div class='mt-2'>
+      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='breadcrumbs'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='breadcrumbs'>
             Breadcrumbs
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
+    <div class='mt-2'>
+      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
     </div>
   
 </div>
@@ -757,6 +831,7 @@
       
     </ul>
   </div>
+
 
     </div>
     
@@ -830,12 +905,16 @@
   // without hitting "Identifier 'wrapper' has already been declared".
   {
     const wrapper = document.getElementById('stork-wrapper');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
       wrapper.classList.remove('stork-wrapper-edible', 'stork-wrapper-edible-dark');
-      wrapper.classList.add(e.matches ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+      wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+    };
+    applyTheme();
+    // Theme toggle mutates the .dark class on <html>; mirror it onto the
+    // stork wrapper so the search dialog re-skins live without a reload.
+    new MutationObserver(applyTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class']
     });
   }
 </script>

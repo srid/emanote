@@ -16,12 +16,10 @@ pre code {
   padding: 0;
 }
 
-/* Dark mode code block */
-@media (prefers-color-scheme: dark) {
-  pre {
-    background-color: #1e1e1e;
-    border-color: #333;
-  }
+/* Dark mode code block — keyed off .dark so the theme toggle controls it. */
+.dark pre {
+  background-color: #1e1e1e;
+  border-color: #333;
 }
 
 /* Token colors */
@@ -57,34 +55,32 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  code span.al { color: #ff6b6b; }
-  code span.an { color: #8ec8e8; }
-  code span.at { color: #a9c77d; }
-  code span.bn { color: #87ceab; }
-  code span.bu { color: #66cc99; }
-  code span.cf { color: #66cc99; }
-  code span.ch { color: #79a6d2; }
-  code span.cn { color: #e09090; }
-  code span.co { color: #8ec8e8; }
-  code span.cv { color: #8ec8e8; }
-  code span.do { color: #e08080; }
-  code span.dt { color: #e09090; }
-  code span.dv { color: #87ceab; }
-  code span.er { color: #ff6b6b; }
-  code span.fl { color: #87ceab; }
-  code span.fu { color: #79a6d2; }
-  code span.im { color: #66cc99; }
-  code span.in { color: #8ec8e8; }
-  code span.kw { color: #cc99cc; }
-  code span.op { color: #cccccc; }
-  code span.ot { color: #66cc99; }
-  code span.pp { color: #d7ba7d; }
-  code span.sc { color: #79a6d2; }
-  code span.ss { color: #cc99cc; }
-  code span.st { color: #79a6d2; }
-  code span.va { color: #9cdcfe; }
-  code span.vs { color: #79a6d2; }
-  code span.wa { color: #8ec8e8; }
-}
+/* Dark mode token colour overrides */
+.dark code span.al { color: #ff6b6b; }
+.dark code span.an { color: #8ec8e8; }
+.dark code span.at { color: #a9c77d; }
+.dark code span.bn { color: #87ceab; }
+.dark code span.bu { color: #66cc99; }
+.dark code span.cf { color: #66cc99; }
+.dark code span.ch { color: #79a6d2; }
+.dark code span.cn { color: #e09090; }
+.dark code span.co { color: #8ec8e8; }
+.dark code span.cv { color: #8ec8e8; }
+.dark code span.do { color: #e08080; }
+.dark code span.dt { color: #e09090; }
+.dark code span.dv { color: #87ceab; }
+.dark code span.er { color: #ff6b6b; }
+.dark code span.fl { color: #87ceab; }
+.dark code span.fu { color: #79a6d2; }
+.dark code span.im { color: #66cc99; }
+.dark code span.in { color: #8ec8e8; }
+.dark code span.kw { color: #cc99cc; }
+.dark code span.op { color: #cccccc; }
+.dark code span.ot { color: #66cc99; }
+.dark code span.pp { color: #d7ba7d; }
+.dark code span.sc { color: #79a6d2; }
+.dark code span.ss { color: #cc99cc; }
+.dark code span.st { color: #79a6d2; }
+.dark code span.va { color: #9cdcfe; }
+.dark code span.vs { color: #79a6d2; }
+.dark code span.wa { color: #8ec8e8; }

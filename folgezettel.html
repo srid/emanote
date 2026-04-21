@@ -13,6 +13,18 @@
 <head>
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <script>
+    // Apply theme before first paint to avoid FOUC.
+    // Priority: explicit user choice (localStorage) > OS preference.
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = stored === 'dark' || (stored !== 'light' && prefersDark);
+      if (isDark) document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+    })();
+  </script>
   <title>
     Folgezettel links – Emanote
   </title>
@@ -48,23 +60,45 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=a5da3971-1942-41c8-a994-8ed3a4a15ef3' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=845730bd-c471-473b-9c63-e818ab975200' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
+<!-- Fonts are self-hosted under _emanote-static/fonts to keep the
+     generated static site fully offline-capable. See the README in
+     that directory for how to refresh. -->
+<link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
 <style data-category='global-font'>
-  /* Refined typography with system font stack */
+  /* Font option C (trial):
+     Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
+     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  :root {
+    --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-serif);
     line-height: 1.7;
-    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
-    line-height: 1.3;
-    font-weight: 700;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  ema\:metadata, section[class*="font-mono"] {
+    font-family: var(--font-sans);
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: var(--font-mono);
   }
 </style>
 
@@ -79,29 +113,25 @@
 </style>
 
 <style data-category='kbd'>
-  /* <kbd> styling */
+  /* <kbd> styling — flat with a subtle baseline, theme-variable colours */
   kbd {
-    background-color: #f7f7f7;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.1),
-      0 2px 0 0 rgba(255, 255, 255, 0.8) inset;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--color-gray-800);
     display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85em;
     line-height: 1.2;
-    padding: 3px 6px;
+    padding: 2px 6px;
     white-space: nowrap;
-    font-size: 0.9em;
   }
 
-  /* Dark mode kbd styling */
   .dark kbd {
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.4),
-      0 2px 0 0 rgba(255, 255, 255, 0.08) inset;
-    color: #f3f4f6;
+    background-color: var(--color-gray-800);
+    border-color: var(--color-gray-700);
+    color: var(--color-gray-100);
   }
 </style>
 
@@ -113,29 +143,105 @@
   }
 </style>
 
+<style data-category='lists'>
+  /* Tighten nested list margins so a bulleted sub-list inside a numbered
+     item doesn't push its parent's siblings apart. */
+  main li > ul,
+  main li > ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+</style>
+
+<style data-category='task-list'>
+  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
+  main li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-left: -1rem;
+  }
+
+  main li:has(> svg.--ema-checkbox) > span {
+    flex: 1;
+  }
+</style>
+
+<style data-category='sidebar-tree'>
+  /* Folgezettel depth rails: nested tree levels get a subtle left border */
+  #sidebar .pl-2 .pl-2 {
+    border-left: 1px solid var(--color-gray-200);
+    margin-left: 0.25rem;
+  }
+
+  .dark #sidebar .pl-2 .pl-2 {
+    border-left-color: var(--color-gray-800);
+  }
+</style>
+
 <style data-category='toc'>
   a.--ema-toc {
     background-color: transparent !important;
   }
 
-  /* Active TOC item styling */
-  a.--ema-toc.toc-item-active {
+  /* Visual hierarchy by depth: each nested level (H3, H4, ...) is
+     progressively smaller, lighter, and more muted so a long TOC
+     stays scannable at a glance. Top-level (H2) items keep full
+     weight and contrast. */
+  #toc ul a.--ema-toc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .dark #toc ul a.--ema-toc {
+    color: var(--color-gray-300);
+  }
+
+  #toc ul ul a.--ema-toc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  .dark #toc ul ul a.--ema-toc {
+    color: var(--color-gray-400);
+  }
+
+  #toc ul ul ul a.--ema-toc {
+    font-size: 0.78125rem;
+    color: var(--color-gray-500);
+  }
+
+  .dark #toc ul ul ul a.--ema-toc {
+    color: var(--color-gray-500);
+  }
+
+  #toc ul ul ul ul a.--ema-toc {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+  }
+
+  .dark #toc ul ul ul ul a.--ema-toc {
+    color: var(--color-gray-600);
+  }
+
+  /* Active TOC item — uses theme primary palette so per-site theme overrides
+     flow through without hardcoding a colour here. The selector is scoped
+     under #toc so it beats the per-depth color rules above. */
+  #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
   }
 
-  /* Light mode active state */
-  a.--ema-toc.toc-item-active {
-    background-color: #eff6ff !important;
-    color: #1d4ed8 !important;
-  }
-
-  /* Dark mode active state */
-  .dark a.--ema-toc.toc-item-active {
-    background-color: #172554 !important;
-    color: #93c5fd !important;
-    border-left-color: #3b82f6;
+  .dark #toc a.--ema-toc.toc-item-active {
+    background-color: var(--color-primary-950) !important;
+    color: var(--color-primary-300) !important;
+    border-left-color: var(--color-primary-400);
   }
 </style>
 
@@ -210,6 +316,24 @@
 </style>
 
 <script>
+  // Theme toggle: persist choice in localStorage; the early-load script in
+  // base.tpl applies it before first paint so there's no FOUC on reload.
+  (function () {
+    window.emanote = window.emanote || {};
+    window.emanote.theme = {
+      toggle: function () {
+        var root = document.documentElement;
+        var isDark = root.classList.toggle('dark');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
+        if (document.querySelector('.mermaid')) window.location.reload();
+      }
+    };
+  })();
+</script>
+
+<script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
     const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
@@ -250,106 +374,47 @@
 </script>
 
 <style data-category='external-link'>
-  /* External link icon */
-  a[data-linkicon=""]::after {
-    content: ""
-  }
-
-  a[data-linkicon=none]::after {
-    content: ""
-  }
-
+  /* External/mail link glyphs — drawn with mask-image so they inherit the
+     link's currentColor (one rule for both light and dark themes). */
   a[data-linkicon="external"] {
-    padding-right: 24px;
+    padding-right: 1.1em;
   }
 
   a[data-linkicon="external"]::after {
-    margin-right: -24px;
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:gray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
-  }
-
-  .dark a[data-linkicon="external"]::after {
-    content: url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg" height="0.7em" viewBox="0 0 20 20"> \
-        <g style="stroke:lightgray;stroke-width:1"> \
-          <line x1="5" y1="5" x2="5" y2="14" /> \
-          <line x1="14" y1="9" x2="14" y2="14" /> \
-          <line x1="5" y1="14" x2="14" y2="14" /> \
-          <line x1="5" y1="5" x2="9" y2="5"  /> \
-          <line x1="10" y1="2" x2="17" y2="2"  /> \
-          <line x1="17" y1="2" x2="17" y2="9" /> \
-          <line x1="10" y1="9" x2="17" y2="2" style="stroke-width:1.0" /> \
-        </g> \
-      </svg>');
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.15em;
+    margin-right: -1.1em;
+    vertical-align: baseline;
+    background-color: currentColor;
+    opacity: 0.55;
+    -webkit-mask: var(--icon-external) no-repeat center / contain;
+    mask: var(--icon-external) no-repeat center / contain;
   }
 
   a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="gray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+    width: 0.9em;
+    height: 0.9em;
+    -webkit-mask: var(--icon-mail) no-repeat center / contain;
+    mask: var(--icon-mail) no-repeat center / contain;
   }
 
-  .dark a[data-linkicon="external"][href^="mailto:"]::after {
-    content: url('data:image/svg+xml,\
-        <svg \
-          xmlns="http://www.w3.org/2000/svg" \
-          height="0.7em" \
-          fill="none" \
-          viewBox="0 0 24 24" \
-          stroke="lightgray" \
-          stroke-width="2"> \
-          <path \
-            stroke-linecap="round" \
-            stroke-linejoin="round" \
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> \
-        </svg>');
+  :root {
+    --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g style="stroke:black;stroke-width:1;fill:none"><line x1="5" y1="5" x2="5" y2="14"/><line x1="14" y1="9" x2="14" y2="14"/><line x1="5" y1="14" x2="14" y2="14"/><line x1="5" y1="5" x2="9" y2="5"/><line x1="10" y1="2" x2="17" y2="2"/><line x1="17" y1="2" x2="17" y2="9"/><line x1="10" y1="9" x2="17" y2="2"/></g></svg>');
+    --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
   <!-- What goes in this file will appear on near the end of <head>-->
 
   
-    <style id='emanote-sidebar-sizing'>
-      /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-52  */
-      @media (min-width: 768px) {
-        #sidebar {
-          min-width: 13rem;
-        }
-      }
-
-      /* xl:min-w-72  */
-      @media (min-width: 1280px) {
-        #sidebar {
-          min-width: 18rem;
-        }
-      }
-    </style>
-
     
   
-  <!-- Custom Stork-search styling for Emanote --><link rel='stylesheet' href='_emanote-static/stork/edible.css' media='(prefers-color-scheme: light)' />
-<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' media='(prefers-color-scheme: dark)' />
+  <!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
+     unconditionally; the active one is picked by toggling the wrapper's
+     CSS class, driven by the same .dark class the theme toggle manages. --><link rel='stylesheet' href='_emanote-static/stork/edible.css' />
+<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
 
 <style data-category='stork'>
   #stork-search-container {
@@ -367,7 +432,7 @@
 
   
     <script id='emanote-stork' data-emanote-base-url='/'>
-      window.emanote = {};
+      window.emanote = window.emanote || {};
       window.emanote.stork = {
         searchShown: false,
         indexIsStale: false,
@@ -462,21 +527,21 @@
       
 
       
-        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden'>
-  <div class='flex justify-left'>
-    <div class='w-full px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'>
-      <ul class='flex flex-wrap text-base'>
-        <li class='inline-flex items-center'>
+        <nav id='breadcrumbs' class='w-full text-gray-700 dark:text-gray-300 md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800'>
+  <div class='flex items-stretch'>
+    <div class='flex-1 min-w-0 px-4 py-3 overflow-x-auto'>
+      <ul class='flex items-center text-base whitespace-nowrap'>
+        <li class='inline-flex items-center shrink-0'>
           
             
-              <img style='width: 1rem;' src='favicon.svg' alt='Site Icon' />
+              <img class='w-4 h-4' src='favicon.svg' alt='Site Icon' />
             
           
         </li>
         
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='/'>
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='/'>
                 Emanote
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
@@ -484,8 +549,8 @@
               </svg>
             </li>
           
-            <li class='inline-flex items-center'>
-              <a class='px-1 font-bold' href='guide'>
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='guide'>
                 Guide
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
@@ -496,14 +561,14 @@
         
       </ul>
     </div>
-    <button class='inline px-3 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 outline-none cursor-pointer focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
+    <button class='shrink-0 px-3 border-l border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer' title='Search (Ctrl+K)' type='button' onclick='window.emanote.stork.toggleSearch()'>
       <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-primary-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
     </button>
-    <button class='inline px-3 py-2 text-white bg-primary-600 dark:bg-primary-700 outline-none cursor-pointer focus:outline-none hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+    <button class='shrink-0 px-3 text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors cursor-pointer' title='Toggle sidebar' type='button' onclick="toggleHidden('sidebar')">
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
         <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'></path>
       </svg>
     </button>
@@ -514,12 +579,13 @@
     </script>
   </div>
 </nav>
+
       
 
       
         <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800'>
           <!-- Sidebar column -->
-          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 xl:w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
+          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
   <div class='px-4 py-5 text-gray-800 dark:text-gray-200'>
     <div class='flex items-center justify-between mb-4'>
       <div id='site-logo' class='flex items-center space-x-2.5 min-w-0'>
@@ -540,23 +606,19 @@
       </div>
 
       <div id='indexing-links' class='flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0'>
-        <a href='-/tags' title='View tags' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors'>
-          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
-            </path>
-          </svg>
-        </a>
-        <a href='-/all' title='Expand full tree' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors'>
-          <svg style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'>
-            </path>
-          </svg>
-        </a>
         <button title='Search (Ctrl+K)' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer' onclick='window.emanote.stork.toggleSearch()'>
           <svg xmlns='http://www.w3.org/2000/svg' style='width: 1rem;' class='hover:text-primary-700' f
  fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'>
   <path stroke-linecap='round' stroke-linejoin='round' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'></path>
 </svg>
+        </button>
+        <button title='Toggle dark mode' class='p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer' onclick='window.emanote.theme.toggle()'>
+          <svg class='hidden dark:block' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z'></path>
+          </svg>
+          <svg class='block dark:hidden' style='width: 1.125rem;' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z'></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -1297,9 +1359,10 @@
           <!-- Main body column -->
           <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-6 py-8 max-w-7xl mx-auto'>
-    <h1 class='mb-10 px-8 py-5 bg-primary-600 dark:bg-primary-800 text-5xl font-bold text-white text-center rounded-2xl'>
+    <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
   Folgezettel links
 </h1>
+
     
       <div class='md:grid md:gap-8 md:grid-cols-8'>
         <div class='md:col-span-6'>
@@ -1321,7 +1384,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      Conceptually, a <a href='https://neuron.zettel.page/folgezettel-heterarchy' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>folgezettel</a> link can be thought of as an arrow from a parent note to a descendent note.
+      Conceptually, a <a href='https://neuron.zettel.page/folgezettel-heterarchy' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>folgezettel</a> link can be thought of as an arrow from a parent note to a descendent note.
     </p>
   
     <h2 id='syntax' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1347,7 +1410,7 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
 </code></pre></div>
     <h2 id='folder' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
-  <a href='folder-note' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folder notes</a>
+  <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Folder notes</a>
   
   <a href='folgezettel#folder' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
@@ -1360,9 +1423,9 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.
+      By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.
     </p>
-  <div data-callout-metadata data-callout-fold data-callout='note' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #086DD310; border-left-color: #086DD3'>
+  <div data-callout-metadata data-callout-fold data-callout='note' class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
@@ -1381,19 +1444,19 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      The top-level root folder is not considered a folgezettel by default, unless you specify it (as shown below). This is to support the use-case of the user having a <em>flat list</em> of notes <em>without</em> subdirectories, but connected through <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.
+      The top-level root folder is not considered a folgezettel by default, unless you specify it (as shown below). This is to support the use-case of the user having a <em>flat list</em> of notes <em>without</em> subdirectories, but connected through <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.
     </p>
   
   </div>
 </div>
     <p class='mb-4 leading-relaxed'>
-      This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>your configuration</a> to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>false</code> as shown here:
+      This behavior can be configured. To turn it off on a per-folder basis, set the corresponding flag in <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>your configuration</a> to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>false</code> as shown here:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yaml'><span class='fu'>emanote</span><span class='kw'>:</span>
 <span class='co'>  # Whether to automatically treat the contents of this </span>
 <span class='co'>  # folder note as its folgezettel children</span>
 <span class='at'>  </span><span class='fu'>folder-folgezettel</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
-</code></pre></div><div data-callout-metadata data-callout-fold data-callout='tip' class='callout bg-opacity-5 bg-[#f5f5f5] dark:bg-gray-900 p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 border-gray-200 dark:border-gray-700 shadow-sm' role='note' style='background-color: #08BFBC10; border-left-color: #08BFBC'>
+</code></pre></div><div data-callout-metadata data-callout-fold data-callout='tip' class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
   <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
   </path>
   <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
@@ -1412,7 +1475,7 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      Put this configuration in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folder note</a> <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/</code>. Put it in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo.yaml</code> if you want to disable it for <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/</code> and all subfolders under it recursively. Put it in top-level <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code> to disable it for all folders. See <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.
+      Put this configuration in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>folder note</a> <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/</code>. Put it in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo.yaml</code> if you want to disable it for <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>foo/</code> and all subfolders under it recursively. Put it in top-level <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code> to disable it for all folders. See <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.
     </p>
   
   </div>
@@ -1459,153 +1522,154 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
       
   </div>
   <script>
-    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
-    function highlightTOC() {
-      // Grab the toc links
-      const links = document.querySelectorAll("ul > li > a.--ema-toc");
+    // Highlight the TOC link for the section currently in view.
+    // Uses Intersection Observer (passive, no scroll-loop layout thrashing);
+    // replaces the old window.onscroll approach from issue #520.
+    (function () {
+      const tocLinks = document.querySelectorAll("a.--ema-toc");
+      if (tocLinks.length === 0) return;
 
-      // Find the matching anchors in the document body
-      const sections = [];
-      links.forEach((link) => {
-        let found = {};
-        for (section of document.querySelectorAll("a.--ema-anchor")) {
-          if (link.href == section.href) {
-            found = section;
-            break;
-          }
-        }
-        sections.push(found);
+      const anchors = {};
+      document.querySelectorAll("a.--ema-anchor").forEach((a) => {
+        anchors[a.href] = a;
       });
 
-      // Current toc link is marked with the following class
+      const observed = [];
+      const visibility = new Map();
+      tocLinks.forEach((link) => {
+        const anchor = anchors[link.href];
+        if (!anchor) return;
+        const section = anchor.closest("h1, h2, h3, h4, h5, h6") || anchor;
+        observed.push({ section, link });
+        visibility.set(section, false);
+      });
+
       const mark = "toc-item-active";
-
-      // Set window scroll handler to update the toc mark.
-      window.onscroll = () => {
-        // Remove previous mark
-        links.forEach((link) => {
-          link.classList.remove(mark);
-        });
-
-        // Mark the link of the section that is in view, starting from the end
-        let marked = false;
-        for (var i = sections.length - 1; i >= 0; i--) {
-          if (window.scrollY > sections[i].offsetTop - 80) {
-            links[i].classList.add(mark);
-            marked = true;
-            break;
-          }
-        }
-
-        // Special case for the first and last section which might not reach the top
-        if (!marked && window.scrollY > 0) {
-          let i = 0;
-          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
-            // We are at the bottom
-            i = links.length - 1
-          }
-          links[i].classList.add(mark);
-        }
+      const setActive = (activeLink) => {
+        tocLinks.forEach((l) => l.classList.remove(mark));
+        if (activeLink) activeLink.classList.add(mark);
       };
-    }
-    highlightTOC();
+
+      const pickActive = () => {
+        let firstVisible = null;
+        let lastAbove = null;
+        for (const { section, link } of observed) {
+          if (visibility.get(section)) {
+            if (!firstVisible) firstVisible = link;
+          } else if (section.getBoundingClientRect().top < 0) {
+            lastAbove = link;
+          }
+        }
+        setActive(firstVisible || lastAbove || observed[0]?.link);
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          visibility.set(entry.target, entry.isIntersecting);
+        }
+        pickActive();
+      }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
+
+      for (const { section } of observed) observer.observe(section);
+      pickActive();
+    })();
   </script>
 </nav>
+
         </div>
       </div>
       
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
       
-  <div class='flex-1 p-5 mt-8 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm'>
+  <div id='backlinks' class='flex-1 mt-8'>
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
-    <ul class='space-y-2'>
+    <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='uptree'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='uptree'>
             Uplink tree
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>These relationships are called by <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
+    <div class='mt-2'>
+      <div><p>These relationships are called by <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='sidebar'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='sidebar'>
             Sidebar
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>In <a href='html-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.</p></div>
+    <div class='mt-2'>
+      <div><p>In <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='markdown'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='markdown'>
             Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>See <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a> for a special type of wiki-link used to define the <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a> (and <a href='uptree' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>) heirarchy.</p></div>
+    <div class='mt-2'>
+      <div><p>See <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a> for a special type of wiki-link used to define the <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Sidebar</a> (and <a href='uptree' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>) heirarchy.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='folgezettel'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='folgezettel'>
             Folgezettel links
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>[!note] The top-level root folder is not considered a folgezettel by default, unless you specify it (as shown below). This is to support the use-case of the user having a <em>flat list</em> of notes <em>without</em> subdirectories, but connected through <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
+    <div class='mt-2'>
+      <div><p>[!note] The top-level root folder is not considered a folgezettel by default, unless you specify it (as shown below). This is to support the use-case of the user having a <em>flat list</em> of notes <em>without</em> subdirectories, but connected through <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='folder-note'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='folder-note'>
             Folder notes
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>The children of folder notes become its <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folgezettel</a> children by default.</p></div>
+    <div class='mt-2'>
+      <div><p>The children of folder notes become its <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folgezettel</a> children by default.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li>
-          <a class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900 inline-block' href='breadcrumbs'>
+        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
+          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='breadcrumbs'>
             Breadcrumbs
           </a>
           
-            <div class='mb-4 overflow-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
   
-    <div class='pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400'>
-      <div><p>[!warning] Folgezettel Breadcrumbs do not use <a href='folgezettel' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
+    <div class='mt-2'>
+      <div><p>[!warning] Folgezettel Breadcrumbs do not use <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folgezettel links</a>.</p></div>
     </div>
   
 </div>
@@ -1614,6 +1678,7 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
       
     </ul>
   </div>
+
 
     </div>
     
@@ -1687,12 +1752,16 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
   // without hitting "Identifier 'wrapper' has already been declared".
   {
     const wrapper = document.getElementById('stork-wrapper');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
       wrapper.classList.remove('stork-wrapper-edible', 'stork-wrapper-edible-dark');
-      wrapper.classList.add(e.matches ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+      wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+    };
+    applyTheme();
+    // Theme toggle mutates the .dark class on <html>; mirror it onto the
+    // stork wrapper so the search dialog re-skins live without a reload.
+    new MutationObserver(applyTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class']
     });
   }
 </script>

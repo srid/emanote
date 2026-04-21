@@ -443,32 +443,23 @@ slug: dark-mode
 
 # Dark Mode
 
-Emanote includes built-in dark mode support using Tailwind CSS. The dark mode feature automatically detects and follows your system's color scheme preference.
+Emanote ships with a manual light/dark theme toggle. The user's choice is persisted in `localStorage` and applied before first paint, so there's no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS `prefers-color-scheme` preference.
 
-## Features
+## How it works
 
-- **Automatic Detection**: Respects your system's dark mode preference by default
-- **Tailwind Integration**: Uses Tailwind CSS's `prefers-color-scheme` media query strategy
-- **Comprehensive Coverage**: All page elements adapt to dark mode including content, navigation, and UI components
-
-## Controlling Dark Mode
-
-Dark mode automatically follows your system's color scheme preference. To manually toggle dark mode, we recommend using a browser extension like:
-
-- **Chrome**: [Dark Mode Toggle](https://chromewebstore.google.com/detail/chrome-dark-mode-toggle/idnbggfpadjhjicgjmhlpeilafaplnhd?hl=en)
-  - Note: You may need to enable the "Experimental Web Platform Features" flag at `chrome://flags` for the extension to work properly
-- **Firefox**: Similar extensions available in Firefox Add-ons
-
-These extensions override the system preference and allow you to toggle dark mode for any website.
+- The toggle button lives in the sidebar (next to the search icon), and also in the top-right corner of the no-sidebar "neuron-style" layout.
+- Clicking the toggle flips a `.dark` class on `<html>` and stores the choice in `localStorage` under the key `emanote-theme`.
+- An inline `<script>` in `base.tpl` runs in the document head before any stylesheets, reads `localStorage` (falling back to `prefers-color-scheme`), and adds the `.dark` class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
+- All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the `.dark` class rather than the `prefers-color-scheme` media query, so everything tracks the manual toggle.
 
 ## Customization
 
 ### Adding Dark Mode Classes
 
-When customizing templates, use Tailwind's `dark:` prefix to add dark mode variants:
+When customizing templates, use Tailwind's `dark:` variant:
 
 ```html
-<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+<div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   Content that adapts to dark mode
 </div>
 ```
@@ -478,26 +469,23 @@ When customizing templates, use Tailwind's `dark:` prefix to add dark mode varia
 For custom CSS, target the `.dark` class that gets added to the HTML root:
 
 ```css
-/* Light mode styles */
 .my-element {
   background-color: #ffffff;
   color: #1f2937;
 }
 
-/* Dark mode styles */
 .dark .my-element {
   background-color: #1f2937;
   color: #f3f4f6;
 }
 ```
 
-## Technical Implementation
+Avoid `@media (prefers-color-scheme: dark)` in new code — it won't respond to the manual toggle. If you're porting CSS from elsewhere that uses the media query, convert it to a `.dark` class selector.
 
-The dark mode functionality is implemented through:
+### Mermaid diagrams
 
-1. **Media Query Detection**: Uses `@media (prefers-color-scheme: dark)` to detect system preference
-2. **Tailwind CSS**: Uses Tailwind's `dark:` prefix utilities that respond to the media query
-3. **Automatic Switching**: No JavaScript required - works purely with CSS media queries
+Mermaid reads the active colour scheme at initialization, so toggling the theme triggers a full-page reload when a Mermaid diagram is present — just enough to re-initialize the renderer with the new palette.
+
 
 ===
 
@@ -568,7 +556,15 @@ slug: fonts
 
 # Fonts and Typography
 
-Emanote uses a **system font stack** as the default font family throughout the site. This provides excellent performance and native appearance across all platforms without requiring any font downloads. If you want to customize the typography:
+Emanote ships with three self-hosted fonts served out of the bundled static layer (no third-party fetch at page load):
+
+- [Lora](https://fonts.google.com/specimen/Lora) — prose
+- [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) — UI chrome (sidebar, breadcrumbs, TOC, backlinks) and headings
+- [Space Mono](https://fonts.google.com/specimen/Space+Mono) — inline code and code blocks
+
+The woff2 files plus a generated `fonts.css` live under `_emanote-static/fonts/`, and `templates/styles.tpl` links them via `${ema:emanoteStaticLayerUrl}/fonts/fonts.css`. Generated static sites therefore work fully offline.
+
+The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) shows up in the note title, wikilinks, TOC accents, and backlink cards rather than in full-bleed body backgrounds.
 
 ## Changing the Font Family
 
@@ -576,12 +572,15 @@ To use a different font, create a `templates/styles.tpl` file in your notebook a
 
 ```html
 <style data-category="global-font">
-  /* Replace system fonts with your preferred font */
-  body {
-    font-family: 'Your Font Name', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  :root {
+    --font-serif: 'Your Serif', ui-serif, Georgia, serif;
+    --font-sans: 'Your Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'Your Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 </style>
 ```
+
+The default theme reads these three variables — `--font-serif` for body prose, `--font-sans` for UI chrome, and `--font-mono` for code — so setting them is enough to swap fonts everywhere.
 
 ## Using Google Fonts {#google}
 
@@ -593,11 +592,13 @@ Create `templates/styles.tpl` with both the font import and the styling:
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style data-category="global-font">
-  body {
-    font-family: 'Inter', sans-serif;
+  :root {
+    --font-sans: 'Inter', sans-serif;
   }
 </style>
 ```
+
+Using Google Fonts means each page load fetches CSS and woff2 from `fonts.gstatic.com`. If you want your generated static site to work fully offline, self-host instead (below).
 
 ## Self-hosting Custom Fonts {#custom}
 
@@ -616,8 +617,8 @@ To self-host your own fonts:
     font-style: normal;
   }
 
-  body {
-    font-family: 'YourFont', sans-serif;
+  :root {
+    --font-sans: 'YourFont', sans-serif;
   }
 </style>
 ```
