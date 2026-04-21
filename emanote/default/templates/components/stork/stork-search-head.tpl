@@ -1,6 +1,8 @@
-<!-- Custom Stork-search styling for Emanote -->
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible.css" media="(prefers-color-scheme: light)" />
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible-dark.css" media="(prefers-color-scheme: dark)" />
+<!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
+     unconditionally; the active one is picked by toggling the wrapper's
+     CSS class, driven by the same .dark class the theme toggle manages. -->
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible.css" />
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/stork/edible-dark.css" />
 
 <style data-category="stork">
   #stork-search-container {
