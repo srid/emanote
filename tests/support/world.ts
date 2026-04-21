@@ -14,8 +14,6 @@ setDefaultTimeout(60_000);
  *  here costs nothing on the green path and fails loudly on the red path. */
 const CSS_READY_TIMEOUT = 10_000;
 
-const PRIMARY_500 = "--color-primary-500";
-
 export class EmanoteWorld extends World {
   browser!: Browser;
   context!: BrowserContext;
@@ -26,16 +24,17 @@ export class EmanoteWorld extends World {
    *  non-empty value, then return it. Times out with the regression
    *  signal for #633 (theme-remap alias or target palette var missing). */
   async waitForPrimaryResolved(): Promise<string> {
-    return this.page.waitForFunction(
+    const handle = await this.page.waitForFunction(
       (prop: string) => {
         const v = getComputedStyle(document.documentElement)
           .getPropertyValue(prop)
           .trim();
         return v.length > 0 ? v : null;
       },
-      PRIMARY_500,
+      "--color-primary-500",
       { timeout: CSS_READY_TIMEOUT },
-    ).then((handle) => handle.jsonValue() as Promise<string>);
+    );
+    return handle.jsonValue() as Promise<string>;
   }
 }
 
