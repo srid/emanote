@@ -45,36 +45,34 @@ regenerating the compiled CSS.
 -}
 tailwindInputCss :: Text
 tailwindInputCss =
-  [text|
-    @import "tailwindcss";
-    @plugin "@tailwindcss/typography";
+  let aliases = primaryColorAliases "blue"
+   in [text|
+        @import "tailwindcss";
+        @plugin "@tailwindcss/typography";
 
-    @theme {
-      --color-primary-50:  var(--color-blue-50);
-      --color-primary-100: var(--color-blue-100);
-      --color-primary-200: var(--color-blue-200);
-      --color-primary-300: var(--color-blue-300);
-      --color-primary-400: var(--color-blue-400);
-      --color-primary-500: var(--color-blue-500);
-      --color-primary-600: var(--color-blue-600);
-      --color-primary-700: var(--color-blue-700);
-      --color-primary-800: var(--color-blue-800);
-      --color-primary-900: var(--color-blue-900);
-      --color-primary-950: var(--color-blue-950);
-    }
-  |]
+        @theme {
+        $aliases
+        }
+      |]
 
 -- | Per-site @\<style\>@ that re-aliases @--color-primary-*@ to the user's theme.
 themeRemapStyle :: Text -> H.Html
-themeRemapStyle themeName =
-  let remap =
-        unlines
-          [ "  --color-primary-" <> lvl <> ": var(--color-" <> themeName <> "-" <> lvl <> ");"
-          | lvl <- colorScaleLevels
-          ]
-      css = ":root {\n" <> remap <> "}\n"
+themeRemapStyle paletteName =
+  let css = ":root {\n" <> primaryColorAliases paletteName <> "}\n"
    in H.style $ H.toHtml css
 
+{- | CSS lines aliasing @--color-primary-N@ to @var(--color-\<palette\>-N)@,
+one per scale level. Shared by the compile-time @\@theme@ block and the
+runtime @:root@ remap so the two can't drift on scale levels.
+-}
+primaryColorAliases :: Text -> Text
+primaryColorAliases paletteName =
+  unlines
+    [ "  --color-primary-" <> lvl <> ": var(--color-" <> paletteName <> "-" <> lvl <> ");"
+    | lvl <- colorScaleLevels
+    ]
+
+-- | The eleven Tailwind default color scale levels.
 colorScaleLevels :: [Text]
 colorScaleLevels =
   ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"]
