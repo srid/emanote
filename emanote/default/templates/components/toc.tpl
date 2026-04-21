@@ -19,56 +19,56 @@
     </ema:note:toc>
   </div>
   <script>
-    // Highlight the TOC, based from https://stackoverflow.com/a/75346369
-    // TODO: We should get rid of JavaScript! See https://github.com/srid/emanote/issues/520
-    function highlightTOC() {
-      // Grab the toc links
-      const links = document.querySelectorAll("ul > li > a.--ema-toc");
+    // Highlight the TOC link for the section currently in view.
+    // Uses Intersection Observer (passive, no scroll-loop layout thrashing);
+    // replaces the old window.onscroll approach from issue #520.
+    (function () {
+      const tocLinks = document.querySelectorAll("a.--ema-toc");
+      if (tocLinks.length === 0) return;
 
-      // Find the matching anchors in the document body
-      const sections = [];
-      links.forEach((link) => {
-        let found = {};
-        for (section of document.querySelectorAll("a.--ema-anchor")) {
-          if (link.href == section.href) {
-            found = section;
-            break;
-          }
-        }
-        sections.push(found);
+      const anchors = {};
+      document.querySelectorAll("a.--ema-anchor").forEach((a) => {
+        anchors[a.href] = a;
       });
 
-      // Current toc link is marked with the following class
+      const observed = [];
+      const visibility = new Map();
+      tocLinks.forEach((link) => {
+        const anchor = anchors[link.href];
+        if (!anchor) return;
+        const section = anchor.closest("h1, h2, h3, h4, h5, h6") || anchor;
+        observed.push({ section, link });
+        visibility.set(section, false);
+      });
+
       const mark = "toc-item-active";
-
-      // Set window scroll handler to update the toc mark.
-      window.onscroll = () => {
-        // Remove previous mark
-        links.forEach((link) => {
-          link.classList.remove(mark);
-        });
-
-        // Mark the link of the section that is in view, starting from the end
-        let marked = false;
-        for (var i = sections.length - 1; i >= 0; i--) {
-          if (window.scrollY > sections[i].offsetTop - 80) {
-            links[i].classList.add(mark);
-            marked = true;
-            break;
-          }
-        }
-
-        // Special case for the first and last section which might not reach the top
-        if (!marked && window.scrollY > 0) {
-          let i = 0;
-          if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight) {
-            // We are at the bottom
-            i = links.length - 1
-          }
-          links[i].classList.add(mark);
-        }
+      const setActive = (activeLink) => {
+        tocLinks.forEach((l) => l.classList.remove(mark));
+        if (activeLink) activeLink.classList.add(mark);
       };
-    }
-    highlightTOC();
+
+      const pickActive = () => {
+        let firstVisible = null;
+        let lastAbove = null;
+        for (const { section, link } of observed) {
+          if (visibility.get(section)) {
+            if (!firstVisible) firstVisible = link;
+          } else if (section.getBoundingClientRect().top < 0) {
+            lastAbove = link;
+          }
+        }
+        setActive(firstVisible || lastAbove || observed[0]?.link);
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          visibility.set(entry.target, entry.isIntersecting);
+        }
+        pickActive();
+      }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
+
+      for (const { section } of observed) observer.observe(section);
+      pickActive();
+    })();
   </script>
 </nav>

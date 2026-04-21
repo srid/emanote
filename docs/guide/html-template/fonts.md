@@ -4,7 +4,9 @@ slug: fonts
 
 # Fonts and Typography
 
-Emanote uses a **system font stack** as the default font family throughout the site. This provides excellent performance and native appearance across all platforms without requiring any font downloads. If you want to customize the typography:
+Emanote ships with [Fraunces](https://fonts.google.com/specimen/Fraunces) (a variable serif) for prose and headings, and [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) for code. Both are loaded from Google Fonts on page load. The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) shows up in headings, wikilinks, and accent bars rather than in full-bleed backgrounds.
+
+If you want to customize the typography:
 
 ## Changing the Font Family
 

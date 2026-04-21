@@ -13,23 +13,6 @@
 
 <apply template="base">
   <bind tag="head-main">
-    <style id="emanote-sidebar-sizing">
-      /* For use in sidebar.tpl, as we cannot achieve this in tailwind itself! */
-      /* md:min-w-52  */
-      @media (min-width: 768px) {
-        #sidebar {
-          min-width: 13rem;
-        }
-      }
-
-      /* xl:min-w-72  */
-      @media (min-width: 1280px) {
-        #sidebar {
-          min-width: 18rem;
-        }
-      }
-    </style>
-
     <ema:has:uptree>
       <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/inverted-tree.css" />
     </ema:has:uptree>
