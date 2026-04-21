@@ -75,10 +75,7 @@ runEmbedTemplate name splices = do
 embedResourceRoute :: Model -> HP.RenderCtx -> MN.Note -> Maybe (HI.Splice Identity)
 embedResourceRoute model ctx note = do
   let url = SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute)
-      -- Namespace footnote IDs per embedded note so that a parent note
-      -- and its embeds never emit duplicate `fn1` / `fnref1` IDs on the
-      -- same rendered page (#360).
-      embedCtx = ctx {HP.idPrefix = "embed-" <> sanitizeForId url <> "-"}
+      embedCtx = ctx {HP.idPrefix = computeEmbedIdPrefix url}
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx id (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice url
@@ -87,8 +84,17 @@ embedResourceRoute model ctx note = do
     "ema:note:toc" ##
       renderToc ctx (newToc $ note ^. MN.noteDoc)
 
-sanitizeForId :: Text -> Text
-sanitizeForId = T.map (\c -> if Char.isAlphaNum c then c else '-')
+{- | Namespace footnote IDs per embedded note so that a parent note and
+its embeds never emit duplicate `fn1` / `fnref1` IDs on the same
+rendered page (#360). The scheme is URL-derived purely so that prefix
+changes here don't force a rebuild of heist-extra — swap the policy
+(hash, counter, UUID) without touching the library's
+`RenderCtx.idPrefix` mechanism.
+-}
+computeEmbedIdPrefix :: Text -> Text
+computeEmbedIdPrefix url = "embed-" <> T.map sanitize url <> "-"
+  where
+    sanitize c = if Char.isAlphaNum c then c else '-'
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
