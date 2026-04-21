@@ -1,6 +1,6 @@
 <div class="mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300">
   <context>
-    <div class="pl-2 mt-2 border-l-2 border-primary-200 dark:border-primary-600 hover:border-primary-500 dark:hover:border-primary-400">
+    <div class="mt-2">
       <context:body>
         <PandocLink class="text-primary-700 dark:text-primary-300">
           <Internal class="font-semibold no-underline hover:underline decoration-primary-500" />
