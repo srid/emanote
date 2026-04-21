@@ -98,13 +98,11 @@ mkTemplateRenderCtx model r meta =
     renderFeatures =
       RenderFeatures
         { codeHighlighting =
-            if SData.lookupAeson True ("emanote" :| ["syntaxHighlighting"]) meta
-              then Skylighting
-              else NoHighlighting
+            bool NoHighlighting Skylighting
+              $ SData.lookupAeson True ("emanote" :| ["syntaxHighlighting"]) meta
         , mathRendering =
-            if SData.lookupAeson True ("emanote" :| ["staticMath"]) meta
-              then StaticMathML
-              else NoStaticMath
+            bool NoStaticMath StaticMathML
+              $ SData.lookupAeson True ("emanote" :| ["staticMath"]) meta
         }
 
 defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
