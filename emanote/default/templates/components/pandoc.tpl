@@ -67,14 +67,10 @@
       </DefinitionList:Items>
     </dl>
   </DefinitionList>
-  <Note:Ref>
-    <sup id="fnref${footnote:idx}" class="footnote-ref">
-      <a href="${ema:note:url}#fn${footnote:idx}"><footnote:idx /></a>
-    </sup>
-  </Note:Ref>
+  <Note:Ref><sup id="fnref${footnote:idx}" class="footnote-ref"><a href="${ema:note:url}#fn${footnote:idx}"><footnote:idx /></a></sup></Note:Ref>
   <Note:List>
     <aside title="Footnotes"
-      class="mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800">
+      class="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
       <header class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Footnotes</header>
       <ol class="footnote-list list-decimal pl-6 space-y-3 marker:text-gray-400 dark:marker:text-gray-500">
         <footnote>

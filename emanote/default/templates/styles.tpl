@@ -72,32 +72,91 @@
 </style>
 
 <style data-category="footnotes">
-  /* Body-side ref: show as [N] with subtle background so it reads as a
-     footnote marker and is easier to click. */
+  /* Footnotes as editorial apparatus — the scholarly gutter of a book,
+     not a second column of body prose. A short primary tick over a
+     full-width hairline marks the section break; old-style figures and
+     primary-tinted markers keep the numerals quiet but considered. */
+
+  /* Body-side ref — hugs the preceding word with lining figures and a
+     true superscript baseline. No padding-left so it reads as part of
+     the same word, not a separate token. */
   sup.footnote-ref {
-    font-size: 0.75em;
+    font-size: 0.7em;
     line-height: 0;
     vertical-align: super;
-    padding: 0 0.15em;
+    padding: 0 0.08em 0 0;
+    font-variant-numeric: lining-nums;
+    font-weight: 500;
   }
   sup.footnote-ref a {
-    color: var(--color-primary-700);
+    color: var(--color-primary-600);
     text-decoration: none;
   }
   sup.footnote-ref a:hover {
     text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
   }
   .dark sup.footnote-ref a {
-    color: var(--color-primary-300);
+    color: var(--color-primary-400);
   }
 
+  /* The <aside> itself — replace the flat border-t-2 with a dual rule:
+     a short primary accent over a thin gray hairline, magazine-style. */
+  aside[title="Footnotes"] {
+    border-top: none !important;
+    margin-top: 3.5rem;
+    padding-top: 1.75rem;
+    position: relative;
+    max-width: 44rem;
+  }
+  aside[title="Footnotes"]::before {
+    /* Short primary tick, left-aligned */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3.5rem;
+    height: 2px;
+    background-color: var(--color-primary-500);
+  }
+  aside[title="Footnotes"]::after {
+    /* Thin gray hairline extending beneath the tick */
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 3.5rem;
+    right: 0;
+    height: 1px;
+    background-color: var(--color-gray-200);
+  }
+  .dark aside[title="Footnotes"]::after {
+    background-color: var(--color-gray-800);
+  }
+
+  /* List markers — old-style figures in primary, feel cited not listy */
+  ol.footnote-list {
+    font-variant-numeric: oldstyle-nums;
+  }
+  ol.footnote-list > li::marker {
+    color: var(--color-primary-600);
+    font-weight: 500;
+  }
+  .dark ol.footnote-list > li::marker {
+    color: var(--color-primary-400);
+  }
+
+  /* Back-reference — thin, muted; lifts and tints on hover */
   a.footnote-backref {
-    margin-left: 0.35em;
+    margin-left: 0.5em;
     color: var(--color-gray-400);
     text-decoration: none;
+    display: inline-block;
+    transition: transform 0.15s ease, color 0.15s ease;
   }
   a.footnote-backref:hover {
     color: var(--color-primary-600);
+    transform: translateY(-1px);
   }
   .dark a.footnote-backref {
     color: var(--color-gray-600);
@@ -106,9 +165,8 @@
     color: var(--color-primary-400);
   }
 
-  /* :target highlight — flash the landed footnote (and the ref, when
-     jumped back to) so the destination is obvious. Theme-scoped start
-     color lets the single keyframe serve both light and dark. */
+  /* :target flash — brief highlight on landing; theme-scoped start
+     color lets one keyframe serve both modes. */
   :root { --footnote-flash-start: var(--color-primary-100); }
   .dark { --footnote-flash-start: var(--color-primary-900); }
   ol.footnote-list li:target,
@@ -118,6 +176,20 @@
   @keyframes footnote-flash {
     0%   { background-color: var(--footnote-flash-start); }
     100% { background-color: transparent; }
+  }
+
+  /* Respect users who asked for less motion */
+  @media (prefers-reduced-motion: reduce) {
+    ol.footnote-list li:target,
+    sup.footnote-ref:target a {
+      animation: none;
+    }
+    a.footnote-backref {
+      transition: none;
+    }
+    a.footnote-backref:hover {
+      transform: none;
+    }
   }
 </style>
 
