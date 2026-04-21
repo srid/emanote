@@ -55,10 +55,17 @@ const fixtureDir = path.resolve(
 
 const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "emanote-e2e-"));
 
+/** Active backend resource. Exactly one variant is live per run,
+ *  determined by `EMANOTE_MODE`. Keeping both cases in one union
+ *  means the "what's running" invariant is expressed by the type
+ *  rather than by a pair of optional module-level fields. */
+type BackendResource =
+  | { kind: "live"; proc: ChildProcess }
+  | { kind: "static"; server: http.Server };
+
 let browser: Browser;
 let baseUrl: string;
-let liveProc: ChildProcess | undefined;
-let staticServer: http.Server | undefined;
+let backend: BackendResource | undefined;
 
 /** Poll a URL until it returns a 200 response containing `needle`. Emanote
  *  cold-start is slow (Haskell + Tailwind compile on live-mode first
@@ -89,17 +96,17 @@ async function waitForHtml(
   );
 }
 
-async function startLive(): Promise<string> {
+async function startLive(): Promise<{ url: string; resource: BackendResource }> {
   const port = await getPort();
-  liveProc = spawn(
+  const proc = spawn(
     emanoteBin,
     ["-L", fixtureDir, "run", "--port", String(port), "--no-ws"],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
-  liveProc.stderr?.on("data", (d: Buffer) =>
+  proc.stderr?.on("data", (d: Buffer) =>
     process.stderr.write(`[emanote:live] ${d}`),
   );
-  liveProc.on("exit", (code, sig) => {
+  proc.on("exit", (code, sig) => {
     if (code !== 0 && code !== null) {
       process.stderr.write(
         `[emanote:live] exited unexpectedly (code=${code} sig=${sig})\n`,
@@ -108,10 +115,13 @@ async function startLive(): Promise<string> {
   });
   const url = `http://127.0.0.1:${port}`;
   await waitForHtml(url, "emanote-theme-remap", 60_000);
-  return url;
+  return { url, resource: { kind: "live", proc } };
 }
 
-async function startStatic(): Promise<string> {
+async function startStatic(): Promise<{
+  url: string;
+  resource: BackendResource;
+}> {
   const outDir = path.join(runRoot, "site");
   fs.mkdirSync(outDir, { recursive: true });
   await new Promise<void>((resolve, reject) => {
@@ -125,10 +135,9 @@ async function startStatic(): Promise<string> {
     );
   });
   const port = await getPort();
-  staticServer = http.createServer((req, res) => {
+  const server = http.createServer((req, res) => {
     const urlPath = decodeURIComponent((req.url ?? "/").split("?")[0]);
-    const candidate =
-      urlPath.endsWith("/") ? urlPath + "index.html" : urlPath;
+    const candidate = urlPath.endsWith("/") ? urlPath + "index.html" : urlPath;
     const filePath = path.join(outDir, candidate);
     if (!filePath.startsWith(outDir)) {
       res.statusCode = 403;
@@ -145,8 +154,11 @@ async function startStatic(): Promise<string> {
       res.end(data);
     });
   });
-  await new Promise<void>((resolve) => staticServer!.listen(port, resolve));
-  return `http://127.0.0.1:${port}`;
+  await new Promise<void>((resolve) => server.listen(port, resolve));
+  return {
+    url: `http://127.0.0.1:${port}`,
+    resource: { kind: "static", server },
+  };
 }
 
 function contentTypeFor(p: string): string {
@@ -172,7 +184,9 @@ function contentTypeFor(p: string): string {
 }
 
 BeforeAll(async () => {
-  baseUrl = mode === "live" ? await startLive() : await startStatic();
+  const started = mode === "live" ? await startLive() : await startStatic();
+  baseUrl = started.url;
+  backend = started.resource;
   browser = await chromium.launch({
     headless: process.env.HEADLESS !== "false",
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
@@ -181,11 +195,12 @@ BeforeAll(async () => {
 
 AfterAll(async () => {
   if (browser) await browser.close();
-  if (liveProc) liveProc.kill("SIGTERM");
-  if (staticServer)
-    await new Promise<void>((r) =>
-      staticServer!.close(() => r()),
-    );
+  if (backend?.kind === "live") {
+    backend.proc.kill("SIGTERM");
+  } else if (backend?.kind === "static") {
+    const { server } = backend;
+    await new Promise<void>((r) => server.close(() => r()));
+  }
   try {
     fs.rmSync(runRoot, { recursive: true, force: true });
   } catch {
