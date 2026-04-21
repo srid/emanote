@@ -115,21 +115,16 @@
   }
 
   /* :target highlight — flash the landed footnote (and the ref, when
-     jumped back to) so the destination is obvious. */
+     jumped back to) so the destination is obvious. Theme-scoped start
+     color lets the single keyframe serve both light and dark. */
+  :root { --footnote-flash-start: var(--color-primary-100); }
+  .dark { --footnote-flash-start: var(--color-primary-900); }
   ol.footnote-list li:target,
   sup.footnote-ref:target a {
     animation: footnote-flash 1.2s ease-out;
   }
   @keyframes footnote-flash {
-    0%   { background-color: var(--color-primary-100); }
-    100% { background-color: transparent; }
-  }
-  .dark ol.footnote-list li:target,
-  .dark sup.footnote-ref:target a {
-    animation: footnote-flash-dark 1.2s ease-out;
-  }
-  @keyframes footnote-flash-dark {
-    0%   { background-color: var(--color-primary-900); }
+    0%   { background-color: var(--footnote-flash-start); }
     100% { background-color: transparent; }
   }
 </style>
