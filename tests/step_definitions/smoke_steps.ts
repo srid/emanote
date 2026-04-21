@@ -27,15 +27,51 @@ Then(
   },
 );
 
+// texmath emits `<math xmlns="http://www.w3.org/1998/Math/MathML" display="...">`
+// for every expression. Assert on the namespace *and* display attribute so a
+// regression to raw `\(…\)` delimiters (for client-side MathJax/KaTeX) — which
+// would produce 0 math elements — fails loudly.
+const MATHML_NS = "http://www.w3.org/1998/Math/MathML";
+
 Then(
-  "the page contains a MathML element",
+  "the page contains an inline <math> element in the MathML namespace",
   async function (this: EmanoteWorld) {
-    // texmath writes `<math xmlns="…">` for every expression; a single
-    // locator hit is enough to prove the build-time pipeline fired.
-    const count = await this.page.locator("math").count();
+    const count = await this.page
+      .locator(`math[xmlns="${MATHML_NS}"][display="inline"]`)
+      .count();
     assert.ok(
       count > 0,
-      "Expected at least one <math> element; found 0 — emanote.staticMath default may have regressed.",
+      `Expected at least one inline MathML element; found ${count}. emanote.staticMath default may have regressed, or texmath's InlineMath → display="inline" mapping changed.`,
+    );
+  },
+);
+
+Then(
+  "the page contains a block <math> element in the MathML namespace",
+  async function (this: EmanoteWorld) {
+    const count = await this.page
+      .locator(`math[xmlns="${MATHML_NS}"][display="block"]`)
+      .count();
+    assert.ok(
+      count > 0,
+      `Expected at least one block MathML element; found ${count}. The $$…$$ display-math path is broken.`,
+    );
+  },
+);
+
+Then(
+  "no KaTeX stylesheet is referenced",
+  async function (this: EmanoteWorld) {
+    // The js.katex snippet was removed from the default config in the same PR
+    // that flipped staticMath on. Default-config sites should therefore never
+    // emit a katex stylesheet link.
+    const count = await this.page
+      .locator('link[href*="katex"], script[src*="katex"]')
+      .count();
+    assert.strictEqual(
+      count,
+      0,
+      `Default config should not pull in KaTeX; found ${count} katex asset reference(s). Did the js.katex snippet or a default \`page.headHtml\` leak back in?`,
     );
   },
 );
