@@ -4,10 +4,16 @@
 
 - Built-in static syntax highlighting using skylighting (replaces client-side JS highlighters)
 
-## Unreleased
+## 1.6.0.0 (Unreleased)
 
 **Notable features**
 
+- **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
+  - Templates use a `primary-*` color token (e.g. `bg-primary-500`) that resolves via CSS variables at runtime; compiled CSS is palette-agnostic.
+  - `template.theme: blue|green|...` YAML config is unchanged — the mechanism moved from Heist string-splicing (`${theme}-NNN` across 20+ templates) to a single per-page `:root` remap block.
+  - Drops the stale `Web.Tailwind` Haskell dep; shells out to `tailwindcss_4` CLI directly.
+  - Dev server uses `@tailwindcss/browser@4` (replaces v3 Play CDN).
+  - Related follow-up work tracked in [#632](https://github.com/srid/emanote/issues/632).
 - UI revamp (#622)
   - Dark mode (#605, #617)
 - Mermaid: add `elk` layout (#618)
