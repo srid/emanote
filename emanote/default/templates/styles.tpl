@@ -81,21 +81,12 @@
   sup.footnote-ref a {
     color: var(--color-primary-700);
     text-decoration: none;
-    padding: 0.05em 0.25em;
-    border-radius: 3px;
-    background-color: var(--color-primary-50);
-    transition: background-color 0.15s;
   }
   sup.footnote-ref a:hover {
-    background-color: var(--color-primary-100);
     text-decoration: underline;
   }
   .dark sup.footnote-ref a {
     color: var(--color-primary-300);
-    background-color: var(--color-primary-950);
-  }
-  .dark sup.footnote-ref a:hover {
-    background-color: var(--color-primary-900);
   }
 
   a.footnote-backref {
