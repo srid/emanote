@@ -16,12 +16,16 @@
   // without hitting "Identifier 'wrapper' has already been declared".
   {
     const wrapper = document.getElementById('stork-wrapper');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    const applyTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
       wrapper.classList.remove('stork-wrapper-edible', 'stork-wrapper-edible-dark');
-      wrapper.classList.add(e.matches ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+      wrapper.classList.add(isDark ? 'stork-wrapper-edible-dark' : 'stork-wrapper-edible');
+    };
+    applyTheme();
+    // Theme toggle mutates the .dark class on <html>; mirror it onto the
+    // stork wrapper so the search dialog re-skins live without a reload.
+    new MutationObserver(applyTheme).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class']
     });
   }
 </script>

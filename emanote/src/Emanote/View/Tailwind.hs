@@ -63,6 +63,7 @@ tailwindBrowserConfig :: Text -> Text
 tailwindBrowserConfig paletteName =
   let aliases = primaryColorAliases paletteName
    in [text|
+        @custom-variant dark (&:where(.dark, .dark *));
         @theme {
         $aliases
         }
@@ -77,6 +78,7 @@ tailwindCliInputCss =
   [text|
     @import "tailwindcss";
     @plugin "@tailwindcss/typography";
+    @custom-variant dark (&:where(.dark, .dark *));
 
     ${tailwindThemeBlock}
   |]

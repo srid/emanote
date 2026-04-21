@@ -29,7 +29,6 @@
     </p>
   </Para>
   <Task:Checked>
-    <!-- FIXME: Fix list styling to use flexbox, so task lists don't botch them up -->
     <apply template="/templates/components/checkbox-checked">
       <inlines />
     </apply>
@@ -76,24 +75,21 @@
     </sup>
   </Note:Ref>
   <Note:List>
-    <div title="Footnotes"
-      class="pt-2 mt-8 space-y-1 text-gray-500 dark:text-gray-400 transform scale-x-90 border-t-2 border-gray-200 dark:border-gray-700">
-      <header class="font-semibold">Footnotes</header>
-      <footnote>
-        <div id="fn${footnote:idx}">
-          <header class="italic">
-            <footnote:idx />.
-          </header>
-          <div class="inline-block mb-2 ml-4">
+    <aside title="Footnotes"
+      class="mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800">
+      <header class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Footnotes</header>
+      <ol class="list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500">
+        <footnote>
+          <li id="fn${footnote:idx}" class="pl-2">
             <footnote:content />
-          </div>
-        </div>
-      </footnote>
-    </div>
+          </li>
+        </footnote>
+      </ol>
+    </aside>
   </Note:List>
 
   <BulletList>
-    <ul class="my-4 ml-6 space-y-2 list-disc leading-relaxed">
+    <ul class="my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500">
       <BulletList:Items>
         <li>
           <BulletList:Item />
@@ -102,21 +98,21 @@
     </ul>
   </BulletList>
   <OrderedList>
-    <ul class="my-4 ml-6 space-y-2 list-decimal list-inside leading-relaxed">
+    <ol class="my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400">
       <OrderedList:Items>
-        <li>
+        <li class="pl-1">
           <OrderedList:Item />
         </li>
       </OrderedList:Items>
-    </ul>
+    </ol>
   </OrderedList>
   <HorizontalRule>
     <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-primary-600 dark:text-primary-400">
-    <Internal class="bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900" />
-    <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
+  <PandocLink class="text-primary-700 dark:text-primary-300">
+    <Internal class="font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors" />
+    <External class="no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
   <Code class="py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]" />

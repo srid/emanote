@@ -23,6 +23,8 @@ data-files:
   _emanote-live-server/**/*.js
   _emanote-static/*.css
   _emanote-static/*.svg
+  _emanote-static/fonts/*.css
+  _emanote-static/fonts/*.woff2
   _emanote-static/stork/edible-dark.css
   _emanote-static/stork/edible.css
   _emanote-static/stork/stork.js

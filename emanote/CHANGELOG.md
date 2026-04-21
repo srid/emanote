@@ -14,8 +14,10 @@
   - Drops the stale `Web.Tailwind` Haskell dep; shells out to `tailwindcss_4` CLI directly.
   - Dev server uses `@tailwindcss/browser@4` (replaces v3 Play CDN).
   - Related follow-up work tracked in [#632](https://github.com/srid/emanote/issues/632).
-- UI revamp (#622)
-  - Dark mode (#605, #617)
+- UI revamp (#622, [#636](https://github.com/srid/emanote/pull/636))
+  - New self-hosted typography: Lora + Space Grotesk + Space Mono.
+  - Manual dark/light theme toggle (#605, #617) with `localStorage` persistence.
+  - Backlinks as a card grid; TOC with depth-based hierarchy and `IntersectionObserver` scroll-spy (#520).
 - Mermaid: add `elk` layout (#618)
 - Home Manager module: macOS support via launchd (#623)
 
