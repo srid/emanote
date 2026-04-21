@@ -48,7 +48,7 @@ test-e2e:
     set -euo pipefail
     BIN="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
     cd tests
-    npm install
+    npm ci
     npx playwright install chromium
     EMANOTE_BIN="$BIN" EMANOTE_MODE=live npm test
     EMANOTE_BIN="$BIN" EMANOTE_MODE=static npm test
