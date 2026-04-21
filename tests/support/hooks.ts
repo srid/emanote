@@ -4,7 +4,7 @@
  * `EMANOTE_MODE` is the only axis that distinguishes runs:
  *   - `live`   → spawn `emanote -L <fixture> run --port N`
  *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
- *                on a random port with a zero-dep Node static server
+ *                on a random port via `serve-handler`
  *
  * Step definitions only see `baseUrl` and never learn which mode they ran
  * in — any mode-specific branching in a step means the boundary has
