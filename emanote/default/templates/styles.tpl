@@ -1,42 +1,34 @@
 <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/skylighting.css" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<!-- Fonts are self-hosted under _emanote-static/fonts to keep the
+     generated static site fully offline-capable. See the README in
+     that directory for how to refresh. -->
+<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/fonts/fonts.css" />
 
 <style data-category="global-font">
-  /* Display/prose voice: Fraunces (variable serif).
-     UI chrome voice: Inter (sans) — sidebar, breadcrumbs, TOC, metadata.
-     Code: JetBrains Mono. */
+  /* Font option C (trial):
+     Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
+     Code: Space Mono (pairs stylistically with Space Grotesk). */
   :root {
-    --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
   body {
     font-family: var(--font-serif);
-    font-variation-settings: 'opsz' 18, 'SOFT' 40;
     line-height: 1.7;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-    font-variation-settings: 'opsz' 72, 'SOFT' 20, 'WONK' 1;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 600;
   }
 
-  main p,
-  main li,
-  main dd,
-  main blockquote,
-  main td {
-    font-variation-settings: 'opsz' 14, 'SOFT' 60;
-  }
-
-  #sidebar, #breadcrumbs, #toc, #footer, .callout-title,
+  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
   ema\:metadata, section[class*="font-mono"] {
     font-family: var(--font-sans);
   }
@@ -129,9 +121,52 @@
     background-color: transparent !important;
   }
 
+  /* Visual hierarchy by depth: each nested level (H3, H4, ...) is
+     progressively smaller, lighter, and more muted so a long TOC
+     stays scannable at a glance. Top-level (H2) items keep full
+     weight and contrast. */
+  #toc ul a.--ema-toc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+
+  .dark #toc ul a.--ema-toc {
+    color: var(--color-gray-300);
+  }
+
+  #toc ul ul a.--ema-toc {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--color-gray-600);
+  }
+
+  .dark #toc ul ul a.--ema-toc {
+    color: var(--color-gray-400);
+  }
+
+  #toc ul ul ul a.--ema-toc {
+    font-size: 0.78125rem;
+    color: var(--color-gray-500);
+  }
+
+  .dark #toc ul ul ul a.--ema-toc {
+    color: var(--color-gray-500);
+  }
+
+  #toc ul ul ul ul a.--ema-toc {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+  }
+
+  .dark #toc ul ul ul ul a.--ema-toc {
+    color: var(--color-gray-600);
+  }
+
   /* Active TOC item — uses theme primary palette so per-site theme overrides
-     flow through without hardcoding a colour here. */
-  a.--ema-toc.toc-item-active {
+     flow through without hardcoding a colour here. The selector is scoped
+     under #toc so it beats the per-depth color rules above. */
+  #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
     border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
@@ -139,7 +174,7 @@
     color: var(--color-primary-700) !important;
   }
 
-  .dark a.--ema-toc.toc-item-active {
+  .dark #toc a.--ema-toc.toc-item-active {
     background-color: var(--color-primary-950) !important;
     color: var(--color-primary-300) !important;
     border-left-color: var(--color-primary-400);
