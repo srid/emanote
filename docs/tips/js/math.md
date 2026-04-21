@@ -9,7 +9,7 @@ Emanote renders `$...$` and `$$...$$` to **MathML at build time** by default via
 ### Demo
 
 When $a \ne 0$, there are two solutions to $ax^2 + bx + c = 0$ and they are
-$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}.$$
 
 ## Opting out
 
@@ -39,8 +39,15 @@ Paste the KaTeX loader directly into `page.headHtml` — Emanote's default confi
 ```yaml
 page:
   headHtml: |
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+          crossorigin="anonymous">
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+            crossorigin="anonymous"></script>
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
 ```
 
