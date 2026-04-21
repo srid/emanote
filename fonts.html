@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=986366de-5ac8-49f4-9b50-5eb20e0afa48' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
@@ -1830,11 +1830,11 @@
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      The woff2 files plus a generated <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>fonts.css</code> live under <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>_emanote-static/fonts/</code>, and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> links them via <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>${ema:emanoteStaticLayerUrl}/fonts/fonts.css</code>. Generated static sites therefore work fully offline.
+      The woff2 files plus a generated <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>fonts.css</code> live under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/fonts/</code>, and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> links them via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>${ema:emanoteStaticLayerUrl}/fonts/fonts.css</code>. Generated static sites therefore work fully offline.
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      The theme colour (set via <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>template.theme</code> — see <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>) shows up in the note title, wikilinks, TOC accents, and backlink cards rather than in full-bleed body backgrounds.
+      The theme colour (set via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>template.theme</code> — see <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>) shows up in the note title, wikilinks, TOC accents, and backlink cards rather than in full-bleed body backgrounds.
     </p>
   
     <h2 id='changing-the-font-family' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1852,7 +1852,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      To use a different font, create a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> file in your notebook and override the global font styling (in <a href='layer' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>default layer</a>):
+      To use a different font, create a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> file in your notebook and override the global font styling (in <a href='layer' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>default layer</a>):
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"global-font"</span><span class='dt'>&gt;</span>
   <span class='in'>:root</span> {
@@ -1863,7 +1863,7 @@
 <span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      The default theme reads these three variables — <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>--font-serif</code> for body prose, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>--font-sans</code> for UI chrome, and <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>--font-mono</code> for code — so setting them is enough to swap fonts everywhere.
+      The default theme reads these three variables — <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--font-serif</code> for body prose, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--font-sans</code> for UI chrome, and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--font-mono</code> for code — so setting them is enough to swap fonts everywhere.
     </p>
   
     <h2 id='google' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1881,7 +1881,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Create <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> with both the font import and the styling:
+      Create <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> with both the font import and the styling:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>link</span><span class='ot'> rel</span><span class='op'>=</span><span class='st'>"preconnect"</span><span class='ot'> href</span><span class='op'>=</span><span class='st'>"https://fonts.googleapis.com"</span><span class='dt'>&gt;</span>
 <span class='dt'>&lt;</span><span class='kw'>link</span><span class='ot'> rel</span><span class='op'>=</span><span class='st'>"preconnect"</span><span class='ot'> href</span><span class='op'>=</span><span class='st'>"https://fonts.gstatic.com"</span><span class='ot'> crossorigin</span><span class='dt'>&gt;</span>
@@ -1894,7 +1894,7 @@
 <span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      Using Google Fonts means each page load fetches CSS and woff2 from <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>fonts.gstatic.com</code>. If you want your generated static site to work fully offline, self-host instead (below).
+      Using Google Fonts means each page load fetches CSS and woff2 from <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>fonts.gstatic.com</code>. If you want your generated static site to work fully offline, self-host instead (below).
     </p>
   
     <h2 id='custom' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1918,15 +1918,15 @@
     <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
         <li class='pl-1'>
-          Create a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>_emanote-static/fonts/</code> directory in your notebook
+          Create a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/fonts/</code> directory in your notebook
         </li>
       
         <li class='pl-1'>
-          Add your font files (<code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.ttf</code>, <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.woff2</code>, etc.)
+          Add your font files (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.ttf</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.woff2</code>, etc.)
         </li>
       
         <li class='pl-1'>
-          Create <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>templates/styles.tpl</code> with <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>@font-face</code> declarations:
+          Create <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@font-face</code> declarations:
         </li>
       
     </ol>

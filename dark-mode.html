@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=986366de-5ac8-49f4-9b50-5eb20e0afa48' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
@@ -1810,7 +1810,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>localStorage</code> and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>prefers-color-scheme</code> preference.
+      Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> preference.
     </p>
   
     <h2 id='how-it-works' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1834,15 +1834,15 @@
         </li>
       
         <li>
-          Clicking the toggle flips a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.dark</code> class on <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>&lt;html&gt;</code> and stores the choice in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>localStorage</code> under the key <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote-theme</code>.
+          Clicking the toggle flips a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;html&gt;</code> and stores the choice in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> under the key <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote-theme</code>.
         </li>
       
         <li>
-          An inline <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>&lt;script&gt;</code> in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>base.tpl</code> runs in the document head before any stylesheets, reads <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>localStorage</code> (falling back to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>prefers-color-scheme</code>), and adds the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.dark</code> class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
+          An inline <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;script&gt;</code> in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>base.tpl</code> runs in the document head before any stylesheets, reads <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> (falling back to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code>), and adds the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
         </li>
       
         <li>
-          All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.dark</code> class rather than the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>prefers-color-scheme</code> media query, so everything tracks the manual toggle.
+          All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> media query, so everything tracks the manual toggle.
         </li>
       
     </ul>
@@ -1876,7 +1876,7 @@
     </h3>
   
     <p class='mb-4 leading-relaxed'>
-      When customizing templates, use Tailwind’s <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>dark:</code> variant:
+      When customizing templates, use Tailwind’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>dark:</code> variant:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>div</span><span class='ot'> class</span><span class='op'>=</span><span class='st'>"bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"</span><span class='dt'>&gt;</span>
   Content that adapts to dark mode
@@ -1897,7 +1897,7 @@
     </h3>
   
     <p class='mb-4 leading-relaxed'>
-      For custom CSS, target the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.dark</code> class that gets added to the HTML root:
+      For custom CSS, target the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class that gets added to the HTML root:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='css'><span class='fu'>.my-element</span> {
   <span class='kw'>background-color</span><span class='ch'>:</span> <span class='cn'>#ffffff</span><span class='op'>;</span>
@@ -1910,7 +1910,7 @@
 }
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      Avoid <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>@media (prefers-color-scheme: dark)</code> in new code — it won’t respond to the manual toggle. If you’re porting CSS from elsewhere that uses the media query, convert it to a <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>.dark</code> class selector.
+      Avoid <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@media (prefers-color-scheme: dark)</code> in new code — it won’t respond to the manual toggle. If you’re porting CSS from elsewhere that uses the media query, convert it to a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class selector.
     </p>
   
     <h3 id='mermaid-diagrams' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>

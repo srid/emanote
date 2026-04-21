@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=986366de-5ac8-49f4-9b50-5eb20e0afa48' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
@@ -1208,7 +1208,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Add the following to your <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>flake.nix</code> assuming your Markdown content lives under the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>./content</code> subdirectory:
+      Add the following to your <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>flake.nix</code> assuming your Markdown content lives under the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>./content</code> subdirectory:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='nix'><span class='op'>{</span>
   <span class='va'>inputs</span> <span class='op'>=</span> <span class='op'>{</span>
@@ -1240,7 +1240,7 @@
     <p class='mb-4 leading-relaxed'>
       This creates:
     </p>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Flake Output</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Description</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Command</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>packages.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Static website build</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>nix build .#my-site</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>apps.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Emanote live server</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>nix run .#my-site</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>checks.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>HTML validation with htmlproofer</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>nix flake check</code></td></tr></tbody></table>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Flake Output</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Description</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Command</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>packages.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Static website build</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>nix build .#my-site</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>apps.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Emanote live server</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>nix run .#my-site</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>checks.my-site</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>HTML validation with htmlproofer</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>nix flake check</code></td></tr></tbody></table>
     <h3 id='workflow' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
       
   Workflow
@@ -1285,7 +1285,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Each site in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote.sites.&lt;name&gt;</code> supports these options:
+      Each site in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote.sites.&lt;name&gt;</code> supports these options:
     </p>
   
     <h3 id='basic-options' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
@@ -1305,15 +1305,15 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>layers</code></strong> (required): List of content layers to include in the site
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>layers</code></strong> (required): List of content layers to include in the site
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>path</code>: Nix path to the layer directory
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>path</code>: Nix path to the layer directory
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>pathString</code>: String representation for the CLI
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pathString</code>: String representation for the CLI
         </li>
       
     </ul>
@@ -1321,27 +1321,27 @@
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>package</code></strong>: Emanote package to use (default: <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>inputs'.emanote.packages.default</code>)
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>package</code></strong>: Emanote package to use (default: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>inputs'.emanote.packages.default</code>)
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>port</code></strong>: Development server port (default: random port)
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>port</code></strong>: Development server port (default: random port)
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>basePath</code></strong>: Top-level directory path for deployment (default: root)
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>basePath</code></strong>: Top-level directory path for deployment (default: root)
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>allowBrokenInternalLinks</code></strong>: Allow broken internal links (default: <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>false</code>)
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>allowBrokenInternalLinks</code></strong>: Allow broken internal links (default: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>false</code>)
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>check</code></strong>: Enable htmlproofer checks (default: <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>true</code>)
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>check</code></strong>: Enable htmlproofer checks (default: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>true</code>)
         </li>
       
         <li>
-          <strong><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>extraConfig</code></strong>: Additional YAML configuration merged into <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.yaml</code>
+          <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>extraConfig</code></strong>: Additional YAML configuration merged into <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code>
         </li>
       
     </ul>
@@ -1429,7 +1429,7 @@
     <p class='mb-4 leading-relaxed'>
       This creates outputs for each site:
     </p>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Flake Output</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Description</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>packages.{blog,docs,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Static website builds</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>apps.{blog,docs,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Live development servers</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>checks.{blog,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>HTML validation with htmlproofer (docs excluded due to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>check = false</code>)</td></tr></tbody></table>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Flake Output</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Description</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>packages.{blog,docs,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Static website builds</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>apps.{blog,docs,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Live development servers</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>checks.{blog,wiki}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>HTML validation with htmlproofer (docs excluded due to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>check = false</code>)</td></tr></tbody></table>
     <h2 id='template-example' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
       
   Template Example

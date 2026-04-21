@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=986366de-5ac8-49f4-9b50-5eb20e0afa48' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
@@ -1776,11 +1776,11 @@
         </li>
       
         <li class='pl-1'>
-          Run <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote run --port=8080</code> (or just <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>emanote</code>) in terminal after <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>cd</code>’ing to that notebook folder; this will launch the live server.
+          Run <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run --port=8080</code> (or just <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote</code>) in terminal after <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>cd</code>’ing to that notebook folder; this will launch the live server.
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          Or, if you only want to generate the HTML files (for deployment), run <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>mkdir /tmp/output; emanote gen /tmp/output</code>.
+          Or, if you only want to generate the HTML files (for deployment), run <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>mkdir /tmp/output; emanote gen /tmp/output</code>.
         </li>
       
     </ul>
@@ -1834,7 +1834,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>[[..]]</code> style wikilinks can link to not only Markdown files, but also to any <em>other</em> files.
+      <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>[[..]]</code> style wikilinks can link to not only Markdown files, but also to any <em>other</em> files.
     </p>
   
     <p class='mb-4 leading-relaxed'>
@@ -1912,7 +1912,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
+      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
     </p>
   
   </div>
@@ -1950,7 +1950,7 @@
       <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
         
           <li id='fn1' class='pl-2'>
-            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{class=".."}</code> syntax, rather than the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>lg:grid-cols-2</code>).
+            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{class=".."}</code> syntax, rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lg:grid-cols-2</code>).
           </li>
         
       </ol>

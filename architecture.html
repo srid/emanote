@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=986366de-5ac8-49f4-9b50-5eb20e0afa48' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
 
   <link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
@@ -870,11 +870,11 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Source</code>: manages source files and communicates them to <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Model</code>.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Source</code>: manages source files and communicates them to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Model</code>.
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          The key concept here is the notion of “union mount”, implemented by <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
+          The key concept here is the notion of “union mount”, implemented by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Source.Mount</code>, which will eventually be made its own Haskell library.
         </li>
       
     </ul>
@@ -882,11 +882,11 @@
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Model</code>: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          The individual modules in this package should be <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>import</code>ed separately to use the specific model types.
+          The individual modules in this package should be <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>import</code>ed separately to use the specific model types.
         </li>
       
     </ul>
@@ -894,15 +894,15 @@
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Route</code>: Route types
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Route</code>: Route types
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Route.ModelRoute</code>: Haskell route types to point to somewhere in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Model</code> (eg: route to a .md file, or a route to a .jpeg file)
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Route.SiteRoute</code>: Haskell route types pointing to somewhere in the generated site.
         </li>
       
     </ul>
@@ -910,19 +910,19 @@
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.View</code>: Rendering code (HTML, templates, site routes)
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Pandoc</code>: Everything to do with light-weight markup processing
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Pandoc.Markdown</code>: Markdown-specific parsers and syntax.
         </li>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Pandoc.Renderer</code>: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
         </li>
       
     </ul>
@@ -938,11 +938,11 @@
     <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
         <li class='pl-1'>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Model</code> in sync with what’s on disk
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.Source.emanate</code> which is responsible for keeping the in-memory <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Model</code> in sync with what’s on disk
         </li>
       
         <li class='pl-1'>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Emanote.View.render</code> which, whilst querying the <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>Model</code>, is responsible for producing the final HTML for every <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>SiteRoute</code> in the target website.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Emanote.View.render</code> which, whilst querying the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Model</code>, is responsible for producing the final HTML for every <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>SiteRoute</code> in the target website.
         </li>
       
     </ol>
@@ -954,7 +954,7 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>./default</code>: The primary and first “<a href='layer' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-1 px-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded border border-gray-200 dark:border-gray-700 text-[0.9em]'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
+          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>./default</code>: The primary and first “<a href='layer' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>layer</a>” used, which provides the default HTML templates (we use Heist), <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.md</code> and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
         </li>
       
     </ul>
