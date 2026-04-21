@@ -75,21 +75,16 @@ runEmbedTemplate name splices = do
 embedResourceRoute :: Model -> HP.RenderCtx -> MN.Note -> Maybe (HI.Splice Identity)
 embedResourceRoute model ctx note = do
   let url = SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute)
-      embedCtx = ctx {HP.idPrefix = computeEmbedIdPrefix url}
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx id (MN._noteTitle note)
     "ema:note:url" ## HI.textSplice url
     "ema:note:pandoc" ##
-      pandocSplice embedCtx (note ^. MN.noteDoc)
+      pandocSplice (ctx {HP.idPrefix = computeEmbedIdPrefix url}) (note ^. MN.noteDoc)
     "ema:note:toc" ##
       renderToc ctx (newToc $ note ^. MN.noteDoc)
 
-{- | Namespace footnote IDs per embedded note so that a parent note and
-its embeds never emit duplicate `fn1` / `fnref1` IDs on the same
-rendered page (#360). The scheme is URL-derived purely so that prefix
-changes here don't force a rebuild of heist-extra — swap the policy
-(hash, counter, UUID) without touching the library's
-`RenderCtx.idPrefix` mechanism.
+{- | Prefix footnote IDs by embedded note so a parent and its embeds don't
+collide on `fn1`/`fnref1` when rendered into the same page (#360).
 -}
 computeEmbedIdPrefix :: Text -> Text
 computeEmbedIdPrefix url = "embed-" <> T.map sanitize url <> "-"
