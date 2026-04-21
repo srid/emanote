@@ -46,11 +46,27 @@ tailwindThemeBlock =
 
 {- | Config block for the Tailwind v4 browser CDN shim (dev mode).
 
-The browser build explicitly rejects @\@plugin@ and @\@config@, so this is
-@\@theme@-only. The CDN script itself provides the @\@import \"tailwindcss\"@.
+Unlike the CLI path, the browser CDN only scans element @class@ attributes
+for candidates — it does not look at inline @\<style\>@ content. So the
+prod-mode pattern (hardcoded @var(--color-blue-\*)@ in @\@theme@ + per-page
+@:root@ remap) leaves the chosen palette's CSS variables undefined in dev,
+breaking live theme overrides.
+
+Instead, bake the page's actual palette directly into @\@theme@ so Tailwind
+sees the @var(--color-\<palette\>-\*)@ references in its own config input
+and tree-shakes the right palette into the compiled CSS.
+
+The browser build also explicitly rejects @\@plugin@ and @\@config@, so this
+is @\@theme@-only. The CDN script itself provides the @\@import \"tailwindcss\"@.
 -}
-tailwindBrowserConfig :: Text
-tailwindBrowserConfig = tailwindThemeBlock
+tailwindBrowserConfig :: Text -> Text
+tailwindBrowserConfig paletteName =
+  let aliases = primaryColorAliases paletteName
+   in [text|
+        @theme {
+        $aliases
+        }
+      |]
 
 {- | Full input CSS fed to the Tailwind v4 CLI (prod compile).
 

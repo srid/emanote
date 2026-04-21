@@ -131,7 +131,7 @@ commonSplices withCtx model meta routeTitle = do
           if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
             then do
               cachedTailwindCdn
-              H.style ! A.type_ "text/tailwindcss" $ H.toHtml tailwindBrowserConfig
+              H.style ! A.type_ "text/tailwindcss" $ H.toHtml (tailwindBrowserConfig themeName)
             else do
               -- TODO: Use ?md5 to prevent stale browser caching of CSS.
               -- TODO: This should go through Ema route encoder!
