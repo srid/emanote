@@ -17,11 +17,13 @@
 let
   resolveLayer = l:
     let
+      mountPoint = l.mountPoint or null;
       pathString = l.pathString or (builtins.toString l.path);
+      suffix = lib.optionalString (mountPoint != null) "@${mountPoint}";
     in
     {
-      layer = if l.mountPoint or null == null then "${l.path}" else "${l.path}@${l.mountPoint}";
-      layerString = if l.mountPoint or null == null then pathString else "${pathString}@${l.mountPoint}";
+      layer = "${l.path}${suffix}";
+      layerString = "${pathString}${suffix}";
     };
   resolved = map resolveLayer layers;
 
