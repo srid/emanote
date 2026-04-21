@@ -1,2 +1,3 @@
 *.tpl linguist-language=HTML
 flake.lock linguist-generated=true
+.claude/** linguist-generated=true

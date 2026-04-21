@@ -1,10 +1,10 @@
 lockfile_version: '1'
-generated_at: '2026-04-07T00:00:00.681514+00:00'
-apm_version: 0.8.10
+generated_at: '2026-04-21T01:34:29.263812+00:00'
+apm_version: 0.8.12
 dependencies:
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: fdcd6901c9c1c476a9dee9d3afc95b533286942b
+  resolved_commit: 84fbf4c80dea64fe895cd4a9447263a5d0e04f67
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -15,4 +15,9 @@ dependencies:
   - .claude/skills/code-police
   - .claude/skills/github-pr
   - .claude/skills/hickey
+  deployed_file_hashes:
+    .claude/commands/do.md: sha256:32b5d62dfa8c046fefea96c559e414b26676df4ec04ce6ef8fc0c04b91c54a6d
+    .claude/commands/talk.md: sha256:1ebb0c4af665b117c924f98ed05cf0be33551443de127fd50bc118138a315f2d
+    .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:10efff34db308970bd3cddb2a0074513f25ab3ab707a6d4d30ae614b912cb5ec
+    .claude/rules/apm-sources.md: sha256:a2cabaedbca711de3804320a6d992b357c70381667a86829b69ccaf76dc2da54
   content_hash: sha256:ea3ea7a0c80263561a765dff41e46f5bab4a2f80be42f6e37ebce104082adc77
