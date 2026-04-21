@@ -16,11 +16,14 @@
       sources = import ./npins;
       systems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" "aarch64-linux" ];
 
-      # Compute every per-system output once. `default.nix` instantiates
-      # the haskell-flake project and is too expensive to re-import per
-      # output attribute.
+      # `haskell-flake.evalHaskellProject` is the expensive step — evaluate
+      # it once per system and thread the result through both default.nix
+      # (packages/apps/checks) and shell.nix (devShell).
       perSystem = pkgs:
-        let outs = import ./default.nix { inherit pkgs; }; in
+        let
+          project = import ./nix/haskell-project.nix { inherit pkgs; };
+          outs = import ./default.nix { inherit pkgs project; };
+        in
         {
           packages = {
             default = outs.default;
@@ -35,7 +38,7 @@
             };
             docs = outs.docs-app;
           };
-          devShells.default = import ./shell.nix { inherit pkgs; };
+          devShells.default = import ./shell.nix { inherit pkgs project; };
           checks = {
             closure-size = outs.closure-size;
           } // pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
