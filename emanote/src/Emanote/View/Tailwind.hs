@@ -1,18 +1,9 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-{- | Tailwind v4 integration surface.
-
-Owns everything version-specific about how Emanote talks to Tailwind:
-
-  * 'tailwindInputCss' — the base input CSS (@import, @plugin, @theme).
-  * 'themeRemapStyle' — the @\<style\>@ that per-site remaps @--color-primary-*@
-    to the configured @template.theme@ palette.
-  * 'compileTailwindCss' — shells out to the Tailwind v4 CLI for prod builds.
-  * 'generatedCssFile' — filename the CLI writes to.
-
-If Tailwind v5 lands with different CLI flags or directive syntax, this is
-the one module that needs to change.
+{- | Tailwind v4 integration surface. Owns everything version-specific
+about how Emanote talks to Tailwind — if Tailwind v5 lands with different
+CLI flags or directive syntax, this is the one module that needs to change.
 -}
 module Emanote.View.Tailwind (
   tailwindInputCss,
@@ -73,7 +64,6 @@ primaryColorAliases paletteName =
     | lvl <- colorScaleLevels
     ]
 
--- | The eleven Tailwind default color scale levels.
 colorScaleLevels :: [Text]
 colorScaleLevels =
   ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"]

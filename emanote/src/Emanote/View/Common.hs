@@ -127,19 +127,15 @@ commonSplices withCtx model meta routeTitle = do
       pure
         . RX.renderHtmlNodes
         $ do
-          -- Per-site theme remap: aliases the 'primary' color token to the
-          -- configured 'template.theme' palette at runtime. Keeps the compiled
-          -- Tailwind CSS agnostic of which palette a site picked.
           themeRemapStyle themeName
           if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
             then do
-              -- Dev / uncompiled path: use the Tailwind v4 browser CDN shim.
               cachedTailwindCdn
               H.style ! A.type_ "text/tailwindcss" $ H.toHtml tailwindInputCss
             else do
+              -- TODO: Use ?md5 to prevent stale browser caching of CSS.
+              -- TODO: This should go through Ema route encoder!
               H.link
-                -- TODO: Use ?md5 to prevent stale browser caching of CSS.
-                -- TODO: This should go through Ema route encoder!
                 ! A.href (H.toValue $ cannotBeCached generatedCssFile)
                 ! A.rel "stylesheet"
                 ! A.type_ "text/css"
