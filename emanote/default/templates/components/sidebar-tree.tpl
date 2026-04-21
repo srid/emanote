@@ -1,11 +1,11 @@
 <!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-${theme}-50 dark:hover:bg-${theme}-950 hover:text-${theme}-700 dark:hover:text-${theme}-300 transition-colors</bind>
+<bind tag="link-class">hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
 <node:active>
-  <bind tag="link-class">font-semibold bg-${theme}-50 dark:bg-${theme}-950 text-${theme}-700 dark:text-${theme}-300 hover:bg-${theme}-100 dark:hover:bg-${theme}-900 transition-colors</bind>
+  <bind tag="link-class">font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">font-semibold hover:bg-${theme}-50 dark:hover:bg-${theme}-950 hover:text-${theme}-700 dark:hover:text-${theme}-300 transition-colors</bind>
+      <bind tag="link-class">font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>

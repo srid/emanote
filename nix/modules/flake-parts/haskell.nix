@@ -20,7 +20,8 @@
 
       devShell.tools = hp: {
         inherit (pkgs)
-          stork;
+          stork
+          tailwindcss_4;
       };
       autoWire = [ "packages" "apps" "checks" ];
       packages = {
@@ -48,12 +49,10 @@
         pandoc-link-context.jailbreak = true;
         tagtree.broken = false;
         tagtree.jailbreak = true;
-        tailwind.broken = false;
-        tailwind.jailbreak = true;
         unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
         emanote = { name, pkgs, self, super, ... }: {
           check = false;
-          extraBuildDepends = [ pkgs.stork ];
+          extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
           custom = pkg: pkg.overrideAttrs (lib.addMetaAttrs {
             # https://github.com/NixOS/cabal2nix/issues/608
             longDescription = ''

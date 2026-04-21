@@ -1,5 +1,5 @@
 <div class="flex items-center justify-center mt-2">
-  <a class="text-gray-300 hover:text-${theme}-600 text-sm" title="Edit this page on GitHub"
+  <a class="text-gray-300 hover:text-primary-600 text-sm" title="Edit this page on GitHub"
     href="https://github.com/srid/emanote/edit/master/docs/${ema:note:source-path}">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
       stroke="currentColor">

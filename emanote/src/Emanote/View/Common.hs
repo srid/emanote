@@ -4,7 +4,6 @@ module Emanote.View.Common (
   commonSplices,
   renderModelTemplate,
   routeBreadcrumbs,
-  generatedCssFile,
 
   -- * Render context
   TemplateRenderCtx (..),
@@ -29,6 +28,7 @@ import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
+import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
@@ -104,9 +104,6 @@ defaultRouteMeta model =
       meta = Meta.getEffectiveRouteMeta r model
    in (r, meta)
 
-generatedCssFile :: FilePath
-generatedCssFile = "tailwind.css"
-
 commonSplices ::
   (HasCallStack) =>
   ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
@@ -126,20 +123,22 @@ commonSplices withCtx model meta routeTitle = do
   -- Add tailwind css shim
   "tailwindCssShim" ##
     do
+      let themeName = SData.lookupAeson @Text "blue" ("template" :| ["theme"]) meta
       pure
         . RX.renderHtmlNodes
-        $ if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
-          then do
-            -- Twind shim doesn't reliably work in dev server mode. Let's just use the
-            -- tailwind CDN.
-            cachedTailwindCdn
-          else do
-            H.link
+        $ do
+          themeRemapStyle themeName
+          if M.inLiveServer model || not (model ^. M.modelCompileTailwind)
+            then do
+              cachedTailwindCdn
+              H.style ! A.type_ "text/tailwindcss" $ H.toHtml (tailwindBrowserConfig themeName)
+            else do
               -- TODO: Use ?md5 to prevent stale browser caching of CSS.
               -- TODO: This should go through Ema route encoder!
-              ! A.href (H.toValue $ cannotBeCached generatedCssFile)
-              ! A.rel "stylesheet"
-              ! A.type_ "text/css"
+              H.link
+                ! A.href (H.toValue $ cannotBeCached generatedCssFile)
+                ! A.rel "stylesheet"
+                ! A.type_ "text/css"
   "ema:version" ##
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
@@ -192,8 +191,17 @@ commonSplices withCtx model meta routeTitle = do
             SR.siteRouteUrl model
               $ SR.staticFileSiteRoute
               $ LiveServerFiles.tailwindJsFile model
+      -- The Tailwind v4 browser CDN injects a compiled <style> into <head>
+      -- which Ema's idiomorph patching would otherwise strip on each route
+      -- switch (causing FOUC). Tag any attribute-less, id-less <style> in
+      -- <head> with im-preserve before morph so idiomorph keeps it.
+      let preserveScript :: Text =
+            "window.addEventListener('EMABeforeMorphDOM', () => {"
+              <> "document.head.querySelectorAll('style:not([data-category]):not([type]):not([id])')"
+              <> ".forEach(s => s.setAttribute('im-preserve', 'true'));"
+              <> "});"
+      H.script $ H.toHtml preserveScript
       H.script
-        ! H.customAttribute "data-ema-skip" "true"
         ! A.src (H.toValue localCdnUrl)
         $ mempty
 

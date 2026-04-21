@@ -1,5 +1,6 @@
 template:
   urlStrategy: pretty
+  theme: blue
 
 page:
   siteUrl: https://emanote.srid.ca

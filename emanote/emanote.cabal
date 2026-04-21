@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               emanote
-version:            1.5.4.1
+version:            1.6.0.0
 license:            AGPL-3.0-only
 copyright:          2022 Sridhar Ratnakumar
 maintainer:         srid@srid.ca
@@ -139,7 +139,6 @@ common library-common
     , stm
     , tagged
     , tagtree
-    , tailwind               >=0.3
     , text
     , time
     , tomland
@@ -209,6 +208,7 @@ library
     Emanote.View.Feed
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
+    Emanote.View.Tailwind
     Emanote.View.TaskIndex
     Emanote.View.Template
 

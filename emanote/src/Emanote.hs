@@ -6,7 +6,7 @@ module Emanote (
   defaultEmanoteConfig,
 ) where
 
-import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT, runStdoutLoggingT)
+import Control.Monad.Logger (LogLevel (LevelError), runStderrLoggingT)
 import Control.Monad.Logger.Extras (Logger (Logger), logToStderr, runLoggerLoggingT)
 import Control.Monad.Writer.Strict (MonadWriter (tell), WriterT (runWriterT))
 import Data.Default (def)
@@ -36,15 +36,13 @@ import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
-import Emanote.View.Common (generatedCssFile)
 import Emanote.View.Export qualified as Export
 import Emanote.View.Export.JSON qualified as ExportJSON
+import Emanote.View.Tailwind (compileTailwindCss, generatedCssFile)
 import Emanote.View.Template qualified as View
-import Optics.Core ((%), (.~), (^.))
+import Optics.Core ((.~), (^.))
 import Relude
 import System.FilePath ((</>))
-import UnliftIO (MonadUnliftIO)
-import Web.Tailwind qualified as Tailwind
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.ModelEma
@@ -135,20 +133,6 @@ checkBrokenLinks cli modelRels = runStderrLoggingT $ do
       logE $ "Found " <> show (getSum res) <> " broken internal links! Emanote generated the site, but the generated site has broken internal links."
       log "(Tip: use `--allow-broken-internal-links` to ignore this check.)"
       exitFailure
-
-compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
-compileTailwindCss cssPath genPaths = do
-  runStdoutLoggingT $ do
-    log $ "Running Tailwind CSS v3 compiler to generate: " <> toText cssPath
-    Tailwind.runTailwind
-      $ def
-      & Tailwind.tailwindConfig
-      % Tailwind.tailwindConfigContent
-      .~ genPaths
-      & Tailwind.tailwindOutput
-      .~ cssPath
-      & Tailwind.tailwindMode
-      .~ Tailwind.Production
 
 defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =
