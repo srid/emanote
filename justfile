@@ -35,3 +35,20 @@ test:
 # Launch chrome-devtools MCP server (invoked by .mcp.json for Claude Code)
 mcp-chrome-devtools *ARGS:
     nix-shell nix/chrome-devtools/shell.nix --run "chrome-devtools-mcp --headless=true --isolated=true {{ARGS}}"
+
+# Run e2e tests (cucumber + playwright) against both live and static backends.
+# Builds emanote once via Nix, then runs the suite twice with EMANOTE_MODE set.
+# Playwright deliberately lives outside the Nix devshell (node_modules + chromium)
+# because bundling browsers into Nix is fragile in CI — see tests/README.md.
+# Omits `--with-deps` so local runs don't shell out to sudo apt-get; CI
+# passes `--with-deps` in the workflow to install browser system libs on
+# the ubuntu-latest runner.
+test-e2e:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    BIN="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
+    cd tests
+    npm install
+    npx playwright install chromium
+    EMANOTE_BIN="$BIN" EMANOTE_MODE=live npm test
+    EMANOTE_BIN="$BIN" EMANOTE_MODE=static npm test

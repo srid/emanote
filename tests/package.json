@@ -1,0 +1,16 @@
+{
+  "name": "emanote-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --import tsx ./node_modules/@cucumber/cucumber/bin/cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.7.0",
+    "@types/node": "^22.0.0",
+    "get-port": "^7.1.0",
+    "playwright": "1.57.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}
