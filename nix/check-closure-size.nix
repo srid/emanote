@@ -4,7 +4,9 @@
 # Until those work again, the budget tracks the observed baseline.
 { pkgs, emanote }:
 let
-  maxBytes = 7500 * 1000 * 1000; # 7.5 GB; ~10% above 6.77 GB baseline
+  # 8.5 GB accommodates both systems: x86_64-linux baseline is 6.77 GB,
+  # aarch64-darwin is 7.53 GB (darwin closure is ~11% larger).
+  maxBytes = 8500 * 1000 * 1000;
   closure = pkgs.closureInfo { rootPaths = [ emanote ]; };
 in
 pkgs.runCommand "emanote-closure-size-check"
