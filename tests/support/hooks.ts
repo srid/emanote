@@ -21,6 +21,9 @@ import {
 import { chromium } from "playwright";
 import type { Browser } from "playwright";
 import getPort from "get-port";
+// @ts-expect-error — serve-handler ships no TS types; its runtime shape
+// is a single function and we call it with an untyped options object.
+import serveHandler from "serve-handler";
 import * as fs from "node:fs";
 import * as http from "node:http";
 import * as os from "node:os";
@@ -135,52 +138,14 @@ async function startStatic(): Promise<{
     );
   });
   const port = await getPort();
-  const server = http.createServer((req, res) => {
-    const urlPath = decodeURIComponent((req.url ?? "/").split("?")[0]);
-    const candidate = urlPath.endsWith("/") ? urlPath + "index.html" : urlPath;
-    const filePath = path.join(outDir, candidate);
-    if (!filePath.startsWith(outDir)) {
-      res.statusCode = 403;
-      res.end("forbidden");
-      return;
-    }
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.statusCode = 404;
-        res.end("not found");
-        return;
-      }
-      res.setHeader("Content-Type", contentTypeFor(filePath));
-      res.end(data);
-    });
-  });
+  const server = http.createServer((req, res) =>
+    serveHandler(req, res, { public: outDir, cleanUrls: false }),
+  );
   await new Promise<void>((resolve) => server.listen(port, resolve));
   return {
     url: `http://127.0.0.1:${port}`,
     resource: { kind: "static", server },
   };
-}
-
-function contentTypeFor(p: string): string {
-  const ext = path.extname(p).toLowerCase();
-  switch (ext) {
-    case ".html":
-      return "text/html; charset=utf-8";
-    case ".css":
-      return "text/css; charset=utf-8";
-    case ".js":
-      return "text/javascript; charset=utf-8";
-    case ".json":
-      return "application/json; charset=utf-8";
-    case ".svg":
-      return "image/svg+xml";
-    case ".png":
-      return "image/png";
-    case ".woff2":
-      return "font/woff2";
-    default:
-      return "application/octet-stream";
-  }
 }
 
 BeforeAll(async () => {
