@@ -31,7 +31,7 @@ import Emanote.View.LiveServerFiles qualified as LiveServerFiles
 import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
-import Heist.Extra.Splices.Pandoc.Ctx (RenderCtx)
+import Heist.Extra.Splices.Pandoc.Ctx (CodeBackend (..), MathBackend (..), RenderCtx, RenderFeatures (..))
 import Heist.Extra.TemplateState qualified as Tmpl
 import Heist.Interpreted qualified as HI
 import Heist.Splices.Apply qualified as HA
@@ -90,13 +90,22 @@ mkTemplateRenderCtx model r meta =
           classRules
           model
           r
-          enableSyntaxHighlighting
+          renderFeatures
     classRules :: Map Text Text
     classRules =
       SData.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta
-    enableSyntaxHighlighting :: Bool
-    enableSyntaxHighlighting =
-      SData.lookupAeson True ("emanote" :| ["syntaxHighlighting"]) meta
+    renderFeatures :: RenderFeatures
+    renderFeatures =
+      RenderFeatures
+        { codeHighlighting =
+            if SData.lookupAeson True ("emanote" :| ["syntaxHighlighting"]) meta
+              then Skylighting
+              else NoHighlighting
+        , mathRendering =
+            if SData.lookupAeson True ("emanote" :| ["staticMath"]) meta
+              then StaticMathML
+              else NoStaticMath
+        }
 
 defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
 defaultRouteMeta model =

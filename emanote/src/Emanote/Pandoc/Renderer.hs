@@ -50,8 +50,8 @@ mkRenderCtxWithPandocRenderers ::
   Map Text Text ->
   model ->
   route ->
-  -- | Enable syntax highlighting for code blocks
-  Bool ->
+  -- | Rendering feature selection (code highlighting, static math, …)
+  Splices.RenderFeatures ->
   HeistT Identity m Splices.RenderCtx
 mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
   Splices.mkRenderCtx

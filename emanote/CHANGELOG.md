@@ -6,6 +6,7 @@
 
 - **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
 - Built-in static syntax highlighting using skylighting, replacing client-side JS highlighters ([#624](https://github.com/srid/emanote/pull/624))
+- Built-in static math rendering (LaTeX → MathML at build time via `texmath`), closes [#626](https://github.com/srid/emanote/issues/626). KaTeX snippet removed from default config; MathJax snippet retained.
 - UI revamp (#622, [#636](https://github.com/srid/emanote/pull/636))
   - New self-hosted typography: Lora + Space Grotesk + Space Mono.
   - Manual dark/light theme toggle (#605, #617) with `localStorage` persistence.
