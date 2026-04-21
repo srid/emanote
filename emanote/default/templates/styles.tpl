@@ -98,7 +98,6 @@
     background-color: var(--color-primary-900);
   }
 
-  /* Back-reference arrow at end of footnote item. */
   a.footnote-backref {
     margin-left: 0.35em;
     color: var(--color-gray-400);
