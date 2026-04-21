@@ -34,21 +34,20 @@ import { EmanoteWorld } from "./world.ts";
 
 type Mode = "live" | "static";
 
-const mode: Mode = (() => {
-  const m = process.env.EMANOTE_MODE;
-  if (m !== "live" && m !== "static") {
-    throw new Error(
-      `EMANOTE_MODE must be "live" or "static" (got ${JSON.stringify(m)})`,
-    );
-  }
-  return m;
-})();
+function requireEnv(name: string): string {
+  const v = process.env[name];
+  if (!v) throw new Error(`${name} must be set`);
+  return v;
+}
 
-const emanoteBin = (() => {
-  const bin = process.env.EMANOTE_BIN;
-  if (!bin) throw new Error("EMANOTE_BIN must point to the emanote binary");
-  return bin;
-})();
+const rawMode = requireEnv("EMANOTE_MODE");
+if (rawMode !== "live" && rawMode !== "static") {
+  throw new Error(
+    `EMANOTE_MODE must be "live" or "static" (got ${JSON.stringify(rawMode)})`,
+  );
+}
+const mode: Mode = rawMode;
+const emanoteBin = requireEnv("EMANOTE_BIN");
 
 const fixtureDir = path.resolve(
   import.meta.dirname,
