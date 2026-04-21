@@ -127,24 +127,20 @@
     background-color: transparent !important;
   }
 
-  /* Active TOC item styling */
+  /* Active TOC item — uses theme primary palette so per-site theme overrides
+     flow through without hardcoding a colour here. */
   a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-primary-500);
     padding-left: calc(0.5rem - 3px) !important;
+    background-color: var(--color-primary-50) !important;
+    color: var(--color-primary-700) !important;
   }
 
-  /* Light mode active state */
-  a.--ema-toc.toc-item-active {
-    background-color: #eff6ff !important;
-    color: #1d4ed8 !important;
-  }
-
-  /* Dark mode active state */
   .dark a.--ema-toc.toc-item-active {
-    background-color: #172554 !important;
-    color: #93c5fd !important;
-    border-left-color: #3b82f6;
+    background-color: var(--color-primary-950) !important;
+    color: var(--color-primary-300) !important;
+    border-left-color: var(--color-primary-400);
   }
 </style>
 
