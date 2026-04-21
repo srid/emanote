@@ -19,6 +19,7 @@
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
+    # TODO: replace with tagged release once srid/heist-extra#11 merges.
     heist-extra.url = "github:srid/heist-extra/static-math";
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
