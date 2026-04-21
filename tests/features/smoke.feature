@@ -11,3 +11,7 @@ Feature: Smoke
     Given I note the resolved primary palette at "/"
     When I open "/themed.html"
     Then the resolved primary palette differs from the noted value
+
+  Scenario: Static math renders to a MathML element
+    When I open "/math.html"
+    Then the page contains a MathML element

@@ -28,6 +28,19 @@ Then(
 );
 
 Then(
+  "the page contains a MathML element",
+  async function (this: EmanoteWorld) {
+    // texmath writes `<math xmlns="…">` for every expression; a single
+    // locator hit is enough to prove the build-time pipeline fired.
+    const count = await this.page.locator("math").count();
+    assert.ok(
+      count > 0,
+      "Expected at least one <math> element; found 0 — emanote.staticMath default may have regressed.",
+    );
+  },
+);
+
+Then(
   "the resolved primary palette differs from the noted value",
   async function (this: EmanoteWorld) {
     assert.ok(
