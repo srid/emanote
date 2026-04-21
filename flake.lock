@@ -145,8 +145,8 @@
       },
       "original": {
         "owner": "srid",
-        "ref": "footnote-id-prefix",
         "repo": "heist-extra",
+        "rev": "387ecc1c8138c9af09d27503aed7fed76f88fd8b",
         "type": "github"
       }
     },

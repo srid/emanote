@@ -19,7 +19,11 @@
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
-    heist-extra.url = "github:srid/heist-extra/footnote-id-prefix";
+    # Pinned to the exact commit on `footnote-id-prefix` rather than
+    # the branch ref so that a future `nix flake update` cannot silently
+    # pick up a force-push or rebase. Flip back to `master` / a released
+    # tag once https://github.com/srid/heist-extra/pull/XX merges.
+    heist-extra.url = "github:srid/heist-extra/387ecc1c8138c9af09d27503aed7fed76f88fd8b";
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;
