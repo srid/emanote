@@ -16,7 +16,7 @@
   - Related follow-up work tracked in [#632](https://github.com/srid/emanote/issues/632).
 - UI revamp (#622, [#636](https://github.com/srid/emanote/pull/636))
   - Typography: Lora (prose) + Space Grotesk (UI chrome + headings) + Space Mono (code), all self-hosted under `_emanote-static/fonts/` so generated static sites no longer fetch from `fonts.gstatic.com`. Refreshable via `just fonts-update`.
-  - Manual dark/light theme toggle with `localStorage` persistence and pre-paint class application (no FOUC); toggle button in the sidebar and in the no-sidebar layout. See [[dark-mode|Dark Mode]] for details.
+  - Manual dark/light theme toggle with `localStorage` persistence and pre-paint class application (no FOUC); toggle button in the sidebar and in the no-sidebar layout.
   - Dark mode now drives everything via `.dark` class — syntax highlighting, stork search dialog, callouts, and Mermaid (#605, #617).
   - Backlinks re-done as a 2-column card grid with a thin primary left-accent and subtle shadow; "Links to this page" picks up the UI-chrome sans font.
   - "On this page" TOC: replaced `window.onscroll` spy with `IntersectionObserver` (#520), and added depth-based visual hierarchy (nested headings step down in font-size + colour).
