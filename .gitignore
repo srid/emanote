@@ -12,3 +12,4 @@ apm_modules/
 /.worktrees
 /.do-results.json
 /.claude/scheduled_tasks.lock
+/.claude/settings.local.json
