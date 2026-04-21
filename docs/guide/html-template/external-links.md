@@ -1,8 +1,5 @@
 ---
 slug: external-links
-page:
-  headHtml: |
-    <snippet var="js.mathjax" />
 ---
 
 # External links
