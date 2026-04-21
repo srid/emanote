@@ -191,8 +191,10 @@ commonSplices withCtx model meta routeTitle = do
             SR.siteRouteUrl model
               $ SR.staticFileSiteRoute
               $ LiveServerFiles.tailwindJsFile model
+      -- No data-ema-skip: the Tailwind v4 browser CDN injects a compiled
+      -- <style> into <head> which Ema's morph patching then removes. Letting
+      -- Ema re-run the script on each route switch re-injects the style.
       H.script
-        ! H.customAttribute "data-ema-skip" "true"
         ! A.src (H.toValue localCdnUrl)
         $ mempty
 
