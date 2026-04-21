@@ -133,12 +133,14 @@ Then(
 Then(
   "at least one footnote id is present",
   async function (this: EmanoteWorld) {
+    // `fnref` rather than `fn` so heading slugs like `function-call` can't
+    // masquerade as footnote refs and falsely satisfy this guard.
     const count = await this.page
-      .locator('[id^="fn"]')
+      .locator('[id^="fnref"]')
       .count();
     assert.ok(
       count > 0,
-      "Expected at least one footnote id on the page; the fixture's Markdown may have stopped producing footnotes.",
+      "Expected at least one footnote ref id on the page; the fixture's Markdown may have stopped producing footnotes.",
     );
   },
 );
