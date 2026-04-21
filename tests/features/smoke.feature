@@ -23,3 +23,8 @@ Feature: Smoke
   Scenario: KaTeX is not loaded by default
     When I open "/math.html"
     Then no KaTeX stylesheet is referenced
+
+  Scenario: Embedded notes do not produce duplicate footnote ids
+    When I open "/footnote-embed.html"
+    Then every element id on the page is unique
+    And at least one footnote id is present

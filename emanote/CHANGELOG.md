@@ -14,6 +14,14 @@
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
+**Bug fixes**
+
+- Footnotes no longer produce duplicate HTML `id` attributes when a note
+  containing a footnote embeds another note that also has a footnote.
+  Embed-rendered footnotes are now namespaced via `heist-extra`'s new
+  `RenderCtx.idPrefix`, so each embedded note gets a per-route prefix on
+  its `fn…` / `fnref…` IDs ([#360](https://github.com/srid/emanote/issues/360)).
+
 ## 1.4.0.0 (2025-08-18)
 
 **Notable features**

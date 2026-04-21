@@ -150,5 +150,5 @@ emanote:
   # Render `$...$` / `$$...$$` to MathML at build time via texmath (default: true).
   # Modern browsers render MathML natively (Firefox, Safari, Chrome >=109), so
   # no runtime JS is needed. Set to false to fall back to client-side JS
-  # (MathJax snippet, or a custom KaTeX snippet — see docs/tips/js/math).
+  # (MathJax snippet, or a custom KaTeX snippet — see docs/tips/math).
   staticMath: true

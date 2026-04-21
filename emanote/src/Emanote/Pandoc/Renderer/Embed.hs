@@ -1,7 +1,9 @@
 module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Data.Char qualified as Char
 import Data.Map.Syntax ((##))
+import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
@@ -72,13 +74,21 @@ runEmbedTemplate name splices = do
 
 embedResourceRoute :: Model -> HP.RenderCtx -> MN.Note -> Maybe (HI.Splice Identity)
 embedResourceRoute model ctx note = do
+  let url = SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute)
+      -- Namespace footnote IDs per embedded note so that a parent note
+      -- and its embeds never emit duplicate `fn1` / `fnref1` IDs on the
+      -- same rendered page (#360).
+      embedCtx = ctx {HP.idPrefix = "embed-" <> sanitizeForId url <> "-"}
   pure . runEmbedTemplate "note" $ do
     "ema:note:title" ## Tit.titleSplice ctx id (MN._noteTitle note)
-    "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
+    "ema:note:url" ## HI.textSplice url
     "ema:note:pandoc" ##
-      pandocSplice ctx (note ^. MN.noteDoc)
+      pandocSplice embedCtx (note ^. MN.noteDoc)
     "ema:note:toc" ##
       renderToc ctx (newToc $ note ^. MN.noteDoc)
+
+sanitizeForId :: Text -> Text
+sanitizeForId = T.map (\c -> if Char.isAlphaNum c then c else '-')
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do

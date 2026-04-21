@@ -106,3 +106,39 @@ Then(
     );
   },
 );
+
+// Guards issue #360 (duplicate footnote ids under note embedding). The
+// outer + inner both render through pandocSplice, which numbers footnotes
+// from 1 per document; before the fix, the embed inherited the outer's
+// id namespace and produced `id="fn1"` twice on the same page.
+Then(
+  "every element id on the page is unique",
+  async function (this: EmanoteWorld) {
+    const duplicates = await this.page.evaluate(() => {
+      const counts = new Map<string, number>();
+      for (const el of document.querySelectorAll("[id]")) {
+        const id = el.id;
+        counts.set(id, (counts.get(id) ?? 0) + 1);
+      }
+      return [...counts.entries()].filter(([, n]) => n > 1);
+    });
+    assert.strictEqual(
+      duplicates.length,
+      0,
+      `Duplicate element ids found (see #360): ${JSON.stringify(duplicates)}`,
+    );
+  },
+);
+
+Then(
+  "at least one footnote id is present",
+  async function (this: EmanoteWorld) {
+    const count = await this.page
+      .locator('[id^="fn"]')
+      .count();
+    assert.ok(
+      count > 0,
+      "Expected at least one footnote id on the page; the fixture's Markdown may have stopped producing footnotes.",
+    );
+  },
+);
