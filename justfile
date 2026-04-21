@@ -35,3 +35,7 @@ test:
 # Launch chrome-devtools MCP server (invoked by .mcp.json for Claude Code)
 mcp-chrome-devtools *ARGS:
     nix-shell nix/chrome-devtools/shell.nix --run "chrome-devtools-mcp --headless=true --isolated=true {{ARGS}}"
+
+# Refresh the self-hosted Google Fonts bundle under _emanote-static/fonts/
+fonts-update:
+    {{nix_shell}} emanote/default/_emanote-static/fonts/update.sh

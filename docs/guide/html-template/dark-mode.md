@@ -4,32 +4,23 @@ slug: dark-mode
 
 # Dark Mode
 
-Emanote includes built-in dark mode support using Tailwind CSS. The dark mode feature automatically detects and follows your system's color scheme preference.
+Emanote ships with a manual light/dark theme toggle. The user's choice is persisted in `localStorage` and applied before first paint, so there's no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS `prefers-color-scheme` preference.
 
-## Features
+## How it works
 
-- **Automatic Detection**: Respects your system's dark mode preference by default
-- **Tailwind Integration**: Uses Tailwind CSS's `prefers-color-scheme` media query strategy
-- **Comprehensive Coverage**: All page elements adapt to dark mode including content, navigation, and UI components
-
-## Controlling Dark Mode
-
-Dark mode automatically follows your system's color scheme preference. To manually toggle dark mode, we recommend using a browser extension like:
-
-- **Chrome**: [Dark Mode Toggle](https://chromewebstore.google.com/detail/chrome-dark-mode-toggle/idnbggfpadjhjicgjmhlpeilafaplnhd?hl=en)
-  - Note: You may need to enable the "Experimental Web Platform Features" flag at `chrome://flags` for the extension to work properly
-- **Firefox**: Similar extensions available in Firefox Add-ons
-
-These extensions override the system preference and allow you to toggle dark mode for any website.
+- The toggle button lives in the sidebar (next to the search icon), and also in the top-right corner of the no-sidebar "neuron-style" layout.
+- Clicking the toggle flips a `.dark` class on `<html>` and stores the choice in `localStorage` under the key `emanote-theme`.
+- An inline `<script>` in `base.tpl` runs in the document head before any stylesheets, reads `localStorage` (falling back to `prefers-color-scheme`), and adds the `.dark` class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
+- All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the `.dark` class rather than the `prefers-color-scheme` media query, so everything tracks the manual toggle.
 
 ## Customization
 
 ### Adding Dark Mode Classes
 
-When customizing templates, use Tailwind's `dark:` prefix to add dark mode variants:
+When customizing templates, use Tailwind's `dark:` variant:
 
 ```html
-<div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+<div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   Content that adapts to dark mode
 </div>
 ```
@@ -39,23 +30,19 @@ When customizing templates, use Tailwind's `dark:` prefix to add dark mode varia
 For custom CSS, target the `.dark` class that gets added to the HTML root:
 
 ```css
-/* Light mode styles */
 .my-element {
   background-color: #ffffff;
   color: #1f2937;
 }
 
-/* Dark mode styles */
 .dark .my-element {
   background-color: #1f2937;
   color: #f3f4f6;
 }
 ```
 
-## Technical Implementation
+Avoid `@media (prefers-color-scheme: dark)` in new code — it won't respond to the manual toggle. If you're porting CSS from elsewhere that uses the media query, convert it to a `.dark` class selector.
 
-The dark mode functionality is implemented through:
+### Mermaid diagrams
 
-1. **Media Query Detection**: Uses `@media (prefers-color-scheme: dark)` to detect system preference
-2. **Tailwind CSS**: Uses Tailwind's `dark:` prefix utilities that respond to the media query
-3. **Automatic Switching**: No JavaScript required - works purely with CSS media queries
+Mermaid reads the active colour scheme at initialization, so toggling the theme triggers a full-page reload when a Mermaid diagram is present — just enough to re-initialize the renderer with the new palette.
