@@ -26,21 +26,5 @@ in
       description = ''Mount point for the layer'';
       default = null;
     };
-    outputs.layer = mkOption {
-      type = types.str;
-      description = ''Layer spec'';
-      readOnly = true;
-    };
-    outputs.layerString = mkOption {
-      type = types.str;
-      description = ''Layer spec'';
-      readOnly = true;
-    };
-  };
-  config = {
-    outputs.layer =
-      if config.mountPoint == null then "${config.path}" else "${config.path}@${config.mountPoint}";
-    outputs.layerString =
-      if config.mountPoint == null then config.pathString else "${config.pathString}@${config.mountPoint}";
   };
 }
