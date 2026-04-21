@@ -139,7 +139,17 @@ async function startStatic(): Promise<{
   });
   const port = await getPort();
   const server = http.createServer((req, res) =>
-    serveHandler(req, res, { public: outDir, cleanUrls: false }),
+    serveHandler(req, res, {
+      public: outDir,
+      cleanUrls: false,
+      // serve-handler doesn't auto-serve index.html on `/` when cleanUrls
+      // is off — it falls through to a directory listing instead. Without
+      // this rewrite, `page.goto("/")` lands on a listing page with no
+      // stylesheets, so the primary-palette probe times out with a
+      // misleading #633-class error. Explicit rewrite keeps the fixture
+      // behavior consistent with real deployments.
+      rewrites: [{ source: "/", destination: "/index.html" }],
+    }),
   );
   await new Promise<void>((resolve) => server.listen(port, resolve));
   return {
