@@ -191,9 +191,16 @@ commonSplices withCtx model meta routeTitle = do
             SR.siteRouteUrl model
               $ SR.staticFileSiteRoute
               $ LiveServerFiles.tailwindJsFile model
-      -- No data-ema-skip: the Tailwind v4 browser CDN injects a compiled
-      -- <style> into <head> which Ema's morph patching then removes. Letting
-      -- Ema re-run the script on each route switch re-injects the style.
+      -- The Tailwind v4 browser CDN injects a compiled <style> into <head>
+      -- which Ema's idiomorph patching would otherwise strip on each route
+      -- switch (causing FOUC). Tag any attribute-less, id-less <style> in
+      -- <head> with im-preserve before morph so idiomorph keeps it.
+      let preserveScript :: Text =
+            "window.addEventListener('EMABeforeMorphDOM', () => {"
+              <> "document.head.querySelectorAll('style:not([data-category]):not([type]):not([id])')"
+              <> ".forEach(s => s.setAttribute('im-preserve', 'true'));"
+              <> "});"
+      H.script $ H.toHtml preserveScript
       H.script
         ! A.src (H.toValue localCdnUrl)
         $ mempty

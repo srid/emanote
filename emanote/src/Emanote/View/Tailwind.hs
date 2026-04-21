@@ -19,7 +19,9 @@ import NeatInterpolation (text)
 import Relude
 import System.IO (hClose)
 import System.Which (staticWhich)
+import Text.Blaze.Html ((!))
 import Text.Blaze.Html5 qualified as H
+import Text.Blaze.Html5.Attributes qualified as A
 import UnliftIO (MonadUnliftIO)
 import UnliftIO.Process (callProcess)
 import UnliftIO.Temporary (withSystemTempFile)
@@ -63,11 +65,15 @@ tailwindCliInputCss =
     ${tailwindThemeBlock}
   |]
 
--- | Per-site @\<style\>@ that re-aliases @--color-primary-*@ to the user's theme.
+{- | Per-site @\<style\>@ that re-aliases @--color-primary-*@ to the user's
+theme. The @id@ lets idiomorph match it across route switches so per-route
+theme overrides take effect, and distinguishes it from the id-less
+\@tailwindcss/browser@ CDN-injected style that needs @im-preserve@.
+-}
 themeRemapStyle :: Text -> H.Html
 themeRemapStyle paletteName =
   let css = ":root {\n" <> primaryColorAliases paletteName <> "}\n"
-   in H.style $ H.toHtml css
+   in H.style ! A.id "emanote-theme-remap" $ H.toHtml css
 
 {- | CSS lines aliasing @--color-primary-N@ to @var(--color-\<palette\>-N)@,
 one per scale level. Shared by the compile-time @\@theme@ block and the
