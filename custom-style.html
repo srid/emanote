@@ -60,9 +60,21 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=85333886-89e3-4a53-94f5-08d1bf4d574a' rel='stylesheet' type='text/css' />
 
-  <link rel='stylesheet' href='_emanote-static/skylighting.css' />
+  <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
+     express: @keyframes, :target, ::marker bodies that need multiple
+     properties, decorative ::before/::after stacks, @media queries,
+     font-feature-settings, and cross-cutting rules that apply to
+     Pandoc-rendered HTML we don't author class-by-class.
+
+     Prefer inline Tailwind in the templates (components/*.tpl) for
+     anything expressible as utility classes — colors, spacing,
+     typography, hover/dark/motion-reduce variants, before:content-[''],
+     marker:*, align-super, etc. Use arbitrary values (e.g.
+     [font-variant-numeric:oldstyle-nums]) before reaching for a new
+     rule here. Only land in this file when the alternative would be a
+     pile of [...] utilities so ugly that a CSS block reads cleaner. --><link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
@@ -132,6 +144,27 @@
     background-color: var(--color-gray-800);
     border-color: var(--color-gray-700);
     color: var(--color-gray-100);
+  }
+</style>
+
+<style data-category='footnotes'>
+  /* Only the :target flash and its keyframes live here — Tailwind can't
+     express @keyframes or a theme-scoped start color for one animation.
+     Everything else (aside rules, markers, sup, backref) is inline
+     utilities in components/pandoc.tpl. */
+  :root { --footnote-flash-start: var(--color-primary-100); }
+  .dark { --footnote-flash-start: var(--color-primary-900); }
+  ol.footnote-list li:target,
+  sup.footnote-ref:target a {
+    animation: footnote-flash 0.5s ease-out;
+  }
+  @keyframes footnote-flash {
+    0%   { background-color: var(--footnote-flash-start); }
+    100% { background-color: transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ol.footnote-list li:target,
+    sup.footnote-ref:target a { animation: none; }
   }
 </style>
 
@@ -1638,13 +1671,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement
-    <sup class='px-0.5'>
-      <a class='text-primary-600 dark:text-primary-400 hover:underline' href='custom-style#fn1'>
-        1
-      </a>
-    </sup>
-   you can make use of CSS grids as provided by Tailwind’s classes.
+      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement<sup id='fnref1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]'><a class='text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1' href='custom-style#fn1'>1</a></sup> you can make use of CSS grids as provided by Tailwind’s classes.
     </p>
   <div class='grid grid-flow-row grid-cols-1 gap-0 p-3 bg-gray-500 lg:grid-cols-2'><section title='Embedded note' class='p-4 mx-2 mb-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner'>
   <header class='flex items-center justify-center text-2xl italic bg-primary-50 dark:bg-primary-900 rounded py-1 px-2 mb-3'>
@@ -1766,13 +1793,7 @@
         </li>
       
         <li class='pl-1'>
-          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a>
-    <sup class='px-0.5'>
-      <a class='text-primary-600 dark:text-primary-400 hover:underline' href='start#fn1'>
-        1
-      </a>
-    </sup>
-  .
+          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a><sup id='fnref1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]'><a class='text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1' href='start#fn1'>1</a></sup>.
         </li>
       
         <li class='pl-1'>
@@ -1788,27 +1809,23 @@
         </li>
       
         <li class='pl-1'>
-          Visit <a href='guide' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.
-    <sup class='px-0.5'>
-      <a class='text-primary-600 dark:text-primary-400 hover:underline' href='start#fn2'>
-        2
-      </a>
-    </sup>
-  
+          Visit <a href='guide' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup id='fnref2' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]'><a class='text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1' href='start#fn2'>2</a></sup>
         </li>
       
     </ol>
   
-    <aside title='Footnotes' class='mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800'>
+    <aside title='Footnotes' class="relative mt-14 pt-7 max-w-[44rem] text-sm leading-relaxed text-gray-600 dark:text-gray-400 before:content-[''] before:absolute before:top-0 before:left-0 before:w-14 before:h-[2px] before:bg-primary-500 after:content-[''] after:absolute after:top-px after:left-14 after:right-0 after:h-px after:bg-gray-200 dark:after:bg-gray-800">
       <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Footnotes</header>
-      <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
+      <ol class='footnote-list list-decimal pl-6 space-y-3 marker:text-primary-600 dark:marker:text-primary-400 marker:font-medium [font-variant-numeric:oldstyle-nums]'>
         
           <li id='fn1' class='pl-2'>
             <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
+            <a href='start#fnref1' class='footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0' aria-label='Back to content'>↩</a>
           </li>
         
           <li id='fn2' class='pl-2'>
             If you are <a href='https://srid.ca/haskell' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Architecture</a>.
+            <a href='start#fnref2' class='footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0' aria-label='Back to content'>↩</a>
           </li>
         
       </ol>
@@ -1945,12 +1962,13 @@
       For additional information and discussion on this topic, check out <a href='https://github.com/srid/emanote/discussions/438' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>this discussion on GitHub</a>.
     </p>
   
-    <aside title='Footnotes' class='mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800'>
+    <aside title='Footnotes' class="relative mt-14 pt-7 max-w-[44rem] text-sm leading-relaxed text-gray-600 dark:text-gray-400 before:content-[''] before:absolute before:top-0 before:left-0 before:w-14 before:h-[2px] before:bg-primary-500 after:content-[''] after:absolute after:top-px after:left-14 after:right-0 after:h-px after:bg-gray-200 dark:after:bg-gray-800">
       <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Footnotes</header>
-      <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
+      <ol class='footnote-list list-decimal pl-6 space-y-3 marker:text-primary-600 dark:marker:text-primary-400 marker:font-medium [font-variant-numeric:oldstyle-nums]'>
         
           <li id='fn1' class='pl-2'>
             If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{class=".."}</code> syntax, rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lg:grid-cols-2</code>).
+            <a href='custom-style#fnref1' class='footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0' aria-label='Back to content'>↩</a>
           </li>
         
       </ol>
@@ -2095,14 +2113,14 @@
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
     <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='markdown'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='markdown'>
             Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code>==</code> (ie. <code>==inline text==</code>).<sup>*</sup> The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.</p></div>
     </div>
   
@@ -2110,14 +2128,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='external-links'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='external-links'>
             External links
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
     </div>
   

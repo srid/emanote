@@ -60,9 +60,21 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=85333886-89e3-4a53-94f5-08d1bf4d574a' rel='stylesheet' type='text/css' />
 
-  <link rel='stylesheet' href='_emanote-static/skylighting.css' />
+  <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
+     express: @keyframes, :target, ::marker bodies that need multiple
+     properties, decorative ::before/::after stacks, @media queries,
+     font-feature-settings, and cross-cutting rules that apply to
+     Pandoc-rendered HTML we don't author class-by-class.
+
+     Prefer inline Tailwind in the templates (components/*.tpl) for
+     anything expressible as utility classes — colors, spacing,
+     typography, hover/dark/motion-reduce variants, before:content-[''],
+     marker:*, align-super, etc. Use arbitrary values (e.g.
+     [font-variant-numeric:oldstyle-nums]) before reaching for a new
+     rule here. Only land in this file when the alternative would be a
+     pile of [...] utilities so ugly that a CSS block reads cleaner. --><link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
@@ -132,6 +144,27 @@
     background-color: var(--color-gray-800);
     border-color: var(--color-gray-700);
     color: var(--color-gray-100);
+  }
+</style>
+
+<style data-category='footnotes'>
+  /* Only the :target flash and its keyframes live here — Tailwind can't
+     express @keyframes or a theme-scoped start color for one animation.
+     Everything else (aside rules, markers, sup, backref) is inline
+     utilities in components/pandoc.tpl. */
+  :root { --footnote-flash-start: var(--color-primary-100); }
+  .dark { --footnote-flash-start: var(--color-primary-900); }
+  ol.footnote-list li:target,
+  sup.footnote-ref:target a {
+    animation: footnote-flash 0.5s ease-out;
+  }
+  @keyframes footnote-flash {
+    0%   { background-color: var(--footnote-flash-start); }
+    100% { background-color: transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ol.footnote-list li:target,
+    sup.footnote-ref:target a { animation: none; }
   }
 </style>
 
@@ -1182,13 +1215,7 @@
         </li>
       
         <li>
-          <a href='install' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Install Emanote</a> in Ubuntu.
-    <sup class='px-0.5'>
-      <a class='text-primary-600 dark:text-primary-400 hover:underline' href='wsl#fn1'>
-        1
-      </a>
-    </sup>
-  
+          <a href='install' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Install Emanote</a> in Ubuntu.<sup id='fnref1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]'><a class='text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1' href='wsl#fn1'>1</a></sup>
         </li>
       
         <li>
@@ -1281,12 +1308,13 @@
       You can use <a href='https://askubuntu.com/a/1178910' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Task Scheduler</a> to automatically launch WSL Syncthing on Windows logon. Create a Basic tasks that is triggered on user log on, with the action being to start a program <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>C:\Windows\System32\wsl.exe</code> with arguments <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-d Ubuntu -u &lt;yourusername&gt; syncthing</code>.
     </p>
   
-    <aside title='Footnotes' class='mt-12 pt-4 text-sm leading-relaxed text-gray-600 dark:text-gray-400 border-t-2 border-gray-200 dark:border-gray-800'>
+    <aside title='Footnotes' class="relative mt-14 pt-7 max-w-[44rem] text-sm leading-relaxed text-gray-600 dark:text-gray-400 before:content-[''] before:absolute before:top-0 before:left-0 before:w-14 before:h-[2px] before:bg-primary-500 after:content-[''] after:absolute after:top-px after:left-14 after:right-0 after:h-px after:bg-gray-200 dark:after:bg-gray-800">
       <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Footnotes</header>
-      <ol class='list-decimal pl-6 space-y-3 marker:font-mono marker:text-xs marker:text-gray-400 dark:marker:text-gray-500'>
+      <ol class='footnote-list list-decimal pl-6 space-y-3 marker:text-primary-600 dark:marker:text-primary-400 marker:font-medium [font-variant-numeric:oldstyle-nums]'>
         
           <li id='fn1' class='pl-2'>
             You might find the new <a href='https://docs.microsoft.com/en-us/windows/terminal/get-started' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Windows Terminal</a> pleasant to work with.
+            <a href='wsl#fnref1' class='footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0' aria-label='Back to content'>↩</a>
           </li>
         
       </ol>
@@ -1409,14 +1437,14 @@
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
     <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='install'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='install'>
             Installing
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><strong>Windows users</strong>: See <a href='wsl' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Using on Windows</a> for Windows Subsystem for Linux setup</div>
     </div>
   

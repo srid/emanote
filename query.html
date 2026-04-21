@@ -60,9 +60,21 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=85333886-89e3-4a53-94f5-08d1bf4d574a' rel='stylesheet' type='text/css' />
 
-  <link rel='stylesheet' href='_emanote-static/skylighting.css' />
+  <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
+     express: @keyframes, :target, ::marker bodies that need multiple
+     properties, decorative ::before/::after stacks, @media queries,
+     font-feature-settings, and cross-cutting rules that apply to
+     Pandoc-rendered HTML we don't author class-by-class.
+
+     Prefer inline Tailwind in the templates (components/*.tpl) for
+     anything expressible as utility classes — colors, spacing,
+     typography, hover/dark/motion-reduce variants, before:content-[''],
+     marker:*, align-super, etc. Use arbitrary values (e.g.
+     [font-variant-numeric:oldstyle-nums]) before reaching for a new
+     rule here. Only land in this file when the alternative would be a
+     pile of [...] utilities so ugly that a CSS block reads cleaner. --><link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
@@ -132,6 +144,27 @@
     background-color: var(--color-gray-800);
     border-color: var(--color-gray-700);
     color: var(--color-gray-100);
+  }
+</style>
+
+<style data-category='footnotes'>
+  /* Only the :target flash and its keyframes live here — Tailwind can't
+     express @keyframes or a theme-scoped start color for one animation.
+     Everything else (aside rules, markers, sup, backref) is inline
+     utilities in components/pandoc.tpl. */
+  :root { --footnote-flash-start: var(--color-primary-100); }
+  .dark { --footnote-flash-start: var(--color-primary-900); }
+  ol.footnote-list li:target,
+  sup.footnote-ref:target a {
+    animation: footnote-flash 0.5s ease-out;
+  }
+  @keyframes footnote-flash {
+    0%   { background-color: var(--footnote-flash-start); }
+    100% { background-color: transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ol.footnote-list li:target,
+    sup.footnote-ref:target a { animation: none; }
   }
 </style>
 
@@ -1775,14 +1808,14 @@
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
     <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='yaml-config'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='yaml-config'>
             YAML configuration
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p><code>date</code>: The note timestamp. This is used to order note chronologically, such as for the timeline <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>query</a>. The value can be set from the filename if it begins with <code>YYYY-MM-DD</code>, which is useful for including the date in the note URL. In case of conflict, the date from the YAML configuration takes priority.</p></div>
     </div>
   
@@ -1790,14 +1823,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='sidebar'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='sidebar'>
             Sidebar
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div>The ordering of children in the tree is determined in the following order (this is also the order in which <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> results are rendered by default):</div>
     </div>
   
@@ -1805,14 +1838,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='neuron-layout'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='neuron-layout'>
             Neuron-like layout
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>In the absence of <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:</p></div>
     </div>
   
@@ -1820,18 +1853,18 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='neuron'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='neuron'>
             Migrating from neuron
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div>In all notes, replace neuron’s <code>z:zettels</code>-style <a href='https://neuron.zettel.page/tag-queries' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>tag queries</a> with <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a>.</div>
     </div>
   
-    <div class='mt-2'>
+    <div>
       <div><a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a></div>
     </div>
   
@@ -1839,14 +1872,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='guide'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='guide'>
             Guide
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><strong><a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a></strong> — Obsidian-style embed queries for dynamic content</div>
     </div>
   
@@ -1854,18 +1887,18 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='feed'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='feed'>
             ATOM feed
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>An atom feed can be generated for a given note <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>note metadata</a>:</p></div>
     </div>
   
-    <div class='mt-2'>
+    <div>
       <div><p>An example is available in the <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='query.xml' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500'>query.xml</a>.</p></div>
     </div>
   

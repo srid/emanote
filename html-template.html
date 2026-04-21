@@ -60,9 +60,21 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=ab6de87a-490d-4f50-95c4-250797c79782' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=85333886-89e3-4a53-94f5-08d1bf4d574a' rel='stylesheet' type='text/css' />
 
-  <link rel='stylesheet' href='_emanote-static/skylighting.css' />
+  <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
+     express: @keyframes, :target, ::marker bodies that need multiple
+     properties, decorative ::before/::after stacks, @media queries,
+     font-feature-settings, and cross-cutting rules that apply to
+     Pandoc-rendered HTML we don't author class-by-class.
+
+     Prefer inline Tailwind in the templates (components/*.tpl) for
+     anything expressible as utility classes — colors, spacing,
+     typography, hover/dark/motion-reduce variants, before:content-[''],
+     marker:*, align-super, etc. Use arbitrary values (e.g.
+     [font-variant-numeric:oldstyle-nums]) before reaching for a new
+     rule here. Only land in this file when the alternative would be a
+     pile of [...] utilities so ugly that a CSS block reads cleaner. --><link rel='stylesheet' href='_emanote-static/skylighting.css' />
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
@@ -132,6 +144,27 @@
     background-color: var(--color-gray-800);
     border-color: var(--color-gray-700);
     color: var(--color-gray-100);
+  }
+</style>
+
+<style data-category='footnotes'>
+  /* Only the :target flash and its keyframes live here — Tailwind can't
+     express @keyframes or a theme-scoped start color for one animation.
+     Everything else (aside rules, markers, sup, backref) is inline
+     utilities in components/pandoc.tpl. */
+  :root { --footnote-flash-start: var(--color-primary-100); }
+  .dark { --footnote-flash-start: var(--color-primary-900); }
+  ol.footnote-list li:target,
+  sup.footnote-ref:target a {
+    animation: footnote-flash 0.5s ease-out;
+  }
+  @keyframes footnote-flash {
+    0%   { background-color: var(--footnote-flash-start); }
+    100% { background-color: transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ol.footnote-list li:target,
+    sup.footnote-ref:target a { animation: none; }
   }
 </style>
 
@@ -2073,14 +2106,14 @@
     <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
     <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='yaml-config'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='yaml-config'>
             YAML configuration
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>[!tip] Using in HTML templates You can reference the YAML frontmatter config from <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>. See <a href='https://github.com/srid/emanote/discussions/131#discussioncomment-1382189' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>here</a> for details.</p></div>
     </div>
   
@@ -2088,14 +2121,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='uptree'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='uptree'>
             Uplink tree
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>The <em>uplink tree</em> or “uptree”<sup>*</sup> is a feature available in <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkTag'>HTML Templates</a>, which visualizes hierarchical relationships between notes as a graph at the top of the page.</p></div>
     </div>
   
@@ -2103,14 +2136,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='toc'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='toc'>
             Table of contents
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>In <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>the default template</a>, the table of contents is rendered on the right side. TOC is rendered only if the page has more than one heading.</p></div>
     </div>
   
@@ -2118,14 +2151,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='sidebar'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='sidebar'>
             Sidebar
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>In <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>the default template</a>, the sidebar is rendered on the left side. The sidebar tree is determined from <a href='folgezettel' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folgezettel heterarchy</a>.</p></div>
     </div>
   
@@ -2133,14 +2166,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='neuron-layout'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='neuron-layout'>
             Neuron-like layout
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>Emanote’s builtin <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:</p></div>
     </div>
   
@@ -2148,14 +2181,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='neuron'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='neuron'>
             Migrating from neuron
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div>Full theming (customize <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML Templates</a> fully)</div>
     </div>
   
@@ -2163,14 +2196,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='layer'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='layer'>
             Layer system
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>Emanote <em>implicitly</em> includes what is known as the “default” layer. Its contents can be seen <a href='https://github.com/srid/emanote/tree/master/emanote/default' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>here</a>. This layer contains <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>index.yaml</a> and other default assets, like the logo, favicon and <a href='fonts' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>fonts</a>. When you run <code>emanote -L /your/notebook run</code>, your notebook is overlaid <em>on top of</em> this default layer. What this means, in effect, is that you override <strong>just about any file</strong> in the default layer, such the HTML content of <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML Templates</a>, in your own notebook directory. As an example, see <a href='https://github.com/srid/emanote/tree/master/docs/templates/hooks' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>template/hooks</code></a> of this documentation notbook.</p></div>
     </div>
   
@@ -2178,14 +2211,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='guide'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='guide'>
             Guide
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><strong><a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML Templates</a></strong> — Full HTML customization with Heist templates</div>
     </div>
   
@@ -2193,18 +2226,18 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='external-links'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='external-links'>
             External links
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>Note that the attribute can also be used to display the icons in the <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML templates</a> (like the footer or the sidebar) or in raw HTML of <a href='markdown' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>.</p></div>
     </div>
   
-    <div class='mt-2'>
+    <div>
       <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
     </div>
   
@@ -2212,14 +2245,14 @@
           
         </li>
       
-        <li class='bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-all'>
-          <a class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-2' href='callout'>
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='callout'>
             Callouts
           </a>
           
-            <div class='mb-4 overflow-x-auto text-sm text-gray-500 dark:text-gray-300'>
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
-    <div class='mt-2'>
+    <div>
       <div><p>To add a new custom callout named <code>foo</code> (viz.: <code>[!foo] ...</code>), create a <code>/templates/filters/callout/foo.tpl</code> file in your <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>templates</a> folder. You can also change the layout and styling of existing callout types in <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>/templates/filters/callout/*.tpl</code></a>.</p></div>
     </div>
   
