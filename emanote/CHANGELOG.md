@@ -1,25 +1,17 @@
 # Revision history for emanote
 
-## 1.5.4.0 (2025-12-18)
-
-- Built-in static syntax highlighting using skylighting (replaces client-side JS highlighters)
-
 ## 1.6.0.0 (Unreleased)
 
 **Notable features**
 
 - **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
-  - Templates use a `primary-*` color token (e.g. `bg-primary-500`) that resolves via CSS variables at runtime; compiled CSS is palette-agnostic.
-  - `template.theme: blue|green|...` YAML config is unchanged — the mechanism moved from Heist string-splicing (`${theme}-NNN` across 20+ templates) to a single per-page `:root` remap block.
-  - Drops the stale `Web.Tailwind` Haskell dep; shells out to `tailwindcss_4` CLI directly.
-  - Dev server uses `@tailwindcss/browser@4` (replaces v3 Play CDN).
-  - Related follow-up work tracked in [#632](https://github.com/srid/emanote/issues/632).
+- Built-in static syntax highlighting using skylighting, replacing client-side JS highlighters ([#624](https://github.com/srid/emanote/pull/624))
 - UI revamp (#622, [#636](https://github.com/srid/emanote/pull/636))
   - New self-hosted typography: Lora + Space Grotesk + Space Mono.
   - Manual dark/light theme toggle (#605, #617) with `localStorage` persistence.
   - Backlinks as a card grid; TOC with depth-based hierarchy and `IntersectionObserver` scroll-spy (#520).
-- Mermaid: add `elk` layout (#618)
-- Home Manager module: macOS support via launchd (#623)
+- Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
+- Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
 ## 1.4.0.0 (2025-08-18)
 
