@@ -61,7 +61,9 @@
 
       checks = forEachSystem (pkgs:
         let outs = import ./default.nix { inherit pkgs; };
-        in pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
+        in {
+          closure-size = outs.closure-size;
+        } // pkgs.lib.optionalAttrs (outs.docs-linkCheck != null) {
           docs-linkCheck = outs.docs-linkCheck;
         });
     };

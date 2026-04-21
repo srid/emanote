@@ -18,6 +18,8 @@ let
     allowBrokenInternalLinks = true; # A couple, by design, in markdown.md
     extraConfig.template.urlStrategy = "pretty";
   };
+
+  closureSizeCheck = import ./nix/check-closure-size.nix { inherit pkgs emanote; };
 in
 {
   inherit emanote project;
@@ -25,4 +27,5 @@ in
   docs = docs.package;
   docs-app = docs.app;
   docs-linkCheck = docs.check;
+  closure-size = closureSizeCheck;
 }
