@@ -27,21 +27,38 @@ Then(
   },
 );
 
-// texmath emits `<math xmlns="http://www.w3.org/1998/Math/MathML" display="...">`
-// for every expression. Assert on the namespace *and* display attribute so a
-// regression to raw `\(…\)` delimiters (for client-side MathJax/KaTeX) — which
-// would produce 0 math elements — fails loudly.
+// texmath emits `<math xmlns="…" display="…">` for every expression. The HTML
+// parser places `<math>` in the MathML namespace automatically, so
+// `element.namespaceURI` is the reliable check — the `xmlns=` attribute is a
+// namespace declaration that CSS `[xmlns=…]` selectors don't see. We assert
+// the `display` attribute via a CSS selector and the namespace via JS.
 const MATHML_NS = "http://www.w3.org/1998/Math/MathML";
+
+async function assertMathMLCount(
+  page: EmanoteWorld["page"],
+  display: "inline" | "block",
+  msgSuffix: string,
+) {
+  const count = await page.evaluate(
+    ({ display, ns }) =>
+      [...document.querySelectorAll(`math[display="${display}"]`)].filter(
+        (el) => el.namespaceURI === ns,
+      ).length,
+    { display, ns: MATHML_NS },
+  );
+  assert.ok(
+    count > 0,
+    `Expected at least one ${display} MathML element; found ${count}. ${msgSuffix}`,
+  );
+}
 
 Then(
   "the page contains an inline <math> element in the MathML namespace",
   async function (this: EmanoteWorld) {
-    const count = await this.page
-      .locator(`math[xmlns="${MATHML_NS}"][display="inline"]`)
-      .count();
-    assert.ok(
-      count > 0,
-      `Expected at least one inline MathML element; found ${count}. emanote.staticMath default may have regressed, or texmath's InlineMath → display="inline" mapping changed.`,
+    await assertMathMLCount(
+      this.page,
+      "inline",
+      "emanote.staticMath default may have regressed, or texmath's InlineMath → display=\"inline\" mapping changed.",
     );
   },
 );
@@ -49,12 +66,10 @@ Then(
 Then(
   "the page contains a block <math> element in the MathML namespace",
   async function (this: EmanoteWorld) {
-    const count = await this.page
-      .locator(`math[xmlns="${MATHML_NS}"][display="block"]`)
-      .count();
-    assert.ok(
-      count > 0,
-      `Expected at least one block MathML element; found ${count}. The $$…$$ display-math path is broken.`,
+    await assertMathMLCount(
+      this.page,
+      "block",
+      "The $$…$$ display-math path is broken.",
     );
   },
 );
