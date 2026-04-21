@@ -18,7 +18,7 @@
 
 - Footnotes no longer produce duplicate HTML `id` attributes when a note
   containing a footnote embeds another note that also has a footnote.
-  Embed-rendered footnotes are now namespaced via `heist-extra`'s new
+  Embed-rendered footnotes are now namespaced via `heist-extra`'s
   `RenderCtx.idPrefix`, so each embedded note gets a per-route prefix on
   its `fn…` / `fnref…` IDs ([#360](https://github.com/srid/emanote/issues/360)).
 

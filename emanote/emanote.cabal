@@ -116,7 +116,7 @@ common library-common
     , fsnotify
     , hedgehog
     , heist                  >=1.1.1.0
-    , heist-extra            >=0.5.1.0
+    , heist-extra            >=0.5.0.0
     , hspec
     , hspec-hedgehog
     , ixset-typed            >=0.5.1.0
