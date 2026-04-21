@@ -76,6 +76,8 @@
      footnote marker and is easier to click. */
   sup.footnote-ref {
     font-size: 0.75em;
+    line-height: 0;
+    vertical-align: super;
     padding: 0 0.15em;
   }
   sup.footnote-ref a {
