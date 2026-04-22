@@ -89,6 +89,10 @@
 
     var popoverEl = null;
     var currentRef = null;
+    // Pandoc emits exactly one top-level <aside data-footnote-list> per
+    // page. Live-server reloads the whole document on source changes, so
+    // caching across clicks is safe — no SPA mutations to worry about.
+    var topLevelAside = null;
 
     function ensurePopover() {
       if (popoverEl) return popoverEl;
@@ -116,16 +120,16 @@
       if (embed) {
         return embed.querySelector('aside[data-footnote-list] ' + liSel);
       }
-      // Non-embedded ref: find the first top-level aside (one whose closest
-      // data-footnote-embed ancestor is itself null).
-      var asides = document.querySelectorAll('aside[data-footnote-list]');
-      for (var i = 0; i < asides.length; i++) {
-        if (!asides[i].closest('[data-footnote-embed]')) {
-          var li = asides[i].querySelector(liSel);
-          if (li) return li;
+      if (!topLevelAside) {
+        var asides = document.querySelectorAll('aside[data-footnote-list]');
+        for (var i = 0; i < asides.length; i++) {
+          if (!asides[i].closest('[data-footnote-embed]')) {
+            topLevelAside = asides[i];
+            break;
+          }
         }
       }
-      return null;
+      return topLevelAside ? topLevelAside.querySelector(liSel) : null;
     }
 
     function cloneContent(li) {
