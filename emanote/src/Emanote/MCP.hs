@@ -8,7 +8,6 @@ module Emanote.MCP (
   callPhase1Tool,
 ) where
 
-import Control.Monad.IO.Class (liftIO)
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
 import MCP.Protocol qualified as MP
@@ -125,7 +124,7 @@ instance MCPServer MCPServerM where
 
 startHttpServer :: Int -> IO ()
 startHttpServer port = do
-  let serverInfo =
+  let implInfo =
         MT.Implementation "emanote-mcp" (Just "Emanote MCP") "1.6.0.0"
       capabilities =
         MT.ServerCapabilities
@@ -139,7 +138,7 @@ startHttpServer port = do
         HTTPServerConfig
           { httpPort = port
           , httpBaseUrl = "http://127.0.0.1:" <> show port
-          , httpServerInfo = serverInfo
+          , httpServerInfo = implInfo
           , httpCapabilities = capabilities
           , httpEnableLogging = False
           , httpOAuthConfig = Nothing
