@@ -132,7 +132,7 @@
     function cloneContent(li) {
       var clone = li.cloneNode(true);
       // Backref would navigate away from the popup — drop it.
-      var backrefs = clone.querySelectorAll('a.footnote-backref');
+      var backrefs = clone.querySelectorAll('a[data-footnote-backref]');
       for (var i = 0; i < backrefs.length; i++) backrefs[i].remove();
       return clone;
     }

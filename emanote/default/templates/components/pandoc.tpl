@@ -76,7 +76,7 @@
         <footnote>
           <li id="fn${footnote:idx}" data-footnote-id="${footnote:idx}" class="pl-2">
             <footnote:content />
-            <a href="${ema:note:url}#fnref${footnote:idx}" class="footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0" aria-label="Back to content">↩</a>
+            <a href="${ema:note:url}#fnref${footnote:idx}" data-footnote-backref class="footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0" aria-label="Back to content">↩</a>
           </li>
         </footnote>
       </ol>
