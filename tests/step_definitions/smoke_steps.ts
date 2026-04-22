@@ -106,3 +106,145 @@ Then(
     );
   },
 );
+
+const POPOVER_SEL = "#emanote-footnote-popover";
+
+When(
+  "I click the footnote ref with index {string} in the parent body",
+  async function (this: EmanoteWorld, idx: string) {
+    // Top-level refs are the ones whose closest [data-footnote-scope] is null.
+    // Playwright's `:not(:has(…ancestor))` trick doesn't exist, so filter in-page.
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `sup[data-footnote-ref="${i}"]`,
+      );
+      for (const r of refs) {
+        if (!r.closest("[data-footnote-scope]")) return r as HTMLElement;
+      }
+      return null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(el, `No top-level sup[data-footnote-ref="${idx}"] on the page.`);
+    await el.click();
+  },
+);
+
+When(
+  "I click the footnote ref with index {string} inside an embedded note",
+  async function (this: EmanoteWorld, idx: string) {
+    // Embeds render as <section data-footnote-scope>; callouts as <div>.
+    // Match only the section form so this step doesn't pick up a
+    // callout-scoped ref by accident.
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `section[data-footnote-scope] sup[data-footnote-ref="${i}"]`,
+      );
+      return (refs[0] as HTMLElement) ?? null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(
+      el,
+      `No section[data-footnote-scope] sup[data-footnote-ref="${idx}"] on the page.`,
+    );
+    await el.click();
+  },
+);
+
+When(
+  "I click the footnote ref with index {string} inside a callout",
+  async function (this: EmanoteWorld, idx: string) {
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `[data-callout] sup[data-footnote-ref="${i}"]`,
+      );
+      return (refs[0] as HTMLElement) ?? null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(
+      el,
+      `No [data-callout] sup[data-footnote-ref="${idx}"] on the page.`,
+    );
+    await el.click();
+  },
+);
+
+Then(
+  "the footnote popup contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const popover = this.page.locator(POPOVER_SEL);
+    await popover.waitFor({ state: "attached", timeout: 5_000 });
+    const isOpen = await popover.evaluate((el) =>
+      (el as HTMLElement).matches(":popover-open"),
+    );
+    assert.ok(
+      isOpen,
+      "Popover element exists but is not open — showPopover() likely failed or the click didn't reach the handler.",
+    );
+    const text = (await popover.textContent()) ?? "";
+    assert.ok(
+      text.includes(needle),
+      `Popover did not contain ${JSON.stringify(needle)}. Got: ${JSON.stringify(text)}.`,
+    );
+  },
+);
+
+// Print-mode footnotes. The popup is screen-only; the hidden <aside
+// data-footnote-list> is revealed by `print:block` on paper so printed
+// copies still carry the cited bodies.
+async function countVisibleFootnoteAsides(page: EmanoteWorld["page"]) {
+  return page.evaluate(
+    () =>
+      Array.from(
+        document.querySelectorAll("aside[data-footnote-list]"),
+      ).filter((a) => getComputedStyle(a as Element).display !== "none").length,
+  );
+}
+
+Then(
+  "no footnote list is visible on screen",
+  async function (this: EmanoteWorld) {
+    const count = await countVisibleFootnoteAsides(this.page);
+    assert.strictEqual(
+      count,
+      0,
+      `Expected no visible <aside data-footnote-list> on screen; got ${count}. The popup is the only footnote UI on screen — a visible aside means hidden/print:block got reverted.`,
+    );
+  },
+);
+
+When(
+  "the page is emulated as print media",
+  async function (this: EmanoteWorld) {
+    await this.page.emulateMedia({ media: "print" });
+  },
+);
+
+Then(
+  "at least one footnote list is visible",
+  async function (this: EmanoteWorld) {
+    const count = await countVisibleFootnoteAsides(this.page);
+    assert.ok(
+      count > 0,
+      `Expected at least one <aside data-footnote-list> visible under print emulation; got ${count}. The print:block variant on the aside is missing or the parent hides it regardless.`,
+    );
+  },
+);
+
+Then(
+  "the printed footnote list contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const text = await this.page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll("aside[data-footnote-list]"))
+          .filter((a) => getComputedStyle(a as Element).display !== "none")
+          .map((a) => (a as HTMLElement).textContent ?? "")
+          .join(" "),
+    );
+    assert.ok(
+      text.includes(needle),
+      `Visible print-mode footnote list did not contain ${JSON.stringify(
+        needle,
+      )}. Got: ${JSON.stringify(text.slice(0, 200))}.`,
+    );
+  },
+);

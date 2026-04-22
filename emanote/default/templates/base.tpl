@@ -45,6 +45,7 @@
   <tailwindCssShim />
 
   <apply template="/templates/styles" />
+  <apply template="/templates/components/footnote-popup" />
   <apply template="/templates/hooks/more-head" />
 
   <head-main />

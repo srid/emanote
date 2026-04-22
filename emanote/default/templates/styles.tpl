@@ -85,27 +85,6 @@
   }
 </style>
 
-<style data-category="footnotes">
-  /* Only the :target flash and its keyframes live here — Tailwind can't
-     express @keyframes or a theme-scoped start color for one animation.
-     Everything else (aside rules, markers, sup, backref) is inline
-     utilities in components/pandoc.tpl. */
-  :root { --footnote-flash-start: var(--color-primary-100); }
-  .dark { --footnote-flash-start: var(--color-primary-900); }
-  ol.footnote-list li:target,
-  sup.footnote-ref:target a {
-    animation: footnote-flash 0.5s ease-out;
-  }
-  @keyframes footnote-flash {
-    0%   { background-color: var(--footnote-flash-start); }
-    100% { background-color: transparent; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    ol.footnote-list li:target,
-    sup.footnote-ref:target a { animation: none; }
-  }
-</style>
-
 <style data-category="callout">
   /* To prevent overemphasis of link styles in callout titles */
   .callout .callout-title a {
