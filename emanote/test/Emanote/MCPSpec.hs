@@ -2,7 +2,6 @@ module Emanote.MCPSpec where
 
 import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
-import Emanote.MCP.Info
 import Emanote.MCP.Surface
 import MCP.Protocol (CallToolParams (..), CallToolResult (..))
 import Relude
@@ -12,8 +11,8 @@ spec :: Spec
 spec = do
   describe "readResource" $ do
     it "serves server information" $ do
-      readResource serverInfoResourceUri
-        `shouldSatisfy` either (const False) (T.isInfixOf implementationVersion)
+      readResource "emanote://server/info"
+        `shouldSatisfy` either (const False) (T.isInfixOf "version: ")
 
     it "rejects unknown resources" $ do
       readResource "emanote://missing"
@@ -21,7 +20,7 @@ spec = do
 
   describe "callTool" $ do
     it "returns structured server information" $ do
-      let result = callTool (CallToolParams serverInfoToolName Nothing)
+      let result = callTool (CallToolParams "emanote_get_server_info" Nothing)
       Aeson.decode @Aeson.Value (Aeson.encode $ structuredContent result)
         `shouldSatisfy` isJust
 

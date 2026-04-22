@@ -6,8 +6,6 @@ module Emanote.MCP.Surface (
   tools,
   readResource,
   callTool,
-  serverInfoResourceUri,
-  serverInfoToolName,
 ) where
 
 import Data.Aeson qualified as Aeson
@@ -24,6 +22,21 @@ serverInfoResourceUri = "emanote://server/info"
 serverInfoToolName :: Text
 serverInfoToolName = "emanote_get_server_info"
 
+implementationName :: Text
+implementationName =
+  case implementationInfo of
+    MT.Implementation name _ _ -> name
+
+implementationTitle :: Text
+implementationTitle =
+  case implementationInfo of
+    MT.Implementation _ title _ -> fromMaybe "Emanote MCP" title
+
+implementationVersion :: Text
+implementationVersion =
+  case implementationInfo of
+    MT.Implementation _ _ version -> version
+
 -- | Local resource registry entry pairing MCP metadata with its read handler.
 data ResourceHandler = ResourceHandler
   { resourceKey :: Text
@@ -33,8 +46,7 @@ data ResourceHandler = ResourceHandler
 
 -- | Local tool registry entry pairing MCP metadata with its call handler.
 data ToolHandler = ToolHandler
-  { toolKey :: Text
-  , toolDescriptor :: MT.Tool
+  { toolDescriptor :: MT.Tool
   , runTool :: MP.CallToolParams -> Maybe MP.CallToolResult
   }
 
@@ -80,8 +92,7 @@ resourceHandlers =
 toolHandlers :: [ToolHandler]
 toolHandlers =
   [ ToolHandler
-      { toolKey = serverInfoToolName
-      , toolDescriptor =
+      { toolDescriptor =
           MT.Tool
             serverInfoToolName
             (Just "Emanote MCP Server Info")
