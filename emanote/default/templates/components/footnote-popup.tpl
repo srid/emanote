@@ -41,12 +41,12 @@
   .emanote-footnote-popup-body > :last-child { margin-bottom: 0; }
   .emanote-footnote-popup-body p { margin-bottom: 0.5rem; }
 
-  sup.footnote-ref.emanote-footnote-active a {
+  sup[data-footnote-ref].emanote-footnote-active a {
     background-color: var(--color-primary-100);
     border-radius: 3px;
     padding: 0 0.2em;
   }
-  .dark sup.footnote-ref.emanote-footnote-active a {
+  .dark sup[data-footnote-ref].emanote-footnote-active a {
     background-color: var(--color-primary-900);
   }
 
