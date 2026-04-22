@@ -50,7 +50,10 @@
     background-color: var(--color-primary-900);
   }
 
-  /* Mobile bottom-sheet: slide up from the bottom, full width. */
+  /* Mobile bottom-sheet: slide up from the bottom, full width.
+     The 640px breakpoint must stay in sync with MOBILE_MAX in the
+     <script> below — the JS side toggles the --mobile class, the CSS
+     side owns what that class looks like. */
   @media (max-width: 640px) {
     .emanote-footnote-popup--mobile {
       top: auto !important;
@@ -81,6 +84,8 @@
     }
 
     var POPOVER_ID = 'emanote-footnote-popover';
+    // MOBILE_MAX must stay in sync with the @media (max-width: …) breakpoint
+    // in the <style> above — neither side enforces it.
     var MOBILE_MAX = 640;
 
     var popoverEl = null;
