@@ -2,7 +2,7 @@ name: early-flower
 version: 1.0.0
 description: APM project for early-flower
 author: Sridhar Ratnakumar
-target: claude
+target: [claude,codex]
 dependencies:
   apm:
   - srid/agency#master

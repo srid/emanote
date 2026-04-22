@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# /do workflow's sync step — extracted to a script to collapse several Bash
+# round-trips into one. Handles fetch, fast-forward, forge detection, dirty-
+# tree hint, and initial results bookkeeping.
+#
+# Usage:
+#   sync <noGit>
+#     <noGit>  "true" or "false" — whether --no-git was passed
+#
+# Stdout (for the agent to parse):
+#   forge=<github|bitbucket|unknown>
+#   branch=<current branch name>
+#   defaultBranch=<origin HEAD ref name>
+
+set -euo pipefail
+
+noGit="${1:?Usage: sync <noGit>  (true|false)}"
+case "$noGit" in
+  true|false) ;;
+  *) echo "sync: noGit must be 'true' or 'false', got '$noGit'" >&2; exit 2 ;;
+esac
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DO_RESULTS="$SCRIPT_DIR/../do-results"
+
+startedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+# Fetch and pin origin/HEAD
+git fetch origin
+git remote set-head origin --auto >/dev/null
+
+# Fast-forward if behind upstream, unless --no-git
+if [ "$noGit" = "false" ]; then
+  if upstream="$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null)"; then
+    behind="$(git rev-list --count "HEAD..$upstream" 2>/dev/null || echo 0)"
+    ahead="$(git rev-list --count "$upstream..HEAD" 2>/dev/null || echo 0)"
+    if [ "$behind" -gt 0 ] && [ "$ahead" -eq 0 ]; then
+      git pull --ff-only
+    fi
+  fi
+fi
+
+# Dirty-tree hint (no pause, just print)
+if [ "$noGit" = "false" ] && [ -n "$(git status --porcelain)" ]; then
+  echo "Dirty tree detected. Continuing will create a fresh branch on top of these changes. If you wanted the agent to extend your WIP in place without touching git, re-run with --no-git." >&2
+fi
+
+# Forge detection from origin URL
+origin_url="$(git remote get-url origin)"
+case "$origin_url" in
+  *github.com*)  forge="github" ;;
+  *bitbucket.*)  forge="bitbucket" ;;
+  *)             forge="unknown" ;;
+esac
+
+# Initialize results skeleton and record the sync step
+"$DO_RESULTS" init "$forge" "$noGit"
+"$DO_RESULTS" step sync passed \
+  "git fetch ok; forge=$forge; noGit=$noGit" \
+  "$startedAt" now
+
+# Emit structured facts the agent uses for downstream steps
+branch="$(git rev-parse --abbrev-ref HEAD)"
+default_ref="$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' || echo master)"
+
+echo "forge=$forge"
+echo "branch=$branch"
+echo "defaultBranch=$default_ref"
