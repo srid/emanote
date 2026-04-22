@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
+-- | HTTP transport bootstrap and MCP server instance wiring for Emanote.
 module Emanote.MCP.Server (
   startHttpServer,
 ) where

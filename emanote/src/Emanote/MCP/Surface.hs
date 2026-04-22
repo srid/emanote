@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | Resource and tool surface exposed by the current Emanote MCP server.
 module Emanote.MCP.Surface (
   resources,
   tools,

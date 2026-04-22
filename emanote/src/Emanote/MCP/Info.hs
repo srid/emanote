@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | Shared server identity facts exposed by the Emanote MCP server.
 module Emanote.MCP.Info (
   implementationInfo,
   implementationName,
