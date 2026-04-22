@@ -147,7 +147,6 @@
       var refRect = ref.getBoundingClientRect();
       var popRect = popover.getBoundingClientRect();
       var vw = window.innerWidth;
-      var vh = window.innerHeight;
       var margin = 12;
 
       var left = refRect.left + refRect.width / 2 - popRect.width / 2;
