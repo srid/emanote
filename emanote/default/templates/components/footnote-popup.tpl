@@ -178,7 +178,10 @@
       ref.classList.add('emanote-footnote-active');
       try { popover.hidePopover(); } catch (_) {}
       try { popover.showPopover(); } catch (_) { return; }
-      positionPopover(popover, ref);
+      // Defer to next frame so popover width reflects the content just
+      // inserted — measuring immediately after showPopover() can center
+      // on the previous frame's width.
+      requestAnimationFrame(function () { positionPopover(popover, ref); });
     }
 
     function onClick(e) {
