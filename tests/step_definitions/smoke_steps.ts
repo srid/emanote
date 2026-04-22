@@ -106,3 +106,67 @@ Then(
     );
   },
 );
+
+// Footnote popup scenarios. The popover lives at `#emanote-footnote-popover`
+// and is owned by the script in components/footnote-popup.tpl. Clicking a
+// `sup[data-footnote-ref]` that matches the scope (embedded vs. top-level)
+// must route the click to the right `<li data-footnote-id>`.
+const POPOVER_SEL = "#emanote-footnote-popover";
+
+When(
+  "I click the footnote ref with index {string} in the parent body",
+  async function (this: EmanoteWorld, idx: string) {
+    // Top-level refs are the ones whose closest [data-footnote-embed] is null.
+    // Playwright's `:not(:has(…ancestor))` trick doesn't exist, so filter in-page.
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `sup[data-footnote-ref="${i}"]`,
+      );
+      for (const r of refs) {
+        if (!r.closest("[data-footnote-embed]")) return r as HTMLElement;
+      }
+      return null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(el, `No top-level sup[data-footnote-ref="${idx}"] on the page.`);
+    await el.click();
+  },
+);
+
+When(
+  "I click the footnote ref with index {string} inside an embedded note",
+  async function (this: EmanoteWorld, idx: string) {
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `[data-footnote-embed] sup[data-footnote-ref="${i}"]`,
+      );
+      return (refs[0] as HTMLElement) ?? null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(
+      el,
+      `No [data-footnote-embed] sup[data-footnote-ref="${idx}"] on the page.`,
+    );
+    await el.click();
+  },
+);
+
+Then(
+  "the footnote popup contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const popover = this.page.locator(POPOVER_SEL);
+    await popover.waitFor({ state: "attached", timeout: 5_000 });
+    const isOpen = await popover.evaluate((el) =>
+      (el as HTMLElement).matches(":popover-open"),
+    );
+    assert.ok(
+      isOpen,
+      "Popover element exists but is not open — showPopover() likely failed or the click didn't reach the handler.",
+    );
+    const text = (await popover.textContent()) ?? "";
+    assert.ok(
+      text.includes(needle),
+      `Popover did not contain ${JSON.stringify(needle)}. Got: ${JSON.stringify(text)}.`,
+    );
+  },
+);

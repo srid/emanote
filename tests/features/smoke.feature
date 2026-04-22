@@ -23,3 +23,18 @@ Feature: Smoke
   Scenario: KaTeX is not loaded by default
     When I open "/math.html"
     Then no KaTeX stylesheet is referenced
+
+  Scenario: Clicking a parent-level footnote ref opens the popup
+    When I open "/footnotes.html"
+    And I click the footnote ref with index "1" in the parent body
+    Then the footnote popup contains "PARENT_FOOTNOTE_BODY"
+
+  Scenario: Clicking a footnote ref inside a callout opens the popup
+    When I open "/footnotes.html"
+    And I click the footnote ref with index "2" in the parent body
+    Then the footnote popup contains "CALLOUT_FOOTNOTE_BODY"
+
+  Scenario: Clicking a footnote ref inside an embedded note opens the popup with the embed's footnote body
+    When I open "/footnotes.html"
+    And I click the footnote ref with index "1" inside an embedded note
+    Then the footnote popup contains "EMBED_FOOTNOTE_BODY"

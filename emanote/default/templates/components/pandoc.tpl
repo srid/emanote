@@ -67,14 +67,14 @@
       </DefinitionList:Items>
     </dl>
   </DefinitionList>
-  <Note:Ref><sup id="fnref${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]"><a class="text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1" href="${ema:note:url}#fn${footnote:idx}"><footnote:idx /></a></sup></Note:Ref>
+  <Note:Ref><sup id="fnref${footnote:idx}" data-footnote-ref="${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium [font-variant-numeric:lining-nums]"><a class="text-primary-600 dark:text-primary-400 no-underline hover:underline hover:underline-offset-2 hover:decoration-1" href="${ema:note:url}#fn${footnote:idx}"><footnote:idx /></a></sup></Note:Ref>
   <Note:List>
-    <aside title="Footnotes"
+    <aside title="Footnotes" data-footnote-list
       class="relative mt-14 pt-7 max-w-[44rem] text-sm leading-relaxed text-gray-600 dark:text-gray-400 before:content-[''] before:absolute before:top-0 before:left-0 before:w-14 before:h-[2px] before:bg-primary-500 after:content-[''] after:absolute after:top-px after:left-14 after:right-0 after:h-px after:bg-gray-200 dark:after:bg-gray-800">
       <header class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Footnotes</header>
       <ol class="footnote-list list-decimal pl-6 space-y-3 marker:text-primary-600 dark:marker:text-primary-400 marker:font-medium [font-variant-numeric:oldstyle-nums]">
         <footnote>
-          <li id="fn${footnote:idx}" class="pl-2">
+          <li id="fn${footnote:idx}" data-footnote-id="${footnote:idx}" class="pl-2">
             <footnote:content />
             <a href="${ema:note:url}#fnref${footnote:idx}" class="footnote-backref ml-2 inline-block no-underline text-gray-400 dark:text-gray-600 hover:text-primary-600 dark:hover:text-primary-400 transition hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0" aria-label="Back to content">↩</a>
           </li>
