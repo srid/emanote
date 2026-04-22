@@ -4,7 +4,7 @@ import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
 import Emanote.MCP
 import MCP.Protocol (CallToolParams (..), CallToolResult (..))
-import Relude (isJust)
+import Relude
 import Test.Hspec
 
 spec :: Spec
