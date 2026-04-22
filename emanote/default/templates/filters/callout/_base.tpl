@@ -1,4 +1,4 @@
-<div data-callout-metadata="" data-callout-fold="" data-callout="${callout:type}"
+<div data-callout-metadata="" data-callout-fold="" data-callout="${callout:type}" data-footnote-scope
   class="callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm" role="note"
   style="background-color: color-mix(in srgb, ${color} 8%, transparent); border-left-color: ${color}">
   <path

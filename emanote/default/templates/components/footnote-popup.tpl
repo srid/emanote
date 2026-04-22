@@ -1,7 +1,7 @@
 <!-- Progressive-enhancement popup for footnote references.
 
      Binds to the stable contract `data-footnote-ref` / `data-footnote-id`
-     / `data-footnote-list` / `data-footnote-embed` emitted by pandoc.tpl
+     / `data-footnote-list` / `data-footnote-scope` emitted by pandoc.tpl
      and embed-note.tpl, not to Pandoc's `.footnote-ref` / `.footnote-list`
      class names (those are stable-by-stasis, not by encapsulation).
 
@@ -40,6 +40,13 @@
   }
   .emanote-footnote-popup-body > :last-child { margin-bottom: 0; }
   .emanote-footnote-popup-body p { margin-bottom: 0.5rem; }
+  /* The cloned <li> lives outside its <ol>; strip the stray marker
+     and the indent that would otherwise reserve room for it. */
+  .emanote-footnote-popup-body > li {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+  }
 
   sup[data-footnote-ref].emanote-footnote-active a {
     background-color: var(--color-primary-100);
@@ -109,24 +116,33 @@
       return popoverEl;
     }
 
+    function findOwnAside(scope) {
+      // The aside "owned" by a scope is the one whose nearest
+      // data-footnote-scope ancestor is the scope itself — not a nested
+      // one. When scope is null, the root is the document and owned
+      // asides are those with no scope ancestor at all.
+      var root = scope || document;
+      var asides = root.querySelectorAll('aside[data-footnote-list]');
+      for (var i = 0; i < asides.length; i++) {
+        if (asides[i].closest('[data-footnote-scope]') === scope) return asides[i];
+      }
+      return null;
+    }
+
     function findTarget(ref) {
       var idx = ref.getAttribute('data-footnote-ref');
       if (!idx) return null;
-      var liSel = 'li[data-footnote-id="' + CSS.escape(idx) + '"]';
-      var embed = ref.closest('[data-footnote-embed]');
-      if (embed) {
-        return embed.querySelector('aside[data-footnote-list] ' + liSel);
+      var scope = ref.closest('[data-footnote-scope]');
+      var aside;
+      if (scope === null) {
+        if (!topLevelAside) topLevelAside = findOwnAside(null);
+        aside = topLevelAside;
+      } else {
+        aside = findOwnAside(scope);
       }
-      if (!topLevelAside) {
-        var asides = document.querySelectorAll('aside[data-footnote-list]');
-        for (var i = 0; i < asides.length; i++) {
-          if (!asides[i].closest('[data-footnote-embed]')) {
-            topLevelAside = asides[i];
-            break;
-          }
-        }
-      }
-      return topLevelAside ? topLevelAside.querySelector(liSel) : null;
+      return aside
+        ? aside.querySelector('li[data-footnote-id="' + CSS.escape(idx) + '"]')
+        : null;
     }
 
     function cloneContent(li) {

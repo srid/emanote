@@ -112,14 +112,14 @@ const POPOVER_SEL = "#emanote-footnote-popover";
 When(
   "I click the footnote ref with index {string} in the parent body",
   async function (this: EmanoteWorld, idx: string) {
-    // Top-level refs are the ones whose closest [data-footnote-embed] is null.
+    // Top-level refs are the ones whose closest [data-footnote-scope] is null.
     // Playwright's `:not(:has(…ancestor))` trick doesn't exist, so filter in-page.
     const handle = await this.page.evaluateHandle((i) => {
       const refs = document.querySelectorAll(
         `sup[data-footnote-ref="${i}"]`,
       );
       for (const r of refs) {
-        if (!r.closest("[data-footnote-embed]")) return r as HTMLElement;
+        if (!r.closest("[data-footnote-scope]")) return r as HTMLElement;
       }
       return null;
     }, idx);
@@ -132,16 +132,37 @@ When(
 When(
   "I click the footnote ref with index {string} inside an embedded note",
   async function (this: EmanoteWorld, idx: string) {
+    // Embeds render as <section data-footnote-scope>; callouts as <div>.
+    // Match only the section form so this step doesn't pick up a
+    // callout-scoped ref by accident.
     const handle = await this.page.evaluateHandle((i) => {
       const refs = document.querySelectorAll(
-        `[data-footnote-embed] sup[data-footnote-ref="${i}"]`,
+        `section[data-footnote-scope] sup[data-footnote-ref="${i}"]`,
       );
       return (refs[0] as HTMLElement) ?? null;
     }, idx);
     const el = handle.asElement();
     assert.ok(
       el,
-      `No [data-footnote-embed] sup[data-footnote-ref="${idx}"] on the page.`,
+      `No section[data-footnote-scope] sup[data-footnote-ref="${idx}"] on the page.`,
+    );
+    await el.click();
+  },
+);
+
+When(
+  "I click the footnote ref with index {string} inside a callout",
+  async function (this: EmanoteWorld, idx: string) {
+    const handle = await this.page.evaluateHandle((i) => {
+      const refs = document.querySelectorAll(
+        `[data-callout] sup[data-footnote-ref="${i}"]`,
+      );
+      return (refs[0] as HTMLElement) ?? null;
+    }, idx);
+    const el = handle.asElement();
+    assert.ok(
+      el,
+      `No [data-callout] sup[data-footnote-ref="${idx}"] on the page.`,
     );
     await el.click();
   },

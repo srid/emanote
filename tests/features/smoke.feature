@@ -29,9 +29,9 @@ Feature: Smoke
     And I click the footnote ref with index "1" in the parent body
     Then the footnote popup contains "PARENT_FOOTNOTE_BODY"
 
-  Scenario: Clicking a footnote ref inside a callout opens the popup
+  Scenario: Clicking a footnote ref inside a callout resolves to that callout's footnote body
     When I open "/footnotes.html"
-    And I click the footnote ref with index "2" in the parent body
+    And I click the footnote ref with index "1" inside a callout
     Then the footnote popup contains "CALLOUT_FOOTNOTE_BODY"
 
   Scenario: Clicking a footnote ref inside an embedded note opens the popup with the embed's footnote body
