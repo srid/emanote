@@ -39,7 +39,12 @@ calloutResolvingSplice _model _nr ctx _noteRoute blk = do
     HE.runCustomTemplate tpl $ do
       "callout:type" ## HI.textSplice calloutType
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
-      "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
+      -- pandocSpliceWithoutFootnoteList (not pandocSplice): the outer
+      -- pandocSplice gathers every B.Note in the full doc AST (including
+      -- ones inside this callout's body) and emits the document-level
+      -- footnote list already; a second list rendered inside the callout
+      -- block would produce duplicate `fn…` ids on the page (#360).
+      "callout:body" ## HP.pandocSpliceWithoutFootnoteList ctx $ B.Pandoc mempty (body callout)
       "query" ##
         HI.textSplice (show blks)
 

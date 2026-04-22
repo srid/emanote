@@ -28,3 +28,8 @@ Feature: Smoke
     When I open "/footnote-embed.html"
     Then every element id on the page is unique
     And at least one footnote id is present
+
+  Scenario: Callout bodies do not produce duplicate footnote ids
+    When I open "/footnote-callout.html"
+    Then every element id on the page is unique
+    And at least one footnote id is present

@@ -15,9 +15,18 @@ You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://h
 
 ## Notes
 
-Embedding a note will simply inline it. For example, using `![[start]]` displays the following:
+Embedding a note will simply inline it.[^ids] For example, using `![[start]]` displays the following:
 
 ![[start]]
+
+[^ids]: When the embedded note contains footnotes, Emanote namespaces
+    those footnotes' HTML `id` attributes per-embedded-route so a
+    parent note with its own footnotes doesn't collide with the
+    embed's on the rendered page
+    ([#360](https://github.com/srid/emanote/issues/360)). Footnote
+    references still navigate to the embedded note's standalone page,
+    where the same footnotes exist under their bare `fnN` / `fnrefN`
+    ids.
 
 
 ## Files
