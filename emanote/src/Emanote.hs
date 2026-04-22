@@ -22,6 +22,7 @@ import Ema (
 import Ema.CLI qualified
 import Ema.Dynamic (Dynamic (Dynamic))
 import Emanote.CLI qualified as CLI
+import Emanote.MCP qualified as MCP
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type (modelCompileTailwind)
@@ -43,6 +44,7 @@ import Emanote.View.Template qualified as View
 import Optics.Core ((.~), (^.))
 import Relude
 import System.FilePath ((</>))
+import UnliftIO.Async (withAsync)
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.ModelEma
@@ -72,8 +74,18 @@ run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
     CLI.Cmd_Ema emaCli -> do
       let emaCfg = SiteConfig emaCli def
-      Ema.runSiteWith @SiteRoute emaCfg cfg
-        >>= postRun cfg
+      if Ema.CLI.isLiveServer (Ema.CLI.action emaCli)
+        then case CLI.mcpPort _emanoteConfigCli of
+          Just port ->
+            withAsync (MCP.startHttpServer port) $ \_ ->
+              Ema.runSiteWith @SiteRoute emaCfg cfg
+                >>= postRun cfg
+          Nothing ->
+            Ema.runSiteWith @SiteRoute emaCfg cfg
+              >>= postRun cfg
+        else
+          Ema.runSiteWith @SiteRoute emaCfg cfg
+            >>= postRun cfg
     CLI.Cmd_Export exportFormat -> do
       Dynamic (unModelEma -> model0, _) <-
         flip runLoggerLoggingT oneOffLogger

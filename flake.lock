@@ -166,6 +166,23 @@
         "type": "github"
       }
     },
+    "mcp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1750284853,
+        "narHash": "sha256-4QdlLpS7mtCyY8b5klaUAtdW1tR8sJhxN2p5Nu7zgoQ=",
+        "owner": "dpella",
+        "repo": "mcp",
+        "rev": "66594b5a7d52fdf07f15a84918819e31ba1f4e70",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dpella",
+        "repo": "mcp",
+        "rev": "66594b5a7d52fdf07f15a84918819e31ba1f4e70",
+        "type": "github"
+      }
+    },
     "nixos-unified": {
       "locked": {
         "lastModified": 1751174231,
@@ -209,6 +226,7 @@
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
         "lvar": "lvar",
+        "mcp": "mcp",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
         "unionmount": "unionmount"

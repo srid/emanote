@@ -21,6 +21,7 @@ import UnliftIO.Directory (getCurrentDirectory)
 data Cli = Cli
   { layers :: NonEmpty Layer
   , allowBrokenInternalLinks :: Bool
+  , mcpPort :: Maybe Int
   , cmd :: Cmd
   }
 
@@ -49,6 +50,14 @@ cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- layerList $ one $ Layer cwd Nothing
   allowBrokenInternalLinks <- switch (long "allow-broken-internal-links" <> help "Report but do not fail on broken internal links")
+  mcpPort <-
+    optional
+      $ option
+        auto
+        ( long "mcp-port"
+            <> metavar "PORT"
+            <> help "Run an MCP HTTP server on the given port alongside the live server"
+        )
   cmd <-
     fmap Cmd_Ema Ema.CLI.cliParser
       <|> subparser (command "export" (info exportParser (progDesc "Export commands")))

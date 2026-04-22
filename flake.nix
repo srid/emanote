@@ -27,6 +27,8 @@
     commonmark-simple.flake = false;
     commonmark-wikilink.url = "github:srid/commonmark-wikilink/0.2.0.0";
     commonmark-wikilink.flake = false;
+    mcp.url = "github:dpella/mcp/66594b5a7d52fdf07f15a84918819e31ba1f4e70";
+    mcp.flake = false;
 
     emanote-template.url = "github:srid/emanote-template";
     emanote-template.flake = false;

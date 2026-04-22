@@ -121,6 +121,7 @@ common library-common
     , hspec-hedgehog
     , ixset-typed            >=0.5.1.0
     , map-syntax
+    , mcp                    >=0.3.0.0
     , megaparsec
     , monad-logger
     , monad-logger-extras
@@ -161,6 +162,7 @@ library
   exposed-modules:
     Emanote
     Emanote.CLI
+    Emanote.MCP
     Emanote.Model
     Emanote.Model.Calendar
     Emanote.Model.Calendar.Parser
@@ -245,6 +247,7 @@ test-suite test
   else
     build-depends: emanote
     other-modules:
+      Emanote.MCPSpec
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
       Emanote.Model.TocSpec
