@@ -181,6 +181,9 @@
       }
       currentRef = ref;
       ref.classList.add('emanote-footnote-active');
+      // hidePopover throws InvalidStateError if the popover is already
+      // closed. That's the expected case on first open; the throw carries
+      // no signal we'd act on, so swallow it.
       try { popover.hidePopover(); } catch (_) {}
       try {
         popover.showPopover();
