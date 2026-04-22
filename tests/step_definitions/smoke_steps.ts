@@ -107,10 +107,6 @@ Then(
   },
 );
 
-// Footnote popup scenarios. The popover lives at `#emanote-footnote-popover`
-// and is owned by the script in components/footnote-popup.tpl. Clicking a
-// `sup[data-footnote-ref]` that matches the scope (embedded vs. top-level)
-// must route the click to the right `<li data-footnote-id>`.
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
