@@ -67,10 +67,13 @@
       </DefinitionList:Items>
     </dl>
   </DefinitionList>
-  <Note:Ref><sup data-footnote-ref="${footnote:idx}" role="button" tabindex="0" aria-label="Footnote ${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums]"><footnote:idx /></sup></Note:Ref>
+  <Note:Ref><sup data-footnote-ref="${footnote:idx}" role="button" tabindex="0" aria-label="Footnote ${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none"><footnote:idx /></sup></Note:Ref>
   <Note:List>
-    <aside data-footnote-list aria-hidden="true" hidden>
-      <ol>
+    <!-- Screen: hidden (popup is the UI). Print: revealed with standard
+         footnote-list styling so printed output includes the cited bodies. -->
+    <aside data-footnote-list aria-hidden="true" class="hidden print:block mt-10 text-sm">
+      <header class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Footnotes</header>
+      <ol class="list-decimal pl-6 space-y-2">
         <footnote>
           <li data-footnote-id="${footnote:idx}">
             <footnote:content />

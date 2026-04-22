@@ -187,3 +187,64 @@ Then(
     );
   },
 );
+
+// Print-mode footnotes. The popup is screen-only; the hidden <aside
+// data-footnote-list> is revealed by `print:block` on paper so printed
+// copies still carry the cited bodies.
+async function countVisibleFootnoteAsides(page: EmanoteWorld["page"]) {
+  return page.evaluate(
+    () =>
+      Array.from(
+        document.querySelectorAll("aside[data-footnote-list]"),
+      ).filter((a) => getComputedStyle(a as Element).display !== "none").length,
+  );
+}
+
+Then(
+  "no footnote list is visible on screen",
+  async function (this: EmanoteWorld) {
+    const count = await countVisibleFootnoteAsides(this.page);
+    assert.strictEqual(
+      count,
+      0,
+      `Expected no visible <aside data-footnote-list> on screen; got ${count}. The popup is the only footnote UI on screen — a visible aside means hidden/print:block got reverted.`,
+    );
+  },
+);
+
+When(
+  "the page is emulated as print media",
+  async function (this: EmanoteWorld) {
+    await this.page.emulateMedia({ media: "print" });
+  },
+);
+
+Then(
+  "at least one footnote list is visible",
+  async function (this: EmanoteWorld) {
+    const count = await countVisibleFootnoteAsides(this.page);
+    assert.ok(
+      count > 0,
+      `Expected at least one <aside data-footnote-list> visible under print emulation; got ${count}. The print:block variant on the aside is missing or the parent hides it regardless.`,
+    );
+  },
+);
+
+Then(
+  "the printed footnote list contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const text = await this.page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll("aside[data-footnote-list]"))
+          .filter((a) => getComputedStyle(a as Element).display !== "none")
+          .map((a) => (a as HTMLElement).textContent ?? "")
+          .join(" "),
+    );
+    assert.ok(
+      text.includes(needle),
+      `Visible print-mode footnote list did not contain ${JSON.stringify(
+        needle,
+      )}. Got: ${JSON.stringify(text.slice(0, 200))}.`,
+    );
+  },
+);

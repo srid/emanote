@@ -1,81 +1,16 @@
 <!-- Footnote popup. Footnote refs have no anchor href and no bottom list
-     renders on screen; the body content is emitted inside a hidden
-     <aside data-footnote-list>, sourced only by this script for the
-     popup clone. Bound to data-footnote-ref / data-footnote-id /
-     data-footnote-list / data-footnote-scope. -->
+     renders on screen (the hidden <aside data-footnote-list> is the clone
+     source for this script, and also the print-mode rendering). Bound to
+     data-footnote-ref / data-footnote-id / data-footnote-list /
+     data-footnote-scope.
+
+     Popover chrome is styled via Tailwind utility classes applied from
+     the script below onto the JS-created <div>; the one CSS escape
+     hatch here is the Popover ::backdrop pseudo-element, which has no
+     Tailwind variant. -->
 
 <style data-category="footnote-popup">
-  #emanote-footnote-popover {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    position: fixed;
-    max-width: min(32rem, calc(100vw - 2rem));
-    width: max-content;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: inherit;
-    z-index: 9999;
-  }
   #emanote-footnote-popover::backdrop { background: transparent; }
-  .emanote-footnote-popup-body {
-    background: white;
-    color: var(--color-gray-800);
-    padding: 0.875rem 1.125rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-gray-200);
-    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    position: relative;
-  }
-  .dark .emanote-footnote-popup-body {
-    background: var(--color-gray-900);
-    color: var(--color-gray-200);
-    border-color: var(--color-gray-700);
-    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
-  }
-  .emanote-footnote-popup-body > :last-child { margin-bottom: 0; }
-  .emanote-footnote-popup-body p { margin-bottom: 0.5rem; }
-  /* The cloned <li> lives outside its <ol>; strip the stray marker
-     and the indent that would otherwise reserve room for it. */
-  .emanote-footnote-popup-body > li {
-    list-style: none;
-    padding-left: 0;
-    margin-left: 0;
-  }
-
-  sup[data-footnote-ref].emanote-footnote-active {
-    background-color: var(--color-primary-100);
-    border-radius: 3px;
-    padding: 0 0.2em;
-  }
-  .dark sup[data-footnote-ref].emanote-footnote-active {
-    background-color: var(--color-primary-900);
-  }
-  sup[data-footnote-ref]:focus-visible {
-    outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-
-  /* Mobile bottom-sheet: slide up from the bottom, full width. */
-  @media (max-width: 640px) {
-    .emanote-footnote-popup--mobile {
-      top: auto !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100% !important;
-      max-width: 100vw !important;
-    }
-    .emanote-footnote-popup--mobile .emanote-footnote-popup-body {
-      border-radius: 1rem 1rem 0 0;
-      padding: 1rem 1.25rem 1.5rem;
-      max-height: 60vh;
-      overflow-y: auto;
-      box-shadow: 0 -12px 30px -5px rgb(0 0 0 / 0.25);
-    }
-  }
 </style>
 
 <script>
@@ -84,19 +19,42 @@
 
     if (typeof HTMLElement === 'undefined' ||
         !HTMLElement.prototype.hasOwnProperty('popover')) {
-      // No Popover API — fall through to native anchor navigation.
+      // No Popover API — footnote refs stay inert, no popup.
       return;
     }
 
-    // The pixel value must stay in sync with the @media (max-width: …)
-    // breakpoint in the <style> above — neither side enforces it.
+    // Keep these in sync with the max-sm: variants below (Tailwind's sm
+    // breakpoint is 640px). Parsed as a MediaQueryList once and reused.
     var mobileMQL = window.matchMedia('(max-width: 640px)');
+
+    var POPOVER_CLASS = [
+      'fixed z-[9999] m-0 p-0 border-0 bg-transparent',
+      'w-max max-w-[min(32rem,calc(100vw-2rem))]',
+      'text-[0.95rem] leading-relaxed',
+      // Mobile: pin to viewport edge as a full-width bottom sheet.
+      'max-sm:top-auto max-sm:left-0 max-sm:right-0 max-sm:bottom-0',
+      'max-sm:w-full max-sm:max-w-full',
+    ].join(' ');
+
+    var BODY_CLASS = [
+      'relative bg-white dark:bg-gray-900',
+      'text-gray-800 dark:text-gray-200',
+      'px-[1.125rem] py-[0.875rem]',
+      'rounded-lg border border-gray-200 dark:border-gray-700',
+      'shadow-xl',
+      // Cloned pandoc content inherits styling from the surrounding page
+      // (paragraphs, stray <li> left from the <ol> the <li> came from).
+      '[&>:last-child]:mb-0 [&_p]:mb-2',
+      '[&>li]:list-none [&>li]:pl-0 [&>li]:ml-0',
+      // Mobile bottom-sheet shape.
+      'max-sm:rounded-t-2xl max-sm:rounded-b-none',
+      'max-sm:px-5 max-sm:pt-4 max-sm:pb-6',
+      'max-sm:max-h-[60vh] max-sm:overflow-y-auto',
+      'max-sm:shadow-2xl',
+    ].join(' ');
 
     var popoverEl = null;
     var currentRef = null;
-    // Pandoc emits exactly one top-level <aside data-footnote-list> per
-    // page. Live-server reloads the whole document on source changes, so
-    // caching across clicks is safe — no SPA mutations to worry about.
     var topLevelAside = null;
 
     function ensurePopover() {
@@ -106,8 +64,9 @@
       popoverEl = document.createElement('div');
       popoverEl.id = 'emanote-footnote-popover';
       popoverEl.setAttribute('popover', 'auto');
+      popoverEl.className = POPOVER_CLASS;
       var body = document.createElement('div');
-      body.className = 'emanote-footnote-popup-body';
+      body.className = BODY_CLASS;
       popoverEl.appendChild(body);
       document.body.appendChild(popoverEl);
       popoverEl.addEventListener('toggle', function (e) {
@@ -151,18 +110,14 @@
         : null;
     }
 
-    function cloneContent(li) {
-      return li.cloneNode(true);
-    }
-
     function positionPopover(popover, ref) {
       if (mobileMQL.matches) {
-        popover.classList.add('emanote-footnote-popup--mobile');
+        // Bottom-sheet layout comes from max-sm: utilities on POPOVER_CLASS;
+        // just clear any inline top/left left over from a prior desktop open.
         popover.style.top = '';
         popover.style.left = '';
         return;
       }
-      popover.classList.remove('emanote-footnote-popup--mobile');
       var refRect = ref.getBoundingClientRect();
       var popRect = popover.getBoundingClientRect();
       var vw = window.innerWidth;
@@ -189,7 +144,7 @@
       var popover = ensurePopover();
       var body = popover.firstElementChild;
       body.textContent = '';
-      body.appendChild(cloneContent(target));
+      body.appendChild(target.cloneNode(true));
       // hidePopover throws InvalidStateError if the popover is already
       // closed. That's the expected case on first open; the throw carries
       // no signal we'd act on, so swallow it.

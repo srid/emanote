@@ -6,12 +6,11 @@ date: 2022-08-03
 
 # Embedding
 
-You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/Linking+notes+and+files/Embedding+files). The HTML can be fully customized for each embed type[^parent].
+You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/Linking+notes+and+files/Embedding+files). The HTML can be fully customized for each embed types.
 
 > [!warning] 
 > The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported.
 
-[^parent]: A page-level footnote, rendered into the bottom list and also shown in the click-anywhere popup. The popup is a progressive enhancement — the bottom list stays usable when JS is off or on print.
 [^blk]: This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
 
 ## Notes

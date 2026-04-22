@@ -49,7 +49,7 @@ https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/foot
 
 Demo: Checkout this note[^1] and this other note[^2] as both are footnotes. You may also reuse[^1] footnotes.
 
-Clicking a footnote reference opens a click-dismissible popup with the footnote's body — no scroll-away. On narrow screens the popup slides up as a bottom sheet. The full footnote list still renders at the bottom of the page, for print and no-JS fallback.
+Clicking a footnote reference opens a click-dismissible popup with the footnote's body — no scroll-away, no bottom footnote list. Keyboard users can focus a ref and press Enter or Space. On narrow screens the popup slides up as a bottom sheet.
 
 [^1]: First footnote example
 [^2]: Second footnote example. Footnotes *within*[^1] footnotes are not handled.
