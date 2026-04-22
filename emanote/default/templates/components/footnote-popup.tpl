@@ -209,10 +209,20 @@
       openFor(sup, target);
     }
 
+    // Scroll fires at ≥ 60 Hz; coalesce repositions into the browser's
+    // next animation frame so we do one layout read per frame, not per
+    // scroll tick.
+    var viewportTick = false;
     function onViewportChange() {
-      if (popoverEl && popoverEl.matches(':popover-open') && currentRef) {
-        positionPopover(popoverEl, currentRef);
-      }
+      if (viewportTick) return;
+      if (!popoverEl || !popoverEl.matches(':popover-open') || !currentRef) return;
+      viewportTick = true;
+      requestAnimationFrame(function () {
+        viewportTick = false;
+        if (popoverEl && popoverEl.matches(':popover-open') && currentRef) {
+          positionPopover(popoverEl, currentRef);
+        }
+      });
     }
 
     function init() {
