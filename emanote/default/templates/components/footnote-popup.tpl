@@ -1,12 +1,8 @@
-<!-- Progressive-enhancement popup for footnote references.
-
-     Binds to the stable contract `data-footnote-ref` / `data-footnote-id`
-     / `data-footnote-list` / `data-footnote-scope` emitted by pandoc.tpl
-     and embed-note.tpl, not to Pandoc's `.footnote-ref` / `.footnote-list`
-     class names (those are stable-by-stasis, not by encapsulation).
-
-     The bottom `<aside>` stays visible as a no-JS / print fallback; the
-     popup is a convenience layer, not a replacement. -->
+<!-- Footnote popup. Footnote refs have no anchor href and no bottom list
+     renders on screen; the body content is emitted inside a hidden
+     <aside data-footnote-list>, sourced only by this script for the
+     popup clone. Bound to data-footnote-ref / data-footnote-id /
+     data-footnote-list / data-footnote-scope. -->
 
 <style data-category="footnote-popup">
   #emanote-footnote-popover {
@@ -48,13 +44,18 @@
     margin-left: 0;
   }
 
-  sup[data-footnote-ref].emanote-footnote-active a {
+  sup[data-footnote-ref].emanote-footnote-active {
     background-color: var(--color-primary-100);
     border-radius: 3px;
     padding: 0 0.2em;
   }
-  .dark sup[data-footnote-ref].emanote-footnote-active a {
+  .dark sup[data-footnote-ref].emanote-footnote-active {
     background-color: var(--color-primary-900);
+  }
+  sup[data-footnote-ref]:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   /* Mobile bottom-sheet: slide up from the bottom, full width. */
@@ -99,7 +100,9 @@
     var topLevelAside = null;
 
     function ensurePopover() {
-      if (popoverEl) return popoverEl;
+      // Emanote's live-server patches the DOM on source changes, which can
+      // detach a previously appended popover. Recreate when that happens.
+      if (popoverEl && popoverEl.isConnected) return popoverEl;
       popoverEl = document.createElement('div');
       popoverEl.id = 'emanote-footnote-popover';
       popoverEl.setAttribute('popover', 'auto');
@@ -135,7 +138,10 @@
       var scope = ref.closest('[data-footnote-scope]');
       var aside;
       if (scope === null) {
-        if (!topLevelAside) topLevelAside = findOwnAside(null);
+        // Re-resolve if the cached aside got swapped out by a live-reload patch.
+        if (!topLevelAside || !topLevelAside.isConnected) {
+          topLevelAside = findOwnAside(null);
+        }
         aside = topLevelAside;
       } else {
         aside = findOwnAside(scope);
@@ -146,11 +152,7 @@
     }
 
     function cloneContent(li) {
-      var clone = li.cloneNode(true);
-      // Backref would navigate away from the popup — drop it.
-      var backrefs = clone.querySelectorAll('a[data-footnote-backref]');
-      for (var i = 0; i < backrefs.length; i++) backrefs[i].remove();
-      return clone;
+      return li.cloneNode(true);
     }
 
     function positionPopover(popover, ref) {
@@ -212,15 +214,24 @@
       requestAnimationFrame(function () { positionPopover(popover, ref); });
     }
 
-    function onClick(e) {
-      if (e.defaultPrevented) return;
-      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-      var sup = e.target.closest('sup[data-footnote-ref]');
-      if (!sup) return;
+    function activate(e, sup) {
       var target = findTarget(sup);
       if (!target) return;
       e.preventDefault();
       openFor(sup, target);
+    }
+
+    function onClick(e) {
+      if (e.defaultPrevented) return;
+      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      var sup = e.target.closest('sup[data-footnote-ref]');
+      if (sup) activate(e, sup);
+    }
+
+    function onKeydown(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var sup = e.target.closest('sup[data-footnote-ref]');
+      if (sup) activate(e, sup);
     }
 
     // Scroll fires at ≥ 60 Hz; coalesce repositions into the browser's
@@ -241,6 +252,7 @@
 
     function init() {
       document.addEventListener('click', onClick);
+      document.addEventListener('keydown', onKeydown);
       window.addEventListener('resize', onViewportChange);
       window.addEventListener('scroll', onViewportChange, { passive: true });
     }
