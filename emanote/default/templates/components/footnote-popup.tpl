@@ -176,11 +176,6 @@
       var body = popover.firstElementChild;
       body.textContent = '';
       body.appendChild(cloneContent(target));
-      if (currentRef && currentRef !== ref) {
-        currentRef.classList.remove('emanote-footnote-active');
-      }
-      currentRef = ref;
-      ref.classList.add('emanote-footnote-active');
       // hidePopover throws InvalidStateError if the popover is already
       // closed. That's the expected case on first open; the throw carries
       // no signal we'd act on, so swallow it.
@@ -192,6 +187,13 @@
         console.warn('[emanote] footnote popover showPopover failed', err);
         return;
       }
+      // Only dirty the active-state after show succeeds — otherwise a
+      // failed show leaves a stale highlight on the ref until next click.
+      if (currentRef && currentRef !== ref) {
+        currentRef.classList.remove('emanote-footnote-active');
+      }
+      currentRef = ref;
+      ref.classList.add('emanote-footnote-active');
       // Defer to next frame so popover width reflects the content just
       // inserted — measuring immediately after showPopover() can center
       // on the previous frame's width.
