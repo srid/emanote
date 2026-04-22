@@ -177,7 +177,13 @@
       currentRef = ref;
       ref.classList.add('emanote-footnote-active');
       try { popover.hidePopover(); } catch (_) {}
-      try { popover.showPopover(); } catch (_) { return; }
+      try {
+        popover.showPopover();
+      } catch (err) {
+        // Silent return would mean the click appeared to do nothing.
+        console.warn('[emanote] footnote popover showPopover failed', err);
+        return;
+      }
       // Defer to next frame so popover width reflects the content just
       // inserted — measuring immediately after showPopover() can center
       // on the previous frame's width.
