@@ -22,20 +22,26 @@ serverInfoResourceUri = "emanote://server/info"
 serverInfoToolName :: Text
 serverInfoToolName = "emanote_get_server_info"
 
+serverImplementation :: (Text, Text, Text)
+serverImplementation =
+  case implementationInfo of
+    MT.Implementation name title version ->
+      (name, fromMaybe "Emanote MCP" title, version)
+
 implementationName :: Text
 implementationName =
-  case implementationInfo of
-    MT.Implementation name _ _ -> name
+  let (name, _, _) = serverImplementation
+   in name
 
 implementationTitle :: Text
 implementationTitle =
-  case implementationInfo of
-    MT.Implementation _ title _ -> fromMaybe "Emanote MCP" title
+  let (_, title, _) = serverImplementation
+   in title
 
 implementationVersion :: Text
 implementationVersion =
-  case implementationInfo of
-    MT.Implementation _ _ version -> version
+  let (_, _, version) = serverImplementation
+   in version
 
 -- | Local resource registry entry pairing MCP metadata with its read handler.
 data ResourceHandler = ResourceHandler
@@ -50,9 +56,11 @@ data ToolHandler = ToolHandler
   , runTool :: MP.CallToolParams -> Maybe MP.CallToolResult
   }
 
+-- | Resource descriptors advertised by the current MCP surface.
 resources :: [MT.Resource]
 resources = resourceDescriptor <$> resourceHandlers
 
+-- | Tool descriptors advertised by the current MCP surface.
 tools :: [MT.Tool]
 tools = toolDescriptor <$> toolHandlers
 

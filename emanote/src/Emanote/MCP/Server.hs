@@ -49,6 +49,8 @@ instance MCPServer MCPServerM where
   handleComplete _params =
     pure $ MP.CompleteResult (MP.CompletionResult [] (Just 0) (Just False)) Nothing
 
+  -- The server does not advertise MCP logging capability yet, so setLevel
+  -- requests have no effect until logging is wired through explicitly.
   handleSetLevel _params =
     liftIO pass
 

@@ -11,6 +11,7 @@ import MCP.Types qualified as MT
 import Paths_emanote qualified
 import Relude
 
+-- | MCP protocol version advertised during server initialization.
 protocolVersion :: Text
 protocolVersion = MT.mcpProtocolVersion
 
