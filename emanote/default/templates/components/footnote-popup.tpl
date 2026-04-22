@@ -83,7 +83,6 @@
       return;
     }
 
-    var POPOVER_ID = 'emanote-footnote-popover';
     // MOBILE_MAX must stay in sync with the @media (max-width: …) breakpoint
     // in the <style> above — neither side enforces it.
     var MOBILE_MAX = 640;
@@ -94,7 +93,7 @@
     function ensurePopover() {
       if (popoverEl) return popoverEl;
       popoverEl = document.createElement('div');
-      popoverEl.id = POPOVER_ID;
+      popoverEl.id = 'emanote-footnote-popover';
       popoverEl.setAttribute('popover', 'auto');
       var body = document.createElement('div');
       body.className = 'emanote-footnote-popup-body';
