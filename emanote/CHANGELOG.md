@@ -11,6 +11,7 @@
   - New self-hosted typography: Lora + Space Grotesk + Space Mono.
   - Manual dark/light theme toggle (#605, #617) with `localStorage` persistence.
   - Backlinks as a card grid; TOC with depth-based hierarchy and `IntersectionObserver` scroll-spy (#520).
+  - Popup footnotes as the only on-screen UI (desktop card / mobile bottom-sheet); printed output renders the footnote list ([#642](https://github.com/srid/emanote/pull/642)).
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
