@@ -11,7 +11,6 @@ Follow these steps to get started with Emanote.
 1. Use your existing notebook, or create one from [[emanote-template]][^gh].
 1. Run `emanote run --port=8080` (or just `emanote`) in terminal after `cd`'ing to that notebook folder; this will launch the live server.
      - Or, if you only want to generate the HTML files (for deployment), run `mkdir /tmp/output; emanote gen /tmp/output`.
-     - To also start the phase-1 MCP HTTP endpoint in the same process, pass `--mcp-port=8081` to the live server command. This currently exposes the MCP lifecycle plus a minimal read-only resource/tool surface; notebook-backed MCP resources land in a later phase.
 2. Visit [[guide]] to learn more about Emanote, or [[examples]] to get inspired first.[^h]
 
 

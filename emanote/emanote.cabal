@@ -163,6 +163,9 @@ library
     Emanote
     Emanote.CLI
     Emanote.MCP
+    Emanote.MCP.Info
+    Emanote.MCP.Server
+    Emanote.MCP.Surface
     Emanote.Model
     Emanote.Model.Calendar
     Emanote.Model.Calendar.Parser

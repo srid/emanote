@@ -2,28 +2,29 @@ module Emanote.MCPSpec where
 
 import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
-import Emanote.MCP
+import Emanote.MCP.Info
+import Emanote.MCP.Surface
 import MCP.Protocol (CallToolParams (..), CallToolResult (..))
 import Relude
 import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "readPhase1Resource" $ do
-    it "serves the phase-1 info resource" $ do
-      readPhase1Resource "emanote://phase-1/info"
-        `shouldSatisfy` either (const False) (T.isInfixOf "phase 1 is enabled")
+  describe "readResource" $ do
+    it "serves server information" $ do
+      readResource serverInfoResourceUri
+        `shouldSatisfy` either (const False) (T.isInfixOf implementationVersion)
 
     it "rejects unknown resources" $ do
-      readPhase1Resource "emanote://missing"
+      readResource "emanote://missing"
         `shouldBe` Left "Unknown MCP resource: emanote://missing"
 
-  describe "callPhase1Tool" $ do
-    it "returns structured status for the phase-1 tool" $ do
-      let result = callPhase1Tool (CallToolParams "emanote_phase_1_status" Nothing)
+  describe "callTool" $ do
+    it "returns structured server information" $ do
+      let result = callTool (CallToolParams serverInfoToolName Nothing)
       Aeson.decode @Aeson.Value (Aeson.encode $ structuredContent result)
         `shouldSatisfy` isJust
 
     it "marks unknown tools as errors" $ do
-      isError (callPhase1Tool (CallToolParams "unknown" Nothing))
+      isError (callTool (CallToolParams "unknown" Nothing))
         `shouldBe` Just True
