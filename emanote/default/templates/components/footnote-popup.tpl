@@ -83,9 +83,9 @@
       return;
     }
 
-    // MOBILE_MAX must stay in sync with the @media (max-width: …) breakpoint
-    // in the <style> above — neither side enforces it.
-    var MOBILE_MAX = 640;
+    // The pixel value must stay in sync with the @media (max-width: …)
+    // breakpoint in the <style> above — neither side enforces it.
+    var mobileMQL = window.matchMedia('(max-width: 640px)');
 
     var popoverEl = null;
     var currentRef = null;
@@ -136,12 +136,8 @@
       return clone;
     }
 
-    function isMobile() {
-      return window.matchMedia('(max-width: ' + MOBILE_MAX + 'px)').matches;
-    }
-
     function positionPopover(popover, ref) {
-      if (isMobile()) {
+      if (mobileMQL.matches) {
         popover.classList.add('emanote-footnote-popup--mobile');
         popover.style.top = '';
         popover.style.left = '';
