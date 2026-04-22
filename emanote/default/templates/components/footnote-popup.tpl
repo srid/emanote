@@ -25,17 +25,17 @@
   #emanote-footnote-popover::backdrop { background: transparent; }
   .emanote-footnote-popup-body {
     background: white;
-    color: var(--color-gray-800, #1f2937);
+    color: var(--color-gray-800);
     padding: 0.875rem 1.125rem;
     border-radius: 0.5rem;
-    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border: 1px solid var(--color-gray-200);
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     position: relative;
   }
   .dark .emanote-footnote-popup-body {
-    background: var(--color-gray-900, #111827);
-    color: var(--color-gray-200, #e5e7eb);
-    border-color: var(--color-gray-700, #374151);
+    background: var(--color-gray-900);
+    color: var(--color-gray-200);
+    border-color: var(--color-gray-700);
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
   }
   .emanote-footnote-popup-body > :last-child { margin-bottom: 0; }
