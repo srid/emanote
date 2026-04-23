@@ -56,7 +56,6 @@ server via 'UnliftIO.Async.race_'.
 run :: Int -> IO ()
 run port = do
   stateVar <- newMVar initialState
-  putStrLn $ "MCP server listening on http://localhost:" <> show port <> "/mcp"
   Warp.run port (simpleHttpApp stateVar)
 
 initialState :: MCPServerState
