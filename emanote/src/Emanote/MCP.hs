@@ -111,7 +111,7 @@ instructions =
       , "Resources:"
       , "- " <> metadataUri <> " — JSON metadata for every note (titles, paths, parents, links)"
       , "- " <> contentUri <> " — all notes concatenated as a single Markdown document"
-      , "- " <> noteUriPrefix <> "{path} — individual note by source path (e.g. " <> noteUriPrefix <> "guide/mcp.md)"
+      , "- " <> noteUriTemplate <> " — individual note by source path (e.g. " <> noteUriPrefix <> "guide/mcp.md)"
       ]
 
 capabilities :: ServerCapabilities
@@ -133,6 +133,12 @@ contentUri = "emanote://export/content"
 
 noteUriPrefix :: Text
 noteUriPrefix = "emanote://note/"
+
+{- | RFC 6570 template for the per-note URI; referenced both in instructions
+and in 'noteTemplate'.
+-}
+noteUriTemplate :: Text
+noteUriTemplate = noteUriPrefix <> "{path}"
 
 noteUri :: R.LMLRoute -> Text
 noteUri route = noteUriPrefix <> toText (ExportJSON.lmlSourcePath route)
@@ -261,8 +267,8 @@ noteTemplate =
   ResourceTemplate
     { MCP.name = "Notebook note"
     , MCP.title = Just "Notebook note"
-    , uriTemplate = noteUriPrefix <> "{path}"
-    , MCP.description = Just "Individual note by source path, e.g. emanote://note/guide/mcp.md"
+    , uriTemplate = noteUriTemplate
+    , MCP.description = Just $ "Individual note by source path, e.g. " <> noteUriPrefix <> "guide/mcp.md"
     , MCP.mimeType = Just "text/markdown"
     , annotations = Nothing
     , MCP._meta = Nothing
