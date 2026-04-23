@@ -198,18 +198,21 @@ readResource model uri
   | uri == contentUri = do
       body <- liftIO $ ExportContent.renderContentExport model
       pure $ ProcessSuccess $ textResult uri (Just "text/markdown") body
-  | Just path <- T.stripPrefix noteUriPrefix uri
-  , Just route <- parseNoteRoute (toString path) =
-      case Note.lookupNotesByRoute route (model ^. M.modelNotes) of
-        Nothing -> pure $ ProcessRPCError 404 $ "Note not found: " <> uri
-        Just note -> do
-          mContent <- liftIO $ ExportContent.readNoteContent note
-          case mContent of
-            Nothing -> pure $ ProcessRPCError 404 $ "Note has no source file: " <> uri
-            Just content ->
-              let header = ExportContent.generateNoteHeader model note
-               in pure $ ProcessSuccess $ textResult uri (Just "text/markdown") (header <> content)
+  | Just path <- T.stripPrefix noteUriPrefix uri =
+      readNoteResource model uri (toString path)
   | otherwise = pure $ ProcessRPCError 404 $ "Resource not found: " <> uri
+
+readNoteResource :: Model -> Text -> FilePath -> MCPServerT (ProcessResult ReadResourceResult)
+readNoteResource model uri path =
+  case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
+    Nothing -> pure $ ProcessRPCError 404 $ "Note not found: " <> uri
+    Just note -> do
+      mContent <- liftIO $ ExportContent.readNoteContent note
+      case mContent of
+        Nothing -> pure $ ProcessRPCError 404 $ "Note has no source file: " <> uri
+        Just content ->
+          let header = ExportContent.generateNoteHeader model note
+           in pure $ ProcessSuccess $ textResult uri (Just "text/markdown") (header <> content)
 
 parseNoteRoute :: FilePath -> Maybe R.LMLRoute
 parseNoteRoute fp =
