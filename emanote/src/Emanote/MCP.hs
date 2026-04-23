@@ -18,10 +18,8 @@ import Data.Version (showVersion)
 import MCP.Server (
   Implementation (..),
   ListResourcesResult (..),
-  LoggingLevel (..),
   MCPHandlerState,
   MCPHandlerUser,
-  MCPServerState (..),
   ProcessResult (..),
   ReadResourceParams (..),
   ResourcesCapability (..),
@@ -55,14 +53,8 @@ server via 'UnliftIO.Async.race_'.
 -}
 run :: Int -> IO ()
 run port = do
-  stateVar <- newMVar initialState
+  stateVar <- newMVar $ initMCPServerState () Nothing Nothing capabilities implementation instructions handlers
   Warp.run port (simpleHttpApp stateVar)
-
-initialState :: MCPServerState
-initialState =
-  (initMCPServerState () Nothing Nothing capabilities implementation instructions handlers)
-    { mcp_log_level = Just Warning
-    }
 
 implementation :: Implementation
 implementation =
