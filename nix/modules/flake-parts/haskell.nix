@@ -32,6 +32,14 @@
         ghcid.source = "0.8.8";
         heist-extra.source = inputs.heist-extra;
 
+        # MCP (Model Context Protocol) server library.
+        # Pulled from GitHub because 0.3.1.0 isn't in the pinned
+        # all-cabal-hashes snapshot and mcp-types isn't packaged in nixpkgs.
+        mcp.source = inputs.dpella-mcp + /mcp-server;
+        mcp-types.source = inputs.dpella-mcp + /mcp-types;
+        # jsonrpc is an mcp-types dependency missing from nixpkgs.
+        jsonrpc.source = inputs.dpella-jsonrpc;
+
         ema.source = inputs.ema + /ema;
         ema-generics.source = inputs.ema + /ema-generics;
         ema-extra.source = inputs.ema + /ema-extra;

@@ -5,10 +5,12 @@ module Emanote.CLI (
   Cli (..),
   Layer (..),
   Cmd (..),
+  RunCmd (..),
   parseCli,
   cliParser,
 ) where
 
+import Data.Default (def)
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema.CLI qualified
@@ -21,6 +23,7 @@ import UnliftIO.Directory (getCurrentDirectory)
 data Cli = Cli
   { layers :: NonEmpty Layer
   , allowBrokenInternalLinks :: Bool
+  , verbose :: Bool
   , cmd :: Cmd
   }
 
@@ -30,28 +33,61 @@ data Layer = Layer
   }
 
 data Cmd
-  = Cmd_Ema Ema.CLI.Cli
+  = Cmd_Run RunCmd
+  | Cmd_Gen FilePath
   | Cmd_Export ExportFormat
 
-exportParser :: Parser Cmd
-exportParser = do
-  exportCmd <-
-    subparser
-      ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
-          <> command "content" (info contentParser (progDesc "Export all notes to single Markdown file to stdout (uses baseUrl from notebook config)"))
-      )
-  pure $ Cmd_Export exportCmd
+-- | Arguments for the 'run' subcommand: Ema's live-server args plus Emanote's additions.
+data RunCmd = RunCmd
+  { runEmaArgs :: Ema.CLI.RunArgs
+  , runMcpPort :: Maybe Int
+  }
+
+cmdParser :: Parser Cmd
+cmdParser =
+  hsubparser
+    ( mconcat
+        [ command "run" (info (Cmd_Run <$> runCmdParser) (progDesc "Run the live server"))
+        , command "gen" (info (Cmd_Gen <$> argument str (metavar "DEST")) (progDesc "Generate the static site"))
+        , command "export" (info (Cmd_Export <$> exportParser) (progDesc "Export commands"))
+        ]
+    )
+    <|> pure (Cmd_Run defaultRunCmd)
   where
-    contentParser :: Parser ExportFormat
-    contentParser = pure ExportFormat_Content
+    defaultRunCmd = RunCmd def Nothing
+
+runCmdParser :: Parser RunCmd
+runCmdParser =
+  RunCmd
+    <$> Ema.CLI.runArgsParser
+    <*> optional
+      ( option portReader
+          $ mconcat
+            [ long "mcp-port"
+            , metavar "PORT"
+            , help "Expose an MCP (Model Context Protocol) server on this port alongside the live server"
+            ]
+      )
+
+exportParser :: Parser ExportFormat
+exportParser =
+  subparser
+    ( command "metadata" (info (pure ExportFormat_Metadata) (progDesc "Export metadata JSON"))
+        <> command "content" (info (pure ExportFormat_Content) (progDesc "Export all notes to single Markdown file to stdout (uses baseUrl from notebook config)"))
+    )
+
+portReader :: ReadM Int
+portReader = eitherReader $ \s ->
+  case readMaybe s of
+    Just n | n >= 1 && n <= 65535 -> Right n
+    _ -> Left $ "Port must be an integer in [1, 65535], got: " <> s
 
 cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- layerList $ one $ Layer cwd Nothing
   allowBrokenInternalLinks <- switch (long "allow-broken-internal-links" <> help "Report but do not fail on broken internal links")
-  cmd <-
-    fmap Cmd_Ema Ema.CLI.cliParser
-      <|> subparser (command "export" (info exportParser (progDesc "Export commands")))
+  verbose <- switch (long "verbose" <> short 'v' <> help "Enable verbose logging")
+  cmd <- cmdParser
   pure Cli {..}
   where
     layerList defaultPath = do

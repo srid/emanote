@@ -15,7 +15,7 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     # These are not (necessarily) upstreamed to nixpkgs, yet.
-    ema.url = "github:srid/ema/0.12.0.0";
+    ema.url = "github:srid/ema";
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
@@ -30,6 +30,13 @@
 
     emanote-template.url = "github:srid/emanote-template";
     emanote-template.flake = false;
+
+    # dpella/mcp is newer on GitHub than in nixpkgs' all-cabal-hashes,
+    # so pin the source directly. mcp-server/ and mcp-types/ are subdirs.
+    dpella-mcp.url = "github:dpella/mcp/52d13472d23ec11b9f6109f0fbf5159e9fda93da";
+    dpella-mcp.flake = false;
+    dpella-jsonrpc.url = "github:dpella/jsonrpc/0a708eb6c2744e1d69822d1cb90e9e352455a51b";
+    dpella-jsonrpc.flake = false;
   };
   outputs = inputs:
     inputs.nixos-unified.lib.mkFlake { inherit inputs; root = ./.; };

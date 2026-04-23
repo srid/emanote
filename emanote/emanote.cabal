@@ -121,6 +121,8 @@ common library-common
     , hspec-hedgehog
     , ixset-typed            >=0.5.1.0
     , map-syntax
+    , mcp                    >=0.3     && <0.4
+    , mcp-types              >=0.1     && <0.2
     , megaparsec
     , monad-logger
     , monad-logger-extras
@@ -150,6 +152,7 @@ common library-common
     , uri-encode
     , url-slug
     , uuid
+    , warp
     , which
     , with-utf8
     , xmlhtml
@@ -161,6 +164,7 @@ library
   exposed-modules:
     Emanote
     Emanote.CLI
+    Emanote.MCP
     Emanote.Model
     Emanote.Model.Calendar
     Emanote.Model.Calendar.Parser

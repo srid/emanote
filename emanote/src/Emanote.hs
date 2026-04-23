@@ -22,6 +22,7 @@ import Ema (
 import Ema.CLI qualified
 import Ema.Dynamic (Dynamic (Dynamic))
 import Emanote.CLI qualified as CLI
+import Emanote.MCP qualified as MCP
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
 import Emanote.Model.Type (modelCompileTailwind)
@@ -43,6 +44,7 @@ import Emanote.View.Template qualified as View
 import Optics.Core ((.~), (^.))
 import Relude
 import System.FilePath ((</>))
+import UnliftIO.Async (race_)
 
 instance IsRoute SiteRoute where
   type RouteModel SiteRoute = Model.ModelEma
@@ -70,10 +72,15 @@ defaultEmanoteConfig cli =
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
-    CLI.Cmd_Ema emaCli -> do
-      let emaCfg = SiteConfig emaCli def
-      Ema.runSiteWith @SiteRoute emaCfg cfg
-        >>= postRun cfg
+    CLI.Cmd_Run runCmd -> do
+      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
+          ema = Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
+      case CLI.runMcpPort runCmd of
+        Nothing -> ema
+        Just port -> race_ (MCP.run port (CLI.verbose _emanoteConfigCli)) ema
+    CLI.Cmd_Gen dest -> do
+      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
+      Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
     CLI.Cmd_Export exportFormat -> do
       Dynamic (unModelEma -> model0, _) <-
         flip runLoggerLoggingT oneOffLogger
@@ -81,6 +88,12 @@ run cfg@EmanoteConfig {..} = do
       content <- Export.renderExport exportFormat model0
       putLBSLn content
   where
+    toEmaCli :: CLI.Cmd -> Ema.CLI.Cli
+    toEmaCli = \case
+      CLI.Cmd_Run rc -> mkEmaCli $ Ema.CLI.Run (CLI.runEmaArgs rc)
+      CLI.Cmd_Gen dest -> mkEmaCli $ Ema.CLI.Generate dest
+      CLI.Cmd_Export _ -> mkEmaCli $ Ema.CLI.action def
+    mkEmaCli action = Ema.CLI.Cli {Ema.CLI.action = action, Ema.CLI.verbose = CLI.verbose _emanoteConfigCli}
     -- A logger suited for running one-off commands.
     oneOffLogger =
       logToStderr
