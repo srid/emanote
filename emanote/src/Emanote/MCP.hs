@@ -169,7 +169,14 @@ handlers modelRef =
       }
 
 {- | Run the given action against the current model, or reply 503 if the model
-ref is still empty (client arrived before Ema produced its first snapshot).
+ref is still empty.
+
+'Nothing' here is always a startup race: @race_@ in 'Emanote.run' gives no
+ordering guarantee between Warp's socket bind and Ema's first
+'emanoteSiteInput' call, so a client can hit @/mcp@ before 'tapModel' has
+written the initial snapshot. It is never a steady-state condition. Phase
+4 (#645) should remove this path entirely by deferring 'MCP.run' until
+after the first model is published.
 -}
 withModel ::
   IORef (Maybe Model) ->
