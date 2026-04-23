@@ -8,5 +8,9 @@ dependencies:
   - srid/agency#master
   - juspay/skills/skills/nix-justfile
   - anthropics/skills/skills/frontend-design
-  mcp: []
+  mcp:
+  - name: emanote
+    registry: false
+    transport: http
+    url: http://localhost:8079/mcp
 scripts: {}
