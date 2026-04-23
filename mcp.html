@@ -26,15 +26,15 @@
     })();
   </script>
   <title>
-    JavaScript behaviours – Emanote
+    MCP server – Emanote
   </title>
   
     
-      <meta property='og:description' content='Improve your Emanote website using custom JavaScript code. Emanote provides some predefined behaviours, like syntax highlighting or rendering of mathematical formulas. They can be accessed by including appropriate snippets in page.headHtml or page.bodyHtml of YAML configuration files (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). The source code for the snippets can be found in the default index.yaml under the js: YAML map.' />
+      <meta property='og:description' content='[!warning] Work in progress MCP support is rolling out in phases (#645). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='JavaScript behaviours' />
+      <meta property='og:title' content='MCP server' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -782,8 +782,8 @@
             </li>
           
             <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='tips'>
-                Tips
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='guide'>
+                Guide
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -905,6 +905,10 @@
       <!-- Variable bindings for this tree-->
 
   
+    
+      
+    
+  
 
 
 
@@ -918,7 +922,43 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='guide' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
+      Guide
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='markdown' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
@@ -930,13 +970,13 @@
           
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
-      Guide
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown'>
+      Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='13 children inside'>
-          13
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -951,9 +991,299 @@
       <!-- Variable bindings for this tree-->
 
   
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config'>
+      YAML configuration
+    </a>
     
       
+        
     
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query'>
+      Queries
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
+      Daily Notes
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export'>
+      Export
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed'>
+      ATOM feed
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note'>
+      Folder notes
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel'>
+      Folgezettel links
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
   
 
 
@@ -968,275 +1298,248 @@
     <span class='flex-shrink-0'>
       
         
+          <a href='html-template' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template'>
+      HTML Templates
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='10 children inside'>
+          10
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer'>
+      Layer system
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters'>
+      Lua Filters
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+  
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
+        </path>
       </svg>
       
   
         
     </span>
-    <a class='font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
+    <a class='font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp'>
+      MCP server
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode'>
+      Org Mode ✍️
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='tips' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
       Tips
     </a>
     
       
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
+        </span>
       
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syntax Highlighting' href='syntax-highlighting'>
-      Syntax Highlighting
-    </a>
-    
-      
-        
     
   </div>
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
   -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Adding Images' href='adding-images'>
-      Adding Images
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-  
-
-
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors rounded-md px-2 py-1 truncate flex-1' title='JavaScript' href='js'>
-      JavaScript
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Math' href='math'>
-      Math
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Mermaid Diagrams' href='mermaid'>
-      Mermaid Diagrams
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syncthing sync' href='sync'>
-      Syncthing sync
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
   
 </div>
     
@@ -1331,11 +1634,13 @@
           <div class='flex-1 w-full bg-white dark:bg-gray-800'>
   <main class='px-6 py-8 max-w-7xl mx-auto'>
     <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
-  JavaScript behaviours
+  MCP server
 </h1>
 
     
-      <article class='overflow-auto'>
+      <div class='md:grid md:gap-8 md:grid-cols-8'>
+        <div class='md:col-span-6'>
+          <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
@@ -1347,53 +1652,329 @@
 
 
 
-
+<div data-callout-metadata data-callout-fold data-callout='warning' data-footnote-scope
+ class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #EC7500 8%, transparent); border-left-color: #EC7500'>
+  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
+  </path>
+  <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>
+    <div class='callout-icon flex-shrink-0'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+        
+    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
+    <line x1='12' y1='9' x2='12' y2='13'></line>
+    <line x1='12' y1='17' x2='12.01' y2='17'></line>
+  
+      </svg>
+    </div>
+    <div class='ml-3'>
+       Work in progress
+    </div>
+  </div>
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
+    
     <p class='mb-4 leading-relaxed'>
-      Improve your Emanote website using custom JavaScript code. Emanote provides some predefined behaviours, like syntax highlighting or rendering of mathematical formulas. They can be accessed by including appropriate snippets in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.headHtml</code> or <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.bodyHtml</code> of <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>YAML configuration files</a> (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). The source code for the snippets can be found in the default <a href='https://github.com/srid/emanote/blob/master/emanote/default/index.yaml' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code></a> under the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>js:</code> YAML map.
+      MCP support is rolling out in phases (<a href='https://github.com/srid/emanote/issues/645' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><span class='font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm emanote:inline-tag:645' title='Tag' data-tag='645'><a href='-/tags/645' title='Tag' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>#645</a></span></a>). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
     </p>
-  <nav>
-  <div class='mb-8'>
-    <header data-nosnippet class='pb-2 mb-2 font-semibold text-gray-600 dark:text-gray-400'>
-      Pages matching path './*'
-    </header>
-    <ul>
+  
+  </div>
+</div>
+    <p class='mb-4 leading-relaxed'>
+      Emanote can expose an <a href='https://modelcontextprotocol.io' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>MCP (Model Context Protocol)</a> endpoint beside its <span title='Link is broken'><s>[[live-server|live server]]</s>❌</span>, so that <a href='https://claude.com/claude-code' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Claude Code</a>, <a href='https://github.com/openai/codex' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Codex</a>, or any other MCP-aware client can query your notebook directly from the same process that renders it.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      Enable it by passing <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--mcp-port PORT</code> to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run</code>:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>emanote</span> run <span class='at'>--port</span> 9010 <span class='at'>--mcp-port</span> 8079
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Emanote prints one line to stderr once the MCP endpoint is ready:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code>[mcp] listening on http://localhost:8079/mcp</code></pre></div>
+    <h2 id='client-setup' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Client setup
+  
+  <a href='mcp#client-setup' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <h3 id='claude-code' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
+      
+  Claude Code
+  
+  <a href='mcp#claude-code' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      Claude Code reads MCP server configuration from <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.mcp.json</code> in your project root (or your home directory). Point it at the running Emanote:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='json'><span class='fu'>{</span>
+  <span class='dt'>"mcpServers"</span><span class='fu'>:</span> <span class='fu'>{</span>
+    <span class='dt'>"emanote"</span><span class='fu'>:</span> <span class='fu'>{</span>
+      <span class='dt'>"url"</span><span class='fu'>:</span> <span class='st'>"http://localhost:8079/mcp"</span>
+    <span class='fu'>}</span>
+  <span class='fu'>}</span>
+<span class='fu'>}</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Start Emanote in one terminal (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run --mcp-port 8079</code>), launch Claude Code in the same directory, and it will connect on startup. Use <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>/mcp</code> inside Claude Code to verify the server appears and list its tools/resources.
+    </p>
+  
+    <h3 id='codex' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
+      
+  Codex
+  
+  <a href='mcp#codex' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      Codex uses <a href='https://github.com/openai/codex#mcp-servers' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>~/.codex/config.toml</code></a> for MCP servers. HTTP transport wiring looks like:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml'><span class='kw'>[mcp_servers.emanote]</span>
+<span class='dt'>url</span> <span class='op'>=</span> <span class='st'>"http://localhost:8079/mcp"</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Restart Codex after editing the config; it will pick up the server on next launch.
+    </p>
+  
+    <h3 id='quick-sanity-check-with-curl' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
+      
+  Quick sanity check with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>curl</code>
+  
+  <a href='mcp#quick-sanity-check-with-curl' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      MCP is JSON-RPC over HTTP with SSE responses. A raw <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>initialize</code> call:
+    </p>
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='sh'><span class='ex'>curl</span> <span class='at'>-sS</span> <span class='at'>-N</span> <span class='at'>-X</span> POST http://localhost:8079/mcp <span class='dt'>\</span>
+  <span class='at'>-H</span> <span class='st'>'Content-Type: application/json'</span> <span class='dt'>\</span>
+  <span class='at'>-H</span> <span class='st'>'Accept: application/json, text/event-stream'</span> <span class='dt'>\</span>
+  <span class='at'>-d</span> <span class='st'>'{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"1.0"}}}'</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      You should see an SSE <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>event: message</code> frame carrying the server’s implementation metadata and advertised capabilities.
+    </p>
+  
+    <h2 id='debugging' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Debugging
+  
+  <a href='mcp#debugging' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600 dark:text-gray-400'>
-              </span>
-            
-            <a class='flex-1 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-2 py-1 rounded-md font-semibold border-l-2 no-underline hover:bg-primary-100 dark:hover:bg-primary-900' href='math'>
-              Math
-            </a>
-          </div>
+          Pass <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-v</code> / <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--verbose</code> to Emanote and the underlying <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>mcp</code> library will print one <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>[request]</code> / <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>[response]</code> line per JSON-RPC call to stdout. Useful when a client is misbehaving or you want to see exactly what a tool call looks like.
         </li>
       
         <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600 dark:text-gray-400'>
-              </span>
-            
-            <a class='flex-1 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-2 py-1 rounded-md font-semibold border-l-2 no-underline hover:bg-primary-100 dark:hover:bg-primary-900' href='mermaid'>
-              Mermaid Diagrams
-            </a>
-          </div>
+          If MCP fails to bind (port already in use, privileged port without capability), Emanote exits with the socket exception — MCP and the live server share process lifetime, so neither runs when the other can’t start.
+        </li>
+      
+        <li>
+          MCP is not enabled unless <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--mcp-port</code> is present under the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>run</code> subcommand. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote gen</code> never starts MCP.
         </li>
       
     </ul>
-  </div>
-</nav>
+  
+    <h2 id='authentication' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Authentication
+  
+  <a href='mcp#authentication' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      There is none today. The server is intended for local use, bound to a loopback port. Do not expose the MCP port to the public internet or to an untrusted network.
+    </p>
+  
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/tips/js.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/mcp.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
   </a>
 </div>
 </article>
+        </div>
+        <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6 md:bg-gray-50/50 dark:md:bg-gray-950/50 md:-mr-6 md:pr-6 md:-my-8 md:py-8'>
+          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
+  <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
+    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
     
+        <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='Client setup'>
+              <a href='mcp#client-setup' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Client setup
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='Claude Code'>
+              <a href='mcp#claude-code' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Claude Code
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Codex'>
+              <a href='mcp#codex' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Codex
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Quick sanity check with curl'>
+              <a href='mcp#quick-sanity-check-with-curl' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Quick sanity check with curl
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Debugging'>
+              <a href='mcp#debugging' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Debugging
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Authentication'>
+              <a href='mcp#authentication' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Authentication
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+  </div>
+  <script>
+    // Highlight the TOC link for the section currently in view.
+    // Uses Intersection Observer (passive, no scroll-loop layout thrashing);
+    // replaces the old window.onscroll approach from issue #520.
+    (function () {
+      const tocLinks = document.querySelectorAll("a.--ema-toc");
+      if (tocLinks.length === 0) return;
+
+      const anchors = {};
+      document.querySelectorAll("a.--ema-anchor").forEach((a) => {
+        anchors[a.href] = a;
+      });
+
+      const observed = [];
+      const visibility = new Map();
+      tocLinks.forEach((link) => {
+        const anchor = anchors[link.href];
+        if (!anchor) return;
+        const section = anchor.closest("h1, h2, h3, h4, h5, h6") || anchor;
+        observed.push({ section, link });
+        visibility.set(section, false);
+      });
+
+      const mark = "toc-item-active";
+      const setActive = (activeLink) => {
+        tocLinks.forEach((l) => l.classList.remove(mark));
+        if (activeLink) activeLink.classList.add(mark);
+      };
+
+      const pickActive = () => {
+        let firstVisible = null;
+        let lastAbove = null;
+        for (const { section, link } of observed) {
+          if (visibility.get(section)) {
+            if (!firstVisible) firstVisible = link;
+          } else if (section.getBoundingClientRect().top < 0) {
+            lastAbove = link;
+          }
+        }
+        setActive(firstVisible || lastAbove || observed[0]?.link);
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          visibility.set(entry.target, entry.isIntersecting);
+        }
+        pickActive();
+      }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
+
+      for (const { section } of observed) observer.observe(section);
+      pickActive();
+    })();
+  </script>
+</nav>
+
+        </div>
+      </div>
+      
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
       
@@ -1401,6 +1982,15 @@
     </div>
     
   <section class='flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm'>
+    
+      <!-- FIXME: The use of -/tags is wrong, because we should use routeUrl using Ema's encoder 
+        Perhaps Emanote should inject tagMetas with urls.
+      -->
+      <a title='Tag' class='px-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-primary-500' href='-/tags/645'>
+        <!-- DoNotFormat -->
+        #645
+        <!-- DoNotFormat -->
+      </a>
     
   </section>
 
