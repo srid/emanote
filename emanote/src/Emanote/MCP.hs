@@ -5,10 +5,9 @@
 {- | MCP (Model Context Protocol) server.
 
 Runs alongside the Emanote live server in the same process, exposing a
-read-only surface over HTTP. Phase 1 establishes the transport and the
-minimal lifecycle (@initialize@, @resources/list@, @resources/read@,
-@tools/list@, @tools/call@) with empty resource and tool inventories;
-notebook-backed resources and query tools arrive in later phases.
+read-only surface over HTTP. Advertises the @resources@ and @tools@
+capabilities; current handlers return empty inventories and a
+not-found reply for unknown URIs.
 -}
 module Emanote.MCP (
   run,
@@ -37,13 +36,9 @@ import Network.Wai.Handler.Warp qualified as Warp
 import Paths_emanote qualified
 import Relude
 
--- | No per-session state is required for Phase 1.
 type instance MCPHandlerState = ()
 
-{- | No authenticated user type is required because we serve over
-'simpleHttpApp', which bypasses the JWT pipeline entirely. The instance
-exists only to satisfy the library's type-family constraint.
--}
+-- | Unused: 'simpleHttpApp' bypasses the JWT pipeline that would consume this.
 type instance MCPHandlerUser = ()
 
 {- | Start the MCP HTTP server on the given port.
@@ -65,9 +60,7 @@ implementation =
     }
 
 instructions :: Maybe Text
-instructions =
-  Just
-    "Emanote exposes its live notebook model over MCP. Phase 1 provides only the handshake; resources and tools arrive in later phases."
+instructions = Just "Emanote notebook exposed over MCP."
 
 capabilities :: ServerCapabilities
 capabilities =
