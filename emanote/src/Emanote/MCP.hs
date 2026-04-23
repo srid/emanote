@@ -17,8 +17,10 @@ import Data.Version (showVersion)
 import MCP.Server (
   Implementation (..),
   ListResourcesResult (..),
+  LoggingLevel (..),
   MCPHandlerState,
   MCPHandlerUser,
+  MCPServerState (..),
   ProcessResult (..),
   ReadResourceParams (..),
   ResourcesCapability (..),
@@ -35,6 +37,7 @@ import MCP.Server qualified as MCP
 import Network.Wai.Handler.Warp qualified as Warp
 import Paths_emanote qualified
 import Relude
+import System.IO (hPutStrLn)
 
 type instance MCPHandlerState = ()
 
@@ -44,12 +47,24 @@ type instance MCPHandlerUser = ()
 {- | Start the MCP HTTP server on the given port.
 
 This blocks. Intended to be run concurrently with the Emanote live
-server via 'UnliftIO.Async.race_'.
+server via 'UnliftIO.Async.race_'. Prints a single @listening@ line
+to stderr once Warp has bound the socket. When @verbose@ is set, the
+underlying @mcp@ library emits one line per request/response to
+stdout.
 -}
-run :: Int -> IO ()
-run port = do
-  stateVar <- newMVar $ initMCPServerState () Nothing Nothing capabilities implementation instructions handlers
-  Warp.run port (simpleHttpApp stateVar)
+run :: Int -> Bool -> IO ()
+run port verbose = do
+  stateVar <-
+    newMVar
+      (initMCPServerState () Nothing Nothing capabilities implementation instructions handlers)
+        { mcp_log_level = Just (if verbose then Debug else Warning)
+        }
+  let settings =
+        Warp.defaultSettings
+          & Warp.setPort port
+          & Warp.setBeforeMainLoop
+            (hPutStrLn stderr $ "[mcp] listening on http://localhost:" <> show port <> "/mcp")
+  Warp.runSettings settings (simpleHttpApp stateVar)
 
 implementation :: Implementation
 implementation =

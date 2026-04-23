@@ -77,7 +77,7 @@ run cfg@EmanoteConfig {..} = do
           ema = Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
       case CLI.runMcpPort runCmd of
         Nothing -> ema
-        Just port -> race_ (MCP.run port) ema
+        Just port -> race_ (MCP.run port (CLI.verbose _emanoteConfigCli)) ema
     CLI.Cmd_Gen dest -> do
       let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
       Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
