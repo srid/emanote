@@ -55,8 +55,29 @@ instance EmaSite SiteRoute where
   type SiteArg SiteRoute = EmanoteConfig
   siteInput cliAct cfg = do
     model <- emanoteSiteInput cliAct cfg
-    pure $ model <&> modelUpdateCachedFields
+    let tapped = model <&> modelUpdateCachedFields
+    case _emanoteConfigLiveModelRef cfg of
+      Nothing -> pure tapped
+      Just ref -> tapModelRef ref tapped
   siteOutput = View.emanoteSiteOutput
+
+{- | Mirror every Dynamic value (initial + updates) into the given ref so
+out-of-band readers (the MCP server) can snapshot the live model.
+-}
+tapModelRef ::
+  (MonadIO m) =>
+  IORef (Maybe Model.Model) ->
+  Dynamic m Model.ModelEma ->
+  m (Dynamic m Model.ModelEma)
+tapModelRef ref (Dynamic (x0, updater)) = do
+  liftIO $ writeIORef ref $ Just (unModelEma x0)
+  pure
+    $ Dynamic
+      ( x0
+      , \send -> updater $ \x -> do
+          liftIO $ writeIORef ref $ Just (unModelEma x)
+          send x
+      )
 
 -- | Populate model fields that needs to be computed once per update.
 modelUpdateCachedFields :: Model.ModelEma -> Model.ModelEma
@@ -67,17 +88,22 @@ modelUpdateCachedFields model =
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
-  EmanoteConfig cli id defaultEmanotePandocRenderers False
+  EmanoteConfig cli id defaultEmanotePandocRenderers False Nothing
 
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
     CLI.Cmd_Run runCmd -> do
-      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
-          ema = Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
       case CLI.runMcpPort runCmd of
-        Nothing -> ema
-        Just port -> race_ (MCP.run port (CLI.verbose _emanoteConfigCli)) ema
+        Nothing ->
+          let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
+           in Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
+        Just port -> do
+          modelRef <- newIORef Nothing
+          let cfg' = cfg {_emanoteConfigLiveModelRef = Just modelRef}
+              emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
+              ema = Ema.runSiteWith @SiteRoute emaCfg cfg' >>= postRun cfg'
+          race_ (MCP.run port (CLI.verbose _emanoteConfigCli) modelRef) ema
     CLI.Cmd_Gen dest -> do
       let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
       Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
