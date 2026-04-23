@@ -72,12 +72,15 @@ defaultEmanoteConfig cli =
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
-    CLI.Cmd_Ema emaCli -> do
-      let emaCfg = SiteConfig emaCli def
+    CLI.Cmd_Run runCmd -> do
+      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
           ema = Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
-      case CLI.mcpPort _emanoteConfigCli of
+      case CLI.runMcpPort runCmd of
         Nothing -> ema
         Just port -> race_ (MCP.run port) ema
+    CLI.Cmd_Gen dest -> do
+      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
+      Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
     CLI.Cmd_Export exportFormat -> do
       Dynamic (unModelEma -> model0, _) <-
         flip runLoggerLoggingT oneOffLogger
@@ -85,6 +88,12 @@ run cfg@EmanoteConfig {..} = do
       content <- Export.renderExport exportFormat model0
       putLBSLn content
   where
+    toEmaCli :: CLI.Cmd -> Ema.CLI.Cli
+    toEmaCli = \case
+      CLI.Cmd_Run rc -> mkEmaCli $ Ema.CLI.Run (CLI.runEmaArgs rc)
+      CLI.Cmd_Gen dest -> mkEmaCli $ Ema.CLI.Generate dest
+      CLI.Cmd_Export _ -> mkEmaCli $ Ema.CLI.action def
+    mkEmaCli action = Ema.CLI.Cli {Ema.CLI.action = action, Ema.CLI.verbose = CLI.verbose _emanoteConfigCli}
     -- A logger suited for running one-off commands.
     oneOffLogger =
       logToStderr
