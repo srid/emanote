@@ -52,7 +52,7 @@ cliParser cwd = do
   allowBrokenInternalLinks <- switch (long "allow-broken-internal-links" <> help "Report but do not fail on broken internal links")
   mcpPort <-
     optional
-      $ option auto
+      $ option portReader
       $ mconcat
         [ long "mcp-port"
         , metavar "PORT"
@@ -72,6 +72,11 @@ cliParser cwd = do
           , value defaultPath
           , help "List of (semicolon delimited) notebook folders to 'union mount', with the left-side folders being overlaid on top of the right-side ones. The default layer is implicitly included at the end of this list."
           ]
+    portReader :: ReadM Int
+    portReader = eitherReader $ \s ->
+      case readMaybe s of
+        Just n | n >= 1 && n <= 65535 -> Right n
+        _ -> Left $ "Port must be an integer in [1, 65535], got: " <> s
     layerListReader :: ReadM (NonEmpty Layer)
     layerListReader = do
       let partition s =
