@@ -12,7 +12,7 @@ notebook model as read-only MCP resources:
 * @emanote:\/\/note\/{path}@ — an individual note by its source path
 
 The live model is shared with 'Emanote.run' via an 'IORef' populated by
-'Emanote.tapModelRef' on every Ema update.
+'Emanote.tapModel' on every Ema update.
 -}
 module Emanote.MCP (
   run,
@@ -77,7 +77,7 @@ underlying @mcp@ library emits one line per request/response to
 stdout.
 
 Reads the current model from the supplied ref, which
-'Emanote.tapModelRef' populates on every Ema update. When the ref is
+'Emanote.tapModel' populates on every Ema update. When the ref is
 still 'Nothing' (a client arriving before Ema has produced its first
 model), handlers reply with JSON-RPC 503 so clients can retry.
 -}

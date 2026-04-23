@@ -56,26 +56,32 @@ instance EmaSite SiteRoute where
   siteInput cliAct cfg = do
     model <- emanoteSiteInput cliAct cfg
     let tapped = model <&> modelUpdateCachedFields
-    case _emanoteConfigLiveModelRef cfg of
+    case _emanoteConfigOnModelUpdate cfg of
       Nothing -> pure tapped
-      Just ref -> tapModelRef ref tapped
+      Just onUpdate -> tapModel onUpdate tapped
   siteOutput = View.emanoteSiteOutput
 
-{- | Mirror every Dynamic value (initial + updates) into the given ref so
-out-of-band readers (the MCP server) can snapshot the live model.
+{- | Invoke the given callback with every Dynamic value (initial + each
+update) so out-of-band subscribers (like the MCP server) can observe model
+changes without driving Ema's render loop.
+
+Phase 4 (#645) will grow this into a fanout: today the callback is a single
+IORef write, but subscription-based resources will need per-subscriber
+queues. When that lands, this helper and 'EmanoteConfig' should expose a
+richer bus type rather than a single @Model -> IO ()@.
 -}
-tapModelRef ::
+tapModel ::
   (MonadIO m) =>
-  IORef (Maybe Model.Model) ->
+  (Model.Model -> IO ()) ->
   Dynamic m Model.ModelEma ->
   m (Dynamic m Model.ModelEma)
-tapModelRef ref (Dynamic (x0, updater)) = do
-  liftIO $ writeIORef ref $ Just (unModelEma x0)
+tapModel onUpdate (Dynamic (x0, updater)) = do
+  liftIO $ onUpdate (unModelEma x0)
   pure
     $ Dynamic
       ( x0
       , \send -> updater $ \x -> do
-          liftIO $ writeIORef ref $ Just (unModelEma x)
+          liftIO $ onUpdate (unModelEma x)
           send x
       )
 
@@ -100,7 +106,7 @@ run cfg@EmanoteConfig {..} = do
            in Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
         Just port -> do
           modelRef <- newIORef Nothing
-          let cfg' = cfg {_emanoteConfigLiveModelRef = Just modelRef}
+          let cfg' = cfg {_emanoteConfigOnModelUpdate = Just (writeIORef modelRef . Just)}
               emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
               ema = Ema.runSiteWith @SiteRoute emaCfg cfg' >>= postRun cfg'
           race_ (MCP.run port (CLI.verbose _emanoteConfigCli) modelRef) ema

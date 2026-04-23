@@ -6,8 +6,8 @@ module Emanote.Source.Dynamic (
   EmanoteConfig (..),
   emanoteCompileTailwind,
   emanoteConfigCli,
-  emanoteConfigLiveModelRef,
   emanoteConfigNoteFn,
+  emanoteConfigOnModelUpdate,
   emanoteConfigPandocRenderers,
 ) where
 
@@ -45,9 +45,12 @@ data EmanoteConfig = EmanoteConfig
   -- ^ How to render Pandoc to Heist HTML.
   , _emanoteCompileTailwind :: Bool
   -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
-  , _emanoteConfigLiveModelRef :: Maybe (IORef (Maybe Model.Model))
-  -- ^ When set, each model update is mirrored to this ref. Used by the MCP
-  -- server to read the live model snapshot without driving Ema's render loop.
+  , _emanoteConfigOnModelUpdate :: Maybe (Model.Model -> IO ())
+  -- ^ If set, called once with the initial model and again after every
+  -- update. Ema's 'Dynamic' is push-only (no pull-side API), so out-of-band
+  -- readers (the MCP server) subscribe via this hook rather than reaching
+  -- into Ema. Storage is the caller's concern; @Emanote.run@ writes to an
+  -- 'IORef' it owns.
   }
 
 {- | Make an Ema `Dynamic` for the Emanote model.
