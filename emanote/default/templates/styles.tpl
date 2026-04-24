@@ -108,9 +108,10 @@
   }
 
   /* Nested callouts: drop the outer block margin so the inner callout
-     hugs the body of its parent rather than introducing a paragraph gap. */
-  .callout .callout-content > .callout:last-child,
-  .callout details > div > .callout:last-child {
+     hugs the body of its parent rather than introducing a paragraph gap.
+     Both foldable (<details>) and non-foldable (<div>) outer callouts wrap
+     their body in `.callout-content`, so a single selector covers both. */
+  .callout .callout-content > .callout:last-child {
     margin-bottom: 0;
   }
 </style>
