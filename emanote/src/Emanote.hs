@@ -79,14 +79,14 @@ run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
     CLI.Cmd_Run runCmd -> do
-      case CLI.runMcpPort runCmd of
-        Nothing ->
-          let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
-           in Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
-        Just port -> do
-          let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
-          flip runLoggerLoggingT (Ema.CLI.getLogger (toEmaCli (CLI.Cmd_Run runCmd))) $ do
-            rawDyn <- siteInput @SiteRoute (Ema.CLI.action (toEmaCli (CLI.Cmd_Run runCmd))) cfg
+      let emaCli = toEmaCli (CLI.Cmd_Run runCmd)
+          emaCfg = SiteConfig emaCli def
+      flip runLoggerLoggingT (Ema.CLI.getLogger emaCli) $ do
+        rawDyn <- siteInput @SiteRoute (Ema.CLI.action emaCli) cfg
+        case CLI.runMcpPort runCmd of
+          Nothing ->
+            Ema.runSiteWithInput @SiteRoute emaCfg rawDyn >>= liftIO . postRun cfg
+          Just port -> do
             (readEma, wrapped) <- currentValue rawDyn
             let readLiveModel = unModelEma <$> readEma
             race_

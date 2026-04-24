@@ -4,7 +4,7 @@
 
 **Notable features**
 
-- **MCP server**: new `emanote run --mcp-port PORT` flag runs an in-process Model Context Protocol HTTP endpoint beside the live server. Notebook data is exposed as read-only resources — `emanote://export/metadata` (JSON), `emanote://export/content` (single-file Markdown dump), and `emanote://note/{path}` for individual notes. Query tools and subscriptions follow in later phases ([#645](https://github.com/srid/emanote/issues/645))
+- **MCP server**: new `emanote run --mcp-port PORT` flag runs an in-process Model Context Protocol HTTP endpoint beside the live server. Notebook data is exposed as read-only resources — `emanote://export/metadata` (JSON), `emanote://export/content` (single-file Markdown dump), and `emanote://note/{path}` for individual notes. Query tools and subscriptions follow in later phases ([#645](https://github.com/srid/emanote/issues/645), [#649](https://github.com/srid/emanote/pull/649))
 - **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
 - Built-in static syntax highlighting using skylighting, replacing client-side JS highlighters ([#624](https://github.com/srid/emanote/pull/624))
 - Built-in static math rendering (LaTeX → MathML at build time via `texmath`) ([#639](https://github.com/srid/emanote/pull/639))
