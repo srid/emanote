@@ -112,10 +112,16 @@ renderFeed model baseNote = case eFeedText of
 
 {- | A minimal valid Atom feed with no entries. Used as a safe fallback when the
 real feed cannot be generated (see 'renderFeed' and issue #490).
+
+Crashes only if the atom-feed library cannot serialize a fully hardcoded
+@nullFeed@ — a library bug worth surfacing loudly, not the user-facing
+misconfiguration this fallback exists to absorb.
 -}
 renderEmptyFeed :: Note -> LByteString
 renderEmptyFeed baseNote =
   let feedName = Atom.TextString $ toPlain $ _noteTitle baseNote
       feedId = show (_noteRoute baseNote)
       atomFeed = Atom.nullFeed feedId feedName "1970-01-01T00:00:00Z"
-   in maybe mempty encodeUtf8 (Export.textFeed atomFeed)
+   in encodeUtf8
+        $ fromMaybe (error "Emanote.View.Feed.renderEmptyFeed: atom-feed library failed to serialize a nullFeed")
+        $ Export.textFeed atomFeed
