@@ -121,7 +121,7 @@ renderEmptyFeed :: Note -> LByteString
 renderEmptyFeed baseNote =
   let feedName = Atom.TextString $ toPlain $ _noteTitle baseNote
       feedId = show (_noteRoute baseNote)
-      atomFeed = Atom.nullFeed feedId feedName "1970-01-01T00:00:00Z"
+      atomFeed = Atom.nullFeed feedId feedName (getNoteDate baseNote)
    in encodeUtf8
         $ fromMaybe (error "Emanote.View.Feed.renderEmptyFeed: atom-feed library failed to serialize a nullFeed")
         $ Export.textFeed atomFeed
