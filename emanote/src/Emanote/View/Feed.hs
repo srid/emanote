@@ -62,12 +62,7 @@ getNoteQuery note = case _noteDoc note of
           Left _ -> Right query
       _ -> go rest
 
-{- | Render an Atom feed for a feed-enabled note.
-
-A malformed feed configuration (missing/invalid query, empty query results) used
-to crash the entire build at 'Emanote.View.Template.renderResourceRoute'. We now
-fall back to an empty-but-valid Atom feed; see issue #490.
--}
+-- | Render an Atom feed for a feed-enabled note. Falls back to an empty-but-valid feed on misconfiguration. See issue #490.
 renderFeed :: Model -> Note -> LByteString
 renderFeed model baseNote = case eFeedText of
   Left _err -> renderEmptyFeed baseNote
@@ -110,13 +105,7 @@ renderFeed model baseNote = case eFeedText of
       let atomFeed = (Atom.nullFeed feedUrl feedName feedUpdated) {Atom.feedEntries, Atom.feedLinks}
       maybeToRight "invalid feed" $ Export.textFeed atomFeed
 
-{- | A minimal valid Atom feed with no entries. Used as a safe fallback when the
-real feed cannot be generated (see 'renderFeed' and issue #490).
-
-Crashes only if the atom-feed library cannot serialize a fully hardcoded
-@nullFeed@ — a library bug worth surfacing loudly, not the user-facing
-misconfiguration this fallback exists to absorb.
--}
+-- | A minimal valid Atom feed with no entries. Safe fallback for 'renderFeed'.
 renderEmptyFeed :: Note -> LByteString
 renderEmptyFeed baseNote =
   let feedName = Atom.TextString $ toPlain $ _noteTitle baseNote
