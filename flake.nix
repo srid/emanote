@@ -15,10 +15,7 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     # These are not (necessarily) upstreamed to nixpkgs, yet.
-    # Temporarily pinned to the feat/run-site-with-input branch until
-    # srid/ema#179 merges to master. Brings in currentValue (#177) plus
-    # runSiteWithInput.
-    ema.url = "github:srid/ema/feat/run-site-with-input";
+    ema.url = "github:srid/ema";
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
