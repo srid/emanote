@@ -209,6 +209,7 @@ library
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export
+    Emanote.View.Export.Catalog
     Emanote.View.Export.Content
     Emanote.View.Export.JSON
     Emanote.View.Feed

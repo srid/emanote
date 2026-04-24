@@ -11,9 +11,15 @@ notebook model as read-only MCP resources:
 * @emanote:\/\/export\/content@ — all notes concatenated as a single Markdown document
 * @emanote:\/\/note\/{path}@ — an individual note by its source path
 
-The live model is read via an 'IO Model' supplied by 'Emanote.run', which
-builds it from 'Ema.Dynamic.currentValue' on the 'Dynamic' produced by
-the site's 'siteInput'.
+This module owns the MCP /protocol surface/ only — URI constants,
+capability declarations, handshake text, and Resource/ResourceTemplate
+wire types. The /notebook catalog/ (what's available, how to read it)
+lives in 'Emanote.View.Export.Catalog'. The two are bridged by
+'uriToKind' \/ 'kindToUri' and 'toMcpResource'.
+
+The live model is read via an 'IO Model' supplied by 'Emanote.run',
+which builds it from 'Ema.Dynamic.currentValue' on the 'Dynamic'
+produced by the site's 'siteInput'.
 -}
 module Emanote.MCP (
   run,
@@ -22,14 +28,8 @@ module Emanote.MCP (
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Emanote.Model (Model)
-import Emanote.Model qualified as M
-import Emanote.Model.Note qualified as Note
-import Emanote.Model.Title qualified as Tit
-import Emanote.Route qualified as R
-import Emanote.Route.Ext (LML (Md, Org))
-import Emanote.Route.ModelRoute (mkLMLRouteFromKnownFilePath)
-import Emanote.View.Export.Content qualified as ExportContent
-import Emanote.View.Export.JSON qualified as ExportJSON
+import Emanote.View.Export.Catalog (NotebookResource (..), ResourceBody (..), ResourceKind (..))
+import Emanote.View.Export.Catalog qualified as Catalog
 import MCP.Server (
   Implementation (..),
   ListResourceTemplatesResult (..),
@@ -38,7 +38,6 @@ import MCP.Server (
   MCPHandlerState,
   MCPHandlerUser,
   MCPServerState (..),
-  MCPServerT,
   ProcessResult (..),
   ReadResourceParams (..),
   ReadResourceResult (..),
@@ -59,7 +58,6 @@ import MCP.Server (
  )
 import MCP.Server qualified as MCP
 import Network.Wai.Handler.Warp qualified as Warp
-import Optics.Operators ((^.))
 import Paths_emanote qualified
 import Relude
 import System.IO (hPutStrLn)
@@ -77,10 +75,10 @@ to stderr once Warp has bound the socket. When @verbose@ is set, the
 underlying @mcp@ library emits one line per request/response to
 stdout.
 
-The model reader is produced by 'Emanote.run' on top of
-'Ema.Dynamic.currentValue'. It returns the initial model before any
-update lands, and the latest pushed value thereafter — both reads are
-non-blocking pointer loads.
+The @'IO' 'Model'@ reader must be non-blocking — handlers call it
+synchronously from the request path. 'Ema.Dynamic.currentValue'
+satisfies this (it reads an 'IORef' seeded with the Dynamic's initial
+value before the reader is returned), and is the intended source.
 -}
 run :: Int -> Bool -> IO Model -> IO ()
 run port verbose readModel = do
@@ -126,6 +124,8 @@ capabilities =
     , experimental = Nothing
     }
 
+-- * URI schema (wire contract — external clients hard-code these)
+
 metadataUri :: Text
 metadataUri = "emanote://export/metadata"
 
@@ -135,14 +135,39 @@ contentUri = "emanote://export/content"
 noteUriPrefix :: Text
 noteUriPrefix = "emanote://note/"
 
-{- | RFC 6570 template for the per-note URI; referenced both in instructions
-and in 'noteTemplate'.
--}
+-- | RFC 6570 template for the per-note URI.
 noteUriTemplate :: Text
 noteUriTemplate = noteUriPrefix <> "{path}"
 
-noteUri :: R.LMLRoute -> Text
-noteUri route = noteUriPrefix <> toText (ExportJSON.lmlSourcePath route)
+-- * Catalog ↔ URI translation
+
+uriToKind :: Text -> Maybe ResourceKind
+uriToKind uri
+  | uri == metadataUri = Just MetadataJson
+  | uri == contentUri = Just ContentMarkdown
+  | Just path <- T.stripPrefix noteUriPrefix uri = Just (Note (toString path))
+  | otherwise = Nothing
+
+kindToUri :: ResourceKind -> Text
+kindToUri = \case
+  MetadataJson -> metadataUri
+  ContentMarkdown -> contentUri
+  Note path -> noteUriPrefix <> toText path
+
+toMcpResource :: NotebookResource -> Resource
+toMcpResource NotebookResource {resourceKind, resourceName, resourceTitle, resourceMime, resourceDescription} =
+  Resource
+    { MCP.uri = kindToUri resourceKind
+    , MCP.name = resourceName
+    , MCP.title = resourceTitle
+    , MCP.description = resourceDescription
+    , MCP.mimeType = Just resourceMime
+    , size = Nothing
+    , annotations = Nothing
+    , MCP._meta = Nothing
+    }
+
+-- * Handlers
 
 handlers :: IO Model -> MCP.ProcessHandlers
 handlers readModel =
@@ -153,7 +178,7 @@ handlers readModel =
           pure
             $ ProcessSuccess
             $ ListResourcesResult
-              { resources = staticResources <> noteResources model
+              { resources = toMcpResource <$> Catalog.listResources model
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
@@ -165,42 +190,19 @@ handlers readModel =
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
-      , readResourceHandler = Just $ \ReadResourceParams {uri} -> do
-          model <- liftIO readModel
-          readResource model uri
+      , readResourceHandler = Just $ \ReadResourceParams {uri} ->
+          case uriToKind uri of
+            Nothing -> pure $ ProcessRPCError 404 $ "Resource not found: " <> uri
+            Just kind -> do
+              model <- liftIO readModel
+              mBody <- liftIO $ Catalog.readResource model kind
+              pure $ case mBody of
+                Nothing -> ProcessRPCError 404 $ "Resource not found: " <> uri
+                Just (ResourceBody mime body) ->
+                  ProcessSuccess $ textResult uri mime body
       }
 
-readResource :: Model -> Text -> MCPServerT (ProcessResult ReadResourceResult)
-readResource model uri
-  | uri == metadataUri =
-      pure
-        $ ProcessSuccess
-        $ textResult uri (Just "application/json")
-        $ decodeUtf8 (ExportJSON.renderJSONExport model)
-  | uri == contentUri = do
-      body <- liftIO $ ExportContent.renderContentExport model
-      pure $ ProcessSuccess $ textResult uri (Just "text/markdown") body
-  | Just path <- T.stripPrefix noteUriPrefix uri =
-      readNoteResource model uri (toString path)
-  | otherwise = pure $ ProcessRPCError 404 $ "Resource not found: " <> uri
-
-readNoteResource :: Model -> Text -> FilePath -> MCPServerT (ProcessResult ReadResourceResult)
-readNoteResource model uri path =
-  case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
-    Nothing -> pure $ ProcessRPCError 404 $ "Note not found: " <> uri
-    Just note -> do
-      mContent <- liftIO $ ExportContent.readNoteContent note
-      case mContent of
-        Nothing -> pure $ ProcessRPCError 404 $ "Note has no source file: " <> uri
-        Just content ->
-          let header = ExportContent.generateNoteHeader model note
-           in pure $ ProcessSuccess $ textResult uri (Just "text/markdown") (header <> content)
-
-parseNoteRoute :: FilePath -> Maybe R.LMLRoute
-parseNoteRoute fp =
-  mkLMLRouteFromKnownFilePath Md fp <|> mkLMLRouteFromKnownFilePath Org fp
-
-textResult :: Text -> Maybe Text -> Text -> ReadResourceResult
+textResult :: Text -> Text -> Text -> ReadResourceResult
 textResult uri mime body =
   ReadResourceResult
     { contents =
@@ -208,51 +210,12 @@ textResult uri mime body =
             TextResourceContents
               { MCP.uri = uri
               , text = body
-              , mimeType = mime
+              , mimeType = Just mime
               , MCP._meta = Nothing
               }
         ]
     , MCP._meta = Nothing
     }
-
-staticResources :: [Resource]
-staticResources =
-  [ Resource
-      { MCP.uri = metadataUri
-      , MCP.name = "Notebook metadata"
-      , MCP.title = Just "Notebook metadata (JSON)"
-      , MCP.description = Just "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links."
-      , MCP.mimeType = Just "application/json"
-      , size = Nothing
-      , annotations = Nothing
-      , MCP._meta = Nothing
-      }
-  , Resource
-      { MCP.uri = contentUri
-      , MCP.name = "Notebook content (single-file)"
-      , MCP.title = Just "Notebook content (single-file Markdown)"
-      , MCP.description = Just "All notes concatenated into a single Markdown document, separated by '===' delimiters."
-      , MCP.mimeType = Just "text/markdown"
-      , size = Nothing
-      , annotations = Nothing
-      , MCP._meta = Nothing
-      }
-  ]
-
-noteResources :: Model -> [Resource]
-noteResources model =
-  [ Resource
-    { MCP.uri = noteUri (Note._noteRoute note)
-    , MCP.name = toText (ExportJSON.lmlSourcePath (Note._noteRoute note))
-    , MCP.title = Just $ Tit.toPlain (Note._noteTitle note)
-    , MCP.description = Nothing
-    , MCP.mimeType = Just "text/markdown"
-    , size = Nothing
-    , annotations = Nothing
-    , MCP._meta = Nothing
-    }
-  | note <- toList (model ^. M.modelNotes)
-  ]
 
 noteTemplate :: ResourceTemplate
 noteTemplate =
