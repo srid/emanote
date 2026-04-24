@@ -11,8 +11,9 @@ notebook model as read-only MCP resources:
 * @emanote:\/\/export\/content@ — all notes concatenated as a single Markdown document
 * @emanote:\/\/note\/{path}@ — an individual note by its source path
 
-The live model is shared with 'Emanote.run' via an 'IORef' populated by
-'Emanote.tapModel' on every Ema update.
+The live model is read via an 'IO Model' supplied by 'Emanote.run', which
+builds it from 'Ema.Dynamic.currentValue' on the 'Dynamic' produced by
+the site's 'siteInput'.
 -}
 module Emanote.MCP (
   run,
@@ -76,16 +77,16 @@ to stderr once Warp has bound the socket. When @verbose@ is set, the
 underlying @mcp@ library emits one line per request/response to
 stdout.
 
-Reads the current model from the supplied ref, which
-'Emanote.tapModel' populates on every Ema update. When the ref is
-still 'Nothing' (a client arriving before Ema has produced its first
-model), handlers reply with JSON-RPC 503 so clients can retry.
+The model reader is produced by 'Emanote.run' on top of
+'Ema.Dynamic.currentValue'. It returns the initial model before any
+update lands, and the latest pushed value thereafter — both reads are
+non-blocking pointer loads.
 -}
-run :: Int -> Bool -> IORef (Maybe Model) -> IO ()
-run port verbose modelRef = do
+run :: Int -> Bool -> IO Model -> IO ()
+run port verbose readModel = do
   stateVar <-
     newMVar
-      (initMCPServerState () Nothing Nothing capabilities implementation instructions (handlers modelRef))
+      (initMCPServerState () Nothing Nothing capabilities implementation instructions (handlers readModel))
         { mcp_log_level = Just (if verbose then Debug else Warning)
         }
   let settings =
@@ -143,19 +144,19 @@ noteUriTemplate = noteUriPrefix <> "{path}"
 noteUri :: R.LMLRoute -> Text
 noteUri route = noteUriPrefix <> toText (ExportJSON.lmlSourcePath route)
 
-handlers :: IORef (Maybe Model) -> MCP.ProcessHandlers
-handlers modelRef =
+handlers :: IO Model -> MCP.ProcessHandlers
+handlers readModel =
   withToolHandlers []
     $ defaultProcessHandlers
-      { listResourcesHandler = Just $ \_ ->
-          withModel modelRef $ \model ->
-            pure
-              $ ProcessSuccess
-              $ ListResourcesResult
-                { resources = staticResources <> noteResources model
-                , nextCursor = Nothing
-                , MCP._meta = Nothing
-                }
+      { listResourcesHandler = Just $ \_ -> do
+          model <- liftIO readModel
+          pure
+            $ ProcessSuccess
+            $ ListResourcesResult
+              { resources = staticResources <> noteResources model
+              , nextCursor = Nothing
+              , MCP._meta = Nothing
+              }
       , listResourceTemplatesHandler = Just $ \_ ->
           pure
             $ ProcessSuccess
@@ -164,29 +165,10 @@ handlers modelRef =
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
-      , readResourceHandler = Just $ \ReadResourceParams {uri} ->
-          withModel modelRef $ \model -> readResource model uri
+      , readResourceHandler = Just $ \ReadResourceParams {uri} -> do
+          model <- liftIO readModel
+          readResource model uri
       }
-
-{- | Run the given action against the current model, or reply 503 if the model
-ref is still empty.
-
-'Nothing' here is always a startup race: @race_@ in 'Emanote.run' gives no
-ordering guarantee between Warp's socket bind and Ema's first
-'emanoteSiteInput' call, so a client can hit @/mcp@ before 'tapModel' has
-written the initial snapshot. It is never a steady-state condition. Phase
-4 (#645) should remove this path entirely by deferring 'MCP.run' until
-after the first model is published.
--}
-withModel ::
-  IORef (Maybe Model) ->
-  (Model -> MCPServerT (ProcessResult a)) ->
-  MCPServerT (ProcessResult a)
-withModel ref k = do
-  mModel <- liftIO $ readIORef ref
-  case mModel of
-    Nothing -> pure $ ProcessRPCError 503 "Emanote model not yet loaded; please retry"
-    Just model -> k model
 
 readResource :: Model -> Text -> MCPServerT (ProcessResult ReadResourceResult)
 readResource model uri

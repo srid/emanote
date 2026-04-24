@@ -17,10 +17,11 @@ import Ema (
   SiteConfig (SiteConfig),
   fromPrism_,
   runSiteWith,
+  runSiteWithInput,
   toPrism_,
  )
 import Ema.CLI qualified
-import Ema.Dynamic (Dynamic (Dynamic))
+import Ema.Dynamic (Dynamic (Dynamic), currentValue)
 import Emanote.CLI qualified as CLI
 import Emanote.MCP qualified as MCP
 import Emanote.Model.Graph qualified as G
@@ -55,35 +56,8 @@ instance EmaSite SiteRoute where
   type SiteArg SiteRoute = EmanoteConfig
   siteInput cliAct cfg = do
     model <- emanoteSiteInput cliAct cfg
-    let tapped = model <&> modelUpdateCachedFields
-    case _emanoteConfigOnModelUpdate cfg of
-      Nothing -> pure tapped
-      Just onUpdate -> tapModel onUpdate tapped
+    pure $ model <&> modelUpdateCachedFields
   siteOutput = View.emanoteSiteOutput
-
-{- | Invoke the given callback with every Dynamic value (initial + each
-update) so out-of-band subscribers (like the MCP server) can observe model
-changes without driving Ema's render loop.
-
-Phase 4 (#645) will grow this into a fanout: today the callback is a single
-IORef write, but subscription-based resources will need per-subscriber
-queues. When that lands, this helper and 'EmanoteConfig' should expose a
-richer bus type rather than a single @Model -> IO ()@.
--}
-tapModel ::
-  (MonadIO m) =>
-  (Model.Model -> IO ()) ->
-  Dynamic m Model.ModelEma ->
-  m (Dynamic m Model.ModelEma)
-tapModel onUpdate (Dynamic (x0, updater)) = do
-  liftIO $ onUpdate (unModelEma x0)
-  pure
-    $ Dynamic
-      ( x0
-      , \send -> updater $ \x -> do
-          liftIO $ onUpdate (unModelEma x)
-          send x
-      )
 
 -- | Populate model fields that needs to be computed once per update.
 modelUpdateCachedFields :: Model.ModelEma -> Model.ModelEma
@@ -94,7 +68,12 @@ modelUpdateCachedFields model =
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
-  EmanoteConfig cli id defaultEmanotePandocRenderers False Nothing
+  EmanoteConfig
+    { _emanoteConfigCli = cli
+    , _emanoteConfigNoteFn = id
+    , _emanoteConfigPandocRenderers = defaultEmanotePandocRenderers
+    , _emanoteCompileTailwind = False
+    }
 
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
@@ -105,11 +84,14 @@ run cfg@EmanoteConfig {..} = do
           let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
            in Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
         Just port -> do
-          modelRef <- newIORef Nothing
-          let cfg' = cfg {_emanoteConfigOnModelUpdate = Just (writeIORef modelRef . Just)}
-              emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
-              ema = Ema.runSiteWith @SiteRoute emaCfg cfg' >>= postRun cfg'
-          race_ (MCP.run port (CLI.verbose _emanoteConfigCli) modelRef) ema
+          let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
+          flip runLoggerLoggingT (Ema.CLI.getLogger (toEmaCli (CLI.Cmd_Run runCmd))) $ do
+            rawDyn <- siteInput @SiteRoute (Ema.CLI.action (toEmaCli (CLI.Cmd_Run runCmd))) cfg
+            (readEma, wrapped) <- currentValue rawDyn
+            let readLiveModel = unModelEma <$> readEma
+            race_
+              (liftIO $ MCP.run port (CLI.verbose _emanoteConfigCli) readLiveModel)
+              (Ema.runSiteWithInput @SiteRoute emaCfg wrapped >>= liftIO . postRun cfg)
     CLI.Cmd_Gen dest -> do
       let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
       Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
