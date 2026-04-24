@@ -1,18 +1,18 @@
-{- | Protocol-agnostic catalog of what an Emanote notebook exposes.
+{- | Notebook resource catalog consumed by "Emanote.MCP".
 
-Sits between 'Emanote.Model' and any surface that wants to publish the
-notebook (MCP today, possibly other transports later). Knows nothing
-about MCP, URIs, or any wire format — the consumer translates
-'ResourceKind' into its own addressing scheme.
-
-The catalog answers two questions:
+Answers two questions:
 
 * /What/ is available? — 'listResources' returns catalog entries, one per
   static export ('MetadataJson', 'ContentMarkdown') and one per note.
 * /How do I fetch one?/ — 'readResource' resolves a 'ResourceKind' to a
   'ResourceBody'.
+
+The types here are MCP-independent (no URIs, no wire types), which
+keeps the catalog easy to reuse if a second surface ever appears. The
+module lives under "Emanote.MCP" because MCP is today's only consumer
+and shares the catalog's change cadence.
 -}
-module Emanote.View.Export.Catalog (
+module Emanote.MCP.Catalog (
   ResourceKind (..),
   NotebookResource (..),
   ResourceBody (..),

@@ -14,7 +14,7 @@ notebook model as read-only MCP resources:
 This module owns the MCP /protocol surface/ only — URI constants,
 capability declarations, handshake text, and Resource/ResourceTemplate
 wire types. The /notebook catalog/ (what's available, how to read it)
-lives in 'Emanote.View.Export.Catalog'. The two are bridged by
+lives in "Emanote.MCP.Catalog". The two are bridged by
 'uriToKind' \/ 'kindToUri' and 'toMcpResource'.
 
 The live model is read via an 'IO Model' supplied by 'Emanote.run',
@@ -27,9 +27,9 @@ module Emanote.MCP (
 
 import Data.Text qualified as T
 import Data.Version (showVersion)
+import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), ResourceKind (..))
+import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.Model (Model)
-import Emanote.View.Export.Catalog (NotebookResource (..), ResourceBody (..), ResourceKind (..))
-import Emanote.View.Export.Catalog qualified as Catalog
 import MCP.Server (
   Implementation (..),
   ListResourceTemplatesResult (..),
