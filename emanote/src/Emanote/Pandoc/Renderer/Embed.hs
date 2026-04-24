@@ -3,6 +3,7 @@ module Emanote.Pandoc.Renderer.Embed where
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
 import Emanote.Model (Model)
+import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
@@ -31,7 +32,9 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
-  let parentR = R.withLmlRoute R.routeParent noteRoute
+  let parentR =
+        maybe (R.withLmlRoute R.routeParent noteRoute) MN.noteResolveLinkBase
+          $ M.modelLookupNoteByRoute' noteRoute model
   -- TODO: Use anchor to embed a section?
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
@@ -48,7 +51,9 @@ embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
-  let parentR = R.withLmlRoute R.routeParent noteRoute
+  let parentR =
+        maybe (R.withLmlRoute R.routeParent noteRoute) MN.noteResolveLinkBase
+          $ M.modelLookupNoteByRoute' noteRoute model
   (Rel.URTResource mr, _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveModelRoute model mr
@@ -59,7 +64,9 @@ embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
-  let parentR = R.withLmlRoute R.routeParent noteRoute
+  let parentR =
+        maybe (R.withLmlRoute R.routeParent noteRoute) MN.noteResolveLinkBase
+          $ M.modelLookupNoteByRoute' noteRoute model
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl

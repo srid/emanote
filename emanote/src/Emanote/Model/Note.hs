@@ -32,7 +32,7 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import System.FilePath (takeFileName, (</>))
+import System.FilePath (takeDirectory, takeFileName, (</>))
 import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -122,6 +122,31 @@ noteAncestors =
 
 noteParent :: Note -> Maybe (R 'R.Folder)
 noteParent = R.withLmlRoute R.routeParent . _noteRoute
+
+{- | Folder used as the base for resolving relative URLs from this note.
+
+For most notes, this is the parent folder of the note's route. For notes
+loaded from @\<dir\>/index.md@ (or @index.org@) the canonicalized route
+already drops the @index@ slug — but relative URLs should still resolve
+against the actual @\<dir\>/@ directory, not its parent. We use the note's
+on-disk source path (when known) to derive the correct base.
+
+See <https://github.com/srid/emanote/issues/608>.
+-}
+noteResolveLinkBase :: Note -> Maybe (R 'R.Folder)
+noteResolveLinkBase note =
+  case _noteSource note of
+    Just (_, fp) -> resolveLinkBaseFromFilePath fp
+    Nothing -> noteParent note
+
+-- | Folder route corresponding to the directory containing the given file.
+resolveLinkBaseFromFilePath :: FilePath -> Maybe (R 'R.Folder)
+resolveLinkBaseFromFilePath fp =
+  case takeDirectory fp of
+    "." -> Nothing
+    "" -> Nothing
+    "/" -> Nothing
+    dir -> R.mkRouteFromFilePath dir
 
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
