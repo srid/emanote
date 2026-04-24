@@ -108,6 +108,12 @@ parseObsidianCallout blks = do
     -- Pandoc may tokenize @[!type]-@ either as a single @Str "[!type]-"@ or
     -- split across @Str "[!type]"@ followed by @Str "-"@. Absorb the latter
     -- case so the parser sees a single header string.
+    --
+    -- Note: we deliberately do not absorb a fold marker that appears after
+    -- a 'B.Space' (i.e. @Str "[!type]"@, @Space@, @Str "-"@). In Obsidian
+    -- markdown, @> [!tip] -@ means a tip callout whose title text starts
+    -- with a hyphen, *not* a foldable callout — fold markers must be
+    -- adjacent to the closing bracket.
     absorbFoldSuffix :: Text -> [B.Inline] -> (Text, [B.Inline])
     absorbFoldSuffix header (B.Str suffix : rest)
       | suffix == "+" || suffix == "-" = (header <> suffix, rest)
