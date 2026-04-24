@@ -29,9 +29,7 @@ import Text.Pandoc.Walk qualified as W
 urlResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
-  let parentR =
-        maybe (R.withLmlRoute R.routeParent noteRoute) MN.noteResolveLinkBase
-          $ M.modelLookupNoteByRoute' noteRoute model
+  let parentR = M.modelResolveLinkBase model noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model noteRoute uRel
   renderSomeInlineRefWith id (is, (url, tit)) rRel model ctx inl $ \sr ->
