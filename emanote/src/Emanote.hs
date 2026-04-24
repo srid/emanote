@@ -17,10 +17,11 @@ import Ema (
   SiteConfig (SiteConfig),
   fromPrism_,
   runSiteWith,
+  runSiteWithInput,
   toPrism_,
  )
 import Ema.CLI qualified
-import Ema.Dynamic (Dynamic (Dynamic))
+import Ema.Dynamic (Dynamic (Dynamic), currentValue)
 import Emanote.CLI qualified as CLI
 import Emanote.MCP qualified as MCP
 import Emanote.Model.Graph qualified as G
@@ -67,17 +68,30 @@ modelUpdateCachedFields model =
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
-  EmanoteConfig cli id defaultEmanotePandocRenderers False
+  EmanoteConfig
+    { _emanoteConfigCli = cli
+    , _emanoteConfigNoteFn = id
+    , _emanoteConfigPandocRenderers = defaultEmanotePandocRenderers
+    , _emanoteCompileTailwind = False
+    }
 
 run :: EmanoteConfig -> IO ()
 run cfg@EmanoteConfig {..} = do
   case CLI.cmd _emanoteConfigCli of
     CLI.Cmd_Run runCmd -> do
-      let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Run runCmd)) def
-          ema = Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
-      case CLI.runMcpPort runCmd of
-        Nothing -> ema
-        Just port -> race_ (MCP.run port (CLI.verbose _emanoteConfigCli)) ema
+      let emaCli = toEmaCli (CLI.Cmd_Run runCmd)
+          emaCfg = SiteConfig emaCli def
+      flip runLoggerLoggingT (Ema.CLI.getLogger emaCli) $ do
+        rawDyn <- siteInput @SiteRoute (Ema.CLI.action emaCli) cfg
+        case CLI.runMcpPort runCmd of
+          Nothing ->
+            Ema.runSiteWithInput @SiteRoute emaCfg rawDyn >>= liftIO . postRun cfg
+          Just port -> do
+            (readEma, wrapped) <- currentValue rawDyn
+            let readLiveModel = unModelEma <$> readEma
+            race_
+              (liftIO $ MCP.run port (CLI.verbose _emanoteConfigCli) readLiveModel)
+              (Ema.runSiteWithInput @SiteRoute emaCfg wrapped >>= liftIO . postRun cfg)
     CLI.Cmd_Gen dest -> do
       let emaCfg = SiteConfig (toEmaCli (CLI.Cmd_Gen dest)) def
       Ema.runSiteWith @SiteRoute emaCfg cfg >>= postRun cfg
