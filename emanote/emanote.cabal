@@ -255,3 +255,4 @@ test-suite test
       Emanote.Pandoc.ExternalLinkSpec
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec
+      Emanote.View.FeedSpec

@@ -16,6 +16,10 @@
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
+**Fixes**
+
+- Atom feed: misconfigured feeds (missing query block, empty query results) no longer crash the whole build; an empty-but-valid Atom document is emitted instead ([#490](https://github.com/srid/emanote/issues/490))
+
 ## 1.4.0.0 (2025-08-18)
 
 **Notable features**
