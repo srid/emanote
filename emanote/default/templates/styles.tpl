@@ -91,6 +91,28 @@
     color: inherit;
     text-decoration: underline;
   }
+
+  /* Foldable callouts (Obsidian [!type]+ / [!type]-): suppress the native
+     <details>/<summary> disclosure marker since we render our own chevron,
+     and rotate the chevron based on open state. */
+  details.callout-foldable > summary {
+    list-style: none;
+  }
+
+  details.callout-foldable > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.callout-foldable[open] > summary .callout-fold-marker svg {
+    transform: rotate(180deg);
+  }
+
+  /* Nested callouts: drop the outer block margin so the inner callout
+     hugs the body of its parent rather than introducing a paragraph gap. */
+  .callout .callout-content > .callout:last-child,
+  .callout details > div > .callout:last-child {
+    margin-bottom: 0;
+  }
 </style>
 
 <style data-category="lists">
