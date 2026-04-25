@@ -88,7 +88,10 @@ resolveModelRoute model lr =
         & maybe Rel.RRTMissing Rel.RRTFound
 
 {- | Reinterpret an `LMLRoute` (parsed from a `.xml` URL into the
-Atom-feed slot) as an opaque `.xml` static-file route.
+Atom-feed slot) as an opaque `.xml` static-file route. The `Maybe`
+is only there because `mkRouteFromFilePath` is partial in general; on
+the encoded path it is total (a non-empty `NonEmpty Slug` always
+encodes to a non-empty filepath that re-parses).
 -}
 xmlStaticRouteFromLml :: R.LMLRoute -> Maybe (R.R 'R.AnyExt)
 xmlStaticRouteFromLml lmlRoute =
