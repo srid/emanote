@@ -257,6 +257,18 @@ modelLookupNoteByRoute' :: LMLRoute -> ModelT f -> Maybe Note
 modelLookupNoteByRoute' r =
   fmap snd . modelLookupNoteByRoute (R.LMLView_Html, r)
 
+{- | Folder used as the base for resolving relative URLs from the note at the
+given route. Uses the note's on-disk source path when the note exists; falls
+back to the canonical route parent for synthesized notes (and for routes that
+have no matching note in the model).
+-}
+modelResolveLinkBase :: ModelT f -> LMLRoute -> Maybe (R.R 'R.Folder)
+modelResolveLinkBase model r =
+  maybe
+    (R.withLmlRoute R.routeParent r)
+    N.noteResolveLinkBase
+    (modelLookupNoteByRoute' r model)
+
 modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
   Rel.resolvedRelTargetFromCandidates

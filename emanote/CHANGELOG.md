@@ -17,9 +17,10 @@
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
-**Fixes**
+**Bug fixes**
 
 - Atom feed: a feed query that matches no notes no longer crashes the build; an empty-but-valid Atom document is emitted instead. Configuration errors (missing/invalid query block, missing `page.siteUrl`) still fail loudly ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
+- Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
 
 ## 1.4.0.0 (2025-08-18)
 
