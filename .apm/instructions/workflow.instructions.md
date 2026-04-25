@@ -10,7 +10,8 @@ cabal build all
 just fmt
 
 ## Test command
-just test
+- `just test` — Haskell unit tests
+- `just e2e-live` / `just e2e-static` — cucumber+Playwright e2e (live and static modes)
 
 ## CI command
 vira ci
