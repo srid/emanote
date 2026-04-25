@@ -35,18 +35,17 @@ test:
 mod e2e 'tests/nix/mod.just'
 
 # Run e2e suite in live mode (`emanote run`)
-e2e-live:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    bin="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
-    just e2e run "cd tests && { [ -d node_modules ] || npm install; } && EMANOTE_BIN=$bin EMANOTE_MODE=live npm test"
+e2e-live: (_e2e "live")
 
 # Run e2e suite in static mode (`emanote gen` + serve)
-e2e-static:
+e2e-static: (_e2e "static")
+
+[private]
+_e2e mode:
     #!/usr/bin/env bash
     set -euo pipefail
     bin="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
-    just e2e run "cd tests && { [ -d node_modules ] || npm install; } && EMANOTE_BIN=$bin EMANOTE_MODE=static npm test"
+    just e2e run "cd tests && { [ -d node_modules ] || npm install; } && EMANOTE_BIN=$bin EMANOTE_MODE={{mode}} npm test"
 
 # Launch chrome-devtools MCP server (invoked by .mcp.json for Claude Code)
 mcp-chrome-devtools *ARGS:
