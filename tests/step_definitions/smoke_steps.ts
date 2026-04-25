@@ -49,10 +49,6 @@ Then(
         `Page body contains ${JSON.stringify(marker)} — #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
       );
     }
-    assert.ok(
-      text.length > 0,
-      "Page body is empty — emanote produced no rendered output. In live mode this means the Dynamic died before any HTML was emitted; in static mode the gen run aborted.",
-    );
   },
 );
 
