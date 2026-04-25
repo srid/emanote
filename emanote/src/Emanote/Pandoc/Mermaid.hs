@@ -75,9 +75,20 @@ runMmdc :: (MonadIO m) => Text -> m (Either Text Text)
 runMmdc code = liftIO $ withSystemTempDirectory "emanote-mermaid" $ \tmpDir -> do
   let inputPath = tmpDir </> "diagram.mmd"
       outputPath = tmpDir </> "diagram.svg"
+      puppeteerConfig = tmpDir </> "puppeteer.json"
   writeFileBS inputPath (encodeUtf8 code)
+  -- Disable Chromium's SUID sandbox: GitHub Actions runners and most
+  -- containerised CI environments don't ship the helper with the right
+  -- ownership/setuid bits, so the default sandbox aborts the launch with
+  -- "The SUID sandbox helper binary was found, but is not configured
+  -- correctly." mmdc only renders trusted local mermaid source, so opting
+  -- out of the sandbox is safe.
+  writeFileBS puppeteerConfig "{\"args\":[\"--no-sandbox\",\"--disable-setuid-sandbox\"]}"
   (exitCode, _stdout, stderr) <-
-    readProcessWithExitCode mmdcBin ["-i", inputPath, "-o", outputPath] ""
+    readProcessWithExitCode
+      mmdcBin
+      ["-i", inputPath, "-o", outputPath, "-p", puppeteerConfig]
+      ""
   case exitCode of
     ExitFailure n ->
       pure . Left $ "mmdc exited " <> show n <> ": " <> T.strip (toText stderr)
