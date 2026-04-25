@@ -11,8 +11,14 @@
 
 import { ready } from './morph.js';
 
+// findTarget uses CSS.escape on a user-supplied id; the early guard for the
+// Popover API is the natural place to also gate on CSS.escape so we never
+// reach the throwing call in a browser that lacks it. (In practice every
+// browser with the Popover API also has CSS.escape — this just keeps the
+// "footnote refs stay inert" contract honest if either is ever missing.)
 if (typeof HTMLElement !== 'undefined' &&
-    HTMLElement.prototype.hasOwnProperty('popover')) {
+    HTMLElement.prototype.hasOwnProperty('popover') &&
+    typeof CSS !== 'undefined' && CSS.escape) {
   ready(init);
 }
 // No Popover API — footnote refs stay inert, no popup.
