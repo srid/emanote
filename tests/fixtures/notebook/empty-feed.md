@@ -5,8 +5,13 @@ feed:
 
 # Empty feed
 
-A feed-enabled note that contains no `query` code block. Before issue
+A feed-enabled note whose query matches no notes. Before issue
 [#490](https://github.com/srid/emanote/issues/490) this aborted
-`emanote gen` with `Bad feed: ... can't find note query` and broke the
-live server's atom route for the note. The fix degrades gracefully to
-an empty-but-valid Atom feed.
+`emanote gen` with `Bad feed: ... no notes matched the query` and broke
+the live server's atom route. The fix degrades the empty-result case
+to a valid empty Atom feed; configuration errors (missing `query`
+block, invalid query) still fail loud.
+
+```query
+path:./does-not-exist/*
+```

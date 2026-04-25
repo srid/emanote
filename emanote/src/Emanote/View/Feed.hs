@@ -62,55 +62,56 @@ getNoteQuery note = case _noteDoc note of
           Left _ -> Right query
       _ -> go rest
 
--- | Render an Atom feed for a feed-enabled note. Falls back to an empty-but-valid feed on misconfiguration. See issue #490.
-renderFeed :: Model -> Note -> LByteString
-renderFeed model baseNote = case eFeedText of
-  Left _err -> renderEmptyFeed baseNote
-  Right feedText -> encodeUtf8 feedText
+{- | Render an Atom feed for a feed-enabled note.
+
+Configuration errors (missing/invalid query block, missing
+@page.siteUrl@) are reported as 'Left' so the caller can fail loudly.
+An empty query result set is treated as a normal runtime state — a
+blog with no posts yet — and yields an empty-but-valid Atom feed. See
+issue #490.
+-}
+renderFeed :: Model -> Note -> Either LText LByteString
+renderFeed model baseNote = encodeUtf8 <$> eFeedText
   where
+    eFeedText :: Either LText LText
     eFeedText = do
-      -- get the note feed
       feed <- maybeToRight "feed attribute missing" $ _noteFeed baseNote
-
-      -- find the query and get the feed notes
       feedQuery <- getNoteQuery baseNote
-      notes <- case runQuery (_noteRoute baseNote) model feedQuery of
-        [] -> Left "no notes matched the query"
-        x : xs -> Right (x :| xs)
+      case nonEmpty (runQuery (_noteRoute baseNote) model feedQuery) of
+        Nothing -> Right (renderEmptyFeed baseNote)
+        Just notes -> renderPopulatedFeed model baseNote feed notes
 
-      -- lookup the feedUrl
-      let feedMeta :: Aeson.Value
-          feedMeta = getEffectiveRouteMeta (_noteRoute baseNote) model
-      let mFeedUrl :: Maybe Text
-          mFeedUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
-      feedUrl <- maybeToRight "index.yaml or note doesn't have page.siteUrl" mFeedUrl
+renderPopulatedFeed :: Model -> Note -> Feed -> NonEmpty Note -> Either LText LText
+renderPopulatedFeed model baseNote feed notes = do
+  let feedMeta :: Aeson.Value
+      feedMeta = getEffectiveRouteMeta (_noteRoute baseNote) model
+  let mFeedUrl :: Maybe Text
+      mFeedUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
+  feedUrl <- maybeToRight "index.yaml or note doesn't have page.siteUrl" mFeedUrl
 
-      -- process the notes
-      let noteUrl note =
-            let sr = SiteRoute_ResourceRoute $ ResourceRoute_LML LMLView_Html $ _noteRoute note
-             in siteRouteUrl model sr
-      let takeNotes = case _feedLimit feed of
-            Nothing -> id
-            Just x -> take (fromIntegral x)
-      let feedEntries = noteToEntry feedUrl noteUrl <$> takeNotes (toList notes)
+  let noteUrl note =
+        let sr = SiteRoute_ResourceRoute $ ResourceRoute_LML LMLView_Html $ _noteRoute note
+         in siteRouteUrl model sr
+  let takeNotes = case _feedLimit feed of
+        Nothing -> id
+        Just x -> take (fromIntegral x)
+  let feedEntries = noteToEntry feedUrl noteUrl <$> takeNotes (toList notes)
 
-      -- render the feed
-      let feedTitle = fromMaybe (toPlain $ _noteTitle baseNote) (_feedTitle feed)
-      let feedName = Atom.TextString feedTitle
-      let feedUpdated = getNoteDate (head notes)
-      let feedLinks =
-            [ (Atom.nullLink (feedUrl <> "/" <> noteUrl baseNote)) {Atom.linkRel = Just (Left "alternate")}
-            , (Atom.nullLink (feedUrl <> "/" <> siteRouteUrl model (noteFeedSiteRoute baseNote))) {Atom.linkRel = Just (Left "self")}
-            ]
-      let atomFeed = (Atom.nullFeed feedUrl feedName feedUpdated) {Atom.feedEntries, Atom.feedLinks}
-      maybeToRight "invalid feed" $ Export.textFeed atomFeed
+  let feedTitle = fromMaybe (toPlain $ _noteTitle baseNote) (_feedTitle feed)
+  let feedName = Atom.TextString feedTitle
+  let feedUpdated = getNoteDate (head notes)
+  let feedLinks =
+        [ (Atom.nullLink (feedUrl <> "/" <> noteUrl baseNote)) {Atom.linkRel = Just (Left "alternate")}
+        , (Atom.nullLink (feedUrl <> "/" <> siteRouteUrl model (noteFeedSiteRoute baseNote))) {Atom.linkRel = Just (Left "self")}
+        ]
+  let atomFeed = (Atom.nullFeed feedUrl feedName feedUpdated) {Atom.feedEntries, Atom.feedLinks}
+  maybeToRight "invalid feed" $ Export.textFeed atomFeed
 
--- | A minimal valid Atom feed with no entries. Safe fallback for 'renderFeed'.
-renderEmptyFeed :: Note -> LByteString
+-- | A minimal valid Atom feed with no entries, used when a feed query matches no notes.
+renderEmptyFeed :: Note -> LText
 renderEmptyFeed baseNote =
   let feedName = Atom.TextString $ toPlain $ _noteTitle baseNote
       feedId = show (_noteRoute baseNote)
       atomFeed = Atom.nullFeed feedId feedName (getNoteDate baseNote)
-   in encodeUtf8
-        $ fromMaybe (error "Emanote.View.Feed.renderEmptyFeed: atom-feed library failed to serialize a nullFeed")
+   in fromMaybe (error "Emanote.View.Feed.renderEmptyFeed: atom-feed library failed to serialize a nullFeed")
         $ Export.textFeed atomFeed

@@ -95,7 +95,9 @@ renderResourceRoute m = \case
       Just (R.LMLView_Html, note) ->
         Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
       Just (R.LMLView_Atom, note) ->
-        Ema.AssetGenerated Ema.Other $ renderFeed m note
+        case renderFeed m note of
+          Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
+          Right feed -> Ema.AssetGenerated Ema.Other feed
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
