@@ -40,6 +40,7 @@ e2e-live: (_e2e "live")
 # Run e2e suite in static mode (`emanote gen` + serve)
 e2e-static: (_e2e "static")
 
+# Shared body for e2e-live / e2e-static; toggles EMANOTE_MODE.
 [private]
 _e2e mode:
     #!/usr/bin/env bash
