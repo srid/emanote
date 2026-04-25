@@ -1,6 +1,6 @@
 module Emanote.Pandoc.MermaidSpec where
 
-import Control.Monad.Writer.Strict (runWriterT)
+import Control.Monad.Logger (runNoLoggingT)
 import Data.Aeson qualified as Aeson
 import Emanote.Pandoc.Mermaid (stripXmlPrologue, transformMermaidBlocks)
 import Hedgehog
@@ -43,18 +43,15 @@ spec = do
 
   describe "transformMermaidBlocks" $ do
     it "is a no-op when no mermaid blocks are present" $ do
-      -- A document without mermaid blocks must not invoke mmdc at all
-      -- (verified by passing through unchanged with no errors `tell`'d).
-      (result, errs) <- runWriterT $ transformMermaidBlocks emptyMeta (doc [plainBlock])
+      -- A document without mermaid blocks must not invoke mmdc at all.
+      result <- runNoLoggingT $ transformMermaidBlocks emptyMeta (doc [plainBlock])
       result `shouldBe` doc [plainBlock]
-      errs `shouldBe` []
 
     it "is a no-op when mermaid.static is set to false in the page meta" $ do
       -- Opt-out for client-side rendering. Mermaid blocks must reach the
       -- HTML untouched so the js.mermaid snippet can pick them up.
-      (result, errs) <- runWriterT $ transformMermaidBlocks staticOffMeta (doc [mermaidBlock])
+      result <- runNoLoggingT $ transformMermaidBlocks staticOffMeta (doc [mermaidBlock])
       result `shouldBe` doc [mermaidBlock]
-      errs `shouldBe` []
 
 -- The success path (mmdc actually invoked) lives in the e2e suite at
 -- tests/features/smoke.feature, where a built emanote with the Nix-supplied

@@ -10,8 +10,18 @@ Emanote renders every `mermaid` code block to **inline SVG at build time**. The 
 
 Per-diagram render failures preserve the original code block and surface the error both inline (above the failing source) and in the document-top error banner, so you can fix the diagram source.
 
-> [!tip] Need browser-side rendering instead?
-> For interactive features, or when build-time rendering isn't an option, set `mermaid.static: false` and use the `js.mermaid` snippet. See [[mermaid/client-side]] for the full setup and a live demo.
+> [!tip] Switch to browser-side rendering
+> For interactive features, or when build-time rendering isn't an option, set `mermaid.static: false` in the page (or any ancestor `index.yaml`) and add the `js.mermaid` snippet to `page.bodyHtml`:
+>
+> ```yaml
+> mermaid:
+>   static: false
+> page:
+>   bodyHtml: |
+>     <snippet var="js.mermaid" />
+> ```
+>
+> Mermaid blocks then ship as source and `mermaid.js` renders them in the browser. Trade-offs: requires network for the CDN load, invisible to search engines and offline readers until JS runs.
 
 ## Example using Mermaid
 
