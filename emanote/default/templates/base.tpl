@@ -10,8 +10,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
-    // Apply theme before first paint to avoid FOUC.
+    // Apply theme before first paint to avoid FOUC. Must run synchronously
+    // here (no module loader, no defer) — that's why this is the one
+    // theme-related script that doesn't live in _emanote-static/js/.
     // Priority: explicit user choice (localStorage) > OS preference.
+    // The 'emanote-theme' key is mirrored by STORAGE_KEY in
+    // _emanote-static/js/theme-toggle.js — keep both in sync.
     (function () {
       var stored = null;
       try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
