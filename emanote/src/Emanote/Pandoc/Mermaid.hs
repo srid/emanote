@@ -87,17 +87,13 @@ runMmdc bin code = liftIO $ withSystemTempDirectory "emanote-mermaid" $ \tmpDir 
   (exitCode, _stdout, stderr) <-
     readProcessWithExitCode bin ["-i", inputPath, "-o", outputPath] ""
   case exitCode of
-    ExitSuccess ->
-      doesFileExist outputPath >>= \case
-        True -> Right . stripXmlPrologue . decodeUtf8 <$> readFileBS outputPath
-        False -> pure $ Left "mmdc exited 0 but produced no SVG file"
     ExitFailure n ->
-      pure
-        . Left
-        $ "mmdc exited "
-        <> show n
-        <> ": "
-        <> T.strip (toText stderr)
+      pure . Left $ "mmdc exited " <> show n <> ": " <> T.strip (toText stderr)
+    ExitSuccess -> do
+      exists <- doesFileExist outputPath
+      if exists
+        then Right . stripXmlPrologue . decodeUtf8 <$> readFileBS outputPath
+        else pure $ Left "mmdc exited 0 but produced no SVG file"
 
 {- | Strip leading XML processing instructions (@\<?...?\>@) and tag-style
 declarations (@\<!DOCTYPE ...\>@) so the SVG can be embedded directly into
