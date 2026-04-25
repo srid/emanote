@@ -22,6 +22,7 @@
 - Atom feed: a feed query that matches no notes no longer crashes the build; an empty-but-valid Atom document is emitted instead. Configuration errors (missing/invalid query block, missing `page.siteUrl`) still fail loudly ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
 - Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
 - Raw HTML blocks containing a literal `</div>` no longer crash the renderer with `div cannot contain text looking like its end tag` (closes [#119](https://github.com/srid/emanote/issues/119)). Fixed upstream in [srid/heist-extra#13](https://github.com/srid/heist-extra/pull/13) by switching the raw-HTML wrapper to a unique `<rawhtml>` element with `display: contents`.
+- A malformed `*.yaml` file (e.g. a non-string mapping key like `[]: foo`) no longer takes the live server down with `BadInput "NonStringKey []"`; the parse error is logged and the rest of the site keeps rendering with the previous good metadata for that route (closes [#285](https://github.com/srid/emanote/issues/285)).
 
 ## 1.4.0.0 (2025-08-18)
 

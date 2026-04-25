@@ -51,6 +51,10 @@ Feature: Smoke
     When I open "/subfolder.html"
     Then the article link with text "sibling" has href containing "subfolder/sibling"
 
+  Scenario: A malformed YAML file does not crash the build (regression: #285)
+    When I open "/"
+    Then the page body contains "E2E Fixture"
+
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
     Then no footnote list is visible on screen

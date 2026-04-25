@@ -5,7 +5,6 @@ module Emanote.Source.Patch (
   ignorePatterns,
 ) where
 
-import Control.Exception (throwIO)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
@@ -17,9 +16,9 @@ import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
-  BadInput (BadInput),
   log,
   logD,
+  logE,
  )
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
@@ -106,11 +105,18 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
-            sData <-
-              liftIO
-                $ either (throwIO . BadInput) pure
-                $ SD.parseSDataCascading r yamlContents
-            pure $ M.modelInsertData sData
+            -- A YAML parse error used to throw `BadInput` here, which killed
+            -- the UnionMount change handler and stopped the live server from
+            -- rendering anything (issue #285). Log the error and leave the
+            -- model unchanged for this route — any previously-good data
+            -- stays in place, so the rest of the site keeps rendering while
+            -- the user fixes the file.
+            case SD.parseSDataCascading r yamlContents of
+              Left err -> do
+                logE $ "Bad YAML file: " <> err
+                pure id
+              Right sData ->
+                pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
             pure $ M.modelDeleteData r

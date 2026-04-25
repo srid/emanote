@@ -27,6 +27,22 @@ Then(
   },
 );
 
+// #285: a malformed `*.yaml` file (e.g. `[]: foo`, a non-string mapping key)
+// used to throw `BadInput` from the UnionMount change handler — killing the
+// Dynamic so the live server could no longer render any page, and aborting
+// the static build before any HTML was produced. Asserting that the home
+// page renders proves the bad-yaml file no longer takes the whole site down.
+Then(
+  "the page body contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      text.includes(needle),
+      `Page body did not contain ${JSON.stringify(needle)} — likely #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {
