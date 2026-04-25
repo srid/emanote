@@ -107,6 +107,25 @@ Then(
   },
 );
 
+// Issue #608: a relative link inside `<dir>/index.md` must resolve against
+// `<dir>/`, not the parent of the canonicalized route. Scoped to <article>
+// because the sidebar nav also surfaces a child link to the same target —
+// and that path is auto-generated from the route hierarchy, so it stays
+// correct even when the bug is live. Only the article-body anchor exercises
+// the relative-URL resolver we're testing.
+Then(
+  "the article link with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    const link = this.page.locator(`article a:has-text("${linkText}")`).first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const href = await link.getAttribute("href");
+    assert.ok(
+      href && href.includes(needle),
+      `Article link "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
