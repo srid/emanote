@@ -11,26 +11,26 @@ the guard against repeats.
 See [issue #634](https://github.com/srid/emanote/issues/634) for the
 full motivation.
 
-## Running
-
-This suite runs in GitHub Actions (`.github/workflows/ci.yaml`, job
-`e2e-tests`) as a matrix over `{live, static}`. There's deliberately no
-`just` recipe — Playwright's downloaded Chromium binary depends on
-glibc system libs that aren't on `PATH` in a NixOS or plain Nix
-devshell, and `npx playwright install --with-deps` shells out to `sudo
-apt-get` which doesn't apply on NixOS either. CI (ubuntu-latest) has
-both, so that's where this suite runs.
-
-If you do want to iterate locally on a Debian/Ubuntu-like host:
+## Running locally
 
 ```sh
-cd tests
-npm ci
-npx playwright install --with-deps chromium   # one-time
-EMANOTE_BIN=$(command -v emanote) EMANOTE_MODE=live npm test
+just e2e-live    # spawns `emanote run`, runs the suite against it
+just e2e-static  # `emanote gen` once, then serves the output
 ```
 
+Runtime provisioning (Node + Playwright-compatible Chromium) lives in
+`tests/nix/` — a portable bundle described in `tests/nix/README.md`.
+The npm step downloads the cucumber toolchain on first run; subsequent
+runs reuse `node_modules`.
+
 Set `HEADLESS=false` to watch the browser.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yaml`, job `e2e-tests`) runs the
+matrix `{live, static}` directly with apt-provided Chromium, which is
+cheaper on Ubuntu runners than spinning a Nix devshell. CI is the
+single source of truth for which modes are tested.
 
 ## Layout
 
@@ -43,6 +43,8 @@ Set `HEADLESS=false` to watch the browser.
 - `support/world.ts` — per-scenario state (browser page, helpers).
 - `fixtures/notebook/` — minimal notebook consumed by both modes. Not
   coupled to `docs/` so doc edits never flake tests.
+- `nix/` — portable runtime shell + just module; see
+  `tests/nix/README.md`.
 
 ## Adding scenarios
 
