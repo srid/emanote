@@ -17,10 +17,13 @@
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
+- **Mermaid diagrams now render to inline SVG at build time** via `mmdc` (mermaid-cli), pinned by the Nix flake the same way as `tailwindcss` and `stork`. The generated site has no client-side JS dependency for diagrams and works fully offline. The `js.mermaid` snippet remains documented as an opt-in alternative for users who explicitly want CDN-based client-side rendering. ([#625](https://github.com/srid/emanote/issues/625), [#656](https://github.com/srid/emanote/pull/656))
+
 **Bug fixes**
 
 - Atom feed: a feed query that matches no notes no longer crashes the build; an empty-but-valid Atom document is emitted instead. Configuration errors (missing/invalid query block, missing `page.siteUrl`) still fail loudly ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
 - Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
+- Raw HTML blocks containing a literal `</div>` no longer crash the renderer with `div cannot contain text looking like its end tag` ([#119](https://github.com/srid/emanote/issues/119)). Fixed upstream in [srid/heist-extra#13](https://github.com/srid/heist-extra/pull/13) by switching the raw-HTML wrapper to a unique `<rawhtml>` element.
 
 ## 1.4.0.0 (2025-08-18)
 
