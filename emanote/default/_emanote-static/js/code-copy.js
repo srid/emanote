@@ -32,10 +32,16 @@ onElement('pre > code', (codeBlock) => {
 });
 
 function flash(button, icon, title) {
+  // Cancel any pending reset on this same button — otherwise a click
+  // landing inside the 2s window from a prior click overwrites the new
+  // state (most visibly: an error message replaced by a fresh copy icon
+  // before the user can read it).
+  if (button._emanoteFlashTimer) clearTimeout(button._emanoteFlashTimer);
   button.innerHTML = icon;
   button.setAttribute('title', title);
-  setTimeout(() => {
+  button._emanoteFlashTimer = setTimeout(() => {
     button.innerHTML = COPY_ICON;
     button.setAttribute('title', 'Copy code');
+    button._emanoteFlashTimer = null;
   }, 2000);
 }
