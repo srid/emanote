@@ -19,10 +19,7 @@
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
-    # Pinned to the branch that fixes xmlhtml's "div cannot contain text
-    # looking like its end tag" crash on mermaid SVG. Revert to master
-    # once srid/heist-extra#13 lands.
-    heist-extra.url = "github:srid/heist-extra/mermaid-rawhtml-wrapper";
+    heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;
