@@ -99,13 +99,21 @@ runMmdc bin code = liftIO $ withSystemTempDirectory "emanote-mermaid" $ \tmpDir 
         <> ": "
         <> T.strip (toText stderr)
 
-{- | Drop @<?xml ...?>@ and @<!DOCTYPE ...>@ prefixes so the SVG can be
-embedded directly into HTML.
+{- | Strip leading XML processing instructions (@\<?...?\>@) and tag-style
+declarations (@\<!DOCTYPE ...\>@) so the SVG can be embedded directly into
+HTML. Unrecognised or malformed prefixes are left in place rather than
+silently truncated.
 -}
 stripXmlPrologue :: Text -> Text
 stripXmlPrologue = go . T.stripStart
   where
-    go t
-      | "<?xml" `T.isPrefixOf` t = go . T.stripStart . T.drop 1 . T.dropWhile (/= '>') $ t
-      | "<!DOCTYPE" `T.isPrefixOf` t = go . T.stripStart . T.drop 1 . T.dropWhile (/= '>') $ t
-      | otherwise = t
+    go t = case stripOnePrologue t of
+      Just rest -> go (T.stripStart rest)
+      Nothing -> t
+    stripOnePrologue t
+      | "<?" `T.isPrefixOf` t = stripUntil "?>" (T.drop 2 t)
+      | "<!DOCTYPE" `T.isPrefixOf` t = stripUntil ">" (T.drop 9 t)
+      | otherwise = Nothing
+    stripUntil terminator t = case T.breakOn terminator t of
+      (_, after) | T.null after -> Nothing
+      (_, after) -> Just (T.drop (T.length terminator) after)
