@@ -51,8 +51,14 @@
 
 # Tips
 /tips/adding-images /adding-images 301
-/tips/js /js 301
+/tips/math /math 301
+/tips/mermaid /mermaid 301
+/tips/syntax-highlighting /syntax-highlighting 301
+/tips/sync /sync 301
+
+# Tips: legacy js/ paths (mermaid + math no longer require client JS;
+# the js/ section was removed in #656)
+/tips/js /tips 301
 /tips/js/math /math 301
 /tips/js/mermaid /mermaid 301
 /tips/js/syntax-highlighting /syntax-highlighting 301
-/tips/sync /sync 301

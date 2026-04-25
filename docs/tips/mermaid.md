@@ -6,11 +6,12 @@ slug: mermaid
 
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks.
 
-Emanote renders every `mermaid` code block to **inline SVG at build time** using [`mmdc`](https://github.com/mermaid-js/mermaid-cli) (mermaid-cli). The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix flake pins `mermaid-cli` as a build/runtime input — same pattern as `tailwindcss` and `stork` — so the binary path is baked in at compile time and you don't need to install anything extra.
+Emanote renders every `mermaid` code block to **inline SVG at build time**. The generated site has no client-side JavaScript dependency for diagrams and works fully offline.
 
-Per-diagram render failures preserve the original code block and surface the underlying `mmdc` error both inline (above the failing source) and in the document-top error banner, so you can fix the diagram source.
+Per-diagram render failures preserve the original code block and surface the error both inline (above the failing source) and in the document-top error banner, so you can fix the diagram source.
 
-> Need diagrams to render in the browser instead — for interactive features or when `mmdc` isn't available in your build environment? See [[mermaid/client-side]].
+> [!tip] Need browser-side rendering instead?
+> For interactive features, or when build-time rendering isn't an option, set `mermaid.static: false` and use the `js.mermaid` snippet. See [[mermaid/client-side]] for the full setup and a live demo.
 
 ## Example using Mermaid
 
