@@ -1,6 +1,6 @@
 ---
 name: talk
-description: Enter talk mode — conversation only, no file changes
+description: Enter talk mode — conversation and research, no repo changes
 argument-hint: "[--no-laconic] [--review-model=<opus|sonnet|haiku>] <topic or question>"
 ---
 
@@ -10,9 +10,10 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 
 ## Rules
 
-- **Do NOT edit, write, or create any files.** No `Edit`, `Write`, `NotebookEdit` tool calls, and no Bash commands that create or modify files (`echo >`, `tee`, `sed -i`, etc.). Period.
-- **Do NOT run destructive commands.** No `git commit`, `git push`, or anything that mutates the repo.
+- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo.
+- **Do NOT run destructive repo commands.** No `git commit`, `git push`, `git add`, `git rm`, or anything else that mutates the current repo.
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
+- You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
 - You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous. You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
 - **Talk mode ends when the user invokes an action skill** (e.g., `do`). Until then, stay in talk mode.
 
@@ -37,7 +38,7 @@ Use `Agent(subagent_type=Explore)` for any of:
 
 For narrow, single-file lookups, `Grep`/`Read` directly is fine. The line is: if you would be guessing without reading, you must read first.
 
-**When the source isn't on disk.** If the relevant library isn't in `node_modules/`, `vendor/`, or similar, and isn't already checked out somewhere you can read, `git clone` it to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read it there. Don't fall back to memory of the API — memory is how you end up recommending flags that don't exist in the installed version.
+**When the source isn't on disk.** If the relevant library isn't in `node_modules/`, `vendor/`, or similar, and isn't already checked out somewhere you can read, `git clone` it to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read it there. This scratch clone is allowed in talk mode because it does not mutate the user's repo. Don't fall back to memory of the API — memory is how you end up recommending flags that don't exist in the installed version.
 
 **Subagent output is a lead, not ground truth.** Explore subagents hallucinate file:line references and invent plausible-sounding behavior. If you haven't verified a claim yourself, mark it "per subagent, unverified" so the user can weigh it — don't launder subagent guesses into confident statements.
 

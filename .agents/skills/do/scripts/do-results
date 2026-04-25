@@ -12,7 +12,6 @@
 #                                               (use when startedAt comes from a single-shell caller)
 #                                               pass "now" for startedAt/completedAt to auto-generate UTC timestamp
 #   do-results set <field> <value>            — update a top-level field (active, status)
-#   do-results patch-last <field> <value>     — patch a field on the last step
 
 set -euo pipefail
 
@@ -25,7 +24,7 @@ fi
 
 FILE=".do-results.json"
 
-cmd="${1:?Usage: do-results <init|step-start|step-end|step|set|patch-last> ...}"
+cmd="${1:?Usage: do-results <init|step-start|step-end|step|set> ...}"
 shift
 
 case "$cmd" in
@@ -51,7 +50,8 @@ ENDJSON
     startedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     existing="$($JQ -r '.pendingStep.name // empty' "$FILE")"
     if [ -n "$existing" ]; then
-      echo "do-results: overwriting stale pendingStep '$existing' — step-end was not called" >&2
+      echo "do-results: pendingStep '$existing' already active — call step-end before starting '$name'" >&2
+      exit 1
     fi
     $JQ --arg n "$name" --arg sa "$startedAt" \
        '.pendingStep = {"name":$n,"startedAt":$sa}' \
@@ -120,15 +120,9 @@ ENDJSON
     fi
     ;;
 
-  patch-last)
-    field="${1:?field required}"
-    value="${2:?value required}"
-    $JQ --arg f "$field" --arg v "$value" '.steps[-1][$f] = $v' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
-    ;;
-
   *)
     echo "Unknown command: $cmd" >&2
-    echo "Usage: do-results <init|step-start|step-end|step|set|patch-last> ..." >&2
+    echo "Usage: do-results <init|step-start|step-end|step|set> ..." >&2
     exit 1
     ;;
 esac

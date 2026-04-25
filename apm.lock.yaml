@@ -24,7 +24,7 @@ dependencies:
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: f031519fc0b11e5230a74eef76e7baf15ff32efe
+  resolved_commit: d52271b707854ebe8b20d2bfbfb999fcefa00c23
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -56,12 +56,12 @@ dependencies:
   deployed_file_hashes:
     .claude/agents/hickey.md: sha256:edde9b0d3b27b947b7372f662b2e8652d136e0bb9af7924892b00450a1e586bc
     .claude/agents/lowy.md: sha256:a1c8e5ba115439bcfa0d7e331f96e71b2d690ff2e5fb9b824bb5f588eb43ac75
-    .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:b9d316555a1509eabb610d32cccdcd1dacaf926b2fd831a3178c30d283756d69
+    .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
     .claude/rules/apm-sources.md: sha256:8707579e05e2a39f01278b2d225f3cb2ec97912c65c94aa57e5830954f98eab1
     .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
     .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
-    .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:b9d316555a1509eabb610d32cccdcd1dacaf926b2fd831a3178c30d283756d69
-  content_hash: sha256:f309878ce79ee166620ef89812d093707f07b79cbebaa74725dc6f32f3cac8d3
+    .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
+  content_hash: sha256:859799bc34087e579fd564b4fdf3b8adcaddae7d5d753567318d3d51c9e2d7be
 local_deployed_files:
 - .agents/skills/dpella-mcp
 - .claude/skills/dpella-mcp
