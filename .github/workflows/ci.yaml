@@ -18,17 +18,45 @@ jobs:
           # TODO: Define this in Vira or make it part of our flake?
           nix build github:hercules-ci/flake.parts-website#checks.x86_64-linux.linkcheck --override-input emanote .
 
-  e2e-tests:
+  # Build emanote once and ship the Nix closure as an artifact so the
+  # downstream e2e-tests job can run both `live` and `static` modes
+  # against the same binary without rebuilding (previously the matrix
+  # rebuilt twice in parallel — ~4 min each).
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        mode: [live, static]
+    outputs:
+      bin: ${{ steps.build.outputs.bin }}
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@v33
+      - name: Build emanote
+        id: build
+        run: |
+          OUT="$(nix build --no-link --print-out-paths .#default)"
+          echo "bin=$OUT/bin/emanote" >> "$GITHUB_OUTPUT"
+          nix-store --export $(nix-store -qR "$OUT") | gzip > emanote-closure.nar.gz
+      - name: Upload emanote closure
+        uses: actions/upload-artifact@v4
+        with:
+          name: emanote-closure
+          path: emanote-closure.nar.gz
+          retention-days: 1
+
+  e2e-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v33
+      - name: Download emanote closure
+        uses: actions/download-artifact@v4
+        with:
+          name: emanote-closure
+      - name: Import emanote closure
+        run: gunzip -c emanote-closure.nar.gz | nix-store --import > /dev/null
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -42,21 +70,22 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('tests/package-lock.json') }}
-      - name: Build emanote
-        id: build
-        run: |
-          BIN="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
-          echo "bin=$BIN" >> "$GITHUB_OUTPUT"
       - name: Install test dependencies
         working-directory: tests
         run: |
           npm ci
           npx playwright install --with-deps chromium
-      - name: E2E (${{ matrix.mode }})
+      - name: E2E (live)
         working-directory: tests
         env:
-          EMANOTE_BIN: ${{ steps.build.outputs.bin }}
-          EMANOTE_MODE: ${{ matrix.mode }}
+          EMANOTE_BIN: ${{ needs.build.outputs.bin }}
+          EMANOTE_MODE: live
+        run: npm test
+      - name: E2E (static)
+        working-directory: tests
+        env:
+          EMANOTE_BIN: ${{ needs.build.outputs.bin }}
+          EMANOTE_MODE: static
         run: npm test
 
   website:
