@@ -151,7 +151,12 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors (model ^. M.modelDataErrors) (note ^. MN.noteDoc)
+      -- Scope yaml errors to this note's cascade: a bad `subfolder/index.yaml`
+      -- only contributes meta to notes under `/subfolder/*`, so its banner
+      -- belongs on those notes too — not globally on every page.
+      cascade = Set.fromList . toList $ R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
+      hereErrors = Map.restrictKeys (model ^. M.modelDataErrors) cascade
+      doc = prependDataErrors hereErrors (note ^. MN.noteDoc)
       toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource

@@ -49,19 +49,32 @@ Then(
   },
 );
 
+// The banner is a Pandoc Div with class `emanote:error`, which an existing
+// Heist splice rewrites into Tailwind utility classes. Match by the unique
+// header text instead of the source class — the test shouldn't break the
+// next time those utilities get tweaked.
+const YAML_BANNER_HEADER = "Emanote: bad YAML files";
+
 Then(
   "the page shows the YAML errors banner",
   async function (this: EmanoteWorld) {
-    // The banner is a Pandoc Div with class `emanote:error`, which an
-    // existing Heist splice rewrites into Tailwind utility classes. Match
-    // by the unique header text instead of the source class — the test
-    // shouldn't break the next time those utilities get tweaked.
-    const header = this.page.getByText("Emanote: bad YAML files");
+    const header = this.page.getByText(YAML_BANNER_HEADER);
     await header.waitFor({ state: "attached", timeout: 5_000 });
     const text = (await this.page.textContent("body")) ?? "";
     assert.ok(
       text.includes("broken-285.yaml"),
       `Banner header rendered but did not name the broken fixture file — the per-file error message stopped propagating. Got: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
+Then(
+  "the page does not show the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      !text.includes(YAML_BANNER_HEADER),
+      `Banner header leaked onto a page whose route cascade does not include the broken yaml — yaml-error scoping regressed. First 400 chars: ${JSON.stringify(text.slice(0, 400))}.`,
     );
   },
 );

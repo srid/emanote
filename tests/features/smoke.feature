@@ -51,10 +51,15 @@ Feature: Smoke
     When I open "/subfolder.html"
     Then the article link with text "sibling" has href containing "subfolder/sibling"
 
-  Scenario: A malformed YAML file is surfaced as a banner instead of crashing (regression: #285)
-    When I open "/"
+  Scenario: A malformed YAML file is surfaced as a banner on its sibling note (regression: #285)
+    When I open "/broken-285.html"
     Then the page rendered without an Ema exception
     And the page shows the YAML errors banner
+
+  Scenario: The YAML errors banner does not leak onto unrelated pages (regression: #285)
+    When I open "/"
+    Then the page rendered without an Ema exception
+    And the page does not show the YAML errors banner
 
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
