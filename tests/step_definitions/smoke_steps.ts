@@ -10,6 +10,23 @@ When("I fetch {string}", async function (this: EmanoteWorld, url: string) {
   this.lastResponse = await this.page.request.get(url);
 });
 
+// #119: a raw HTML block containing a literal `</div>` used to truncate the
+// page mid-render with `div cannot contain text looking like its end tag`.
+// Asserting on a marker *inside* the raw block proves the page reached past
+// the offending node — a partial response wouldn't include the marker.
+Then(
+  "the page contains an element with data-marker {string}",
+  async function (this: EmanoteWorld, marker: string) {
+    const count = await this.page
+      .locator(`[data-marker="${marker}"]`)
+      .count();
+    assert.ok(
+      count > 0,
+      `Expected an element with data-marker="${marker}"; got ${count}. Either the raw-HTML wrapper regressed (xmlhtml's "div cannot contain text…" path) and the page was truncated, or Pandoc no longer recognises the source as a raw HTML block.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {

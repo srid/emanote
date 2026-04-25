@@ -39,6 +39,10 @@ Feature: Smoke
     And I click the footnote ref with index "1" inside an embedded note
     Then the footnote popup contains "EMBED_FOOTNOTE_BODY"
 
+  Scenario: Raw HTML block containing </div> renders without crashing (regression: #119)
+    When I open "/rawhtml.html"
+    Then the page contains an element with data-marker "RAWHTML_DIV_OK"
+
   Scenario: A feed-enabled note whose query matches no notes does not crash the build (regression: #490)
     When I fetch "/empty-feed.xml"
     Then the response is a valid Atom feed
