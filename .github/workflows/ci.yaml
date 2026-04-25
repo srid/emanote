@@ -60,7 +60,12 @@ jobs:
         with:
           name: emanote-closure
       - name: Import emanote closure
-        run: gunzip -c emanote-closure.nar.gz | nix-store --import > /dev/null
+        run: |
+          gunzip -c emanote-closure.nar.gz | nix-store --import > /dev/null
+          # nix-store --import accepts a syntactically valid but
+          # incomplete closure without complaint; assert the binary is
+          # actually executable before proceeding to test setup.
+          test -x "${{ needs.build.outputs.bin }}" || { echo "imported closure missing emanote binary at ${{ needs.build.outputs.bin }}" >&2; exit 1; }
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
