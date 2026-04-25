@@ -1,21 +1,12 @@
 module Emanote.Pandoc.MermaidSpec where
 
-import Control.Exception (bracket_)
-import Control.Monad.Logger (runNoLoggingT)
 import Control.Monad.Writer.Strict (runWriterT)
 import Emanote.Pandoc.Mermaid (stripXmlPrologue, transformMermaidBlocks)
 import Hedgehog
 import Relude
-import System.Environment (setEnv, unsetEnv)
 import Test.Hspec
 import Test.Hspec.Hedgehog
 import Text.Pandoc.Definition qualified as B
-
-runMermaid :: B.Pandoc -> IO (B.Pandoc, [Text])
-runMermaid = runNoLoggingT . runWriterT . transformMermaidBlocks
-
-mermaidBlock :: B.Block
-mermaidBlock = B.CodeBlock ("", ["mermaid"], []) "graph LR\nA --> B"
 
 plainBlock :: B.Block
 plainBlock = B.CodeBlock ("", ["haskell"], []) "id = \\x -> x"
@@ -42,21 +33,13 @@ spec = do
 
   describe "transformMermaidBlocks" $ do
     it "is a no-op when no mermaid blocks are present" $ do
-      (result, errs) <- runMermaid (doc [plainBlock])
+      -- A document without mermaid blocks must not invoke mmdc at all
+      -- (verified by passing through unchanged with no errors `tell`'d).
+      (result, errs) <- runWriterT $ transformMermaidBlocks (doc [plainBlock])
       result `shouldBe` doc [plainBlock]
       errs `shouldBe` []
-    it "preserves mermaid blocks when mmdc is missing from PATH" $ do
-      -- Point PATH at a directory that exists but holds no mmdc.
-      -- (`setEnv name ""` in base actually *unsets*, so we need a real path.)
-      withMmdcMissing $ do
-        (result, errs) <- runMermaid (doc [mermaidBlock])
-        result `shouldBe` doc [mermaidBlock]
-        -- Missing mmdc is environmental, not a per-note error: do not tell it.
-        errs `shouldBe` []
 
-withMmdcMissing :: IO a -> IO a
-withMmdcMissing action = do
-  original <- lookupEnv "PATH"
-  bracket_ (setEnv "PATH" "/var/empty") (restore original) action
-  where
-    restore = maybe (unsetEnv "PATH") (setEnv "PATH")
+-- The success path (mmdc actually invoked) lives in the e2e suite at
+-- tests/features/smoke.feature, where a built emanote with the Nix-supplied
+-- mmdc renders a fixture diagram and the resulting page is asserted to
+-- contain an inline <svg> element.

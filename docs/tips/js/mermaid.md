@@ -11,9 +11,9 @@ page:
 
 ## Inline SVG (default, offline-friendly)
 
-When the [`mmdc`](https://github.com/mermaid-js/mermaid-cli) binary is on your `PATH`, Emanote renders every `mermaid` code block to inline SVG at build time. The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix build pulls in `mermaid-cli` automatically.
+Emanote renders every `mermaid` code block to inline SVG at build time using [`mmdc`](https://github.com/mermaid-js/mermaid-cli) (mermaid-cli). The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix flake pins `mermaid-cli` as a build/runtime input — same pattern as `tailwindcss` and `stork` — so the binary path is baked in at compile time and you don't need to install anything extra.
 
-If `mmdc` is missing, Emanote logs a warning and leaves the code block intact — install `mermaid-cli` (`npm i -g @mermaid-js/mermaid-cli` or via your package manager) to enable rendering.
+Per-diagram render failures preserve the original code block and surface the underlying `mmdc` error inline (and in the document-top error banner) so you can fix the diagram source.
 
 ## Client-side rendering (CDN)
 
@@ -25,7 +25,7 @@ page:
     <snippet var="js.mermaid" />
 ```
 
-This loads `mermaid.js` from a CDN and requires network access to render diagrams. Use it when `mmdc` cannot be installed in your build environment.
+This loads `mermaid.js` from a CDN and requires network access to render diagrams. The build-time SVG path is the recommended default.
 
 ## Example using Mermaid
 
