@@ -3,6 +3,7 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
+import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
@@ -150,7 +151,8 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      toc = newToc $ note ^. MN.noteDoc
+      doc = prependDataErrors (model ^. M.modelDataErrors) (note ^. MN.noteDoc)
+      toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
@@ -204,7 +206,7 @@ renderLmlHtml model note = do
     "ema:note:pandoc" ##
       C.withBlockCtx ctx
         $ \ctx' ->
-          Splices.pandocSplice ctx' (note ^. MN.noteDoc)
+          Splices.pandocSplice ctx' doc
     "ema:note:toc" ##
       C.withBlockCtx ctx
         $ \ctx' ->
@@ -286,3 +288,19 @@ withTemplateName =
 withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
   SData.oneAesonText (toList $ "page" :| ["siteTitle"])
+
+{- | Prepend a banner block listing yaml parse errors before the note's body.
+
+Mirrors the per-note `errorDiv` baked into a Note by `mkNoteWith`, but
+stays at render time because yaml errors are global (one bad file affects
+the whole site) rather than per-note. Issue #285.
+-}
+prependDataErrors :: Map (R.R 'R.Yaml) Text -> Pandoc -> Pandoc
+prependDataErrors errs (Pandoc m blocks)
+  | Map.null errs = Pandoc m blocks
+  | otherwise = Pandoc m (banner : blocks)
+  where
+    banner =
+      B.Div ("", ["emanote:error"], [])
+        $ B.Para [B.Strong [B.Str "Emanote: bad YAML files"]]
+        : fmap (\(_, e) -> B.Para [B.Str e]) (Map.toList errs)

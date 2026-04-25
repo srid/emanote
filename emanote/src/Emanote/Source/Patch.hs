@@ -105,18 +105,19 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
-            -- On parse failure, leave the model unchanged for this route —
-            -- previously-good data stays in place. Throwing here used to
-            -- kill the UnionMount change handler (issue #285).
+            -- On parse failure, drop any prior data for this route and
+            -- record the error in the model so `renderLmlHtml` can surface
+            -- it on every page. Throwing here used to kill the UnionMount
+            -- change handler (issue #285).
             case SD.parseSDataCascading r yamlContents of
               Left err -> do
                 logE $ "Bad YAML file: " <> err
-                pure id
+                pure $ M.modelInsertDataError r err . M.modelDeleteData r
               Right sData ->
-                pure $ M.modelInsertData sData
+                pure $ M.modelInsertData sData . M.modelDeleteDataError r
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
-            pure $ M.modelDeleteData r
+            pure $ M.modelDeleteDataError r . M.modelDeleteData r
     R.HeistTpl ->
       case action of
         UM.Refresh refreshAction overlays -> do

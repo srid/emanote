@@ -27,9 +27,10 @@ Then(
   },
 );
 
-// #285 regression. Asserts the inverse of the bug's surface signature
-// (Ema's exception template strings) rather than binding to fixture text
-// that could rename without anyone noticing.
+// #285 — two complementary checks. The "no Ema exception" assertion
+// guards the *crash* (the original bug surface); the banner assertion
+// guards the *visibility* of the error so a parse failure can't fail
+// silently. Both must hold for the regression to be considered fixed.
 const EMA_EXCEPTION_MARKERS = [
   "Ema App threw an exception",
   "Unable to render template",
@@ -45,6 +46,23 @@ Then(
         `Page body contains ${JSON.stringify(marker)} — #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
       );
     }
+  },
+);
+
+Then(
+  "the page shows the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    // The banner is a Pandoc Div with class `emanote:error`, which an
+    // existing Heist splice rewrites into Tailwind utility classes. Match
+    // by the unique header text instead of the source class — the test
+    // shouldn't break the next time those utilities get tweaked.
+    const header = this.page.getByText("Emanote: bad YAML files");
+    await header.waitFor({ state: "attached", timeout: 5_000 });
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      text.includes("broken-285.yaml"),
+      `Banner header rendered but did not name the broken fixture file — the per-file error message stopped propagating. Got: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
   },
 );
 
