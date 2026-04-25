@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1c3612da-252e-483b-a6d0-8b766cc77d6f' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=d393ed22-fe0e-4d7f-858c-d49f38fb58b2' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -152,6 +152,29 @@
   .callout .callout-title a {
     color: inherit;
     text-decoration: underline;
+  }
+
+  /* Foldable callouts (Obsidian [!type]+ / [!type]-): suppress the native
+     <details>/<summary> disclosure marker since we render our own chevron,
+     and rotate the chevron based on open state. */
+  details.callout-foldable > summary {
+    list-style: none;
+  }
+
+  details.callout-foldable > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.callout-foldable[open] > summary .callout-fold-marker svg {
+    transform: rotate(180deg);
+  }
+
+  /* Nested callouts: drop the outer block margin so the inner callout
+     hugs the body of its parent rather than introducing a paragraph gap.
+     Both foldable (<details>) and non-foldable (<div>) outer callouts wrap
+     their body in `.callout-content`, so a single selector covers both. */
+  .callout .callout-content > .callout:last-child {
+    margin-bottom: 0;
   }
 </style>
 

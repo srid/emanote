@@ -60,7 +60,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1c3612da-252e-483b-a6d0-8b766cc77d6f' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=d393ed22-fe0e-4d7f-858c-d49f38fb58b2' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -152,6 +152,29 @@
   .callout .callout-title a {
     color: inherit;
     text-decoration: underline;
+  }
+
+  /* Foldable callouts (Obsidian [!type]+ / [!type]-): suppress the native
+     <details>/<summary> disclosure marker since we render our own chevron,
+     and rotate the chevron based on open state. */
+  details.callout-foldable > summary {
+    list-style: none;
+  }
+
+  details.callout-foldable > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.callout-foldable[open] > summary .callout-fold-marker svg {
+    transform: rotate(180deg);
+  }
+
+  /* Nested callouts: drop the outer block margin so the inner callout
+     hugs the body of its parent rather than introducing a paragraph gap.
+     Both foldable (<details>) and non-foldable (<div>) outer callouts wrap
+     their body in `.callout-content`, so a single selector covers both. */
+  .callout .callout-content > .callout:last-child {
+    margin-bottom: 0;
   }
 </style>
 
@@ -1656,23 +1679,29 @@
     <p class='mb-4 leading-relaxed'>
       Emanote supports <a href='https://help.obsidian.md/Plugins/Search#Embed+search+results+in+a+note' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Obsidian-style embed queries</a>.
     </p>
+  
+
+
+
+
   <div data-callout-metadata data-callout-fold data-callout='tip' data-footnote-scope
  class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
-  <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-  </path>
-  <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
-    <div class='callout-icon flex-shrink-0'>
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-        
+    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
+      
+  <div class='callout-icon flex-shrink-0'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+      
     <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
     </path>
   
-      </svg>
-    </div>
-    <div class='ml-3'>
-       Progress
-    </div>
+    </svg>
   </div>
+
+      <div class='ml-3'>
+         Progress
+      </div>
+    </div>
+    
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
@@ -1680,7 +1709,14 @@
     </p>
   
   </div>
-</div>
+
+  </div>
+
+
+
+
+
+
     <p class='mb-4 leading-relaxed'>
       Both <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>*</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>**</code> are supported in the path patterns. See <a href='https://hackage.haskell.org/package/filepattern-0.1.3/docs/System-FilePattern.html' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>System.FilePattern</a> for exact semantics.
     </p>
