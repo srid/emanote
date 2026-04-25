@@ -15,7 +15,6 @@ import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
-import Emanote.Route.R qualified as R
 import Emanote.Route.SiteRoute qualified as SF
 import Emanote.Route.SiteRoute qualified as SR
 import Heist qualified as H
