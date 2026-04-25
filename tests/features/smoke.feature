@@ -39,6 +39,10 @@ Feature: Smoke
     And I click the footnote ref with index "1" inside an embedded note
     Then the footnote popup contains "EMBED_FOOTNOTE_BODY"
 
+  Scenario: A feed-enabled note without a query block does not crash the build (regression: #490)
+    When I fetch "/empty-feed.xml"
+    Then the response is a valid Atom feed
+
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
     Then no footnote list is visible on screen

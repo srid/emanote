@@ -3,7 +3,7 @@ import {
   setWorldConstructor,
   setDefaultTimeout,
 } from "@cucumber/cucumber";
-import type { Browser, BrowserContext, Page } from "playwright";
+import type { APIResponse, Browser, BrowserContext, Page } from "playwright";
 
 setDefaultTimeout(60_000);
 
@@ -19,6 +19,7 @@ export class EmanoteWorld extends World {
   context!: BrowserContext;
   page!: Page;
   notedPrimary500?: string;
+  lastResponse?: APIResponse;
 
   /** Poll `--color-primary-500` on `:root` until it resolves to a
    *  non-empty value, then return it. Times out with the regression

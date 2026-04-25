@@ -18,7 +18,7 @@
 
 **Fixes**
 
-- Atom feed: misconfigured feeds (missing query block, empty query results) no longer crash the whole build; an empty-but-valid Atom document is emitted instead ([#490](https://github.com/srid/emanote/issues/490))
+- Atom feed: misconfigured feeds (missing query block, empty query results) no longer crash the whole build; an empty-but-valid Atom document is emitted instead ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
 
 ## 1.4.0.0 (2025-08-18)
 
