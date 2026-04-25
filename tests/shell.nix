@@ -5,20 +5,26 @@
 # `npx playwright install --with-deps` (which shells out to
 # `sudo apt-get`) cannot work.
 #
-# The pin below is constrained by `playwright-driver` matching the
-# `playwright` version in `tests/package.json` — diverging the two
+# nixpkgs is read from the parent flake's `nixpkgs-latest` input —
+# kept independent from the main `nixpkgs` input (which the Haskell
+# build pins) so the Playwright pin can move on its own cadence. The
+# constraint: this rev's `playwright-driver` version must match the
+# `playwright` version in `tests/package.json`. Diverging the two
 # raises "browser revision X not found at <PLAYWRIGHT_BROWSERS_PATH>"
-# at launch. Bump both together. Kept independent from the parent
-# flake's nixpkgs because that pin is driven by the Haskell build.
+# at launch — bump both together via `nix flake update nixpkgs-latest`
+# plus a matching npm bump.
 let
-  nixpkgs = builtins.fetchTree {
-    type = "github";
-    owner = "nixos";
-    repo = "nixpkgs";
-    rev = "f8573b9c935cfaa162dd62cc9e75ae2db86f85df";
-    narHash = "sha256-hpXH0z3K9xv0fHaje136KY872VT2T5uwxtezlAskQgY=";
-  };
-  pkgs = import nixpkgs { };
+  lock = builtins.fromJSON (builtins.readFile ../flake.lock);
+  nixpkgsLocked = lock.nodes.nixpkgs-latest.locked;
+  pkgs = import
+    (builtins.fetchTree {
+      type = "github";
+      owner = nixpkgsLocked.owner;
+      repo = nixpkgsLocked.repo;
+      rev = nixpkgsLocked.rev;
+      narHash = nixpkgsLocked.narHash;
+    })
+    { };
 in
 pkgs.mkShell {
   packages = [ pkgs.nodejs ];
