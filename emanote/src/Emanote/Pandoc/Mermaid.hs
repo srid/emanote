@@ -9,8 +9,8 @@ preserving the original code block alongside a visible error message when
 -}
 module Emanote.Pandoc.Mermaid (
   transformMermaidBlocks,
-  -- For testing
-  hasMermaidBlock,
+
+  -- * Internal helpers (exported for unit tests)
   stripXmlPrologue,
 ) where
 

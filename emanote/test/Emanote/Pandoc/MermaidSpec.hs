@@ -3,7 +3,7 @@ module Emanote.Pandoc.MermaidSpec where
 import Control.Exception (bracket_)
 import Control.Monad.Logger (runNoLoggingT)
 import Control.Monad.Writer.Strict (runWriterT)
-import Emanote.Pandoc.Mermaid (hasMermaidBlock, stripXmlPrologue, transformMermaidBlocks)
+import Emanote.Pandoc.Mermaid (stripXmlPrologue, transformMermaidBlocks)
 import Hedgehog
 import Relude
 import System.Environment (setEnv, unsetEnv)
@@ -25,14 +25,6 @@ doc = B.Pandoc mempty
 
 spec :: Spec
 spec = do
-  describe "hasMermaidBlock" $ do
-    it "detects a CodeBlock with the mermaid class" . hedgehog $ do
-      hasMermaidBlock (doc [mermaidBlock]) === True
-    it "ignores CodeBlocks without the mermaid class" . hedgehog $ do
-      hasMermaidBlock (doc [plainBlock]) === False
-    it "ignores documents with no code blocks" . hedgehog $ do
-      hasMermaidBlock (doc [B.Para [B.Str "hi"]]) === False
-
   describe "stripXmlPrologue" $ do
     it "drops the XML declaration" . hedgehog $ do
       stripXmlPrologue "<?xml version=\"1.0\"?>\n<svg></svg>" === "<svg></svg>"
