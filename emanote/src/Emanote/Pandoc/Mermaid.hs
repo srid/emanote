@@ -31,9 +31,6 @@ import UnliftIO.Temporary (withSystemTempDirectory)
 mermaidClass :: Text
 mermaidClass = "mermaid"
 
-mmdcExe :: String
-mmdcExe = "mmdc"
-
 {- | Walk the Pandoc AST and replace mermaid code blocks with inline SVG.
 
 If @mmdc@ is unavailable on PATH, the document is returned unchanged after
@@ -44,7 +41,7 @@ transformMermaidBlocks :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => B.
 transformMermaidBlocks doc
   | not (hasMermaidBlock doc) = pure doc
   | otherwise =
-      liftIO (findExecutable mmdcExe) >>= \case
+      liftIO (findExecutable "mmdc") >>= \case
         Nothing -> do
           logW
             $ "mmdc not found on PATH; mermaid code blocks will not be rendered to "
@@ -70,7 +67,6 @@ renderBlock bin blk = case blk of
             pure $ B.Div ("", ["mermaid-error"], []) [errorMessage err, blk]
   _ -> pure blk
 
--- | A visible error message rendered above the original mermaid source.
 errorMessage :: Text -> B.Block
 errorMessage err =
   B.Para
