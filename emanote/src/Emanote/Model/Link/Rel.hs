@@ -44,7 +44,11 @@ data Rel = Rel
 -}
 data UnresolvedRelTarget
   = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
-  | URTResource ModelRoute
+  | -- | One or more candidate `ModelRoute`s the URL could resolve to,
+    -- ordered by preference. A single URL can map to multiple kinds
+    -- (e.g. a @.xml@ URL → feed-enabled note OR static @.xml@ asset);
+    -- resolution picks the first candidate that exists in the model.
+    URTResource (NonEmpty ModelRoute)
   | URTVirtual SR.VirtualRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
@@ -75,13 +79,22 @@ noteRels note =
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 
--- | Return all possible `UnresolvedRelTarget`s to the resource indexed by this `ModelRoute`.
+{- | All `UnresolvedRelTarget`s that could resolve to the given
+`ModelRoute`. The `URTResource` form is built from the canonical URL
+form of @r@ re-parsed via `mkModelRouteCandidates` so the candidate
+list matches what the parse path stored in the rel index — without
+that round-trip, a static-@.xml@ backlink lookup would search for
+@URTResource (one r)@ while parsed rels actually carry the joint
+@(feed-route :| [static])@ list and never match.
+-}
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
   let allowedWikiLinks = WL.allowedWikiLinks . R.unRoute
       wls = either (R.withLmlRoute allowedWikiLinks . snd) allowedWikiLinks $ R.modelRouteCase r
-   in (URTWikiLink <$> toList wls)
-        <> [URTResource r]
+      resourceURTs =
+        maybeToList
+          $ viaNonEmpty URTResource (R.mkModelRouteCandidates (R.encodeModelRoute r))
+   in (URTWikiLink <$> toList wls) <> resourceURTs
 
 {- | Parse a relative URL string for later resolution.
 
@@ -95,11 +108,11 @@ parseUnresolvedRelTarget baseDir attrs url = do
       pure $ URTWikiLink wl
     Right fp ->
       fmap URTVirtual (SR.decodeVirtualRoute fp)
-        <|> fmap
+        <|> viaNonEmpty
           URTResource
           ( fp
               & relocateRelUrlUnder (R.encodeRoute <$> baseDir)
-              & R.mkModelRouteFromFilePath
+              & R.mkModelRouteCandidates
           )
   pure (res, manchor)
 

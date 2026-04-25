@@ -26,8 +26,8 @@ resolveUnresolvedRelTarget model currentRoute = \case
   Rel.URTWikiLink (_wlType, wl) -> do
     resolveWikiLinkMustExist model currentRoute wl
       <&> resourceSiteRoute
-  Rel.URTResource r ->
-    resolveModelRoute model r
+  Rel.URTResource candidates ->
+    resolveModelRouteCandidates model candidates
       <&> resourceSiteRoute
   Rel.URTVirtual virtualRoute -> do
     Rel.RRTFound
@@ -67,37 +67,26 @@ resolveAmbiguity (R.withLmlRoute coerce -> currentRoute) candidates = do
 resolveModelRoute ::
   Model -> R.ModelRoute -> Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
 resolveModelRoute model lr =
-  case R.modelRouteCase lr of
-    -- A `.xml` URL parses to an `LMLView_Atom` route by default (so
-    -- `[atom](feed.xml)` can target a feed-enabled note). When no
-    -- such note exists, fall back to looking up a static `.xml`
-    -- asset of the same path before declaring the link broken
-    -- (regression: #547).
-    Left (R.LMLView_Atom, lmlR) ->
-      case M.modelLookupNoteByRoute (R.LMLView_Atom, lmlR) model of
-        Just hit -> Rel.RRTFound (Left hit)
-        Nothing ->
-          maybe Rel.RRTMissing (Rel.RRTFound . Right)
-            $ flip M.modelLookupStaticFileByRoute model
-            =<< xmlStaticRouteFromLml lmlR
-    other ->
-      bitraverse
-        (`M.modelLookupNoteByRoute` model)
-        (`M.modelLookupStaticFileByRoute` model)
-        other
-        & maybe Rel.RRTMissing Rel.RRTFound
+  bitraverse
+    (`M.modelLookupNoteByRoute` model)
+    (`M.modelLookupStaticFileByRoute` model)
+    (R.modelRouteCase lr)
+    & maybe Rel.RRTMissing Rel.RRTFound
 
-{- | Reinterpret an `LMLRoute` (parsed from a `.xml` URL into the
-Atom-feed slot) as an opaque `.xml` static-file route. The `Maybe`
-is only there because `mkRouteFromFilePath` is partial in general; on
-the encoded path it is total (a non-empty `NonEmpty Slug` always
-encodes to a non-empty filepath that re-parses).
+{- | Try each candidate `ModelRoute` in order; the first one that
+exists in the model wins. The candidate list is built by
+`mkModelRouteCandidates` and captures the URL-to-resource-kind
+ambiguity (notably @.xml@ → feed route OR static asset; see #547).
 -}
-xmlStaticRouteFromLml :: R.LMLRoute -> Maybe (R.R 'R.AnyExt)
-xmlStaticRouteFromLml lmlRoute =
-  R.mkRouteFromFilePath @_ @'R.AnyExt
-    $ R.encodeRoute @_ @'R.Xml
-    $ R.withLmlRoute coerce lmlRoute
+resolveModelRouteCandidates ::
+  Model ->
+  NonEmpty R.ModelRoute ->
+  Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
+resolveModelRouteCandidates model =
+  firstFound . fmap (resolveModelRoute model)
+  where
+    firstFound (Rel.RRTMissing :| (x : xs)) = firstFound (x :| xs)
+    firstFound (other :| _) = other
 
 resourceSiteRoute :: Either (R.LMLView, MN.Note) SF.StaticFile -> SR.SiteRoute
 resourceSiteRoute =
