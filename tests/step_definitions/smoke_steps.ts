@@ -6,6 +6,32 @@ When("I open {string}", async function (this: EmanoteWorld, url: string) {
   await this.page.goto(url, { waitUntil: "domcontentloaded" });
 });
 
+When("I fetch {string}", async function (this: EmanoteWorld, url: string) {
+  this.lastResponse = await this.page.request.get(url);
+});
+
+Then(
+  "the response is a valid Atom feed",
+  async function (this: EmanoteWorld) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    assert.strictEqual(
+      resp.status(),
+      200,
+      `Expected 200; got ${resp.status()}. The feed route should serve an empty-but-valid Atom document, not error out (see #490).`,
+    );
+    const body = await resp.text();
+    assert.ok(
+      body.startsWith("<?xml"),
+      `Expected an XML prolog; first 100 chars: ${JSON.stringify(body.slice(0, 100))}.`,
+    );
+    assert.ok(
+      body.includes("<feed"),
+      `Expected a top-level <feed> element; body did not contain one. First 200 chars: ${JSON.stringify(body.slice(0, 200))}.`,
+    );
+  },
+);
+
 Given(
   "I note the resolved primary palette at {string}",
   async function (this: EmanoteWorld, url: string) {
