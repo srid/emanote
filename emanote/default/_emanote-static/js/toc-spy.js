@@ -54,4 +54,26 @@ ready(() => {
 
   for (const { section } of observed) observer.observe(section);
   pickActive();
+
+  // The IO only fires on intersection-state changes. Tall sections
+  // separated by skinny headings can all stay outside the active band
+  // through a long scroll — no state change, no callback, pickActive
+  // never re-runs, so the active link freezes on observed[0] (the
+  // initial fallback). pickActive's lastAbove branch reads from
+  // getBoundingClientRect() though, so it does need to re-run on
+  // scroll. rAF-coalesce so we do at most one pass per frame even
+  // under fast wheel/trackpad input.
+  let scrollTick = false;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (scrollTick) return;
+      scrollTick = true;
+      requestAnimationFrame(() => {
+        scrollTick = false;
+        pickActive();
+      });
+    },
+    { passive: true },
+  );
 });
