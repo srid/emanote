@@ -26,6 +26,7 @@ import Emanote.Route (LMLRoute)
 import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as HS
 import Relude
 import Text.Casing qualified
 import Text.Megaparsec qualified as M
@@ -44,14 +45,12 @@ calloutResolvingSplice _model _nr ctx _noteRoute blk = do
       "callout:title" ## Tit.titleSplice ctx id $ Tit.fromInlines (title callout)
       "callout:body" ## HP.pandocSplice ctx $ B.Pandoc mempty (body callout)
       "callout:fold-state" ## HI.textSplice (foldStateAttr $ foldState callout)
-      "callout:if-not-foldable" ## whenSplice (isNothing $ foldState callout)
-      "callout:if-foldable-expanded" ## whenSplice (foldState callout == Just Expanded)
-      "callout:if-foldable-collapsed" ## whenSplice (foldState callout == Just Collapsed)
+      "callout:if-not-foldable" ## HS.ifISplice (isNothing $ foldState callout)
+      "callout:if-foldable-expanded" ## HS.ifISplice (foldState callout == Just Expanded)
+      "callout:if-foldable-collapsed" ## HS.ifISplice (foldState callout == Just Collapsed)
       "query" ##
         HI.textSplice (show blks)
   where
-    whenSplice :: Bool -> HI.Splice Identity
-    whenSplice cond = if cond then HI.runChildren else pure []
     foldStateAttr :: Maybe FoldState -> Text
     foldStateAttr = \case
       Nothing -> ""
