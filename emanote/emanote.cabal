@@ -189,6 +189,7 @@ library
     Emanote.Pandoc.Markdown.Parser
     Emanote.Pandoc.Markdown.Syntax.HashTag
     Emanote.Pandoc.Markdown.Syntax.Highlight
+    Emanote.Pandoc.Mermaid
     Emanote.Pandoc.Renderer
     Emanote.Pandoc.Renderer.Callout
     Emanote.Pandoc.Renderer.Embed
@@ -253,6 +254,7 @@ test-suite test
       Emanote.Model.QuerySpec
       Emanote.Model.TocSpec
       Emanote.Pandoc.ExternalLinkSpec
+      Emanote.Pandoc.MermaidSpec
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec
       Emanote.View.FeedSpec

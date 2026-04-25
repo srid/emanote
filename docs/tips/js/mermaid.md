@@ -9,7 +9,15 @@ page:
 
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks.
 
-To enable this, add the following to `page.bodyHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter.
+## Inline SVG (default, offline-friendly)
+
+When the [`mmdc`](https://github.com/mermaid-js/mermaid-cli) binary is on your `PATH`, Emanote renders every `mermaid` code block to inline SVG at build time. The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix build pulls in `mermaid-cli` automatically.
+
+If `mmdc` is missing, Emanote logs a warning and leaves the code block intact — install `mermaid-cli` (`npm i -g @mermaid-js/mermaid-cli` or via your package manager) to enable rendering.
+
+## Client-side rendering (CDN)
+
+If you would rather render diagrams in the browser via the official `mermaid` JavaScript bundle, add the following to `page.bodyHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter:
 
 ```yaml
 page:
@@ -17,7 +25,7 @@ page:
     <snippet var="js.mermaid" />
 ```
 
-The above alias will add Mermaid `<style>` and `<script>` tags based on Emanote's defaults.
+This loads `mermaid.js` from a CDN and requires network access to render diagrams. Use it when `mmdc` cannot be installed in your build environment.
 
 ## Example using Mermaid
 

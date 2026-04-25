@@ -21,7 +21,8 @@
       devShell.tools = hp: {
         inherit (pkgs)
           stork
-          tailwindcss_4;
+          tailwindcss_4
+          mermaid-cli;
       };
       autoWire = [ "packages" "apps" "checks" ];
       packages = {
@@ -60,7 +61,7 @@
         unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
         emanote = { name, pkgs, self, super, ... }: {
           check = false;
-          extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
+          extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 pkgs.mermaid-cli ];
           custom = pkg: pkg.overrideAttrs (lib.addMetaAttrs {
             # https://github.com/NixOS/cabal2nix/issues/608
             longDescription = ''
