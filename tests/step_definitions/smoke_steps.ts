@@ -139,6 +139,37 @@ Then(
 // and that path is auto-generated from the route hierarchy, so it stays
 // correct even when the bug is live. Only the article-body anchor exercises
 // the relative-URL resolver we're testing.
+// Mermaid #625: code blocks with class `mermaid` are replaced with inline
+// RawBlock html SVG at parse time. The check that we picked the inline-SVG
+// path (rather than the legacy js.mermaid CDN path) is twofold: at least
+// one <svg> appears inside <article>, AND no <code class="language-mermaid">
+// source remains. Either alone could be satisfied by the wrong rendering
+// strategy — the conjunction nails it.
+Then(
+  "the article contains at least one inline <svg> element",
+  async function (this: EmanoteWorld) {
+    const count = await this.page.locator("article svg").count();
+    assert.ok(
+      count > 0,
+      `Expected ≥1 <svg> under <article>; got ${count}. Either mmdc didn't run (check the Nix mermaid-cli input) or the SVG was emitted outside the article container.`,
+    );
+  },
+);
+
+Then(
+  "the article contains no <code class={string}> source block",
+  async function (this: EmanoteWorld, klass: string) {
+    const count = await this.page
+      .locator(`article code.${klass}`)
+      .count();
+    assert.strictEqual(
+      count,
+      0,
+      `Found ${count} <code class="${klass}"> block(s) in <article> — the mermaid CodeBlock was not consumed by Emanote.Pandoc.Mermaid. Did the parse-time transform regress?`,
+    );
+  },
+);
+
 Then(
   "the article link with text {string} has href containing {string}",
   async function (this: EmanoteWorld, linkText: string, needle: string) {

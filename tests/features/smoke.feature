@@ -39,6 +39,11 @@ Feature: Smoke
     And I click the footnote ref with index "1" inside an embedded note
     Then the footnote popup contains "EMBED_FOOTNOTE_BODY"
 
+  Scenario: Mermaid code blocks render to inline SVG at build time (#625)
+    When I open "/mermaid.html"
+    Then the article contains at least one inline <svg> element
+    And the article contains no <code class="language-mermaid"> source block
+
   Scenario: A feed-enabled note whose query matches no notes does not crash the build (regression: #490)
     When I fetch "/empty-feed.xml"
     Then the response is a valid Atom feed
