@@ -111,8 +111,8 @@ stripXmlPrologue = go . T.stripStart
       Just rest -> go (T.stripStart rest)
       Nothing -> t
     stripOnePrologue t
-      | "<?" `T.isPrefixOf` t = stripUntil "?>" (T.drop 2 t)
-      | "<!DOCTYPE" `T.isPrefixOf` t = stripUntil ">" (T.drop 9 t)
+      | Just rest <- T.stripPrefix "<?" t = stripUntil "?>" rest
+      | Just rest <- T.stripPrefix "<!DOCTYPE" t = stripUntil ">" rest
       | otherwise = Nothing
     stripUntil terminator t = case T.breakOn terminator t of
       (_, after) | T.null after -> Nothing
