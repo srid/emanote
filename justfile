@@ -32,8 +32,6 @@ ghcid:
 test:
     {{nix_shell}} ghcid -c "cabal repl test:test --flags=ghcid" --warnings -T :main
 
-mod e2e 'tests/mod.just'
-
 # Run e2e suite in live mode (`emanote run`)
 e2e-live: (_e2e "live")
 
@@ -46,7 +44,7 @@ _e2e mode:
     #!/usr/bin/env bash
     set -euo pipefail
     bin="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
-    just e2e run "cd tests && { [ -d node_modules ] || npm ci; } && EMANOTE_BIN=$bin EMANOTE_MODE={{mode}} npm test"
+    nix-shell tests/shell.nix --run "cd tests && { [ -d node_modules ] || npm ci; } && EMANOTE_BIN=$bin EMANOTE_MODE={{mode}} npm test"
 
 # Launch chrome-devtools MCP server (invoked by .mcp.json for Claude Code)
 mcp-chrome-devtools *ARGS:

@@ -44,8 +44,6 @@ single source of truth for which modes are tested.
   coupled to `docs/` so doc edits never flake tests.
 - `shell.nix` — Nix shell providing Node + Playwright-compatible
   Chromium for local runs.
-- `mod.just` — `just` module exposing `run *cmd` for the top-level
-  `e2e-live` / `e2e-static` recipes.
 
 ## Adding scenarios
 
