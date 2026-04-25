@@ -1,31 +1,16 @@
 ---
 slug: mermaid
-page:
-  bodyHtml: |
-    <snippet var="js.mermaid" />
 ---
 
 # Mermaid Diagrams
 
 [Mermaid](https://mermaid-js.github.io/mermaid/#/) lets you create diagrams and visualizations using text and code. You can define these diagrams in your Markdown code blocks.
 
-## Inline SVG (default, offline-friendly)
+Emanote renders every `mermaid` code block to **inline SVG at build time** using [`mmdc`](https://github.com/mermaid-js/mermaid-cli) (mermaid-cli). The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix flake pins `mermaid-cli` as a build/runtime input — same pattern as `tailwindcss` and `stork` — so the binary path is baked in at compile time and you don't need to install anything extra.
 
-Emanote renders every `mermaid` code block to inline SVG at build time using [`mmdc`](https://github.com/mermaid-js/mermaid-cli) (mermaid-cli). The generated site has no client-side JavaScript dependency for diagrams and works offline. The Nix flake pins `mermaid-cli` as a build/runtime input — same pattern as `tailwindcss` and `stork` — so the binary path is baked in at compile time and you don't need to install anything extra.
+Per-diagram render failures preserve the original code block and surface the underlying `mmdc` error both inline (above the failing source) and in the document-top error banner, so you can fix the diagram source.
 
-Per-diagram render failures preserve the original code block and surface the underlying `mmdc` error inline (and in the document-top error banner) so you can fix the diagram source.
-
-## Client-side rendering (CDN)
-
-If you would rather render diagrams in the browser via the official `mermaid` JavaScript bundle, add the following to `page.bodyHtml` of [[yaml-config|YAML configuration]] or Markdown frontmatter:
-
-```yaml
-page:
-  bodyHtml: |
-    <snippet var="js.mermaid" />
-```
-
-This loads `mermaid.js` from a CDN and requires network access to render diagrams. The build-time SVG path is the recommended default.
+> Need diagrams to render in the browser instead — for interactive features or when `mmdc` isn't available in your build environment? See [[mermaid/client-side]].
 
 ## Example using Mermaid
 
