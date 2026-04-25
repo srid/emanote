@@ -31,17 +31,22 @@ onElement('pre > code', (codeBlock) => {
   pre.appendChild(button);
 });
 
+// WeakMap keeps the per-button reset timer out of the DOM node itself —
+// no expando, no name-collision risk with other code touching the button.
+const flashTimers = new WeakMap();
+
 function flash(button, icon, title) {
   // Cancel any pending reset on this same button — otherwise a click
   // landing inside the 2s window from a prior click overwrites the new
   // state (most visibly: an error message replaced by a fresh copy icon
   // before the user can read it).
-  if (button._emanoteFlashTimer) clearTimeout(button._emanoteFlashTimer);
+  const pending = flashTimers.get(button);
+  if (pending) clearTimeout(pending);
   button.innerHTML = icon;
   button.setAttribute('title', title);
-  button._emanoteFlashTimer = setTimeout(() => {
+  flashTimers.set(button, setTimeout(() => {
     button.innerHTML = COPY_ICON;
     button.setAttribute('title', 'Copy code');
-    button._emanoteFlashTimer = null;
-  }, 2000);
+    flashTimers.delete(button);
+  }, 2000));
 }
