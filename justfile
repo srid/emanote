@@ -46,7 +46,7 @@ _e2e mode:
     #!/usr/bin/env bash
     set -euo pipefail
     bin="$(nix build --no-link --print-out-paths .#default)/bin/emanote"
-    just e2e run "cd tests && { [ -d node_modules ] || npm install; } && EMANOTE_BIN=$bin EMANOTE_MODE={{mode}} npm test"
+    just e2e run "cd tests && { [ -d node_modules ] || npm ci; } && EMANOTE_BIN=$bin EMANOTE_MODE={{mode}} npm test"
 
 # Launch chrome-devtools MCP server (invoked by .mcp.json for Claude Code)
 mcp-chrome-devtools *ARGS:
