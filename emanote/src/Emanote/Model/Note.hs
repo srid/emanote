@@ -350,6 +350,9 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
+    -- Mermaid runs after parseNote{Markdown,Org} (which already applied
+    -- preparePandoc and any user Lua filters) so user filters get a chance
+    -- to manipulate mermaid code blocks before they are baked into SVG.
     doc1 <- Mermaid.transformMermaidBlocks doc0
     pure (doc1, meta0)
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
