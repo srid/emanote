@@ -17,6 +17,10 @@
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 
+**Bug fixes**
+
+- Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
+
 ## 1.4.0.0 (2025-08-18)
 
 **Notable features**

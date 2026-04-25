@@ -10,7 +10,7 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.Model.Note (Note, noteDoc, noteRoute)
+import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
@@ -71,7 +71,7 @@ noteRels note =
         $ flip concatMap (Map.toList m)
         $ \(url, instances) -> do
           flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = R.withLmlRoute R.routeParent $ note ^. noteRoute
+            let parentR = noteResolveLinkBase note
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
 

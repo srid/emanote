@@ -39,6 +39,10 @@ Feature: Smoke
     And I click the footnote ref with index "1" inside an embedded note
     Then the footnote popup contains "EMBED_FOOTNOTE_BODY"
 
+  Scenario: Relative links from <dir>/index.md resolve against <dir>/ (issue #608)
+    When I open "/subfolder.html"
+    Then the article link with text "sibling" has href containing "subfolder/sibling"
+
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
     Then no footnote list is visible on screen
