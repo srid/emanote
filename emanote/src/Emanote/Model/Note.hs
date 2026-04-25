@@ -344,13 +344,14 @@ parseNote ::
   Text ->
   m Note
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc0, meta), errs) <- runWriterT $ do
-    case r of
+  ((doc, meta), errs) <- runWriterT $ do
+    (doc0, meta0) <- case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
-  doc <- Mermaid.transformMermaidBlocks doc0
+    doc1 <- Mermaid.transformMermaidBlocks doc0
+    pure (doc1, meta0)
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> meta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta

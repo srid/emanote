@@ -2,6 +2,7 @@ module Emanote.Pandoc.MermaidSpec where
 
 import Control.Exception (bracket_)
 import Control.Monad.Logger (runNoLoggingT)
+import Control.Monad.Writer.Strict (runWriterT)
 import Emanote.Pandoc.Mermaid (hasMermaidBlock, stripXmlPrologue, transformMermaidBlocks)
 import Hedgehog
 import Relude
@@ -9,6 +10,9 @@ import System.Environment (setEnv, unsetEnv)
 import Test.Hspec
 import Test.Hspec.Hedgehog
 import Text.Pandoc.Definition qualified as B
+
+runMermaid :: B.Pandoc -> IO (B.Pandoc, [Text])
+runMermaid = runNoLoggingT . runWriterT . transformMermaidBlocks
 
 mermaidBlock :: B.Block
 mermaidBlock = B.CodeBlock ("", ["mermaid"], []) "graph LR\nA --> B"
@@ -41,13 +45,16 @@ spec = do
 
   describe "transformMermaidBlocks" $ do
     it "is a no-op when no mermaid blocks are present" $ do
-      result <- runNoLoggingT $ transformMermaidBlocks (doc [plainBlock])
+      (result, errs) <- runMermaid (doc [plainBlock])
       result `shouldBe` doc [plainBlock]
+      errs `shouldBe` []
     it "preserves mermaid blocks when mmdc is missing from PATH" $ do
       -- Force findExecutable to return Nothing by clobbering PATH.
       withEmptyPath $ do
-        result <- runNoLoggingT $ transformMermaidBlocks (doc [mermaidBlock])
+        (result, errs) <- runMermaid (doc [mermaidBlock])
         result `shouldBe` doc [mermaidBlock]
+        -- Missing mmdc is environmental, not a per-note error: do not tell it.
+        errs `shouldBe` []
 
 withEmptyPath :: IO a -> IO a
 withEmptyPath action = do

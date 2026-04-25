@@ -15,8 +15,9 @@ module Emanote.Pandoc.Mermaid (
 ) where
 
 import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Text qualified as T
-import Emanote.Prelude (logE, logW)
+import Emanote.Prelude (logW)
 import Relude
 import System.Directory (findExecutable)
 import System.Exit (ExitCode (..))
@@ -36,10 +37,10 @@ mmdcExe = "mmdc"
 {- | Walk the Pandoc AST and replace mermaid code blocks with inline SVG.
 
 If @mmdc@ is unavailable on PATH, the document is returned unchanged after
-a single warning log line. Per-diagram failures preserve the original
-block alongside an HTML comment with the underlying error.
+a single warning log line. Per-diagram render failures are reported via
+@tell@ so they surface in the same per-note error block as parse failures.
 -}
-transformMermaidBlocks :: (MonadIO m, MonadLogger m) => B.Pandoc -> m B.Pandoc
+transformMermaidBlocks :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => B.Pandoc -> m B.Pandoc
 transformMermaidBlocks doc
   | not (hasMermaidBlock doc) = pure doc
   | otherwise =
@@ -58,14 +59,14 @@ hasMermaidBlock = getAny . W.query check
     check (B.CodeBlock (_, classes, _) _) = Any (mermaidClass `elem` classes)
     check _ = mempty
 
-renderBlock :: (MonadIO m, MonadLogger m) => FilePath -> B.Block -> m B.Block
+renderBlock :: (MonadIO m, MonadWriter [Text] m) => FilePath -> B.Block -> m B.Block
 renderBlock bin blk = case blk of
   B.CodeBlock (_, classes, _) code
     | mermaidClass `elem` classes ->
         runMmdc bin code >>= \case
           Right svg -> pure $ B.RawBlock (B.Format "html") svg
           Left err -> do
-            logE $ "mermaid render failed: " <> err
+            tell ["mermaid render failed: " <> err]
             pure $ B.Div ("", ["mermaid-error"], []) [errorComment err, blk]
   _ -> pure blk
 
