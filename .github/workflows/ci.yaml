@@ -84,6 +84,11 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
+      # The two modes are intentionally serialized and share identical
+      # setup (Nix install, artifact import, node, playwright). If they
+      # ever need to diverge — different timeout, different env, a
+      # service container — restore the matrix or split into separate
+      # jobs rather than growing inline conditionals here.
       - name: E2E (live)
         working-directory: tests
         env:
