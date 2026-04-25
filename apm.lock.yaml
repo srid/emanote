@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-23T20:15:02.314767+00:00'
+generated_at: '2026-04-25T22:37:18.904589+00:00'
 apm_version: 0.9.2
 dependencies:
 - repo_url: anthropics/skills
@@ -9,7 +9,6 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/frontend-design
   - .claude/skills/frontend-design
   content_hash: sha256:063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67
 - repo_url: juspay/skills
@@ -19,24 +18,14 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .agents/skills/nix-justfile
   - .claude/skills/nix-justfile
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: d52271b707854ebe8b20d2bfbfb999fcefa00c23
+  resolved_commit: d6ff23a65e6779236f41134eb7ead87e4f8b8417
   resolved_ref: master
   package_type: apm_package
   deployed_files:
-  - .agents/skills/code-police
-  - .agents/skills/do
-  - .agents/skills/elegance
-  - .agents/skills/fact-check
-  - .agents/skills/forge-pr
-  - .agents/skills/hickey
-  - .agents/skills/lowy
-  - .agents/skills/ralph
-  - .agents/skills/talk
   - .claude/agents/hickey.md
   - .claude/agents/lowy.md
   - .claude/hooks/agency/scripts/do-stop-guard.sh
@@ -50,18 +39,14 @@ dependencies:
   - .claude/skills/lowy
   - .claude/skills/ralph
   - .claude/skills/talk
-  - .codex/agents/hickey.toml
-  - .codex/agents/lowy.toml
-  - .codex/hooks/agency/scripts/do-stop-guard.sh
   deployed_file_hashes:
     .claude/agents/hickey.md: sha256:edde9b0d3b27b947b7372f662b2e8652d136e0bb9af7924892b00450a1e586bc
     .claude/agents/lowy.md: sha256:a1c8e5ba115439bcfa0d7e331f96e71b2d690ff2e5fb9b824bb5f588eb43ac75
     .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
     .claude/rules/apm-sources.md: sha256:8707579e05e2a39f01278b2d225f3cb2ec97912c65c94aa57e5830954f98eab1
-    .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
-    .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
-    .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
   content_hash: sha256:859799bc34087e579fd564b4fdf3b8adcaddae7d5d753567318d3d51c9e2d7be
 local_deployed_files:
-- .agents/skills/dpella-mcp
+- .claude/rules/workflow.md
 - .claude/skills/dpella-mcp
+local_deployed_file_hashes:
+  .claude/rules/workflow.md: sha256:6469210d507ae53cf40889dce3221319cbb5219b80c277cb7e4550e3a7201137
