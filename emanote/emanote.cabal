@@ -25,6 +25,7 @@ data-files:
   _emanote-static/*.svg
   _emanote-static/fonts/*.css
   _emanote-static/fonts/*.woff2
+  _emanote-static/js/*.js
   _emanote-static/stork/edible-dark.css
   _emanote-static/stork/edible.css
   _emanote-static/stork/stork.js

@@ -288,63 +288,8 @@
   }
 </style>
 
-<script>
-  // Theme toggle: persist choice in localStorage; the early-load script in
-  // base.tpl applies it before first paint so there's no FOUC on reload.
-  (function () {
-    window.emanote = window.emanote || {};
-    window.emanote.theme = {
-      toggle: function () {
-        var root = document.documentElement;
-        var isDark = root.classList.toggle('dark');
-        root.style.colorScheme = isDark ? 'dark' : 'light';
-        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
-        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
-        if (document.querySelector('.mermaid')) window.location.reload();
-      }
-    };
-  })();
-</script>
-
-<script>
-  // Add copy buttons to code blocks
-  document.addEventListener('DOMContentLoaded', function() {
-    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
-    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-
-    document.querySelectorAll('pre code').forEach(function(codeBlock) {
-      const pre = codeBlock.parentElement;
-
-      // Create copy button
-      const button = document.createElement('button');
-      button.className = 'code-copy-button';
-      button.innerHTML = copyIcon;
-      button.setAttribute('aria-label', 'Copy code to clipboard');
-      button.setAttribute('title', 'Copy code');
-
-      button.addEventListener('click', function() {
-        const text = codeBlock.textContent;
-        navigator.clipboard.writeText(text).then(function() {
-          button.innerHTML = checkIcon;
-          button.setAttribute('title', 'Copied!');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        }).catch(function(err) {
-          console.error('Copy failed:', err);
-          button.setAttribute('title', 'Copy failed');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        });
-      });
-
-      pre.appendChild(button);
-    });
-  });
-</script>
+<!-- Theme toggle and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
 
 <style data-category="external-link">
   /* External/mail link glyphs — drawn with mask-image so they inherit the
