@@ -105,12 +105,9 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
-            -- A YAML parse error used to throw `BadInput` here, which killed
-            -- the UnionMount change handler and stopped the live server from
-            -- rendering anything (issue #285). Log the error and leave the
-            -- model unchanged for this route — any previously-good data
-            -- stays in place, so the rest of the site keeps rendering while
-            -- the user fixes the file.
+            -- On parse failure, leave the model unchanged for this route —
+            -- previously-good data stays in place. Throwing here used to
+            -- kill the UnionMount change handler (issue #285).
             case SD.parseSDataCascading r yamlContents of
               Left err -> do
                 logE $ "Bad YAML file: " <> err

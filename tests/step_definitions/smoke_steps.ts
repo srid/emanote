@@ -27,13 +27,9 @@ Then(
   },
 );
 
-// #285: a malformed `*.yaml` file (e.g. `[]: foo`, a non-string mapping key)
-// used to throw `BadInput` from the UnionMount change handler — killing the
-// Dynamic in live mode (browser saw "Ema App threw an exception / Unable to
-// render template '/templates/error'") and aborting `emanote gen` in static
-// mode before any HTML was produced. The assertion checks the inverse of the
-// bug's surface signature directly, instead of binding to fixture text that
-// could rename without anyone noticing.
+// #285 regression. Asserts the inverse of the bug's surface signature
+// (Ema's exception template strings) rather than binding to fixture text
+// that could rename without anyone noticing.
 const EMA_EXCEPTION_MARKERS = [
   "Ema App threw an exception",
   "Unable to render template",
