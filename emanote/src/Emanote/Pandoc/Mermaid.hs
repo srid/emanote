@@ -18,7 +18,9 @@ module Emanote.Pandoc.Mermaid (
 ) where
 
 import Control.Monad.Writer.Strict (MonadWriter (tell))
+import Data.Aeson qualified as Aeson
 import Data.Text qualified as T
+import Emanote.Model.SData qualified as SData
 import Relude
 import System.Exit (ExitCode (..))
 import System.FilePath ((</>))
@@ -40,11 +42,20 @@ mmdcBin = $(staticWhich "mmdc")
 Per-diagram render failures are reported via @tell@ so they surface in the
 same per-note error block as parse failures, and the failing block is left
 in place beneath a visible @Mermaid rendering failed:@ message.
+
+A page can opt out of build-time rendering with @mermaid.static: false@
+in its frontmatter (or in any ancestor @index.yaml@). With static rendering
+disabled, code blocks are left intact for client-side rendering via the
+@js.mermaid@ snippet.
 -}
-transformMermaidBlocks :: (MonadIO m, MonadWriter [Text] m) => B.Pandoc -> m B.Pandoc
-transformMermaidBlocks doc
+transformMermaidBlocks :: (MonadIO m, MonadWriter [Text] m) => Aeson.Value -> B.Pandoc -> m B.Pandoc
+transformMermaidBlocks meta doc
+  | not staticEnabled = pure doc
   | hasMermaidBlock doc = W.walkM renderBlock doc
   | otherwise = pure doc
+  where
+    staticEnabled :: Bool
+    staticEnabled = SData.lookupAeson True ("mermaid" :| ["static"]) meta
 
 hasMermaidBlock :: B.Pandoc -> Bool
 hasMermaidBlock = getAny . W.query check
@@ -84,14 +95,16 @@ runMmdc code = liftIO $ withSystemTempDirectory "emanote-mermaid" $ \tmpDir -> d
   -- correctly." mmdc only renders trusted local mermaid source, so opting
   -- out of the sandbox is safe.
   writeFileBS puppeteerConfig "{\"args\":[\"--no-sandbox\",\"--disable-setuid-sandbox\"]}"
-  (exitCode, _stdout, stderr) <-
+  -- `err` (not `stderr`) — Relude exports `stderr` as the standard handle,
+  -- shadowing it would warn under -Wname-shadowing.
+  (exitCode, _stdout, err) <-
     readProcessWithExitCode
       mmdcBin
       ["-i", inputPath, "-o", outputPath, "-p", puppeteerConfig]
       ""
   case exitCode of
     ExitFailure n ->
-      pure . Left $ "mmdc exited " <> show n <> ": " <> T.strip (toText stderr)
+      pure . Left $ "mmdc exited " <> show n <> ": " <> T.strip (toText err)
     ExitSuccess -> do
       exists <- doesFileExist outputPath
       if exists

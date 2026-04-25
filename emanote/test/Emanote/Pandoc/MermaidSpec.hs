@@ -1,6 +1,7 @@
 module Emanote.Pandoc.MermaidSpec where
 
 import Control.Monad.Writer.Strict (runWriterT)
+import Data.Aeson qualified as Aeson
 import Emanote.Pandoc.Mermaid (stripXmlPrologue, transformMermaidBlocks)
 import Hedgehog
 import Relude
@@ -11,8 +12,17 @@ import Text.Pandoc.Definition qualified as B
 plainBlock :: B.Block
 plainBlock = B.CodeBlock ("", ["haskell"], []) "id = \\x -> x"
 
+mermaidBlock :: B.Block
+mermaidBlock = B.CodeBlock ("", ["mermaid"], []) "graph LR\nA --> B"
+
 doc :: [B.Block] -> B.Pandoc
 doc = B.Pandoc mempty
+
+emptyMeta :: Aeson.Value
+emptyMeta = Aeson.object []
+
+staticOffMeta :: Aeson.Value
+staticOffMeta = Aeson.object ["mermaid" Aeson..= Aeson.object ["static" Aeson..= False]]
 
 spec :: Spec
 spec = do
@@ -35,8 +45,15 @@ spec = do
     it "is a no-op when no mermaid blocks are present" $ do
       -- A document without mermaid blocks must not invoke mmdc at all
       -- (verified by passing through unchanged with no errors `tell`'d).
-      (result, errs) <- runWriterT $ transformMermaidBlocks (doc [plainBlock])
+      (result, errs) <- runWriterT $ transformMermaidBlocks emptyMeta (doc [plainBlock])
       result `shouldBe` doc [plainBlock]
+      errs `shouldBe` []
+
+    it "is a no-op when mermaid.static is set to false in the page meta" $ do
+      -- Opt-out for client-side rendering. Mermaid blocks must reach the
+      -- HTML untouched so the js.mermaid snippet can pick them up.
+      (result, errs) <- runWriterT $ transformMermaidBlocks staticOffMeta (doc [mermaidBlock])
+      result `shouldBe` doc [mermaidBlock]
       errs `shouldBe` []
 
 -- The success path (mmdc actually invoked) lives in the e2e suite at
