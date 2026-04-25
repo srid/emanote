@@ -4,8 +4,8 @@
 
 The site is fully renderable offline once SVG is baked into the HTML, with
 no client-side JavaScript or CDN dependency for diagrams. Falls back to
-preserving the original code block (with an HTML comment carrying the
-error) when @mmdc@ is missing or rendering fails.
+preserving the original code block alongside a visible error message when
+@mmdc@ is missing or rendering fails.
 -}
 module Emanote.Pandoc.Mermaid (
   transformMermaidBlocks,
@@ -67,15 +67,17 @@ renderBlock bin blk = case blk of
           Right svg -> pure $ B.RawBlock (B.Format "html") svg
           Left err -> do
             tell ["mermaid render failed: " <> err]
-            pure $ B.Div ("", ["mermaid-error"], []) [errorComment err, blk]
+            pure $ B.Div ("", ["mermaid-error"], []) [errorMessage err, blk]
   _ -> pure blk
 
-errorComment :: Text -> B.Block
-errorComment err =
-  B.RawBlock (B.Format "html")
-    $ "<!-- mermaid render failed: "
-    <> T.replace "-->" "--&gt;" err
-    <> " -->"
+-- | A visible error message rendered above the original mermaid source.
+errorMessage :: Text -> B.Block
+errorMessage err =
+  B.Para
+    [ B.Strong [B.Str "Mermaid rendering failed:"]
+    , B.Space
+    , B.Code mempty err
+    ]
 
 runMmdc :: (MonadIO m) => FilePath -> Text -> m (Either Text Text)
 runMmdc bin code = liftIO $ withSystemTempDirectory "emanote-mermaid" $ \tmpDir -> do
