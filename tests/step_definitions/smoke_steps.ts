@@ -310,3 +310,124 @@ Then(
     );
   },
 );
+
+// Theme toggle button lives in the sidebar header (sidebar.tpl) and the
+// minimal layout header (layouts/default.tpl); both wire it via inline
+// onclick="window.emanote.theme.toggle()" with title="Toggle dark mode".
+// Click the first one Playwright finds — both fire the same handler.
+When("I click the theme toggle", async function (this: EmanoteWorld) {
+  await this.page.locator('button[title="Toggle dark mode"]').first().click();
+});
+
+Then(
+  "the documentElement has class {string}",
+  async function (this: EmanoteWorld, cls: string) {
+    const has = await this.page.evaluate(
+      (c) => document.documentElement.classList.contains(c),
+      cls,
+    );
+    assert.ok(
+      has,
+      `Expected <html> to have class ${JSON.stringify(cls)}; classList was ${JSON.stringify(
+        await this.page.evaluate(() => document.documentElement.className),
+      )}. The theme-toggle module either failed to load or its onclick handler did not run.`,
+    );
+  },
+);
+
+Then(
+  "localStorage {string} is {string}",
+  async function (this: EmanoteWorld, key: string, expected: string) {
+    const value = await this.page.evaluate(
+      (k) => localStorage.getItem(k),
+      key,
+    );
+    assert.strictEqual(
+      value,
+      expected,
+      `Expected localStorage[${JSON.stringify(key)}] to be ${JSON.stringify(expected)}; got ${JSON.stringify(value)}. The persistence step in window.emanote.theme.toggle either threw silently or never ran.`,
+    );
+  },
+);
+
+// code-copy.js wires a button into every <pre> that has a child <code>.
+// Asserting parity (#buttons === #pre>code) catches both regressions:
+// missing buttons (selector mismatch, module not loaded) and duplicates
+// (idempotency-guard regressed in morph.js's dataset sentinel).
+Then(
+  "every <pre> with a child <code> has a .code-copy-button",
+  async function (this: EmanoteWorld) {
+    // Module loads via <script type="module"> which is defer-by-default —
+    // wait for at least one button before counting.
+    await this.page
+      .locator("pre > .code-copy-button")
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const counts = await this.page.evaluate(() => ({
+      preWithCode: document.querySelectorAll("pre:has(> code)").length,
+      buttons: document.querySelectorAll("pre > .code-copy-button").length,
+    }));
+    assert.ok(
+      counts.preWithCode > 0,
+      `Fixture has zero <pre><code> blocks; nothing to assert against.`,
+    );
+    assert.strictEqual(
+      counts.buttons,
+      counts.preWithCode,
+      `Expected one .code-copy-button per <pre><code>, got ${counts.buttons} buttons for ${counts.preWithCode} blocks. Mismatch means either the module didn't run, the selector drifted, or the dataset-sentinel idempotency guard regressed and produced duplicates.`,
+    );
+  },
+);
+
+// TOC scroll-spy: scroll a target heading to viewport top, then assert
+// the matching TOC link has the active mark. The IntersectionObserver
+// uses rootMargin "-80px 0px -60% 0px" — sections in that band are
+// "visible". Scrolling the heading to the top puts it just above the
+// 80px margin, but its body is in the band, so the section qualifies.
+When(
+  "I scroll the heading with id {string} to the top of the viewport",
+  async function (this: EmanoteWorld, headingId: string) {
+    await this.page.evaluate((id) => {
+      const el = document.getElementById(id);
+      if (!el) throw new Error(`No element with id ${JSON.stringify(id)}`);
+      el.scrollIntoView({ block: "start", behavior: "instant" });
+    }, headingId);
+  },
+);
+
+Then(
+  "the TOC link for {string} has class {string}",
+  async function (this: EmanoteWorld, hrefSuffix: string, cls: string) {
+    // The TOC link's href is absolute (resolves against <base>); match by
+    // suffix to stay independent of the served origin.
+    const link = this.page
+      .locator(`#toc a.--ema-toc[href$="${hrefSuffix}"]`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    // Auto-retrying expectation — the IntersectionObserver fires async
+    // after scroll, so the active class arrives a frame or two later.
+    try {
+      await this.page.waitForFunction(
+        ({ suffix, mark }) => {
+          const a = document.querySelector(
+            `#toc a.--ema-toc[href$="${suffix}"]`,
+          );
+          return a?.classList.contains(mark) ?? false;
+        },
+        { suffix: hrefSuffix, mark: cls },
+        { timeout: 3_000 },
+      );
+    } catch {
+      const allMarked = await this.page.evaluate(
+        (mark) =>
+          Array.from(document.querySelectorAll(`#toc a.--ema-toc.${mark}`))
+            .map((a) => (a as HTMLAnchorElement).href)
+            .join(", ") || "(none)",
+        cls,
+      );
+      throw new Error(
+        `Expected TOC link with href ending ${JSON.stringify(hrefSuffix)} to have class ${JSON.stringify(cls)}. Currently active links: ${allMarked}. Either the IntersectionObserver never fired (toc-spy.js not loaded / module-mode timing changed the observed-set computation) or pickActive picked a different section than expected.`,
+      );
+    }
+  },
+);

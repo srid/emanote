@@ -57,3 +57,18 @@ Feature: Smoke
     When the page is emulated as print media
     Then at least one footnote list is visible
     And the printed footnote list contains "PARENT_FOOTNOTE_BODY"
+
+  Scenario: Theme toggle button flips the dark class and persists to localStorage
+    When I open "/"
+    And I click the theme toggle
+    Then the documentElement has class "dark"
+    And localStorage "emanote-theme" is "dark"
+
+  Scenario: Every fenced code block gets a copy button at first paint
+    When I open "/code.html"
+    Then every <pre> with a child <code> has a .code-copy-button
+
+  Scenario: Scrolling a section to the viewport top highlights its TOC link
+    When I open "/toc.html"
+    And I scroll the heading with id "cherry" to the top of the viewport
+    Then the TOC link for "#cherry" has class "toc-item-active"
