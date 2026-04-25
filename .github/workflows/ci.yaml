@@ -34,6 +34,10 @@ jobs:
         id: build
         run: |
           OUT="$(nix build --no-link --print-out-paths .#default)"
+          # Fail the build job if the derivation no longer places the
+          # binary at <out>/bin/emanote — otherwise the mismatch would
+          # surface 30+ minutes later as an obscure test failure.
+          test -x "$OUT/bin/emanote" || { echo "expected emanote binary at $OUT/bin/emanote" >&2; exit 1; }
           echo "bin=$OUT/bin/emanote" >> "$GITHUB_OUTPUT"
           nix-store --export $(nix-store -qR "$OUT") | gzip > emanote-closure.nar.gz
       - name: Upload emanote closure
