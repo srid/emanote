@@ -15,7 +15,12 @@ window.emanote.theme = {
     root.style.colorScheme = isDark ? 'dark' : 'light';
     try {
       localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
-    } catch (e) {}
+    } catch (e) {
+      // Quota exceeded, private-mode restrictions, etc. The visual toggle
+      // already happened — surface the persistence failure so a confused
+      // user (whose preference reverts on reload) can find a hint.
+      console.warn('[emanote] theme preference not persisted:', e);
+    }
     // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
     if (document.querySelector('.mermaid')) window.location.reload();
   },
