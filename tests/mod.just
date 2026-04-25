@@ -1,6 +1,6 @@
-# Public interface for the `tests/nix/` portable e2e bundle.
+# Public interface for the e2e nix shell.
 # Consumer:
-#   mod e2e 'tests/nix/mod.just'
+#   mod e2e 'tests/mod.just'
 #   just e2e run "cd <test-dir> && <test-runner-cmd>"
 
 # Run a command inside the e2e nix shell (provides Node + Playwright Chromium).

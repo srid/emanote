@@ -19,9 +19,8 @@ just e2e-static  # `emanote gen` once, then serves the output
 ```
 
 Runtime provisioning (Node + Playwright-compatible Chromium) lives in
-`tests/nix/` — a portable bundle described in `tests/nix/README.md`.
-The npm step downloads the cucumber toolchain on first run; subsequent
-runs reuse `node_modules`.
+`tests/shell.nix`. The npm step downloads the cucumber toolchain on
+first run; subsequent runs reuse `node_modules`.
 
 Set `HEADLESS=false` to watch the browser.
 
@@ -43,8 +42,10 @@ single source of truth for which modes are tested.
 - `support/world.ts` — per-scenario state (browser page, helpers).
 - `fixtures/notebook/` — minimal notebook consumed by both modes. Not
   coupled to `docs/` so doc edits never flake tests.
-- `nix/` — portable runtime shell + just module; see
-  `tests/nix/README.md`.
+- `shell.nix` — Nix shell providing Node + Playwright-compatible
+  Chromium for local runs.
+- `mod.just` — `just` module exposing `run *cmd` for the top-level
+  `e2e-live` / `e2e-static` recipes.
 
 ## Adding scenarios
 

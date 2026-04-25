@@ -1,21 +1,15 @@
-# Standalone Nix shell for cucumber/Playwright e2e suites.
+# Nix shell for the cucumber/Playwright e2e suite.
 #
 # Provides Node.js and a Playwright-compatible Chromium so the suite
 # runs on NixOS or any Nix-only host where
 # `npx playwright install --with-deps` (which shells out to
 # `sudo apt-get`) cannot work.
 #
-# Consumers:
-#   nix-shell tests/nix/shell.nix --run '<cmd>'
-# or via the companion just module (`tests/nix/mod.just`):
-#   mod e2e 'tests/nix/mod.just'
-#   just e2e run "<cmd>"
-#
-# The pin below is constrained by `playwright-driver` matching the npm
-# `playwright` version your tests import — diverging the two raises
-# "browser revision X not found at <PLAYWRIGHT_BROWSERS_PATH>" at
-# launch. Bump both together. This rev tracks Kolu so the two repos
-# stay aligned ahead of an eventual extract-to-shared-repo move.
+# The pin below is constrained by `playwright-driver` matching the
+# `playwright` version in `tests/package.json` — diverging the two
+# raises "browser revision X not found at <PLAYWRIGHT_BROWSERS_PATH>"
+# at launch. Bump both together. Kept independent from the parent
+# flake's nixpkgs because that pin is driven by the Haskell build.
 let
   nixpkgs = builtins.fetchTree {
     type = "github";

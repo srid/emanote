@@ -32,7 +32,7 @@ ghcid:
 test:
     {{nix_shell}} ghcid -c "cabal repl test:test --flags=ghcid" --warnings -T :main
 
-mod e2e 'tests/nix/mod.just'
+mod e2e 'tests/mod.just'
 
 # Run e2e suite in live mode (`emanote run`)
 e2e-live: (_e2e "live")
