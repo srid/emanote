@@ -53,7 +53,7 @@ Feature: Smoke
 
   Scenario: A malformed YAML file does not crash the build (regression: #285)
     When I open "/"
-    Then the page body contains "E2E Fixture"
+    Then the page rendered without an Ema exception
 
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"

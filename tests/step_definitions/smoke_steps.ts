@@ -29,16 +29,29 @@ Then(
 
 // #285: a malformed `*.yaml` file (e.g. `[]: foo`, a non-string mapping key)
 // used to throw `BadInput` from the UnionMount change handler — killing the
-// Dynamic so the live server could no longer render any page, and aborting
-// the static build before any HTML was produced. Asserting that the home
-// page renders proves the bad-yaml file no longer takes the whole site down.
+// Dynamic in live mode (browser saw "Ema App threw an exception / Unable to
+// render template '/templates/error'") and aborting `emanote gen` in static
+// mode before any HTML was produced. The assertion checks the inverse of the
+// bug's surface signature directly, instead of binding to fixture text that
+// could rename without anyone noticing.
+const EMA_EXCEPTION_MARKERS = [
+  "Ema App threw an exception",
+  "Unable to render template",
+];
+
 Then(
-  "the page body contains {string}",
-  async function (this: EmanoteWorld, needle: string) {
+  "the page rendered without an Ema exception",
+  async function (this: EmanoteWorld) {
     const text = (await this.page.textContent("body")) ?? "";
+    for (const marker of EMA_EXCEPTION_MARKERS) {
+      assert.ok(
+        !text.includes(marker),
+        `Page body contains ${JSON.stringify(marker)} — #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
+      );
+    }
     assert.ok(
-      text.includes(needle),
-      `Page body did not contain ${JSON.stringify(needle)} — likely #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
+      text.length > 0,
+      "Page body is empty — emanote produced no rendered output. In live mode this means the Dynamic died before any HTML was emitted; in static mode the gen run aborted.",
     );
   },
 );
