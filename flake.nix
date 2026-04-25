@@ -6,6 +6,10 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Independent pin tracking unstable HEAD, used by tests/shell.nix
+    # for playwright-driver. Decoupled from `nixpkgs` so the Haskell
+    # build's pin and the Playwright pin update on different cadences.
+    nixpkgs-latest.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
