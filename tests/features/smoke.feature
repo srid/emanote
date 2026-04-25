@@ -45,3 +45,28 @@ Feature: Smoke
     When the page is emulated as print media
     Then at least one footnote list is visible
     And the printed footnote list contains "PARENT_FOOTNOTE_BODY"
+
+  Scenario: Plain callout renders as a non-foldable <div>
+    When I open "/callouts.html"
+    Then the callout with type "info" is non-foldable
+
+  Scenario: Foldable+expanded callout renders as <details open> with body visible
+    When I open "/callouts.html"
+    Then the callout with type "tip" is foldable and initially expanded
+    And the body of the callout with type "tip" is visible
+
+  Scenario: Foldable+collapsed callout renders as <details> with body hidden
+    When I open "/callouts.html"
+    Then the callout with type "warning" is foldable and initially collapsed
+    And the body of the callout with type "warning" is hidden
+
+  Scenario: Clicking the summary of a foldable callout toggles its open state
+    When I open "/callouts.html"
+    And I click the summary of the callout with type "warning"
+    Then the callout with type "warning" is foldable and initially expanded
+    When I click the summary of the callout with type "warning"
+    Then the callout with type "warning" is foldable and initially collapsed
+
+  Scenario: A nested callout renders inside its parent's body
+    When I open "/callouts.html"
+    Then the callout with type "note" contains a nested callout with type "quote"
