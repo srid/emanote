@@ -29,8 +29,16 @@ function getBaseUrl() {
   }
 }
 
-let searchShown = false;
 let indexIsStale = false;
+
+// The .stork-overflow-hidden-important body class IS the modal-open
+// state — the previous mirror flag could drift if anything outside
+// this module mutated the class (e.g. a future utility, a devtools
+// toggle), causing the keydown handler to silently no-op on Esc when
+// the modal looked open. Derive on read instead.
+function isSearchShown() {
+  return document.body.classList.contains('stork-overflow-hidden-important');
+}
 
 function registerIndex(options) {
   const indexName = 'emanote-search'; // matches input[data-stork] in stork-search.tpl
@@ -51,8 +59,8 @@ function toggleSearch() {
   const container = document.getElementById('stork-search-container');
   if (!container) return;
   container.classList.toggle('hidden');
-  searchShown = document.body.classList.toggle('stork-overflow-hidden-important');
-  if (searchShown) {
+  const nowShown = document.body.classList.toggle('stork-overflow-hidden-important');
+  if (nowShown) {
     document.getElementById('stork-search-input')?.focus();
   }
 }
@@ -60,7 +68,6 @@ function toggleSearch() {
 function clearSearch() {
   document.getElementById('stork-search-container')?.classList.add('hidden');
   document.body.classList.remove('stork-overflow-hidden-important');
-  searchShown = false;
 }
 
 // The stork-wrapper element is rendered into every page's body by
@@ -103,7 +110,7 @@ document.addEventListener('click', (e) => {
 
 // Ctrl+K / Cmd+K opens; Esc closes when modal is open.
 document.addEventListener('keydown', (e) => {
-  if (searchShown && e.key === 'Escape') {
+  if (isSearchShown() && e.key === 'Escape') {
     clearSearch();
     e.preventDefault();
   } else if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey)) {
