@@ -60,10 +60,6 @@ data ModelT encF = Model
   , _modelNotes :: IxNote
   , _modelRels :: IxRel
   , _modelSData :: IxSData
-  , _modelDataErrors :: Map (R 'R.Yaml) Text
-  -- ^ YAML parse errors keyed by route. Populated by the patch handler when
-  -- @parseSDataCascading@ fails; surfaced on every rendered note so a bad
-  -- file can't fail silently (issue #285).
   , _modelStaticFiles :: IxStaticFile
   , _modelTasks :: IxTask
   -- ^ A tree (forest) of all notes, based on their folder hierarchy.
@@ -113,7 +109,6 @@ emptyModel layers act ren ctw instanceId storkVar =
       _modelNotes = Ix.empty & injectRoot
     , _modelRels = Ix.empty
     , _modelSData = Ix.empty
-    , _modelDataErrors = mempty
     , _modelStaticFiles = Ix.empty
     , _modelTasks = Ix.empty
     , _modelHeistTemplate = def
@@ -249,13 +244,9 @@ modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelInsertDataError :: R.R 'R.Yaml -> Text -> ModelT f -> ModelT f
-modelInsertDataError r err =
-  modelDataErrors %~ Map.insert r err
-
-modelDeleteDataError :: R.R 'R.Yaml -> ModelT f -> ModelT f
-modelDeleteDataError r =
-  modelDataErrors %~ Map.delete r
+modelLookupSData :: R.R 'R.Yaml -> ModelT f -> Maybe SData
+modelLookupSData r =
+  Ix.getOne . Ix.getEQ r . _modelSData
 
 modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> ModelT f -> Maybe (R.LMLView, Note)
 modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do

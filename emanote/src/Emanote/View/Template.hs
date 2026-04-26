@@ -3,7 +3,6 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
-import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
@@ -151,12 +150,7 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      -- Scope yaml errors to this note's cascade: a bad `subfolder/index.yaml`
-      -- only contributes meta to notes under `/subfolder/*`, so its banner
-      -- belongs on those notes too — not globally on every page.
-      cascade = Set.fromList . toList $ R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
-      hereErrors = Map.restrictKeys (model ^. M.modelDataErrors) cascade
-      doc = prependDataErrors hereErrors (note ^. MN.noteDoc)
+      doc = prependDataErrors (cascadeYamlErrors model r) (note ^. MN.noteDoc)
       toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
@@ -294,18 +288,30 @@ withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
   SData.oneAesonText (toList $ "page" :| ["siteTitle"])
 
+{- | YAML parse errors whose route is in this note's cascade.
+
+A bad @subfolder/index.yaml@ contributes meta to notes under
+@\/subfolder\/*@; its banner belongs on those notes, not globally.
+-}
+cascadeYamlErrors :: Model -> R.LMLRoute -> [Text]
+cascadeYamlErrors model r =
+  flip mapMaybe (toList cascade) $ \rt -> do
+    s <- M.modelLookupSData rt model
+    s ^. SData.sdataError
+  where
+    cascade = R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
+
 {- | Prepend a banner block listing yaml parse errors before the note's body.
 
 Mirrors the per-note `errorDiv` baked into a Note by `mkNoteWith`, but
-stays at render time because yaml errors are global (one bad file affects
-the whole site) rather than per-note. Issue #285.
+stays at render time so the banner can be scoped to this note's cascade
+without denormalizing errors onto every affected note. Issue #285.
 -}
-prependDataErrors :: Map (R.R 'R.Yaml) Text -> Pandoc -> Pandoc
-prependDataErrors errs (Pandoc m blocks)
-  | Map.null errs = Pandoc m blocks
-  | otherwise = Pandoc m (banner : blocks)
+prependDataErrors :: [Text] -> Pandoc -> Pandoc
+prependDataErrors [] doc = doc
+prependDataErrors errs (Pandoc m blocks) = Pandoc m (banner : blocks)
   where
     banner =
       B.Div ("", ["emanote:error"], [])
         $ B.Para [B.Strong [B.Str "Emanote: bad YAML files"]]
-        : fmap (\(_, e) -> B.Para [B.Str e]) (Map.toList errs)
+        : fmap (\e -> B.Para [B.Str e]) errs

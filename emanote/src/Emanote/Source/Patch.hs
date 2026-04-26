@@ -24,7 +24,7 @@ import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
-import Optics.Operators ((%~))
+import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
@@ -105,19 +105,17 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
-            -- On parse failure, drop any prior data for this route and
-            -- record the error in the model so `renderLmlHtml` can surface
-            -- it on every page. Throwing here used to kill the UnionMount
-            -- change handler (issue #285).
-            case SD.parseSDataCascading r yamlContents of
-              Left err -> do
-                logE $ "Bad YAML file: " <> err
-                pure $ M.modelInsertDataError r err . M.modelDeleteData r
-              Right sData ->
-                pure $ M.modelInsertData sData . M.modelDeleteDataError r
+            -- A failed parse is no longer an exception (which used to kill
+            -- the UnionMount change handler — issue #285); it lives in
+            -- `_sdataError` of the inserted SData and gets surfaced at
+            -- render time.
+            let sData = SD.parseSDataCascading r yamlContents
+            forM_ (sData ^. SD.sdataError) $ \err ->
+              logE $ "Bad YAML file: " <> err
+            pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
-            pure $ M.modelDeleteDataError r . M.modelDeleteData r
+            pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
         UM.Refresh refreshAction overlays -> do

@@ -16,11 +16,19 @@ import Relude
 
 {- | `S` for "structured". Refers to a per-route data file represented by Aeson
  value.  Example: /foo/bar.yaml file
+
+ An `SData` represents the outcome of parsing the yaml file at its route:
+ a successful parse populates `_sdataValue`; a failed parse leaves it
+ `Aeson.Null` and records the message in `_sdataError`. Modeling the
+ failure case in the same record (rather than a side-channel error map)
+ keeps "yaml file → outcome" a single mapping.
 -}
 data SData = SData
   { _sdataValue :: Aeson.Value
   , _sdataRoute :: R.R 'R.Yaml
   -- ^ Location of this data file
+  , _sdataError :: Maybe Text
+  -- ^ `Just err` if parsing failed; `Nothing` on success.
   }
   deriving stock (Eq, Ord, Data, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -36,12 +44,15 @@ instance Indexable SDataIxs SData where
 
 makeLenses ''SData
 
-parseSDataCascading :: R.R 'R.Yaml -> NonEmpty (FilePath, ByteString) -> Either Text SData
-parseSDataCascading r bs = do
-  vals <- forM bs $ \(fp, b) ->
-    (first (\err -> toText $ "Failed to parse " <> fp <> " :" <> Yaml.prettyPrintParseException err) . Yaml.decodeEither') b
-  let val = mergeAesons vals
-  pure $ SData val r
+parseSDataCascading :: R.R 'R.Yaml -> NonEmpty (FilePath, ByteString) -> SData
+parseSDataCascading r bs =
+  case traverse parseOne bs of
+    Left err -> SData Aeson.Null r (Just err)
+    Right vals -> SData (mergeAesons vals) r Nothing
+  where
+    parseOne (fp, b) =
+      first (\e -> toText $ "Failed to parse " <> fp <> " :" <> Yaml.prettyPrintParseException e)
+        $ Yaml.decodeEither' b
 
 -- | Later values override former.
 mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
