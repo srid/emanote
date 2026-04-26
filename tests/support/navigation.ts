@@ -10,18 +10,14 @@
 import type { Page } from "playwright";
 import { mode } from "./mode.ts";
 
-/** Wait for Ema's WS shim to be ready: poll until `window.ema.switchRoute`
+/** Wait for Ema's WS shim to be ready: until `window.ema.switchRoute`
  *  exists, then await `window.ema.ready` (PR srid/ema#181) so the next
  *  caller doesn't race the WS handshake. The shim's `init()` runs on
- *  module load and is usually a no-op poll, but the loop is cheap
+ *  module load and is usually a no-op wait, but the gate is cheap
  *  insurance against page-load timing. */
 async function waitForEmaReady(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    while (!(window as any).ema?.switchRoute) {
-      await new Promise((r) => setTimeout(r, 25));
-    }
-    await (window as any).ema.ready;
-  });
+  await page.waitForFunction(() => !!(window as any).ema?.switchRoute);
+  await page.evaluate(() => (window as any).ema.ready);
 }
 
 /** Prime morph mode for a fresh scenario: land on `/` via a real page
