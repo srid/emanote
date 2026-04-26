@@ -26,7 +26,7 @@
       </ul>
     </div>
     <button class="shrink-0 px-3 border-l border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-      title="Search (Ctrl+K)" type="button" onclick="window.emanote.stork.toggleSearch()">
+      title="Search (Ctrl+K)" type="button" data-emanote-stork-toggle>
       <apply template="stork/stork-icon" />
     </button>
     <button

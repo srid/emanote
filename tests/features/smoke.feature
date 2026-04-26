@@ -94,3 +94,25 @@ Feature: Smoke
     And I navigate via Ema to "/toc.html"
     And I scroll the heading with id "cherry" into the active band
     Then the TOC link for "#cherry" has class "toc-item-active"
+
+  Scenario: Ctrl+K opens the Stork search modal; Esc closes it
+    When I open "/"
+    Then the Stork search modal is "hidden"
+    When I press "Control+K"
+    Then the Stork search modal is "visible"
+    When I press "Escape"
+    Then the Stork search modal is "hidden"
+
+  Scenario: Clicking a sidebar/breadcrumbs search button opens the Stork search modal
+    When I open "/"
+    Then the Stork search modal is "hidden"
+    When I click the Stork search trigger
+    Then the Stork search modal is "visible"
+
+  @morph
+  Scenario: Stork search dialog stays styled after Ema's in-app morph navigation
+    When I open "/"
+    And I navigate via Ema to "/toc.html"
+    And I click the Stork search trigger
+    Then the Stork search modal is "visible"
+    And the Stork wrapper has the edible theme class

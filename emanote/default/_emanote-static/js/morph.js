@@ -1,8 +1,11 @@
 // Adapter between site behaviors and Ema's live-server DOM patches.
 //
 // Ema patches the DOM via idiomorph on source changes / in-app navigation.
-// A behavior must choose ONE strategy for surviving morph; pick the one
-// that matches its data dependencies:
+// Each behavior picks the strategy (or combination) that matches its data
+// dependencies — most use one, but combining is fine when separate concerns
+// have separate dependency shapes (e.g. stork uses event delegation for
+// clicks AND onMorph for index-staleness signaling AND a mutation observer
+// for theme mirroring, all in one module). The strategies:
 //
 //   1. STATELESS GLOBAL — the behavior is just a function attached to
 //      `window.emanote.*` (e.g. theme-toggle). The morphed-in DOM still
@@ -29,9 +32,10 @@
 //      setup time (e.g. toc-spy's IntersectionObserver targets specific
 //      heading elements that change per page).
 //
-// Most new behaviors will fit (1), (2), or (3). Reach for (4) only if
+// Most new behaviors will fit (1), (2), or (3) — reach for (4) only if
 // the data dependency is genuinely \"observe these specific elements\"
-// rather than \"react to events on these elements\".
+// rather than \"react to events on these elements\". Combine when
+// distinct concerns within one module need different shapes.
 
 const registry = [];
 let observerStarted = false;

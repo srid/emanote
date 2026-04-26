@@ -15,6 +15,7 @@
   - Backlinks as a card grid; TOC with depth-based hierarchy and `IntersectionObserver` scroll-spy (#520).
   - Popup footnotes as the only on-screen UI (desktop card / mobile bottom-sheet); printed output renders the footnote list ([#642](https://github.com/srid/emanote/pull/642)).
   - Site-authored interactive JS extracted from per-template `<script>` blocks into ES modules under `_emanote-static/js/` (loaded once, cached across pages). Code-copy buttons now also appear on code blocks added by the live-server's DOM patches, not only those present at first load ([#643](https://github.com/srid/emanote/issues/643)).
+  - Stork search controller migrated to the same ES-module pattern. Templates expose the search trigger via `data-emanote-stork-toggle` (event delegation) instead of inline `onclick="window.emanote.stork.toggleSearch()"`; the dark-mode mirror that re-skins the search dialog moved into the module too. Closes the Stork follow-up implied by [#643](https://github.com/srid/emanote/issues/643).
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
 

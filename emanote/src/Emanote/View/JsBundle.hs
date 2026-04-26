@@ -51,7 +51,7 @@ doesn't appear here.
 -}
 emanoteJsModuleNames :: [Text]
 emanoteJsModuleNames =
-  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup"]
+  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork"]
 
 {- | Render the importmap + module entry script tags. Drop into the page
 \<head\> via a Heist splice; safe to call multiple times per render
