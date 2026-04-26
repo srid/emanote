@@ -38,7 +38,12 @@ e2e-live: (_e2e "live")
 # Run e2e suite in static mode (`emanote gen` + serve)
 e2e-static: (_e2e "static")
 
-# Shared body for e2e-live / e2e-static; toggles EMANOTE_MODE.
+# Run e2e suite in morph mode (`emanote run`, every `I open` is an
+# Ema-internal route switch — exercises the morph code path that
+# `live` and `static` skip via fresh page loads).
+e2e-morph: (_e2e "morph")
+
+# Shared body for e2e-live / e2e-static / e2e-morph; toggles EMANOTE_MODE.
 [private]
 _e2e mode:
     #!/usr/bin/env bash

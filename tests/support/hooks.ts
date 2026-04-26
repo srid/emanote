@@ -1,14 +1,6 @@
 /**
- * Cucumber hooks — browser lifecycle + emanote backend launcher.
- *
- * `EMANOTE_MODE` is the only axis that distinguishes runs:
- *   - `live`   → spawn `emanote -L <fixture> run --port N`
- *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
- *                on a random port via `serve-handler`
- *
- * Step definitions only see `baseUrl` and never learn which mode they ran
- * in — any mode-specific branching in a step means the boundary has
- * leaked. Keep it encapsulated here.
+ * Cucumber lifecycle plumbing: backend start/stop, browser context,
+ * scenario filtering, screenshot-on-failure.
  */
 
 import {
@@ -31,22 +23,9 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
+import { mode, requireEnv } from "./mode.ts";
+import { primeMorph } from "./navigation.ts";
 
-type Mode = "live" | "static";
-
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`${name} must be set`);
-  return v;
-}
-
-const rawMode = requireEnv("EMANOTE_MODE");
-if (rawMode !== "live" && rawMode !== "static") {
-  throw new Error(
-    `EMANOTE_MODE must be "live" or "static" (got ${JSON.stringify(rawMode)})`,
-  );
-}
-const mode: Mode = rawMode;
 const emanoteBin = requireEnv("EMANOTE_BIN");
 
 const fixtureDir = path.resolve(
@@ -169,7 +148,7 @@ async function startStatic(): Promise<{
  *  here — so give this hook a deliberate 180s ceiling instead of racing
  *  the ~60s default. */
 BeforeAll({ timeout: 180_000 }, async () => {
-  const started = mode === "live" ? await startLive() : await startStatic();
+  const started = mode === "static" ? await startStatic() : await startLive();
   baseUrl = started.url;
   backend = started.resource;
   browser = await chromium.launch({
@@ -202,22 +181,16 @@ Before(async function (this: EmanoteWorld) {
   this.page = await this.context.newPage();
 });
 
-// Cucumber tag for scenarios that exercise Ema's morph-based in-app
-// navigation. Pinned to a constant so the two hooks below and any
-// new ones agree on spelling.
 const MORPH_TAG = "@morph";
 
-// Morph navigation requires the live WebSocket. Static mode serves a
-// pre-built tree with no WS; window.ema is undefined there, so any
-// MORPH_TAG-tagged scenario would fail at the first switchRoute call.
-// Skip them up-front instead of letting them red-fail.
+// Static mode has no WebSocket and `window.ema` is undefined, so any
+// `@morph` scenario would fail at the first `switchRoute` call.
 Before({ tags: MORPH_TAG }, function () {
-  if (mode !== "live") return "skipped" as const;
+  if (mode === "static") return "skipped" as const;
 });
 
-// Catch the inverse mistake: a scenario that uses the morph-nav step
-// without the tag would silently run in static mode and time out at
-// the step's 60s polling-loop ceiling. Fail fast at scenario start.
+// Inverse safety: a scenario using the morph-nav step without `@morph`
+// would silently hang in static mode until the cucumber step ceiling.
 Before(function (this: EmanoteWorld, scenario) {
   const usesMorph = scenario.pickle.steps.some((s) =>
     s.text.includes("navigate via Ema"),
@@ -225,9 +198,16 @@ Before(function (this: EmanoteWorld, scenario) {
   const tagged = scenario.pickle.tags.some((t) => t.name === MORPH_TAG);
   if (usesMorph && !tagged) {
     throw new Error(
-      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it runs only in live mode (static mode has no WebSocket and window.ema is undefined).`,
+      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it is skipped in static mode (no WebSocket; window.ema is undefined there).`,
     );
   }
+});
+
+// In morph mode the first `openRoute` morph-switches via
+// `window.ema`, which only exists after a real page load — prime it.
+Before(async function (this: EmanoteWorld) {
+  if (mode !== "morph") return;
+  await primeMorph(this.page);
 });
 
 After(async function (this: EmanoteWorld, scenario) {
