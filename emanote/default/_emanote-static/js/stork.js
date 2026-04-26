@@ -55,13 +55,17 @@ function getBaseUrl() {
 
 let indexIsStale = false;
 
-// The .stork-overflow-hidden-important body class IS the modal-open
-// state — the previous mirror flag could drift if anything outside
-// this module mutated the class (e.g. a future utility, a devtools
-// toggle), causing the keydown handler to silently no-op on Esc when
-// the modal looked open. Derive on read instead.
+// Body class set when the search modal is open; defined in
+// components/stork/stork-search-head.tpl's <style> block. Its presence
+// IS the modal-open state — see isSearchShown.
+const MODAL_HIDDEN_CLASS = 'stork-overflow-hidden-important';
+
+// Deriving the open-state from the DOM (rather than mirroring it in a
+// module-scoped flag) avoids the drift hazard when any other code
+// mutates the class — the keydown handler reads this on every Esc
+// press, so a stale flag would silently no-op.
 function isSearchShown() {
-  return document.body.classList.contains('stork-overflow-hidden-important');
+  return document.body.classList.contains(MODAL_HIDDEN_CLASS);
 }
 
 function registerIndex(options) {
@@ -83,7 +87,7 @@ function toggleSearch() {
   const container = document.getElementById('stork-search-container');
   if (!container) return;
   container.classList.toggle('hidden');
-  const nowShown = document.body.classList.toggle('stork-overflow-hidden-important');
+  const nowShown = document.body.classList.toggle(MODAL_HIDDEN_CLASS);
   if (nowShown) {
     document.getElementById('stork-search-input')?.focus();
   }
@@ -91,7 +95,7 @@ function toggleSearch() {
 
 function clearSearch() {
   document.getElementById('stork-search-container')?.classList.add('hidden');
-  document.body.classList.remove('stork-overflow-hidden-important');
+  document.body.classList.remove(MODAL_HIDDEN_CLASS);
 }
 
 // The stork-wrapper element is rendered into every page's body by
