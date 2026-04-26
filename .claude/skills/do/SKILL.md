@@ -225,7 +225,22 @@ The sub-agent already knows to read its skill file and follow that methodology; 
 
 **Model override.** If the user passed `--review-model=<model>`, pass `model: "<model>"` in **both** `Agent` tool calls — this overrides the `model: sonnet` in the agents' frontmatter via the `Agent` tool's built-in `model` parameter. If the flag was not passed, omit the `model` parameter entirely so the agent definition's default (sonnet) applies. Accept only `opus`, `sonnet`, and `haiku`; reject anything else at argument-parse time with a one-line error, since a typo silently falling back to sonnet would hide a budget decision the user was trying to express.
 
-After both reviewers return, synthesize their findings. Findings marked **"Defer #issue"** or **"No-op"** are surfaced in the PR comment (see **create-pr**) but not acted on here.
+After both reviewers return, **audit every `Defer` disposition before acting**. `/do` is not optimizing for minimal diff — it is optimizing for the simpler artifact landing in `master`. A PR that grows from 50 lines to 400 because hickey caught a real fragmentation bug is a *better* PR, not a worse one; the alternative is shipping the complected version and trusting a "broader refactor" follow-up that statistically never happens. **The default disposition is "Fix in this PR" — even when the fix grows the diff substantially.**
+
+For every `Defer` the sub-agents returned, check the stated reason. Acceptable defers are narrow:
+
+- The fix requires a change outside this repository's control (upstream library, sister repo, external API).
+- The fix conflicts with concurrent in-flight work in another open PR on the same files.
+- The fix requires a coordinated migration (data, schema, dependency upgrade) that must not be coupled to this PR's release timeline.
+
+Reasons that are **never** acceptable — flip the disposition to "Fix in this PR" and apply:
+
+- "Broader refactor", "wider scope", "out of scope", "follow-up refactor", "separate PR" — restatements of "the diff would grow," not reasons.
+- "PR is getting big", "keep diff minimal" — `/do` does not constrain on diff size.
+- "Pre-existing", "not introduced by this PR" — only acceptable when paired with one of the three narrow reasons above; otherwise the cleanup belongs at the lines this branch is already touching.
+- Any `Defer` missing an issue link (e.g. "Defer — broader refactor" with no `#<issue>`) — the hickey/lowy skill files require issue links on defers, so a missing link means the sub-agent skipped the rule. Flip it unconditionally.
+
+For each flipped finding, apply it in this PR using the per-commit rules below. After the audit, only **No-op** and surviving (genuinely-narrow) `Defer #issue` entries are surfaced in the PR comment (see **create-pr**) without code action — every other finding lands as a commit.
 
 **Apply each "Fix in this PR" finding as its own commit** — do not batch multiple findings into one commit. A reviewer reading the PR's commit history should be able to read one "address hickey finding: decomplect viewportDimensions" commit at a time and follow the structural refinement as a sequence, not decode a grab-bag diff. For each finding in turn:
 

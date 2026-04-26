@@ -2,7 +2,7 @@ module Emanote.Model.Link.RelSpec where
 
 import Emanote.Model.Link.Rel
 import Emanote.Model.Note qualified as MN
-import Emanote.Route.ModelRoute (mkModelRouteFromFilePath)
+import Emanote.Route.ModelRoute (mkModelRouteCandidates)
 import Emanote.Route.R (R (..))
 import Hedgehog
 import Relude
@@ -46,7 +46,7 @@ spec = do
     it "relative link from subfolder/index.md resolves under subfolder/" . hedgehog $ do
       let base = MN.resolveLinkBaseFromFilePath "subfolder/index.md"
           got = fst <$> parseUnresolvedRelTarget base [] "foo.md"
-          want = URTResource <$> mkModelRouteFromFilePath "subfolder/foo.md"
+          want = viaNonEmpty URTResource (mkModelRouteCandidates "subfolder/foo.md")
       got === want
 
 -- https://github.com/hedgehogqa/haskell-hedgehog/issues/121

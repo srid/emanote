@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-25T22:37:18.904589+00:00'
+generated_at: '2026-04-26T00:26:07.555233+00:00'
 apm_version: 0.9.2
 dependencies:
 - repo_url: anthropics/skills
@@ -22,7 +22,7 @@ dependencies:
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: d6ff23a65e6779236f41134eb7ead87e4f8b8417
+  resolved_commit: 96994aff26b010935f03835caba19d0d0491e243
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -30,6 +30,7 @@ dependencies:
   - .claude/agents/lowy.md
   - .claude/hooks/agency/scripts/do-stop-guard.sh
   - .claude/rules/apm-sources.md
+  - .claude/skills/agency-setup
   - .claude/skills/code-police
   - .claude/skills/do
   - .claude/skills/elegance
@@ -43,10 +44,10 @@ dependencies:
     .claude/agents/hickey.md: sha256:edde9b0d3b27b947b7372f662b2e8652d136e0bb9af7924892b00450a1e586bc
     .claude/agents/lowy.md: sha256:a1c8e5ba115439bcfa0d7e331f96e71b2d690ff2e5fb9b824bb5f588eb43ac75
     .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-    .claude/rules/apm-sources.md: sha256:8707579e05e2a39f01278b2d225f3cb2ec97912c65c94aa57e5830954f98eab1
-  content_hash: sha256:859799bc34087e579fd564b4fdf3b8adcaddae7d5d753567318d3d51c9e2d7be
+    .claude/rules/apm-sources.md: sha256:65640c481c347cc4edf50603f784d0b448b6395acc43419a4f8ad0c53de2db4b
+  content_hash: sha256:2d57a89ae458bef1584dc34bf25d95dfad68910e825b41dd27c2cf457a8b650a
 local_deployed_files:
 - .claude/rules/workflow.md
 - .claude/skills/dpella-mcp
 local_deployed_file_hashes:
-  .claude/rules/workflow.md: sha256:6469210d507ae53cf40889dce3221319cbb5219b80c277cb7e4550e3a7201137
+  .claude/rules/workflow.md: sha256:3e42667698cfa83f0a19944fd3355c1b7627f3cd4dce566ecc07d89d4ad23ac0

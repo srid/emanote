@@ -8,7 +8,8 @@ module Emanote.Route.ModelRoute (
   -- Some route in a generated site
   ModelRoute (..),
   modelRouteCase,
-  mkModelRouteFromFilePath,
+  mkModelRouteCandidates,
+  encodeModelRoute,
   -- Only LML routes
   LMLView (..),
   LMLRoute (..),
@@ -81,10 +82,27 @@ modelRouteCase = \case
   ModelRoute_LML view r -> Left (view, r)
   ModelRoute_StaticFile r -> Right r
 
-mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
-mkModelRouteFromFilePath fp =
-  fmap (uncurry ModelRoute_LML) (mkLMLRouteFromFilePath fp)
-    <|> fmap ModelRoute_StaticFile (R.mkRouteFromFilePath fp)
+{- | All `ModelRoute`s a URL filepath could plausibly resolve to,
+ordered by preference.
+
+The same URL can map to multiple resource kinds — most importantly,
+@*.xml@ is both the natural URL for a feed-enabled note's Atom output
+and the natural URL for a static @.xml@ asset. Resolution at lookup
+time picks the first candidate that exists in the model; if the user
+intended one but the model only contains the other, the link still
+resolves correctly.
+-}
+mkModelRouteCandidates :: FilePath -> [ModelRoute]
+mkModelRouteCandidates fp =
+  maybeToList (uncurry ModelRoute_LML <$> mkLMLRouteFromFilePath fp)
+    <> maybeToList (ModelRoute_StaticFile <$> R.mkRouteFromFilePath fp)
+
+-- | Encode a `ModelRoute` to its on-the-wire URL filepath.
+encodeModelRoute :: ModelRoute -> FilePath
+encodeModelRoute = \case
+  ModelRoute_StaticFile r -> R.encodeRoute r
+  ModelRoute_LML LMLView_Html lmlR -> withLmlRoute R.encodeRoute lmlR
+  ModelRoute_LML LMLView_Atom lmlR -> R.encodeRoute @_ @'Xml (withLmlRoute coerce lmlR)
 
 mkLMLRouteFromFilePath :: FilePath -> Maybe (LMLView, LMLRoute)
 mkLMLRouteFromFilePath fp =
