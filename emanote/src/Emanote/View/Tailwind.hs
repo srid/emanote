@@ -15,10 +15,9 @@ module Emanote.View.Tailwind (
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.ByteString qualified as BS
 import Emanote.Prelude (log)
+import Emanote.Static.Sources qualified as Sources
 import NeatInterpolation (text)
-import Paths_emanote qualified
 import Relude
-import System.FilePath ((</>))
 import System.IO (hClose)
 import System.Which (staticWhich)
 import Text.Blaze.Html ((!))
@@ -130,7 +129,7 @@ compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = runStdoutLoggingT $ do
   log $ "Running Tailwind CSS v4 compiler to generate: " <> toText cssPath
   withSystemTempFile "emanote-tailwind-input.css" $ \inputPath h -> do
-    jsSourcePath <- liftIO $ (</> "_emanote-static" </> "js") <$> Paths_emanote.getDataDir
+    jsSourcePath <- liftIO Sources.jsScanPath
     let sources =
           unlines (map (\p -> "@source \"" <> toText p <> "\";") genPaths)
             <> "@source \""

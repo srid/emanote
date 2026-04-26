@@ -207,6 +207,7 @@ library
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern
+    Emanote.Static.Sources
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export
