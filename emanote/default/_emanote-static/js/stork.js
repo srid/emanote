@@ -68,9 +68,13 @@ function isSearchShown() {
   return document.body.classList.contains(MODAL_HIDDEN_CLASS);
 }
 
-function registerIndex(options) {
+function registerIndex(forceOverwrite = false) {
   const indexName = 'emanote-search'; // matches input[data-stork] in stork-search.tpl
-  stork.register(indexName, getBaseUrl() + '-/stork.st', options);
+  stork.register(
+    indexName,
+    getBaseUrl() + '-/stork.st',
+    forceOverwrite ? { forceOverwrite: true } : undefined,
+  );
 }
 
 function refreshIndex() {
@@ -79,7 +83,7 @@ function refreshIndex() {
   indexIsStale = false;
   // NOTE: This will leak memory; per-morph re-registration is a known
   // trade-off vs. fully reloading the page. See issue #411.
-  registerIndex({ forceOverwrite: true });
+  registerIndex(true);
 }
 
 function toggleSearch() {
