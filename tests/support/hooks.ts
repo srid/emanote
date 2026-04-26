@@ -223,13 +223,10 @@ Before({ tags: MORPH_TAG }, function () {
 // Catch the inverse mistake: a scenario that uses the morph-nav step
 // without the tag would silently run in static mode and time out at
 // the step's 60s polling-loop ceiling. Fail fast at scenario start.
-//
-// In morph mode the check is meaningless — every `I open` is itself a
-// morph nav, so requiring `@morph` on every scenario would defeat the
-// purpose of the mode (which is to surface the morph code path
-// universally, not selectively). Suppress the check there.
+// The check applies in every mode — the rule "tag morph-nav scenarios
+// so they skip in static" is a static-mode invariant and morph mode
+// inherits the same authoring contract.
 Before(function (this: EmanoteWorld, scenario) {
-  if (mode === "morph") return;
   const usesMorph = scenario.pickle.steps.some((s) =>
     s.text.includes("navigate via Ema"),
   );
