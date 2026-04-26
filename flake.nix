@@ -19,7 +19,9 @@
     nixos-unified.url = "github:srid/nixos-unified";
 
     # These are not (necessarily) upstreamed to nixpkgs, yet.
-    ema.url = "github:srid/ema";
+    # Pinned to the feat/ema-ready-promise branch (PR srid/ema#181) for
+    # `window.ema.ready`; revert to `github:srid/ema` once that lands.
+    ema.url = "github:srid/ema/feat/ema-ready-promise";
     ema.flake = false;
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;

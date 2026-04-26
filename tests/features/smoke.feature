@@ -72,3 +72,10 @@ Feature: Smoke
     When I open "/toc.html"
     And I scroll the heading with id "cherry" into the active band
     Then the TOC link for "#cherry" has class "toc-item-active"
+
+  @morph
+  Scenario: TOC scroll-spy survives Ema's in-app morph navigation (issue #667)
+    When I open "/"
+    And I navigate via Ema to "/toc.html"
+    And I scroll the heading with id "cherry" into the active band
+    Then the TOC link for "#cherry" has class "toc-item-active"

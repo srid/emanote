@@ -71,15 +71,16 @@
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1776974157,
-        "narHash": "sha256-rMb1a7VzMS2nmfEWAtJEKgZYg9Mc5JdSNK4y+z1S/ec=",
+        "lastModified": 1777214338,
+        "narHash": "sha256-bzypHo+Z/fLJRK1hTEuxCzK/ybxJixDrfML8M6cfDtk=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "e92e52dbefea57de08ef64b4db0ea795170d6b81",
+        "rev": "bbd6e3b69c199d36852feaa60c789c3dcb6c25ed",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "feat/ema-ready-promise",
         "repo": "ema",
         "type": "github"
       }

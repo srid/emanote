@@ -379,6 +379,32 @@ Then(
   },
 );
 
+// Morph navigation: drive Ema's in-app route switch via the JS API
+// instead of clicking a link. Awaits `window.ema.ready` (PR srid/ema#181)
+// to avoid racing the WS handshake, then waits for `EMAHotReload` —
+// fired by the shim after morph + script reload completes — so the
+// next step sees the new DOM, not the in-flight one.
+When(
+  "I navigate via Ema to {string}",
+  async function (this: EmanoteWorld, path: string) {
+    await this.page.evaluate(async (p) => {
+      // Wait for the shim to define window.ema (its `init()` runs
+      // synchronously on the module load, so this is usually a no-op
+      // — but the polling loop is cheap insurance against a race).
+      while (!(window as any).ema?.switchRoute) {
+        await new Promise((r) => setTimeout(r, 25));
+      }
+      await (window as any).ema.ready;
+      await new Promise<void>((resolve) => {
+        window.addEventListener("EMAHotReload", () => resolve(), {
+          once: true,
+        });
+        (window as any).ema.switchRoute(p);
+      });
+    }, path);
+  },
+);
+
 // TOC scroll-spy: position a target heading inside the IntersectionObserver
 // "active band" (rootMargin "-80px 0px -60% 0px" → y=80..288 on a 720px
 // viewport), then assert its TOC link is highlighted. Putting the heading

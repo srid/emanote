@@ -101,9 +101,13 @@ async function waitForHtml(
 
 async function startLive(): Promise<{ url: string; resource: BackendResource }> {
   const port = await getPort();
+  // WS is enabled (no `--no-ws`) so scenarios tagged `@morph` can
+  // exercise Ema's in-app morph navigation via `window.ema.switchRoute`.
+  // The fixtures are static during a run, so the WS doesn't trigger
+  // spurious morphs in non-morph scenarios.
   const proc = spawn(
     emanoteBin,
-    ["-L", fixtureDir, "run", "--port", String(port), "--no-ws"],
+    ["-L", fixtureDir, "run", "--port", String(port)],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
   proc.stderr?.on("data", (d: Buffer) =>
@@ -196,6 +200,14 @@ Before(async function (this: EmanoteWorld) {
     viewport: { width: 1280, height: 720 },
   });
   this.page = await this.context.newPage();
+});
+
+// Morph navigation requires the live WebSocket. Static mode serves a
+// pre-built tree with no WS; window.ema is undefined there, so any
+// `@morph`-tagged scenario would fail at the first switchRoute call.
+// Skip them up-front instead of letting them red-fail.
+Before({ tags: "@morph" }, function () {
+  if (mode !== "live") return "skipped" as const;
 });
 
 After(async function (this: EmanoteWorld, scenario) {
