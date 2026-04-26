@@ -2,7 +2,7 @@
 // Uses IntersectionObserver (passive, no scroll-loop layout thrashing);
 // replaces the old window.onscroll approach from issue #520.
 
-import { ready } from './morph.js';
+import { ready } from '@emanote/morph';
 
 ready(() => {
   const tocLinks = document.querySelectorAll('a.--ema-toc');

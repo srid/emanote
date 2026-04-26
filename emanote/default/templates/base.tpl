@@ -54,11 +54,13 @@
 
   <head-main />
   <apply template="components/stork/stork-search-head" />
-  <!-- Site-authored interactive behaviors. type="module" is defer-by-default,
-       so this never blocks first paint. The FOUC theme applier above and the
-       Stork controller above stay inline for their own reasons (pre-paint
-       requirement; vendor coupling, see issue #643). -->
-  <script type="module" src="${ema:emanoteStaticLayerUrl}/js/main.js"></script>
+  <!-- Site-authored interactive behaviors (issue #643). The splice emits
+       an importmap (so live-server's per-file ?t=<mtime> propagates
+       through ES module imports) plus the main entry as a deferred
+       module. The FOUC theme applier above and the Stork controller
+       above stay inline for their own reasons (pre-paint requirement;
+       vendor coupling). -->
+  <emanoteJsBundle />
 </head>
 
 <!-- DoNotFormat -->

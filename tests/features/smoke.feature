@@ -68,7 +68,7 @@ Feature: Smoke
     When I open "/code.html"
     Then every <pre> with a child <code> has a .code-copy-button
 
-  Scenario: Scrolling a section to the viewport top highlights its TOC link
+  Scenario: Scrolling a section into view highlights its TOC link
     When I open "/toc.html"
-    And I scroll the heading with id "cherry" to the top of the viewport
+    And I scroll the heading with id "cherry" into the active band
     Then the TOC link for "#cherry" has class "toc-item-active"

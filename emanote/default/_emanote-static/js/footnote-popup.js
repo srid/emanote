@@ -9,7 +9,7 @@
 // Popover ::backdrop pseudo-element (in components/footnote-popup.tpl),
 // which has no Tailwind variant.
 
-import { ready } from './morph.js';
+import { ready } from '@emanote/morph';
 
 // findTarget uses CSS.escape on a user-supplied id; the early guard for the
 // Popover API is the natural place to also gate on CSS.escape so we never

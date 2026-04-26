@@ -379,18 +379,20 @@ Then(
   },
 );
 
-// TOC scroll-spy: scroll a target heading to viewport top, then assert
-// the matching TOC link has the active mark. The IntersectionObserver
-// uses rootMargin "-80px 0px -60% 0px" — sections in that band are
-// "visible". Scrolling the heading to the top puts it just above the
-// 80px margin, but its body is in the band, so the section qualifies.
+// TOC scroll-spy: position a target heading inside the IntersectionObserver
+// "active band" (rootMargin "-80px 0px -60% 0px" → y=80..288 on a 720px
+// viewport), then assert its TOC link is highlighted. Putting the heading
+// at y=200 sits it firmly inside the band, so the firstVisible branch in
+// pickActive() picks it deterministically — no subpixel fragility on the
+// `top < 0` boundary that "scroll to viewport top" semantics would have.
 When(
-  "I scroll the heading with id {string} to the top of the viewport",
+  "I scroll the heading with id {string} into the active band",
   async function (this: EmanoteWorld, headingId: string) {
     await this.page.evaluate((id) => {
       const el = document.getElementById(id);
       if (!el) throw new Error(`No element with id ${JSON.stringify(id)}`);
-      el.scrollIntoView({ block: "start", behavior: "instant" });
+      const headingTopInDoc = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: headingTopInDoc - 200, behavior: "instant" });
     }, headingId);
   },
 );
