@@ -595,3 +595,27 @@ When(
       .click();
   },
 );
+
+// Stork dark/light theme mirror: stork.js's MutationObserver on
+// <html>.class flips the wrapper between stork-wrapper-edible and
+// stork-wrapper-edible-dark. Without one of those classes on the
+// wrapper, the edible.css / edible-dark.css rules don't apply and
+// the search dialog renders as unstyled inputs. Asserting on the
+// presence of either class catches the morph-time regression where
+// the new #stork-wrapper element gets no class because the observer
+// only fires when <html>.class actually changes.
+Then(
+  "the Stork wrapper has the edible theme class",
+  async function (this: EmanoteWorld) {
+    const wrapper = this.page.locator("#stork-wrapper");
+    await wrapper.waitFor({ state: "attached", timeout: 5_000 });
+    const classes = (await wrapper.getAttribute("class")) ?? "";
+    const ok =
+      classes.includes("stork-wrapper-edible") ||
+      classes.includes("stork-wrapper-edible-dark");
+    assert.ok(
+      ok,
+      `Expected #stork-wrapper to carry stork-wrapper-edible{,-dark}; class list was ${JSON.stringify(classes)}. After Ema's morph nav the wrapper element is fresh and the JS theme-mirror only fires on <html>.class changes — if the user didn't flip themes, the new wrapper stays unstyled.`,
+    );
+  },
+);

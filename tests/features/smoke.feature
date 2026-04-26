@@ -108,3 +108,11 @@ Feature: Smoke
     Then the Stork search modal is "hidden"
     When I click the Stork search trigger
     Then the Stork search modal is "visible"
+
+  @morph
+  Scenario: Stork search dialog stays styled after Ema's in-app morph navigation
+    When I open "/"
+    And I navigate via Ema to "/toc.html"
+    And I click the Stork search trigger
+    Then the Stork search modal is "visible"
+    And the Stork wrapper has the edible theme class
