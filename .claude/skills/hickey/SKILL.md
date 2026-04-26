@@ -61,7 +61,7 @@ Two abstractions serving one user-level concern = accidental concept multiplicat
 
 ### Layer 4: Check the Structural Pattern Catalog
 
-Scan for known structural patterns **and any additional patterns from project instructions**. The catalog has two halves: complecting (things braided together that should be separate) and fragmentation (things split apart that should be one). Both directions are "interleaved vs. not-interleaved" — Hickey's principle is bidirectional.
+Scan for known structural patterns plus **any additional patterns the project has declared**. Before evaluating, read `.agency/hickey.md` if it exists — its content is project-specific (inline patterns, or a pointer to another file). Treat any patterns found there as additions to the catalog below. The catalog has two halves: complecting (things braided together that should be separate) and fragmentation (things split apart that should be one). Both directions are "interleaved vs. not-interleaved" — Hickey's principle is bidirectional.
 
 **Complecting patterns (things-that-should-be-separate braided together)**
 

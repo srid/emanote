@@ -1,7 +1,4 @@
----
-paths:
-  - "**"
----
+# /do config
 
 ## Check command
 cabal build all
@@ -18,3 +15,7 @@ vira ci
 
 ## Documentation
 Keep `README.md`, `docs/` (user documentation), and `CHANGELOG.md` (under the `Unreleased` section) in sync with user-facing changes.
+
+<!-- Optional (add manually for the evidence step):
+## PR evidence
+-->

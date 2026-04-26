@@ -43,7 +43,7 @@ For every module boundary, service split, or new abstraction in the code under r
 
 What is likely to change behind this boundary? Be specific — not "requirements might change" but "the payment provider, the auth protocol, the notification channel." If you can't name concrete axes of change, the boundary may be arbitrary.
 
-**Consider project-declared areas of volatility.** If the project has enumerated its own areas of volatility — the term of art Lowy uses throughout *Righting Software* — those declarations surface as system-reminders when you read a matching file (Claude Code's `paths:`-scoped rule mechanism; it is wiring, not Lowy doctrine). The schema, loosely modeled on Lowy's TradeMe enumeration (*Righting Software*, Ch. 5), is:
+**Consider project-declared areas of volatility.** If the project has enumerated its own areas of volatility — the term of art Lowy uses throughout *Righting Software* — read `.agency/lowy.md` if it exists. Its content is project-specific (inline rows or a pointer to another file). The schema, loosely modeled on Lowy's TradeMe enumeration (*Righting Software*, Ch. 5), is:
 
 | Area of volatility | What changes | Why volatile (likelihood × effect) | Expected encapsulation |
 |--------------------|--------------|------------------------------------|------------------------|
