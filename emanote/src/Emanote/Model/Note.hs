@@ -341,7 +341,7 @@ mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [T
 mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
-      doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
+      doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
    in Note r src doc meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
@@ -352,9 +352,19 @@ mkNoteWith r src doc' meta errs =
               h1 : prefix : rest
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
-    errorDiv :: [Text] -> B.Block
-    errorDiv s =
-      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
+
+{- | Shared builder for the @emanote:error@ banner Div used by both
+the per-note markdown error path (in 'mkNoteWith') and the route-cascade
+yaml error path (in 'Emanote.View.Template'). The CSS class is the actual
+sync contract: a Heist splice rewrites it into Tailwind utilities, so
+both error surfaces stay visually consistent as long as they go through
+this helper.
+-}
+errorDiv :: Text -> [Text] -> B.Block
+errorDiv header errs =
+  B.Div (cls "emanote:error")
+    $ B.Para [B.Strong $ one $ B.Str header]
+    : (B.Para . one . B.Str <$> errs)
 
 parseNote ::
   forall m.

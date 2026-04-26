@@ -150,7 +150,7 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors (cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      doc = prependDataErrors (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
       toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
@@ -288,30 +288,14 @@ withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
   SData.oneAesonText (toList $ "page" :| ["siteTitle"])
 
-{- | YAML parse errors whose route is in this note's cascade.
-
-A bad @subfolder/index.yaml@ contributes meta to notes under
-@\/subfolder\/*@; its banner belongs on those notes, not globally.
--}
-cascadeYamlErrors :: Model -> R.LMLRoute -> [Text]
-cascadeYamlErrors model r =
-  flip mapMaybe (toList cascade) $ \rt -> do
-    s <- M.modelLookupSData rt model
-    leftToMaybe (s ^. SData.sdataValue)
-  where
-    cascade = R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
-
 {- | Prepend a banner block listing yaml parse errors before the note's body.
 
-Mirrors the per-note `errorDiv` baked into a Note by `mkNoteWith`, but
-stays at render time so the banner can be scoped to this note's cascade
-without denormalizing errors onto every affected note. Issue #285.
+Stays at render time so the banner can be scoped to this note's cascade
+(via 'Meta.cascadeYamlErrors') without denormalizing errors onto every
+affected note. Banner construction goes through 'MN.errorDiv' so the
+markdown and yaml error surfaces share one Div shape. Issue #285.
 -}
 prependDataErrors :: [Text] -> Pandoc -> Pandoc
 prependDataErrors [] doc = doc
-prependDataErrors errs (Pandoc m blocks) = Pandoc m (banner : blocks)
-  where
-    banner =
-      B.Div ("", ["emanote:error"], [])
-        $ B.Para [B.Strong [B.Str "Emanote: bad YAML files"]]
-        : fmap (\e -> B.Para [B.Str e]) errs
+prependDataErrors errs (Pandoc m blocks) =
+  Pandoc m (MN.errorDiv "Emanote: bad YAML files" errs : blocks)
