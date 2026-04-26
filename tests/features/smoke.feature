@@ -61,6 +61,10 @@ Feature: Smoke
     Then the page rendered without an Ema exception
     And the page does not show the YAML errors banner
 
+  Scenario: Markdown link to a static .xml asset resolves to the file (regression: #547)
+    When I open "/xmllink.html"
+    Then the article link with text "xml asset" has href containing "test.xml"
+
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
     Then no footnote list is visible on screen

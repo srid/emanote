@@ -50,9 +50,9 @@ embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
   let parentR = M.modelResolveLinkBase model noteRoute
-  (Rel.URTResource mr, _mAnchor) <-
+  (Rel.URTResource candidates, _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveModelRoute model mr
+  let rRel = Resolve.resolveModelRouteCandidates model candidates
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
     $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
