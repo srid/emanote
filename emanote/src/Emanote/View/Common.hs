@@ -169,9 +169,9 @@ commonSplices withCtx model meta routeTitle = do
   -- consuming tag and binds ${url}; see "Emanote.View.StaticUrl".
   "emanoteStaticUrl" ## StaticUrl.emanoteStaticUrlSplice model
   -- Deprecated in favour of <emanoteStaticUrl path="…">: this splice
-  -- skips siteRouteUrl, so live-server edits to the assets it points
-  -- at don't get the ?t=<mtime> cache buster (issue #666). Kept for
-  -- third-party templates that still reference it.
+  -- emits the static folder URL for callers to concatenate paths
+  -- onto, so per-asset cache-busting (?t=<mtime>) never reaches the
+  -- file (issue #666). Kept for third-party templates.
   "ema:emanoteStaticLayerUrl" ##
     HI.textSplice
       ( -- HACK
