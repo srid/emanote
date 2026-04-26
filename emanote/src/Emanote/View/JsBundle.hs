@@ -44,10 +44,31 @@ emanoteJsModuleNames =
 {- | Render the importmap + module entry script tags. Drop into the page
 \<head\> via a Heist splice; safe to call multiple times per render
 (each call is pure, only reads from the model).
+
+The importmap script is tagged @im-preserve@ (idiomorph keeps it
+across morph) and @data-ema-skip@ (Ema's @reloadScripts@ skips it).
+Both are necessary in live-server mode: a morphed-in second importmap
+hits the HTML spec's \"already-resolved specifier\" rule, so the
+browser silently drops every bare-name remapping and emits a console
+warning per entry. Worse, the resulting empty importmap leaves any
+re-evaluated module's bare imports unresolvable. Preserving the first
+importmap means edits to dependent modules require a hard reload
+during dev (the morph path can't pick up new @?t=@ URLs through bare
+specifiers) — that's the trade-off; cleaner than visible breakage.
+
+The main module entry is left unmarked: 'reloadScripts' re-creates
+it on each morph, and a changed @?t=@ on @main.js@ triggers a fresh
+fetch (its top-level imports still resolve via the preserved
+importmap, so they hit the cached versions of the dependencies — the
+known limitation above).
 -}
 emanoteJsBundle :: Model -> H.Html
 emanoteJsBundle model = do
-  H.script ! A.type_ "importmap" $ H.toHtml (importMap model)
+  H.script
+    ! A.type_ "importmap"
+    ! H.customAttribute "im-preserve" "true"
+    ! H.dataAttribute "ema-skip" "true"
+    $ H.toHtml (importMap model)
   H.script
     ! A.type_ "module"
     ! A.src (H.toValue (jsUrl model "main"))
@@ -55,8 +76,9 @@ emanoteJsBundle model = do
 
 importMap :: Model -> Text
 importMap model =
-  decodeUtf8 . Aeson.encode $
-    Aeson.object
+  decodeUtf8
+    . Aeson.encode
+    $ Aeson.object
       [ "imports"
           Aeson..= Aeson.object
             [ AesonKey.fromText ("@emanote/" <> name) Aeson..= importmapUrl model name
@@ -74,15 +96,18 @@ afterwards.
 importmapUrl :: Model -> Text -> Text
 importmapUrl model name =
   let u = jsUrl model name
-   in if "/" `T.isPrefixOf` u
-        || "./" `T.isPrefixOf` u
-        || "../" `T.isPrefixOf` u
+   in if "/"
+        `T.isPrefixOf` u
+        || "./"
+        `T.isPrefixOf` u
+        || "../"
+        `T.isPrefixOf` u
         then u
         else "./" <> u
 
 jsUrl :: Model -> Text -> Text
 jsUrl model name =
-  SR.siteRouteUrl model $
-    SR.staticFileSiteRoute $
-      fromMaybe (error $ "no _emanote-static/js/" <> name <> ".js?") $
-        M.modelLookupStaticFile ("_emanote-static" </> "js" </> toString name <> ".js") model
+  SR.siteRouteUrl model
+    $ SR.staticFileSiteRoute
+    $ fromMaybe (error $ "no _emanote-static/js/" <> name <> ".js?")
+    $ M.modelLookupStaticFile ("_emanote-static" </> "js" </> toString name <> ".js") model
