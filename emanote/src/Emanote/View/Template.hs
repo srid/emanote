@@ -297,7 +297,7 @@ cascadeYamlErrors :: Model -> R.LMLRoute -> [Text]
 cascadeYamlErrors model r =
   flip mapMaybe (toList cascade) $ \rt -> do
     s <- M.modelLookupSData rt model
-    s ^. SData.sdataError
+    leftToMaybe (s ^. SData.sdataValue)
   where
     cascade = R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
 

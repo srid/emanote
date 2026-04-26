@@ -15,20 +15,17 @@ import Optics.TH (makeLenses)
 import Relude
 
 {- | `S` for "structured". Refers to a per-route data file represented by Aeson
- value.  Example: /foo/bar.yaml file
+ value. Example: /foo/bar.yaml file.
 
- An `SData` represents the outcome of parsing the yaml file at its route:
- a successful parse populates `_sdataValue`; a failed parse leaves it
- `Aeson.Null` and records the message in `_sdataError`. Modeling the
- failure case in the same record (rather than a side-channel error map)
- keeps "yaml file → outcome" a single mapping.
+ `_sdataValue` carries the parse outcome: `Right` on success, `Left` with
+ the parse-error message on failure. Using `Either` (rather than two
+ fields like `value + Maybe error`) makes invalid states unrepresentable
+ — you can't have both a value and an error.
 -}
 data SData = SData
-  { _sdataValue :: Aeson.Value
+  { _sdataValue :: Either Text Aeson.Value
   , _sdataRoute :: R.R 'R.Yaml
   -- ^ Location of this data file
-  , _sdataError :: Maybe Text
-  -- ^ `Just err` if parsing failed; `Nothing` on success.
   }
   deriving stock (Eq, Ord, Data, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -46,9 +43,7 @@ makeLenses ''SData
 
 parseSDataCascading :: R.R 'R.Yaml -> NonEmpty (FilePath, ByteString) -> SData
 parseSDataCascading r bs =
-  case traverse parseOne bs of
-    Left err -> SData Aeson.Null r (Just err)
-    Right vals -> SData (mergeAesons vals) r Nothing
+  SData (mergeAesons <$> traverse parseOne bs) r
   where
     parseOne (fp, b) =
       first (\e -> toText $ "Failed to parse " <> fp <> " :" <> Yaml.prettyPrintParseException e)

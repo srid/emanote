@@ -106,11 +106,11 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
             -- A failed parse is no longer an exception (which used to kill
-            -- the UnionMount change handler — issue #285); it lives in
-            -- `_sdataError` of the inserted SData and gets surfaced at
-            -- render time.
+            -- the UnionMount change handler — issue #285); it lives on the
+            -- `Left` side of the inserted SData's `_sdataValue` and gets
+            -- surfaced at render time.
             let sData = SD.parseSDataCascading r yamlContents
-            forM_ (sData ^. SD.sdataError) $ \err ->
+            whenLeft_ (sData ^. SD.sdataValue) $ \err ->
               logE $ "Bad YAML file: " <> err
             pure $ M.modelInsertData sData
           UM.Delete -> do

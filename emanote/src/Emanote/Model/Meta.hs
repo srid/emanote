@@ -39,5 +39,6 @@ getEffectiveRouteMetaWith frontmatter mr model =
    in maybe Aeson.Null SData.mergeAesons $ nonEmpty metas
 
 getYamlMeta :: R.R 'R.Yaml -> ModelT f -> Maybe Aeson.Value
-getYamlMeta r model =
-  fmap (^. sdataValue) . Ix.getOne . Ix.getEQ r $ model ^. modelSData
+getYamlMeta r model = do
+  s <- Ix.getOne . Ix.getEQ r $ model ^. modelSData
+  rightToMaybe (s ^. sdataValue)
