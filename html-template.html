@@ -14,8 +14,12 @@
   <meta charset='UTF-8' />
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <script>
-    // Apply theme before first paint to avoid FOUC.
+    // Apply theme before first paint to avoid FOUC. Must run synchronously
+    // here (no module loader, no defer) — that's why this is the one
+    // theme-related script that doesn't live in _emanote-static/js/.
     // Priority: explicit user choice (localStorage) > OS preference.
+    // The 'emanote-theme' key is mirrored by STORAGE_KEY in
+    // _emanote-static/js/theme-toggle.js — keep both in sync.
     (function () {
       var stored = null;
       try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
@@ -60,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=b8b38c17-b08d-4a28-bef7-16aca11aaded' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=da6bbdb4-3b48-4553-a302-6eb58b4bdc50' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -350,63 +354,8 @@
   }
 </style>
 
-<script>
-  // Theme toggle: persist choice in localStorage; the early-load script in
-  // base.tpl applies it before first paint so there's no FOUC on reload.
-  (function () {
-    window.emanote = window.emanote || {};
-    window.emanote.theme = {
-      toggle: function () {
-        var root = document.documentElement;
-        var isDark = root.classList.toggle('dark');
-        root.style.colorScheme = isDark ? 'dark' : 'light';
-        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
-        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
-        if (document.querySelector('.mermaid')) window.location.reload();
-      }
-    };
-  })();
-</script>
-
-<script>
-  // Add copy buttons to code blocks
-  document.addEventListener('DOMContentLoaded', function() {
-    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
-    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-
-    document.querySelectorAll('pre code').forEach(function(codeBlock) {
-      const pre = codeBlock.parentElement;
-
-      // Create copy button
-      const button = document.createElement('button');
-      button.className = 'code-copy-button';
-      button.innerHTML = copyIcon;
-      button.setAttribute('aria-label', 'Copy code to clipboard');
-      button.setAttribute('title', 'Copy code');
-
-      button.addEventListener('click', function() {
-        const text = codeBlock.textContent;
-        navigator.clipboard.writeText(text).then(function() {
-          button.innerHTML = checkIcon;
-          button.setAttribute('title', 'Copied!');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        }).catch(function(err) {
-          console.error('Copy failed:', err);
-          button.setAttribute('title', 'Copy failed');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        });
-      });
-
-      pre.appendChild(button);
-    });
-  });
-</script>
+<!-- Theme toggle and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
 
 <style data-category='external-link'>
   /* External/mail link glyphs — drawn with mask-image so they inherit the
@@ -441,225 +390,12 @@
     --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
-  <!-- Footnote popup. Footnote refs have no anchor href and no bottom list
-     renders on screen (the hidden <aside data-footnote-list> is the clone
-     source for this script, and also the print-mode rendering). Bound to
-     data-footnote-ref / data-footnote-id / data-footnote-list /
-     data-footnote-scope.
-
-     Popover chrome is styled via Tailwind utility classes applied from
-     the script below onto the JS-created <div>; the one CSS escape
-     hatch here is the Popover ::backdrop pseudo-element, which has no
-     Tailwind variant. --><style data-category='footnote-popup'>
+  <!-- Footnote popup CSS escape hatch. The behavior itself lives in
+     _emanote-static/js/footnote-popup.js (see issue #643); the Popover
+     ::backdrop pseudo-element is the one bit that has no Tailwind
+     variant, so it stays inline here next to the markup contract. --><style data-category='footnote-popup'>
   #emanote-footnote-popover::backdrop { background: transparent; }
 </style>
-
-<script>
-  (function () {
-    'use strict';
-
-    if (typeof HTMLElement === 'undefined' ||
-        !HTMLElement.prototype.hasOwnProperty('popover')) {
-      // No Popover API — footnote refs stay inert, no popup.
-      return;
-    }
-
-    // Keep these in sync with the max-sm: variants below (Tailwind's sm
-    // breakpoint is 640px). Parsed as a MediaQueryList once and reused.
-    var mobileMQL = window.matchMedia('(max-width: 640px)');
-
-    var POPOVER_CLASS = [
-      'fixed z-[9999] m-0 p-0 border-0 bg-transparent',
-      'w-max max-w-[min(32rem,calc(100vw-2rem))]',
-      'text-[0.95rem] leading-relaxed',
-      // Mobile: pin to viewport edge as a full-width bottom sheet.
-      'max-sm:top-auto max-sm:left-0 max-sm:right-0 max-sm:bottom-0',
-      'max-sm:w-full max-sm:max-w-full',
-    ].join(' ');
-
-    var BODY_CLASS = [
-      'relative bg-white dark:bg-gray-900',
-      'text-gray-800 dark:text-gray-200',
-      'px-[1.125rem] py-[0.875rem]',
-      'rounded-lg border border-gray-200 dark:border-gray-700',
-      'shadow-xl',
-      // Cloned pandoc content inherits styling from the surrounding page
-      // (paragraphs, stray <li> left from the <ol> the <li> came from).
-      '[&>:last-child]:mb-0 [&_p]:mb-2',
-      '[&>li]:list-none [&>li]:pl-0 [&>li]:ml-0',
-      // Mobile bottom-sheet shape.
-      'max-sm:rounded-t-2xl max-sm:rounded-b-none',
-      'max-sm:px-5 max-sm:pt-4 max-sm:pb-6',
-      'max-sm:max-h-[60vh] max-sm:overflow-y-auto',
-      'max-sm:shadow-2xl',
-    ].join(' ');
-
-    var popoverEl = null;
-    var currentRef = null;
-    var topLevelAside = null;
-
-    function ensurePopover() {
-      // Emanote's live-server patches the DOM on source changes, which can
-      // detach a previously appended popover. Recreate when that happens.
-      if (popoverEl && popoverEl.isConnected) return popoverEl;
-      popoverEl = document.createElement('div');
-      popoverEl.id = 'emanote-footnote-popover';
-      popoverEl.setAttribute('popover', 'auto');
-      popoverEl.className = POPOVER_CLASS;
-      var body = document.createElement('div');
-      body.className = BODY_CLASS;
-      popoverEl.appendChild(body);
-      document.body.appendChild(popoverEl);
-      popoverEl.addEventListener('toggle', function (e) {
-        if (e.newState === 'closed' && currentRef) {
-          currentRef.classList.remove('emanote-footnote-active');
-          currentRef = null;
-        }
-      });
-      return popoverEl;
-    }
-
-    function findOwnAside(scope) {
-      // The aside "owned" by a scope is the one whose nearest
-      // data-footnote-scope ancestor is the scope itself — not a nested
-      // one. When scope is null, the root is the document and owned
-      // asides are those with no scope ancestor at all.
-      var root = scope || document;
-      var asides = root.querySelectorAll('aside[data-footnote-list]');
-      for (var i = 0; i < asides.length; i++) {
-        if (asides[i].closest('[data-footnote-scope]') === scope) return asides[i];
-      }
-      return null;
-    }
-
-    function findTarget(ref) {
-      var idx = ref.getAttribute('data-footnote-ref');
-      if (!idx) return null;
-      var scope = ref.closest('[data-footnote-scope]');
-      var aside;
-      if (scope === null) {
-        // Re-resolve if the cached aside got swapped out by a live-reload patch.
-        if (!topLevelAside || !topLevelAside.isConnected) {
-          topLevelAside = findOwnAside(null);
-        }
-        aside = topLevelAside;
-      } else {
-        aside = findOwnAside(scope);
-      }
-      return aside
-        ? aside.querySelector('li[data-footnote-id="' + CSS.escape(idx) + '"]')
-        : null;
-    }
-
-    function positionPopover(popover, ref) {
-      if (mobileMQL.matches) {
-        // Bottom-sheet layout comes from max-sm: utilities on POPOVER_CLASS;
-        // just clear any inline top/left left over from a prior desktop open.
-        popover.style.top = '';
-        popover.style.left = '';
-        return;
-      }
-      var refRect = ref.getBoundingClientRect();
-      var popRect = popover.getBoundingClientRect();
-      var vw = window.innerWidth;
-      var margin = 12;
-
-      var left = refRect.left + refRect.width / 2 - popRect.width / 2;
-      if (left < margin) left = margin;
-      if (left + popRect.width > vw - margin) left = vw - popRect.width - margin;
-
-      var spaceAbove = refRect.top;
-      var top;
-      if (spaceAbove > popRect.height + margin) {
-        top = refRect.top - popRect.height - 8;
-      } else {
-        top = refRect.bottom + 8;
-      }
-      if (top < margin) top = margin;
-
-      popover.style.top = top + 'px';
-      popover.style.left = left + 'px';
-    }
-
-    function openFor(ref, target) {
-      var popover = ensurePopover();
-      var body = popover.firstElementChild;
-      body.textContent = '';
-      body.appendChild(target.cloneNode(true));
-      // hidePopover throws InvalidStateError if the popover is already
-      // closed. That's the expected case on first open; the throw carries
-      // no signal we'd act on, so swallow it.
-      try { popover.hidePopover(); } catch (_) {}
-      try {
-        popover.showPopover();
-      } catch (err) {
-        // Silent return would mean the click appeared to do nothing.
-        console.warn('[emanote] footnote popover showPopover failed', err);
-        return;
-      }
-      // Only dirty the active-state after show succeeds — otherwise a
-      // failed show leaves a stale highlight on the ref until next click.
-      if (currentRef && currentRef !== ref) {
-        currentRef.classList.remove('emanote-footnote-active');
-      }
-      currentRef = ref;
-      ref.classList.add('emanote-footnote-active');
-      // Defer to next frame so popover width reflects the content just
-      // inserted — measuring immediately after showPopover() can center
-      // on the previous frame's width.
-      requestAnimationFrame(function () { positionPopover(popover, ref); });
-    }
-
-    function activate(e, sup) {
-      var target = findTarget(sup);
-      if (!target) return;
-      e.preventDefault();
-      openFor(sup, target);
-    }
-
-    function onClick(e) {
-      if (e.defaultPrevented) return;
-      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-      var sup = e.target.closest('sup[data-footnote-ref]');
-      if (sup) activate(e, sup);
-    }
-
-    function onKeydown(e) {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      var sup = e.target.closest('sup[data-footnote-ref]');
-      if (sup) activate(e, sup);
-    }
-
-    // Scroll fires at ≥ 60 Hz; coalesce repositions into the browser's
-    // next animation frame so we do one layout read per frame, not per
-    // scroll tick.
-    var viewportTick = false;
-    function onViewportChange() {
-      if (viewportTick) return;
-      if (!popoverEl || !popoverEl.matches(':popover-open') || !currentRef) return;
-      viewportTick = true;
-      requestAnimationFrame(function () {
-        viewportTick = false;
-        if (popoverEl && popoverEl.matches(':popover-open') && currentRef) {
-          positionPopover(popoverEl, currentRef);
-        }
-      });
-    }
-
-    function init() {
-      document.addEventListener('click', onClick);
-      document.addEventListener('keydown', onKeydown);
-      window.addEventListener('resize', onViewportChange);
-      window.addEventListener('scroll', onViewportChange, { passive: true });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  })();
-</script>
 
   <!-- What goes in this file will appear on near the end of <head>-->
 
@@ -768,6 +504,13 @@
     </script>
   
 
+  <!-- Site-authored interactive behaviors (issue #643). The splice emits
+       an importmap (so live-server's per-file ?t=<mtime> propagates
+       through ES module imports) plus the main entry as a deferred
+       module. The FOUC theme applier above and the Stork controller
+       above stay inline for their own reasons (pre-paint requirement;
+       vendor coupling). -->
+  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
 </head>
 
 <!-- DoNotFormat -->
@@ -2305,59 +2048,7 @@
         </ul>
       
   </div>
-  <script>
-    // Highlight the TOC link for the section currently in view.
-    // Uses Intersection Observer (passive, no scroll-loop layout thrashing);
-    // replaces the old window.onscroll approach from issue #520.
-    (function () {
-      const tocLinks = document.querySelectorAll("a.--ema-toc");
-      if (tocLinks.length === 0) return;
-
-      const anchors = {};
-      document.querySelectorAll("a.--ema-anchor").forEach((a) => {
-        anchors[a.href] = a;
-      });
-
-      const observed = [];
-      const visibility = new Map();
-      tocLinks.forEach((link) => {
-        const anchor = anchors[link.href];
-        if (!anchor) return;
-        const section = anchor.closest("h1, h2, h3, h4, h5, h6") || anchor;
-        observed.push({ section, link });
-        visibility.set(section, false);
-      });
-
-      const mark = "toc-item-active";
-      const setActive = (activeLink) => {
-        tocLinks.forEach((l) => l.classList.remove(mark));
-        if (activeLink) activeLink.classList.add(mark);
-      };
-
-      const pickActive = () => {
-        let firstVisible = null;
-        let lastAbove = null;
-        for (const { section, link } of observed) {
-          if (visibility.get(section)) {
-            if (!firstVisible) firstVisible = link;
-          } else if (section.getBoundingClientRect().top < 0) {
-            lastAbove = link;
-          }
-        }
-        setActive(firstVisible || lastAbove || observed[0]?.link);
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          visibility.set(entry.target, entry.isIntersecting);
-        }
-        pickActive();
-      }, { rootMargin: "-80px 0px -60% 0px", threshold: 0 });
-
-      for (const { section } of observed) observer.observe(section);
-      pickActive();
-    })();
-  </script>
+  <!-- Scroll-spy behavior moved to _emanote-static/js/toc-spy.js — see issue #643. -->
 </nav>
 
         </div>
