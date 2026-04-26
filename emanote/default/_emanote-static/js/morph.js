@@ -22,6 +22,15 @@ export function ready(fn) {
   }
 }
 
+// Subscribe to Ema's post-morph hook. Behaviors that capture DOM refs
+// at setup time (e.g. toc-spy's IntersectionObserver) need to tear down
+// + re-init when Ema swaps in a new page via idiomorph. Wrapping the
+// raw event name here keeps it a one-place internal detail of morph.js;
+// behavior code shouldn't need to know which Ema event drives this.
+export function onMorph(fn) {
+  window.addEventListener('EMAHotReload', fn);
+}
+
 export function onElement(selector, fn) {
   // Each registration gets its own opaque dataset key. Earlier this was
   // derived from the selector by character-substitution, but that risks

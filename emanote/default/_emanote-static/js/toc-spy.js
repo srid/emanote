@@ -6,10 +6,10 @@
 // per-page setup captures DOM refs in a closure (the IO observes
 // specific heading elements), so when Ema swaps in a new page via
 // idiomorph the old observer holds dead references and the new TOC
-// links go un-observed. We listen for `EMAHotReload` (fires after
-// morph + script reload) and tear down + re-init each time.
+// links go un-observed. morph.onMorph subscribes to the post-morph
+// hook so we can tear down + re-init each time.
 
-import { ready } from '@emanote/morph';
+import { ready, onMorph } from '@emanote/morph';
 
 let teardown = null;
 
@@ -95,4 +95,4 @@ function reset() {
 }
 
 ready(reset);
-window.addEventListener('EMAHotReload', reset);
+onMorph(reset);
