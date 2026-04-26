@@ -1,12 +1,21 @@
 // Highlight the TOC link for the section currently in view.
 // Uses IntersectionObserver (passive, no scroll-loop layout thrashing);
 // replaces the old window.onscroll approach from issue #520.
+//
+// Survives Ema's morph-based in-app navigation (issue #667). The
+// per-page setup captures DOM refs in a closure (the IO observes
+// specific heading elements), so when Ema swaps in a new page via
+// idiomorph the old observer holds dead references and the new TOC
+// links go un-observed. We listen for `EMAHotReload` (fires after
+// morph + script reload) and tear down + re-init each time.
 
 import { ready } from '@emanote/morph';
 
-ready(() => {
+let teardown = null;
+
+function setup() {
   const tocLinks = document.querySelectorAll('a.--ema-toc');
-  if (tocLinks.length === 0) return;
+  if (tocLinks.length === 0) return null;
 
   const anchors = {};
   document.querySelectorAll('a.--ema-anchor').forEach((a) => {
@@ -64,16 +73,26 @@ ready(() => {
   // scroll. rAF-coalesce so we do at most one pass per frame even
   // under fast wheel/trackpad input.
   let scrollTick = false;
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (scrollTick) return;
-      scrollTick = true;
-      requestAnimationFrame(() => {
-        scrollTick = false;
-        pickActive();
-      });
-    },
-    { passive: true },
-  );
-});
+  const onScroll = () => {
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => {
+      scrollTick = false;
+      pickActive();
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener('scroll', onScroll);
+  };
+}
+
+function reset() {
+  if (teardown) teardown();
+  teardown = setup();
+}
+
+ready(reset);
+window.addEventListener('EMAHotReload', reset);
