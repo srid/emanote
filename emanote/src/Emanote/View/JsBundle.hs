@@ -1,0 +1,88 @@
+{- | Site-authored interactive-JS bundling surface.
+
+Owns how the @\<script type=\"module\"\>@ entry and its companion
+@\<script type=\"importmap\"\>@ get rendered into the page \<head\>.
+Adding a new behavior is a one-line addition to 'emanoteJsModuleNames';
+see issue #643 for the design rationale.
+
+The whole reason this module exists separately from a bare
+@<script src=...>@ in @base.tpl@ is live-server cache invalidation:
+'SR.siteRouteUrl' appends @?t=\<mtime\>@ to static-file URLs in live
+mode, but ES module imports of @./morph.js@ resolve to a queryless
+URL per the HTML spec — so the @?t=@ on @main.js@ wouldn't propagate
+to its transitive imports. The importmap turns each module's bare
+specifier into a versioned URL, so editing any single module
+invalidates exactly that file's cache key.
+-}
+module Emanote.View.JsBundle (
+  emanoteJsBundle,
+) where
+
+import Data.Aeson qualified as Aeson
+import Data.Aeson.Key qualified as AesonKey
+import Data.Text qualified as T
+import Emanote.Model.Type (Model)
+import Emanote.Model.Type qualified as M
+import Emanote.Route.SiteRoute.Class qualified as SR
+import Relude
+import System.FilePath ((</>))
+import Text.Blaze.Html ((!))
+import Text.Blaze.Html5 qualified as H
+import Text.Blaze.Html5.Attributes qualified as A
+
+{- | Bare names (without @.js@ extension) of every behavior module under
+@_emanote-static\/js\/@ that's loaded via the importmap. The cabal
+@data-files@ glob is the source-of-truth deployment manifest, but the
+importmap has to enumerate names so we can compose bare specifiers.
+'main' is loaded as the entry script, not via the importmap, so it
+doesn't appear here.
+-}
+emanoteJsModuleNames :: [Text]
+emanoteJsModuleNames =
+  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup"]
+
+{- | Render the importmap + module entry script tags. Drop into the page
+\<head\> via a Heist splice; safe to call multiple times per render
+(each call is pure, only reads from the model).
+-}
+emanoteJsBundle :: Model -> H.Html
+emanoteJsBundle model = do
+  H.script ! A.type_ "importmap" $ H.toHtml (importMap model)
+  H.script
+    ! A.type_ "module"
+    ! A.src (H.toValue (jsUrl model "main"))
+    $ mempty
+
+importMap :: Model -> Text
+importMap model =
+  decodeUtf8 . Aeson.encode $
+    Aeson.object
+      [ "imports"
+          Aeson..= Aeson.object
+            [ AesonKey.fromText ("@emanote/" <> name) Aeson..= importmapUrl model name
+            | name <- emanoteJsModuleNames
+            ]
+      ]
+
+{- | Importmap URL targets must start with @\/@, @.\/@, or @..\/@ per the
+HTML spec — bare relative paths (which 'SR.siteRouteUrl' emits, since
+they resolve through @\<base\>@) get silently ignored by the
+importmap parser, leaving the bare specifier unresolvable. Prefix
+with @.\/@ when needed; the @\<base\>@ resolution still happens
+afterwards.
+-}
+importmapUrl :: Model -> Text -> Text
+importmapUrl model name =
+  let u = jsUrl model name
+   in if "/" `T.isPrefixOf` u
+        || "./" `T.isPrefixOf` u
+        || "../" `T.isPrefixOf` u
+        then u
+        else "./" <> u
+
+jsUrl :: Model -> Text -> Text
+jsUrl model name =
+  SR.siteRouteUrl model $
+    SR.staticFileSiteRoute $
+      fromMaybe (error $ "no _emanote-static/js/" <> name <> ".js?") $
+        M.modelLookupStaticFile ("_emanote-static" </> "js" </> toString name <> ".js") model
