@@ -86,7 +86,7 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
-      # The two modes are intentionally serialized and share identical
+      # The three modes are intentionally serialized and share identical
       # setup (Nix install, artifact import, node, playwright). If they
       # ever need to diverge — different timeout, different env, a
       # service container — restore the matrix or split into separate
@@ -100,6 +100,11 @@ jobs:
         working-directory: tests
         env:
           EMANOTE_MODE: static
+        run: npm test
+      - name: E2E (morph)
+        working-directory: tests
+        env:
+          EMANOTE_MODE: morph
         run: npm test
 
   website:

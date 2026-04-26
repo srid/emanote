@@ -1,17 +1,20 @@
 # /do config
 
 ## Check command
-cabal build all
+`cabal build all`
 
 ## Format command
-just fmt
+`just fmt`
 
 ## Test command
 - `just test` — Haskell unit tests
-- `just e2e-live` / `just e2e-static` — cucumber+Playwright e2e (live and static modes)
+- `just e2e-live` / `just e2e-static` / `just e2e-morph` — cucumber+Playwright e2e (live, static, and morph modes)
 
 ## CI command
-vira ci
+- `vira ci`
+- All e2e tests (`just e2e-??`)
+
+Ignore Github Actions (slow) unless user asks for it.
 
 ## Documentation
 Keep `README.md`, `docs/` (user documentation), and `CHANGELOG.md` (under the `Unreleased` section) in sync with user-facing changes.
