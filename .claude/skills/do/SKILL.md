@@ -62,10 +62,10 @@ Each step is bookended by two calls to the `scripts/do-results` script (in this 
 
 ## Progress tracking
 
-Drive Claude Code's native todo UI via the `TaskCreate` tool so the user sees a live checklist of the workflow. At the start of **sync** (or the chosen `--from` entry point), seed a task list with all 14 step names in order:
+Drive Claude Code's native todo UI via the `TaskCreate` tool so the user sees a live checklist of the workflow. At the start of **sync** (or the chosen `--from` entry point), seed a task list with all 15 step names in order:
 
 ```
-sync, research, branch, implement, check, docs, fmt, commit, hickey+lowy, police, test, create-pr, ci, done
+sync, research, branch, implement, check, docs, fmt, commit, hickey+lowy, police, test, create-pr, ci, evidence, done
 ```
 
 At each step boundary, update task state **alongside** the `scripts/do-results` script call — they are not redundant. The JSON file is machine state for the stop hook; the task list is the human-facing UI. Miss either and the workflow is inconsistent.
@@ -74,7 +74,7 @@ Rules:
 
 - **Flip to `in_progress` when a step starts, `completed` when it verifies.** One step `in_progress` at a time.
 - **Retries stay `in_progress`.** If `check`, `test`, or `ci` loop through their retry budget, do **not** bounce the task state back to `pending` or flicker it — leave it `in_progress` until the step finally verifies (or the retries exhaust and the workflow fails).
-- **`--from <step>` entry points**: still seed all 14 steps. Mark steps earlier than the entry point as `completed` immediately after seeding, so the checklist shows a consistent 14-item view regardless of entry point.
+- **`--from <step>` entry points**: still seed all 15 steps. Mark steps earlier than the entry point as `completed` immediately after seeding, so the checklist shows a consistent 15-item view regardless of entry point.
 - **Skipped steps** (e.g. `branch`/`commit`/`create-pr` under `--no-git`, or PR steps on non-GitHub forges) go straight to `completed`. Record the skip with a back-to-back `scripts/do-results step-start <name>` / `scripts/do-results step-end skipped ... "<reason>"`; the task list just shows the step as done.
 - **Failure**: if retries exhaust and the workflow halts, leave the failing step `in_progress`, mark `done` `completed` after the failure summary is written, and run `scripts/do-results set status failed`.
 
@@ -112,13 +112,12 @@ Research the task thoroughly before writing code.
 
 - If given a GitHub issue URL **and** `forge == github`, fetch with `gh issue view`. On non-GitHub forges, treat any issue-like URL as opaque context — use the prompt text as-is and do not attempt to fetch. (Bitbucket issue/Jira fetching is tracked in #10.)
 - **Never assume** how something works. Read the code. Check the config.
-- If the prompt involves external tools/libraries, use WebSearch/WebFetch.
+- If the prompt involves external tools/libraries, prefer `git clone` to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read the source on disk with `Read`/`Grep`/`Glob`. Fall back to `WebSearch`/`WebFetch` only when the source genuinely isn't a clonable repo (vendor docs, blog posts, RFCs).
 
 **Delegation rule — keep the main context lean.** Before your third `Read` in this step, stop and delegate the rest via `Agent(subagent_type=Explore)`. Main-context reads are reserved for:
 
   (a) specific files the user named in the prompt,
-  (b) `.apm/instructions/**` and files referenced from them,
-  (c) verifying a specific file:line an Explore subagent cited — and only with `offset`/`limit`, never full-file.
+  (b) verifying a specific file:line an Explore subagent cited — and only with `offset`/`limit`, never full-file.
 
 Anything that smells like "map the codebase", "find all callers", "understand how X works across the repo" — delegate. The Explore subagent returns a file:line map; keep that map and reference it in later steps instead of re-reading. Use `Grep`/`Glob` before `Read`: if the question can be answered by searching, don't open the file.
 
@@ -162,7 +161,7 @@ Otherwise: implement the planned changes. Prefer simplicity. Do the boring obvio
 
 ### check
 
-Read the project's instructions to find the check command — a fast static-correctness gate (e.g. `tsc --noEmit`, `cargo check`, `cabal build`, `mypy`, `dune build @check`). Run it.
+Read `.agency/do.md` and look for a `## Check command` section — a fast static-correctness gate (e.g. `tsc --noEmit`, `cargo check`, `cabal build`, `mypy`, `dune build @check`). Run it.
 
 This is the cheapest gate in the pipeline, so it runs first — fail fast on broken code before any downstream step does work over it. If no check command is documented, skip this step with a note.
 
@@ -173,7 +172,7 @@ This is the cheapest gate in the pipeline, so it runs first — fail fast on bro
 
 ### docs
 
-Read the project's instructions to find which documentation files to keep in sync (e.g., README.md). Compare those files against changes in this PR.
+Read `.agency/do.md` and look for a `## Documentation` section listing which docs to keep in sync (e.g., README.md). Compare those files against changes in this PR.
 
 If no documentation files are documented, skip this step with a note.
 
@@ -184,7 +183,7 @@ If no documentation files are documented, skip this step with a note.
 
 ### fmt
 
-Read the project's instructions to find the format command (typically documented in a workflow instruction). Run it.
+Read `.agency/do.md` and look for a `## Format command` section. Run it.
 
 If no format command is documented, skip this step with a note.
 
@@ -288,7 +287,7 @@ For the elegance pass specifically: `/simplify` applies fixes in batches across 
 
 ### test
 
-Read the project's instructions to find the test command and strategy. Run only the tests relevant to the code paths changed in this PR.
+Read `.agency/do.md` and look for a `## Test command` section. Run only the tests relevant to the code paths changed in this PR.
 
 Use `git diff origin/HEAD...HEAD --name-only` to identify changed files and determine which tests are relevant.
 
@@ -350,15 +349,15 @@ Re-check the PR title/body against current scope. If scope changed, update via `
 
 ### ci
 
-Read the project's instructions to find the CI command and verification method. Run CI with `run_in_background: true` if the command takes more than a few seconds.
+Read `.agency/do.md` and look for a `## CI command` section, plus any verification method documented there. Run CI with `run_in_background: true` if the command takes more than a few seconds.
 
 **Never pipe CI to `tail`/`head`**, and **never append `2>&1`** — background mode captures both streams.
 
 **Active state**: Before waiting for background CI, run `scripts/do-results set active waiting`. When CI returns (success or failure), run `scripts/do-results set active working` before proceeding. This lets the stop hook allow graceful exits while the agent is idle.
 
-CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) and are forge-independent — **run them regardless of forge**. Only the *verification method* may be forge-specific: if the project's instructions describe verification via `gh` commit-status checks and `forge != github`, fall back to exit code + command output for verification on non-GitHub forges, and note this in the step record. (Bitbucket `bkt pr checks` wiring is tracked in #10.)
+CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) and are forge-independent — **run them regardless of forge**. Only the *verification method* may be forge-specific: if `.agency/do.md` describes verification via `gh` commit-status checks and `forge != github`, fall back to exit code + command output for verification on non-GitHub forges, and note this in the step record. (Bitbucket `bkt pr checks` wiring is tracked in #10.)
 
-**Verify**: Use the verification method described in the project's instructions (e.g., checking commit statuses on GitHub, reading CI output elsewhere). If no CI command is documented, skip with a note. **The CI result must cover `HEAD`.** Before recording the step as passed, compare the commit SHA that CI ran against with `git rev-parse HEAD`. If they differ (e.g., a commit was pushed after CI started — whether from a fix retry, user-requested changes, or any other source), re-run CI against the current HEAD. CI passing on a stale commit does not satisfy verification.
+**Verify**: Use the verification method described in `.agency/do.md` (e.g., checking commit statuses on GitHub, reading CI output elsewhere). If no CI command is documented, skip with a note. **The CI result must cover `HEAD`.** Before recording the step as passed, compare the commit SHA that CI ran against with `git rev-parse HEAD`. If they differ (e.g., a commit was pushed after CI started — whether from a fix retry, user-requested changes, or any other source), re-run CI against the current HEAD. CI passing on a stale commit does not satisfy verification.
 
 **On failure** — read logs or output to diagnose.
 
@@ -370,14 +369,52 @@ CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) a
 
 ---
 
+### evidence
+
+**Opt-in step.** Most projects skip this. The step exists so projects with empirical "did the feature actually work" needs — UI screenshots, performance benchmarks, demo recordings, output transcripts — can attach that evidence to the PR without baking the mechanism into agency.
+
+**If `--no-git`**: Skip with status `skipped` and reason `"--no-git"`. There is no PR to attach evidence to.
+
+**If `forge != github`**: Skip with status `skipped` and reason `"non-<forge> forge: <forge>"`. (Bitbucket comment wiring is tracked in #10.)
+
+**Otherwise**: Read `.agency/do.md` and look for a `## PR evidence` section. If `.agency/do.md` is missing, or the section is missing or empty, skip with status `skipped` and reason `"no PR evidence section in .agency/do.md"` — the default for projects that haven't opted in.
+
+**If the section is present**:
+
+The section is project-specific and free-form: it can be inline prose describing the capture procedure, a pointer to another file (`See ./scripts/capture-evidence.md`), a script reference (`Run ./scripts/capture-pr-evidence.sh and use its stdout`), or any combination. Don't second-guess the form — read it, then **spawn a sub-agent** (`Agent(subagent_type: "general-purpose", ...)`) so the capture work (MCP calls, screenshot uploads, gh API requests) doesn't pollute `/do`'s main context.
+
+The sub-agent prompt should include:
+
+- The literal section content from `.agency/do.md`.
+- Standard PR context: PR URL, branch name, base branch, current commit SHA, and `git diff origin/HEAD...HEAD --name-only` so the sub-agent knows which routes/files to exercise.
+- An explicit instruction that the sub-agent's job is to return a single block of markdown (image links embedded, table data inline, etc.) suitable for posting under a `## Evidence` heading. The sub-agent should not post the comment itself — only return the markdown.
+
+After the sub-agent returns, post its output as one PR comment using `gh pr comment` under a `## Evidence` heading. Use the **single-quoted heredoc** pattern (see `forge-pr` → "Passing the body to `gh` safely") so backticks and `$` survive unescaped:
+
+```sh
+gh pr comment --body "$(cat <<'EOF'
+## Evidence
+
+<markdown returned by the sub-agent>
+EOF
+)"
+```
+
+Embed image/asset URLs inline in the markdown — `gh pr comment` itself cannot attach files; the workflow section is responsible for telling the sub-agent how to host any binary artifacts so they end up referenceable.
+
+**Verify**: Either the step was skipped per the rules above, or a `## Evidence` PR comment exists (`gh pr view --comments` or equivalent) populated from the sub-agent's output.
+
+---
+
 ### done
 
 Present a summary of all steps with their verification status. If any step has a non-success status, retry it (max 3 attempts from done). If still failing after retries, set `status: "failed"`.
 
-`"completed"` requires **all steps `passed`**, with two exceptions that count toward completion:
+`"completed"` requires **all steps `passed`**, with three exceptions that count toward completion:
 
 1. A step `skipped` with `reason` beginning `"non-<forge> forge:"` (detected forge isn't GitHub).
 2. A step `skipped` with `reason` `"--no-git"` (user opted out of git operations).
+3. A step `skipped` with `reason` `"no PR evidence section in .agency/do.md"` (project hasn't opted into the evidence step — this is the default).
 
 A `failed` step always blocks `"completed"`. No redefining "passed," no footnote caveats. Update via `scripts/do-results set status completed` or `scripts/do-results set status failed` accordingly.
 
@@ -446,7 +483,7 @@ COMMENT
 
 ## Rules
 
-- **Never skip steps** (unless skipped by `--no-git` or forge detection). Run them in order from entry point to **done**.
+- **Never skip steps** (unless skipped by `--no-git`, forge detection, or — for **evidence** — the project hasn't filled in a `## PR evidence` section in `.agency/do.md`). Run them in order from entry point to **done**.
 - **Every commit is NEW.** Never amend, rebase, or force-push.
 - **Feature branches only.** Never commit to master/main. (Under `--no-git`, no commits happen at all, so this rule is moot — the agent leaves the user on whatever branch they started on.)
 - **Background for CI.** Run CI with `run_in_background: true`.

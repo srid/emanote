@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-04-26T00:26:07.555233+00:00'
-apm_version: 0.9.2
+generated_at: '2026-04-26T21:58:56.533754+00:00'
+apm_version: 0.9.3
 dependencies:
 - repo_url: anthropics/skills
   host: github.com
@@ -22,7 +22,7 @@ dependencies:
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: 96994aff26b010935f03835caba19d0d0491e243
+  resolved_commit: f71ce4a8fec9a6dc63f61b2c40f4129fa57378b1
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -45,9 +45,6 @@ dependencies:
     .claude/agents/lowy.md: sha256:a1c8e5ba115439bcfa0d7e331f96e71b2d690ff2e5fb9b824bb5f588eb43ac75
     .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
     .claude/rules/apm-sources.md: sha256:65640c481c347cc4edf50603f784d0b448b6395acc43419a4f8ad0c53de2db4b
-  content_hash: sha256:2d57a89ae458bef1584dc34bf25d95dfad68910e825b41dd27c2cf457a8b650a
+  content_hash: sha256:d399274863e9a31c241a705aebc838af8421b4ca525e7fb499f6d32825e5438e
 local_deployed_files:
-- .claude/rules/workflow.md
 - .claude/skills/dpella-mcp
-local_deployed_file_hashes:
-  .claude/rules/workflow.md: sha256:3e42667698cfa83f0a19944fd3355c1b7627f3cd4dce566ecc07d89d4ad23ac0
