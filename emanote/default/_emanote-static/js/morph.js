@@ -10,9 +10,9 @@
 // Behaviors that do their own lazy resolution (event delegation +
 // isConnected checks, like footnote-popup.js) only need `ready`.
 
-const SENTINEL = 'emanoteWired';
 const registry = [];
 let observerStarted = false;
+let nextSentinel = 0;
 
 export function ready(fn) {
   if (document.readyState === 'loading') {
@@ -23,7 +23,14 @@ export function ready(fn) {
 }
 
 export function onElement(selector, fn) {
-  const tag = sentinelKey(selector);
+  // Each registration gets its own opaque dataset key. Earlier this was
+  // derived from the selector by character-substitution, but that risks
+  // collisions on similarly-shaped selectors (e.g. 'sup[data-foo]' and
+  // 'sup[data_foo]' hashed to the same string), which would silently
+  // skip the second registration. The counter is bounded by the number
+  // of behavior registrations (single digits), and the sentinel is
+  // purely an idempotence guard — its identity carries no meaning.
+  const tag = 'emanoteWired_' + nextSentinel++;
   registry.push({ selector, tag, fn });
   ready(() => {
     scan(document, selector, tag, fn);
@@ -59,10 +66,4 @@ function startObserver() {
     }
   });
   mo.observe(document.body, { childList: true, subtree: true });
-}
-
-// Each behavior gets its own dataset key so two registrations on the same
-// element (different selectors / different fns) don't collide.
-function sentinelKey(selector) {
-  return SENTINEL + '_' + selector.replace(/[^a-zA-Z0-9]/g, '_');
 }
