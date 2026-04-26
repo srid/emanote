@@ -538,3 +538,57 @@ Then(
     }
   },
 );
+
+// Stork search modal. The container starts with `hidden` on the
+// class list (set in components/stork/stork-search.tpl); toggleSearch
+// in stork.js flips it. Asserting the class membership is more
+// reliable than computed visibility because the container is
+// position:fixed with a backdrop — getComputedStyle sees `display:
+// block` either way; only the .hidden class hides it.
+const STORK_CONTAINER_SEL = "#stork-search-container";
+
+Then(
+  "the Stork search modal is {string}",
+  async function (this: EmanoteWorld, state: string) {
+    const container = this.page.locator(STORK_CONTAINER_SEL);
+    await container.waitFor({ state: "attached", timeout: 5_000 });
+    // Module load is defer + dynamic-import async; give the click
+    // handler a couple frames to land before reading state.
+    try {
+      await this.page.waitForFunction(
+        ({ sel, want }) => {
+          const el = document.querySelector(sel);
+          if (!el) return false;
+          const hidden = el.classList.contains("hidden");
+          return want === "hidden" ? hidden : !hidden;
+        },
+        { sel: STORK_CONTAINER_SEL, want: state },
+        { timeout: 3_000 },
+      );
+    } catch {
+      const actual = await container.evaluate((el) =>
+        el.classList.contains("hidden") ? "hidden" : "visible",
+      );
+      throw new Error(
+        `Expected Stork modal to be ${JSON.stringify(state)}; was ${JSON.stringify(actual)}. Either stork.js didn't load (check importmap), the keyboard listener / data-emanote-stork-toggle delegation didn't fire, or toggleSearch didn't update the .hidden class on ${STORK_CONTAINER_SEL}.`,
+      );
+    }
+  },
+);
+
+When("I press {string}", async function (this: EmanoteWorld, key: string) {
+  await this.page.keyboard.press(key);
+});
+
+When(
+  "I click the Stork search trigger",
+  async function (this: EmanoteWorld) {
+    // Several buttons carry data-emanote-stork-toggle (sidebar,
+    // breadcrumbs, the modal backdrop). Click the first matching
+    // <button> — backdrop is a <div>, so the filter avoids it.
+    await this.page
+      .locator("button[data-emanote-stork-toggle]")
+      .first()
+      .click();
+  },
+);

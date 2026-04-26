@@ -23,7 +23,7 @@
 
       <div id="indexing-links" class="flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0">
         <button title="Search (Ctrl+K)" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
-          onclick="window.emanote.stork.toggleSearch()">
+          data-emanote-stork-toggle>
           <apply template="stork/stork-icon" />
         </button>
         <button title="Toggle dark mode" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
