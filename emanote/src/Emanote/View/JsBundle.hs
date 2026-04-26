@@ -9,23 +9,12 @@ issue #669 for consolidation work).
 
 == What's volatile vs. what's scaffolding
 
-The cache-busting protocol — currently @?t=\<mtime\>@ via 'SR.siteRouteUrl',
-plumbed through the importmap so it propagates across the ES module
-graph — is the only part of this module that's expected to evolve.
-A future move to content-hashed URLs (see @ema\/issues\/20@) or a
-service-worker-based invalidation strategy would replace 'jsUrl' /
-'importmapUrl' but leave the rest untouched.
-
-Everything else here is scaffolding pinned by stable specs:
-
-  * 'emanoteJsModuleNames' — changes only when behaviors are added
-    or removed. Same change rate as @main.js@'s import list.
-  * 'importMap' — encodes the W3C importmap JSON shape. HTML-spec
-    stable.
-  * 'emanoteJsBundle' — emits two @\<script\>@ tags. Trivial Blaze
-    HTML; not a volatility surface.
-
-Co-located here for locality; not because they share a change axis.
+Only the cache-busting protocol — 'jsUrl' / 'importmapUrl', currently
+@?t=\<mtime\>@ via 'SR.siteRouteUrl' — is expected to evolve. A future
+move to content-hashed URLs (see @ema/issues/20@) or service-worker
+invalidation lives there. Everything else (the manifest, the importmap
+JSON shape, the @\<script\>@ tags) is W3C-spec-stable scaffolding,
+co-located here for locality, not for shared change rate.
 
 == Why importmap rather than direct imports
 
