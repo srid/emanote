@@ -210,6 +210,23 @@ Before({ tags: "@morph" }, function () {
   if (mode !== "live") return "skipped" as const;
 });
 
+// Catch the inverse mistake: a scenario that uses 'navigate via Ema'
+// without the @morph tag would silently run in static mode (no WS,
+// window.ema undefined) and the step's polling loop would time out
+// after 60s with no early signal. Fail fast at scenario start with a
+// pointer to the right tag.
+Before(function (this: EmanoteWorld, scenario) {
+  const usesMorph = scenario.pickle.steps.some((s) =>
+    s.text.includes("navigate via Ema"),
+  );
+  const tagged = scenario.pickle.tags.some((t) => t.name === "@morph");
+  if (usesMorph && !tagged) {
+    throw new Error(
+      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged @morph. Add '@morph' above the Scenario keyword so it runs only in live mode (static mode has no WebSocket and window.ema is undefined).`,
+    );
+  }
+});
+
 After(async function (this: EmanoteWorld, scenario) {
   if (scenario.result?.status === Status.FAILED) {
     const dir = path.join(runRoot, "screenshots");
