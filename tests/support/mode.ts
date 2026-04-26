@@ -12,7 +12,7 @@
 
 export type Mode = "live" | "static" | "morph";
 
-function requireEnv(name: string): string {
+export function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`${name} must be set`);
   return v;

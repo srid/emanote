@@ -27,14 +27,8 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
-import { mode } from "./mode.ts";
+import { mode, requireEnv } from "./mode.ts";
 import { primeMorph } from "./navigation.ts";
-
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`${name} must be set`);
-  return v;
-}
 
 const emanoteBin = requireEnv("EMANOTE_BIN");
 
