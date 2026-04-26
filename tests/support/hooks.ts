@@ -249,32 +249,39 @@ Before(function (this: EmanoteWorld, scenario) {
 Before(async function (this: EmanoteWorld) {
   if (mode !== "morph") return;
   await this.page.goto("/", { waitUntil: "domcontentloaded" });
-  await this.page.evaluate(async () => {
+  await waitForEmaReady(this.page);
+});
+
+/** Wait for Ema's WS shim to be ready: poll until `window.ema.switchRoute`
+ *  exists, then await `window.ema.ready` (PR srid/ema#181) so the next
+ *  caller doesn't race the WS handshake. The shim's `init()` runs on
+ *  module load and is usually a no-op poll, but the loop is cheap
+ *  insurance against page-load timing. */
+async function waitForEmaReady(page: Page): Promise<void> {
+  await page.evaluate(async () => {
     while (!(window as any).ema?.switchRoute) {
       await new Promise((r) => setTimeout(r, 25));
     }
     await (window as any).ema.ready;
   });
-});
+}
 
-/** Drive an Ema-internal morph navigation: switch the route via
- *  `window.ema.switchRoute` and wait for `EMAHotReload` (fired by the
- *  shim after morph + script reload completes) so the next step sees
- *  the new DOM, not the in-flight one. Awaits `window.ema.ready` (PR
- *  srid/ema#181) to avoid racing the WS handshake. */
+/** Drive an Ema-internal morph navigation: wait for the WS shim, then
+ *  switch the route via `window.ema.switchRoute` and wait for
+ *  `EMAHotReload` (fired by the shim after morph + script reload
+ *  completes) so the next step sees the new DOM, not the in-flight one. */
 export async function morphNav(page: Page, url: string): Promise<void> {
-  await page.evaluate(async (p) => {
-    while (!(window as any).ema?.switchRoute) {
-      await new Promise((r) => setTimeout(r, 25));
-    }
-    await (window as any).ema.ready;
-    await new Promise<void>((resolve) => {
-      window.addEventListener("EMAHotReload", () => resolve(), {
-        once: true,
-      });
-      (window as any).ema.switchRoute(p);
-    });
-  }, url);
+  await waitForEmaReady(page);
+  await page.evaluate(
+    (p) =>
+      new Promise<void>((resolve) => {
+        window.addEventListener("EMAHotReload", () => resolve(), {
+          once: true,
+        });
+        (window as any).ema.switchRoute(p);
+      }),
+    url,
+  );
 }
 
 /** Open a route — the verb step definitions call. In `live` and
