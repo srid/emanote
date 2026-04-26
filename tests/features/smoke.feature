@@ -28,6 +28,7 @@ Feature: Smoke
     When I open "/footnotes.html"
     And I click the footnote ref with index "1" in the parent body
     Then the footnote popup contains "PARENT_FOOTNOTE_BODY"
+    And the footnote popup body has a non-transparent background
 
   Scenario: Clicking a footnote ref inside a callout resolves to that callout's footnote body
     When I open "/footnotes.html"

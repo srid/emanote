@@ -250,6 +250,33 @@ Then(
   },
 );
 
+// The popup body's Tailwind classes (bg-white, rounded-lg, shadow-xl,
+// etc.) are applied by JS at runtime — they never appear in any
+// generated HTML attribute, so the static-mode Tailwind CLI doesn't
+// see them and silently drops the corresponding rules. The visible
+// symptom is a popup with no background fill, no shadow, no rounding —
+// just a thin default border around plain text. Asserting on a
+// concrete computed style (the body's background-color) catches that
+// regression: the JS sets `bg-white dark:bg-gray-900`, which compiles
+// to a non-transparent rgb()/oklab() value. If Tailwind didn't pick up
+// the class, getComputedStyle returns rgba(0,0,0,0).
+Then(
+  "the footnote popup body has a non-transparent background",
+  async function (this: EmanoteWorld) {
+    const popover = this.page.locator(POPOVER_SEL);
+    const bg = await popover.evaluate((el) => {
+      const body = el.firstElementChild as HTMLElement | null;
+      if (!body) return null;
+      return getComputedStyle(body).backgroundColor;
+    });
+    assert.ok(bg, "Popover has no body element — script setup regressed.");
+    assert.ok(
+      bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent",
+      `Popover body background is ${JSON.stringify(bg)} — Tailwind dropped the popup classes (likely because the static-mode CSS compile didn't scan the JS module that applies them; see Tailwind.hs's @source for _emanote-static/js).`,
+    );
+  },
+);
+
 // Print-mode footnotes. The popup is screen-only; the hidden <aside
 // data-footnote-list> is revealed by `print:block` on paper so printed
 // copies still carry the cited bodies.
