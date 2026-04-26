@@ -97,14 +97,14 @@ Feature: Smoke
 
   Scenario: Ctrl+K opens the Stork search modal; Esc closes it
     When I open "/"
-    Then the Stork search modal is hidden
+    Then the Stork search modal is "hidden"
     When I press "Control+K"
-    Then the Stork search modal is visible
+    Then the Stork search modal is "visible"
     When I press "Escape"
-    Then the Stork search modal is hidden
+    Then the Stork search modal is "hidden"
 
   Scenario: Clicking a sidebar/breadcrumbs search button opens the Stork search modal
     When I open "/"
-    Then the Stork search modal is hidden
+    Then the Stork search modal is "hidden"
     When I click the Stork search trigger
-    Then the Stork search modal is visible
+    Then the Stork search modal is "visible"

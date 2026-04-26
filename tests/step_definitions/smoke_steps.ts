@@ -583,11 +583,14 @@ When("I press {string}", async function (this: EmanoteWorld, key: string) {
 When(
   "I click the Stork search trigger",
   async function (this: EmanoteWorld) {
-    // Several buttons carry data-emanote-stork-toggle (sidebar,
-    // breadcrumbs, the modal backdrop). Click the first matching
-    // <button> — backdrop is a <div>, so the filter avoids it.
+    // Several buttons carry data-emanote-stork-toggle (sidebar +
+    // breadcrumbs); the breadcrumbs button is mobile-only (md:hidden)
+    // and at the test viewport (1280×720, md+) only the sidebar
+    // button is visible. Filter to the visible one — `.first()` alone
+    // would pick the hidden breadcrumbs button by document order and
+    // time out trying to click an invisible target.
     await this.page
-      .locator("button[data-emanote-stork-toggle]")
+      .locator("button[data-emanote-stork-toggle]:visible")
       .first()
       .click();
   },
