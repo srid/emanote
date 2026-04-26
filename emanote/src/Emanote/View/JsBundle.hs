@@ -2,17 +2,40 @@
 
 Owns how the @\<script type=\"module\"\>@ entry and its companion
 @\<script type=\"importmap\"\>@ get rendered into the page \<head\>.
-Adding a new behavior is a one-line addition to 'emanoteJsModuleNames';
-see issue #643 for the design rationale.
+Adding a new behavior is a one-line addition to 'emanoteJsModuleNames'
+HERE, plus a matching @import '@@emanote\/\<name\>'@ line in
+@_emanote-static\/js\/main.js@ — the two lists must agree (see
+issue #669 for consolidation work).
 
-The whole reason this module exists separately from a bare
-@<script src=...>@ in @base.tpl@ is live-server cache invalidation:
+== What's volatile vs. what's scaffolding
+
+The cache-busting protocol — currently @?t=\<mtime\>@ via 'SR.siteRouteUrl',
+plumbed through the importmap so it propagates across the ES module
+graph — is the only part of this module that's expected to evolve.
+A future move to content-hashed URLs (see @ema\/issues\/20@) or a
+service-worker-based invalidation strategy would replace 'jsUrl' /
+'importmapUrl' but leave the rest untouched.
+
+Everything else here is scaffolding pinned by stable specs:
+
+  * 'emanoteJsModuleNames' — changes only when behaviors are added
+    or removed. Same change rate as @main.js@'s import list.
+  * 'importMap' — encodes the W3C importmap JSON shape. HTML-spec
+    stable.
+  * 'emanoteJsBundle' — emits two @\<script\>@ tags. Trivial Blaze
+    HTML; not a volatility surface.
+
+Co-located here for locality; not because they share a change axis.
+
+== Why importmap rather than direct imports
+
 'SR.siteRouteUrl' appends @?t=\<mtime\>@ to static-file URLs in live
-mode, but ES module imports of @./morph.js@ resolve to a queryless
+mode, but ES module imports of @.\/morph.js@ resolve to a queryless
 URL per the HTML spec — so the @?t=@ on @main.js@ wouldn't propagate
 to its transitive imports. The importmap turns each module's bare
 specifier into a versioned URL, so editing any single module
-invalidates exactly that file's cache key.
+invalidates exactly that file's cache key. See issue #643 for the
+design rationale and trade-offs.
 -}
 module Emanote.View.JsBundle (
   emanoteJsBundle,
