@@ -250,6 +250,33 @@ Then(
   },
 );
 
+// The popup body's Tailwind classes (bg-white, rounded-lg, shadow-xl,
+// etc.) are applied by JS at runtime — they never appear in any
+// generated HTML attribute, so the static-mode Tailwind CLI doesn't
+// see them and silently drops the corresponding rules. The visible
+// symptom is a popup with no background fill, no shadow, no rounding —
+// just a thin default border around plain text. Asserting on a
+// concrete computed style (the body's background-color) catches that
+// regression: the JS sets `bg-white dark:bg-gray-900`, which compiles
+// to a non-transparent rgb()/oklab() value. If Tailwind didn't pick up
+// the class, getComputedStyle returns rgba(0,0,0,0).
+Then(
+  "the footnote popup body has a non-transparent background",
+  async function (this: EmanoteWorld) {
+    const popover = this.page.locator(POPOVER_SEL);
+    const bg = await popover.evaluate((el) => {
+      const body = el.firstElementChild as HTMLElement | null;
+      if (!body) return null;
+      return getComputedStyle(body).backgroundColor;
+    });
+    assert.ok(bg, "Popover has no body element — script setup regressed.");
+    assert.ok(
+      bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent",
+      `Popover body background is ${JSON.stringify(bg)} — Tailwind dropped the popup classes (likely because the static-mode CSS compile didn't scan the JS module that applies them; see Tailwind.hs's @source for _emanote-static/js).`,
+    );
+  },
+);
+
 // Print-mode footnotes. The popup is screen-only; the hidden <aside
 // data-footnote-list> is revealed by `print:block` on paper so printed
 // copies still carry the cited bodies.
@@ -308,5 +335,154 @@ Then(
         needle,
       )}. Got: ${JSON.stringify(text.slice(0, 200))}.`,
     );
+  },
+);
+
+// Theme toggle button lives in the sidebar header (sidebar.tpl) and the
+// minimal layout header (layouts/default.tpl); both wire it via inline
+// onclick="window.emanote.theme.toggle()" with title="Toggle dark mode".
+// Click the first one Playwright finds — both fire the same handler.
+When("I click the theme toggle", async function (this: EmanoteWorld) {
+  await this.page.locator('button[title="Toggle dark mode"]').first().click();
+});
+
+Then(
+  "the documentElement has class {string}",
+  async function (this: EmanoteWorld, cls: string) {
+    const has = await this.page.evaluate(
+      (c) => document.documentElement.classList.contains(c),
+      cls,
+    );
+    assert.ok(
+      has,
+      `Expected <html> to have class ${JSON.stringify(cls)}; classList was ${JSON.stringify(
+        await this.page.evaluate(() => document.documentElement.className),
+      )}. The theme-toggle module either failed to load or its onclick handler did not run.`,
+    );
+  },
+);
+
+Then(
+  "localStorage {string} is {string}",
+  async function (this: EmanoteWorld, key: string, expected: string) {
+    const value = await this.page.evaluate(
+      (k) => localStorage.getItem(k),
+      key,
+    );
+    assert.strictEqual(
+      value,
+      expected,
+      `Expected localStorage[${JSON.stringify(key)}] to be ${JSON.stringify(expected)}; got ${JSON.stringify(value)}. The persistence step in window.emanote.theme.toggle either threw silently or never ran.`,
+    );
+  },
+);
+
+// code-copy.js wires a button into every <pre> that has a child <code>.
+// Asserting parity (#buttons === #pre>code) catches both regressions:
+// missing buttons (selector mismatch, module not loaded) and duplicates
+// (idempotency-guard regressed in morph.js's dataset sentinel).
+Then(
+  "every <pre> with a child <code> has a .code-copy-button",
+  async function (this: EmanoteWorld) {
+    // Module loads via <script type="module"> which is defer-by-default —
+    // wait for at least one button before counting.
+    await this.page
+      .locator("pre > .code-copy-button")
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const counts = await this.page.evaluate(() => ({
+      preWithCode: document.querySelectorAll("pre:has(> code)").length,
+      buttons: document.querySelectorAll("pre > .code-copy-button").length,
+    }));
+    assert.ok(
+      counts.preWithCode > 0,
+      `Fixture has zero <pre><code> blocks; nothing to assert against.`,
+    );
+    assert.strictEqual(
+      counts.buttons,
+      counts.preWithCode,
+      `Expected one .code-copy-button per <pre><code>, got ${counts.buttons} buttons for ${counts.preWithCode} blocks. Mismatch means either the module didn't run, the selector drifted, or the dataset-sentinel idempotency guard regressed and produced duplicates.`,
+    );
+  },
+);
+
+// Morph navigation: drive Ema's in-app route switch via the JS API
+// instead of clicking a link. Awaits `window.ema.ready` (PR srid/ema#181)
+// to avoid racing the WS handshake, then waits for `EMAHotReload` —
+// fired by the shim after morph + script reload completes — so the
+// next step sees the new DOM, not the in-flight one.
+When(
+  "I navigate via Ema to {string}",
+  async function (this: EmanoteWorld, path: string) {
+    await this.page.evaluate(async (p) => {
+      // Wait for the shim to define window.ema (its `init()` runs
+      // synchronously on the module load, so this is usually a no-op
+      // — but the polling loop is cheap insurance against a race).
+      while (!(window as any).ema?.switchRoute) {
+        await new Promise((r) => setTimeout(r, 25));
+      }
+      await (window as any).ema.ready;
+      await new Promise<void>((resolve) => {
+        window.addEventListener("EMAHotReload", () => resolve(), {
+          once: true,
+        });
+        (window as any).ema.switchRoute(p);
+      });
+    }, path);
+  },
+);
+
+// TOC scroll-spy: position a target heading inside the IntersectionObserver
+// "active band" (rootMargin "-80px 0px -60% 0px" → y=80..288 on a 720px
+// viewport), then assert its TOC link is highlighted. Putting the heading
+// at y=200 sits it firmly inside the band, so the firstVisible branch in
+// pickActive() picks it deterministically — no subpixel fragility on the
+// `top < 0` boundary that "scroll to viewport top" semantics would have.
+When(
+  "I scroll the heading with id {string} into the active band",
+  async function (this: EmanoteWorld, headingId: string) {
+    await this.page.evaluate((id) => {
+      const el = document.getElementById(id);
+      if (!el) throw new Error(`No element with id ${JSON.stringify(id)}`);
+      const headingTopInDoc = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: headingTopInDoc - 200, behavior: "instant" });
+    }, headingId);
+  },
+);
+
+Then(
+  "the TOC link for {string} has class {string}",
+  async function (this: EmanoteWorld, hrefSuffix: string, cls: string) {
+    // The TOC link's href is absolute (resolves against <base>); match by
+    // suffix to stay independent of the served origin.
+    const link = this.page
+      .locator(`#toc a.--ema-toc[href$="${hrefSuffix}"]`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    // Auto-retrying expectation — the IntersectionObserver fires async
+    // after scroll, so the active class arrives a frame or two later.
+    try {
+      await this.page.waitForFunction(
+        ({ suffix, mark }) => {
+          const a = document.querySelector(
+            `#toc a.--ema-toc[href$="${suffix}"]`,
+          );
+          return a?.classList.contains(mark) ?? false;
+        },
+        { suffix: hrefSuffix, mark: cls },
+        { timeout: 3_000 },
+      );
+    } catch {
+      const allMarked = await this.page.evaluate(
+        (mark) =>
+          Array.from(document.querySelectorAll(`#toc a.--ema-toc.${mark}`))
+            .map((a) => (a as HTMLAnchorElement).href)
+            .join(", ") || "(none)",
+        cls,
+      );
+      throw new Error(
+        `Expected TOC link with href ending ${JSON.stringify(hrefSuffix)} to have class ${JSON.stringify(cls)}. Currently active links: ${allMarked}. Either the IntersectionObserver never fired (toc-spy.js not loaded / module-mode timing changed the observed-set computation) or pickActive picked a different section than expected.`,
+      );
+    }
   },
 );

@@ -12,7 +12,7 @@ module Emanote.View.Common (
 )
 where
 
-import Data.Aeson.Types qualified as Aeson
+import Data.Aeson qualified as Aeson
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
@@ -27,6 +27,7 @@ import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.View.JsBundle qualified as JsBundle
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
 import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
@@ -187,6 +188,11 @@ commonSplices withCtx model meta routeTitle = do
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix" ##
     HI.textSplice (SR.urlStrategySuffix model)
+  -- Site-authored interactive-JS bundle. See `Emanote.View.JsBundle`
+  -- for the importmap + module-entry rendering and the cache-busting
+  -- design (issue #643).
+  "emanoteJsBundle" ##
+    pure (RX.renderHtmlNodes (JsBundle.emanoteJsBundle model))
   where
     -- A hack to force the browser not to cache the CSS, because we are not md5
     -- hashing the CSS yet (because the CSS is generated *after* the HTML files

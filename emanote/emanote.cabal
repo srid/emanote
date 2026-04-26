@@ -25,6 +25,7 @@ data-files:
   _emanote-static/*.svg
   _emanote-static/fonts/*.css
   _emanote-static/fonts/*.woff2
+  _emanote-static/js/*.js
   _emanote-static/stork/edible-dark.css
   _emanote-static/stork/edible.css
   _emanote-static/stork/stork.js
@@ -206,12 +207,14 @@ library
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern
+    Emanote.Static.Sources
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export
     Emanote.View.Export.Content
     Emanote.View.Export.JSON
     Emanote.View.Feed
+    Emanote.View.JsBundle
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
     Emanote.View.Tailwind

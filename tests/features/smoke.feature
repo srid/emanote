@@ -28,6 +28,7 @@ Feature: Smoke
     When I open "/footnotes.html"
     And I click the footnote ref with index "1" in the parent body
     Then the footnote popup contains "PARENT_FOOTNOTE_BODY"
+    And the footnote popup body has a non-transparent background
 
   Scenario: Clicking a footnote ref inside a callout resolves to that callout's footnote body
     When I open "/footnotes.html"
@@ -61,3 +62,25 @@ Feature: Smoke
     When the page is emulated as print media
     Then at least one footnote list is visible
     And the printed footnote list contains "PARENT_FOOTNOTE_BODY"
+
+  Scenario: Theme toggle button flips the dark class and persists to localStorage
+    When I open "/"
+    And I click the theme toggle
+    Then the documentElement has class "dark"
+    And localStorage "emanote-theme" is "dark"
+
+  Scenario: Every fenced code block gets a copy button at first paint
+    When I open "/code.html"
+    Then every <pre> with a child <code> has a .code-copy-button
+
+  Scenario: Scrolling a section into view highlights its TOC link
+    When I open "/toc.html"
+    And I scroll the heading with id "cherry" into the active band
+    Then the TOC link for "#cherry" has class "toc-item-active"
+
+  @morph
+  Scenario: TOC scroll-spy survives Ema's in-app morph navigation (issue #667)
+    When I open "/"
+    And I navigate via Ema to "/toc.html"
+    And I scroll the heading with id "cherry" into the active band
+    Then the TOC link for "#cherry" has class "toc-item-active"

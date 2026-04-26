@@ -101,9 +101,13 @@ async function waitForHtml(
 
 async function startLive(): Promise<{ url: string; resource: BackendResource }> {
   const port = await getPort();
+  // WS is enabled (no `--no-ws`) so scenarios tagged `@morph` can
+  // exercise Ema's in-app morph navigation via `window.ema.switchRoute`.
+  // The fixtures are static during a run, so the WS doesn't trigger
+  // spurious morphs in non-morph scenarios.
   const proc = spawn(
     emanoteBin,
-    ["-L", fixtureDir, "run", "--port", String(port), "--no-ws"],
+    ["-L", fixtureDir, "run", "--port", String(port)],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
   proc.stderr?.on("data", (d: Buffer) =>
@@ -196,6 +200,34 @@ Before(async function (this: EmanoteWorld) {
     viewport: { width: 1280, height: 720 },
   });
   this.page = await this.context.newPage();
+});
+
+// Cucumber tag for scenarios that exercise Ema's morph-based in-app
+// navigation. Pinned to a constant so the two hooks below and any
+// new ones agree on spelling.
+const MORPH_TAG = "@morph";
+
+// Morph navigation requires the live WebSocket. Static mode serves a
+// pre-built tree with no WS; window.ema is undefined there, so any
+// MORPH_TAG-tagged scenario would fail at the first switchRoute call.
+// Skip them up-front instead of letting them red-fail.
+Before({ tags: MORPH_TAG }, function () {
+  if (mode !== "live") return "skipped" as const;
+});
+
+// Catch the inverse mistake: a scenario that uses the morph-nav step
+// without the tag would silently run in static mode and time out at
+// the step's 60s polling-loop ceiling. Fail fast at scenario start.
+Before(function (this: EmanoteWorld, scenario) {
+  const usesMorph = scenario.pickle.steps.some((s) =>
+    s.text.includes("navigate via Ema"),
+  );
+  const tagged = scenario.pickle.tags.some((t) => t.name === MORPH_TAG);
+  if (usesMorph && !tagged) {
+    throw new Error(
+      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it runs only in live mode (static mode has no WebSocket and window.ema is undefined).`,
+    );
+  }
 });
 
 After(async function (this: EmanoteWorld, scenario) {

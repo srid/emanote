@@ -15,6 +15,7 @@ module Emanote.View.Tailwind (
 import Control.Monad.Logger (runStdoutLoggingT)
 import Data.ByteString qualified as BS
 import Emanote.Prelude (log)
+import Emanote.Static.Sources qualified as Sources
 import NeatInterpolation (text)
 import Relude
 import System.IO (hClose)
@@ -115,12 +116,25 @@ tailwindBin = $(staticWhich "tailwindcss")
 
 Writes a temp input CSS combining 'tailwindCliInputCss' with one @\@source@
 line per generated path, then invokes @tailwindcss@ v4 with @--minify@.
+
+The bundled JS modules under @_emanote-static\/js@ are also added as
+sources: behaviors like the footnote popup apply Tailwind utility
+classes via JS (@element.className = '...'@), so those class names
+never appear in any generated HTML attribute. Without an explicit
+source pointing at the JS, Tailwind's scanner doesn't see them and
+the styles are dropped from @tailwind.css@ — popup, code-copy, etc.
+all render unstyled in static-built sites.
 -}
 compileTailwindCss :: (MonadUnliftIO m) => FilePath -> [FilePath] -> m ()
 compileTailwindCss cssPath genPaths = runStdoutLoggingT $ do
   log $ "Running Tailwind CSS v4 compiler to generate: " <> toText cssPath
   withSystemTempFile "emanote-tailwind-input.css" $ \inputPath h -> do
-    let sources = unlines $ map (\p -> "@source \"" <> toText p <> "\";") genPaths
+    jsSourcePath <- liftIO Sources.jsScanPath
+    let sources =
+          unlines (map (\p -> "@source \"" <> toText p <> "\";") genPaths)
+            <> "@source \""
+            <> toText jsSourcePath
+            <> "\";\n"
         input =
           [text|
             ${tailwindCliInputCss}

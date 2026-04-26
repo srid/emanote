@@ -10,8 +10,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
-    // Apply theme before first paint to avoid FOUC.
+    // Apply theme before first paint to avoid FOUC. Must run synchronously
+    // here (no module loader, no defer) — that's why this is the one
+    // theme-related script that doesn't live in _emanote-static/js/.
     // Priority: explicit user choice (localStorage) > OS preference.
+    // The 'emanote-theme' key is mirrored by STORAGE_KEY in
+    // _emanote-static/js/theme-toggle.js — keep both in sync.
     (function () {
       var stored = null;
       try { stored = localStorage.getItem('emanote-theme'); } catch (e) {}
@@ -50,6 +54,13 @@
 
   <head-main />
   <apply template="components/stork/stork-search-head" />
+  <!-- Site-authored interactive behaviors (issue #643). The splice emits
+       an importmap (so live-server's per-file ?t=<mtime> propagates
+       through ES module imports) plus the main entry as a deferred
+       module. The FOUC theme applier above and the Stork controller
+       above stay inline for their own reasons (pre-paint requirement;
+       vendor coupling). -->
+  <emanoteJsBundle />
 </head>
 
 <!-- DoNotFormat -->
