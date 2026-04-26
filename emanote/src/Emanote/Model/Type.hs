@@ -244,6 +244,10 @@ modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
+modelLookupSData :: R.R 'R.Yaml -> ModelT f -> Maybe SData
+modelLookupSData r =
+  Ix.getOne . Ix.getEQ r . _modelSData
+
 modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> ModelT f -> Maybe (R.LMLView, Note)
 modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
   note <- N.lookupNotesByRoute r notes

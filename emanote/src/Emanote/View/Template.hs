@@ -150,7 +150,8 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      toc = newToc $ note ^. MN.noteDoc
+      doc = prependDataErrors (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
@@ -204,7 +205,7 @@ renderLmlHtml model note = do
     "ema:note:pandoc" ##
       C.withBlockCtx ctx
         $ \ctx' ->
-          Splices.pandocSplice ctx' (note ^. MN.noteDoc)
+          Splices.pandocSplice ctx' doc
     "ema:note:toc" ##
       C.withBlockCtx ctx
         $ \ctx' ->
@@ -286,3 +287,15 @@ withTemplateName =
 withSiteTitle :: Text -> Aeson.Value
 withSiteTitle =
   SData.oneAesonText (toList $ "page" :| ["siteTitle"])
+
+{- | Prepend a banner block listing yaml parse errors before the note's body.
+
+Stays at render time so the banner can be scoped to this note's cascade
+(via 'Meta.cascadeYamlErrors') without denormalizing errors onto every
+affected note. Banner construction goes through 'MN.errorDiv' so the
+markdown and yaml error surfaces share one Div shape. Issue #285.
+-}
+prependDataErrors :: [Text] -> Pandoc -> Pandoc
+prependDataErrors [] doc = doc
+prependDataErrors errs (Pandoc m blocks) =
+  Pandoc m (MN.errorDiv "Emanote: bad YAML files" errs : blocks)

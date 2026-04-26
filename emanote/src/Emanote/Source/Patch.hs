@@ -5,7 +5,6 @@ module Emanote.Source.Patch (
   ignorePatterns,
 ) where
 
-import Control.Exception (throwIO)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
@@ -17,15 +16,15 @@ import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
-  BadInput (BadInput),
   log,
   logD,
+  logE,
  )
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
-import Optics.Operators ((%~))
+import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
@@ -106,10 +105,13 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             yamlContents <- forM (NEL.reverse overlays) $ \overlay -> do
               let fpAbs = locResolve overlay
               traverseToSnd (readRefreshedFile refreshAction) fpAbs
-            sData <-
-              liftIO
-                $ either (throwIO . BadInput) pure
-                $ SD.parseSDataCascading r yamlContents
+            -- A failed parse is no longer an exception (which used to kill
+            -- the UnionMount change handler — issue #285); it lives on the
+            -- `Left` side of the inserted SData's `_sdataValue` and gets
+            -- surfaced at render time.
+            let sData = SD.parseSDataCascading r yamlContents
+            whenLeft_ (sData ^. SD.sdataValue) $ \err ->
+              logE $ "Bad YAML file: " <> err
             pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp

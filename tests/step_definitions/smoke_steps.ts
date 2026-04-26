@@ -27,6 +27,58 @@ Then(
   },
 );
 
+// #285 — two complementary checks. The "no Ema exception" assertion
+// guards the *crash* (the original bug surface); the banner assertion
+// guards the *visibility* of the error so a parse failure can't fail
+// silently. Both must hold for the regression to be considered fixed.
+const EMA_EXCEPTION_MARKERS = [
+  "Ema App threw an exception",
+  "Unable to render template",
+];
+
+Then(
+  "the page rendered without an Ema exception",
+  async function (this: EmanoteWorld) {
+    const text = (await this.page.textContent("body")) ?? "";
+    for (const marker of EMA_EXCEPTION_MARKERS) {
+      assert.ok(
+        !text.includes(marker),
+        `Page body contains ${JSON.stringify(marker)} — #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
+      );
+    }
+  },
+);
+
+// The banner is a Pandoc Div with class `emanote:error`, which an existing
+// Heist splice rewrites into Tailwind utility classes. Match by the unique
+// header text instead of the source class — the test shouldn't break the
+// next time those utilities get tweaked.
+const YAML_BANNER_HEADER = "Emanote: bad YAML files";
+
+Then(
+  "the page shows the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    const header = this.page.getByText(YAML_BANNER_HEADER);
+    await header.waitFor({ state: "attached", timeout: 5_000 });
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      text.includes("broken-285.yaml"),
+      `Banner header rendered but did not name the broken fixture file — the per-file error message stopped propagating. Got: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
+Then(
+  "the page does not show the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      !text.includes(YAML_BANNER_HEADER),
+      `Banner header leaked onto a page whose route cascade does not include the broken yaml — yaml-error scoping regressed. First 400 chars: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {

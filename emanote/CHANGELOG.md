@@ -24,6 +24,7 @@
 - Markdown links to a static `.xml` asset (e.g. `[Test](./test.xml)`) now resolve to the file. Previously a `.xml` URL was always interpreted as the Atom feed of a same-named note, leaving asset links broken when no such feed-enabled note existed. The missing-link page now also tailors its "you may create…" hint to the URL extension instead of always suggesting `<url>.md` / `<url>.org` (closes [#547](https://github.com/srid/emanote/issues/547))
 - Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
 - Raw HTML blocks containing a literal `</div>` no longer crash the renderer with `div cannot contain text looking like its end tag` (closes [#119](https://github.com/srid/emanote/issues/119)). Fixed upstream in [srid/heist-extra#13](https://github.com/srid/heist-extra/pull/13) by switching the raw-HTML wrapper to a unique `<rawhtml>` element with `display: contents`.
+- A malformed `*.yaml` file (e.g. a non-string mapping key like `[]: foo`) no longer takes the live server down with `BadInput "NonStringKey []"`. The parse error is folded into `SData` itself and surfaced as a banner on the notes whose meta cascade actually depends on the bad file — a broken `subfolder/index.yaml` shows up under `/subfolder/*`, not on every page (closes [#285](https://github.com/srid/emanote/issues/285)).
 
 ## 1.4.0.0 (2025-08-18)
 
