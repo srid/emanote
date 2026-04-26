@@ -26,6 +26,7 @@
 - Resolve relative URLs inside `<dir>/index.md` against `<dir>/` instead of its parent ([#651](https://github.com/srid/emanote/pull/651), closes [#608](https://github.com/srid/emanote/issues/608))
 - Raw HTML blocks containing a literal `</div>` no longer crash the renderer with `div cannot contain text looking like its end tag` (closes [#119](https://github.com/srid/emanote/issues/119)). Fixed upstream in [srid/heist-extra#13](https://github.com/srid/heist-extra/pull/13) by switching the raw-HTML wrapper to a unique `<rawhtml>` element with `display: contents`.
 - A malformed `*.yaml` file (e.g. a non-string mapping key like `[]: foo`) no longer takes the live server down with `BadInput "NonStringKey []"`. The parse error is folded into `SData` itself and surfaced as a banner on the notes whose meta cascade actually depends on the bad file — a broken `subfolder/index.yaml` shows up under `/subfolder/*`, not on every page (closes [#285](https://github.com/srid/emanote/issues/285)).
+- TOC sidebar: tightened entry padding and styled the overflow scrollbar (Firefox `scrollbar-width: thin` + WebKit pseudo-element) so long tables of contents no longer surface the chunky OS-default bar (closes [#668](https://github.com/srid/emanote/issues/668)).
 
 ## 1.4.0.0 (2025-08-18)
 
