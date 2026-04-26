@@ -57,9 +57,10 @@
   <!-- Site-authored interactive behaviors (issue #643). The splice emits
        an importmap (so live-server's per-file ?t=<mtime> propagates
        through ES module imports) plus the main entry as a deferred
-       module. The FOUC theme applier above and the Stork controller
-       above stay inline for their own reasons (pre-paint requirement;
-       vendor coupling). -->
+       module. The FOUC theme applier above stays inline because it
+       must run pre-paint; the vendor Stork WASM loader above stays
+       inline because window.stork must be defined synchronously
+       before the stork.js module evaluates. -->
   <emanoteJsBundle />
 </head>
 
