@@ -16,6 +16,20 @@
 
 import { onMorph } from '@emanote/morph';
 
+// Fail fast if the vendor WASM loader didn't run before this module —
+// otherwise the first user click would throw a cryptic
+// "stork is not defined" instead of pointing at the load-order bug.
+// The vendor <script src> is in stork-search-head.tpl; if a future
+// template tweak reorders or removes it, this guard names the cause.
+if (typeof stork === 'undefined') {
+  throw new Error(
+    'stork.js (vendor WASM loader at _emanote-static/stork/stork.js) ' +
+      'must load before this module. Check stork-search-head.tpl: the ' +
+      "vendor <script src> needs to stay in <head>, before base.tpl's " +
+      '<emanoteJsBundle /> splice.',
+  );
+}
+
 // `${value:baseUrl}` (the same string the inline IIFE used to read
 // from a marker `<script id="emanote-stork" data-emanote-base-url="…">`)
 // is already in the document as `<base href="…">` in <head>.
