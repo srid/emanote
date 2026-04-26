@@ -5,9 +5,6 @@
  *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
  *   - `morph`  → live backend, but `When I open` route-switches via
  *                `window.ema.switchRoute` instead of `page.goto`
- *
- * Read once at module load and validated; downstream modules import the
- * narrowed `mode` constant.
  */
 
 export type Mode = "live" | "static" | "morph";

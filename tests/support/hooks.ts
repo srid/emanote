@@ -1,10 +1,6 @@
 /**
- * Cucumber hooks — browser lifecycle + emanote backend launcher.
- *
- * Mode dispatch and validation live in `./mode.ts`; navigation primitives
- * (`openRoute`, `morphNav`, morph priming) live in `./navigation.ts`.
- * This file owns only the test-lifecycle plumbing: backend start/stop,
- * browser context, scenario filtering, screenshot-on-failure.
+ * Cucumber lifecycle plumbing: backend start/stop, browser context,
+ * scenario filtering, screenshot-on-failure.
  */
 
 import {
@@ -185,26 +181,16 @@ Before(async function (this: EmanoteWorld) {
   this.page = await this.context.newPage();
 });
 
-// Cucumber tag for scenarios that exercise Ema's morph-based in-app
-// navigation. Pinned to a constant so the two hooks below and any
-// new ones agree on spelling.
 const MORPH_TAG = "@morph";
 
-// Morph navigation requires the live WebSocket. Static mode serves a
-// pre-built tree with no WS; window.ema is undefined there, so any
-// MORPH_TAG-tagged scenario would fail at the first switchRoute call.
-// Skip them up-front in static mode; live and morph modes both have
-// the WS and run them.
+// Static mode has no WebSocket and `window.ema` is undefined, so any
+// `@morph` scenario would fail at the first `switchRoute` call.
 Before({ tags: MORPH_TAG }, function () {
   if (mode === "static") return "skipped" as const;
 });
 
-// Catch the inverse mistake: a scenario that uses the morph-nav step
-// without the tag would silently run in static mode and time out at
-// the step's 60s polling-loop ceiling. Fail fast at scenario start.
-// The check applies in every mode — the rule "tag morph-nav scenarios
-// so they skip in static" is a static-mode invariant and morph mode
-// inherits the same authoring contract.
+// Inverse safety: a scenario using the morph-nav step without `@morph`
+// would silently hang in static mode until the cucumber step ceiling.
 Before(function (this: EmanoteWorld, scenario) {
   const usesMorph = scenario.pickle.steps.some((s) =>
     s.text.includes("navigate via Ema"),
@@ -217,11 +203,8 @@ Before(function (this: EmanoteWorld, scenario) {
   }
 });
 
-// Morph mode: prime each scenario by landing on `/` via a fresh load
-// and waiting for the Ema WS shim to be ready. Subsequent `openRoute`
-// calls then route-switch via `window.ema.switchRoute` instead of
-// reloading. Without this priming, the first `openRoute` would have no
-// `window.ema` to switch through.
+// In morph mode the first `openRoute` morph-switches via
+// `window.ema`, which only exists after a real page load — prime it.
 Before(async function (this: EmanoteWorld) {
   if (mode !== "morph") return;
   await primeMorph(this.page);

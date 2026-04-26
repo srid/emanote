@@ -459,11 +459,6 @@ Then(
   },
 );
 
-// Explicit morph navigation step — for `@morph` scenarios that want to
-// assert an Ema in-app route switch independent of mode. In `morph`
-// mode `When I open` already morphs, but scenarios that need to mix a
-// fresh-load `goto` with a subsequent morph (or that want their intent
-// to be obvious in the .feature file) use this step.
 When(
   "I navigate via Ema to {string}",
   async function (this: EmanoteWorld, path: string) {
