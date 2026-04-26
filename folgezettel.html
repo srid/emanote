@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1a206ae8-96ca-4eb8-abbe-3c381adfe5d0' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=1ebf8f15-f75e-4c0e-a7f1-6bfd24d61e63' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1558,14 +1558,16 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
 </article>
         </div>
         <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6 md:bg-gray-50/50 dark:md:bg-gray-950/50 md:-mr-6 md:pr-6 md:-my-8 md:py-8'>
-          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
+          <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
+     OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
+     pseudo-element. --><nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:var(--color-gray-300)_transparent] dark:[scrollbar-color:var(--color-gray-700)_transparent] [&amp;::-webkit-scrollbar]:w-1.5 [&amp;::-webkit-scrollbar-track]:bg-transparent [&amp;::-webkit-scrollbar-thumb]:rounded [&amp;::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&amp;::-webkit-scrollbar-thumb]:bg-gray-700'>
   <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
     <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
     
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Syntax'>
-              <a href='folgezettel#syntax' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='folgezettel#syntax' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Syntax
               </a>
               
@@ -1576,7 +1578,7 @@ Here is the [<span class='co'>[</span><span class='ot'>target-note</span><span c
             </li>
           
             <li class='truncate' title='Folder notes'>
-              <a href='folgezettel#folder' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='folgezettel#folder' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Folder notes
               </a>
               

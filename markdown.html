@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1a206ae8-96ca-4eb8-abbe-3c381adfe5d0' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=1ebf8f15-f75e-4c0e-a7f1-6bfd24d61e63' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -2436,21 +2436,23 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
 </article>
         </div>
         <div class='hidden md:block md:col-span-2 md:border-l md:border-gray-200 dark:md:border-gray-800 md:pl-6 md:bg-gray-50/50 dark:md:bg-gray-950/50 md:-mr-6 md:pr-6 md:-my-8 md:py-8'>
-          <nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto'>
+          <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
+     OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
+     pseudo-element. --><nav id='toc' class='hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:var(--color-gray-300)_transparent] dark:[scrollbar-color:var(--color-gray-700)_transparent] [&amp;::-webkit-scrollbar]:w-1.5 [&amp;::-webkit-scrollbar-track]:bg-transparent [&amp;::-webkit-scrollbar-thumb]:rounded [&amp;::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&amp;::-webkit-scrollbar-thumb]:bg-gray-700'>
   <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
     <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
     
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Wiki Links'>
-              <a href='markdown#wikilink' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#wikilink' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Wiki Links
               </a>
               
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Structural links'>
-              <a href='markdown#structural-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#structural-links' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Structural links
               </a>
               
@@ -2461,7 +2463,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Anchors'>
-              <a href='markdown#anchors' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#anchors' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Anchors
               </a>
               
@@ -2472,7 +2474,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Broken links'>
-              <a href='markdown#broken-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#broken-links' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Broken links
               </a>
               
@@ -2483,7 +2485,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Ambiguous links'>
-              <a href='markdown#ambiguous-links' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#ambiguous-links' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Ambiguous links
               </a>
               
@@ -2498,7 +2500,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Emojis'>
-              <a href='markdown#emojis' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#emojis' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Emojis
               </a>
               
@@ -2509,7 +2511,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Footnotes'>
-              <a href='markdown#footnotes' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#footnotes' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Footnotes
               </a>
               
@@ -2520,7 +2522,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Task lists'>
-              <a href='markdown#tasks' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#tasks' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Task lists
               </a>
               
@@ -2531,7 +2533,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Definition lists'>
-              <a href='markdown#dl' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#dl' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Definition lists
               </a>
               
@@ -2542,7 +2544,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Lists'>
-              <a href='markdown#lists' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#lists' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Lists
               </a>
               
@@ -2553,7 +2555,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Tables'>
-              <a href='markdown#tables' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#tables' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Tables
               </a>
               
@@ -2564,7 +2566,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Hash Tags'>
-              <a href='markdown#hash-tags' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#hash-tags' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Hash Tags
               </a>
               
@@ -2575,7 +2577,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Highlighting'>
-              <a href='markdown#highlighting' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#highlighting' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Highlighting
               </a>
               
@@ -2586,7 +2588,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Callouts'>
-              <a href='markdown#callouts' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#callouts' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Callouts
               </a>
               
@@ -2597,35 +2599,35 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='Heading anchors'>
-              <a href='markdown#hanchor' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#hanchor' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Heading anchors
               </a>
               
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Heading level 3'>
-              <a href='markdown#heading-level-3' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#heading-level-3' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Heading level 3
               </a>
               
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Heading level 4'>
-              <a href='markdown#heading-level-4' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#heading-level-4' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Heading level 4
               </a>
               
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Heading level 5'>
-              <a href='markdown#heading-level-5' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#heading-level-5' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Heading level 5
               </a>
               
         <ul class='space-y-1 ml-2'>
           
             <li class='truncate' title='Heading level 6'>
-              <a href='markdown#heading-level-6' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#heading-level-6' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Heading level 6
               </a>
               
@@ -2652,7 +2654,7 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
             </li>
           
             <li class='truncate' title='More extensions'>
-              <a href='markdown#more-extensions' class='--ema-toc block rounded-md px-2 py-1.5 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+              <a href='markdown#more-extensions' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 More extensions
               </a>
               
