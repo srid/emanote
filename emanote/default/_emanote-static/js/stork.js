@@ -38,7 +38,17 @@ if (typeof stork === 'undefined') {
 function getBaseUrl() {
   try {
     return new URL(document.baseURI).pathname;
-  } catch (_) {
+  } catch (e) {
+    // URL constructor only throws on unparseable input — base.tpl
+    // unconditionally renders <base href="${value:baseUrl}">, so this
+    // path is unreachable in practice. If it ever fires, search will
+    // fetch the index and WASM from "/" which may be wrong; surface
+    // the misconfig rather than silently degrade.
+    console.warn(
+      '[emanote] stork: document.baseURI is unparseable; ' +
+        'falling back to "/" for index + WASM fetches:',
+      e,
+    );
     return '/';
   }
 }
