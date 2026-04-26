@@ -213,6 +213,7 @@ library
     Emanote.View.Export.Content
     Emanote.View.Export.JSON
     Emanote.View.Feed
+    Emanote.View.JsBundle
     Emanote.View.LiveServerFiles
     Emanote.View.TagIndex
     Emanote.View.Tailwind

@@ -13,7 +13,6 @@ module Emanote.View.Common (
 where
 
 import Data.Aeson qualified as Aeson
-import Data.Aeson.Key qualified as AesonKey
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
@@ -28,6 +27,7 @@ import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.View.JsBundle qualified as JsBundle
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
 import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
@@ -188,9 +188,11 @@ commonSplices withCtx model meta routeTitle = do
   -- For those cases the user really wants to hardcode the URL
   "ema:urlStrategySuffix" ##
     HI.textSplice (SR.urlStrategySuffix model)
-  -- See `emanoteJsBundle` for the rationale.
+  -- Site-authored interactive-JS bundle. See `Emanote.View.JsBundle`
+  -- for the importmap + module-entry rendering and the cache-busting
+  -- design (issue #643).
   "emanoteJsBundle" ##
-    pure (RX.renderHtmlNodes emanoteJsBundle)
+    pure (RX.renderHtmlNodes (JsBundle.emanoteJsBundle model))
   where
     -- A hack to force the browser not to cache the CSS, because we are not md5
     -- hashing the CSS yet (because the CSS is generated *after* the HTML files
@@ -214,59 +216,6 @@ commonSplices withCtx model meta routeTitle = do
       H.script $ H.toHtml preserveScript
       H.script
         ! A.src (H.toValue localCdnUrl)
-        $ mempty
-    -- The interactive-JS bundle (see issue #643). Each module file is
-    -- routed through `siteRouteUrl`, which appends `?t=<mtime>` in
-    -- live-server mode. To make that propagate through ES module
-    -- imports — which would otherwise resolve `./morph.js` to a
-    -- queryless URL and stale-cache — every module imports its
-    -- siblings via bare specifiers (e.g. `import { ready } from
-    -- '@emanote/morph'`), and the importmap rendered here remaps each
-    -- bare name to the versioned URL. Touching any module thus
-    -- invalidates exactly that file's cached entry.
-    --
-    -- The 5 file names are pinned: this is the deployment manifest
-    -- and the cabal data-files glob is the source of truth, but the
-    -- importmap has to enumerate them so we can compose bare names.
-    -- Adding a behavior means a one-line addition here.
-    emanoteJsModuleNames :: [Text]
-    emanoteJsModuleNames =
-      ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup"]
-    jsUrl :: Text -> Text
-    jsUrl name =
-      SR.siteRouteUrl model
-        $ SR.staticFileSiteRoute
-        $ fromMaybe (error $ "no _emanote-static/js/" <> name <> ".js?")
-        $ M.modelLookupStaticFile ("_emanote-static" </> "js" </> toString name <> ".js") model
-    -- Importmap URL targets must start with `/`, `./`, or `../` per the
-    -- HTML spec — bare relative paths (which is what siteRouteUrl emits
-    -- for site-relative routes, since they're resolved through <base>)
-    -- get silently ignored, leaving '@emanote/morph' unresolvable and
-    -- main.js's first import throwing TypeError. Prefix with `./` so
-    -- the importmap parser accepts them; <base> still applies during
-    -- the URL resolution that follows.
-    importmapUrl :: Text -> Text
-    importmapUrl name =
-      let u = jsUrl name
-       in if "/" `T.isPrefixOf` u || "./" `T.isPrefixOf` u || "../" `T.isPrefixOf` u
-            then u
-            else "./" <> u
-    importMap :: Text
-    importMap =
-      decodeUtf8
-        . Aeson.encode
-        $ Aeson.object
-          [ "imports"
-              Aeson..= Aeson.object
-                [ AesonKey.fromText ("@emanote/" <> name) Aeson..= importmapUrl name
-                | name <- emanoteJsModuleNames
-                ]
-          ]
-    emanoteJsBundle = do
-      H.script ! A.type_ "importmap" $ H.toHtml importMap
-      H.script
-        ! A.type_ "module"
-        ! A.src (H.toValue (jsUrl "main"))
         $ mempty
 
 renderModelTemplate :: Model -> Tmpl.TemplateName -> H.Splices (HI.Splice Identity) -> LByteString
