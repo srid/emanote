@@ -164,7 +164,16 @@ applyStorkTheme();
 // the cached index doesn't reflect the new corpus. Mark it stale so
 // the next user search re-registers (lazy, on-demand). Same trade-off
 // the inline IIFE made before this module existed.
+//
+// Also re-apply the dark/light wrapper class: the morph swaps in a
+// fresh #stork-wrapper element from the new page's body. The
+// MutationObserver above only fires on <html>.class changes — if the
+// user navigates without toggling the theme, the new wrapper would
+// stay un-classed and the search dialog would render unstyled (just
+// the bare <input> + <output>, no edible.css rules applying). Fold
+// both concerns into one onMorph callback.
 onMorph(() => {
   console.log('stork: Marking index as stale');
   indexIsStale = true;
+  applyStorkTheme();
 });
