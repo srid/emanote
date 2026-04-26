@@ -5,10 +5,14 @@
  *   - `live`   → spawn `emanote -L <fixture> run --port N`
  *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
  *                on a random port via `serve-handler`
+ *   - `morph`  → same backend as `live`, but `When I open` performs an
+ *                Ema-internal route switch (`window.ema.switchRoute`)
+ *                instead of a fresh page load — exercises every behavior
+ *                via the morph code path that fresh-load tests miss.
  *
- * Step definitions only see `baseUrl` and never learn which mode they ran
- * in — any mode-specific branching in a step means the boundary has
- * leaked. Keep it encapsulated here.
+ * Step definitions only see `baseUrl` and the `openRoute` helper exported
+ * here; they never learn which mode they ran in. Any mode-specific
+ * branching in a step means the boundary has leaked. Keep it encapsulated.
  */
 
 import {
@@ -19,7 +23,7 @@ import {
   Status,
 } from "@cucumber/cucumber";
 import { chromium } from "playwright";
-import type { Browser } from "playwright";
+import type { Browser, Page } from "playwright";
 import getPort from "get-port";
 // @ts-expect-error — serve-handler ships no TS types; its runtime shape
 // is a single function and we call it with an untyped options object.
@@ -32,7 +36,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
 
-type Mode = "live" | "static";
+type Mode = "live" | "static" | "morph";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -41,9 +45,9 @@ function requireEnv(name: string): string {
 }
 
 const rawMode = requireEnv("EMANOTE_MODE");
-if (rawMode !== "live" && rawMode !== "static") {
+if (rawMode !== "live" && rawMode !== "static" && rawMode !== "morph") {
   throw new Error(
-    `EMANOTE_MODE must be "live" or "static" (got ${JSON.stringify(rawMode)})`,
+    `EMANOTE_MODE must be "live", "static", or "morph" (got ${JSON.stringify(rawMode)})`,
   );
 }
 const mode: Mode = rawMode;
@@ -169,7 +173,7 @@ async function startStatic(): Promise<{
  *  here — so give this hook a deliberate 180s ceiling instead of racing
  *  the ~60s default. */
 BeforeAll({ timeout: 180_000 }, async () => {
-  const started = mode === "live" ? await startLive() : await startStatic();
+  const started = mode === "static" ? await startStatic() : await startLive();
   baseUrl = started.url;
   backend = started.resource;
   browser = await chromium.launch({
@@ -210,25 +214,80 @@ const MORPH_TAG = "@morph";
 // Morph navigation requires the live WebSocket. Static mode serves a
 // pre-built tree with no WS; window.ema is undefined there, so any
 // MORPH_TAG-tagged scenario would fail at the first switchRoute call.
-// Skip them up-front instead of letting them red-fail.
+// Skip them up-front in static mode; live and morph modes both have
+// the WS and run them.
 Before({ tags: MORPH_TAG }, function () {
-  if (mode !== "live") return "skipped" as const;
+  if (mode === "static") return "skipped" as const;
 });
 
 // Catch the inverse mistake: a scenario that uses the morph-nav step
 // without the tag would silently run in static mode and time out at
 // the step's 60s polling-loop ceiling. Fail fast at scenario start.
+//
+// In morph mode the check is meaningless — every `I open` is itself a
+// morph nav, so requiring `@morph` on every scenario would defeat the
+// purpose of the mode (which is to surface the morph code path
+// universally, not selectively). Suppress the check there.
 Before(function (this: EmanoteWorld, scenario) {
+  if (mode === "morph") return;
   const usesMorph = scenario.pickle.steps.some((s) =>
     s.text.includes("navigate via Ema"),
   );
   const tagged = scenario.pickle.tags.some((t) => t.name === MORPH_TAG);
   if (usesMorph && !tagged) {
     throw new Error(
-      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it runs only in live mode (static mode has no WebSocket and window.ema is undefined).`,
+      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it is skipped in static mode (no WebSocket; window.ema is undefined there).`,
     );
   }
 });
+
+// Morph mode: prime each scenario by landing on `/` via a fresh load
+// and waiting for the Ema WS shim to be ready. Subsequent `I open`
+// steps then route-switch via `window.ema.switchRoute` instead of
+// reloading — see `openRoute` below. Without this priming, the first
+// `I open` would have no `window.ema` to switch through.
+Before(async function (this: EmanoteWorld) {
+  if (mode !== "morph") return;
+  await this.page.goto("/", { waitUntil: "domcontentloaded" });
+  await this.page.evaluate(async () => {
+    while (!(window as any).ema?.switchRoute) {
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    await (window as any).ema.ready;
+  });
+});
+
+/** Drive an Ema-internal morph navigation: switch the route via
+ *  `window.ema.switchRoute` and wait for `EMAHotReload` (fired by the
+ *  shim after morph + script reload completes) so the next step sees
+ *  the new DOM, not the in-flight one. Awaits `window.ema.ready` (PR
+ *  srid/ema#181) to avoid racing the WS handshake. */
+export async function morphNav(page: Page, url: string): Promise<void> {
+  await page.evaluate(async (p) => {
+    while (!(window as any).ema?.switchRoute) {
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    await (window as any).ema.ready;
+    await new Promise<void>((resolve) => {
+      window.addEventListener("EMAHotReload", () => resolve(), {
+        once: true,
+      });
+      (window as any).ema.switchRoute(p);
+    });
+  }, url);
+}
+
+/** Open a route — the verb step definitions call. In `live` and
+ *  `static` modes this is a fresh `page.goto`; in `morph` mode it's an
+ *  Ema-internal route switch. Step definitions stay mode-agnostic by
+ *  going through this helper. */
+export async function openRoute(page: Page, url: string): Promise<void> {
+  if (mode === "morph") {
+    await morphNav(page, url);
+  } else {
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+  }
+}
 
 After(async function (this: EmanoteWorld, scenario) {
   if (scenario.result?.status === Status.FAILED) {

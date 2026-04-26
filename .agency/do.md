@@ -8,7 +8,7 @@ just fmt
 
 ## Test command
 - `just test` — Haskell unit tests
-- `just e2e-live` / `just e2e-static` — cucumber+Playwright e2e (live and static modes)
+- `just e2e-live` / `just e2e-static` / `just e2e-morph` — cucumber+Playwright e2e (live, static, and morph modes)
 
 ## CI command
 vira ci

@@ -1,9 +1,10 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import { EmanoteWorld } from "../support/world.ts";
+import { morphNav, openRoute } from "../support/hooks.ts";
 import * as assert from "node:assert";
 
 When("I open {string}", async function (this: EmanoteWorld, url: string) {
-  await this.page.goto(url, { waitUntil: "domcontentloaded" });
+  await openRoute(this.page, url);
 });
 
 When("I fetch {string}", async function (this: EmanoteWorld, url: string) {
@@ -458,29 +459,15 @@ Then(
   },
 );
 
-// Morph navigation: drive Ema's in-app route switch via the JS API
-// instead of clicking a link. Awaits `window.ema.ready` (PR srid/ema#181)
-// to avoid racing the WS handshake, then waits for `EMAHotReload` —
-// fired by the shim after morph + script reload completes — so the
-// next step sees the new DOM, not the in-flight one.
+// Explicit morph navigation step — for `@morph` scenarios that want to
+// assert an Ema in-app route switch independent of mode. In `morph`
+// mode `When I open` already morphs, but scenarios that need to mix a
+// fresh-load `goto` with a subsequent morph (or that want their intent
+// to be obvious in the .feature file) use this step.
 When(
   "I navigate via Ema to {string}",
   async function (this: EmanoteWorld, path: string) {
-    await this.page.evaluate(async (p) => {
-      // Wait for the shim to define window.ema (its `init()` runs
-      // synchronously on the module load, so this is usually a no-op
-      // — but the polling loop is cheap insurance against a race).
-      while (!(window as any).ema?.switchRoute) {
-        await new Promise((r) => setTimeout(r, 25));
-      }
-      await (window as any).ema.ready;
-      await new Promise<void>((resolve) => {
-        window.addEventListener("EMAHotReload", () => resolve(), {
-          once: true,
-        });
-        (window as any).ema.switchRoute(p);
-      });
-    }, path);
+    await morphNav(this.page, path);
   },
 );
 
