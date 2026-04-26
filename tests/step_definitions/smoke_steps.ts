@@ -1,6 +1,6 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import { EmanoteWorld } from "../support/world.ts";
-import { morphNav, openRoute } from "../support/hooks.ts";
+import { morphNav, openRoute } from "../support/navigation.ts";
 import * as assert from "node:assert";
 
 When("I open {string}", async function (this: EmanoteWorld, url: string) {

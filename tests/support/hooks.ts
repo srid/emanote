@@ -1,18 +1,10 @@
 /**
  * Cucumber hooks — browser lifecycle + emanote backend launcher.
  *
- * `EMANOTE_MODE` is the only axis that distinguishes runs:
- *   - `live`   → spawn `emanote -L <fixture> run --port N`
- *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
- *                on a random port via `serve-handler`
- *   - `morph`  → same backend as `live`, but `When I open` performs an
- *                Ema-internal route switch (`window.ema.switchRoute`)
- *                instead of a fresh page load — exercises every behavior
- *                via the morph code path that fresh-load tests miss.
- *
- * Step definitions only see `baseUrl` and the `openRoute` helper exported
- * here; they never learn which mode they ran in. Any mode-specific
- * branching in a step means the boundary has leaked. Keep it encapsulated.
+ * Mode dispatch and validation live in `./mode.ts`; navigation primitives
+ * (`openRoute`, `morphNav`, morph priming) live in `./navigation.ts`.
+ * This file owns only the test-lifecycle plumbing: backend start/stop,
+ * browser context, scenario filtering, screenshot-on-failure.
  */
 
 import {
@@ -23,7 +15,7 @@ import {
   Status,
 } from "@cucumber/cucumber";
 import { chromium } from "playwright";
-import type { Browser, Page } from "playwright";
+import type { Browser } from "playwright";
 import getPort from "get-port";
 // @ts-expect-error — serve-handler ships no TS types; its runtime shape
 // is a single function and we call it with an untyped options object.
@@ -35,8 +27,8 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
-
-type Mode = "live" | "static" | "morph";
+import { mode } from "./mode.ts";
+import { primeMorph } from "./navigation.ts";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -44,13 +36,6 @@ function requireEnv(name: string): string {
   return v;
 }
 
-const rawMode = requireEnv("EMANOTE_MODE");
-if (rawMode !== "live" && rawMode !== "static" && rawMode !== "morph") {
-  throw new Error(
-    `EMANOTE_MODE must be "live", "static", or "morph" (got ${JSON.stringify(rawMode)})`,
-  );
-}
-const mode: Mode = rawMode;
 const emanoteBin = requireEnv("EMANOTE_BIN");
 
 const fixtureDir = path.resolve(
@@ -239,59 +224,14 @@ Before(function (this: EmanoteWorld, scenario) {
 });
 
 // Morph mode: prime each scenario by landing on `/` via a fresh load
-// and waiting for the Ema WS shim to be ready. Subsequent `I open`
-// steps then route-switch via `window.ema.switchRoute` instead of
-// reloading — see `openRoute` below. Without this priming, the first
-// `I open` would have no `window.ema` to switch through.
+// and waiting for the Ema WS shim to be ready. Subsequent `openRoute`
+// calls then route-switch via `window.ema.switchRoute` instead of
+// reloading. Without this priming, the first `openRoute` would have no
+// `window.ema` to switch through.
 Before(async function (this: EmanoteWorld) {
   if (mode !== "morph") return;
-  await this.page.goto("/", { waitUntil: "domcontentloaded" });
-  await waitForEmaReady(this.page);
+  await primeMorph(this.page);
 });
-
-/** Wait for Ema's WS shim to be ready: poll until `window.ema.switchRoute`
- *  exists, then await `window.ema.ready` (PR srid/ema#181) so the next
- *  caller doesn't race the WS handshake. The shim's `init()` runs on
- *  module load and is usually a no-op poll, but the loop is cheap
- *  insurance against page-load timing. */
-async function waitForEmaReady(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    while (!(window as any).ema?.switchRoute) {
-      await new Promise((r) => setTimeout(r, 25));
-    }
-    await (window as any).ema.ready;
-  });
-}
-
-/** Drive an Ema-internal morph navigation: wait for the WS shim, then
- *  switch the route via `window.ema.switchRoute` and wait for
- *  `EMAHotReload` (fired by the shim after morph + script reload
- *  completes) so the next step sees the new DOM, not the in-flight one. */
-export async function morphNav(page: Page, url: string): Promise<void> {
-  await waitForEmaReady(page);
-  await page.evaluate(
-    (p) =>
-      new Promise<void>((resolve) => {
-        window.addEventListener("EMAHotReload", () => resolve(), {
-          once: true,
-        });
-        (window as any).ema.switchRoute(p);
-      }),
-    url,
-  );
-}
-
-/** Open a route — the verb step definitions call. In `live` and
- *  `static` modes this is a fresh `page.goto`; in `morph` mode it's an
- *  Ema-internal route switch. Step definitions stay mode-agnostic by
- *  going through this helper. */
-export async function openRoute(page: Page, url: string): Promise<void> {
-  if (mode === "morph") {
-    await morphNav(page, url);
-  } else {
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-  }
-}
 
 After(async function (this: EmanoteWorld, scenario) {
   if (scenario.result?.status === Status.FAILED) {
