@@ -26,8 +26,8 @@ resolveUnresolvedRelTarget model currentRoute = \case
   Rel.URTWikiLink (_wlType, wl) -> do
     resolveWikiLinkMustExist model currentRoute wl
       <&> resourceSiteRoute
-  Rel.URTResource r ->
-    resolveModelRoute model r
+  Rel.URTResource candidates ->
+    resolveModelRouteCandidates model candidates
       <&> resourceSiteRoute
   Rel.URTVirtual virtualRoute -> do
     Rel.RRTFound
@@ -72,6 +72,21 @@ resolveModelRoute model lr =
     (`M.modelLookupStaticFileByRoute` model)
     (R.modelRouteCase lr)
     & maybe Rel.RRTMissing Rel.RRTFound
+
+{- | Try each candidate `ModelRoute` in order; the first one that
+exists in the model wins. The candidate list is built by
+`mkModelRouteCandidates` and captures the URL-to-resource-kind
+ambiguity (notably @.xml@ → feed route OR static asset; see #547).
+-}
+resolveModelRouteCandidates ::
+  Model ->
+  NonEmpty R.ModelRoute ->
+  Rel.ResolvedRelTarget (Either (R.LMLView, MN.Note) SF.StaticFile)
+resolveModelRouteCandidates model =
+  firstFound . fmap (resolveModelRoute model)
+  where
+    firstFound (Rel.RRTMissing :| (x : xs)) = firstFound (x :| xs)
+    firstFound (other :| _) = other
 
 resourceSiteRoute :: Either (R.LMLView, MN.Note) SF.StaticFile -> SR.SiteRoute
 resourceSiteRoute =

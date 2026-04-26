@@ -274,13 +274,36 @@ missingNote route404 urlPath =
     $ B.Para
       [ B.Str "No note has the URL "
       , B.Code B.nullAttr $ "/" <> urlPath
-      , -- TODO: org
-        B.Span (cls "font-mono text-sm")
-          $ one
-          $ B.Str
-          $ ". You may create a file with that name, ie. one of: "
-          <> oneOfLmlFilenames route404
+      , B.Str ". "
+      , B.Span (cls "font-mono text-sm") $ one $ B.Str $ missingUrlHint urlPath route404
       ]
+
+{- | Hint text to show on the missing-link page. The naive form
+("create one of: foo.xml.md, foo.xml.org") is misleading whenever the
+requested URL has a non-LML extension — `foo.xml` is far more likely
+a static asset (or feed-enabled `foo.md`) than a note literally named
+`foo.xml.md`. See #547.
+-}
+missingUrlHint :: Text -> R.R ext -> Text
+missingUrlHint urlPath route404
+  | Just stem <- T.stripSuffix ".xml" urlPath =
+      "You may create a static file `"
+        <> urlPath
+        <> "`, or a feed-enabled note `"
+        <> stem
+        <> ".md`."
+  | hasNonLmlExt urlPath =
+      "You may create a static file with that name."
+  | otherwise =
+      "You may create a file with that name, ie. one of: "
+        <> oneOfLmlFilenames route404
+
+{- | True when @url@ has an extension that is neither LML (md/org)
+nor the canonical HTML/XML cases handled elsewhere in the hint.
+-}
+hasNonLmlExt :: Text -> Bool
+hasNonLmlExt url = case T.breakOnEnd "." url of
+  (prefix, ext) -> not (T.null prefix) && ext `notElem` ["md", "org", "html", "xml"]
 
 oneOfLmlFilenames :: R ext -> Text
 oneOfLmlFilenames r =
