@@ -222,6 +222,19 @@ Then(
   },
 );
 
+Then(
+  "the first article link has HTML containing {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const link = this.page.locator("article a").first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const html = await link.innerHTML();
+    assert.ok(
+      html.includes(needle),
+      `First article link expected HTML to contain ${JSON.stringify(needle)}, got ${JSON.stringify(html)}.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
