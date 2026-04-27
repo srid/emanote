@@ -30,6 +30,7 @@
 - TOC sidebar: tightened entry padding and styled the overflow scrollbar (Firefox `scrollbar-width: thin` + WebKit pseudo-element) so long tables of contents no longer surface the chunky OS-default bar (closes [#668](https://github.com/srid/emanote/issues/668)).
 - Markdown tables now honour Pandoc's column alignment, column widths, cell `rowspan` / `colspan`, row & cell attributes, and table footers — previously every field beyond "rows of cells" was discarded (closes [#27](https://github.com/srid/emanote/issues/27); fixed upstream in [srid/heist-extra#15](https://github.com/srid/heist-extra/pull/15)).
 - Live server: assets bundled under `_emanote-static/` (skylighting CSS, self-hosted fonts, inverted-tree CSS, emanote-logo, Stork CSS+JS) now cache-bust with `?t=<mtime>` instead of being served bare. Edits to any of these files in `emanote run` invalidate the browser cache without a manual restart. Templates use a new `<emanoteStaticUrl path="…">${url}</emanoteStaticUrl>` splice; the older `${ema:emanoteStaticLayerUrl}` continues to work for third-party templates but skips the cache buster (closes [#666](https://github.com/srid/emanote/issues/666)).
+- Markdown link labels containing URLs or email addresses now stay inside the outer link instead of rendering as separate nested hyperlinks (closes [#349](https://github.com/srid/emanote/issues/349)).
 
 ## 1.4.0.0 (2025-08-18)
 
