@@ -17,6 +17,10 @@ import Text.Show qualified (Show (show))
 newtype R (ext :: FileType a) = R {unRoute :: NonEmpty Slug}
   deriving stock (Eq, Ord, Typeable, Data)
 
+instance NFData (R ext) where
+  rnf =
+    rnf . fmap Slug.unSlug . unRoute
+
 instance (HasExt ext) => ToJSON (R ext) where
   toJSON = toJSON . encodeRoute
 

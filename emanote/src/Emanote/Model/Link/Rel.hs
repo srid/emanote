@@ -10,7 +10,7 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
+import Emanote.Model.Note (Note, noteDoc, noteNeedsFullParse, noteResolveLinkBase, noteRoute, noteSourceText)
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
@@ -67,7 +67,11 @@ makeLenses ''Rel
 
 noteRels :: Note -> IxRel
 noteRels note =
-  extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
+  case (note ^. noteNeedsFullParse, note ^. noteSourceText) of
+    (True, Just s) ->
+      textRels note s
+    _ ->
+      extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
@@ -78,6 +82,39 @@ noteRels note =
             let parentR = noteResolveLinkBase note
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
             pure $ Rel (note ^. noteRoute) target ctx
+
+textRels :: Note -> Text -> IxRel
+textRels note =
+  Ix.fromList . concatMap lineRels . lines
+  where
+    lineRels line =
+      flip mapMaybe (wikiLinksInLine line) $ \(attrs, url) -> do
+        let parentR = noteResolveLinkBase note
+        (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
+        pure $ Rel (note ^. noteRoute) target [B.Para [B.Str $ T.strip line]]
+
+wikiLinksInLine :: Text -> [([(Text, Text)], Text)]
+wikiLinksInLine =
+  go
+  where
+    go line =
+      case T.breakOn "[[" line of
+        (_, "") -> []
+        (before, rest) ->
+          case T.breakOn "]]" (T.drop 2 rest) of
+            (_, "") -> []
+            (target0, after) ->
+              let target = T.takeWhile (/= '|') target0
+                  attrs = [("data-wikilink-type", wikiLinkType before after)]
+               in (attrs, target) : go (T.drop 2 after)
+
+    wikiLinkType before after
+      | T.isPrefixOf "]]#" after = "WikiLinkBranch"
+      | otherwise =
+          case snd <$> T.unsnoc before of
+            Just '!' -> "WikiLinkEmbed"
+            Just '#' -> "WikiLinkTag"
+            _ -> "WikiLinkNormal"
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL

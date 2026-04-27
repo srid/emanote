@@ -43,6 +43,7 @@ import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Relude
+import Text.Pandoc.Scripting (ScriptingEngine)
 
 data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
@@ -54,6 +55,8 @@ data ModelT encF = Model
   , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
   , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
+  , _modelScriptingEngine :: Maybe ScriptingEngine
+  , _modelPluginBaseDirs :: [FilePath]
   , _modelCompileTailwind :: Bool
   , _modelInstanceID :: UUID
   -- ^ An unique ID for this process's model. ID changes across processes.
@@ -94,14 +97,16 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren ctw instanceId storkVar =
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Maybe ScriptingEngine -> [FilePath] -> Bool -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren scriptingEngine pluginBaseDirs ctw instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
     , _modelEmaCLIAction = act
     , _modelRoutePrism = Const ()
     , _modelPandocRenderers = ren
+    , _modelScriptingEngine = scriptingEngine
+    , _modelPluginBaseDirs = pluginBaseDirs
     , _modelCompileTailwind = ctw
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
@@ -138,6 +143,29 @@ modelInsertNote note =
     %~ updateIxMulti r (Task.noteTasks note)
   where
     r = note ^. N.noteRoute
+
+modelInsertNotes :: [Note] -> ModelT f -> ModelT f
+modelInsertNotes [] =
+  id
+modelInsertNotes notes =
+  modelNotes
+    %~ ( \oldNotes ->
+          let withoutOld = flipfoldl' Ix.deleteIx oldNotes routes
+              withNew = Ix.fromList notes `Ix.union` withoutOld
+              withAncestors =
+                foldl' (\acc note -> injectAncestors (N.noteAncestors note) acc) withNew notes
+           in flipfoldl' dropRedundantAncestor withAncestors routes
+       )
+      >>> modelRels
+    %~ replaceMulti routes newRels
+      >>> modelTasks
+    %~ replaceMulti routes newTasks
+  where
+    routes = fmap (^. N.noteRoute) notes
+    newRels =
+      Ix.fromList $ notes >>= Ix.toList . Rel.noteRels
+    newTasks =
+      Ix.fromList $ notes >>= Ix.toList . Task.noteTasks
 
 {- | If a placeholder route was added already, but the newly added note is a
  non-Markdown, removce that markdown placeholder route.
@@ -220,6 +248,15 @@ deleteIxMulti ::
 deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in flipfoldl' Ix.delete rels candidates
+
+replaceMulti ::
+  (Ix.Indexable ixs a, Ix.IsIndexOf ix ixs) =>
+  [ix] ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a
+replaceMulti routes new old =
+  new `Ix.union` flipfoldl' deleteIxMulti old routes
 
 modelLookupStaticFile :: FilePath -> ModelT f -> Maybe StaticFile
 modelLookupStaticFile fp m = do

@@ -1,7 +1,9 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
+import Data.IxSet.Typed qualified as Ix
 import Data.List (partition)
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
@@ -12,6 +14,8 @@ import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
+import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
@@ -74,35 +78,36 @@ render m = \case
             & setErrorPageMeta
             & MN.noteTitle
             .~ "! Missing link"
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note404
   SR.SiteRoute_AmbiguousR urlPath notes -> do
     let noteAmb =
           MN.ambiguousNoteURL urlPath notes
             & setErrorPageMeta
             & MN.noteTitle
             .~ "! Ambiguous link"
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-  SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m noteAmb
+  SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
   SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
   where
     setErrorPageMeta =
       MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
 
-renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
+renderResourceRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.ResourceRoute -> m (Ema.Asset LByteString)
 renderResourceRoute m = \case
   SR.ResourceRoute_LML view r -> do
     case M.modelLookupNoteByRoute (view, r) m of
-      Just (R.LMLView_Html, note) ->
-        Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
-      Just (R.LMLView_Atom, note) ->
-        case renderFeed m note of
+      Just (R.LMLView_Html, note) -> do
+        Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note
+      Just (R.LMLView_Atom, note) -> do
+        note' <- parseNoteIfNeeded m note
+        case renderFeed m note' of
           Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
-          Right feed -> Ema.AssetGenerated Ema.Other feed
+          Right feed -> pure $ Ema.AssetGenerated Ema.Other feed
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
   SR.ResourceRoute_StaticFile _ fpAbs ->
-    Ema.AssetStatic fpAbs
+    pure $ Ema.AssetStatic fpAbs
 
 renderVirtualRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.VirtualRoute -> m (Ema.Asset LByteString)
 renderVirtualRoute m = \case
@@ -146,8 +151,10 @@ patchMeta meta =
   where
     siteUrl = SData.lookupAeson @Text "" ("page" :| ["siteUrl"]) meta
 
-renderLmlHtml :: Model -> MN.Note -> LByteString
-renderLmlHtml model note = do
+renderLmlHtml :: (MonadIO m, MonadLoggerIO m) => Model -> MN.Note -> m LByteString
+renderLmlHtml model0 note0 = do
+  note <- parseNoteIfNeeded model0 note0
+  model <- parseEmbeddedNotesIfNeeded model0 note
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       doc = prependDataErrors (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
@@ -161,7 +168,7 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
+  pure $ withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
@@ -211,6 +218,41 @@ renderLmlHtml model note = do
         $ \ctx' ->
           renderToc ctx' toc
 
+parseNoteIfNeeded :: (MonadIO m, MonadLoggerIO m) => Model -> MN.Note -> m MN.Note
+parseNoteIfNeeded model =
+  case model ^. M.modelScriptingEngine of
+    Nothing ->
+      pure
+    Just scriptingEngine ->
+      MN.parseNoteIfNeeded scriptingEngine (model ^. M.modelPluginBaseDirs)
+
+parseEmbeddedNotesIfNeeded :: (MonadIO m, MonadLoggerIO m) => Model -> MN.Note -> m Model
+parseEmbeddedNotesIfNeeded model note =
+  go Set.empty model [note]
+  where
+    go _ model' [] =
+      pure model'
+    go seen model' (currentNote : rest) = do
+      let embeddedNotes =
+            filter
+              ( \embeddedNote ->
+                  embeddedNote
+                    ^. MN.noteNeedsFullParse
+                      && Set.notMember (embeddedNote ^. MN.noteRoute) seen
+              )
+              $ embeddedNotesFrom model' currentNote
+      parsedNotes <- traverse (parseNoteIfNeeded model') embeddedNotes
+      let seen' = flipfoldl' Set.insert seen $ fmap (^. MN.noteRoute) embeddedNotes
+          model'' = M.modelInsertNotes parsedNotes model'
+      go seen' model'' (rest <> parsedNotes)
+
+    embeddedNotesFrom model' currentNote =
+      ordNubOn (^. MN.noteRoute) $ do
+        rel <- Ix.toList $ Rel.noteRels currentNote
+        Rel.URTWikiLink (WL.WikiLinkEmbed, wl) <- one $ rel ^. Rel.relTo
+        Rel.RRTFound (Left (_view, embeddedNote)) <- one $ Resolve.resolveWikiLinkMustExist model' (currentNote ^. MN.noteRoute) wl
+        pure embeddedNote
+
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
   Splices.listSplice bs "backlink"
@@ -236,6 +278,8 @@ If there is no 'current route', all sub-trees are marked as active/open.
 -}
 routeTreeSplices :: (Monad n) => C.TemplateRenderCtx n -> Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice Identity)
 routeTreeSplices tCtx mCurrentRoute model = do
+  let activeAncestorRoutes =
+        maybe Set.empty (Set.fromList . concatMap Tree.flatten . G.modelFolgezettelAncestorTree model) mCurrentRoute
   "ema:route-tree" ##
     Splices.treeSplice getOrder (model ^. M.modelFolgezettelTree)
       $ \(last -> nodeRoute) children -> do
@@ -247,10 +291,7 @@ routeTreeSplices tCtx mCurrentRoute model = do
               -- Active tree checking is applicable only when there is an
               -- active route (i.e., mr is a Just)
               flip (maybe True) mCurrentRoute $ \r ->
-                -- FIXME: Performance! (exponential complexity)
-                let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
-                    isFolgeAnc = Set.member nodeRoute folgeAnc
-                 in r == nodeRoute || isFolgeAnc
+                r == nodeRoute || Set.member nodeRoute activeAncestorRoutes
             openTree =
               isActiveTree -- Active tree is always open
                 || not (getCollapsed nodeRoute)

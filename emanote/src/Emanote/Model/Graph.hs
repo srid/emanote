@@ -143,6 +143,7 @@ folgezettelTreesFrom model fromRoute =
     loop fromRoute allRoutes
   where
     allRoutes = Set.fromList $ fmap N._noteRoute $ Ix.toList $ model ^. modelNotes
+    childRoutesByParent = folgezettelChildMap model
     -- Run in a state monad of unvisited routes, taking visited routes as argument.
     go :: (MonadState (Set R.LMLRoute) m) => Set R.LMLRoute -> R.LMLRoute -> m (Tree R.LMLRoute)
     go visitedRoutes route
@@ -151,9 +152,34 @@ folgezettelTreesFrom model fromRoute =
           pure $ Node route []
       | otherwise = do
           modify $ Set.delete route
-          let children = folgezettelChildrenFor model route
+          let children = ordNub $ Map.findWithDefault mempty route childRoutesByParent
           cs <- go (Set.insert route visitedRoutes) `traverse` children
           pure $ Node route cs
+
+folgezettelChildMap :: Model -> Map R.LMLRoute [R.LMLRoute]
+folgezettelChildMap model =
+  Map.fromListWith (<>)
+    $ relationEdges
+    <> folderEdges
+  where
+    relationEdges = do
+      rel <- Ix.toList $ model ^. modelRels
+      let source = rel ^. Rel.relFrom
+      case rel ^. Rel.relTo of
+        Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> do
+          child <- maybeToList $ lookupNoteByWikiLink model source wl
+          pure (source, one child)
+        Rel.URTWikiLink (WL.WikiLinkTag, wl) -> do
+          parent <- maybeToList $ lookupNoteByWikiLink model source wl
+          pure (parent, one source)
+        _ ->
+          mempty
+    folderEdges = do
+      note <- Ix.toList $ model ^. modelNotes
+      parentFolder <- maybeToList $ N.noteParent note
+      let parentRoute = R.defaultLmlRoute parentFolder
+      guard $ folderFolgezettelEnabledFor model parentRoute
+      pure (parentRoute, one $ note ^. MN.noteRoute)
 
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
 folderFolgezettelEnabledFor model r =

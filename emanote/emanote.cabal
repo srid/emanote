@@ -108,6 +108,7 @@ common library-common
     , commonmark-wikilink    >=0.2
     , containers
     , data-default
+    , deepseq
     , deriving-aeson
     , directory
     , ema                    >=0.10.1
@@ -254,6 +255,7 @@ test-suite test
     build-depends: emanote
     other-modules:
       Emanote.Model.Link.RelSpec
+      Emanote.Model.NoteSpec
       Emanote.Model.QuerySpec
       Emanote.Model.TocSpec
       Emanote.Pandoc.ExternalLinkSpec

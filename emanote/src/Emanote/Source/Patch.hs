@@ -1,6 +1,7 @@
 -- | Patch model state depending on file change event.
 module Emanote.Source.Patch (
   patchModel,
+  patchModels,
   filePatterns,
   ignorePatterns,
 ) where
@@ -8,6 +9,7 @@ module Emanote.Source.Patch (
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
+import Data.Map.Strict qualified as Map
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
@@ -16,6 +18,7 @@ import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
+  chainM,
   log,
   logD,
   logE,
@@ -31,6 +34,73 @@ import System.UnionMount qualified as UM
 import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
+
+patchModels ::
+  (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  Stork.IndexVar ->
+  -- | Lua scripting engine
+  ScriptingEngine ->
+  -- | Type of the files being changed
+  R.FileType R.SourceExt ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
+  m (ModelEma -> ModelEma)
+patchModels layers noteF storkIndexTVar scriptingEngine fpType actions = do
+  logger <- askLoggerIO
+  now <- liftIO getCurrentTime
+  let newLogger loc src lvl s =
+        logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
+  runLoggingT (patchModels' layers noteF storkIndexTVar scriptingEngine fpType actions) newLogger
+
+patchModels' ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  Stork.IndexVar ->
+  -- | Lua scripting engine
+  ScriptingEngine ->
+  -- | Type of the files being changed
+  R.FileType R.SourceExt ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
+  m (ModelEma -> ModelEma)
+patchModels' layers noteF storkIndexTVar scriptingEngine fpType actions =
+  case fpType of
+    R.LMLType lmlType ->
+      patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions
+    _ ->
+      uncurry (patchModel' layers noteF storkIndexTVar scriptingEngine fpType) `chainM` Map.toList actions
+
+patchLmlModels ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  Stork.IndexVar ->
+  -- | Lua scripting engine
+  ScriptingEngine ->
+  R.LML ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
+  m (ModelEma -> ModelEma)
+patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions = do
+  unless (Map.null actions)
+    $ Stork.clearStorkIndex storkIndexTVar
+  (notes, deletes) <-
+    fmap partitionEithers $ forM (Map.toList actions) $ \(fp, action) -> do
+      case R.mkLMLRouteFromKnownFilePath lmlType fp of
+        Nothing ->
+          pure $ Right id
+        Just r ->
+          case action of
+            UM.Refresh refreshAction overlays -> do
+              let fpAbs = head overlays
+              s <- readRefreshedFile refreshAction $ locResolve fpAbs
+              note <- N.parseNoteForModel scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
+              note' <- liftIO . evaluateWHNF . force $ noteF note
+              pure $ Left note'
+            UM.Delete -> do
+              log $ "Removing note: " <> toText fp
+              pure $ Right $ M.modelDeleteNote r
+  pure $ foldr (>>>) (M.modelInsertNotes notes) deletes
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
@@ -91,8 +161,9 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             UM.Refresh refreshAction overlays -> do
               let fpAbs = head overlays
               s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
-              pure $ M.modelInsertNote $ noteF note
+              note <- N.parseNoteForModel scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
+              note' <- liftIO . evaluateWHNF . force $ noteF note
+              pure $ M.modelInsertNote note'
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r

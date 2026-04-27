@@ -55,21 +55,21 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   storkIndex <- Stork.newIndex
-  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
+  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
+      pluginBaseDirs = Loc.userLayersToSearch layers
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers (Just scriptingEngine) pluginBaseDirs _emanoteCompileTailwind instanceId storkIndex
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+      (mapFsChanges $ Patch.patchModels layers _emanoteConfigNoteFn storkIndex scriptingEngine)
 
 type ChangeHandler tag model m =
   tag ->
-  FilePath ->
-  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (model -> model)
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
@@ -91,7 +91,7 @@ mapFsChangesOnExt ::
   tag ->
   Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (model -> model)
-mapFsChangesOnExt h fpType fps = do
-  uncurry (h fpType) `chainM` Map.toList fps
+mapFsChangesOnExt h =
+  h
 
 makeLenses ''EmanoteConfig
