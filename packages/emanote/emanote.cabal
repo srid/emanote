@@ -181,6 +181,8 @@ library
     Emanote.Source.Dynamic
     Emanote.Source.Patch
     Emanote.Static.Sources
+    Emanote.Stork
+    Emanote.Stork.Index
     Emanote.View
     Emanote.View.Common
     Emanote.View.Export

@@ -12,7 +12,6 @@ import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.StaticFile (readStaticFileInfo)
-import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Prelude (
   log,
   logD,
@@ -23,6 +22,7 @@ import Emanote.Site.Model (ModelEma)
 import Emanote.Site.Model qualified as M
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
+import Emanote.Stork.Index qualified as Stork
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
 import Relude

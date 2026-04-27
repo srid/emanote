@@ -1,7 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Emanote.Model.Stork.Index (
+module Emanote.Stork.Index (
   IndexVar,
   newIndex,
   clearStorkIndex,

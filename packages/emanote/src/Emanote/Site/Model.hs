@@ -17,7 +17,6 @@ import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note (IxNote, Note)
 import Emanote.Model.SData (IxSData, SData)
 import Emanote.Model.StaticFile (IxStaticFile, StaticFile, StaticFileInfo)
-import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type qualified as Core
@@ -27,6 +26,7 @@ import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
+import Emanote.Stork.Index qualified as Stork
 import Heist.Extra.TemplateState (TemplateState)
 import Optics.Core (Lens', Prism', (%))
 import Optics.Operators ((%~), (^.))

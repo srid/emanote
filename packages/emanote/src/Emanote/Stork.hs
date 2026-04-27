@@ -1,4 +1,4 @@
-module Emanote.Model.Stork (
+module Emanote.Stork (
   renderStorkIndex,
 ) where
 
@@ -7,7 +7,12 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Stork.Index (
+import Emanote.Model.Title qualified as Tit
+import Emanote.Model.Type (Model)
+import Emanote.Model.Type qualified as M
+import Emanote.Route qualified as R
+import Emanote.Source.Loc qualified as Loc
+import Emanote.Stork.Index (
   Config (Config),
   File (File),
   FileType (FileType_Markdown, FileType_PlainText),
@@ -16,11 +21,6 @@ import Emanote.Model.Stork.Index (
   Input (Input),
   readOrBuildStorkIndex,
  )
-import Emanote.Model.Title qualified as Tit
-import Emanote.Model.Type (Model)
-import Emanote.Model.Type qualified as M
-import Emanote.Route qualified as R
-import Emanote.Source.Loc qualified as Loc
 import Optics.Core ((^.))
 import Relude
 import System.FilePath ((</>))

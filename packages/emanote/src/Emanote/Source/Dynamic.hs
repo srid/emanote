@@ -18,7 +18,6 @@ import Ema (Dynamic (..))
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
-import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Prelude (chainM)
 import Emanote.Route (LMLRoute)
@@ -27,6 +26,7 @@ import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
+import Emanote.Stork.Index qualified as Stork
 import Optics.TH (makeLenses)
 import Paths_emanote qualified
 import Relude

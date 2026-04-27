@@ -74,7 +74,6 @@ common library-common
     , commonmark-wikilink  >=0.2
     , containers
     , data-default
-    , deriving-aeson
     , directory
     , emanote-pandoc
     , emanote-route
@@ -95,15 +94,12 @@ common library-common
     , pandoc-lua-engine
     , pandoc-types
     , parsec
-    , process-extras
     , relude               >=1.0
     , tagtree
     , text
     , time
-    , tomland
     , unliftio
     , url-slug
-    , which
     , xmlhtml
     , yaml
 
@@ -123,8 +119,6 @@ library
     Emanote.Model.Query
     Emanote.Model.SData
     Emanote.Model.StaticFile
-    Emanote.Model.Stork
-    Emanote.Model.Stork.Index
     Emanote.Model.Task
     Emanote.Model.Title
     Emanote.Model.Toc

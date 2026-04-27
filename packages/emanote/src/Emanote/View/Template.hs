@@ -13,7 +13,6 @@ import Emanote.Model.Graph qualified as G
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.StaticFile qualified as SF
-import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
@@ -21,6 +20,7 @@ import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.Site.Model (Model, ModelEma)
 import Emanote.Site.Model qualified as M
+import Emanote.Stork (renderStorkIndex)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
