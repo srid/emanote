@@ -24,6 +24,7 @@ import Data.Time.Format (defaultTimeLocale, formatTime)
 import Ema (UrlStrategy (..), routeUrlWith)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
+import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta qualified as Model
 import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
@@ -147,11 +148,12 @@ decodeGeneratedRoute model fp =
       SiteRoute_AmbiguousR ("/" <> fp) (N._noteRoute <$> ns)
 
 noteFeedSiteRoute :: N.Note -> SiteRoute
-noteFeedSiteRoute = SiteRoute_ResourceRoute . ResourceRoute_LML R.LMLView_Atom . N._noteRoute
+noteFeedSiteRoute =
+  Resolve.resourceSiteRoute . Left . (R.LMLView_Atom,)
 
 noteFileSiteRoute :: (R.LMLView, N.Note) -> SiteRoute
 noteFileSiteRoute =
-  lmlSiteRoute . fmap N._noteRoute
+  Resolve.resourceSiteRoute . Left
 
 noteFileSiteRoute' :: N.Note -> SiteRoute
 noteFileSiteRoute' =
@@ -166,7 +168,7 @@ lmlResourceRoute = ResourceRoute_LML
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-  SiteRoute_ResourceRoute . ResourceRoute_StaticFile . SF._staticFileRoute
+  Resolve.resourceSiteRoute . Right
 
 {- | Generate the static URL for a site route, including special handling for html-proofer compatibility.
 
