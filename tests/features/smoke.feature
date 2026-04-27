@@ -52,6 +52,10 @@ Feature: Smoke
     When I open "/subfolder.html"
     Then the article link with text "sibling" has href containing "subfolder/sibling"
 
+  Scenario: Wiki link custom titles render HTML entities (regression: #441)
+    When I open "/wikilink-entities.html"
+    Then the first article link has HTML containing "Spivak&nbsp;(2014)"
+
   Scenario: A malformed YAML file is surfaced as a banner on its sibling note (regression: #285)
     When I open "/broken-285.html"
     Then the page rendered without an Ema exception

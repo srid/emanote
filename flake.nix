@@ -29,7 +29,7 @@
     unionmount.flake = false;
     commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
     commonmark-simple.flake = false;
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink/0.2.0.0";
+    commonmark-wikilink.url = "github:srid/commonmark-wikilink/master";
     commonmark-wikilink.flake = false;
 
     emanote-template.url = "github:srid/emanote-template";
