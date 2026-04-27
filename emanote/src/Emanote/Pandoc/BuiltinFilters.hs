@@ -1,6 +1,5 @@
 module Emanote.Pandoc.BuiltinFilters (
   preparePandoc,
-  flattenNestedLinks,
 ) where
 
 import Emanote.Pandoc.ExternalLink (setExternalLinkIcon)
@@ -16,6 +15,7 @@ preparePandoc =
   linkifyInlineTags
     >>> fixEmojiFontFamily
     >>> setExternalLinkIcon
+    >>> flattenNestedLinks
 
 -- HashTag.hs generates a Span for inline tags.
 -- Here, we must link them to the special tag index page.
@@ -46,23 +46,12 @@ fixEmojiFontFamily =
            in B.Span (id', classes, newAttrs) is
     x -> x
 
-{- | Replace any @Link@ nested inside a parent @Link@'s label with its inner
-inlines, dropping the inner link's target.
-
-The @autolink@ extension in @commonmark-hs@ greedily turns bare URLs and email
-addresses into autolinks even when they appear inside another link's label —
-including positions wrapped in emphasis (@Strong@, @Emph@, @Span@, …). After
-Pandoc translation, this surfaces as @Link [… Link …] target@, which renderers
-split into multiple @\<a>@ tags.
-
-This pass runs as the postcondition of Emanote's whole pre-render pipeline
-(@preparePandoc@ + user-supplied Pandoc filters) so that the AST handed to the
-renderer is guaranteed not to contain nested links, regardless of what user
-filters did. Non-link container inlines and @Image@ children are preserved
-structurally; only @Link@ wrappers are unwrapped.
-
-See <https://github.com/srid/emanote/issues/349>.
--}
+-- Unwrap any @Link@ nested inside another @Link@'s label, keeping the inner
+-- inlines and dropping the inner link's target. The @autolink@ extension in
+-- @commonmark-hs@ greedily wraps bare URLs in their own @Link@ even inside a
+-- parent link's label — including positions wrapped in @Strong@/@Emph@/@Span@
+-- — and Pandoc renderers split the result into multiple @\<a>@ tags.
+-- See https://github.com/srid/emanote/issues/349.
 flattenNestedLinks :: (W.Walkable B.Inline b) => b -> b
 flattenNestedLinks = W.walk $ \case
   B.Link attr inlines target -> B.Link attr (W.walk dropLinks inlines) target

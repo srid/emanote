@@ -235,6 +235,27 @@ Then(
   },
 );
 
+// #349: count assertion is the strongest regression guard. Before the fix,
+// each of the four cases produces 2-3 anchors (parent + autolinks); after
+// the fix, exactly 4 anchors target the four `issue349-*` URLs. Counting
+// all `<a>`s in the article body and filtering by href substring catches
+// every regression mode (extra autolink, empty parent, nested <a>, …).
+Then(
+  "the article body has exactly {int} hyperlinks to issue-349 case targets",
+  async function (this: EmanoteWorld, expected: number) {
+    const hrefs = await this.page.$$eval("article a[href]", (anchors) =>
+      anchors
+        .map((a) => a.getAttribute("href") ?? "")
+        .filter((h) => h.includes("issue349-")),
+    );
+    assert.strictEqual(
+      hrefs.length,
+      expected,
+      `Expected ${expected} article links to issue349 targets, got ${hrefs.length}: ${JSON.stringify(hrefs)}.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
