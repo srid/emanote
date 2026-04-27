@@ -94,7 +94,7 @@ generateNoteHeader model note =
 -- | Read note content from file
 readNoteContent :: Note.Note -> IO (Maybe Text)
 readNoteContent note =
-  case Note._noteSource note of
+  case note ^. Note.noteSource of
     Nothing -> pure Nothing -- Note has no source file (auto-generated)
     Just locAndFile -> do
       let actualFilePath = locResolve locAndFile

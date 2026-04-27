@@ -31,6 +31,10 @@
 - Markdown tables now honour Pandoc's column alignment, column widths, cell `rowspan` / `colspan`, row & cell attributes, and table footers — previously every field beyond "rows of cells" was discarded (closes [#27](https://github.com/srid/emanote/issues/27); fixed upstream in [srid/heist-extra#15](https://github.com/srid/heist-extra/pull/15)).
 - Live server: assets bundled under `_emanote-static/` (skylighting CSS, self-hosted fonts, inverted-tree CSS, emanote-logo, Stork CSS+JS) now cache-bust with `?t=<mtime>` instead of being served bare. Edits to any of these files in `emanote run` invalidate the browser cache without a manual restart. Templates use a new `<emanoteStaticUrl path="…">${url}</emanoteStaticUrl>` splice; the older `${ema:emanoteStaticLayerUrl}` continues to work for third-party templates but skips the cache buster (closes [#666](https://github.com/srid/emanote/issues/666)).
 
+**Performance improvements**
+
+- Large Markdown notebooks use substantially less live-server memory by storing simple notes in a deferred form and compacting repeated startup wikilink relations while preserving backlink contexts on demand (closes [#66](https://github.com/srid/emanote/issues/66)).
+
 ## 1.4.0.0 (2025-08-18)
 
 **Notable features**

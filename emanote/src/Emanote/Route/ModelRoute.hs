@@ -34,21 +34,21 @@ type StaticFileRoute = R 'AnyExt
 
 data LMLView = LMLView_Html | LMLView_Atom
   deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
+  deriving anyclass (NFData, ToJSON)
 
 -- | A R to anywhere in `Model`
 data ModelRoute
   = ModelRoute_StaticFile StaticFileRoute
   | ModelRoute_LML LMLView LMLRoute
   deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
+  deriving anyclass (NFData, ToJSON)
 
 -- | R to a note file in LML (lightweight markup language) format
 data LMLRoute
   = LMLRoute_Md (R ('LMLType 'Md))
   | LMLRoute_Org (R ('LMLType 'Org))
   deriving stock (Eq, Show, Ord, Generic)
-  deriving anyclass (ToJSON)
+  deriving anyclass (NFData, ToJSON)
 
 defaultLmlRoute :: R (ext :: FileType a) -> LMLRoute
 defaultLmlRoute =

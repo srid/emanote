@@ -1,6 +1,7 @@
 -- | Patch model state depending on file change event.
 module Emanote.Source.Patch (
   patchModel,
+  patchModels,
   filePatterns,
   ignorePatterns,
 ) where
@@ -8,94 +9,123 @@ module Emanote.Source.Patch (
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
+import Data.Map.Strict qualified as Map
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
+import Emanote.Model.Note (ParseContext)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
+  chainM,
   log,
   logD,
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
-import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
--- | Map a filesystem change to the corresponding model change.
-patchModel ::
+patchModels ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
-  -- | Type of the file being changed
+  ParseContext ->
+  -- | Type of the files being changed
   R.FileType R.SourceExt ->
-  -- | Path to the file being changed
-  FilePath ->
-  -- | Specific change to the file, along with its paths from other "layers"
-  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModels noteF storkIndexTVar parseContext fpType actions = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
-  -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action) newLogger
+  runLoggingT (patchModels' noteF storkIndexTVar parseContext fpType actions) newLogger
 
--- | Map a filesystem change to the corresponding model change.
-patchModel' ::
+patchModels' ::
   (MonadIO m, MonadLogger m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
-  -- | Type of the file being changed
+  ParseContext ->
+  -- | Type of the files being changed
   R.FileType R.SourceExt ->
-  -- | Path to the file being changed
-  FilePath ->
-  -- | Specific change to the file, along with its paths from other "layers"
-  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModels' noteF storkIndexTVar parseContext fpType actions =
   case fpType of
-    R.LMLType lmlType -> do
+    R.LMLType lmlType ->
+      patchLmlModels noteF storkIndexTVar parseContext lmlType actions
+    _ ->
+      uncurry (patchNonLmlModel fpType) `chainM` Map.toList actions
+
+patchLmlModels ::
+  (MonadIO m, MonadLogger m) =>
+  (N.Note -> N.Note) ->
+  Stork.IndexVar ->
+  ParseContext ->
+  R.LML ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
+  m (ModelEma -> ModelEma)
+patchLmlModels noteF storkIndexTVar parseContext lmlType actions = do
+  unless (Map.null actions)
+    $ Stork.clearStorkIndex storkIndexTVar
+  (notes, deletes) <-
+    fmap partitionEithers $ forM (Map.toList actions) $ \(fp, action) -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
-          pure id -- Impossible
-        Just r -> do
-          -- Stork doesn't support incremental building of index, so we must
-          -- clear it to pave way for a rebuild later when requested.
-          --
-          -- From https://github.com/jameslittle230/stork/discussions/112#discussioncomment-252861
-          --
-          -- > Stork also doesn't support incremental index updates today --
-          -- you'd have to re-index everything when users added a new document,
-          -- which might be prohibitively long.
-          Stork.clearStorkIndex storkIndexTVar
-
+          pure $ Right id
+        Just r ->
           case action of
             UM.Refresh refreshAction overlays -> do
               let fpAbs = head overlays
               s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
-              pure $ M.modelInsertNote $ noteF note
+              note <- N.parseNoteForModel parseContext r fpAbs (decodeUtf8 s)
+              note' <- liftIO . evaluateWHNF . force $ noteF note
+              pure $ Left note'
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
-              pure $ M.modelDeleteNote r
+              pure $ Right $ M.modelDeleteNote r
+  pure $ foldr (>>>) (M.modelInsertNotes notes) deletes
+
+-- | Map a filesystem change to the corresponding model change.
+patchModel ::
+  (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
+  (N.Note -> N.Note) ->
+  Stork.IndexVar ->
+  ParseContext ->
+  -- | Type of the file being changed
+  R.FileType R.SourceExt ->
+  -- | Path to the file being changed
+  FilePath ->
+  -- | Specific change to the file, along with its paths from other "layers"
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (ModelEma -> ModelEma)
+patchModel noteF storkIndexTVar parseContext fpType fp action =
+  patchModels noteF storkIndexTVar parseContext fpType (one (fp, action))
+
+-- | Map a filesystem change to the corresponding model change.
+patchNonLmlModel ::
+  (MonadIO m, MonadLogger m) =>
+  -- | Type of the file being changed
+  R.FileType R.SourceExt ->
+  -- | Path to the file being changed
+  FilePath ->
+  -- | Specific change to the file, along with its paths from other "layers"
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (ModelEma -> ModelEma)
+patchNonLmlModel fpType fp action = do
+  case fpType of
+    R.LMLType _ ->
+      pure id
     R.Yaml ->
       case R.mkRouteFromFilePath' True fp of
         Nothing ->

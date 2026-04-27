@@ -12,7 +12,7 @@ import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
+import Emanote.Model.Type (Model, modelIndexRoute, modelLookupNoteByRoute', modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Optics.Operators as Lens ((^.))
@@ -143,6 +143,7 @@ folgezettelTreesFrom model fromRoute =
     loop fromRoute allRoutes
   where
     allRoutes = Set.fromList $ fmap N._noteRoute $ Ix.toList $ model ^. modelNotes
+    childRoutesByParent = folgezettelChildMap model
     -- Run in a state monad of unvisited routes, taking visited routes as argument.
     go :: (MonadState (Set R.LMLRoute) m) => Set R.LMLRoute -> R.LMLRoute -> m (Tree R.LMLRoute)
     go visitedRoutes route
@@ -151,9 +152,34 @@ folgezettelTreesFrom model fromRoute =
           pure $ Node route []
       | otherwise = do
           modify $ Set.delete route
-          let children = folgezettelChildrenFor model route
+          let children = ordNub $ Map.findWithDefault mempty route childRoutesByParent
           cs <- go (Set.insert route visitedRoutes) `traverse` children
           pure $ Node route cs
+
+folgezettelChildMap :: Model -> Map R.LMLRoute [R.LMLRoute]
+folgezettelChildMap model =
+  Map.fromListWith (<>)
+    $ relationEdges
+    <> folderEdges
+  where
+    relationEdges = do
+      rel <- Ix.toList $ model ^. modelRels
+      let source = rel ^. Rel.relFrom
+      case rel ^. Rel.relTo of
+        Rel.URTWikiLink (WL.WikiLinkBranch, wl) -> do
+          child <- maybeToList $ lookupNoteByWikiLink model source wl
+          pure (source, one child)
+        Rel.URTWikiLink (WL.WikiLinkTag, wl) -> do
+          parent <- maybeToList $ lookupNoteByWikiLink model source wl
+          pure (parent, one source)
+        _ ->
+          mempty
+    folderEdges = do
+      note <- Ix.toList $ model ^. modelNotes
+      parentFolder <- maybeToList $ N.noteParent note
+      let parentRoute = R.defaultLmlRoute parentFolder
+      guard $ folderFolgezettelEnabledFor model parentRoute
+      pure (parentRoute, one $ note ^. MN.noteRoute)
 
 folderFolgezettelEnabledFor :: Model -> R.LMLRoute -> Bool
 folderFolgezettelEnabledFor model r =
@@ -178,9 +204,13 @@ modelLookupBacklinks r model =
   sortOn (Calendar.backlinkSortKey model . fst)
     $ groupNE
     $ backlinkRels r model
-    <&> \rel ->
-      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
+    >>= backlinkContexts
   where
+    backlinkContexts rel =
+      expandedBacklinkContexts r model rel
+        <&> \rel' ->
+          (rel' ^. Rel.relFrom, rel' ^. Rel.relCtx)
+
     groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
     groupNE =
       Map.toList . foldl' f Map.empty
@@ -191,20 +221,33 @@ modelLookupBacklinks r model =
             Nothing -> Map.insert x (one y) m
             Just ys -> Map.insert x (ys <> one y) m
 
+expandedBacklinkContexts :: R.LMLRoute -> Model -> Rel.Rel -> [Rel.Rel]
+expandedBacklinkContexts targetR model rel =
+  case modelLookupNoteByRoute' (rel ^. Rel.relFrom) model of
+    Just sourceNote
+      | Just deferred <- MN.noteDeferred sourceNote ->
+          filter (isBacklinkTo targetR model)
+            . Ix.toList
+            $ Rel.noteTextRels sourceNote (deferred ^. MN.deferredNoteText)
+    _ ->
+      [rel]
+
 -- | Rels pointing *to* this route
 backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
 backlinkRels r model =
   let allPossibleLinks = Rel.unresolvedRelsTo $ toModelRoute r
       rels = Ix.toList $ (model ^. modelRels) @+ allPossibleLinks
-   in filter isUnambiguousBacklink rels
+   in filter (isBacklinkTo r model) rels
   where
     toModelRoute = R.ModelRoute_LML R.LMLView_Html
-    -- Check that 'rel' points to 'r' even after resolving any ambiguous wiki links
-    isUnambiguousBacklink rel = isJust $ do
-      SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
-        Rel.getResolved $ Resolve.resolveRel model rel
-      guard $ r == r'
-      pass
+
+-- Check that 'rel' points to 'r' even after resolving any ambiguous wiki links.
+isBacklinkTo :: R.LMLRoute -> Model -> Rel.Rel -> Bool
+isBacklinkTo r model rel = isJust $ do
+  SR.SiteRoute_ResourceRoute (SR.ResourceRoute_LML _ r') <-
+    Rel.getResolved $ Resolve.resolveRel model rel
+  guard $ r == r'
+  pass
 
 -- | Rels pointing *from* this route
 frontlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]

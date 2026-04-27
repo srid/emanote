@@ -17,7 +17,7 @@ import Data.UUID.V4 qualified as UUID
 import Ema (Dynamic (..))
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
-import Emanote.Model.Note (Note)
+import Emanote.Model.Note (Note, ParseContext (ParseContext))
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
@@ -55,21 +55,21 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   storkIndex <- Stork.newIndex
-  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
+  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
+      parseContext = ParseContext scriptingEngine (Loc.userLayersToSearch layers)
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers (Just parseContext) _emanoteCompileTailwind instanceId storkIndex
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+      (mapFsChanges $ Patch.patchModels _emanoteConfigNoteFn storkIndex parseContext)
 
 type ChangeHandler tag model m =
   tag ->
-  FilePath ->
-  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (model -> model)
 
 mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
@@ -91,7 +91,7 @@ mapFsChangesOnExt ::
   tag ->
   Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (model -> model)
-mapFsChangesOnExt h fpType fps = do
-  uncurry (h fpType) `chainM` Map.toList fps
+mapFsChangesOnExt h =
+  h
 
 makeLenses ''EmanoteConfig

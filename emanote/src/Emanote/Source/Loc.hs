@@ -33,7 +33,7 @@ data Loc
   | -- | The default location (ie., emanote default layer)
     LocDefault FilePath
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Aeson.ToJSON)
+  deriving anyclass (Aeson.ToJSON, NFData)
 
 {- | List of user layers, highest precedent being at first.
 

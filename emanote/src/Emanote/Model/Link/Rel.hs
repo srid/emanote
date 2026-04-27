@@ -10,7 +10,7 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
+import Emanote.Model.Note (Note, deferredNoteText, noteDeferred, noteDoc, noteResolveLinkBase, noteRoute)
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
@@ -67,17 +67,74 @@ makeLenses ''Rel
 
 noteRels :: Note -> IxRel
 noteRels note =
-  extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
+  case noteDeferred note of
+    Just deferred ->
+      deduplicateRelTargets $ noteTextRels note (deferred ^. deferredNoteText)
+    Nothing ->
+      extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
+    parentR = noteResolveLinkBase note
+    noteR = note ^. noteRoute
+
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
       Ix.fromList
         $ flip concatMap (Map.toList m)
         $ \(url, instances) -> do
           flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = noteResolveLinkBase note
             (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
-            pure $ Rel (note ^. noteRoute) target ctx
+            pure $ Rel noteR target ctx
+
+-- | Keep one representative relation per unresolved target for the startup model.
+deduplicateRelTargets :: IxRel -> IxRel
+deduplicateRelTargets =
+  Ix.fromList . Map.elems . foldl' insertRel Map.empty . Ix.toList
+  where
+    insertRel rels rel =
+      Map.insertWith keepOld (rel ^. relTo) rel rels
+    keepOld _new old =
+      old
+
+-- | Extract every wikilink relation from simple Markdown source text.
+noteTextRels :: Note -> Text -> IxRel
+noteTextRels note =
+  Ix.fromList . concatMap lineRels . lines
+  where
+    parentR = noteResolveLinkBase note
+    noteR = note ^. noteRoute
+
+    lineRels line =
+      case wikiLinksInLine line of
+        [] ->
+          []
+        links ->
+          let ctx = [B.Para [B.Str $ T.strip line]]
+           in flip mapMaybe links $ \(attrs, url) -> do
+                (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
+                pure $ Rel noteR target ctx
+
+wikiLinksInLine :: Text -> [([(Text, Text)], Text)]
+wikiLinksInLine =
+  go
+  where
+    go line =
+      case T.breakOn "[[" line of
+        (_, "") -> []
+        (before, rest) ->
+          case T.breakOn "]]" (T.drop 2 rest) of
+            (_, "") -> []
+            (target0, after) ->
+              let target = T.takeWhile (/= '|') target0
+                  attrs = [("data-wikilink-type", wikiLinkType before after)]
+               in (attrs, target) : go (T.drop 2 after)
+
+    wikiLinkType before after
+      | T.isPrefixOf "]]#" after = "WikiLinkBranch"
+      | otherwise =
+          case snd <$> T.unsnoc before of
+            Just '!' -> "WikiLinkEmbed"
+            Just '#' -> "WikiLinkTag"
+            _ -> "WikiLinkNormal"
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL

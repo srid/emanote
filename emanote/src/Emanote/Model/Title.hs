@@ -27,7 +27,7 @@ data Title
   = TitlePlain Text
   | TitlePandoc [B.Inline]
   deriving stock (Show, Generic)
-  deriving anyclass (ToJSON)
+  deriving anyclass (NFData, ToJSON)
 
 instance Eq Title where
   (==) =

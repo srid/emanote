@@ -6,17 +6,18 @@
 module Emanote.Model.Note where
 
 import Commonmark.Extensions.WikiLink qualified as WL
-import Control.Monad.Logger (MonadLogger)
+import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Optics qualified as AO
-import Data.Char (isDigit)
+import Data.Char (isAlphaNum, isDigit)
 import Data.Default (Default (def))
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Time.Calendar (toGregorian)
+import Data.Yaml qualified as Yaml
 import Emanote.Model.Calendar.Parser qualified as Calendar
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
@@ -29,7 +30,7 @@ import Emanote.Route.Ext (FileType (Folder))
 import Emanote.Route.R (R)
 import Emanote.Source.Loc (Loc)
 import Network.URI.Slug (Slug)
-import Optics.Core ((%), (.~))
+import Optics.Core (Getter, to, (%), (.~))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath (takeDirectory, takeFileName, (</>))
@@ -50,24 +51,41 @@ data Feed = Feed
   , _feedLimit :: Maybe Word
   }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Aeson.ToJSON, Aeson.FromJSON)
+  deriving anyclass (Aeson.FromJSON, Aeson.ToJSON, NFData)
 
 data Note = Note
   { _noteRoute :: R.LMLRoute
-  , _noteSource :: Maybe (Loc, FilePath)
-  -- ^ The layer from which this note came. Nothing if the note was auto-generated.
-  , _noteDoc :: Pandoc
+  , _noteBody :: NoteBody
   , _noteMeta :: Aeson.Value
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
   , _noteFeed :: Maybe Feed
   }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Aeson.ToJSON)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data NoteBody
+  = NoteBodyParsed (Maybe (Loc, FilePath)) Pandoc
+  | NoteBodyDeferred DeferredNote
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data DeferredNote = DeferredNote
+  { _deferredNoteSource :: (Loc, FilePath)
+  , _deferredNoteText :: Text
+  , _deferredNoteSummaryDoc :: Pandoc
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data ParseContext = ParseContext
+  { _parseContextScriptingEngine :: ScriptingEngine
+  , _parseContextPluginBaseDirs :: [FilePath]
+  }
 
 newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Aeson.ToJSON)
+  deriving anyclass (Aeson.ToJSON, NFData)
 
 type NoteIxs =
   '[ -- Route to this note
@@ -135,7 +153,7 @@ See <https://github.com/srid/emanote/issues/608>.
 -}
 noteResolveLinkBase :: Note -> Maybe (R 'R.Folder)
 noteResolveLinkBase note =
-  case _noteSource note of
+  case noteBodySource $ _noteBody note of
     Just (_, fp) -> resolveLinkBaseFromFilePath fp
     Nothing -> noteParent note
 
@@ -342,7 +360,7 @@ mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
-   in Note r src doc meta tit errs feed
+   in Note r (NoteBodyParsed src doc) meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -369,17 +387,16 @@ errorDiv header errs =
 parseNote ::
   forall m.
   (MonadIO m, MonadLogger m) =>
-  ScriptingEngine ->
-  [FilePath] ->
+  ParseContext ->
   R.LMLRoute ->
   (Loc, FilePath) ->
   Text ->
   m Note
-parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
+parseNote ParseContext {..} r src@(_, fp) s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
-        parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
+        parseNoteMarkdown _parseContextScriptingEngine _parseContextPluginBaseDirs r fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
@@ -395,6 +412,168 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
       day <- replicateM 2 P.digit
       _ <- P.satisfy (not . isDigit)
       pure $ toText $ mconcat [year, "-", month, "-", day]
+
+parseNoteForModel ::
+  forall m.
+  (MonadIO m, MonadLogger m) =>
+  ParseContext ->
+  R.LMLRoute ->
+  (Loc, FilePath) ->
+  Text ->
+  m Note
+parseNoteForModel parseContext r src s =
+  case r of
+    R.LMLRoute_Md _
+      | Just note <- parseSimpleMarkdownNote r src s ->
+          pure note
+    _ ->
+      parseNote parseContext r src s
+
+parseNoteIfNeeded ::
+  (MonadIO m, MonadLoggerIO m) =>
+  ParseContext ->
+  Note ->
+  m Note
+parseNoteIfNeeded parseContext note =
+  case noteDeferred note of
+    Just DeferredNote {..} -> do
+      logger <- askLoggerIO
+      runLoggingT (parseNote parseContext (_noteRoute note) _deferredNoteSource _deferredNoteText) logger
+    _ ->
+      pure note
+
+parseSimpleMarkdownNote :: R.LMLRoute -> (Loc, FilePath) -> Text -> Maybe Note
+parseSimpleMarkdownNote r src@(_, fp) s = do
+  (frontmatter, body) <- rightToMaybe $ parseFrontMatter s
+  guard $ canUseSimpleMarkdownNote frontmatter body
+  let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
+        Left _ -> meta
+        Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
+      meta = applySimpleNoteMetaFilters r body frontmatter
+      doc = simpleTitleDoc r body meta
+      (doc', tit) = queryNoteTitle r doc metaWithDateFromPath
+      feed = queryNoteFeed metaWithDateFromPath
+  pure $ Note r (NoteBodyDeferred $ DeferredNote src s doc') metaWithDateFromPath tit mempty feed
+  where
+    dateParser = do
+      year <- replicateM 4 P.digit
+      _ <- P.char '-'
+      month <- replicateM 2 P.digit
+      _ <- P.char '-'
+      day <- replicateM 2 P.digit
+      _ <- P.satisfy (not . isDigit)
+      pure $ toText $ mconcat [year, "-", month, "-", day]
+
+parseFrontMatter :: Text -> Either Text (Aeson.Value, Text)
+parseFrontMatter s =
+  case T.stripPrefix "---\n" s of
+    Nothing ->
+      Right (defaultFrontMatter, s)
+    Just rest ->
+      case T.breakOn "\n---" rest of
+        (_, "") ->
+          Left "unterminated frontmatter"
+        (frontmatter, after) -> do
+          value <-
+            first (toText . Yaml.prettyPrintParseException)
+              $ Yaml.decodeEither' @(Maybe Aeson.Value) (encodeUtf8 frontmatter)
+          let body = T.dropWhile (`elem` ['\r', '\n']) $ T.drop 4 after
+          Right (withAesonDefault defaultFrontMatter value, body)
+  where
+    withAesonDefault default_ mv =
+      fromMaybe default_ mv
+        `SData.mergeAeson` default_
+
+canUseSimpleMarkdownNote :: Aeson.Value -> Text -> Bool
+canUseSimpleMarkdownNote frontmatter body =
+  null (SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter)
+    && not (maybe False _feedEnable $ queryNoteFeed frontmatter)
+    && not (hasSingleBracketMarkdown body)
+    && not (any (`T.isInfixOf` body) complexMarkers)
+  where
+    complexMarkers =
+      [ "]("
+      , "!["
+      , "```"
+      , "~~~"
+      , "[ ]"
+      , "[x]"
+      , "[X]"
+      ]
+
+hasSingleBracketMarkdown :: Text -> Bool
+hasSingleBracketMarkdown =
+  go
+  where
+    go s =
+      case T.breakOn "[" s of
+        (_, "") ->
+          False
+        (_, rest)
+          | Just afterOpen <- T.stripPrefix "[[" rest ->
+              case T.breakOn "]]" afterOpen of
+                (_, "") -> True
+                (_, afterClose) -> go $ T.drop 2 afterClose
+          | otherwise ->
+              True
+
+simpleTitleDoc :: R.LMLRoute -> Text -> Aeson.Value -> Pandoc
+simpleTitleDoc r body meta =
+  case SData.lookupAeson @Text "" (one "title") meta of
+    "" ->
+      maybe mempty (Pandoc mempty . one . header) $ firstMarkdownHeading body
+    _ ->
+      mempty
+  where
+    header titleText =
+      B.Header 1 (toText $ R.withLmlRoute R.encodeRoute r, mempty, mempty) [B.Str titleText]
+
+firstMarkdownHeading :: Text -> Maybe Text
+firstMarkdownHeading =
+  viaNonEmpty head
+    . mapMaybe headingText
+    . lines
+  where
+    headingText line = do
+      rest <- T.stripPrefix "# " $ T.stripStart line
+      pure $ T.strip rest
+
+applySimpleNoteMetaFilters :: R.LMLRoute -> Text -> Aeson.Value -> Aeson.Value
+applySimpleNoteMetaFilters r body frontmatter =
+  frontmatter
+    & AO.key "tags"
+    % AO._Array
+    .~ ( fromList
+          . fmap Aeson.toJSON
+          $ ordNub
+          $ mconcat
+            [ tagsFromFrontmatter
+            , tagsFromBody
+            , tagsForDailyNote
+            ]
+       )
+  where
+    tagsFromFrontmatter =
+      SData.lookupAeson @[HT.Tag] mempty (one "tags") frontmatter
+    tagsFromBody =
+      HT.Tag <$> simpleInlineTags body
+    tagsForDailyNote = maybe mempty dayTags $ Calendar.parseRouteDay r
+    dayTags day =
+      let (y, m, _d) = toGregorian day
+          pad2 = toText @String . printf "%02d"
+       in [HT.Tag $ "calendar/" <> show y <> "/" <> pad2 m]
+
+simpleInlineTags :: Text -> [Text]
+simpleInlineTags =
+  mapMaybe tagFromWord . words
+  where
+    tagFromWord word = do
+      tag <- T.stripPrefix "#" word
+      let tag' = T.takeWhile validTagChar tag
+      guard $ not $ T.null tag'
+      pure tag'
+    validTagChar c =
+      c == '/' || c == '-' || c == '_' || c == '.' || isAlphaNum c
 
 parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrg s =
@@ -503,4 +682,35 @@ applyNoteMetaFilters doc r =
               pure $ SData.oneAesonText (toList key) val
           )
 
+noteSource :: Getter Note (Maybe (Loc, FilePath))
+noteSource =
+  to (noteBodySource . _noteBody)
+
+noteDoc :: Getter Note Pandoc
+noteDoc =
+  to (noteBodyDoc . _noteBody)
+
+noteDeferred :: Note -> Maybe DeferredNote
+noteDeferred note =
+  case _noteBody note of
+    NoteBodyDeferred deferred ->
+      Just deferred
+    NoteBodyParsed _ _ ->
+      Nothing
+
+noteBodySource :: NoteBody -> Maybe (Loc, FilePath)
+noteBodySource = \case
+  NoteBodyParsed src _ ->
+    src
+  NoteBodyDeferred DeferredNote {..} ->
+    Just _deferredNoteSource
+
+noteBodyDoc :: NoteBody -> Pandoc
+noteBodyDoc = \case
+  NoteBodyParsed _ doc ->
+    doc
+  NoteBodyDeferred DeferredNote {..} ->
+    _deferredNoteSummaryDoc
+
+makeLenses ''DeferredNote
 makeLenses ''Note

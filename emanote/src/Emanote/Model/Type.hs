@@ -19,6 +19,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note (
   IxNote,
   Note,
+  ParseContext,
   noteHasFeed,
  )
 import Emanote.Model.Note qualified as N
@@ -54,6 +55,7 @@ data ModelT encF = Model
   , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
   , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
+  , _modelParseContext :: Maybe ParseContext
   , _modelCompileTailwind :: Bool
   , _modelInstanceID :: UUID
   -- ^ An unique ID for this process's model. ID changes across processes.
@@ -94,14 +96,15 @@ withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren ctw instanceId storkVar =
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> Maybe ParseContext -> Bool -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren parseContext ctw instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
     , _modelEmaCLIAction = act
     , _modelRoutePrism = Const ()
     , _modelPandocRenderers = ren
+    , _modelParseContext = parseContext
     , _modelCompileTailwind = ctw
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
@@ -125,19 +128,31 @@ inLiveServer :: Model -> Bool
 inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
 
 modelInsertNote :: Note -> ModelT f -> ModelT f
-modelInsertNote note =
+modelInsertNote =
+  modelInsertNotes . one
+
+modelInsertNotes :: [Note] -> ModelT f -> ModelT f
+modelInsertNotes [] =
+  id
+modelInsertNotes notes =
   modelNotes
-    %~ ( Ix.updateIx r note
-          -- Insert folder placeholder automatically for ancestor paths
-          >>> injectAncestors (N.noteAncestors note)
-          >>> dropRedundantAncestor r
+    %~ ( \oldNotes ->
+          let withoutOld = flipfoldl' Ix.deleteIx oldNotes routes
+              withNew = Ix.fromList notes `Ix.union` withoutOld
+              withAncestors =
+                foldl' (\acc note -> injectAncestors (N.noteAncestors note) acc) withNew notes
+           in flipfoldl' dropRedundantAncestor withAncestors routes
        )
       >>> modelRels
-    %~ updateIxMulti r (Rel.noteRels note)
+    %~ replaceMulti routes newRels
       >>> modelTasks
-    %~ updateIxMulti r (Task.noteTasks note)
+    %~ replaceMulti routes newTasks
   where
-    r = note ^. N.noteRoute
+    routes = fmap (^. N.noteRoute) notes
+    newRels =
+      Ix.fromList $ notes >>= Ix.toList . Rel.noteRels
+    newTasks =
+      Ix.fromList $ notes >>= Ix.toList . Task.noteTasks
 
 {- | If a placeholder route was added already, but the newly added note is a
  non-Markdown, removce that markdown placeholder route.
@@ -199,18 +214,6 @@ modelDeleteNote k model =
       guard $ N.hasChildNotes folderR $ model ^. modelNotes
       pure folderR
 
--- | Like `Ix.updateIx`, but works for multiple items.
-updateIxMulti ::
-  (Ix.IsIndexOf ix ixs, Ix.Indexable ixs a) =>
-  ix ->
-  Ix.IxSet ixs a ->
-  Ix.IxSet ixs a ->
-  Ix.IxSet ixs a
-updateIxMulti r new rels =
-  let old = rels @= r
-      deleteMany = foldr Ix.delete
-   in new `Ix.union` (rels `deleteMany` old)
-
 -- | Like `Ix.deleteIx`, but works for multiple items
 deleteIxMulti ::
   (Ix.Indexable ixs a, Ix.IsIndexOf ix ixs) =>
@@ -220,6 +223,15 @@ deleteIxMulti ::
 deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in flipfoldl' Ix.delete rels candidates
+
+replaceMulti ::
+  (Ix.Indexable ixs a, Ix.IsIndexOf ix ixs) =>
+  [ix] ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a ->
+  Ix.IxSet ixs a
+replaceMulti routes new old =
+  new `Ix.union` flipfoldl' deleteIxMulti old routes
 
 modelLookupStaticFile :: FilePath -> ModelT f -> Maybe StaticFile
 modelLookupStaticFile fp m = do
