@@ -13,7 +13,7 @@ Emanote is spiritual successor to [neuron](https://neuron.zettel.page) based on 
 
 ## Installing and using
 
-https://emanote.srid.ca/start/install
+https://emanote.srid.ca/install
 
 ### Examples
 
@@ -23,7 +23,7 @@ https://emanote.srid.ca/examples
 
 Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code.
 
-See https://srid.ca/haskell-template/start for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
+See https://github.com/srid/haskell-template for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
 
 See [architecture](https://emanote.srid.ca/architecture) for a high-level overview of the codebase.
 
