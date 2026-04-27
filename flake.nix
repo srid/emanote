@@ -27,7 +27,7 @@
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;
-    commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
+    commonmark-simple.url = "github:srid/commonmark-simple/fix/flatten-nested-links";
     commonmark-simple.flake = false;
     commonmark-wikilink.url = "github:srid/commonmark-wikilink/master";
     commonmark-wikilink.flake = false;
