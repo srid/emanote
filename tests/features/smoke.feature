@@ -56,6 +56,14 @@ Feature: Smoke
     When I open "/wikilink-entities.html"
     Then the first article link has HTML containing "Spivak&nbsp;(2014)"
 
+  Scenario: URL-bearing link labels render as one hyperlink (regression: #349)
+    When I open "/issue-349.html"
+    Then the article link with text "https://issue349-case1.example.com" has href containing "issue349-case1.example.com#anchor"
+    And the article link with text "case2@issue349.example.com" has href containing "mailto:case2@issue349.example.com"
+    And the article link with text "A sentence linking to" has href containing "issue349-case3-target.example.com"
+    And the article link with text "https://issue349-case4.example.com" has href containing "issue349-case4-target.example.com"
+    And the article body has exactly 4 hyperlinks to issue-349 case targets
+
   Scenario: A malformed YAML file is surfaced as a banner on its sibling note (regression: #285)
     When I open "/broken-285.html"
     Then the page rendered without an Ema exception

@@ -235,6 +235,28 @@ Then(
   },
 );
 
+// #349: count assertion is the strongest regression guard. Before the fix,
+// each of the four cases produces 2-3 anchors (parent + autolinks); after
+// the fix, exactly 4 anchors target the four cases. Filter on the shared
+// `issue349` substring (matches both `issue349-caseN.example.com` and the
+// mailto form `case2@issue349.example.com`) so any regression that adds
+// stray autolinks bumps the count and trips the assertion.
+Then(
+  "the article body has exactly {int} hyperlinks to issue-349 case targets",
+  async function (this: EmanoteWorld, expected: number) {
+    const hrefs = await this.page.$$eval("article a[href]", (anchors) =>
+      anchors
+        .map((a) => a.getAttribute("href") ?? "")
+        .filter((h) => h.includes("issue349")),
+    );
+    assert.strictEqual(
+      hrefs.length,
+      expected,
+      `Expected ${expected} article links to issue349 targets, got ${hrefs.length}: ${JSON.stringify(hrefs)}.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
