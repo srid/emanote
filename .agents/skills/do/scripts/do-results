@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Manages .do-results.json for the /do workflow.
+# Avoids LLM token generation by handling all JSON mutations in bash+jq.
+#
+# Usage:
+#   do-results init <forge> <noGit>           — create initial skeleton
+#   do-results step-start <name>              — stamp pendingStep with now; call at step start
+#   do-results step-end <status> <verif> [reason]
+#                                             — pop pendingStep, append with completedAt=now
+#   do-results step <name> <status> <verif> <startedAt> <completedAt> [reason]
+#                                             — append a completed step with explicit timestamps
+#                                               (use when startedAt comes from a single-shell caller)
+#                                               pass "now" for startedAt/completedAt to auto-generate UTC timestamp
+#   do-results set <field> <value>            — update a top-level field (active, status)
+
+set -euo pipefail
+
+# Resolve jq, falling back to nix if not on PATH
+if command -v jq &>/dev/null; then
+  JQ=jq
+else
+  JQ="nix run nixpkgs#jq --"
+fi
+
+FILE=".do-results.json"
+
+cmd="${1:?Usage: do-results <init|step-start|step-end|step|set> ...}"
+shift
+
+case "$cmd" in
+  init)
+    forge="${1:?forge required (github|bitbucket|unknown)}"
+    noGit="${2:?noGit required (true|false)}"
+    startedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    cat > "$FILE" <<ENDJSON
+{
+  "workflow": "do",
+  "startedAt": "$startedAt",
+  "active": "working",
+  "status": "running",
+  "forge": "$forge",
+  "noGit": $noGit,
+  "steps": []
+}
+ENDJSON
+    ;;
+
+  step-start)
+    name="${1:?name required}"
+    startedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    existing="$($JQ -r '.pendingStep.name // empty' "$FILE")"
+    if [ -n "$existing" ]; then
+      echo "do-results: pendingStep '$existing' already active — call step-end before starting '$name'" >&2
+      exit 1
+    fi
+    $JQ --arg n "$name" --arg sa "$startedAt" \
+       '.pendingStep = {"name":$n,"startedAt":$sa}' \
+       "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    ;;
+
+  step-end)
+    status="${1:?status required (passed|failed|skipped)}"
+    verif="${2:?verification required}"
+    reason="${3:-}"
+    completedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+    name="$($JQ -r '.pendingStep.name // empty' "$FILE")"
+    startedAt="$($JQ -r '.pendingStep.startedAt // empty' "$FILE")"
+    if [ -z "$name" ] || [ -z "$startedAt" ]; then
+      echo "do-results: no pendingStep — call step-start first" >&2
+      exit 1
+    fi
+
+    if [ -n "$reason" ]; then
+      $JQ --arg n "$name" --arg s "$status" --arg v "$verif" \
+         --arg sa "$startedAt" --arg ca "$completedAt" --arg r "$reason" \
+         '.steps += [{"name":$n,"status":$s,"verification":$v,"startedAt":$sa,"completedAt":$ca,"reason":$r}] | del(.pendingStep)' \
+         "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    else
+      $JQ --arg n "$name" --arg s "$status" --arg v "$verif" \
+         --arg sa "$startedAt" --arg ca "$completedAt" \
+         '.steps += [{"name":$n,"status":$s,"verification":$v,"startedAt":$sa,"completedAt":$ca}] | del(.pendingStep)' \
+         "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    fi
+    ;;
+
+  step)
+    name="${1:?name required}"
+    status="${2:?status required (passed|failed|skipped)}"
+    verif="${3:?verification required}"
+    startedAt="${4:?startedAt required}"
+    completedAt="${5:?completedAt required}"
+    reason="${6:-}"
+
+    # Resolve "now" sentinel to current UTC timestamp
+    [[ "$startedAt" == "now" ]] && startedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    [[ "$completedAt" == "now" ]] && completedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+    if [ -n "$reason" ]; then
+      $JQ --arg n "$name" --arg s "$status" --arg v "$verif" \
+         --arg sa "$startedAt" --arg ca "$completedAt" --arg r "$reason" \
+         '.steps += [{"name":$n,"status":$s,"verification":$v,"startedAt":$sa,"completedAt":$ca,"reason":$r}]' \
+         "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    else
+      $JQ --arg n "$name" --arg s "$status" --arg v "$verif" \
+         --arg sa "$startedAt" --arg ca "$completedAt" \
+         '.steps += [{"name":$n,"status":$s,"verification":$v,"startedAt":$sa,"completedAt":$ca}]' \
+         "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    fi
+    ;;
+
+  set)
+    field="${1:?field required}"
+    value="${2:?value required}"
+    # Handle booleans and strings
+    if [ "$value" = "true" ] || [ "$value" = "false" ]; then
+      $JQ --arg f "$field" --argjson v "$value" '.[$f] = $v' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    else
+      $JQ --arg f "$field" --arg v "$value" '.[$f] = $v' "$FILE" > "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    fi
+    ;;
+
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo "Usage: do-results <init|step-start|step-end|step|set> ..." >&2
+    exit 1
+    ;;
+esac
