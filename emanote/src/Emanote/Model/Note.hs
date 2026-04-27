@@ -21,7 +21,7 @@ import Emanote.Model.Calendar.Parser qualified as Calendar
 import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
-import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.BuiltinFilters (flattenNestedLinks, preparePandoc)
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
@@ -440,7 +440,10 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
             pure Nothing
           (x : _) -> pure $ Just x
 
-      doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
+      -- Apply `flattenNestedLinks` *after* user filters so the AST handed to
+      -- the renderer is guaranteed nesting-free regardless of what user
+      -- filters did. Closes #349; see Emanote.Pandoc.BuiltinFilters.
+      doc <- flattenNestedLinks <$> applyPandocFilters scriptingEngine filterPaths (preparePandoc doc')
       let meta = applyNoteMetaFilters doc r frontmatter
       pure (doc, meta)
   where

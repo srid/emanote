@@ -1,6 +1,7 @@
-module Emanote.Pandoc.Markdown.ParserSpec where
+module Emanote.Pandoc.BuiltinFiltersSpec where
 
 import Commonmark.Extensions.WikiLink (plainify)
+import Emanote.Pandoc.BuiltinFilters (flattenNestedLinks)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
 import Relude
 import Test.Hspec
@@ -10,10 +11,12 @@ import Text.Pandoc.Walk qualified as W
 spec :: Spec
 spec = do
   -- Regression test for https://github.com/srid/emanote/issues/349.
-  -- The fix lives in commonmark-simple's `flattenNestedLinks`; this spec
-  -- pins the behaviour at Emanote's parser boundary so a future regression
-  -- in either dependency is caught by Emanote's own test suite.
-  describe "parseMarkdown does not split URL-bearing link labels (#349)" $ do
+  -- `flattenNestedLinks` lives in BuiltinFilters and runs in
+  -- `Emanote.Model.Note.parseNoteMarkdown` *after* user-defined Pandoc
+  -- filters, so a user filter that produces a Link-in-Link cannot bypass it.
+  -- The spec pins the function's behaviour against the real `parseMarkdown`
+  -- output for the cases from the bug report.
+  describe "flattenNestedLinks unwraps URL-bearing link labels (#349)" $ do
     it "URL-only label"
       $ links "[https://www.website.com](https://www.website.com#something)"
       `shouldBe` [("https://www.website.com#something", "https://www.website.com")]
@@ -28,7 +31,7 @@ spec = do
       `shouldBe` [("http://target.com", "https://www.example.com")]
 
 links :: Text -> [(Text, Text)]
-links = either error (collect . snd) . parseMarkdown "<test>"
+links = either error (collect . flattenNestedLinks . snd) . parseMarkdown "<test>"
   where
     collect :: Pandoc -> [(Text, Text)]
     collect = W.query $ \case

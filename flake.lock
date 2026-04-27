@@ -3,16 +3,16 @@
     "commonmark-simple": {
       "flake": false,
       "locked": {
-        "lastModified": 1777293560,
-        "narHash": "sha256-q5CjYJvrkOEs/JnETHawbfRqWlNRakUUUqdgOYybrWQ=",
+        "lastModified": 1755566927,
+        "narHash": "sha256-2WE5SjwgwjKdsHxDRfQIb2WRrVYoNPiCIyG4HZd8Znk=",
         "owner": "srid",
         "repo": "commonmark-simple",
-        "rev": "053f6b4dbcaaa12c284e1b8ce91d3294519a6c76",
+        "rev": "81dc7a66b2490a701bfc87e6e892307665e6336e",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "fix/flatten-nested-links",
+        "ref": "0.2.0.0",
         "repo": "commonmark-simple",
         "type": "github"
       }

@@ -256,8 +256,8 @@ test-suite test
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
       Emanote.Model.TocSpec
+      Emanote.Pandoc.BuiltinFiltersSpec
       Emanote.Pandoc.ExternalLinkSpec
-      Emanote.Pandoc.Markdown.ParserSpec
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec
       Emanote.View.FeedSpec
