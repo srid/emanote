@@ -22,6 +22,9 @@ spec = do
     it "sentence label containing two URLs"
       $ links "[A website similar to https://www.foo.com and https://www.bar.com](https://www.baz.com)"
       `shouldBe` [("https://www.baz.com", "A website similar to https://www.foo.com and https://www.bar.com")]
+    it "URL inside emphasis inside a label"
+      $ links "[**https://www.example.com**](http://target.com)"
+      `shouldBe` [("http://target.com", "https://www.example.com")]
 
 links :: Text -> [(Text, Text)]
 links = either error (collect . snd) . parseMarkdown "<test>"
