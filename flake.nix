@@ -24,7 +24,7 @@
     lvar.url = "github:srid/lvar/0.2.0.0";
     lvar.flake = false;
     # Tracks srid/heist-extra#15 (Pandoc table colSpec/cell metadata; refs #27).
-    heist-extra.url = "github:srid/heist-extra/f819fd2c32a1a51a770c066037887deac3c85da0";
+    heist-extra.url = "github:srid/heist-extra/d2b94dd";
     heist-extra.flake = false;
     unionmount.url = "github:srid/unionmount/0.3.0.0";
     unionmount.flake = false;
