@@ -23,7 +23,9 @@
 <apply template="base">
   <bind tag="head-main">
     <ema:has:uptree>
-      <link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/inverted-tree.css" />
+      <emanoteStaticUrl path="inverted-tree.css">
+        <link rel="stylesheet" href="${url}" />
+      </emanoteStaticUrl>
     </ema:has:uptree>
   </bind>
 

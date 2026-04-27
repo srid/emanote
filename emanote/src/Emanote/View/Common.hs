@@ -29,6 +29,7 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
 import Emanote.View.JsBundle qualified as JsBundle
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
+import Emanote.View.StaticUrl qualified as StaticUrl
 import Emanote.View.Tailwind (generatedCssFile, tailwindBrowserConfig, themeRemapStyle)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
@@ -164,6 +165,13 @@ commonSplices withCtx model meta routeTitle = do
     HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute [])
   "ema:taskIndexUrl" ##
     HI.textSplice (SR.siteRouteUrl model SR.taskIndexRoute)
+  -- Cache-busted URL for an asset under _emanote-static/. Wraps the
+  -- consuming tag and binds ${url}; see "Emanote.View.StaticUrl".
+  "emanoteStaticUrl" ## StaticUrl.emanoteStaticUrlSplice model
+  -- Deprecated in favour of <emanoteStaticUrl path="…">: this splice
+  -- emits the static folder URL for callers to concatenate paths
+  -- onto, so per-asset cache-busting (?t=<mtime>) never reaches the
+  -- file (issue #666). Kept for third-party templates.
   "ema:emanoteStaticLayerUrl" ##
     HI.textSplice
       ( -- HACK

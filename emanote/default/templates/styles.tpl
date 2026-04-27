@@ -12,12 +12,16 @@
      rule here. Only land in this file when the alternative would be a
      pile of [...] utilities so ugly that a CSS block reads cleaner. -->
 
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/skylighting.css" />
+<emanoteStaticUrl path="skylighting.css">
+  <link rel="stylesheet" href="${url}" />
+</emanoteStaticUrl>
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
      that directory for how to refresh. -->
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/fonts/fonts.css" />
+<emanoteStaticUrl path="fonts/fonts.css">
+  <link rel="stylesheet" href="${url}" />
+</emanoteStaticUrl>
 
 <style data-category="global-font">
   /* Font option C (trial):

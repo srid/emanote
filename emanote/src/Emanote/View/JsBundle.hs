@@ -34,8 +34,7 @@ import Data.Aeson qualified as Aeson
 import Data.Aeson.Key qualified as AesonKey
 import Data.Text qualified as T
 import Emanote.Model.Type (Model)
-import Emanote.Model.Type qualified as M
-import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.View.StaticUrl (emanoteStaticUrl)
 import Relude
 import System.FilePath ((</>))
 import Text.Blaze.Html ((!))
@@ -119,7 +118,4 @@ importmapUrl model name =
 
 jsUrl :: Model -> Text -> Text
 jsUrl model name =
-  SR.siteRouteUrl model
-    $ SR.staticFileSiteRoute
-    $ fromMaybe (error $ "no _emanote-static/js/" <> name <> ".js?")
-    $ M.modelLookupStaticFile ("_emanote-static" </> "js" </> toString name <> ".js") model
+  emanoteStaticUrl model ("js" </> toString name <> ".js")
