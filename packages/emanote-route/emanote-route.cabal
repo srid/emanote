@@ -80,3 +80,17 @@ library
     Emanote.Route.ModelRoute
     Emanote.Route.R
     Emanote.Route.SiteRoute.Type
+
+test-suite test
+  import:         library-common
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Spec.hs
+  build-depends:
+    , emanote-route
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , relude
+
+  other-modules:  Emanote.Route.RSpec

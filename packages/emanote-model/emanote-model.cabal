@@ -130,3 +130,24 @@ library
     Emanote.Model.Title
     Emanote.Model.Toc
     Emanote.Model.Type
+
+test-suite test
+  import:         library-common
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Spec.hs
+  build-depends:
+    , containers
+    , emanote-model
+    , emanote-route
+    , hedgehog
+    , hspec
+    , hspec-hedgehog
+    , mtl
+    , relude
+    , tagtree
+
+  other-modules:
+    Emanote.Model.Link.RelSpec
+    Emanote.Model.QuerySpec
+    Emanote.Model.TocSpec
