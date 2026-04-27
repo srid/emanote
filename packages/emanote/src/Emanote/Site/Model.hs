@@ -123,7 +123,7 @@ modelReadyForView =
   modelCore %~ Core.modelReadyForView
 
 -- | Are we running in live server, or statically generated website?
-inLiveServer :: Model -> Bool
+inLiveServer :: ModelT f -> Bool
 inLiveServer = _modelIsLiveServer
 
 modelInsertNote :: Note -> ModelT f -> ModelT f
@@ -182,7 +182,7 @@ modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
 modelLookupTitle r =
   Core.modelLookupTitle r . _modelCore
 
-modelWikiLinkTargets :: WL.WikiLink -> Model -> [Either (R.LMLView, Note) StaticFile]
+modelWikiLinkTargets :: WL.WikiLink -> ModelT f -> [Either (R.LMLView, Note) StaticFile]
 modelWikiLinkTargets wl =
   Core.modelWikiLinkTargets wl . _modelCore
 
