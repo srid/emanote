@@ -216,6 +216,7 @@ library
     Emanote.View.Feed
     Emanote.View.JsBundle
     Emanote.View.LiveServerFiles
+    Emanote.View.StaticUrl
     Emanote.View.TagIndex
     Emanote.View.Tailwind
     Emanote.View.TaskIndex
