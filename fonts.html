@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=8170d9db-3e58-434b-a463-f7323a2e8a7b' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=0627e2a1-4fc7-4280-9353-ed2679a17e18' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -78,12 +78,16 @@
      marker:*, align-super, etc. Use arbitrary values (e.g.
      [font-variant-numeric:oldstyle-nums]) before reaching for a new
      rule here. Only land in this file when the alternative would be a
-     pile of [...] utilities so ugly that a CSS block reads cleaner. --><link rel='stylesheet' href='_emanote-static/skylighting.css' />
+     pile of [...] utilities so ugly that a CSS block reads cleaner. -->
+  <link rel='stylesheet' href='_emanote-static/skylighting.css' />
+
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
      that directory for how to refresh. -->
-<link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
+  <link rel='stylesheet' href='_emanote-static/fonts/fonts.css' />
+
 
 <style data-category='global-font'>
   /* Font option C (trial):
@@ -404,8 +408,12 @@
   
   <!-- Custom Stork-search styling for Emanote. Both stylesheets are loaded
      unconditionally; the active one is picked by toggling the wrapper's
-     CSS class, driven by the same .dark class the theme toggle manages. --><link rel='stylesheet' href='_emanote-static/stork/edible.css' />
-<link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
+     CSS class, driven by the same .dark class the theme toggle manages. -->
+  <link rel='stylesheet' href='_emanote-static/stork/edible.css' />
+
+
+  <link rel='stylesheet' href='_emanote-static/stork/edible-dark.css' />
+
 
 <style data-category='stork'>
   #stork-search-container {
@@ -421,7 +429,9 @@
 <!-- Vendor WASM loader. Defines window.stork synchronously so the
      stork.js module (loaded via the importmap entry from base.tpl)
      can call stork.initialize / stork.register at evaluate time. -->
-<script src='_emanote-static/stork/stork.js'></script>
+
+  <script src='_emanote-static/stork/stork.js'></script>
+
 
   <!-- Site-authored interactive behaviors (issue #643). The splice emits
        an importmap (so live-server's per-file ?t=<mtime> propagates
@@ -1790,7 +1800,7 @@
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      The woff2 files plus a generated <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>fonts.css</code> live under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/fonts/</code>, and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> links them via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>${ema:emanoteStaticLayerUrl}/fonts/fonts.css</code>. Generated static sites therefore work fully offline.
+      The woff2 files plus a generated <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>fonts.css</code> live under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/fonts/</code>, and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>templates/styles.tpl</code> links them via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;emanoteStaticUrl path="fonts/fonts.css"&gt;…&lt;/emanoteStaticUrl&gt;</code>. Generated static sites therefore work fully offline.
     </p>
   
     <p class='mb-4 leading-relaxed'>
@@ -1890,19 +1900,25 @@
         </li>
       
     </ol>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"custom-fonts"</span><span class='dt'>&gt;</span>
-  <span class='im'>@font-face</span> {
-    <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>;</span>
-    <span class='kw'>src</span><span class='ch'>:</span> <span class='fu'>url(</span><span class='st'>'${ema:emanoteStaticLayerUrl}/fonts/YourFont.woff2'</span><span class='fu'>)</span> <span class='fu'>format(</span><span class='st'>'woff2'</span><span class='fu'>)</span><span class='op'>;</span>
-    <span class='kw'>font-weight</span><span class='ch'>:</span> <span class='dv'>400</span><span class='op'>;</span>
-    <span class='kw'>font-style</span><span class='ch'>:</span> <span class='dv'>normal</span><span class='op'>;</span>
-  }
+  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>emanoteStaticUrl</span><span class='ot'> path</span><span class='op'>=</span><span class='st'>"fonts/YourFont.woff2"</span><span class='dt'>&gt;</span>
+  <span class='dt'>&lt;</span><span class='kw'>style</span><span class='ot'> data-category</span><span class='op'>=</span><span class='st'>"custom-fonts"</span><span class='dt'>&gt;</span>
+    <span class='im'>@font-face</span> {
+      <span class='kw'>font-family</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>;</span>
+      <span class='kw'>src</span><span class='ch'>:</span> <span class='fu'>url(</span><span class='st'>'${url}'</span><span class='fu'>)</span> <span class='fu'>format(</span><span class='st'>'woff2'</span><span class='fu'>)</span><span class='op'>;</span>
+      <span class='kw'>font-weight</span><span class='ch'>:</span> <span class='dv'>400</span><span class='op'>;</span>
+      <span class='kw'>font-style</span><span class='ch'>:</span> <span class='dv'>normal</span><span class='op'>;</span>
+    }
 
-  <span class='in'>:root</span> {
-    <span class='va'>--font-sans</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>,</span> <span class='dv'>sans-serif</span><span class='op'>;</span>
-  }
-<span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
+    <span class='in'>:root</span> {
+      <span class='va'>--font-sans</span><span class='ch'>:</span> <span class='st'>'YourFont'</span><span class='op'>,</span> <span class='dv'>sans-serif</span><span class='op'>;</span>
+    }
+  <span class='dt'>&lt;/</span><span class='kw'>style</span><span class='dt'>&gt;</span>
+<span class='dt'>&lt;/</span><span class='kw'>emanoteStaticUrl</span><span class='dt'>&gt;</span>
 </code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      The <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;emanoteStaticUrl path="…"&gt;</code> wrapper routes the URL through the live server’s cache-buster (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>?t=&lt;mtime&gt;</code>), so editing the asset in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run</code> invalidates the browser cache without a restart.
+    </p>
+  
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/fonts.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -2023,7 +2039,9 @@
   </div>
   <div>
     <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.6.0.0'>
-      <img class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+      
+        <img class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
+      
     </a>
   </div>
   <div>
