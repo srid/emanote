@@ -1,9 +1,10 @@
 module Emanote.Pandoc.Markdown.ParserSpec where
 
+import Commonmark.Extensions.WikiLink (plainify)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
 import Relude
 import Test.Hspec
-import Text.Pandoc.Definition (Inline (..), Pandoc)
+import Text.Pandoc.Definition (Inline (Link), Pandoc)
 import Text.Pandoc.Walk qualified as W
 
 spec :: Spec
@@ -31,15 +32,5 @@ links = either error (collect . snd) . parseMarkdown "<test>"
   where
     collect :: Pandoc -> [(Text, Text)]
     collect = W.query $ \case
-      Link _ inlines (url, _) -> [(url, plain inlines)]
+      Link _ inlines (url, _) -> [(url, plainify inlines)]
       _ -> []
-
-plain :: [Inline] -> Text
-plain = W.query $ \case
-  Str t -> t
-  Space -> " "
-  SoftBreak -> " "
-  LineBreak -> "\n"
-  Code _ t -> t
-  Math _ t -> t
-  _ -> ""
