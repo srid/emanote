@@ -23,42 +23,33 @@ The workflow is **forge-aware**: it auto-detects whether the repo lives on GitHu
 
 ## Results Tracking
 
-Each step is bookended by two calls to the `scripts/do-results` script (in this skill's directory): `step-start <name>` before the work begins, and `step-end <status> <verification> [reason]` after verification. This is what keeps per-step timing accurate — collapsing both into a single end-of-step call produces zero-second durations and worthless timing tables. The script manages a JSON file with this schema:
+Every step is bookended by two `scripts/do-results` calls: `step-start <name>` before the work begins, and `step-end <status> <verification> [reason]` after verification. This is what keeps per-step timing accurate — collapsing both into a single end-of-step call produces zero-second durations and worthless timing tables. The script tracks workflow state and emits the final timing table during **done**.
 
-```json
-{
-  "workflow": "do",
-  "startedAt": "<ISO timestamp>",
-  "active": "working",
-  "status": "running",
-  "forge": "github",
-  "noGit": false,
-  "steps": [
-    {
-      "name": "sync",
-      "status": "passed",
-      "verification": "...",
-      "startedAt": "...",
-      "completedAt": "..."
-    }
-  ]
-}
-```
+**Trust the script's stdout.** Every mutation echoes a one-line confirmation. Treat that line as your confirmation that the write succeeded; the script is the only public surface, and whatever it persists internally is private.
 
-- `forge` is set during **sync** (see Forge Detection below). One of `github`, `bitbucket`, `unknown`.
-- `noGit` is `true` if the user passed `--no-git`. When set, git-mutating steps (**branch**, **commit**, **create-pr**) record status `skipped` with reason `"--no-git"`.
-- Step `status` is one of `passed`, `failed`, or `skipped`. A `skipped` step must include a `reason` field explaining why (e.g., `"non-github forge: bitbucket"`, `"--no-git"`, `"no check command configured"`).
+**Lifecycle the script tracks intrinsically**:
 
-- `active` is a state enum, not a boolean. Set it to `"working"` when the workflow starts (**sync**), `"waiting"` when the agent is idle waiting for an external process (e.g., background CI), back to `"working"` when the external process returns, and `false` when the workflow ends (**done**). The stop hook uses this field: `"working"` blocks exits; `"waiting"` and `false` allow them.
-- Set `status` to `"completed"` when **done** is reached, or `"failed"` if halted. This field is informational only.
-- **Always use the `scripts/do-results` script** (in this skill's directory, alongside `scripts/steps/`) — never write the JSON file directly. Invoke with the full path (e.g. `.../skills/do/scripts/do-results ...`). Commands:
-  - **Initialize**: `scripts/do-results init <forge> <noGit>` — creates the skeleton with a timestamp
-  - **Start a step**: `scripts/do-results step-start <name>` — stamps `pendingStep` with the current UTC time. Call this **before** doing the step's work.
-  - **End a step**: `scripts/do-results step-end <status> "<verification>" ["<reason>"]` — pops `pendingStep` and appends the completed step with `completedAt` set to the current UTC time.
-  - **Record a step in one call** (advanced): `scripts/do-results step <name> <status> "<verification>" <startedAt> <completedAt> ["<reason>"]` — used by `scripts/steps/sync` where `startedAt` is captured in shell. Agent code should prefer `step-start` / `step-end`.
-  - **Update top-level field**: `scripts/do-results set <field> <value>` (e.g., `set active waiting`, `set status completed`)
-- **Bookend every step with `step-start` at the top and `step-end` at the bottom.** Calling `step-end` without a prior `step-start` is an error, and calling `step` with `now` for both timestamps collapses duration to 0 — neither pattern is allowed. The only exceptions: `sync` is recorded by `scripts/steps/sync` itself, and skipped steps (where duration is always 0 by definition) may use `step-start` followed immediately by `step-end` with status `skipped`.
-- Do not run `date` yourself or guess timestamps — `do-results` resolves the current UTC time internally.
+- Step `status` — `passed`, `failed`, or `skipped`. A `skipped` step must include a `reason` (e.g. `"non-github forge: bitbucket"`, `"--no-git"`, `"no check command configured"`).
+- `active` — state enum (not a boolean). Set to `working` when the workflow starts (**sync**), `waiting` when the agent is idle waiting for an external process (e.g. background CI), back to `working` when that process returns, and `false` when **done** is reached. The stop hook uses this: `working` blocks exits; `waiting` and `false` allow them.
+- Workflow `status` — `completed` when **done** finishes, `failed` if halted. Informational.
+
+**Workflow fields /do also stashes via `set`** (the script doesn't interpret these — it just remembers them):
+
+- `forge` — `github`, `bitbucket`, or `unknown`. Populated by `scripts/steps/sync` after forge detection.
+- `noGit` — `true` or `false`. Reflects the `--no-git` flag. Git-mutating steps (**branch**, **commit**, **create-pr**) skip with `reason="--no-git"` when set.
+
+**Commands** (invoke with the full path, e.g. `.../skills/do/scripts/do-results ...`):
+
+- `init` — initialize the workflow's lifecycle skeleton. Echoes `init: startedAt=<ts>`.
+- `step-start <name>` — call before step work. Echoes `pending: <name>`.
+- `step-end <status> "<verification>" ["<reason>"]` — call after verification. Echoes `recorded: <name> <status> (steps=<count>, pending=<none|name>)`.
+- `step <name> <status> "<verification>" <startedAt> <completedAt> ["<reason>"]` — single-call form used by `scripts/steps/sync` where `startedAt` was captured in shell. Echoes `recorded: <name> <status> (steps=<count>)`. Agent code should prefer `step-start` / `step-end`.
+- `set <field> <value>` — set an arbitrary top-level field. Used both for lifecycle (`set active waiting`, `set status completed`) and for /do-specific values that sync stashes (`set forge github`, `set noGit false`). Echoes `set: <field>=<value>`.
+
+**Discipline**:
+
+- Bookend every step with `step-start` at the top and `step-end` at the bottom. Calling `step-end` without a prior `step-start` is an error; calling `step` with `now` for both timestamps collapses duration to 0 — neither pattern is allowed. Exceptions: `sync` is recorded by `scripts/steps/sync` itself, and skipped steps (duration always 0) may use back-to-back `step-start` / `step-end skipped`.
+- Don't run `date` yourself or guess timestamps — `do-results` resolves UTC internally.
 
 ## Progress tracking
 
@@ -68,7 +59,7 @@ Drive Claude Code's native todo UI via the `TaskCreate` tool so the user sees a 
 sync, research, branch, implement, check, docs, fmt, commit, hickey+lowy, police, test, create-pr, ci, evidence, done
 ```
 
-At each step boundary, update task state **alongside** the `scripts/do-results` script call — they are not redundant. The JSON file is machine state for the stop hook; the task list is the human-facing UI. Miss either and the workflow is inconsistent.
+At each step boundary, update task state **alongside** the `scripts/do-results` script call — they are not redundant. The script's state drives the stop hook; the task list is the human-facing UI. Miss either and the workflow is inconsistent.
 
 Rules:
 
@@ -102,7 +93,7 @@ The script:
 
 **Only `github` has an active code path today.** Both `bitbucket` and `unknown` cause forge-dependent steps (PR creation, PR comments, PR edits, CI status) to skip gracefully. Bitbucket support is planned — see [srid/agency#10](https://github.com/srid/agency/issues/10).
 
-**Verify**: Script exited 0 and printed a `forge=` line. `.do-results.json` exists and its `forge`/`noGit` fields match.
+**Verify**: Script exited 0 and printed `forge=`, `branch=`, `defaultBranch=` lines on stdout. (Sync silences `do-results`' own confirmation echoes so the protocol stays clean.)
 
 ---
 
@@ -420,7 +411,7 @@ A `failed` step always blocks `"completed"`. No redefining "passed," no footnote
 
 #### Timing summary
 
-Run `scripts/steps/done` in this skill's directory. The script reads `.do-results.json` and emits:
+Run `scripts/steps/done` in this skill's directory. It emits:
 
 1. A markdown timing table (step, status, duration, verification), with any step that took ≥30% of total time shown in **bold**.
 2. A total wall-clock line (`startedAt` of first step → `completedAt` of last step).
