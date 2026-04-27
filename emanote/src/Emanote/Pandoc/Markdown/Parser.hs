@@ -14,6 +14,7 @@ import Relude.Extra.Bifunctor (secondF)
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
+-- | Parse Emanote Markdown into Pandoc and normalize parser artifacts.
 parseMarkdown :: FilePath -> Text -> Either Text (Maybe Aeson.Value, B.Pandoc)
 parseMarkdown fp =
   secondF removeNestedLinks
