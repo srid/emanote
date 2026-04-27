@@ -71,4 +71,4 @@ Callouts can be nested by indenting the inner blockquote with `> >`:
 
 ## Custom callouts {#custom}
 
-To add a new custom callout named `foo` (viz.: `[!foo] ...`), create a `/templates/filters/callout/foo.tpl` file in your [[html-template|templates]] folder. You can also change the layout and styling of existing callout types in [`/templates/filters/callout/*.tpl`](https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout).
+To add a new custom callout named `foo` (viz.: `[!foo] ...`), create a `/templates/filters/callout/foo.tpl` file in your [[html-template|templates]] folder. You can also change the layout and styling of existing callout types in [`/templates/filters/callout/*.tpl`](https://github.com/srid/emanote/tree/master/packages/emanote/default/templates/filters/callout).

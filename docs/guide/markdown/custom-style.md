@@ -55,7 +55,7 @@ notebook.
 To start customizing, create a templates directory in your notebook. From there, you can
 override any templates you wish by copying them from Emanote's default templates into your
 notebook's templates directory. For example, if you want to customize the default pandoc
-styling, you can copy the [pandoc.tpl](https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl)
+styling, you can copy the [pandoc.tpl](https://github.com/srid/emanote/blob/master/packages/emanote/default/templates/components/pandoc.tpl)
 file from Emanote's GitHub repository into your templates/components directory and edit it
 accordingly.
 
@@ -74,4 +74,3 @@ For additional information and discussion on this topic, check out
 [this discussion on GitHub](https://github.com/srid/emanote/discussions/438).
 
 [^mob]: If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind's [responsive classes](https://tailwindcss.com/docs/responsive-design). Incidentally, we use the `{class=".."}` syntax, rather than the `{.someClass}` syntax, only because the former is [more lenient](https://github.com/jgm/commonmark-hs/issues/76) in accepting non-standard class names, such as the Tailwind responsive classes (eg. `lg:grid-cols-2`).
-

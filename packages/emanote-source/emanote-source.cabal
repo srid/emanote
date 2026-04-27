@@ -1,0 +1,78 @@
+cabal-version: 2.4
+name:          emanote-source
+version:       1.6.0.0
+license:       AGPL-3.0-only
+copyright:     2022 Sridhar Ratnakumar
+maintainer:    srid@srid.ca
+author:        Sridhar Ratnakumar
+category:      Web
+homepage:      https://emanote.srid.ca
+synopsis:      Source locations and source file pattern policy for Emanote
+bug-reports:   https://github.com/srid/emanote/issues
+
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  default-extensions:
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    ImportQualifiedPost
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NoImplicitPrelude
+    NoStarIsType
+    NumericUnderscores
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    RankNTypes
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    ViewPatterns
+
+common library-common
+  import:           haskell-common
+  default-language: Haskell2010
+  build-depends:
+    , base            >=4.14 && <5
+    , containers
+    , deriving-aeson
+    , emanote-route
+    , filepath
+    , filepattern
+    , relude          >=1.0
+
+library
+  import:          library-common
+  hs-source-dirs:  src
+  exposed-modules:
+    Emanote.Source.Loc
+    Emanote.Source.Pattern

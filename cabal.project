@@ -1,2 +1,6 @@
 packages:
-  ./emanote
+  ./packages/emanote-route
+  ./packages/emanote-source
+  ./packages/emanote-pandoc
+  ./packages/emanote-model
+  ./packages/emanote

@@ -13,7 +13,7 @@
       projectRoot = builtins.toString (lib.fileset.toSource {
         inherit root;
         fileset = lib.fileset.unions [
-          (root + /emanote)
+          (root + /packages)
           (root + /cabal.project)
         ];
       });

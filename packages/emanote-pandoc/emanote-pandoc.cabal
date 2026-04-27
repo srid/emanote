@@ -1,0 +1,95 @@
+cabal-version: 2.4
+name:          emanote-pandoc
+version:       1.6.0.0
+license:       AGPL-3.0-only
+copyright:     2022 Sridhar Ratnakumar
+maintainer:    srid@srid.ca
+author:        Sridhar Ratnakumar
+category:      Web
+homepage:      https://emanote.srid.ca
+synopsis:
+  Markdown parsing and generic Pandoc renderer plumbing for Emanote
+
+bug-reports:   https://github.com/srid/emanote/issues
+
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  default-extensions:
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    ImportQualifiedPost
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NoImplicitPrelude
+    NoStarIsType
+    NumericUnderscores
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    RankNTypes
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    ViewPatterns
+
+common library-common
+  import:           haskell-common
+  default-language: Haskell2010
+  build-depends:
+    , aeson
+    , base                   >=4.14    && <5
+    , commonmark
+    , commonmark-extensions  >=0.2.3.4
+    , commonmark-pandoc
+    , commonmark-simple      >=0.2
+    , commonmark-wikilink    >=0.2
+    , containers
+    , emanote-route
+    , heist                  >=1.1.1.0
+    , heist-extra            >=0.5.0.0
+    , pandoc
+    , pandoc-types
+    , parsec
+    , relude                 >=1.0
+    , tagtree
+    , text
+
+library
+  import:          library-common
+  hs-source-dirs:  src
+  exposed-modules:
+    Emanote.Pandoc.BuiltinFilters
+    Emanote.Pandoc.ExternalLink
+    Emanote.Pandoc.Link
+    Emanote.Pandoc.Markdown.Parser
+    Emanote.Pandoc.Markdown.Syntax.HashTag
+    Emanote.Pandoc.Markdown.Syntax.Highlight
+    Emanote.Pandoc.Renderer

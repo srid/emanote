@@ -1,0 +1,132 @@
+cabal-version: 2.4
+name:          emanote-model
+version:       1.6.0.0
+license:       AGPL-3.0-only
+copyright:     2022 Sridhar Ratnakumar
+maintainer:    srid@srid.ca
+author:        Sridhar Ratnakumar
+category:      Web
+homepage:      https://emanote.srid.ca
+synopsis:
+  Notebook model, notes, links, queries, graph, tasks, and search for Emanote
+
+bug-reports:   https://github.com/srid/emanote/issues
+
+common haskell-common
+  ghc-options:
+    -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
+    -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  default-extensions:
+    BangPatterns
+    ConstraintKinds
+    DataKinds
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    ImportQualifiedPost
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NoImplicitPrelude
+    NoStarIsType
+    NumericUnderscores
+    OverloadedStrings
+    PolyKinds
+    PostfixOperators
+    RankNTypes
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TemplateHaskell
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    ViewPatterns
+
+common library-common
+  import:           haskell-common
+  default-language: Haskell2010
+  build-depends:
+    , aeson
+    , aeson-extra
+    , aeson-optics
+    , base                 >=4.14    && <5
+    , bytestring
+    , commonmark
+    , commonmark-wikilink  >=0.2
+    , containers
+    , data-default
+    , deriving-aeson
+    , directory
+    , emanote-pandoc
+    , emanote-route
+    , emanote-source
+    , filepath
+    , filepattern
+    , heist                >=1.1.1.0
+    , heist-extra          >=0.5.0.0
+    , ixset-typed          >=0.5.1.0
+    , map-syntax
+    , megaparsec
+    , monad-logger
+    , mtl
+    , optics-core
+    , optics-th
+    , pandoc
+    , pandoc-link-context  >=1.4.0
+    , pandoc-lua-engine
+    , pandoc-types
+    , parsec
+    , process-extras
+    , relude               >=1.0
+    , tagtree
+    , text
+    , time
+    , tomland
+    , unliftio
+    , url-slug
+    , uuid
+    , which
+    , xmlhtml
+    , yaml
+
+library
+  import:          library-common
+  hs-source-dirs:  src
+  exposed-modules:
+    Emanote.Model
+    Emanote.Model.Calendar
+    Emanote.Model.Calendar.Parser
+    Emanote.Model.Graph
+    Emanote.Model.Link.Rel
+    Emanote.Model.Link.Resolve
+    Emanote.Model.Meta
+    Emanote.Model.Note
+    Emanote.Model.Note.Filter
+    Emanote.Model.Query
+    Emanote.Model.SData
+    Emanote.Model.StaticFile
+    Emanote.Model.Stork
+    Emanote.Model.Stork.Index
+    Emanote.Model.Task
+    Emanote.Model.Title
+    Emanote.Model.Toc
+    Emanote.Model.Type
