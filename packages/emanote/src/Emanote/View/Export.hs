@@ -4,8 +4,8 @@ module Emanote.View.Export (
   renderExport,
 ) where
 
-import Emanote.Model (Model)
 import Emanote.Route.SiteRoute.Type (ExportFormat (..))
+import Emanote.Site.Model (Model)
 import Emanote.View.Export.Content
 import Emanote.View.Export.JSON
 import Relude

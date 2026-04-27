@@ -9,18 +9,18 @@ import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO 
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
-import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
-import Emanote.Model.Type (ModelEma)
 import Emanote.Prelude (
   log,
   logD,
   logE,
  )
 import Emanote.Route qualified as R
+import Emanote.Site.Model (ModelEma)
+import Emanote.Site.Model qualified as M
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T

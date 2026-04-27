@@ -19,10 +19,10 @@ module Emanote.Pandoc.Renderer.Callout (
 import Data.Default (Default (def))
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
-import Emanote.Model (Model)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
 import Emanote.Route (LMLRoute)
+import Emanote.Site.Model (Model)
 import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI

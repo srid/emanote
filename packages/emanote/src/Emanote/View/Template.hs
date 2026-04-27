@@ -8,11 +8,8 @@ import Data.Set qualified as Set
 import Data.Text qualified as T
 import Data.Tree qualified as Tree
 import Ema qualified
-import Emanote.Model (Model, ModelEma)
-import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
-import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.StaticFile qualified as SF
@@ -22,6 +19,8 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
+import Emanote.Site.Model (Model, ModelEma)
+import Emanote.Site.Model qualified as M
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
@@ -119,7 +118,11 @@ renderVirtualRoute m = \case
     content <- liftIO $ renderExport exportFormat m
     pure $ Ema.AssetGenerated Ema.Other content
   SR.VirtualRoute_StorkIndex ->
-    Ema.AssetGenerated Ema.Other <$> renderStorkIndex (SR.siteRouteUrl m . SR.lmlSiteRoute . (R.LMLView_Html,)) m
+    Ema.AssetGenerated Ema.Other
+      <$> renderStorkIndex
+        (m ^. M.modelStorkIndex)
+        (SR.siteRouteUrl m . SR.lmlSiteRoute . (R.LMLView_Html,))
+        (m ^. M.modelCore)
   SR.VirtualRoute_TaskIndex ->
     pure $ Ema.AssetGenerated Ema.Html $ TaskIndex.renderTasks m
 
@@ -154,8 +157,8 @@ patchMeta meta =
 renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
-      meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      meta = patchMeta $ M.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
+      doc = prependDataErrors (M.cascadeYamlErrors model r) (note ^. MN.noteDoc)
       toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
@@ -171,7 +174,7 @@ renderLmlHtml model note = do
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
     forM_ ["uptree", "breadcrumbs", "sidebar", "toc"] $ \flag -> do
-      let hasFlag' = Meta.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model
+      let hasFlag' = M.lookupRouteMeta @Bool False ("template" :| [flag, "enable"]) r model
           hasFlag = if flag == "toc" then hasFlag' && not (tocUnnecessaryToRender toc) else hasFlag'
       "ema:has:" <> flag ## Heist.ifElseISplice hasFlag
     -- Sidebar navigation
@@ -193,13 +196,13 @@ renderLmlHtml model note = do
           then feedDiscoveryLink model note
           else mempty
     "ema:note:backlinks" ##
-      backlinksSplice model (G.modelLookupBacklinks r model)
-    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
+      backlinksSplice model (G.modelLookupBacklinks r (model ^. M.modelCore))
+    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r (model ^. M.modelCore)
     "ema:note:backlinks:daily" ##
       backlinksSplice model backlinksDaily
     "ema:note:backlinks:nodaily" ##
       backlinksSplice model backlinksNoDaily
-    let folgeAnc = G.modelFolgezettelAncestorTree model r
+    let folgeAnc = G.modelFolgezettelAncestorTree (model ^. M.modelCore) r
     "ema:note:uptree" ##
       Splices.treeSplice (\_ _ -> ()) folgeAnc
         $ \(last -> nodeRoute) children -> do
@@ -221,7 +224,7 @@ backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
   Splices.listSplice bs "backlink"
     $ \(source, contexts) -> do
       let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
-          bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
+          bmeta = M.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
           bctx = C.mkTemplateRenderCtx model source bmeta
       -- TODO: reuse note splice
       "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
@@ -244,7 +247,7 @@ routeTreeSplices tCtx mCurrentRoute model = do
   "ema:route-tree" ##
     Splices.treeSplice getOrder (model ^. M.modelFolgezettelTree)
       $ \(last -> nodeRoute) children -> do
-        let shortTitle = Meta.lookupRouteMeta @(Maybe Text) Nothing ("short-title" :| []) nodeRoute model
+        let shortTitle = M.lookupRouteMeta @(Maybe Text) Nothing ("short-title" :| []) nodeRoute model
         "node:text" ## maybe (C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model) HI.textSplice shortTitle
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
         let isActiveNode = Just nodeRoute == mCurrentRoute
@@ -253,7 +256,7 @@ routeTreeSplices tCtx mCurrentRoute model = do
               -- active route (i.e., mr is a Just)
               flip (maybe True) mCurrentRoute $ \r ->
                 -- FIXME: Performance! (exponential complexity)
-                let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree model r
+                let folgeAnc = Set.fromList $ concatMap Tree.flatten $ G.modelFolgezettelAncestorTree (model ^. M.modelCore) r
                     isFolgeAnc = Set.member nodeRoute folgeAnc
                  in r == nodeRoute || isFolgeAnc
             openTree =
@@ -267,17 +270,17 @@ routeTreeSplices tCtx mCurrentRoute model = do
         "has-current-route" ## Heist.ifElseISplice (isJust mCurrentRoute)
   where
     getFoldersFirst tr =
-      Meta.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
+      M.lookupRouteMeta @Bool False ("template" :| ["sidebar", "folders-first"]) tr model
     getOrder path children =
       let tr = last path
           isLeaf = null children
           priority = if getFoldersFirst tr && isLeaf then 1 else 0 :: Int
        in ( priority
-          , Meta.lookupRouteMeta @Int 0 (one "order") tr model
+          , M.lookupRouteMeta @Int 0 (one "order") tr model
           , tr
           )
     getCollapsed tr =
-      Meta.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
+      M.lookupRouteMeta @Bool True ("template" :| ["sidebar", "collapsed"]) tr model
 
 lookupTemplateName :: (ConvertUtf8 Text b) => Aeson.Value -> b
 lookupTemplateName meta =

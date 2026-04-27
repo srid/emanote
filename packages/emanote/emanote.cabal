@@ -177,6 +177,7 @@ library
     Emanote.Prelude
     Emanote.Route.SiteRoute
     Emanote.Route.SiteRoute.Class
+    Emanote.Site.Model
     Emanote.Source.Dynamic
     Emanote.Source.Patch
     Emanote.Static.Sources

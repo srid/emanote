@@ -16,17 +16,16 @@ module Emanote.View.Export.JSON (
 import Data.Aeson (ToJSON)
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
-import Emanote.Model (Model)
-import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
-import Emanote.Model.Meta (getEffectiveRouteMeta)
 import Emanote.Model.SData (lookupAeson)
 import Emanote.Model.Title qualified as Tit
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Optics.Operators ((^.))
 import Relude
 
@@ -90,7 +89,7 @@ modelRels model =
       let from_ = rel ^. Rel.relFrom
           to_ = rel ^. Rel.relTo
           toTarget =
-            Resolve.resolveUnresolvedRelTarget model from_ to_
+            Resolve.resolveUnresolvedRelTarget (model ^. M.modelCore) from_ to_
               <&> SR.siteRouteUrlStatic model
        in (from_, one $ Link to_ toTarget)
 
@@ -110,5 +109,5 @@ lmlSourcePath =
 getBaseUrlFromModel :: Model -> Maybe Text
 getBaseUrlFromModel model =
   let indexRoute = M.modelIndexRoute model
-      feedMeta = getEffectiveRouteMeta indexRoute model
+      feedMeta = M.getEffectiveRouteMeta indexRoute model
    in lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta

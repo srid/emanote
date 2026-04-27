@@ -12,6 +12,7 @@ import Emanote.Model.Stork.Index (
   File (File),
   FileType (FileType_Markdown, FileType_PlainText),
   Handling,
+  IndexVar,
   Input (Input),
   readOrBuildStorkIndex,
  )
@@ -24,10 +25,10 @@ import Optics.Core ((^.))
 import Relude
 import System.FilePath ((</>))
 
-renderStorkIndex :: (MonadIO m, MonadLoggerIO m) => (R.LMLRoute -> Text) -> Model -> m LByteString
-renderStorkIndex renderUrl model = do
+renderStorkIndex :: (MonadIO m, MonadLoggerIO m) => IndexVar -> (R.LMLRoute -> Text) -> Model -> m LByteString
+renderStorkIndex storkIndex renderUrl model = do
   let config = Config $ Input (storkFiles renderUrl model) (frontmatterHandling model)
-  readOrBuildStorkIndex (model ^. M.modelStorkIndex) config
+  readOrBuildStorkIndex storkIndex config
 
 storkFiles :: (R.LMLRoute -> Text) -> Model -> [File]
 storkFiles renderUrl model =

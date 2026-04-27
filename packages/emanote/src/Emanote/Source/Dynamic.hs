@@ -19,10 +19,10 @@ import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
 import Emanote.Model.Stork.Index qualified as Stork
-import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Prelude (chainM)
 import Emanote.Route (LMLRoute)
+import Emanote.Site.Model qualified as Model
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch

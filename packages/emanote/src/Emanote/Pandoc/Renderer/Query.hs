@@ -6,13 +6,14 @@ module Emanote.Pandoc.Renderer.Query (
 import Data.List qualified as List
 import Data.Map.Syntax ((##))
 import Data.Text qualified as T
-import Emanote.Model (Model)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Query qualified as Q
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Renderer (PandocBlockRenderer)
 import Emanote.Route (LMLRoute, LMLView (LMLView_Html))
 import Emanote.Route.SiteRoute qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Heist qualified as H
 import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (RenderCtx)
@@ -38,7 +39,7 @@ queryResolvingSplice model _nr ctx noteRoute blk = do
         HI.textSplice (show q)
       "result" ##
         (HI.runChildrenWith . noteSpliceMap ($ ctx) model)
-          `foldMapM` Q.runQuery noteRoute model q
+          `foldMapM` Q.runQuery noteRoute (model ^. M.modelCore) q
 
 -- TODO: Reuse this elsewhere
 noteSpliceMap ::

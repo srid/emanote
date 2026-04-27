@@ -33,7 +33,7 @@ module Emanote.View.JsBundle (
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Key qualified as AesonKey
 import Data.Text qualified as T
-import Emanote.Model.Type (Model)
+import Emanote.Site.Model (Model)
 import Emanote.View.StaticUrl (emanoteStaticUrl)
 import Relude
 import System.FilePath ((</>))

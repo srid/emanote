@@ -25,8 +25,6 @@ import Emanote.CLI qualified as CLI
 import Emanote.MCP qualified as MCP
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Link.Rel (ResolvedRelTarget (..))
-import Emanote.Model.Type (modelCompileTailwind)
-import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer
 import Emanote.Pandoc.Renderer.Callout qualified as PF
 import Emanote.Pandoc.Renderer.Embed qualified as PF
@@ -36,6 +34,7 @@ import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
 import Emanote.Route.SiteRoute.Class (emanoteGeneratableRoutes, emanoteRouteEncoder)
 import Emanote.Route.SiteRoute.Type (SiteRoute)
+import Emanote.Site.Model qualified as Model
 import Emanote.Source.Dynamic (EmanoteConfig (..), emanoteSiteInput)
 import Emanote.View.Export qualified as Export
 import Emanote.View.Export.JSON qualified as ExportJSON
@@ -63,7 +62,7 @@ modelUpdateCachedFields :: Model.ModelEma -> Model.ModelEma
 modelUpdateCachedFields model =
   model
     & Model.modelFolgezettelTree
-    .~ G.folgezettelTreesFrom (unModelEma model) (Model.modelIndexRoute model)
+    .~ G.folgezettelTreesFrom (unModelEma model ^. Model.modelCore) (Model.modelIndexRoute model)
 
 defaultEmanoteConfig :: CLI.Cli -> EmanoteConfig
 defaultEmanoteConfig cli =
@@ -107,7 +106,7 @@ run cfg@EmanoteConfig {..} = do
 
 postRun :: EmanoteConfig -> (Model.ModelEma, (FilePath, [FilePath])) -> IO ()
 postRun EmanoteConfig {..} (unModelEma -> model0, (outPath, genPaths)) = do
-  when (model0 ^. modelCompileTailwind)
+  when (model0 ^. Model.modelCompileTailwind)
     $ compileTailwindCss (outPath </> generatedCssFile) genPaths
   checkBrokenLinks _emanoteConfigCli $ ExportJSON.modelRels model0
   checkBadMarkdownFiles $ Model.modelNoteErrors model0

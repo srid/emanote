@@ -6,13 +6,11 @@ module Emanote.Model.Type where
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
-import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Time (UTCTime)
 import Data.Tree (Forest)
-import Data.UUID (UUID)
 import Emanote.Model.Link.Rel (IxRel)
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Note (
@@ -27,18 +25,13 @@ import Emanote.Model.StaticFile (
   StaticFile (StaticFile),
   StaticFileInfo,
  )
-import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
-import Emanote.Route.SiteRoute.Type (SiteRoute)
 import Emanote.Source.Loc (Loc)
-import Heist.Extra.TemplateState (TemplateState)
-import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Relude
@@ -46,63 +39,27 @@ import Relude
 data Status = Status_Loading | Status_Ready
   deriving stock (Eq, Show)
 
-data ModelT encF = Model
+data Model = Model
   { _modelStatus :: Status
   , _modelLayers :: Set Loc
-  , _modelIsLiveServer :: Bool
-  , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
-  , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
-  -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
-  , _modelCompileTailwind :: Bool
-  , _modelInstanceID :: UUID
-  -- ^ An unique ID for this process's model. ID changes across processes.
   , _modelNotes :: IxNote
   , _modelRels :: IxRel
   , _modelSData :: IxSData
   , _modelStaticFiles :: IxStaticFile
   , _modelTasks :: IxTask
   -- ^ A tree (forest) of all notes, based on their folder hierarchy.
-  , _modelHeistTemplate :: TemplateState
-  , _modelStorkIndex :: Stork.IndexVar
   , _modelFolgezettelTree :: Forest R.LMLRoute
   -- ^ Folgezettel tree computed once for each update to model.
   }
   deriving stock (Generic)
 
-type Model = ModelT Identity
+makeLenses ''Model
 
-{- | A bare version of `Model` that is managed by the Ema app.
-
- The only difference is that this one has no `RouteEncoder`.
--}
-type ModelEma = ModelT (Const ())
-
-deriving stock instance Generic ModelEma
-
-deriving stock instance Generic Model
-
-makeLenses ''ModelT
-
-withoutRoutePrism :: Model -> (Prism' FilePath SiteRoute, ModelEma)
-withoutRoutePrism model@Model {..} =
-  let _modelRoutePrism = Const ()
-   in (runIdentity $ model ^. modelRoutePrism, Model {..})
-
-withRoutePrism :: Prism' FilePath SiteRoute -> ModelEma -> Model
-withRoutePrism enc Model {..} =
-  let _modelRoutePrism = Identity enc
-   in Model {..}
-
-emptyModel :: Set Loc -> Bool -> EmanotePandocRenderers Model LMLRoute -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers isLiveServer ren ctw instanceId storkVar =
+emptyModel :: Set Loc -> Model
+emptyModel layers =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
-    , _modelIsLiveServer = isLiveServer
-    , _modelRoutePrism = Const ()
-    , _modelPandocRenderers = ren
-    , _modelCompileTailwind = ctw
-    , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
       -- being run on an empty directory.
       _modelNotes = Ix.empty & injectRoot
@@ -110,20 +67,14 @@ emptyModel layers isLiveServer ren ctw instanceId storkVar =
     , _modelSData = Ix.empty
     , _modelStaticFiles = Ix.empty
     , _modelTasks = Ix.empty
-    , _modelHeistTemplate = def
-    , _modelStorkIndex = storkVar
     , _modelFolgezettelTree = mempty
     }
 
-modelReadyForView :: ModelT f -> ModelT f
+modelReadyForView :: Model -> Model
 modelReadyForView =
   modelStatus .~ Status_Ready
 
--- | Are we running in live server, or statically generated website?
-inLiveServer :: Model -> Bool
-inLiveServer = _modelIsLiveServer
-
-modelInsertNote :: Note -> ModelT f -> ModelT f
+modelInsertNote :: Note -> Model -> Model
 modelInsertNote note =
   modelNotes
     %~ ( Ix.updateIx r note
@@ -179,7 +130,7 @@ injectAncestorPlaceholder r ns =
     Nothing ->
       Ix.updateIx (R.defaultLmlRoute r) (N.ancestorPlaceholderNote $ coerce r) ns
 
-modelDeleteNote :: LMLRoute -> ModelT f -> ModelT f
+modelDeleteNote :: LMLRoute -> Model -> Model
 modelDeleteNote k model =
   model
     & modelNotes
@@ -220,34 +171,34 @@ deleteIxMulti r rels =
   let candidates = Ix.toList $ Ix.getEQ r rels
    in flipfoldl' Ix.delete rels candidates
 
-modelLookupStaticFile :: FilePath -> ModelT f -> Maybe StaticFile
+modelLookupStaticFile :: FilePath -> Model -> Maybe StaticFile
 modelLookupStaticFile fp m = do
   r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
   Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
-modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> ModelT f -> ModelT f
+modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> Model -> Model
 modelInsertStaticFile t r fp mInfo =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
     staticFile = StaticFile r fp t mInfo
 
-modelDeleteStaticFile :: R.R 'AnyExt -> ModelT f -> ModelT f
+modelDeleteStaticFile :: R.R 'AnyExt -> Model -> Model
 modelDeleteStaticFile r =
   modelStaticFiles %~ Ix.deleteIx r
 
-modelInsertData :: SData -> ModelT f -> ModelT f
+modelInsertData :: SData -> Model -> Model
 modelInsertData v =
   modelSData %~ Ix.updateIx (v ^. sdataRoute) v
 
-modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
+modelDeleteData :: R.R 'R.Yaml -> Model -> Model
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
-modelLookupSData :: R.R 'R.Yaml -> ModelT f -> Maybe SData
+modelLookupSData :: R.R 'R.Yaml -> Model -> Maybe SData
 modelLookupSData r =
   Ix.getOne . Ix.getEQ r . _modelSData
 
-modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> ModelT f -> Maybe (R.LMLView, Note)
+modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> Model -> Maybe (R.LMLView, Note)
 modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
   note <- N.lookupNotesByRoute r notes
   case (view, noteHasFeed note) of
@@ -256,7 +207,7 @@ modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
     (_, _) -> pure (view, note)
 
 -- | Like `modelLookupNoteByRoute`, but for `R.Html` routes only.
-modelLookupNoteByRoute' :: LMLRoute -> ModelT f -> Maybe Note
+modelLookupNoteByRoute' :: LMLRoute -> Model -> Maybe Note
 modelLookupNoteByRoute' r =
   fmap snd . modelLookupNoteByRoute (R.LMLView_Html, r)
 
@@ -265,20 +216,20 @@ given route. Uses the note's on-disk source path when the note exists; falls
 back to the canonical route parent for synthesized notes (and for routes that
 have no matching note in the model).
 -}
-modelResolveLinkBase :: ModelT f -> LMLRoute -> Maybe (R.R 'R.Folder)
+modelResolveLinkBase :: Model -> LMLRoute -> Maybe (R.R 'R.Folder)
 modelResolveLinkBase model r =
   maybe
     (R.withLmlRoute R.routeParent r)
     N.noteResolveLinkBase
     (modelLookupNoteByRoute' r model)
 
-modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
+modelLookupNoteByHtmlRoute :: R 'R.Html -> Model -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
   Rel.resolvedRelTargetFromCandidates
     . N.lookupNotesByHtmlRoute r
     . _modelNotes
 
-modelLookupFeedNoteByHtmlRoute :: R 'R.Xml -> ModelT f -> Maybe Note
+modelLookupFeedNoteByHtmlRoute :: R 'R.Xml -> Model -> Maybe Note
 modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
   Rel.RRTFound note
     | noteHasFeed note -> pure note
@@ -290,7 +241,7 @@ modelLookupFeedNoteByHtmlRoute r model = case resolvedTarget of
         $ N.lookupNotesByXmlRoute r
         $ _modelNotes model
 
-modelLookupTitle :: LMLRoute -> ModelT f -> Tit.Title
+modelLookupTitle :: LMLRoute -> Model -> Tit.Title
 modelLookupTitle r =
   maybe (Tit.fromRoute r) N._noteTitle . modelLookupNoteByRoute' r
 
@@ -307,11 +258,11 @@ modelWikiLinkTargets wl model =
           @= wl
    in fmap Right staticFiles <> fmap Left ((R.LMLView_Html,) <$> notes)
 
-modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
+modelLookupStaticFileByRoute :: R 'AnyExt -> Model -> Maybe StaticFile
 modelLookupStaticFileByRoute r =
   Ix.getOne . Ix.getEQ r . _modelStaticFiles
 
-modelTags :: ModelT f -> [(HT.Tag, [Note])]
+modelTags :: Model -> [(HT.Tag, [Note])]
 modelTags =
   Ix.groupAscBy @HT.Tag . _modelNotes
 
@@ -339,11 +290,11 @@ modelNoteErrors model =
 
   If index.org exist, use that. Otherwise, fallback to index.md.
 -}
-modelIndexRoute :: ModelT f -> LMLRoute
+modelIndexRoute :: Model -> LMLRoute
 modelIndexRoute model = do
   resolveLmlRoute model R.indexRoute
 
-resolveLmlRoute :: forall lmlType f. ModelT f -> R ('R.LMLType lmlType) -> LMLRoute
+resolveLmlRoute :: forall lmlType. Model -> R ('R.LMLType lmlType) -> LMLRoute
 resolveLmlRoute model r =
   fromMaybe (R.defaultLmlRoute r) $ resolveLmlRouteIfExists (model ^. modelNotes) r
 

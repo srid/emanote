@@ -21,9 +21,9 @@ module Emanote.View.StaticUrl (
 ) where
 
 import Data.Map.Syntax ((##))
-import Emanote.Model.Type (Model)
-import Emanote.Model.Type qualified as M
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Heist qualified as H
 import Heist.Interpreted qualified as HI
 import Relude

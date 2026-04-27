@@ -4,15 +4,15 @@ module Emanote.View.Feed where
 
 import Data.Aeson qualified as Aeson
 import Data.Aeson.Optics (key, _String)
-import Emanote.Model (Model)
-import Emanote.Model.Meta (getEffectiveRouteMeta)
 import Emanote.Model.Note (Feed (..), Note (..), lookupMeta)
 import Emanote.Model.Query (Query, parseQuery, runQuery)
 import Emanote.Model.SData (lookupAeson)
 import Emanote.Model.Title (toPlain)
 import Emanote.Route.SiteRoute
 import Emanote.Route.SiteRoute.Class (noteFeedSiteRoute)
-import Optics.Operators ((^?))
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
+import Optics.Operators ((^.), (^?))
 import Optics.Optic ((%))
 import Relude
 import Text.Atom.Feed qualified as Atom
@@ -77,14 +77,14 @@ renderFeed model baseNote = encodeUtf8 <$> eFeedText
     eFeedText = do
       feed <- maybeToRight "feed attribute missing" $ _noteFeed baseNote
       feedQuery <- getNoteQuery baseNote
-      case nonEmpty (runQuery (_noteRoute baseNote) model feedQuery) of
+      case nonEmpty (runQuery (_noteRoute baseNote) (model ^. M.modelCore) feedQuery) of
         Nothing -> Right (renderEmptyFeed baseNote)
         Just notes -> renderPopulatedFeed model baseNote feed notes
 
 renderPopulatedFeed :: Model -> Note -> Feed -> NonEmpty Note -> Either LText LText
 renderPopulatedFeed model baseNote feed notes = do
   let feedMeta :: Aeson.Value
-      feedMeta = getEffectiveRouteMeta (_noteRoute baseNote) model
+      feedMeta = M.getEffectiveRouteMeta (_noteRoute baseNote) model
   let mFeedUrl :: Maybe Text
       mFeedUrl = lookupAeson Nothing ("page" :| ["siteUrl"]) feedMeta
   feedUrl <- maybeToRight "index.yaml or note doesn't have page.siteUrl" mFeedUrl

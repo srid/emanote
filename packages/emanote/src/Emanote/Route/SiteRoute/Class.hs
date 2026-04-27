@@ -22,17 +22,16 @@ import Data.List.NonEmpty qualified as NE
 import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Ema (UrlStrategy (..), routeUrlWith)
-import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
-import Emanote.Model.Meta qualified as Model
 import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
-import Emanote.Model.Type (Model, ModelEma, ModelT)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.ModelRoute (LMLRoute, StaticFileRoute)
 import Emanote.Route.SiteRoute.Type
+import Emanote.Site.Model (Model, ModelEma)
+import Emanote.Site.Model qualified as M
 import Emanote.View.LiveServerFiles qualified as LiveServerFile
 import Optics.Core (Prism', prism')
 import Optics.Operators ((^.))
@@ -193,7 +192,7 @@ siteRouteUrlStatic model sr =
 
     getBaseUrl :: Model -> Text
     getBaseUrl m =
-      Model.lookupRouteMeta "/" ("template" :| ["baseUrl"]) (M.modelIndexRoute m) m
+      M.lookupRouteMeta "/" ("template" :| ["baseUrl"]) (M.modelIndexRoute m) m
 
 -- | Like siteRouteUrlStatic but live-server friendly
 siteRouteUrl :: (HasCallStack) => Model -> SiteRoute -> Text
@@ -229,9 +228,9 @@ urlStrategySuffix model =
     Ema.UrlDirect -> ".html"
     Ema.UrlPretty -> ""
 
-urlStrategy :: ModelT f -> UrlStrategy
+urlStrategy :: M.ModelT f -> UrlStrategy
 urlStrategy model =
-  Model.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
+  M.lookupRouteMeta Ema.UrlDirect ("template" :| one "urlStrategy") (M.modelIndexRoute model) model
 
 indexRoute :: SiteRoute
 indexRoute =

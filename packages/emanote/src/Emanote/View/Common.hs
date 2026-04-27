@@ -17,16 +17,15 @@ import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Data.Version (showVersion)
 import Ema.Server.Common qualified as Ema
-import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
-import Emanote.Model.Type (Model)
-import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Emanote.View.JsBundle qualified as JsBundle
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
 import Emanote.View.StaticUrl qualified as StaticUrl
@@ -110,7 +109,7 @@ mkTemplateRenderCtx model r meta =
 defaultRouteMeta :: Model -> (LMLRoute, Aeson.Value)
 defaultRouteMeta model =
   let r = M.modelIndexRoute model
-      meta = Meta.getEffectiveRouteMeta r model
+      meta = M.getEffectiveRouteMeta r model
    in (r, meta)
 
 commonSplices ::

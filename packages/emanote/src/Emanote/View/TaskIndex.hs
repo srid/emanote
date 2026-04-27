@@ -4,12 +4,12 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
-import Emanote.Model (Model)
 import Emanote.Model.Task (Task)
 import Emanote.Model.Task qualified as Task
-import Emanote.Model.Type qualified as M
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Emanote.View.Common qualified as Common
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc qualified as Splices

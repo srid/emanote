@@ -7,7 +7,7 @@ where
 
 import Data.Text qualified as T
 import Emanote.Model.StaticFile (StaticFile)
-import Emanote.Model.Type qualified as M
+import Emanote.Site.Model qualified as M
 import Relude
 
 -- TODO: Check this compile-time using TH?

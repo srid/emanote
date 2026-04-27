@@ -6,8 +6,6 @@ module Emanote.Pandoc.Renderer.Url (
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Text qualified as T
-import Emanote.Model (Model)
-import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
@@ -16,11 +14,14 @@ import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
 import Optics.Core (review)
+import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
@@ -31,7 +32,7 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   let parentR = M.modelResolveLinkBase model noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
-  let rRel = Resolve.resolveUnresolvedRelTarget model noteRoute uRel
+  let rRel = Resolve.resolveUnresolvedRelTarget (model ^. M.modelCore) noteRoute uRel
   renderSomeInlineRefWith id (is, (url, tit)) rRel model ctx inl $ \sr ->
     case inlRef of
       Link.InlineLink -> do

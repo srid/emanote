@@ -6,12 +6,12 @@ import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Data.Tree (Forest, Tree)
 import Data.Tree qualified as Tree
-import Emanote.Model (Model)
-import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as MN
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer.Query qualified as PF
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.Site.Model (Model)
+import Emanote.Site.Model qualified as M
 import Emanote.View.Common (
   TemplateRenderCtx (withInlineCtx),
   commonSplices,

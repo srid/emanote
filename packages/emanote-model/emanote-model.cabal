@@ -103,7 +103,6 @@ common library-common
     , tomland
     , unliftio
     , url-slug
-    , uuid
     , which
     , xmlhtml
     , yaml
