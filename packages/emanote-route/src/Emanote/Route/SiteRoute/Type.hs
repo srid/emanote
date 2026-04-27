@@ -37,11 +37,10 @@ data VirtualRoute
 
 {- | A route to a resource in `Model`
 
- This is *mostly isomorphic* to `ModelRoute`, except for containing the
- absolute path to the static file.
+ This is *mostly isomorphic* to `ModelRoute`.
 -}
 data ResourceRoute
-  = ResourceRoute_StaticFile StaticFileRoute FilePath
+  = ResourceRoute_StaticFile StaticFileRoute
   | ResourceRoute_LML LMLView LMLRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
@@ -61,7 +60,7 @@ instance Show SiteRoute where
       "Amb: " <> urlPath
     SiteRoute_ResourceRoute rr ->
       case rr of
-        ResourceRoute_StaticFile r _fp ->
+        ResourceRoute_StaticFile r ->
           show r
         ResourceRoute_LML _view r ->
           show $ lmlRouteCase r

@@ -117,7 +117,7 @@ encodeResourceRoute model = \case
             R.LMLView_Atom -> R.encodeRoute <$> N.noteXmlRoute note
             R.LMLView_Html -> pure $ R.encodeRoute $ N.noteHtmlRoute note
       )
-  ResourceRoute_StaticFile r _fpAbs ->
+  ResourceRoute_StaticFile r ->
     R.encodeRoute r
 
 -- | Decode a route that is known to refer to a resource in the model
@@ -166,10 +166,7 @@ lmlResourceRoute = ResourceRoute_LML
 
 staticFileSiteRoute :: SF.StaticFile -> SiteRoute
 staticFileSiteRoute =
-  (SiteRoute_ResourceRoute . staticResourceRoute) . (SF._staticFileRoute &&& SF._staticFilePath)
-  where
-    staticResourceRoute :: (StaticFileRoute, FilePath) -> ResourceRoute
-    staticResourceRoute = uncurry ResourceRoute_StaticFile
+  SiteRoute_ResourceRoute . ResourceRoute_StaticFile . SF._staticFileRoute
 
 {- | Generate the static URL for a site route, including special handling for html-proofer compatibility.
 
@@ -218,7 +215,7 @@ siteRouteUrl model sr =
         Nothing
       SiteRoute_ResourceRoute rr ->
         case rr of
-          ResourceRoute_StaticFile sfR _fp ->
+          ResourceRoute_StaticFile sfR ->
             Just sfR
           ResourceRoute_LML _ _ ->
             Nothing

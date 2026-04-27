@@ -15,6 +15,7 @@ import Emanote.Model.Graph qualified as G
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
+import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
 import Emanote.Route qualified as R
@@ -101,8 +102,12 @@ renderResourceRoute m = \case
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
-  SR.ResourceRoute_StaticFile _ fpAbs ->
-    Ema.AssetStatic fpAbs
+  SR.ResourceRoute_StaticFile staticFileRoute ->
+    case M.modelLookupStaticFileByRoute staticFileRoute m of
+      Just staticFile ->
+        Ema.AssetStatic $ staticFile ^. SF.staticFilePath
+      Nothing ->
+        error $ "Bad static file route: " <> show staticFileRoute
 
 renderVirtualRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.VirtualRoute -> m (Ema.Asset LByteString)
 renderVirtualRoute m = \case

@@ -94,4 +94,4 @@ resourceSiteRoute =
     Left (view, note) ->
       SR.ResourceRoute_LML view (note ^. MN.noteRoute)
     Right staticFile ->
-      SR.ResourceRoute_StaticFile (staticFile ^. SF.staticFileRoute) (staticFile ^. SF.staticFilePath)
+      SR.ResourceRoute_StaticFile (staticFile ^. SF.staticFileRoute)
