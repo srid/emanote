@@ -1101,6 +1101,13 @@ Ordered lists,
 | Search Engine | [Brave Search] |
 | Chat          | [Element]      |
 
+Column alignment is honored on each cell — use `:---` for left, `---:` for right, and `:---:` for center.
+
+| Left   |  Center  | Right |
+| :----- | :------: | ----: |
+| Apple  |  Banana  |  Pear |
+| Carrot | Eggplant |  Kiwi |
+
 (Note that wiki links with a custom text must have their [pipe escaped](https://github.com/srid/emanote/issues/113#issuecomment-894808721) when used inside tables.)
 
 [Brave]: https://brave.com/
