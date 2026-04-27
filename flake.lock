@@ -3,11 +3,11 @@
     "commonmark-simple": {
       "flake": false,
       "locked": {
-        "lastModified": 1777292799,
-        "narHash": "sha256-W6zLvmSwLqRR+V+jOC+AL1+cy0KVIqB+SFKYvN9S8vQ=",
+        "lastModified": 1777293247,
+        "narHash": "sha256-efLxGo31BU1guzY9Wtu/N+YVEnintrtziHIdsq7sLBc=",
         "owner": "srid",
         "repo": "commonmark-simple",
-        "rev": "e28e1f0c34728fa978a6b146b13a2514e37a3662",
+        "rev": "284bf71a83185c40d4abbf748702ec19c814a583",
         "type": "github"
       },
       "original": {
