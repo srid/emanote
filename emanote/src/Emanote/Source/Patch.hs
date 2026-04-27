@@ -12,6 +12,7 @@ import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
+import Emanote.Model.Note (ParseContext)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
 import Emanote.Model.StaticFile (readStaticFileInfo)
@@ -24,64 +25,57 @@ import Emanote.Prelude (
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
-import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
 patchModels ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
+  ParseContext ->
   -- | Type of the files being changed
   R.FileType R.SourceExt ->
   Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (ModelEma -> ModelEma)
-patchModels layers noteF storkIndexTVar scriptingEngine fpType actions = do
+patchModels noteF storkIndexTVar parseContext fpType actions = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModels' layers noteF storkIndexTVar scriptingEngine fpType actions) newLogger
+  runLoggingT (patchModels' noteF storkIndexTVar parseContext fpType actions) newLogger
 
 patchModels' ::
   (MonadIO m, MonadLogger m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
+  ParseContext ->
   -- | Type of the files being changed
   R.FileType R.SourceExt ->
   Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (ModelEma -> ModelEma)
-patchModels' layers noteF storkIndexTVar scriptingEngine fpType actions =
+patchModels' noteF storkIndexTVar parseContext fpType actions =
   case fpType of
     R.LMLType lmlType ->
-      patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions
+      patchLmlModels noteF storkIndexTVar parseContext lmlType actions
     _ ->
-      uncurry (patchModel' layers noteF storkIndexTVar scriptingEngine fpType) `chainM` Map.toList actions
+      uncurry (patchNonLmlModel fpType) `chainM` Map.toList actions
 
 patchLmlModels ::
   (MonadIO m, MonadLogger m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
+  ParseContext ->
   R.LML ->
   Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m (ModelEma -> ModelEma)
-patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions = do
+patchLmlModels noteF storkIndexTVar parseContext lmlType actions = do
   unless (Map.null actions)
     $ Stork.clearStorkIndex storkIndexTVar
   (notes, deletes) <-
@@ -94,7 +88,7 @@ patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions = do
             UM.Refresh refreshAction overlays -> do
               let fpAbs = head overlays
               s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNoteForModel scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
+              note <- N.parseNoteForModel parseContext r fpAbs (decodeUtf8 s)
               note' <- liftIO . evaluateWHNF . force $ noteF note
               pure $ Left note'
             UM.Delete -> do
@@ -105,11 +99,9 @@ patchLmlModels layers noteF storkIndexTVar scriptingEngine lmlType actions = do
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
+  ParseContext ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -117,22 +109,12 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
-  logger <- askLoggerIO
-  now <- liftIO getCurrentTime
-  -- Prefix all patch logging with timestamp.
-  let newLogger loc src lvl s =
-        logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action) newLogger
+patchModel noteF storkIndexTVar parseContext fpType fp action =
+  patchModels noteF storkIndexTVar parseContext fpType (one (fp, action))
 
 -- | Map a filesystem change to the corresponding model change.
-patchModel' ::
+patchNonLmlModel ::
   (MonadIO m, MonadLogger m) =>
-  Set Loc ->
-  (N.Note -> N.Note) ->
-  Stork.IndexVar ->
-  -- | Lua scripting engine
-  ScriptingEngine ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -140,33 +122,10 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchNonLmlModel fpType fp action = do
   case fpType of
-    R.LMLType lmlType -> do
-      case R.mkLMLRouteFromKnownFilePath lmlType fp of
-        Nothing ->
-          pure id -- Impossible
-        Just r -> do
-          -- Stork doesn't support incremental building of index, so we must
-          -- clear it to pave way for a rebuild later when requested.
-          --
-          -- From https://github.com/jameslittle230/stork/discussions/112#discussioncomment-252861
-          --
-          -- > Stork also doesn't support incremental index updates today --
-          -- you'd have to re-index everything when users added a new document,
-          -- which might be prohibitively long.
-          Stork.clearStorkIndex storkIndexTVar
-
-          case action of
-            UM.Refresh refreshAction overlays -> do
-              let fpAbs = head overlays
-              s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNoteForModel scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
-              note' <- liftIO . evaluateWHNF . force $ noteF note
-              pure $ M.modelInsertNote note'
-            UM.Delete -> do
-              log $ "Removing note: " <> toText fp
-              pure $ M.modelDeleteNote r
+    R.LMLType _ ->
+      pure id
     R.Yaml ->
       case R.mkRouteFromFilePath' True fp of
         Nothing ->

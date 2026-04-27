@@ -18,8 +18,8 @@ spec = do
     it "keeps simple Markdown shallow while preserving title, tags, and wikilinks" $ do
       let note = parseSimpleNote "note.md" simpleMarkdown
 
-      note ^. MN.noteNeedsFullParse `shouldBe` True
-      note ^. MN.noteSourceText `shouldBe` Just simpleMarkdown
+      isJust (MN.noteDeferred note) `shouldBe` True
+      fmap (^. MN.deferredNoteText) (MN.noteDeferred note) `shouldBe` Just simpleMarkdown
       Tit.toPlain (note ^. MN.noteTitle) `shouldBe` "Note title"
       MN.noteTags note
         `shouldMatchList` [ TT.Tag "frontmatter"
@@ -31,6 +31,17 @@ spec = do
                           , Rel.URTWikiLink (WL.WikiLinkTag, wiki "tagged")
                           , Rel.URTWikiLink (WL.WikiLinkBranch, wiki "child")
                           ]
+
+    it "deduplicates repeated simple Markdown wikilink targets in the startup model" $ do
+      let markdown = "# Note title\nFirst [[target]].\nSecond [[target]].\n"
+          note = parseSimpleNote "note.md" markdown
+
+      fmap (^. Rel.relTo) (Ix.toList $ Rel.noteRels note)
+        `shouldBe` [Rel.URTWikiLink (WL.WikiLinkNormal, wiki "target")]
+      fmap (^. Rel.relTo) (Ix.toList $ Rel.noteTextRels note markdown)
+        `shouldBe` [ Rel.URTWikiLink (WL.WikiLinkNormal, wiki "target")
+                   , Rel.URTWikiLink (WL.WikiLinkNormal, wiki "target")
+                   ]
 
     it "leaves Markdown requiring full document semantics to the full parser" $ do
       MN.parseSimpleMarkdownNote (route "linked.md") (source "linked.md") "# Title\n[x](https://example.com)\n"

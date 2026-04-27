@@ -17,6 +17,7 @@ The GitHub issue reports:
 - OS source for RSS: `/proc/$PID/status`, field `VmRSS`.
 - Measurement cadence: 1 sample per second.
 - Python, curl-equivalent HTTP requests, and shell tooling came from `nix develop`.
+- Nix store paths in the result tables identify the exact executables measured; later report-only edits can produce a different store path without changing the measured Haskell code.
 - Server command shape:
 
 ```sh
@@ -29,20 +30,20 @@ Two generated notebooks were used:
 
 | Workload | Markdown files | Size on disk | Update phase |
 | --- | ---: | ---: | --- |
-| Local reproduction | 2401 (`index.md` plus 2400 notes) | 19M | 3 rounds, 240 rewritten notes per round, 720 rewrites total |
-| Issue-sized check | 4561 (`index.md` plus 4560 notes) | 72M | 3 rounds, 456 rewritten notes per round, 1368 rewrites total |
+| Local reproduction | 2401 (`index.md` plus 2400 notes) | 18M / 17.74 MiB | 3 rounds, 240 rewritten notes per round, 720 rewrites total |
+| Issue-sized check | 4561 (`index.md` plus 4560 notes) | 82M / 81.65 MiB | 3 rounds, 456 rewritten notes per round, 1368 rewrites total |
 
 Each note has YAML front matter, repeated Markdown text, inline tags, blockquotes, and six wikilinks. `index.md` links to every note so root rendering exercises the full route tree and title lookup path.
 
 ## RSS and startup results
 
-![Peak RSS comparison](https://quickchart.io/chart?c=%7Btype%3A%27bar%27%2Cdata%3A%7Blabels%3A%5B%27Baseline%202401%20timeout%27%2C%27Fixed%202401%27%2C%27Fixed%204561%2F72M%27%5D%2Cdatasets%3A%5B%7Blabel%3A%27Peak%20RSS%20MiB%27%2Cdata%3A%5B1478.5%2C448.7%2C697.7%5D%7D%5D%7D%7D)
+![Peak RSS comparison](https://quickchart.io/chart?c=%7Btype%3A%27bar%27%2Cdata%3A%7Blabels%3A%5B%27Baseline%202401%20timeout%27%2C%27Fixed%202401%27%2C%27Fixed%204561%2F82M%27%5D%2Cdatasets%3A%5B%7Blabel%3A%27Peak%20RSS%20MiB%27%2Cdata%3A%5B1478.5%2C457.3%2C752.2%5D%7D%5D%7D%7D)
 
 | Run | Binary | Workload | Startup readiness | First idle RSS | First `/` render | Peak RSS | Peak phase | Final RSS | Raw data |
 | --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | --- |
 | Baseline reproduction | `/nix/store/rym5k9jidv5rrgg59b0cxkljr5r314wh-emanote-1.6.0.0/bin/emanote` | 2401 files, 19M | no response before 300s timeout | not reached | not reached | 1478.5 MiB | startup | not reached | `/tmp/emanote-issue66-baseline-current-harness-v1/rss.tsv` |
-| Fixed | `/nix/store/f79k867pp1brmrjhrrdvix98sd3lk5lc-emanote-1.6.0.0/bin/emanote` | 2401 files, 19M | 2s | 326.4 MiB | 2.287s / 6389899 bytes | 448.7 MiB | final-idle | 448.7 MiB | `/tmp/emanote-issue66-final-2401-v3/rss.tsv` |
-| Fixed, issue-sized | `/nix/store/f79k867pp1brmrjhrrdvix98sd3lk5lc-emanote-1.6.0.0/bin/emanote` | 4561 files, 72M | 6s | 581.4 MiB | 5.592s / 12107419 bytes | 697.7 MiB | final-idle | 697.7 MiB | `/tmp/emanote-issue66-final-4561-69m-v3/rss.tsv` |
+| Fixed | `/nix/store/g3xnnpa6llqz509rs5g2wil4vaqj0zzj-emanote-1.6.0.0/bin/emanote` | 2401 files, 18M | 3.583s | 387.3 MiB | 2.571s / 4240221 bytes | 457.3 MiB | final-idle | 457.3 MiB | `/tmp/emanote-issue66-final-2401-v8/rss.tsv` |
+| Fixed, issue-sized | `/nix/store/g3xnnpa6llqz509rs5g2wil4vaqj0zzj-emanote-1.6.0.0/bin/emanote` | 4561 files, 82M | 9.690s | 703.4 MiB | 7.688s / 8007261 bytes | 752.2 MiB | final-idle | 752.1 MiB | `/tmp/emanote-issue66-final-4561-69m-v8/rss.tsv` |
 
 Earlier baseline runs also reproduced the >1 GiB condition:
 
@@ -57,14 +58,14 @@ The issue-sized fixed run was checked after measurement with the same generated 
 
 | Check | Result |
 | --- | ---: |
-| Readiness | 6s |
+| Readiness | 9.690s |
 | Unique `note-NNNN` tokens in rendered `/` | 4560 |
 | Rendered `/` contains `note-0001` | True |
 | Rendered `/` contains `note-4560` | True |
-| Rendered `/` bytes | 12107419 |
+| Rendered `/` bytes | 8007261 |
 | Rendered `/note-0001` has heading | True |
 | Rendered `/note-0001` has body text | True |
-| Rendered `/note-0001` bytes | 4978447 |
+| Rendered `/note-0001` bytes | 5077695 |
 
 ## Heap profile
 
@@ -113,11 +114,12 @@ Top closure-type entries at the 382.2 MiB sampled-heap peak:
 
 ## Code changes made
 
-The fix avoids retaining full Pandoc documents for simple Markdown notes at model-build time. A simple Markdown note now stores route, title, metadata, tags, source text, and lightweight wikilink relations; the full Pandoc parse is deferred until that note is rendered.
+The fix avoids retaining full Pandoc documents for simple Markdown notes at model-build time. A simple Markdown note now stores route, title, metadata, tags, source text, and one representative wikilink relation per unresolved target. The full Pandoc parse is deferred until the note is rendered, and backlink pages recover repeated deferred-note contexts from the stored source text on demand.
 
 Other code changes:
 
 - Batch model updates for groups of changed LML files so `modelNotes`, `modelRels`, and `modelTasks` are replaced together.
+- Replace the ad hoc lazy-note fields with explicit `NoteBody`, `DeferredNote`, and `ParseContext` types.
 - Build folgezettel child adjacency once per tree construction instead of scanning relations for every node.
 - Compute the active folgezettel ancestor set once per route-tree render.
 - Enable only the Markdown syntax extensions whose marker text appears in the document.
@@ -134,11 +136,14 @@ These were measured and not used as the final fix:
 | Drop retained backlink context only | Peak/final 1332.8 MiB: `/tmp/emanote-issue66-no-relctx-v2/rss.tsv`. |
 | Drop stored note body only | Peak/final 1424.6 MiB: `/tmp/emanote-issue66-drop-doc-v1/rss.tsv`. |
 | Drop stored note body and backlink context | Peak/final 1333.2 MiB: `/tmp/emanote-issue66-drop-doc-no-relctx-v1/rss.tsv`. |
+| Structural `NoteBody` refactor without deferred relation deduplication | On the 4561-file, 81.65 MiB workload, peak/final RSS was 1688.7 MiB: `/tmp/emanote-issue66-final-4561-69m-v4/rss.tsv`. |
+| Sharing the line context for repeated deferred-note wikilinks only | On the same 4561-file, 81.65 MiB workload, peak/final RSS was 1711.7 MiB: `/tmp/emanote-issue66-final-4561-69m-v5/rss.tsv`. This was noise/regression, not a fix. |
 | RTS `-N1 -c` controls | Reduced RSS in some runs, but this PR does not rely on RTS defaults as the fix. |
 
 ## Current factual conclusions
 
-- The memory issue was reproduced locally above 1 GiB RSS: the baseline reached 1478.5 MiB while still in startup on the same 2401-file generated notebook, and an earlier baseline run peaked at 1293.3 MiB.
+- The memory issue was reproduced locally above 1 GiB RSS: the baseline reached 1478.5 MiB while still in startup on a 2401-file generated notebook, and an earlier baseline run peaked at 1293.3 MiB.
 - Heap profiling showed the retained heap was dominated by `List`, `Text`, `ARR_WORDS`, and `Inline` values from Pandoc parsing/link traversal/rendering, not by a laziness-only leak.
-- The code-level lazy model parse reduced the 2401-file workload from a baseline that failed to answer before 300s to 2s readiness and 448.7 MiB peak RSS.
-- On the issue-sized 4561-file, 72M generated notebook, the fixed binary reached readiness in 6s and peaked at 697.7 MiB after 1368 note rewrites.
+- The code-level lazy model parse plus deferred relation deduplication reduced the 2401-file workload from a baseline that failed to answer before 300s to 3.583s readiness and 457.3 MiB peak RSS.
+- On the 4561-file, 82M generated notebook, the fixed binary reached readiness in 9.690s and peaked at 752.2 MiB after 1368 note rewrites.
+- On the same 4561-file, 82M generated notebook, keeping every repeated deferred-note relation peaked at 1688.7 MiB. Keeping one representative relation per source note and unresolved target reduced that to 752.2 MiB.

@@ -30,7 +30,7 @@ import Emanote.Route.Ext (FileType (Folder))
 import Emanote.Route.R (R)
 import Emanote.Source.Loc (Loc)
 import Network.URI.Slug (Slug)
-import Optics.Core ((%), (.~))
+import Optics.Core (Getter, to, (%), (.~))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath (takeDirectory, takeFileName, (</>))
@@ -55,11 +55,7 @@ data Feed = Feed
 
 data Note = Note
   { _noteRoute :: R.LMLRoute
-  , _noteSource :: Maybe (Loc, FilePath)
-  -- ^ The layer from which this note came. Nothing if the note was auto-generated.
-  , _noteDoc :: Pandoc
-  , _noteSourceText :: Maybe Text
-  , _noteNeedsFullParse :: Bool
+  , _noteBody :: NoteBody
   , _noteMeta :: Aeson.Value
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
@@ -67,6 +63,25 @@ data Note = Note
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON, NFData)
+
+data NoteBody
+  = NoteBodyParsed (Maybe (Loc, FilePath)) Pandoc
+  | NoteBodyDeferred DeferredNote
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data DeferredNote = DeferredNote
+  { _deferredNoteSource :: (Loc, FilePath)
+  , _deferredNoteText :: Text
+  , _deferredNoteSummaryDoc :: Pandoc
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data ParseContext = ParseContext
+  { _parseContextScriptingEngine :: ScriptingEngine
+  , _parseContextPluginBaseDirs :: [FilePath]
+  }
 
 newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving stock (Eq, Ord, Show, Generic)
@@ -138,7 +153,7 @@ See <https://github.com/srid/emanote/issues/608>.
 -}
 noteResolveLinkBase :: Note -> Maybe (R 'R.Folder)
 noteResolveLinkBase note =
-  case _noteSource note of
+  case noteBodySource $ _noteBody note of
     Just (_, fp) -> resolveLinkBaseFromFilePath fp
     Nothing -> noteParent note
 
@@ -345,7 +360,7 @@ mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
-   in Note r src doc Nothing False meta tit errs feed
+   in Note r (NoteBodyParsed src doc) meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -372,17 +387,16 @@ errorDiv header errs =
 parseNote ::
   forall m.
   (MonadIO m, MonadLogger m) =>
-  ScriptingEngine ->
-  [FilePath] ->
+  ParseContext ->
   R.LMLRoute ->
   (Loc, FilePath) ->
   Text ->
   m Note
-parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
+parseNote ParseContext {..} r src@(_, fp) s = do
   ((doc, meta), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
-        parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
+        parseNoteMarkdown _parseContextScriptingEngine _parseContextPluginBaseDirs r fp s
       R.LMLRoute_Org _ -> do
         parseNoteOrg s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
@@ -402,31 +416,29 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
 parseNoteForModel ::
   forall m.
   (MonadIO m, MonadLogger m) =>
-  ScriptingEngine ->
-  [FilePath] ->
+  ParseContext ->
   R.LMLRoute ->
   (Loc, FilePath) ->
   Text ->
   m Note
-parseNoteForModel scriptingEngine pluginBaseDir r src s =
+parseNoteForModel parseContext r src s =
   case r of
     R.LMLRoute_Md _
       | Just note <- parseSimpleMarkdownNote r src s ->
           pure note
     _ ->
-      parseNote scriptingEngine pluginBaseDir r src s
+      parseNote parseContext r src s
 
 parseNoteIfNeeded ::
   (MonadIO m, MonadLoggerIO m) =>
-  ScriptingEngine ->
-  [FilePath] ->
+  ParseContext ->
   Note ->
   m Note
-parseNoteIfNeeded scriptingEngine pluginBaseDir note =
-  case (_noteNeedsFullParse note, _noteSource note, _noteSourceText note) of
-    (True, Just src, Just s) -> do
+parseNoteIfNeeded parseContext note =
+  case noteDeferred note of
+    Just DeferredNote {..} -> do
       logger <- askLoggerIO
-      runLoggingT (parseNote scriptingEngine pluginBaseDir (_noteRoute note) src s) logger
+      runLoggingT (parseNote parseContext (_noteRoute note) _deferredNoteSource _deferredNoteText) logger
     _ ->
       pure note
 
@@ -441,7 +453,7 @@ parseSimpleMarkdownNote r src@(_, fp) s = do
       doc = simpleTitleDoc r body meta
       (doc', tit) = queryNoteTitle r doc metaWithDateFromPath
       feed = queryNoteFeed metaWithDateFromPath
-  pure $ Note r (Just src) doc' (Just s) True metaWithDateFromPath tit mempty feed
+  pure $ Note r (NoteBodyDeferred $ DeferredNote src s doc') metaWithDateFromPath tit mempty feed
   where
     dateParser = do
       year <- replicateM 4 P.digit
@@ -670,4 +682,35 @@ applyNoteMetaFilters doc r =
               pure $ SData.oneAesonText (toList key) val
           )
 
+noteSource :: Getter Note (Maybe (Loc, FilePath))
+noteSource =
+  to (noteBodySource . _noteBody)
+
+noteDoc :: Getter Note Pandoc
+noteDoc =
+  to (noteBodyDoc . _noteBody)
+
+noteDeferred :: Note -> Maybe DeferredNote
+noteDeferred note =
+  case _noteBody note of
+    NoteBodyDeferred deferred ->
+      Just deferred
+    NoteBodyParsed _ _ ->
+      Nothing
+
+noteBodySource :: NoteBody -> Maybe (Loc, FilePath)
+noteBodySource = \case
+  NoteBodyParsed src _ ->
+    src
+  NoteBodyDeferred DeferredNote {..} ->
+    Just _deferredNoteSource
+
+noteBodyDoc :: NoteBody -> Pandoc
+noteBodyDoc = \case
+  NoteBodyParsed _ doc ->
+    doc
+  NoteBodyDeferred DeferredNote {..} ->
+    _deferredNoteSummaryDoc
+
+makeLenses ''DeferredNote
 makeLenses ''Note

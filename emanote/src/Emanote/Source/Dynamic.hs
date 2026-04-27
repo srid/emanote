@@ -17,7 +17,7 @@ import Data.UUID.V4 qualified as UUID
 import Ema (Dynamic (..))
 import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
-import Emanote.Model.Note (Note)
+import Emanote.Model.Note (Note, ParseContext (ParseContext))
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
@@ -57,15 +57,15 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   storkIndex <- Stork.newIndex
   scriptingEngine <- getEngine
   let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-      pluginBaseDirs = Loc.userLayersToSearch layers
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers (Just scriptingEngine) pluginBaseDirs _emanoteCompileTailwind instanceId storkIndex
+      parseContext = ParseContext scriptingEngine (Loc.userLayersToSearch layers)
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers (Just parseContext) _emanoteCompileTailwind instanceId storkIndex
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModels layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+      (mapFsChanges $ Patch.patchModels _emanoteConfigNoteFn storkIndex parseContext)
 
 type ChangeHandler tag model m =
   tag ->

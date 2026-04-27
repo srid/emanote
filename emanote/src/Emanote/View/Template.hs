@@ -220,11 +220,7 @@ renderLmlHtml model0 note0 = do
 
 parseNoteIfNeeded :: (MonadIO m, MonadLoggerIO m) => Model -> MN.Note -> m MN.Note
 parseNoteIfNeeded model =
-  case model ^. M.modelScriptingEngine of
-    Nothing ->
-      pure
-    Just scriptingEngine ->
-      MN.parseNoteIfNeeded scriptingEngine (model ^. M.modelPluginBaseDirs)
+  maybe pure MN.parseNoteIfNeeded (model ^. M.modelParseContext)
 
 parseEmbeddedNotesIfNeeded :: (MonadIO m, MonadLoggerIO m) => Model -> MN.Note -> m Model
 parseEmbeddedNotesIfNeeded model note =
@@ -236,9 +232,8 @@ parseEmbeddedNotesIfNeeded model note =
       let embeddedNotes =
             filter
               ( \embeddedNote ->
-                  embeddedNote
-                    ^. MN.noteNeedsFullParse
-                      && Set.notMember (embeddedNote ^. MN.noteRoute) seen
+                  isJust (MN.noteDeferred embeddedNote)
+                    && Set.notMember (embeddedNote ^. MN.noteRoute) seen
               )
               $ embeddedNotesFrom model' currentNote
       parsedNotes <- traverse (parseNoteIfNeeded model') embeddedNotes
