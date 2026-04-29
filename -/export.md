@@ -1134,6 +1134,19 @@ See [[callout]] for details.
 > Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
 
+## Raw HTML
+
+Block-level HTML is passed through verbatim. When an opening tag and its matching closing tag each sit on their own line with blank lines on either side, the markdown between them is parsed as the element's children. This is how `<details>` renders as a working disclosure widget with rich content inside:
+
+<details>
+
+This paragraph is a child of the `<details>` element. Regular **markdown** still works inside — _emphasis_, [example links](https://example.com), `code spans`, and Emanote extensions like [[neuron|wiki links]] all parse normally.
+
+</details>
+
+Without the blank lines, the `<details>...</details>` is treated as one opaque HTML block — markdown inside is not parsed. _For an Emanote-native foldable variant that doesn't require raw HTML at all, see the `+` / `-` callout suffix in [[callout]]._
+
+
 {#hanchor}
 ## Heading anchors
 
