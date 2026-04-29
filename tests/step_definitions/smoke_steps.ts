@@ -28,6 +28,24 @@ Then(
   },
 );
 
+// #433: orphan opener/closer raw-HTML tags around markdown content used to
+// produce two stranded `<rawhtml>` wrappers with the markdown paragraph as
+// a sibling of (not a child of) the surrounding element. Asserting the
+// marker has a `<details>` ancestor proves the grouping pass landed it
+// inside.
+Then(
+  "the element with data-marker {string} has a <details> ancestor",
+  async function (this: EmanoteWorld, marker: string) {
+    const ancestorCount = await this.page
+      .locator(`details:has([data-marker="${marker}"])`)
+      .count();
+    assert.ok(
+      ancestorCount > 0,
+      `Expected the element with data-marker="${marker}" to have a <details> ancestor; got ${ancestorCount} matching <details>. The orphan-RawHtml grouping pass (heist-extra: groupRawHtmlBlocks) likely regressed — the markdown paragraph is rendering as a sibling of <details> instead of a child.`,
+    );
+  },
+);
+
 // #285 — two complementary checks. The "no Ema exception" assertion
 // guards the *crash* (the original bug surface); the banner assertion
 // guards the *visibility* of the error so a parse failure can't fail
