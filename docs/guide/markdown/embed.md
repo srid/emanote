@@ -9,7 +9,7 @@ date: 2022-08-03
 You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/Linking+notes+and+files/Embedding+files). The HTML can be fully customized for each embed types.
 
 > [!warning] 
-> The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported, but a cyclic chain (`a → b → a`, or a self-embed) renders an inline `↺ Cyclic embed: …` placeholder at the point the cycle would close instead of expanding forever.
+> The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported (see [#cyclic-embeds] below for the one safety stop).
 
 [^blk]: This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
 
@@ -18,6 +18,15 @@ You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://h
 Embedding a note will simply inline it. For example, using `![[start]]` displays the following:
 
 ![[start]]
+
+
+## Cyclic embeds
+
+Embeds compose recursively — an embedded note may itself embed further notes — but a chain that closes back on itself (`a → b → a`, or a note that embeds itself) cannot be expanded without a fixpoint. Emanote detects the cycle and substitutes an inline `↺ Cyclic embed: <title> (via …)` placeholder at the point the loop would close, naming both the offending note and the chain that led there.
+
+The note [[cyclic-embed-demo]] embeds itself. Embedding it here renders one level of its content, then the placeholder where the inner self-embed would have resolved:
+
+![[cyclic-embed-demo]]
 
 
 ## Files
