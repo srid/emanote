@@ -3,7 +3,7 @@
   let isMaster = ctx.branch == "master"
   in pipeline
     { build.systems = [ "x86_64-linux", "aarch64-darwin" ]
-    , build.flakes = [ "." ]
+    , build.flakes = [ ".", "./nix/home-manager-test" ]
     , signoff.enable = True
     , cache.url = if isMaster then Just "https://cache.nixos.asia/oss" else Nothing
     }
