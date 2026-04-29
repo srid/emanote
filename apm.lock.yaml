@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-04-29T00:50:39.128867+00:00'
+generated_at: '2026-04-29T18:56:32.552725+00:00'
 apm_version: 0.10.0
 dependencies:
 - repo_url: anthropics/skills
@@ -24,7 +24,7 @@ dependencies:
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: d87139a440599089c274817328c23b3f7ca555b1
+  resolved_commit: f2e5082a20ee6051fbda7e5bdf411d2cf8be5a6d
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -61,7 +61,7 @@ dependencies:
     .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
     .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
     .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-  content_hash: sha256:10015c9a03d6d705f0c826c8b0867295650206b21583c72aad22ee3da82b55e5
+  content_hash: sha256:1f72f5be25055589bbd3f5523d47427598d6d51b28bcb7b9f3cf4032ada4a0c2
 local_deployed_files:
 - .agents/skills/dpella-mcp
 - .claude/rules/emanote.md

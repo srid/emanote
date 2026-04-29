@@ -78,15 +78,18 @@ This applies only to user-visible feature work. Refactors, internal scaffolding,
 
 Use `AskUserQuestion` to collaborate on the cut: propose your split, surface the trade-offs of each phase boundary (what does phase 1 alone give the user? what does deferring phase 3 cost?), and let the user adjust before they invoke `do`.
 
-## Auto-Lowy
+## Auto-review (Lowy + Hickey)
 
-Any time the conversation produces a concrete code plan, diff proposal, or design sketch that could be implemented, **invoke the `lowy` sub-agent on that proposal before presenting your final recommendation** — do not wait for the user to ask. Fold its findings into the recommendation (flag boundaries that track functionality instead of volatility, flag where a seam would cleanly encapsulate an axis of change) rather than dumping raw sub-agent output on top. Use `Agent(subagent_type="lowy")`, not the `Skill` tool — the sub-agent runs in an isolated context and keeps the main turn lean.
+Any time the conversation produces a concrete code plan, diff proposal, or design sketch that could be implemented, **invoke both the `lowy` and `hickey` sub-agents on that proposal in parallel before presenting your final recommendation** — do not wait for the user to ask. Use `Agent(subagent_type="lowy")` and `Agent(subagent_type="hickey")` (not the `Skill` tool) so each runs in an isolated context and keeps the main turn lean.
 
-Hickey's complecting critique deliberately does **not** run here. It needs a concrete diff to bite — running it on a sketch tends to surface generic concerns rather than the specific interleavings that matter. `do` runs hickey post-implement on the real diff. Talk mode sticks with Lowy because volatility-based decomposition is the design-level lens that's useful while the design is still a sketch.
+**Revise the recommendation in light of their findings before presenting it.** Invoking the reviewers is not the deliverable — the deliverable is a *post-review* proposal whose shape already reflects what landed. Concretely: when a finding lands (real complecting, fragmentation, or a missing volatility seam), change the design itself — don't tack the finding onto an unchanged sketch as a critique section the user has to reconcile. When a finding doesn't land, say briefly why. The headline the user reads should be the revised proposal, with the reviewer pass evident in what changed (and what was rejected), not the original sketch with raw sub-agent output appended.
 
-Skip the Lowy pass only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run it.
+- **Lowy** flags boundaries that track functionality instead of volatility and where a seam would cleanly encapsulate an axis of change.
+- **Hickey** flags structural complecting and fragmentation — concept multiplication, sum-types-as-parallel-fields, hidden coupling at OS or shared-state layers, and the rest of the Layer 3-4 catalog. Hickey on a sketch can drift toward generic critique; in your prompt, instruct it to either land specific complecting/fragmentation risks in *this* sketch or say explicitly that there's nothing yet to bite into. Generic principles are not findings. Layer 5 (entanglement counts) and the diff-shaped Actions table will be thin on a sketch — that's expected; the design-level layers are the ones that bite here.
 
-**Model override.** If `ARGUMENTS` contains `--review-model=<model>` (accept `opus`, `sonnet`, or `haiku`; strip the flag before treating the rest as the topic), pass `model: "<model>"` in the `Agent(subagent_type="lowy")` call. This overrides the `model: sonnet` in `lowy`'s agent frontmatter via the `Agent` tool's built-in `model` parameter. Without the flag, omit `model` so the default (sonnet) applies. Reject unknown values with a one-line error instead of silently falling back — a typo shouldn't quietly erase a budget decision.
+Skip both passes only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run them. `do` re-runs hickey + lowy post-implement on the real diff, so the talk-mode pass is the design-level rehearsal, not the final word.
+
+**Model override.** If `ARGUMENTS` contains `--review-model=<model>` (accept `opus`, `sonnet`, or `haiku`; strip the flag before treating the rest as the topic), pass `model: "<model>"` in **both** the `Agent(subagent_type="lowy")` and `Agent(subagent_type="hickey")` calls. This overrides the `model: sonnet` in each sub-agent's frontmatter via the `Agent` tool's built-in `model` parameter. Without the flag, omit `model` so the default (sonnet) applies. Reject unknown values with a one-line error instead of silently falling back — a typo shouldn't quietly erase a budget decision.
 
 ## Laconic mode (default)
 
