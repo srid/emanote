@@ -1,6 +1,6 @@
 ---
 name: forge-pr
-description: Write engaging PR titles and descriptions for any forge (GitHub today; Bitbucket planned). Use when creating or updating PRs. Avoids boring bullet lists; uses narrative paragraphs with bold/italic for emphasis.
+description: Write engaging PR titles and descriptions for any forge (GitHub today; Bitbucket planned). Use when creating or updating PRs. Leads with narrative paragraphs and reaches for lists, tables, and diagrams when content is genuinely structured.
 ---
 
 # Forge PR Writing
@@ -14,26 +14,40 @@ Write PR descriptions that fellow devs actually want to read. The writing guidan
 - Generic titles like "Update configuration" or "Fix bug in module"
 - "## Changes" / "## Testing" / "## Summary" boilerplate headers
 - Restating the diff in English
+- Wall of prose for content that's _actually_ a list, comparison, or flow — five features described in one sentence, two before/after fixes blended into a paragraph, an architecture seam explained in words instead of drawn
 
 ## What to write instead
 
 **Title**: Short, specific, interesting. Convey _what changed from a user/dev perspective_, not which files were touched. Use imperative mood. Under 70 chars.
 
-**Body**: Write in **paragraphs**, not bullet lists. Structure:
+**Body**: Open with a paragraph. Structure:
 
 1. **Opening paragraph** — What this PR does and _why_, in 2-3 sentences. Bold the key behavioral change. If there's a motivating problem, state it directly.
 
-2. **Details paragraph(s)** — Only if the approach is non-obvious or has trade-offs worth calling out. Use _italics_ for subtle points. Keep it high-level; reviewers can read the diff for implementation details.
+2. **Details** — paragraph(s), bullet list, table, or fenced diagram, whichever fits the shape of the content (see [Use structure when content is structured](#use-structure-when-content-is-structured) below). Only include if the approach is non-obvious, has trade-offs worth calling out, or has discrete moving parts that benefit from being shown rather than described. Use _italics_ for subtle points; keep it high-level.
 
 3. **Anything notable** — Breaking changes, migration steps, or things reviewers should pay attention to. Only if applicable. Use `> blockquote` for callouts.
+
+## Use structure when content is structured
+
+Narrative is the right tool for the opening "what changed and why" paragraph and for asides — but the moment you find yourself writing _"three loaders"_, _"two refinements landed"_, or _"the data passes through X then Y then Z"_, that's structure asking to be made visible. A comma-separated list of five features in prose is harder to scan than five bullets; a table beats a paragraph that says "previously Foo did X, now it does Y, and Bar previously did Z, now it does W."
+
+Reach for these when they earn their keep:
+
+- **Bullet lists** — discrete features, keyboard shortcuts, refinements, anything that isn't a narrative
+- **Tables** — before/after fixes, per-variant comparisons (e.g. loader → format → vendor), trade-off matrices
+- **Fenced ASCII or mermaid diagrams** — data flow, architecture seams, anything with shape that's easier to draw than describe
+- **`###` subheaders** — break long bodies into navigable sections (still avoid generic `## Summary` / `## Changes`)
+
+The rule is _use structure when content is structured_, not _always add structure_. A small PR with one paragraph of motivation is fine; don't reach for a table just to look thorough.
 
 ## Style rules
 
 - Write for a dev skimming their PR feed — they should get the gist in 5 seconds
 - **Bold** the most important phrase in each paragraph
 - _Italics_ for nuance, caveats, secondary points
-- No bullet lists unless listing 3+ discrete items that genuinely aren't a narrative
-- No "## Summary" or "## Changes" headers — just write
+- Bullet lists, tables, and fenced diagrams are encouraged when the content is genuinely structured (see [Use structure when content is structured](#use-structure-when-content-is-structured)). Don't list the diff file-by-file or restate prose as a bulleted dump.
+- `###` subheaders are fine to break up long bodies; skip generic `## Summary` / `## Changes` headers
 - No filler: "This PR...", "In this change...", "As part of..." — start with the substance
 - Link to issues/discussions where relevant (`Closes #123`, `See #456`)
 - If the PR is trivial (typo fix, version bump), a one-liner body is fine
@@ -106,7 +120,7 @@ Title: Update NixOS configuration and add new service
 - Tested locally
 ```
 
-### Good
+### Good (small change — narrative is enough)
 
 ```
 Title: Add kolu service with health monitoring
@@ -119,3 +133,49 @@ The service binds to port 8090 to avoid clashing with the dev server.
 *Health checks hit `/healthz` every 30s — systemd restarts the
 service on three consecutive failures.*
 ```
+
+### Good (richer change — structure earns its keep)
+
+When the change has a flow, several discrete features, and a couple of before/after refinements, _show_ those instead of writing them out as prose:
+
+````
+Title: Export agent session as a self-contained HTML file
+
+**Kolu can now export the active agent session as a portable,
+self-contained HTML file** — Claude Code, OpenCode, or Codex, no
+matter which one is running. The server reads the on-disk transcript,
+normalizes it through a unified vendor-opaque IR, and ships back one
+HTML document the browser opens in a new tab.
+
+### How it fits together
+
+```
+Claude JSONL    ─┐
+OpenCode SQLite ─┼─▶ loader ─▶ TranscriptEvent[] ─▶ renderer ─▶ HTML
+Codex rollout   ─┘             (discriminated union)
+```
+
+The IR (`Transcript` in `anyagent/schemas`) is the key seam. The
+renderer dispatches **only** on `event.kind` — never on `agentKind`.
+_Adding a fourth integration is one new loader plus one `match` arm._
+
+### What you get in the exported page
+
+- **Header pills** — agent name, model, context-token count, PR link
+- **Hide tools** — collapses tool-call cards for narrative reading
+- **Theme** — cycles auto → light → dark
+- **<kbd>j</kbd>/<kbd>k</kbd> nav** — jump between user prompts
+- **Per-event icons** — person, robot, brain, wrench
+
+### Refinements during review
+
+| What was off | Fix |
+| --- | --- |
+| Claude loader threw `ENOENT` for new sessions; OpenCode/Codex returned `null` | All three loaders return `Transcript \| null` uniformly |
+| OpenCode loader did per-message N+1 SQLite fetches | Collapsed into one ordered `LEFT JOIN` (~501 statements → 1) |
+
+> _No streaming, by design — end-of-session export reads the whole
+> transcript in one pass._
+````
+
+The flow diagram replaces a paragraph that would have to enumerate "Claude JSONL, OpenCode SQLite, Codex rollout — all converge on a single loader interface...". The bullet list replaces a comma-jammed sentence. The table replaces "Two refinements landed: first, the Claude loader used to throw...; second, the OpenCode loader collapsed...". Each structural element is doing work prose couldn't do as cleanly.

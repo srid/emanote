@@ -14,7 +14,7 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 - **Do NOT run destructive repo commands.** No `git commit`, `git push`, `git add`, `git rm`, or anything else that mutates the current repo.
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
 - You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
-- You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous. You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
+- You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous, or to collaborate on a design decision (e.g. proposing a phase split — see below). You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
 - **Talk mode ends when the user invokes an action skill** (e.g., `do`). Until then, stay in talk mode.
 
 ## Research before answering — MANDATORY
@@ -67,6 +67,16 @@ If you're about to emit "probably", "almost certainly", "I suspect", "my #1 susp
 
 - Be direct, opinionated, and concise.
 - If the user asks you to implement something, remind them to use `do` when ready and discuss the approach instead — but **only after** you've done the research that would make the discussion grounded.
+
+## Phased delivery for feature work
+
+For **user-visible feature work** large enough that an unphased PR would be painful for a human to review, propose splitting the implementation into phases where each phase is independently useful when merged — any prefix of phases is itself a shippable improvement. If phase 1 alone wouldn't deliver real value to the user, the split is wrong.
+
+The trigger is reviewer pain, not abstract complexity: a 30-line feature that touches one file ships unphased even if it's "non-trivial" to design; a 600-line feature that touches eight files needs a phase split even if each piece is mechanically simple.
+
+This applies only to user-visible feature work. Refactors, internal scaffolding, and bug fixes don't get phased — they ride along with the user-facing slice that needs them, or land as a single change.
+
+Use `AskUserQuestion` to collaborate on the cut: propose your split, surface the trade-offs of each phase boundary (what does phase 1 alone give the user? what does deferring phase 3 cost?), and let the user adjust before they invoke `do`.
 
 ## Auto-Lowy
 
