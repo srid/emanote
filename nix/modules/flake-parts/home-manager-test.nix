@@ -29,6 +29,8 @@
             systemdTarget = "default.target";
           };
 
+          # release-25.05 evaluates with this repo's pinned nixpkgs; newer
+          # Home Manager branches currently require newer lib functions.
           home.enableNixpkgsReleaseCheck = false;
           home.stateVersion = "24.11";
         };
