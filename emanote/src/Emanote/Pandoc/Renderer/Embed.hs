@@ -126,6 +126,14 @@ embedResourceRoute model nr embedStack ctx embedderRoute note = do
 {- | Rebuild a 'HP.RenderCtx' with an augmented embed-ancestor stack baked
 into its splice closures, so any nested splice fired from inside a sub-note
 sees up-to-date ancestry.
+
+The record update ties the knot: @newCtx@ appears on both the left and inside
+its own field assignments. This is well-defined as long as @blockSplice@ /
+@inlineSplice@ stay non-strict fields in 'HP.RenderCtx' — at construction
+time the fields are stored as thunks closing over @newCtx@, and forcing them
+later finds the fully evaluated record. If the upstream @heist-extra@ ever
+makes those fields strict the construction would loop; the alternative would
+be to wrap the dispatchers in explicit lambdas.
 -}
 withEmbedStack ::
   PandocRenderers Model R.LMLRoute ->
