@@ -64,8 +64,8 @@ mkRenderCtxWithPandocRenderers ::
 mkRenderCtxWithPandocRenderers nr embedStack classRules model x =
   Splices.mkRenderCtx
     classRules
-    (dispatchBlock nr model x embedStack)
-    (dispatchInline nr model x embedStack)
+    (\ctx -> dispatchBlock model nr embedStack ctx x)
+    (\ctx -> dispatchInline model nr embedStack ctx x)
 
 {- | Rebuild a 'Splices.RenderCtx' with an augmented embed-ancestor stack.
 
@@ -83,31 +83,33 @@ withEmbedStack ::
 withEmbedStack nr model x newStack origCtx =
   let newCtx =
         origCtx
-          { Splices.blockSplice = dispatchBlock nr model x newStack newCtx
-          , Splices.inlineSplice = dispatchInline nr model x newStack newCtx
+          { Splices.blockSplice = dispatchBlock model nr newStack newCtx x
+          , Splices.inlineSplice = dispatchInline model nr newStack newCtx x
           }
    in newCtx
 
+-- The dispatchers take their arguments in the same order as 'PandocRenderF'
+-- so the renderer call inside is a one-to-one positional pass-through.
 dispatchBlock ::
-  PandocRenderers model route ->
   model ->
-  route ->
+  PandocRenderers model route ->
   Set route ->
   Splices.RenderCtx ->
+  route ->
   B.Block ->
   Maybe (HI.Splice Identity)
-dispatchBlock nr model x stk ctx blk =
+dispatchBlock model nr stk ctx x blk =
   asum $ pandocBlockRenderers nr <&> \f -> f model nr stk ctx x blk
 
 dispatchInline ::
-  PandocRenderers model route ->
   model ->
-  route ->
+  PandocRenderers model route ->
   Set route ->
   Splices.RenderCtx ->
+  route ->
   B.Inline ->
   Maybe (HI.Splice Identity)
-dispatchInline nr model x stk ctx inl =
+dispatchInline model nr stk ctx x inl =
   asum $ pandocInlineRenderers nr <&> \f -> f model nr stk ctx x inl
 
 data EmanotePandocRenderers a r = EmanotePandocRenderers
