@@ -1,11 +1,11 @@
 { root, inputs, self, ... }:
 {
   flake = {
-    homeManagerModule = {
-      _module.args.emanote = self;
+    homeManagerModule = { lib, pkgs, ... }: {
       imports = [
         (root + /nix/modules/home/emanote.nix)
       ];
+      services.emanote.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
     flakeModule = (root + /nix/modules/flake-parts/flake-module);
     templates.default = {

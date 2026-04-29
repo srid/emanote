@@ -1,12 +1,8 @@
 # For use in home-manager; https://emanote.srid.ca/tips/nix
-{ config, lib, pkgs, emanote ? null, ... }:
+{ config, lib, pkgs, ... }:
 let
 
   cfg = config.services.emanote;
-  defaultPackage =
-    if emanote == null
-    then pkgs.emanote
-    else emanote.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   yamlFormat = pkgs.formats.yaml { } // {
     generateDir = name: path: value:
@@ -40,11 +36,8 @@ in
 
       package = mkOption {
         type = types.package;
-        default = defaultPackage;
-        defaultText =
-          if emanote == null
-          then "pkgs.emanote"
-          else literalExpression "emanote.packages.\${pkgs.stdenv.hostPlatform.system}.default";
+        default = pkgs.emanote;
+        defaultText = "pkgs.emanote";
         description = "Emanote derivation to use";
       };
 
