@@ -12,6 +12,7 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Title qualified as Tit
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
@@ -77,10 +78,9 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
             )
         details <-
           HP.rpInline ctx
-            $
             -- FIXME: This aside is meaningless for non-wikilink links (regular
             -- Markdown links)
-            B.Span ("", ["emanote:error:aside"], [])
+            $ Diagnostic.errorInlineAside "aside"
             $ one
             $ tooltip "Find notes containing this broken link"
             $ one
@@ -102,7 +102,7 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
                         linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
                         newIs = one $ B.Str $ show sr
                     HP.rpInline ctx
-                      $ B.Span ("", ["emanote:error:aside"], [])
+                      $ Diagnostic.errorInlineAside "aside"
                       $ one
                       $ tooltip (show sr <> " -> " <> srRoute)
                       $ one

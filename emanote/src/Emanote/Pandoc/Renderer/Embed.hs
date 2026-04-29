@@ -26,6 +26,7 @@ import Emanote.Model.StaticFile (CodeLanguage (..), StaticFileInfo (..), staticF
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Toc (newToc, renderToc)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, dispatchBlock, dispatchInline)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
@@ -187,7 +188,7 @@ use plain @B.Str@ so the box's own styling isn't fighting per-inline
 renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> EmbedStack -> MN.Note -> HI.Splice Identity
 renderCyclicEmbedSplice model ctx embedStack note =
   rpBlock ctx
-    $ B.Div ("", ["emanote:error:cyclic-embed"], [])
+    $ Diagnostic.errorBlock "cyclic-embed"
     $ one
     $ B.Para
     $ [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:"]

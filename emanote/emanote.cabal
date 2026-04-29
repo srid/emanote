@@ -185,6 +185,7 @@ library
     Emanote.Model.Toc
     Emanote.Model.Type
     Emanote.Pandoc.BuiltinFilters
+    Emanote.Pandoc.Diagnostic
     Emanote.Pandoc.ExternalLink
     Emanote.Pandoc.Link
     Emanote.Pandoc.Markdown.Parser
