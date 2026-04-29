@@ -174,10 +174,15 @@ withEmbedStack nr model x newStack origCtx =
           }
    in newCtx
 
-{- | Inline placeholder shown in place of an embed that would form a cycle.
+{- | Block placeholder shown in place of an embed that would form a cycle.
 
 Surfaces the offending note's title plus the chain of ancestor embeds in
-deepest-first order, so a reader can see exactly which path closed the loop.
+deepest-first order. Wrapped in an @emanote:error:cyclic-embed@ Div whose
+class-rewrite (in @emanote/default/index.yaml@) gives it a red-tinted box
+that visually marks the block as Emanote-emitted, distinct from anything the
+user could have written in the source note. Note names inside the placeholder
+use plain @B.Str@ so the box's own styling isn't fighting per-inline
+@\<code\>@ utilities.
 -}
 renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> EmbedStack -> MN.Note -> HI.Splice Identity
 renderCyclicEmbedSplice model ctx embedStack note =
@@ -187,7 +192,7 @@ renderCyclicEmbedSplice model ctx embedStack note =
     $ B.Para
     $ [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:"]
       , B.Space
-      , B.Code B.nullAttr (Tit.toPlain (note ^. MN.noteTitle))
+      , B.Str (Tit.toPlain (note ^. MN.noteTitle))
       ]
     <> chainSuffix
   where
@@ -199,7 +204,7 @@ renderCyclicEmbedSplice model ctx embedStack note =
             <> intercalate [B.Str ",", B.Space] (pure . renderRoute <$> chain)
             <> [B.Str ")"]
     renderRoute :: R.LMLRoute -> B.Inline
-    renderRoute r = B.Code B.nullAttr (Tit.toPlain (M.modelLookupTitle r model))
+    renderRoute r = B.Str (Tit.toPlain (M.modelLookupTitle r model))
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do

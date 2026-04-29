@@ -61,6 +61,12 @@ pandoc:
     emanote:placeholder-message: text-gray-400 dark:text-gray-500 border-t-2 border-gray-200 dark:border-gray-800 inline-block pt-1
     emanote:error: text-l bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100
+    # Inline placeholder shown when a note embed (`![[…]]`) would form a cycle —
+    # rendered by 'Renderer.Embed.renderCyclicEmbedSplice'. The styling is the
+    # @emanote:error@ red-tinted box trimmed down for inline note flow, so a
+    # reader can see at a glance that this block was emitted by Emanote, not
+    # written into the source note.
+    emanote:error:cyclic-embed: not-prose text-sm bg-red-50 dark:bg-red-950 my-3 px-3 py-2 border-l-4 border-red-500 dark:border-red-400 rounded-r-md text-red-900 dark:text-red-100
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-4 py-3 rounded-lg shadow-md bg-yellow-50 dark:bg-yellow-900 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-xl border-l-4 border-yellow-400 mb-8 mt-8 transition-all duration-200
     note: p-4 mb-4 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 w-full float-none md:float-right md:w-1/2 md:clear-both border border-gray-200 dark:border-gray-800

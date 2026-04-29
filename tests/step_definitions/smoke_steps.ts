@@ -53,24 +53,24 @@ Then(
 // #362 — `![[A]]` embedded in B and `![[B]]` embedded in A used to expand
 // without a fixpoint, producing arbitrarily deep nested output (or, on
 // older releases, hanging the live preview). The fix swaps the cyclic
-// embed for an inline `emanote:error:cyclic-embed` div whose text names
-// the offending note. Asserting on both the class and the title proves
-// the placeholder is wired up *and* points at the right route.
+// embed for an inline placeholder block whose text names the offending
+// note. Match by the unique "↺ Cyclic embed:" prefix rather than by
+// the source class, which the pandoc.rewriteClass step transforms into
+// transient Tailwind utilities (same convention as the #285 banner step).
+const CYCLIC_EMBED_MARKER = "↺ Cyclic embed:";
+
 Then(
   "the page contains a cyclic-embed placeholder for {string}",
   async function (this: EmanoteWorld, title: string) {
-    const locator = this.page.locator(
-      ".emanote\\:error\\:cyclic-embed",
-    );
-    const count = await locator.count();
+    const text = (await this.page.textContent("body")) ?? "";
     assert.ok(
-      count > 0,
-      `Expected a .emanote:error:cyclic-embed placeholder; found ${count}. Either the cycle wasn't detected (and the renderer is recursing on its own AST) or the placeholder class was renamed.`,
+      text.includes(CYCLIC_EMBED_MARKER),
+      `Expected ${JSON.stringify(CYCLIC_EMBED_MARKER)} in the page body. Either the cycle wasn't detected (renderer recursing on its own AST) or the placeholder prefix was reworded.`,
     );
-    const text = (await locator.first().textContent()) ?? "";
+    const expected = new RegExp(`${CYCLIC_EMBED_MARKER}\\s*${title}\\b`);
     assert.ok(
-      text.includes(title),
-      `Placeholder did not name the cyclic note. Expected to find ${JSON.stringify(title)} inside the .emanote:error:cyclic-embed body; got ${JSON.stringify(text)}.`,
+      expected.test(text),
+      `Placeholder did not name the cyclic note. Expected to find ${JSON.stringify(`${CYCLIC_EMBED_MARKER} ${title}`)} adjacent in the page body; first 400 chars: ${JSON.stringify(text.slice(0, 400))}.`,
     );
   },
 );
