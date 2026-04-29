@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 {- | Types for custom render extensions to Pandoc AST nodes.
 
  Note that unlike Pandoc *filters* (which operate on entire document), these
@@ -15,6 +13,7 @@ module Emanote.Pandoc.Renderer (
   PandocInlineRenderer,
   PandocBlockRenderer,
   mkRenderCtxWithPandocRenderers,
+  withEmbedStack,
   EmanotePandocRenderers (..),
 ) where
 
@@ -25,10 +24,16 @@ import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition qualified as B
 
--- | Custom Heist renderer function for specific Pandoc AST nodes
+{- | Custom Heist renderer function for specific Pandoc AST nodes.
+
+The @Set route@ is the chain of routes currently being expanded as note
+embeds — the renderer for @![[…]]@ uses it to detect cycles (issue #362).
+Renderers that don't participate in note embedding can ignore it.
+-}
 type PandocRenderF model route astNode =
   model ->
   PandocRenderers model route ->
+  Set route ->
   Splices.RenderCtx ->
   route ->
   astNode ->
@@ -47,27 +52,63 @@ mkRenderCtxWithPandocRenderers ::
   forall model route m.
   (Monad m) =>
   PandocRenderers model route ->
+  -- | Initial embed-ancestor stack. At top level this is the page's own route,
+  -- so that a page directly embedding itself is caught.
+  Set route ->
   Map Text Text ->
   model ->
   route ->
   -- | Rendering feature selection (code highlighting, static math, …)
   Splices.RenderFeatures ->
   HeistT Identity m Splices.RenderCtx
-mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
+mkRenderCtxWithPandocRenderers nr embedStack classRules model x =
   Splices.mkRenderCtx
     classRules
-    ( \ctx blk ->
-        asum
-          $ pandocBlockRenderers
-          <&> \f ->
-            f model nr ctx x blk
-    )
-    ( \ctx blk ->
-        asum
-          $ pandocInlineRenderers
-          <&> \f ->
-            f model nr ctx x blk
-    )
+    (dispatchBlock nr model x embedStack)
+    (dispatchInline nr model x embedStack)
+
+{- | Rebuild a 'Splices.RenderCtx' with an augmented embed-ancestor stack.
+
+When 'embedResourceRoute' descends into a sub-note, it uses this to thread the
+new stack into the nested splice closures so cycle detection sees up-to-date
+ancestry.
+-}
+withEmbedStack ::
+  PandocRenderers model route ->
+  model ->
+  route ->
+  Set route ->
+  Splices.RenderCtx ->
+  Splices.RenderCtx
+withEmbedStack nr model x newStack origCtx =
+  let newCtx =
+        origCtx
+          { Splices.blockSplice = dispatchBlock nr model x newStack newCtx
+          , Splices.inlineSplice = dispatchInline nr model x newStack newCtx
+          }
+   in newCtx
+
+dispatchBlock ::
+  PandocRenderers model route ->
+  model ->
+  route ->
+  Set route ->
+  Splices.RenderCtx ->
+  B.Block ->
+  Maybe (HI.Splice Identity)
+dispatchBlock nr model x stk ctx blk =
+  asum $ pandocBlockRenderers nr <&> \f -> f model nr stk ctx x blk
+
+dispatchInline ::
+  PandocRenderers model route ->
+  model ->
+  route ->
+  Set route ->
+  Splices.RenderCtx ->
+  B.Inline ->
+  Maybe (HI.Splice Identity)
+dispatchInline nr model x stk ctx inl =
+  asum $ pandocInlineRenderers nr <&> \f -> f model nr stk ctx x inl
 
 data EmanotePandocRenderers a r = EmanotePandocRenderers
   { blockRenderers :: PandocRenderers a r

@@ -9,7 +9,7 @@ date: 2022-08-03
 You can embed files, using `![[..]]` - a syntax inspired by [Obsidian](https://help.obsidian.md/Linking+notes+and+files/Embedding+files). The HTML can be fully customized for each embed types.
 
 > [!warning] 
-> The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported.
+> The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.[^blk] Recursive embeds are supported, but a cyclic chain (`a → b → a`, or a self-embed) renders an inline `↺ Cyclic embed: …` placeholder at the point the cycle would close instead of expanding forever.
 
 [^blk]: This constraint is necessary to ensure that the HTML generated remains valid. Embedded content use block elements, which cannot be embedded inside inline nodes.
 

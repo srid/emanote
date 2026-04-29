@@ -89,6 +89,9 @@ mkTemplateRenderCtx model r meta =
       f
         =<< Renderer.mkRenderCtxWithPandocRenderers
           pandocRenderers
+          -- Seed the embed-ancestor stack with the page's own route so a page
+          -- whose body contains @![[itself]]@ is detected as a cycle (#362).
+          (one r)
           classRules
           model
           r

@@ -2,6 +2,7 @@ module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
+import Data.Set qualified as Set
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
@@ -12,15 +13,14 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer)
+import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, withEmbedStack)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
-import Emanote.Route.R qualified as R
 import Emanote.Route.SiteRoute qualified as SF
 import Emanote.Route.SiteRoute qualified as SR
 import Heist qualified as H
 import Heist.Extra qualified as HE
-import Heist.Extra.Splices.Pandoc (pandocSplice)
+import Heist.Extra.Splices.Pandoc (pandocSplice, rpBlock)
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Interpreted qualified as HI
 import Optics.Operators ((^.))
@@ -28,7 +28,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
+embedBlockWikiLinkResolvingSplice model nr embedStack ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
@@ -38,14 +38,14 @@ embedBlockWikiLinkResolvingSplice model _nf ctx noteRoute node = do
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
-    Left (R.LMLView_Html, r) -> embedResourceRoute model ctx r
+    Left (R.LMLView_Html, r) -> embedResourceRoute model nr embedStack ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
           embedStaticFileRoute model (toText $ SF._staticFilePath sf) sf
     _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
+embedBlockRegularLinkResolvingSplice model _nr _embedStack ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
@@ -57,7 +57,7 @@ embedBlockRegularLinkResolvingSplice model _nf ctx noteRoute node = do
     $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
-embedInlineWikiLinkResolvingSplice model _nf ctx noteRoute inl = do
+embedInlineWikiLinkResolvingSplice model _nr _embedStack ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
@@ -71,15 +71,51 @@ runEmbedTemplate name splices = do
   tpl <- HE.lookupHtmlTemplateMust $ "/templates/filters/embed-" <> name
   HE.runCustomTemplate tpl splices
 
-embedResourceRoute :: Model -> HP.RenderCtx -> MN.Note -> Maybe (HI.Splice Identity)
-embedResourceRoute model ctx note = do
-  pure . runEmbedTemplate "note" $ do
-    "ema:note:title" ## Tit.titleSplice ctx id (MN._noteTitle note)
-    "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
-    "ema:note:pandoc" ##
-      pandocSplice ctx (note ^. MN.noteDoc)
-    "ema:note:toc" ##
-      renderToc ctx (newToc $ note ^. MN.noteDoc)
+{- | Render an embedded note (@![[note]]@) as inlined Pandoc.
+
+Cycle handling: if the target note is already an ancestor in 'embedStack',
+render an inline error placeholder instead of recursing — otherwise the embed
+would expand without a fixpoint and either hang the renderer or produce
+arbitrarily deep nested output (issue #362).
+
+When recursion is safe, the splice closures inside 'ctx' are rebuilt to carry
+@Set.insert (note's route) embedStack@, so any nested embed inside this note
+sees up-to-date ancestry.
+-}
+embedResourceRoute ::
+  Model ->
+  PandocRenderers Model R.LMLRoute ->
+  Set R.LMLRoute ->
+  HP.RenderCtx ->
+  -- | The page being rendered (used to rebuild the ctx for nested splices).
+  R.LMLRoute ->
+  MN.Note ->
+  Maybe (HI.Splice Identity)
+embedResourceRoute model nr embedStack ctx pageRoute note = do
+  let targetRoute = note ^. MN.noteRoute
+  if targetRoute `Set.member` embedStack
+    then pure $ renderCyclicEmbedSplice ctx note
+    else do
+      let nestedStack = Set.insert targetRoute embedStack
+          nestedCtx = withEmbedStack nr model pageRoute nestedStack ctx
+      pure . runEmbedTemplate "note" $ do
+        "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
+        "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
+        "ema:note:pandoc" ##
+          pandocSplice nestedCtx (note ^. MN.noteDoc)
+        "ema:note:toc" ##
+          renderToc nestedCtx (newToc $ note ^. MN.noteDoc)
+
+-- | Inline placeholder shown in place of an embed that would form a cycle.
+renderCyclicEmbedSplice :: HP.RenderCtx -> MN.Note -> HI.Splice Identity
+renderCyclicEmbedSplice ctx note =
+  rpBlock ctx
+    $ B.Div ("", ["emanote:error:cyclic-embed"], [])
+    $ one
+    $ B.Para
+      [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:", B.Space]
+      , B.Code B.nullAttr (Tit.toPlain (note ^. MN.noteTitle))
+      ]
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do

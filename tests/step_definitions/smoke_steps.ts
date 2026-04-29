@@ -50,6 +50,31 @@ Then(
   },
 );
 
+// #362 — `![[A]]` embedded in B and `![[B]]` embedded in A used to expand
+// without a fixpoint, producing arbitrarily deep nested output (or, on
+// older releases, hanging the live preview). The fix swaps the cyclic
+// embed for an inline `emanote:error:cyclic-embed` div whose text names
+// the offending note. Asserting on both the class and the title proves
+// the placeholder is wired up *and* points at the right route.
+Then(
+  "the page contains a cyclic-embed placeholder for {string}",
+  async function (this: EmanoteWorld, title: string) {
+    const locator = this.page.locator(
+      ".emanote\\:error\\:cyclic-embed",
+    );
+    const count = await locator.count();
+    assert.ok(
+      count > 0,
+      `Expected a .emanote:error:cyclic-embed placeholder; found ${count}. Either the cycle wasn't detected (and the renderer is recursing on its own AST) or the placeholder class was renamed.`,
+    );
+    const text = (await locator.first().textContent()) ?? "";
+    assert.ok(
+      text.includes(title),
+      `Placeholder did not name the cyclic note. Expected to find ${JSON.stringify(title)} inside the .emanote:error:cyclic-embed body; got ${JSON.stringify(text)}.`,
+    );
+  },
+);
+
 // The banner is a Pandoc Div with class `emanote:error`, which an existing
 // Heist splice rewrites into Tailwind utility classes. Match by the unique
 // header text instead of the source class — the test shouldn't break the
