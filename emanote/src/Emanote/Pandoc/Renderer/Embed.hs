@@ -47,10 +47,11 @@ embedBlockWikiLinkResolvingSplice model nr embedStack ctx noteRoute node = do
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
-    -- Pass `noteRoute` as the embedder route, preserving the pre-existing
-    -- behaviour that relative wikilinks inside an embedded note are resolved
-    -- against the embedder, not against the embedded note. Whether that's
-    -- correct at depth >1 is a separate question (orthogonal to #362).
+    -- Pass `noteRoute` (whatever the dispatcher baked in — at depth 1 the
+    -- page, at deeper levels the same value preserved unchanged) as the
+    -- relative-link base. Preserves pre-existing link-resolution behaviour;
+    -- the question of whether deeper embeds should rebase to the embedded
+    -- note is orthogonal to #362.
     Left (R.LMLView_Html, r) -> embedResourceRoute model nr embedStack ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
@@ -100,11 +101,13 @@ embedResourceRoute ::
   PandocRenderers Model R.LMLRoute ->
   EmbedStack R.LMLRoute ->
   HP.RenderCtx ->
-  -- | Route of the note that *contains* this embed (the embedder). Threaded
-  -- into the nested splice closures unchanged, preserving the pre-existing
-  -- behaviour that relative links inside the embedded note resolve against
-  -- the embedder. Not the same as @note ^. MN.noteRoute@ (the embedded
-  -- note's own route).
+  -- | Route used as the relative-link base for the rendered note's body and
+  -- any embeds nested inside it. The dispatcher rebake rule (see
+  -- 'withEmbedStack') preserves this value across recursion, so at every
+  -- depth it ends up being the original page being rendered — *not* the
+  -- immediate embedder, despite the variable name. Whether nested embeds
+  -- should resolve relative links against the page or against their
+  -- immediate parent is a separate question, orthogonal to #362.
   R.LMLRoute ->
   MN.Note ->
   Maybe (HI.Splice Identity)
