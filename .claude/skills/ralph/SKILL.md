@@ -21,7 +21,7 @@ Use `AskUserQuestion` to collect:
 - Create a feature branch and **draft PR** early (load `forge-pr` skill for title/body). PR description includes a measurements table updated as cycles complete.
 - **Baseline**: measure at least 5 runs, report **median**. For time: distinguish cold (no cache) from hot (cached). Document methodology.
 - Create `docs/<target>-ralph-report.md` with baseline, methodology, optimization log table, and findings.
-- Seed `TaskCreate` list with N cycle tasks.
+- Seed `TaskCreate` list with N cycle tasks — emit all calls as parallel `tool_use` blocks in a single assistant turn so the seed is one model round-trip, not N.
 
 ## 2. The loop
 
