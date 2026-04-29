@@ -47,6 +47,10 @@ embedBlockWikiLinkResolvingSplice model nr embedStack ctx noteRoute node = do
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
+    -- Pass `noteRoute` as the embedder route, preserving the pre-existing
+    -- behaviour that relative wikilinks inside an embedded note are resolved
+    -- against the embedder, not against the embedded note. Whether that's
+    -- correct at depth >1 is a separate question (orthogonal to #362).
     Left (R.LMLView_Html, r) -> embedResourceRoute model nr embedStack ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
@@ -96,17 +100,21 @@ embedResourceRoute ::
   PandocRenderers Model R.LMLRoute ->
   EmbedStack R.LMLRoute ->
   HP.RenderCtx ->
-  -- | The page being rendered (used to rebuild the ctx for nested splices).
+  -- | Route of the note that *contains* this embed (the embedder). Threaded
+  -- into the nested splice closures unchanged, preserving the pre-existing
+  -- behaviour that relative links inside the embedded note resolve against
+  -- the embedder. Not the same as @note ^. MN.noteRoute@ (the embedded
+  -- note's own route).
   R.LMLRoute ->
   MN.Note ->
   Maybe (HI.Splice Identity)
-embedResourceRoute model nr embedStack ctx pageRoute note = do
+embedResourceRoute model nr embedStack ctx embedderRoute note = do
   let targetRoute = note ^. MN.noteRoute
   if embedStackContains targetRoute embedStack
     then pure $ renderCyclicEmbedSplice model ctx embedStack note
     else do
       let nestedStack = pushEmbedStack targetRoute embedStack
-          nestedCtx = withEmbedStack nr model pageRoute nestedStack ctx
+          nestedCtx = withEmbedStack nr model embedderRoute nestedStack ctx
       pure . runEmbedTemplate "note" $ do
         "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
         "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
