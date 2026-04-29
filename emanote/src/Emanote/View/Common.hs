@@ -24,6 +24,7 @@ import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
+import Emanote.Pandoc.Renderer.Embed qualified as Embed
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
@@ -85,17 +86,19 @@ mkTemplateRenderCtx model r meta =
       PandocRenderers Model LMLRoute ->
       (RenderCtx -> H.HeistT Identity m x) ->
       H.HeistT Identity m x
-    withRenderCtx pandocRenderers f =
-      f
-        =<< Renderer.mkRenderCtxWithPandocRenderers
+    withRenderCtx pandocRenderers f = do
+      ctx <-
+        Renderer.mkRenderCtxWithPandocRenderers
           pandocRenderers
-          -- Seed the embed-ancestor stack with the page's own route so a page
-          -- whose body contains @![[itself]]@ is detected as a cycle (#362).
-          (Renderer.startingAt r)
           classRules
           model
           r
           renderFeatures
+      -- Seed the embed-ancestor stack with the page's own route — a page
+      -- whose body contains @![[itself]]@ is detected as a cycle (#362).
+      -- 'Embed.withEmbedStack' rebuilds the splice closures so renderers
+      -- fired during this render see the seeded stack via 'getUserData'.
+      f $ Embed.withEmbedStack pandocRenderers model r (Embed.startingAt r) ctx
     classRules :: Map Text Text
     classRules =
       SData.lookupAeson mempty ("pandoc" :| ["rewriteClass"]) meta

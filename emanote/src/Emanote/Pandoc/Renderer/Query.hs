@@ -23,7 +23,7 @@ import Relude
 import Text.Pandoc.Definition qualified as B
 
 queryResolvingSplice :: PandocBlockRenderer Model LMLRoute
-queryResolvingSplice model _nr _embedStack ctx noteRoute blk = do
+queryResolvingSplice model _nr ctx noteRoute blk = do
   B.CodeBlock
     (_id', classes, _attrs)
     (Q.parseQuery -> Just q) <-

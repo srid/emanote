@@ -1,3 +1,18 @@
+{- | Resolving renderers for note embedding (@![[note]]@).
+
+Cycle handling: a note that embeds itself, or two notes that embed each
+other, used to expand the embed without a fixpoint (issue #362). The
+'EmbedStack' is the chain of routes currently being expanded; the embed
+renderer reads it from the ctx's typed user-data slot via 'currentEmbedStack'
+and writes the augmented chain via 'setUserData' before recursing. When the
+target route is already on the stack, 'renderCyclicEmbedSplice' produces an
+inline placeholder instead of recursing.
+
+The stack is stored in 'HP.RenderCtx''s @userData@ slot rather than threaded
+through 'PandocRenderF', so URL / callout / query renderers — which don't
+participate in note embedding — don't have to mention the embed-only concern
+in their signatures.
+-}
 module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
@@ -12,17 +27,7 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Renderer (
-  EmbedStack,
-  PandocBlockRenderer,
-  PandocInlineRenderer,
-  PandocRenderers,
-  dispatchBlock,
-  dispatchInline,
-  embedStackContains,
-  embedStackToList,
-  pushEmbedStack,
- )
+import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, dispatchBlock, dispatchInline)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.SiteRoute qualified as SF
@@ -31,13 +36,44 @@ import Heist qualified as H
 import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc (pandocSplice, rpBlock)
 import Heist.Extra.Splices.Pandoc qualified as HP
+import Heist.Extra.Splices.Pandoc.Ctx (getUserData, setUserData)
 import Heist.Interpreted qualified as HI
 import Optics.Operators ((^.))
 import Relude
 import Text.Pandoc.Definition qualified as B
 
+{- | Chain of routes currently being expanded as note embeds, deepest-first.
+
+Stays opaque so 'View.Common' must use 'startingAt' (or 'emptyEmbedStack'
+for an out-of-page caller) to seed it — that makes the seeding choice
+explicit at every call site. The page-render path picks 'startingAt' so a
+self-embed (@![[X]]@ inside @X.md@) is caught as a cycle.
+-}
+newtype EmbedStack = EmbedStack [R.LMLRoute]
+  deriving stock (Eq, Show)
+  deriving newtype (Typeable)
+
+emptyEmbedStack :: EmbedStack
+emptyEmbedStack = EmbedStack []
+
+startingAt :: R.LMLRoute -> EmbedStack
+startingAt r = EmbedStack [r]
+
+pushEmbedStack :: R.LMLRoute -> EmbedStack -> EmbedStack
+pushEmbedStack r (EmbedStack rs) = EmbedStack (r : rs)
+
+embedStackContains :: R.LMLRoute -> EmbedStack -> Bool
+embedStackContains r (EmbedStack rs) = r `elem` rs
+
+embedStackToList :: EmbedStack -> [R.LMLRoute]
+embedStackToList (EmbedStack rs) = rs
+
+-- | Read the current embed stack from a ctx; missing slot is treated as empty.
+currentEmbedStack :: HP.RenderCtx -> EmbedStack
+currentEmbedStack = fromMaybe emptyEmbedStack . getUserData
+
 embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockWikiLinkResolvingSplice model nr embedStack ctx noteRoute node = do
+embedBlockWikiLinkResolvingSplice model nr ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
@@ -47,19 +83,14 @@ embedBlockWikiLinkResolvingSplice model nr embedStack ctx noteRoute node = do
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
-    -- Pass `noteRoute` (whatever the dispatcher baked in — at depth 1 the
-    -- page, at deeper levels the same value preserved unchanged) as the
-    -- relative-link base. Preserves pre-existing link-resolution behaviour;
-    -- the question of whether deeper embeds should rebase to the embedded
-    -- note is orthogonal to #362.
-    Left (R.LMLView_Html, r) -> embedResourceRoute model nr embedStack ctx noteRoute r
+    Left (R.LMLView_Html, r) -> embedResourceRoute model nr ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
           embedStaticFileRoute model (toText $ SF._staticFilePath sf) sf
     _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockRegularLinkResolvingSplice model _nr _embedStack ctx noteRoute node = do
+embedBlockRegularLinkResolvingSplice model _nr ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
@@ -71,7 +102,7 @@ embedBlockRegularLinkResolvingSplice model _nr _embedStack ctx noteRoute node = 
     $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
-embedInlineWikiLinkResolvingSplice model _nr _embedStack ctx noteRoute inl = do
+embedInlineWikiLinkResolvingSplice model _nr ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
@@ -87,37 +118,28 @@ runEmbedTemplate name splices = do
 
 {- | Render an embedded note (@![[note]]@) as inlined Pandoc.
 
-Cycle handling: if the target note is already an ancestor in 'embedStack',
-render an inline error placeholder instead of recursing — otherwise the embed
-would expand without a fixpoint and either hang the renderer or produce
-arbitrarily deep nested output (issue #362).
-
-When recursion is safe, the splice closures inside 'ctx' are rebuilt to carry
-the target route prepended to 'embedStack', so any nested embed inside this
-note sees up-to-date ancestry.
+Reads the embed-ancestor stack from 'ctx's user-data slot and short-circuits
+to 'renderCyclicEmbedSplice' when the target is already on the chain — that
+breaks what would otherwise be an infinite expansion (issue #362). Otherwise
+the target route is pushed onto the stack and 'withEmbedStack' rebuilds the
+ctx so the renderers fired from the embedded body see the augmented chain.
 -}
 embedResourceRoute ::
   Model ->
   PandocRenderers Model R.LMLRoute ->
-  EmbedStack R.LMLRoute ->
   HP.RenderCtx ->
-  -- | Route used as the relative-link base for the rendered note's body and
-  -- any embeds nested inside it. The dispatcher rebake rule (see
-  -- 'withEmbedStack') preserves this value across recursion, so at every
-  -- depth it ends up being the original page being rendered — *not* the
-  -- immediate embedder, despite the variable name. Whether nested embeds
-  -- should resolve relative links against the page or against their
-  -- immediate parent is a separate question, orthogonal to #362.
+  -- | Route used as the relative-link base inside the embedded body. See
+  -- the @withEmbedStack@ note about pre-existing depth-1 link-base behaviour.
   R.LMLRoute ->
   MN.Note ->
   Maybe (HI.Splice Identity)
-embedResourceRoute model nr embedStack ctx embedderRoute note = do
-  let targetRoute = note ^. MN.noteRoute
+embedResourceRoute model nr ctx embedderRoute note = do
+  let embedStack = currentEmbedStack ctx
+      targetRoute = note ^. MN.noteRoute
   if embedStackContains targetRoute embedStack
     then pure $ renderCyclicEmbedSplice model ctx embedStack note
     else do
-      let nestedStack = pushEmbedStack targetRoute embedStack
-          nestedCtx = withEmbedStack nr model embedderRoute nestedStack ctx
+      let nestedCtx = withEmbedStack nr model embedderRoute (pushEmbedStack targetRoute embedStack) ctx
       pure . runEmbedTemplate "note" $ do
         "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
         "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
@@ -126,30 +148,29 @@ embedResourceRoute model nr embedStack ctx embedderRoute note = do
         "ema:note:toc" ##
           renderToc nestedCtx (newToc $ note ^. MN.noteDoc)
 
-{- | Rebuild a 'HP.RenderCtx' with an augmented embed-ancestor stack baked
-into its splice closures, so any nested splice fired from inside a sub-note
-sees up-to-date ancestry.
+{- | Rebuild a 'HP.RenderCtx' with the new embed stack baked into both
+'HP.userData' (so the embed renderer can read it via 'getUserData') *and*
+the 'HP.blockSplice' / 'HP.inlineSplice' closures (so renderers fired from
+the embedded body see this updated ctx, not the construction-time one).
 
-The record update ties the knot: @newCtx@ appears on both the left and inside
-its own field assignments. This is well-defined as long as @blockSplice@ /
-@inlineSplice@ stay non-strict fields in 'HP.RenderCtx' — at construction
-time the fields are stored as thunks closing over @newCtx@, and forcing them
-later finds the fully evaluated record. If the upstream @heist-extra@ ever
-makes those fields strict the construction would loop; the alternative would
-be to wrap the dispatchers in explicit lambdas.
+The closure rebuild ties the knot — @newCtx@ appears on both the left and
+inside its own field assignments. This is well-defined as long as
+'HP.blockSplice' / 'HP.inlineSplice' stay non-strict fields in
+'HP.RenderCtx' — at construction time they're stored as thunks closing over
+@newCtx@, and forcing them later finds the fully evaluated record.
 -}
 withEmbedStack ::
   PandocRenderers Model R.LMLRoute ->
   Model ->
   R.LMLRoute ->
-  EmbedStack R.LMLRoute ->
+  EmbedStack ->
   HP.RenderCtx ->
   HP.RenderCtx
 withEmbedStack nr model x newStack origCtx =
   let newCtx =
-        origCtx
-          { HP.blockSplice = dispatchBlock model nr newStack newCtx x
-          , HP.inlineSplice = dispatchInline model nr newStack newCtx x
+        (setUserData newStack origCtx)
+          { HP.blockSplice = dispatchBlock model nr newCtx x
+          , HP.inlineSplice = dispatchInline model nr newCtx x
           }
    in newCtx
 
@@ -158,7 +179,7 @@ withEmbedStack nr model x newStack origCtx =
 Surfaces the offending note's title plus the chain of ancestor embeds in
 deepest-first order, so a reader can see exactly which path closed the loop.
 -}
-renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> EmbedStack R.LMLRoute -> MN.Note -> HI.Splice Identity
+renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> EmbedStack -> MN.Note -> HI.Splice Identity
 renderCyclicEmbedSplice model ctx embedStack note =
   rpBlock ctx
     $ B.Div ("", ["emanote:error:cyclic-embed"], [])

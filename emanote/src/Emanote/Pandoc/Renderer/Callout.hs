@@ -34,7 +34,7 @@ import Text.Megaparsec.Char qualified as M
 import Text.Pandoc.Definition qualified as B
 
 calloutResolvingSplice :: PandocBlockRenderer Model LMLRoute
-calloutResolvingSplice _model _nr _embedStack ctx _noteRoute blk = do
+calloutResolvingSplice _model _nr ctx _noteRoute blk = do
   B.BlockQuote blks <- pure blk
   callout <- parseCallout blks
   let calloutType = T.toLower $ unCalloutType $ type_ callout
