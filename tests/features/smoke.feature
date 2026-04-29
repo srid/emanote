@@ -46,7 +46,7 @@ Feature: Smoke
 
   Scenario: Markdown between blank-line-separated raw-HTML tags nests inside (#433)
     When I open "/rawhtml-details.html"
-    Then the element with data-marker "RAWHTML_DETAILS_INNER" has a <details> ancestor
+    Then the emitted HTML for "/rawhtml-details.html" wraps no <rawhtml> around its <details> tags
 
   Scenario: A feed-enabled note whose query matches no notes does not crash the build (regression: #490)
     When I fetch "/empty-feed.xml"

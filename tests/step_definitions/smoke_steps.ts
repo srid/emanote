@@ -29,19 +29,24 @@ Then(
 );
 
 // #433: orphan opener/closer raw-HTML tags around markdown content used to
-// produce two stranded `<rawhtml>` wrappers with the markdown paragraph as
-// a sibling of (not a child of) the surrounding element. Asserting the
-// marker has a `<details>` ancestor proves the grouping pass landed it
-// inside.
+// produce two stranded `<rawhtml>` wrappers immediately adjacent to the
+// `<details>` opener and closer. Browsers' lenient HTML5 parser recovers
+// the broken stream into a DOM that nests the marker under <details>, so a
+// DOM-level `closest("details")` check passes on master too. Catching the
+// regression requires inspecting the *emitted* HTML directly. The
+// load-bearing structural difference is the `<rawhtml ...><details>`
+// adjacency on master vs. a bare `<details>` on the fix.
 Then(
-  "the element with data-marker {string} has a <details> ancestor",
-  async function (this: EmanoteWorld, marker: string) {
-    const ancestorCount = await this.page
-      .locator(`details:has([data-marker="${marker}"])`)
-      .count();
+  "the emitted HTML for {string} wraps no <rawhtml> around its <details> tags",
+  async function (this: EmanoteWorld, route: string) {
+    const response = await this.page.request.get(route);
+    assert.ok(response.ok(), `Failed to fetch ${route}: ${response.status()}`);
+    const html = await response.text();
+    const wrappedOpener = /<rawhtml[^>]*>\s*<details(?:\s|>)/.test(html);
+    const wrappedCloser = /<rawhtml[^>]*>\s*<\/details>/.test(html);
     assert.ok(
-      ancestorCount > 0,
-      `Expected the element with data-marker="${marker}" to have a <details> ancestor; got ${ancestorCount} matching <details>. The orphan-RawHtml grouping pass (heist-extra: groupRawHtmlBlocks) likely regressed — the markdown paragraph is rendering as a sibling of <details> instead of a child.`,
+      !wrappedOpener && !wrappedCloser,
+      `Expected ${route} to emit a bare <details>...</details> with no surrounding <rawhtml> wrappers. Got wrappedOpener=${wrappedOpener}, wrappedCloser=${wrappedCloser}. The orphan-RawHtml grouping pass (heist-extra: groupRawHtmlBlocks) likely regressed.`,
     );
   },
 );
