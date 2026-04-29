@@ -17,6 +17,8 @@
     git-hooks.url = "github:bmrips/git-hooks.nix";
     git-hooks.flake = false;
     nixos-unified.url = "github:srid/nixos-unified";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     # These are not (necessarily) upstreamed to nixpkgs, yet.
     ema.url = "github:srid/ema";
