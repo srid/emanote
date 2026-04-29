@@ -1890,7 +1890,7 @@ in {
     notes = [
       "/home/user/notes"  # add as many layers as you like
     ];
-    package = emanote.packages.${builtins.currentSystem}.default;
+    # package = emanote.packages.${builtins.currentSystem}.default; # optional override
   };
 }
 ```
