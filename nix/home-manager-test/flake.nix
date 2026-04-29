@@ -2,9 +2,10 @@
   description = "Emanote Home Manager module VM test";
 
   inputs = {
-    emanote.url = "path:../..";
+    emanote.url = "github:srid/emanote";
     nixpkgs.follows = "emanote/nixpkgs";
-    home-manager.follows = "emanote/home-manager";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, emanote, nixpkgs, home-manager }:

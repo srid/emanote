@@ -97,7 +97,6 @@
         "git-hooks": "git-hooks",
         "haskell-flake": "haskell-flake",
         "heist-extra": "heist-extra",
-        "home-manager": "home-manager",
         "lvar": "lvar",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
@@ -105,14 +104,18 @@
         "unionmount": "unionmount"
       },
       "locked": {
-        "path": "../..",
-        "type": "path"
+        "lastModified": 1777423911,
+        "narHash": "sha256-miDZZ+ZjcVgK5KK/BEGqjvc7/7SI91dmZdnGdRTckOI=",
+        "owner": "srid",
+        "repo": "emanote",
+        "rev": "cade10540ca477f946fa7ddd796020d5a2092d14",
+        "type": "github"
       },
       "original": {
-        "path": "../..",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "srid",
+        "repo": "emanote",
+        "type": "github"
+      }
     },
     "emanote-template": {
       "flake": false,
@@ -216,7 +219,6 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "emanote",
           "nixpkgs"
         ]
       },
@@ -302,10 +304,7 @@
     "root": {
       "inputs": {
         "emanote": "emanote",
-        "home-manager": [
-          "emanote",
-          "home-manager"
-        ],
+        "home-manager": "home-manager",
         "nixpkgs": [
           "emanote",
           "nixpkgs"
