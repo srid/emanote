@@ -161,7 +161,8 @@ renderCyclicEmbedSplice model ctx embedStack note =
     $ B.Div ("", ["emanote:error:cyclic-embed"], [])
     $ one
     $ B.Para
-    $ [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:", B.Space]
+    $ [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:"]
+      , B.Space
       , B.Code B.nullAttr (Tit.toPlain (note ^. MN.noteTitle))
       ]
     <> chainSuffix
