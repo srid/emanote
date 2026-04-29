@@ -2,7 +2,6 @@ module Emanote.Pandoc.Renderer.Embed where
 
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Map.Syntax ((##))
-import Data.Set qualified as Set
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Link.Rel qualified as Rel
@@ -79,13 +78,13 @@ would expand without a fixpoint and either hang the renderer or produce
 arbitrarily deep nested output (issue #362).
 
 When recursion is safe, the splice closures inside 'ctx' are rebuilt to carry
-@Set.insert (note's route) embedStack@, so any nested embed inside this note
-sees up-to-date ancestry.
+the target route prepended to 'embedStack', so any nested embed inside this
+note sees up-to-date ancestry.
 -}
 embedResourceRoute ::
   Model ->
   PandocRenderers Model R.LMLRoute ->
-  Set R.LMLRoute ->
+  [R.LMLRoute] ->
   HP.RenderCtx ->
   -- | The page being rendered (used to rebuild the ctx for nested splices).
   R.LMLRoute ->
@@ -93,10 +92,10 @@ embedResourceRoute ::
   Maybe (HI.Splice Identity)
 embedResourceRoute model nr embedStack ctx pageRoute note = do
   let targetRoute = note ^. MN.noteRoute
-  if targetRoute `Set.member` embedStack
-    then pure $ renderCyclicEmbedSplice ctx note
+  if targetRoute `elem` embedStack
+    then pure $ renderCyclicEmbedSplice model ctx embedStack note
     else do
-      let nestedStack = Set.insert targetRoute embedStack
+      let nestedStack = targetRoute : embedStack
           nestedCtx = withEmbedStack nr model pageRoute nestedStack ctx
       pure . runEmbedTemplate "note" $ do
         "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
@@ -114,7 +113,7 @@ withEmbedStack ::
   PandocRenderers Model R.LMLRoute ->
   Model ->
   R.LMLRoute ->
-  Set R.LMLRoute ->
+  [R.LMLRoute] ->
   HP.RenderCtx ->
   HP.RenderCtx
 withEmbedStack nr model x newStack origCtx =
@@ -125,16 +124,30 @@ withEmbedStack nr model x newStack origCtx =
           }
    in newCtx
 
--- | Inline placeholder shown in place of an embed that would form a cycle.
-renderCyclicEmbedSplice :: HP.RenderCtx -> MN.Note -> HI.Splice Identity
-renderCyclicEmbedSplice ctx note =
+{- | Inline placeholder shown in place of an embed that would form a cycle.
+
+Surfaces the offending note's title plus the chain of ancestor embeds in
+deepest-first order, so a reader can see exactly which path closed the loop.
+-}
+renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> [R.LMLRoute] -> MN.Note -> HI.Splice Identity
+renderCyclicEmbedSplice model ctx embedStack note =
   rpBlock ctx
     $ B.Div ("", ["emanote:error:cyclic-embed"], [])
     $ one
     $ B.Para
-      [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:", B.Space]
+    $ [ B.Strong [B.Str "↺", B.Space, B.Str "Cyclic embed:", B.Space]
       , B.Code B.nullAttr (Tit.toPlain (note ^. MN.noteTitle))
       ]
+    <> chainSuffix
+  where
+    chainSuffix
+      | null embedStack = []
+      | otherwise =
+          [B.Space, B.Str "(via", B.Space]
+            <> intercalate [B.Str ",", B.Space] (pure . renderRoute <$> embedStack)
+            <> [B.Str ")"]
+    renderRoute :: R.LMLRoute -> B.Inline
+    renderRoute r = B.Code B.nullAttr (Tit.toPlain (M.modelLookupTitle r model))
 
 embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
 embedStaticFileRoute model altText staticFile = do
