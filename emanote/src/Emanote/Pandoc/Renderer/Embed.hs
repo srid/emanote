@@ -12,7 +12,17 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, dispatchBlock, dispatchInline)
+import Emanote.Pandoc.Renderer (
+  EmbedStack,
+  PandocBlockRenderer,
+  PandocInlineRenderer,
+  PandocRenderers,
+  dispatchBlock,
+  dispatchInline,
+  embedStackContains,
+  embedStackToList,
+  pushEmbedStack,
+ )
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.SiteRoute qualified as SF
@@ -84,7 +94,7 @@ note sees up-to-date ancestry.
 embedResourceRoute ::
   Model ->
   PandocRenderers Model R.LMLRoute ->
-  [R.LMLRoute] ->
+  EmbedStack R.LMLRoute ->
   HP.RenderCtx ->
   -- | The page being rendered (used to rebuild the ctx for nested splices).
   R.LMLRoute ->
@@ -92,10 +102,10 @@ embedResourceRoute ::
   Maybe (HI.Splice Identity)
 embedResourceRoute model nr embedStack ctx pageRoute note = do
   let targetRoute = note ^. MN.noteRoute
-  if targetRoute `elem` embedStack
+  if embedStackContains targetRoute embedStack
     then pure $ renderCyclicEmbedSplice model ctx embedStack note
     else do
-      let nestedStack = targetRoute : embedStack
+      let nestedStack = pushEmbedStack targetRoute embedStack
           nestedCtx = withEmbedStack nr model pageRoute nestedStack ctx
       pure . runEmbedTemplate "note" $ do
         "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
@@ -113,7 +123,7 @@ withEmbedStack ::
   PandocRenderers Model R.LMLRoute ->
   Model ->
   R.LMLRoute ->
-  [R.LMLRoute] ->
+  EmbedStack R.LMLRoute ->
   HP.RenderCtx ->
   HP.RenderCtx
 withEmbedStack nr model x newStack origCtx =
@@ -129,7 +139,7 @@ withEmbedStack nr model x newStack origCtx =
 Surfaces the offending note's title plus the chain of ancestor embeds in
 deepest-first order, so a reader can see exactly which path closed the loop.
 -}
-renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> [R.LMLRoute] -> MN.Note -> HI.Splice Identity
+renderCyclicEmbedSplice :: Model -> HP.RenderCtx -> EmbedStack R.LMLRoute -> MN.Note -> HI.Splice Identity
 renderCyclicEmbedSplice model ctx embedStack note =
   rpBlock ctx
     $ B.Div ("", ["emanote:error:cyclic-embed"], [])
@@ -140,11 +150,12 @@ renderCyclicEmbedSplice model ctx embedStack note =
       ]
     <> chainSuffix
   where
+    chain = embedStackToList embedStack
     chainSuffix
-      | null embedStack = []
+      | null chain = []
       | otherwise =
           [B.Space, B.Str "(via", B.Space]
-            <> intercalate [B.Str ",", B.Space] (pure . renderRoute <$> embedStack)
+            <> intercalate [B.Str ",", B.Space] (pure . renderRoute <$> chain)
             <> [B.Str ")"]
     renderRoute :: R.LMLRoute -> B.Inline
     renderRoute r = B.Code B.nullAttr (Tit.toPlain (M.modelLookupTitle r model))

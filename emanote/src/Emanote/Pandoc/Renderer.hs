@@ -15,6 +15,12 @@ module Emanote.Pandoc.Renderer (
   mkRenderCtxWithPandocRenderers,
   dispatchBlock,
   dispatchInline,
+  EmbedStack,
+  emptyEmbedStack,
+  startingAt,
+  pushEmbedStack,
+  embedStackContains,
+  embedStackToList,
   EmanotePandocRenderers (..),
 ) where
 
@@ -27,20 +33,44 @@ import Text.Pandoc.Definition qualified as B
 
 {- | Custom Heist renderer function for specific Pandoc AST nodes.
 
-The @[route]@ is the chain of routes currently being expanded as note embeds,
-deepest-first — the renderer for @![[…]]@ uses 'elem' to detect cycles
-(issue #362) and the chain is also surfaced in the placeholder shown when a
-cycle is hit. Renderers that don't participate in note embedding can ignore
-it.
+The 'EmbedStack' carries the chain of routes currently being expanded as note
+embeds — the renderer for @![[…]]@ uses it to detect cycles (issue #362).
+Renderers that don't participate in note embedding can ignore it.
 -}
 type PandocRenderF model route astNode =
   model ->
   PandocRenderers model route ->
-  [route] ->
+  EmbedStack route ->
   Splices.RenderCtx ->
   route ->
   astNode ->
   Maybe (HI.Splice Identity)
+
+{- | Chain of routes currently being expanded as note embeds, deepest-first.
+
+Stays opaque so callers must use 'startingAt' or 'emptyEmbedStack' to seed it
+— that makes the seeding choice explicit at every call site. The page-render
+path picks 'startingAt' so a self-embed (@![[X]]@ inside @X.md@) is caught as
+a cycle; an out-of-page caller (e.g. a future preview-pane renderer with no
+enclosing page concept) would pass 'emptyEmbedStack' to opt out.
+-}
+newtype EmbedStack route = EmbedStack [route]
+  deriving stock (Eq, Show)
+
+emptyEmbedStack :: EmbedStack route
+emptyEmbedStack = EmbedStack []
+
+startingAt :: route -> EmbedStack route
+startingAt r = EmbedStack [r]
+
+pushEmbedStack :: route -> EmbedStack route -> EmbedStack route
+pushEmbedStack r (EmbedStack rs) = EmbedStack (r : rs)
+
+embedStackContains :: (Eq route) => route -> EmbedStack route -> Bool
+embedStackContains r (EmbedStack rs) = r `elem` rs
+
+embedStackToList :: EmbedStack route -> [route]
+embedStackToList (EmbedStack rs) = rs
 
 type PandocInlineRenderer model route = PandocRenderF model route B.Inline
 
@@ -55,9 +85,9 @@ mkRenderCtxWithPandocRenderers ::
   forall model route m.
   (Monad m) =>
   PandocRenderers model route ->
-  -- | Initial embed-ancestor stack. At top level this is the page's own route,
-  -- so that a page directly embedding itself is caught.
-  [route] ->
+  -- | Initial embed-ancestor stack. The page-render path uses 'startingAt'
+  -- with the page's own route so a self-embed is caught as a cycle (#362).
+  EmbedStack route ->
   Map Text Text ->
   model ->
   route ->
@@ -77,7 +107,7 @@ mkRenderCtxWithPandocRenderers nr embedStack classRules model x =
 dispatchBlock ::
   model ->
   PandocRenderers model route ->
-  [route] ->
+  EmbedStack route ->
   Splices.RenderCtx ->
   route ->
   B.Block ->
@@ -88,7 +118,7 @@ dispatchBlock model nr stk ctx x blk =
 dispatchInline ::
   model ->
   PandocRenderers model route ->
-  [route] ->
+  EmbedStack route ->
   Splices.RenderCtx ->
   route ->
   B.Inline ->
