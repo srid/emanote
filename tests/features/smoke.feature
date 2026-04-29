@@ -44,6 +44,10 @@ Feature: Smoke
     When I open "/rawhtml.html"
     Then the page contains an element with data-marker "RAWHTML_DIV_OK"
 
+  Scenario: Markdown between blank-line-separated raw-HTML tags nests inside (#433)
+    When I open "/rawhtml-details.html"
+    Then the emitted HTML for "/rawhtml-details.html" wraps no <rawhtml> around its <details> tags
+
   Scenario: A feed-enabled note whose query matches no notes does not crash the build (regression: #490)
     When I fetch "/empty-feed.xml"
     Then the response is a valid Atom feed

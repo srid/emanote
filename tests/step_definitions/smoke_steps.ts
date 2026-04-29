@@ -28,6 +28,29 @@ Then(
   },
 );
 
+// #433: orphan opener/closer raw-HTML tags around markdown content used to
+// produce two stranded `<rawhtml>` wrappers immediately adjacent to the
+// `<details>` opener and closer. Browsers' lenient HTML5 parser recovers
+// the broken stream into a DOM that nests the marker under <details>, so a
+// DOM-level `closest("details")` check passes on master too. Catching the
+// regression requires inspecting the *emitted* HTML directly. The
+// load-bearing structural difference is the `<rawhtml ...><details>`
+// adjacency on master vs. a bare `<details>` on the fix.
+Then(
+  "the emitted HTML for {string} wraps no <rawhtml> around its <details> tags",
+  async function (this: EmanoteWorld, route: string) {
+    const response = await this.page.request.get(route);
+    assert.ok(response.ok(), `Failed to fetch ${route}: ${response.status()}`);
+    const html = await response.text();
+    const wrappedOpener = /<rawhtml[^>]*>\s*<details(?:\s|>)/.test(html);
+    const wrappedCloser = /<rawhtml[^>]*>\s*<\/details>/.test(html);
+    assert.ok(
+      !wrappedOpener && !wrappedCloser,
+      `Expected ${route} to emit a bare <details>...</details> with no surrounding <rawhtml> wrappers. Got wrappedOpener=${wrappedOpener}, wrappedCloser=${wrappedCloser}. The orphan-RawHtml grouping pass (heist-extra: groupRawHtmlBlocks) likely regressed.`,
+    );
+  },
+);
+
 // #285 — two complementary checks. The "no Ema exception" assertion
 // guards the *crash* (the original bug surface); the banner assertion
 // guards the *visibility* of the error so a parse failure can't fail

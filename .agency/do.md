@@ -19,6 +19,8 @@ Ignore Github Actions (slow) unless user asks for it.
 ## Documentation
 Keep `README.md`, `docs/` (user documentation), and `CHANGELOG.md` (under the `Unreleased` section) in sync with user-facing changes.
 
+New or fixed **Markdown-syntax features** should be demonstrated in [`docs/guide/markdown.md`](../docs/guide/markdown.md) so the live example serves as both reference and regression check. A working `<details>` block, a new callout type, a new wiki-link form — each goes there as a real rendered sample, not just a CHANGELOG note.
+
 ## PR evidence
 
 When the change has visible UI impact (theme, layout, rendering, navigation), post a `## Evidence` PR comment with screenshots. Use judgment — backend-only diffs (parser, link resolver, model) sometimes ripple into rendering and warrant a shot anyway.
