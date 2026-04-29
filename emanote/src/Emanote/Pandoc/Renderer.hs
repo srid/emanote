@@ -13,7 +13,8 @@ module Emanote.Pandoc.Renderer (
   PandocInlineRenderer,
   PandocBlockRenderer,
   mkRenderCtxWithPandocRenderers,
-  withEmbedStack,
+  dispatchBlock,
+  dispatchInline,
   EmanotePandocRenderers (..),
 ) where
 
@@ -67,29 +68,10 @@ mkRenderCtxWithPandocRenderers nr embedStack classRules model x =
     (\ctx -> dispatchBlock model nr embedStack ctx x)
     (\ctx -> dispatchInline model nr embedStack ctx x)
 
-{- | Rebuild a 'Splices.RenderCtx' with an augmented embed-ancestor stack.
-
-When 'embedResourceRoute' descends into a sub-note, it uses this to thread the
-new stack into the nested splice closures so cycle detection sees up-to-date
-ancestry.
--}
-withEmbedStack ::
-  PandocRenderers model route ->
-  model ->
-  route ->
-  Set route ->
-  Splices.RenderCtx ->
-  Splices.RenderCtx
-withEmbedStack nr model x newStack origCtx =
-  let newCtx =
-        origCtx
-          { Splices.blockSplice = dispatchBlock model nr newStack newCtx x
-          , Splices.inlineSplice = dispatchInline model nr newStack newCtx x
-          }
-   in newCtx
-
 -- The dispatchers take their arguments in the same order as 'PandocRenderF'
 -- so the renderer call inside is a one-to-one positional pass-through.
+-- Embed.hs uses them to rebuild a ctx with an augmented embed-ancestor stack
+-- when descending into a sub-note (see 'withEmbedStack').
 dispatchBlock ::
   model ->
   PandocRenderers model route ->

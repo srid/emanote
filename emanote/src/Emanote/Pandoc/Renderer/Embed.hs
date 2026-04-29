@@ -13,7 +13,7 @@ import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Toc (newToc, renderToc)
 import Emanote.Pandoc.Link qualified as Link
-import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, withEmbedStack)
+import Emanote.Pandoc.Renderer (PandocBlockRenderer, PandocInlineRenderer, PandocRenderers, dispatchBlock, dispatchInline)
 import Emanote.Pandoc.Renderer.Url qualified as RendererUrl
 import Emanote.Route.ModelRoute qualified as R
 import Emanote.Route.SiteRoute qualified as SF
@@ -105,6 +105,25 @@ embedResourceRoute model nr embedStack ctx pageRoute note = do
           pandocSplice nestedCtx (note ^. MN.noteDoc)
         "ema:note:toc" ##
           renderToc nestedCtx (newToc $ note ^. MN.noteDoc)
+
+{- | Rebuild a 'HP.RenderCtx' with an augmented embed-ancestor stack baked
+into its splice closures, so any nested splice fired from inside a sub-note
+sees up-to-date ancestry.
+-}
+withEmbedStack ::
+  PandocRenderers Model R.LMLRoute ->
+  Model ->
+  R.LMLRoute ->
+  Set R.LMLRoute ->
+  HP.RenderCtx ->
+  HP.RenderCtx
+withEmbedStack nr model x newStack origCtx =
+  let newCtx =
+        origCtx
+          { HP.blockSplice = dispatchBlock model nr newStack newCtx x
+          , HP.inlineSplice = dispatchInline model nr newStack newCtx x
+          }
+   in newCtx
 
 -- | Inline placeholder shown in place of an embed that would form a cycle.
 renderCyclicEmbedSplice :: HP.RenderCtx -> MN.Note -> HI.Splice Identity
