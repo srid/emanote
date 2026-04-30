@@ -10,6 +10,7 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
 import Data.Text qualified as T
 import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
+import Emanote.Pandoc.Link qualified as Link
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
@@ -53,6 +54,12 @@ relSourceOrder :: Rel -> (LMLRoute, RelOrder)
 relSourceOrder rel =
   (_relFrom rel, _relOrder rel)
 
+data LinkOccurrence = LinkOccurrence
+  { linkOccurrenceUrl :: Text
+  , linkOccurrenceAttrs :: [(Text, Text)]
+  , linkOccurrenceContext :: [B.Block]
+  }
+
 {- | A link target that has not been resolved (using model) yet.
 
  Resolving this may or may not result in a resource in the model. The ADT
@@ -86,43 +93,41 @@ noteRels :: Note -> IxRel
 noteRels note =
   extractLinksInOrder . queryLinksWithContextInOrder $ note ^. noteDoc
   where
-    extractLinksInOrder :: [(Text, [(Text, Text)], [B.Block])] -> IxRel
+    extractLinksInOrder :: [LinkOccurrence] -> IxRel
     extractLinksInOrder links =
       Ix.fromList
         $ flip mapMaybe (zip (RelOrder <$> [0 :: Int ..]) links)
-        $ \(order, (url, attrs, ctx)) -> do
+        $ \(order, LinkOccurrence url attrs ctx) -> do
           let parentR = noteResolveLinkBase note
           (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
           pure $ Rel (note ^. noteRoute) order target ctx
 
-    queryLinksWithContextInOrder :: B.Pandoc -> [(Text, [(Text, Text)], [B.Block])]
+    queryLinksWithContextInOrder :: B.Pandoc -> [LinkOccurrence]
     queryLinksWithContextInOrder =
       W.query blockLinks
 
-    blockLinks :: B.Block -> [(Text, [(Text, Text)], [B.Block])]
+    blockLinks :: B.Block -> [LinkOccurrence]
     blockLinks blk =
-      fmap (\(url, attr) -> (url, attr, [blk])) $ case blk of
+      case blk of
         B.Para is ->
-          queryLinkUrls is
+          queryLinkOccurrences [blk] is
         B.Plain is ->
-          queryLinkUrls is
+          queryLinkOccurrences [blk] is
         B.LineBlock is ->
-          queryLinkUrls is
+          queryLinkOccurrences [blk] is
         B.Header _ _ is ->
-          queryLinkUrls is
+          queryLinkOccurrences [blk] is
         _ -> mempty
 
-    queryLinkUrls :: (W.Walkable B.Inline b) => b -> [(Text, [(Text, Text)])]
-    queryLinkUrls =
-      W.query (maybeToList . getLinkUrl)
+    queryLinkOccurrences :: (W.Walkable B.Inline b) => [B.Block] -> b -> [LinkOccurrence]
+    queryLinkOccurrences ctx =
+      W.query (maybeToList . linkOccurrenceIn ctx)
 
-    getLinkUrl :: B.Inline -> Maybe (Text, [(Text, Text)])
-    getLinkUrl = \case
-      B.Link (_, _, attrs) _inlines (url, title) ->
-        -- Put title in attrs, as it *is* an attribute.
-        pure (url, ("title", title) : attrs)
-      _ ->
-        Nothing
+    linkOccurrenceIn :: [B.Block] -> B.Inline -> Maybe LinkOccurrence
+    linkOccurrenceIn ctx inl = do
+      (Link.InlineLink, (_, _, attrs), _label, (url, title)) <- Link.parseInlineRef inl
+      -- Put title in attrs, as it *is* an attribute.
+      pure $ LinkOccurrence url (("title", title) : attrs) ctx
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL
