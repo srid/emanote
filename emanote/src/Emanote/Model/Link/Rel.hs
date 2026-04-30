@@ -21,6 +21,7 @@ import System.FilePath (normalise, (</>))
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
+-- | Source-order position of a relation inside its containing note.
 newtype RelOrder = RelOrder Int
   deriving stock (Eq, Ord, Show)
 
@@ -50,10 +51,12 @@ instance Ord Rel where
       , _relCtx rel
       )
 
+-- | Key for ordering relation contexts as they appeared in a source note.
 relSourceOrder :: Rel -> (LMLRoute, RelOrder)
 relSourceOrder rel =
   (_relFrom rel, _relOrder rel)
 
+-- | A Pandoc link together with the block context used for backlinks.
 data LinkOccurrence = LinkOccurrence
   { linkOccurrenceUrl :: Text
   , linkOccurrenceAttrs :: [(Text, Text)]
