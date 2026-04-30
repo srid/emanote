@@ -95,6 +95,16 @@ noteRels :: Note -> IxRel
 noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
+    -- The 'zipWith [0 ..]' below assigns '_relSrcPos' across the flattened
+    -- @(url, instance)@ stream. The /per-URL/ ordering of instances
+    -- inside each 'NonEmpty' comes from 'queryLinksWithContext''s pandoc
+    -- traversal (built via 'Map.fromListWith (<>)' over 'W.query'-emitted
+    -- block walks), so within a single URL the indices match source
+    -- order. The /across-URL/ ordering is alphabetical because @Map.toList@
+    -- iterates by key — which is fine for the issue-#186 invariant
+    -- (same-target multi-link ordering) but is /not/ document-wide
+    -- traversal order. The '_relSrcPos' haddock spells this out for
+    -- downstream readers.
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
       let parentR = noteResolveLinkBase note
