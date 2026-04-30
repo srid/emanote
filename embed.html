@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=0762f360-6fcc-45b1-bdf4-c20b679e18b4' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=96edec88-5f36-4bf7-a988-39e37113a62f' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -758,6 +758,48 @@
     </span>
     <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Custom CSS styling' href='custom-style'>
       Custom CSS styling
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+  -->
+  
+</div>
+    
+      <!-- Variable bindings for this tree-->
+
+  
+
+
+
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    
+      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
+        </path>
+      </svg>
+    
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Cyclic embed demo' href='cyclic-embed-demo'>
+      Cyclic embed demo
     </a>
     
       
@@ -1553,7 +1595,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.<sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup> Recursive embeds are supported.
+      The embed wiki-link syntax must appear on a paragraph of its own, with no other text added next to it.<sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup> Recursive embeds are supported (see [<span class='font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm emanote:inline-tag:cyclic-embeds' title='Tag' data-tag='cyclic-embeds'><a href='-/tags/cyclic-embeds' title='Tag' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>#cyclic-embeds</a></span>] below for the one safety stop).
     </p>
   
     <!-- Screen: hidden (popup is the UI). Print: revealed with standard
@@ -1662,6 +1704,55 @@
       </ol>
     </aside>
   
+  </div>
+</section>
+    <h2 id='cyclic-embeds' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+      
+  Cyclic embeds
+  
+  <a href='embed#cyclic-embeds' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Embeds compose recursively — an embedded note may itself embed further notes — but a chain that closes back on itself (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>a → b → a</code>, or a note that embeds itself) cannot be expanded without a fixpoint. Emanote detects the cycle and substitutes an inline <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>↺ Cyclic embed: &lt;title&gt; (via …)</code> placeholder at the point the loop would close, naming both the offending note and the chain that led there.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      The note <a href='cyclic-embed-demo' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Cyclic embed demo</a> embeds itself. Embedding it here renders one level of its content, then the placeholder where the inner self-embed would have resolved:
+    </p>
+  <section title='Embedded note' data-footnote-scope class='p-4 mx-2 mb-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner'>
+  <header class='flex items-center justify-center text-2xl italic bg-primary-50 dark:bg-primary-900 rounded py-1 px-2 mb-3'>
+    <a href='cyclic-embed-demo'>
+      Cyclic embed demo
+    </a>
+  </header>
+  <div>
+    
+
+
+
+
+
+
+
+
+
+
+    <p class='mb-4 leading-relaxed'>
+      This note exists only to demonstrate Emanote’s cyclic-embed detection (<a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>![[..]]</code></a>). The line below is a self-embed of this same note — Emanote stops at the point the loop would close and emits a placeholder instead of expanding the embed forever.
+    </p>
+  <div class='emanote:error not-prose text-sm bg-red-50 dark:bg-red-950 my-3 px-3 py-2 border-l-4 border-red-500 dark:border-red-400 rounded-r-md text-red-900 dark:text-red-100'>
+    <p class='mb-4 leading-relaxed'>
+      <strong>↺ Cyclic embed:</strong> Cyclic embed demo (via Cyclic embed demo, Embedding)
+    </p>
+  </div>
   </div>
 </section>
     <h2 id='files' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1863,7 +1954,7 @@
     <p class='mb-4 leading-relaxed'>
       Source code files can be embedded using the same syntax. The following is the result of using <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>![[haskell-code.hs]]</code> (note that <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>![](haskell-code.hs)</code> also works):
     </p>
-  <div class='mb-6' title='/nix/store/4vwhkz7k33k4k0pc8kqvgs0g3rpqj15j-docs/guide/markdown/haskell-code.hs'>
+  <div class='mb-6' title='/nix/store/1bwjjlyzkfj00v91g1wn8a4lbdvxi111-docs/guide/markdown/haskell-code.hs'>
   <pre class='py-4 pr-4 text-sm font-mono rounded-lg overflow-x-auto'><code class='haskell'>module HaskellCode where
 
 main :: IO ()
@@ -1874,7 +1965,7 @@ main = do
     <p class='mb-4 leading-relaxed'>
       A C file:
     </p>
-  <div class='mb-6' title='/nix/store/4vwhkz7k33k4k0pc8kqvgs0g3rpqj15j-docs/guide/markdown/c-code.c'>
+  <div class='mb-6' title='/nix/store/1bwjjlyzkfj00v91g1wn8a4lbdvxi111-docs/guide/markdown/c-code.c'>
   <pre class='py-4 pr-4 text-sm font-mono rounded-lg overflow-x-auto'><code class='c'>#include &lt;stdio.h&gt;
 
 int main() {
@@ -2036,6 +2127,17 @@ int main() {
       
             </li>
           
+            <li class='truncate' title='Cyclic embeds'>
+              <a href='embed#cyclic-embeds' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
+                Cyclic embeds
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
             <li class='truncate' title='Files'>
               <a href='embed#files' class='--ema-toc block rounded-md px-2 py-1 hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'>
                 Files
@@ -2134,6 +2236,21 @@ int main() {
         </li>
       
         <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
+          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='cyclic-embed-demo'>
+            Cyclic embed demo
+          </a>
+          
+            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
+  
+    <div>
+      <div><p>This note exists only to demonstrate Emanote’s cyclic-embed detection (<a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500'><code>![[..]]</code></a>). The line below is a self-embed of this same note — Emanote stops at the point the loop would close and emits a placeholder instead of expanding the embed forever.</p></div>
+    </div>
+  
+</div>
+          
+        </li>
+      
+        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
           <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='custom-style'>
             Custom CSS styling
           </a>
@@ -2177,6 +2294,15 @@ int main() {
       <a title='Tag' class='px-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-primary-500' href='-/tags/emanote/syntax/demo'>
         <!-- DoNotFormat -->
         #emanote/syntax/demo
+        <!-- DoNotFormat -->
+      </a>
+    
+      <!-- FIXME: The use of -/tags is wrong, because we should use routeUrl using Ema's encoder 
+        Perhaps Emanote should inject tagMetas with urls.
+      -->
+      <a title='Tag' class='px-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-primary-500' href='-/tags/cyclic-embeds'>
+        <!-- DoNotFormat -->
+        #cyclic-embeds
         <!-- DoNotFormat -->
       </a>
     
