@@ -2,6 +2,7 @@
 slug: cyclic-embed-demo
 tags: [emanote/syntax/demo]
 short-title: Cyclic embed demo
+date: 2026-04-30
 ---
 
 # Cyclic embed demo
