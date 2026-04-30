@@ -26,6 +26,13 @@ import Text.Pandoc.LinkContext qualified as LC
  Target will remain unresolved in the `Rel`, and can be resolved at a latter
  time (eg: during rendering).
 -}
+
+-- NOTE: Field order below is load-bearing. The derived 'Ord' compares
+-- fields top-to-bottom, and the issue-#186 fix relies on '_relSrcPos'
+-- preceding '_relCtx' so source position breaks ties between
+-- same-@(_relFrom, _relTo)@ rels before lexicographic 'Ord' on the
+-- context blocks does. Reorder only if you also rewrite 'Ord' explicitly.
+-- 'Emanote.Model.Link.RelSpec' guards both halves of this invariant.
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
