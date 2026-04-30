@@ -82,6 +82,11 @@ Feature: Smoke
     When I open "/xmllink.html"
     Then the article link with text "xml asset" has href containing "test.xml"
 
+  Scenario: Cyclic note embedding stops at a placeholder instead of nesting forever (regression: #362)
+    When I open "/cycle-a.html"
+    Then the page rendered without an Ema exception
+    And the page contains a cyclic-embed placeholder for "Cycle A"
+
   Scenario: The footnote list is hidden on screen but rendered in print mode
     When I open "/footnotes.html"
     Then no footnote list is visible on screen

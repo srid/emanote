@@ -22,6 +22,7 @@ import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
@@ -353,16 +354,17 @@ mkNoteWith r src doc' meta errs =
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
 
-{- | Shared builder for the @emanote:error@ banner Div used by both
+{- | Shared builder for the YAML / Markdown parse-error banner used by both
 the per-note markdown error path (in 'mkNoteWith') and the route-cascade
-yaml error path (in 'Emanote.View.Template'). The CSS class is the actual
-sync contract: a Heist splice rewrites it into Tailwind utilities, so
-both error surfaces stay visually consistent as long as they go through
-this helper.
+yaml error path (in 'Emanote.View.Template').
+
+Delegates the AST shape to 'Diagnostic.errorBlock' so all Emanote-emitted
+diagnostics share a single rendering convention (universal @emanote:error@
+marker class plus a @yaml@ variant sub-class for this category).
 -}
 errorDiv :: Text -> [Text] -> B.Block
 errorDiv header errs =
-  B.Div (cls "emanote:error")
+  Diagnostic.errorBlock "yaml"
     $ B.Para [B.Strong $ one $ B.Str header]
     : (B.Para . one . B.Str <$> errs)
 
