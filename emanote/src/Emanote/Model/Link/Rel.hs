@@ -26,11 +26,24 @@ import Text.Pandoc.LinkContext qualified as LC
  Target will remain unresolved in the `Rel`, and can be resolved at a latter
  time (eg: during rendering).
 -}
+
+-- '_relSrcPos' must precede '_relCtx' so the derived 'Ord' breaks ties
+-- between same-@(_relFrom, _relTo)@ rels by source position before
+-- falling back to lexicographic 'Ord' on '_relCtx' (issue #186).
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
+  , _relSrcPos :: !Int
+  -- ^ Tie-breaker for the derived 'Ord'. Within rels sharing
+  -- @(_relFrom, _relTo)@, ascending '_relSrcPos' reflects source-traversal
+  -- order of the originating links — which keeps backlink context cards
+  -- in source order in 'Emanote.Model.Graph.modelLookupBacklinks' (issue
+  -- #186) and prevents same-context multi-links from collapsing under
+  -- @IxSet.fromList@\'s set-dedup. Across distinct '_relTo' values this
+  -- index is /not/ document-wide source position; treat as opaque
+  -- outside 'noteRels'.
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
@@ -69,15 +82,22 @@ noteRels :: Note -> IxRel
 noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
+    -- 'queryLinksWithContext' yields each per-URL 'NonEmpty' in /reverse/
+    -- traversal order: 'Map.fromListWith (<>)' applies its combiner as
+    -- @f new old@, so each later-traversed entry is prepended onto the
+    -- accumulator. Reverse it so the 'zipWith [0 ..]' below assigns
+    -- '_relSrcPos' in forward source order.
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
-      Ix.fromList
-        $ flip concatMap (Map.toList m)
-        $ \(url, instances) -> do
-          flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = noteResolveLinkBase note
-            (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
-            pure $ Rel (note ^. noteRoute) target ctx
+      let parentR = noteResolveLinkBase note
+          links = do
+            (url, instances) <- Map.toList m
+            (attrs, ctx) <- reverse (toList instances)
+            (target, _manchor) <- maybeToList $ parseUnresolvedRelTarget parentR attrs url
+            pure (target, ctx)
+       in Ix.fromList $ zipWith mkRel [0 ..] links
+      where
+        mkRel srcPos (target, ctx) = Rel (note ^. noteRoute) target srcPos ctx
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL
