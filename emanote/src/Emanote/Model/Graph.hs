@@ -177,7 +177,7 @@ modelLookupBacklinks :: R.LMLRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])
 modelLookupBacklinks r model =
   sortOn (Calendar.backlinkSortKey model . fst)
     $ groupNE
-    $ backlinkRels r model
+    $ sortOn Rel.relSourceOrder (backlinkRels r model)
     <&> \rel ->
       (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where

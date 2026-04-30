@@ -20,6 +20,9 @@ import System.FilePath (normalise, (</>))
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
+newtype RelOrder = RelOrder Int
+  deriving stock (Eq, Ord, Show)
+
 {- | A relation from one note to anywhere in the model.
 
  Target will remain unresolved in the `Rel`, and can be resolved at a latter
@@ -29,13 +32,26 @@ data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
   , -- The source-order occurrence index inside the containing note.
-    _relOrder :: Int
+    _relOrder :: RelOrder
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
-  deriving stock (Eq, Ord, Show)
+  deriving stock (Eq, Show)
+
+instance Ord Rel where
+  compare =
+    comparing $ \rel ->
+      ( _relFrom rel
+      , _relOrder rel
+      , _relTo rel
+      , _relCtx rel
+      )
+
+relSourceOrder :: Rel -> (LMLRoute, RelOrder)
+relSourceOrder rel =
+  (_relFrom rel, _relOrder rel)
 
 {- | A link target that has not been resolved (using model) yet.
 
@@ -73,7 +89,7 @@ noteRels note =
     extractLinksInOrder :: [(Text, [(Text, Text)], [B.Block])] -> IxRel
     extractLinksInOrder links =
       Ix.fromList
-        $ flip mapMaybe (zip [0 :: Int ..] links)
+        $ flip mapMaybe (zip (RelOrder <$> [0 :: Int ..]) links)
         $ \(order, (url, attrs, ctx)) -> do
           let parentR = noteResolveLinkBase note
           (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url

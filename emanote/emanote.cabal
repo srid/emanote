@@ -253,6 +253,7 @@ test-suite test
   else
     build-depends: emanote
     other-modules:
+      Emanote.Model.GraphSpec
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
       Emanote.Model.TocSpec
