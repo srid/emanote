@@ -32,12 +32,19 @@ data Rel = Rel
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
   , _relSrcPos :: Int
-  -- ^ Pandoc-traversal index of this link in the source note. Carried so
-  -- the derived 'Ord' breaks ties between rels sharing @(_relFrom, _relTo)@
-  -- by source-file order, not by lexicographic 'Ord' on '_relCtx'. This is
-  -- what keeps backlink contexts in source order in the rendered UI
-  -- (issue #186), and what prevents two same-paragraph links to the same
-  -- target from collapsing under @IxSet.fromList@'s set-dedup.
+  -- ^ Tie-breaker index assigned in 'noteRels' construction order. Within
+  -- the rels that share @(_relFrom, _relTo)@, this preserves the order in
+  -- which 'Text.Pandoc.LinkContext.queryLinksWithContext' yielded their
+  -- contexts — i.e. source order for multiple links to the same target
+  -- from one note. Across distinct @_relTo@ values this index is /not/
+  -- document-wide source position (the underlying @Map@ is keyed by URL,
+  -- so the flattening visits URLs alphabetically); rely on it only as a
+  -- per-@(_relFrom, _relTo)@ tie-break. Carried so the derived 'Ord'
+  -- breaks ties between same-source-target rels by that order, not by
+  -- lexicographic 'Ord' on '_relCtx'. This is what keeps backlink
+  -- contexts in source order in the rendered UI (issue #186), and what
+  -- prevents two same-paragraph links to the same target from collapsing
+  -- under @IxSet.fromList@'s set-dedup.
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
