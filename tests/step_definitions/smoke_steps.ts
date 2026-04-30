@@ -661,6 +661,116 @@ When(
   },
 );
 
+// Daily backlinks split: notes whose basename matches `YYYY-MM-DD[-…]`
+// (Calendar.isDailyNote / parseRouteDay) feed the `<ema:note:backlinks:daily>`
+// splice (rendered by `components/timeline.tpl` into `#timeline`); everything
+// else feeds `<ema:note:backlinks:nodaily>` (rendered by `components/backlinks.tpl`
+// into `#backlinks`). Asserting by panel id + href substring keeps the test
+// resilient to template-styling churn — only the structural separation matters.
+async function panelLinksTo(
+  page: EmanoteWorld["page"],
+  panelId: "timeline" | "backlinks",
+  hrefSubstring: string,
+): Promise<boolean> {
+  return page.evaluate(
+    ({ id, needle }) => {
+      const panel = document.getElementById(id);
+      if (!panel) return false;
+      return Array.from(panel.querySelectorAll("a[href]")).some((a) =>
+        (a.getAttribute("href") ?? "").includes(needle),
+      );
+    },
+    { id: panelId, needle: hrefSubstring },
+  );
+}
+
+Then(
+  "the Timeline panel links to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    await this.page
+      .locator("#timeline")
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
+    assert.ok(
+      found,
+      `Expected #timeline to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Either the daily-detection (Calendar.parseRouteDay on the basename) regressed, or timeline.tpl stopped iterating <ema:note:backlinks:daily>.`,
+    );
+  },
+);
+
+Then(
+  "the Backlinks panel links to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    await this.page
+      .locator("#backlinks")
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
+    assert.ok(
+      found,
+      `Expected #backlinks to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Non-daily backlinks should land here via <ema:note:backlinks:nodaily> in backlinks.tpl.`,
+    );
+  },
+);
+
+Then(
+  "the Backlinks panel does not link to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
+    assert.ok(
+      !found,
+      `#backlinks should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is daily-named and belongs in the Timeline. The daily/non-daily partition (Template.hs) likely regressed.`,
+    );
+  },
+);
+
+Then(
+  "the Timeline panel does not link to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
+    assert.ok(
+      !found,
+      `#timeline should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is non-daily and belongs in the Backlinks panel. The daily/non-daily partition regressed (or parseRouteDay started accepting non-date basenames).`,
+    );
+  },
+);
+
+// Regression guard for the spurious vertical scrollbar in backlink contexts:
+// `overflow-x: auto` on the wrapper coerces `overflow-y` from `visible` to
+// `auto` (per CSS spec — "if one axis is non-visible, the other becomes
+// auto"), so the panel grew an unwanted vertical scrollbar even when no
+// horizontal overflow existed. Fix: drop `overflow-x-auto` from the wrapper
+// and apply it via descendant selectors (`[&_pre]:overflow-x-auto
+// [&_table]:overflow-x-auto`) where it actually matters. The reliable assertion
+// is on the *computed* overflow-y of the wrapper itself: anything other than
+// `visible` means the implicit-coercion bug is back.
+Then(
+  "every backlink context wrapper has overflow-y {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    await this.page
+      .locator("#backlinks")
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const overflows = await this.page.evaluate(() => {
+      // The context.tpl outermost <div> renders as a direct child of the
+      // backlink <li> (sibling of the title <a>). Selecting "li > div"
+      // scoped to #backlinks targets exactly those wrappers.
+      const wrappers = Array.from(
+        document.querySelectorAll("#backlinks li > div"),
+      );
+      return wrappers.map((el) => getComputedStyle(el as Element).overflowY);
+    });
+    assert.ok(
+      overflows.length > 0,
+      `No backlink context wrappers found under #backlinks li > div — the fixture has no non-daily backlinks, so this scenario isn't actually exercising the regression. Add a backlink to the dailyhost fixture.`,
+    );
+    const offenders = overflows.filter((v) => v !== expected);
+    assert.strictEqual(
+      offenders.length,
+      0,
+      `Expected every backlink context wrapper's computed overflow-y to be ${JSON.stringify(expected)}; got ${JSON.stringify(overflows)}. A non-${expected} value (typically "auto" or "scroll") means context.tpl's outer wrapper grew an overflow rule on one axis again — per CSS spec that coerces the visible axis to auto, producing the spurious vertical scrollbar this fix removed.`,
+    );
+  },
+);
+
 // Stork dark/light theme mirror: stork.js's MutationObserver on
 // <html>.class flips the wrapper between stork-wrapper-edible and
 // stork-wrapper-edible-dark. Without one of those classes on the

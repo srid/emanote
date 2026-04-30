@@ -4,8 +4,9 @@ slug: obsidian
 
 # Obsidian
 
-The freeware software [Obsidian](https://obsidian.md/) can be used to edit Markdown files. Emanote's live preview can be embedded using the [builtin web viewer][wv].
+The freeware software [Obsidian](https://obsidian.md/) can be used to edit Markdown files. Emanote's live preview can be embedded using Obsidian's built-in web viewer.
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Works very well with Emanote. <br><br>Screenshot shows editing of <a href="https://twitter.com/nixos_asia?ref_src=twsrc%5Etfw">@nixos_asia</a> website. <a href="https://t.co/Arvm2G70ZV">https://t.co/Arvm2G70ZV</a> <a href="https://t.co/cHVkdhAiWa">pic.twitter.com/cHVkdhAiWa</a></p>&mdash; Sridhar Ratnakumar (@sridca) <a href="https://twitter.com/sridca/status/1885689843704807873?ref_src=twsrc%5Etfw">February 1, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-[wv]: https://x.com/sridca/status/1885689843704807873
+If you use Obsidian's Daily Notes plugin, Emanote can render those
+date-prefixed notes as [[daily-notes|daily notes]] with timeline backlinks.
+Emanote also supports other Obsidian-inspired Markdown features, including
+[[callout|callouts]] and [[embed|embeds]].
