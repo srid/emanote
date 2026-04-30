@@ -31,6 +31,13 @@ data Rel = Rel
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
+  , _relSrcPos :: Int
+  -- ^ Pandoc-traversal index of this link in the source note. Carried so
+  -- the derived 'Ord' breaks ties between rels sharing @(_relFrom, _relTo)@
+  -- by source-file order, not by lexicographic 'Ord' on '_relCtx'. This is
+  -- what keeps backlink contexts in source order in the rendered UI
+  -- (issue #186), and what prevents two same-paragraph links to the same
+  -- target from collapsing under @IxSet.fromList@'s set-dedup.
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
@@ -71,13 +78,15 @@ noteRels note =
   where
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
-      Ix.fromList
-        $ flip concatMap (Map.toList m)
-        $ \(url, instances) -> do
-          flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = noteResolveLinkBase note
-            (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
-            pure $ Rel (note ^. noteRoute) target ctx
+      let parentR = noteResolveLinkBase note
+          links = do
+            (url, instances) <- Map.toList m
+            (attrs, ctx) <- toList instances
+            (target, _manchor) <- maybeToList $ parseUnresolvedRelTarget parentR attrs url
+            pure (target, ctx)
+       in Ix.fromList $ zipWith mkRel [0 ..] links
+      where
+        mkRel srcPos (target, ctx) = Rel (note ^. noteRoute) target srcPos ctx
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL
