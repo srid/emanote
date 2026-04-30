@@ -27,36 +27,23 @@ import Text.Pandoc.LinkContext qualified as LC
  time (eg: during rendering).
 -}
 
--- NOTE: Field order below is load-bearing. The derived 'Ord' compares
--- fields top-to-bottom, and the issue-#186 fix relies on '_relSrcPos'
--- preceding '_relCtx' so source position breaks ties between
--- same-@(_relFrom, _relTo)@ rels before lexicographic 'Ord' on the
--- context blocks does. Reorder only if you also rewrite 'Ord' explicitly.
--- 'Emanote.Model.Link.RelSpec' guards both halves of this invariant.
+-- '_relSrcPos' must precede '_relCtx' so the derived 'Ord' breaks ties
+-- between same-@(_relFrom, _relTo)@ rels by source position before
+-- falling back to lexicographic 'Ord' on '_relCtx' (issue #186).
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
   , _relSrcPos :: Int
-  -- ^ Presentation-layer artifact, not a graph-semantics fact. Consumed
-  -- by 'Emanote.Model.Graph.modelLookupBacklinks' (transitively, via
-  -- 'IxSet.toList'\'s 'Ord'-driven order) to render backlink context
-  -- cards in the order their links appeared in the source note. Other
-  -- consumers of 'Rel' do not depend on this field; treat it as opaque.
-  -- Tie-breaker index assigned in 'noteRels' construction order. Within
-  -- the rels that share @(_relFrom, _relTo)@, this preserves the order in
-  -- which 'Text.Pandoc.LinkContext.queryLinksWithContext' yielded their
-  -- contexts — i.e. source order for multiple links to the same target
-  -- from one note. Across distinct @_relTo@ values this index is /not/
-  -- document-wide source position (the underlying @Map@ is keyed by URL,
-  -- so the flattening visits URLs alphabetically); rely on it only as a
-  -- per-@(_relFrom, _relTo)@ tie-break. Carried so the derived 'Ord'
-  -- breaks ties between same-source-target rels by that order, not by
-  -- lexicographic 'Ord' on '_relCtx'. This is what keeps backlink
-  -- contexts in source order in the rendered UI (issue #186), and what
-  -- prevents two same-paragraph links to the same target from collapsing
-  -- under @IxSet.fromList@'s set-dedup.
+  -- ^ Tie-breaker for the derived 'Ord'. Within rels sharing
+  -- @(_relFrom, _relTo)@, ascending '_relSrcPos' reflects source-traversal
+  -- order of the originating links — which keeps backlink context cards
+  -- in source order in 'Emanote.Model.Graph.modelLookupBacklinks' (issue
+  -- #186) and prevents same-context multi-links from collapsing under
+  -- @IxSet.fromList@\'s set-dedup. Across distinct '_relTo' values this
+  -- index is /not/ document-wide source position; treat as opaque
+  -- outside 'noteRels'.
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
@@ -95,22 +82,11 @@ noteRels :: Note -> IxRel
 noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
-    -- The 'zipWith [0 ..]' below assigns '_relSrcPos' across the flattened
-    -- @(url, instance)@ stream so that, after 'Ix.fromList' \\\\ 'Ix.toList',
-    -- rels sharing @(_relFrom, _relTo)@ come out in source-traversal order.
-    --
-    -- 'queryLinksWithContext' yields its per-URL 'NonEmpty' in /reverse/
-    -- traversal order: it folds the @W.query@-emitted list through
-    -- 'Map.fromListWith (<>)', whose combining function is applied as
+    -- 'queryLinksWithContext' yields each per-URL 'NonEmpty' in /reverse/
+    -- traversal order: 'Map.fromListWith (<>)' applies its combiner as
     -- @f new old@, so each later-traversed entry is prepended onto the
-    -- accumulator. Reverse the per-URL list back to forward order before
-    -- zipping so 'srcPos' counts up with the source. The 'NonEmpty' is
-    -- bounded by per-URL link count in a single note — small in practice.
-    --
-    -- The /across-URL/ ordering is alphabetical because @Map.toList@
-    -- iterates by key — fine for the issue-#186 invariant (same-target
-    -- multi-link ordering) but /not/ document-wide traversal order. The
-    -- '_relSrcPos' haddock documents this for downstream readers.
+    -- accumulator. Reverse it so the 'zipWith [0 ..]' below assigns
+    -- '_relSrcPos' in forward source order.
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
       let parentR = noteResolveLinkBase note
