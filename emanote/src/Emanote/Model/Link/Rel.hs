@@ -35,7 +35,7 @@ data Rel = Rel
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
-  , _relSrcPos :: Int
+  , _relSrcPos :: !Int
   -- ^ Tie-breaker for the derived 'Ord'. Within rels sharing
   -- @(_relFrom, _relTo)@, ascending '_relSrcPos' reflects source-traversal
   -- order of the originating links — which keeps backlink context cards
