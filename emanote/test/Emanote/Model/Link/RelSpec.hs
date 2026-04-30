@@ -1,5 +1,6 @@
 module Emanote.Model.Link.RelSpec where
 
+import Commonmark.Extensions.WikiLink qualified as WL
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Link.Rel
 import Emanote.Model.Note qualified as MN
@@ -53,9 +54,9 @@ spec = do
       got === want
   describe "noteRels source order (issue #186)" $ do
     it "orders rels by source position, not by lexicographic Ord on context" $ do
-      -- "Z..." appears first in source but sorts last alphabetically; "A..."
-      -- appears second in source but sorts first. Pre-fix, IxSet.toList would
-      -- yield A-then-Z (Ord [Block] lex order); post-fix, it yields source order.
+      -- 'Z' sorts last lexicographically but comes first in source; 'A'
+      -- sorts first but comes second. Without the srcPos tie-breaker,
+      -- Ord [Block] would yield A-then-Z; we want source order.
       let mkLink lbl = B.Link B.nullAttr [B.Str lbl] ("Foo.md", "")
           note =
             MN.mkEmptyNoteWith
@@ -63,14 +64,15 @@ spec = do
               [ B.Para [B.Str "Z first: ", mkLink "z"]
               , B.Para [B.Str "A second: ", mkLink "a"]
               ]
-          firstStr rel = case _relCtx rel of
-            [B.Para (B.Str s : _)] -> s
-            _ -> "??"
-      (firstStr <$> Ix.toList (noteRels note))
-        `shouldBe` ["Z first: ", "A second: "]
+          paraText rel = case _relCtx rel of
+            [B.Para is] -> WL.plainify is
+            other -> error $ "expected single-paragraph context, got " <> show other
+      (paraText <$> Ix.toList (noteRels note))
+        `shouldBe` ["Z first: z", "A second: a"]
     it "does not collapse two identical-context links to the same target" $ do
-      -- One paragraph mentioning Foo.md twice. Pre-fix, the two rels share
-      -- (relFrom, relTo, relCtx) and IxSet.fromList's set-dedup loses one.
+      -- One paragraph mentions Foo.md twice. The two rels share
+      -- (relFrom, relTo, relCtx); without srcPos in Ord, IxSet.fromList's
+      -- set-dedup would collapse them to one.
       let mkLink = B.Link B.nullAttr [B.Str "Foo"] ("Foo.md", "")
           note =
             MN.mkEmptyNoteWith
@@ -79,7 +81,7 @@ spec = do
       length (Ix.toList (noteRels note)) `shouldBe` 2
 
 barRoute :: LMLRoute
-barRoute = LMLRoute_Md $ fromMaybe (error "bad route") $ R.mkRouteFromFilePath "Bar.md"
+barRoute = LMLRoute_Md $ fromMaybe (error "barRoute: Bar.md failed to parse") $ R.mkRouteFromFilePath "Bar.md"
 
 -- https://github.com/hedgehogqa/haskell-hedgehog/issues/121
 once :: PropertyT IO () -> Property
