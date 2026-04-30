@@ -96,21 +96,27 @@ noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
     -- The 'zipWith [0 ..]' below assigns '_relSrcPos' across the flattened
-    -- @(url, instance)@ stream. The /per-URL/ ordering of instances
-    -- inside each 'NonEmpty' comes from 'queryLinksWithContext''s pandoc
-    -- traversal (built via 'Map.fromListWith (<>)' over 'W.query'-emitted
-    -- block walks), so within a single URL the indices match source
-    -- order. The /across-URL/ ordering is alphabetical because @Map.toList@
-    -- iterates by key — which is fine for the issue-#186 invariant
-    -- (same-target multi-link ordering) but is /not/ document-wide
-    -- traversal order. The '_relSrcPos' haddock spells this out for
-    -- downstream readers.
+    -- @(url, instance)@ stream so that, after 'Ix.fromList' \\\\ 'Ix.toList',
+    -- rels sharing @(_relFrom, _relTo)@ come out in source-traversal order.
+    --
+    -- 'queryLinksWithContext' yields its per-URL 'NonEmpty' in /reverse/
+    -- traversal order: it folds the @W.query@-emitted list through
+    -- 'Map.fromListWith (<>)', whose combining function is applied as
+    -- @f new old@, so each later-traversed entry is prepended onto the
+    -- accumulator. Reverse the per-URL list back to forward order before
+    -- zipping so 'srcPos' counts up with the source. The 'NonEmpty' is
+    -- bounded by per-URL link count in a single note — small in practice.
+    --
+    -- The /across-URL/ ordering is alphabetical because @Map.toList@
+    -- iterates by key — fine for the issue-#186 invariant (same-target
+    -- multi-link ordering) but /not/ document-wide traversal order. The
+    -- '_relSrcPos' haddock documents this for downstream readers.
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
       let parentR = noteResolveLinkBase note
           links = do
             (url, instances) <- Map.toList m
-            (attrs, ctx) <- toList instances
+            (attrs, ctx) <- reverse (toList instances)
             (target, _manchor) <- maybeToList $ parseUnresolvedRelTarget parentR attrs url
             pure (target, ctx)
        in Ix.fromList $ zipWith mkRel [0 ..] links
