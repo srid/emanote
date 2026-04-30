@@ -137,3 +137,18 @@ Feature: Smoke
     And I click the Stork search trigger
     Then the Stork search modal is "visible"
     And the Stork wrapper has the edible theme class
+
+  Scenario: Daily-named backlinks land in the Timeline panel
+    When I open "/dailyhost.html"
+    Then the Timeline panel links to "dailyhost/2025-01-01"
+    And the Timeline panel links to "dailyhost/2025-01-02"
+
+  Scenario: Non-daily backlinks land in the Backlinks panel and not the Timeline
+    When I open "/dailyhost.html"
+    Then the Backlinks panel links to "dailyhost-mention"
+    And the Backlinks panel does not link to "dailyhost/2025-01-01"
+    And the Timeline panel does not link to "dailyhost-mention"
+
+  Scenario: Backlink context wrapper does not impose a vertical scrollbar (no overflow-x:auto on the outer wrapper)
+    When I open "/dailyhost.html"
+    Then every backlink context wrapper has overflow-y "visible"
