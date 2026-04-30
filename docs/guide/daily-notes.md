@@ -1,5 +1,5 @@
 ---
-slug: daily
+slug: daily-notes
 ---
 
 # Daily Notes
