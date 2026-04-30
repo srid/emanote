@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=96edec88-5f36-4bf7-a988-39e37113a62f' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=9165ba89-d681-43e6-8989-9277d0f97783' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1427,15 +1427,19 @@
             <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
   
     <div>
+      <div><h2 id='folder'><a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folder notes</a></h2></div>
+    </div>
+  
+    <div>
+      <div><p>By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.</p></div>
+    </div>
+  
+    <div>
       <div><p>By default, Emanote includes any directories in your note’s path as vertices in the folgezettel graph. This makes the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folder note</a> a folgezettel parent of the child note. The contents of a folder, likewise, become folgezetten children of the <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folder note</a>. For eg., in <code>foo/bar/qux.md</code>, “foo” is a folgezettel parent of “bar”, and “bar” is a folgezettel parent of “qux”.</p></div>
     </div>
   
     <div>
       <div><p>[!tip] Put this configuration in <code>foo.md</code> if you want to disable folder folgezettel for just that <a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>folder note</a> <code>foo/</code>. Put it in <code>foo.yaml</code> if you want to disable it for <code>foo/</code> and all subfolders under it recursively. Put it in top-level <code>index.yaml</code> to disable it for all folders. See <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for more details.</p></div>
-    </div>
-  
-    <div>
-      <div><h2 id='folder'><a href='folder-note' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>Folder notes</a></h2></div>
     </div>
   
 </div>
