@@ -133,7 +133,6 @@ common library-common
     , optics-th
     , optparse-applicative
     , pandoc
-    , pandoc-link-context    >=1.4.0
     , pandoc-lua-engine
     , pandoc-types
     , parsec

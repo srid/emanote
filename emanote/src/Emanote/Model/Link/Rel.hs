@@ -8,7 +8,6 @@ import Data.Aeson (ToJSON)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
-import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
 import Emanote.Route (LMLRoute, ModelRoute)
@@ -19,7 +18,7 @@ import Optics.TH (makeLenses)
 import Relude
 import System.FilePath (normalise, (</>))
 import Text.Pandoc.Definition qualified as B
-import Text.Pandoc.LinkContext qualified as LC
+import Text.Pandoc.Walk qualified as W
 
 {- | A relation from one note to anywhere in the model.
 
@@ -29,6 +28,8 @@ import Text.Pandoc.LinkContext qualified as LC
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
+  , -- The source-order occurrence index inside the containing note.
+    _relOrder :: Int
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
   , _relCtx :: [B.Block]
@@ -67,17 +68,45 @@ makeLenses ''Rel
 
 noteRels :: Note -> IxRel
 noteRels note =
-  extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
+  extractLinksInOrder . queryLinksWithContextInOrder $ note ^. noteDoc
   where
-    extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
-    extractLinks m =
+    extractLinksInOrder :: [(Text, [(Text, Text)], [B.Block])] -> IxRel
+    extractLinksInOrder links =
       Ix.fromList
-        $ flip concatMap (Map.toList m)
-        $ \(url, instances) -> do
-          flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = noteResolveLinkBase note
-            (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
-            pure $ Rel (note ^. noteRoute) target ctx
+        $ flip mapMaybe (zip [0 :: Int ..] links)
+        $ \(order, (url, attrs, ctx)) -> do
+          let parentR = noteResolveLinkBase note
+          (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
+          pure $ Rel (note ^. noteRoute) order target ctx
+
+    queryLinksWithContextInOrder :: B.Pandoc -> [(Text, [(Text, Text)], [B.Block])]
+    queryLinksWithContextInOrder =
+      W.query blockLinks
+
+    blockLinks :: B.Block -> [(Text, [(Text, Text)], [B.Block])]
+    blockLinks blk =
+      fmap (\(url, attr) -> (url, attr, [blk])) $ case blk of
+        B.Para is ->
+          queryLinkUrls is
+        B.Plain is ->
+          queryLinkUrls is
+        B.LineBlock is ->
+          queryLinkUrls is
+        B.Header _ _ is ->
+          queryLinkUrls is
+        _ -> mempty
+
+    queryLinkUrls :: (W.Walkable B.Inline b) => b -> [(Text, [(Text, Text)])]
+    queryLinkUrls =
+      W.query (maybeToList . getLinkUrl)
+
+    getLinkUrl :: B.Inline -> Maybe (Text, [(Text, Text)])
+    getLinkUrl = \case
+      B.Link (_, _, attrs) _inlines (url, title) ->
+        -- Put title in attrs, as it *is* an attribute.
+        pure (url, ("title", title) : attrs)
+      _ ->
+        Nothing
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. The `URTResource` form is built from the canonical URL
