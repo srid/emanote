@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=374e8f26-30db-4860-ae7f-5cd6e69eb746' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=51eae785-0ec8-4e50-a43d-9bc8cc76ee93' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -775,7 +775,7 @@
 
 
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -784,15 +784,16 @@
     <span class='flex-shrink-0'>
       
         
-          
+          <a href='daily-notes' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
   
-        
+          </a>
+          
       
     </span>
     <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
@@ -800,7 +801,10 @@
     </a>
     
       
-        
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
+      
     
   </div>
 
@@ -1350,7 +1354,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      An atom feed can be generated for a given note <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>note metadata</a>:
+      An atom feed can be generated for a given note <a href='query' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>query</a> by adding the following to the <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>note metadata</a>:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='markdown'><span class='co'>---</span>
 <span class='an'>feed:</span>
@@ -1392,7 +1396,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      You must set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.siteUrl</code> (see below) in the <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>index.yaml</a> for the feed to be generated.
+      You must set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.siteUrl</code> (see below) in the <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a> for the feed to be generated.
     </p>
   
   </div>
@@ -1419,7 +1423,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      An example is available in the <a href='query' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='query.xml' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>query.xml</a>.
+      An example is available in the <a href='query' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Obsidian-style queries</a> note. You can access its feed at <a href='query.xml' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900'>query.xml</a>.
     </p>
   
     <h2 id='configuration' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1507,6 +1511,7 @@
       
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
+
       
 
     </div>

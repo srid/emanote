@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=374e8f26-30db-4860-ae7f-5cd6e69eb746' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=51eae785-0ec8-4e50-a43d-9bc8cc76ee93' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -989,7 +989,7 @@
 
 
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -998,15 +998,16 @@
     <span class='flex-shrink-0'>
       
         
-          
+          <a href='daily-notes' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
   
-        
+          </a>
+          
       
     </span>
     <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
@@ -1014,7 +1015,10 @@
     </a>
     
       
-        
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
+      
     
   </div>
 
@@ -1570,7 +1574,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      The <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes extension</a> provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a “class map” in <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>index.yaml</a>, the default value of which provides some builtin-in styles.
+      The <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes extension</a> provides the ability to set CSS classes on inline or block level elements of Markdown. You can also specify a “class map” in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>, the default value of which provides some builtin-in styles.
     </p>
   
     <h2 id='built-in-styles' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
@@ -1614,7 +1618,7 @@
     </p>
   </div>
     <p class='mb-4 leading-relaxed'>
-      You should expect the above text to appear styled like a yellow sticky note, because the default <a href='yaml-config' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>index.yaml</a> specifies a “sticky-note” class, which rewrites to a list of Tailwind classes, and that class in turn is (re)used in Markdown notes.
+      You should expect the above text to appear styled like a yellow sticky note, because the default <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a> specifies a “sticky-note” class, which rewrites to a list of Tailwind classes, and that class in turn is (re)used in Markdown notes.
     </p>
   
     <h3 id='highlight-block' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 text-3xl'>
@@ -1650,7 +1654,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement<sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup> you can make use of CSS grids as provided by Tailwind’s classes.
+      Using <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/fenced_divs.md' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>fenced_divs</a> with <a href='https://github.com/jgm/commonmark-hs/blob/master/commonmark-extensions/test/attributes.md' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>attributes</a> extension, you can wrap parts of your Markdown using a <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>div</a>, and then style it en masse. For example, to <a href='embed' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>embed multiple notes</a> in a “matrix” arrangement<sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup> you can make use of CSS grids as provided by Tailwind’s classes.
     </p>
   <div class='grid grid-flow-row grid-cols-1 gap-0 p-3 bg-gray-500 lg:grid-cols-2'><section title='Embedded note' data-footnote-scope class='p-4 mx-2 mb-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner'>
   <header class='flex items-center justify-center text-2xl italic bg-primary-50 dark:bg-primary-900 rounded py-1 px-2 mb-3'>
@@ -1677,69 +1681,69 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <a href='https://midirus.com/website' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://midirus.com/website</a> (view <a href='https://github.com/TristanCacqueray/TristanCacqueray.github.io' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://midirus.com/website' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://midirus.com/website</a> (view <a href='https://github.com/TristanCacqueray/TristanCacqueray.github.io' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://ema.srid.ca' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ema.srid.ca</a> (view <a href='https://github.com/srid/ema/tree/master/docs' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://ema.srid.ca' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ema.srid.ca</a> (view <a href='https://github.com/srid/ema/tree/master/docs' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://blog.hemera.systems/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://blog.hemera.systems/</a> (view <a href='https://github.com/TheNeikos/hemera.systems' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://blog.hemera.systems/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://blog.hemera.systems/</a> (view <a href='https://github.com/TheNeikos/hemera.systems' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://fiatjaf.com/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://fiatjaf.com/</a> (view <a href='https://github.com/fiatjaf/z' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://fiatjaf.com/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://fiatjaf.com/</a> (view <a href='https://github.com/fiatjaf/z' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://srid.ca/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca/</a> (view <a href='https://github.com/srid/srid' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://srid.ca/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca/</a> (view <a href='https://github.com/srid/srid' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://coda-coda.github.io/zettels/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://coda-coda.github.io/zettels/</a> (view <a href='https://github.com/coda-coda/zettels' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://coda-coda.github.io/zettels/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://coda-coda.github.io/zettels/</a> (view <a href='https://github.com/coda-coda/zettels' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://gil0mendes.io/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://gil0mendes.io/</a> (view <a href='https://gitlab.com/gil0mendes/website' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://gil0mendes.io/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://gil0mendes.io/</a> (view <a href='https://gitlab.com/gil0mendes/website' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://input-output-hk.github.io/adrestia/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://input-output-hk.github.io/adrestia/</a> (view <a href='https://github.com/input-output-hk/adrestia/tree/master/docs' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://input-output-hk.github.io/adrestia/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://input-output-hk.github.io/adrestia/</a> (view <a href='https://github.com/input-output-hk/adrestia/tree/master/docs' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://inspirativity.zettel.page/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://inspirativity.zettel.page/</a> (view <a href='https://github.com/srid/inspirativity.zettel.page' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://inspirativity.zettel.page/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://inspirativity.zettel.page/</a> (view <a href='https://github.com/srid/inspirativity.zettel.page' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://themotte.zettel.page/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://themotte.zettel.page/</a> (view <a href='https://github.com/Kuratoro/TheMotte.zettel.page' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://themotte.zettel.page/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://themotte.zettel.page/</a> (view <a href='https://github.com/Kuratoro/TheMotte.zettel.page' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://vanceism7.ml' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://vanceism7.ml</a> (view <a href='https://gitlab.com/vanceism7/site' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://vanceism7.ml' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://vanceism7.ml</a> (view <a href='https://gitlab.com/vanceism7/site' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://plutonomicon.github.io/plutonomicon/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://plutonomicon.github.io/plutonomicon/</a> (view <a href='https://github.com/Plutonomicon/plutonomicon' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://plutonomicon.github.io/plutonomicon/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://plutonomicon.github.io/plutonomicon/</a> (view <a href='https://github.com/Plutonomicon/plutonomicon' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://haskell-game.dev/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://haskell-game.dev/</a> (view <a href='https://gitlab.com/dpwiz/haskell-game.dev' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://haskell-game.dev/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://haskell-game.dev/</a> (view <a href='https://gitlab.com/dpwiz/haskell-game.dev' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://ners.ch/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ners.ch/</a> (view <a href='https://github.com/ners/ners.ch' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://ners.ch/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://ners.ch/</a> (view <a href='https://github.com/ners/ners.ch' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
         <li>
-          <a href='https://zettel.theobori.cafe/' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://zettel.theobori.cafe/</a> (view <a href='https://github.com/theobori/zettel' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
+          <a href='https://zettel.theobori.cafe/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://zettel.theobori.cafe/</a> (view <a href='https://github.com/theobori/zettel' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>source</a>)
         </li>
       
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      Wish to add your Emanote website to the above list? <a href='https://github.com/srid/emanote/discussions/new?category=show-and-tell' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Tell us here</a>.
+      Wish to add your Emanote website to the above list? <a href='https://github.com/srid/emanote/discussions/new?category=show-and-tell' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Tell us here</a>.
     </p>
   
   </div>
@@ -1768,11 +1772,11 @@
     <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
         <li class='pl-1'>
-          <a href='install' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Install Emanote</a>
+          <a href='install' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Install Emanote</a>
         </li>
       
         <li class='pl-1'>
-          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a><sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup>.
+          Use your existing notebook, or create one from <a href='emanote-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>emanote-template</a><sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup>.
         </li>
       
         <li class='pl-1'>
@@ -1788,7 +1792,7 @@
         </li>
       
         <li class='pl-1'>
-          Visit <a href='guide' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup data-footnote-ref='2' role='button' tabindex='0' aria-label='Footnote 2' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>2</sup>
+          Visit <a href='guide' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Guide</a> to learn more about Emanote, or <a href='examples' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Examples</a> to get inspired first.<sup data-footnote-ref='2' role='button' tabindex='0' aria-label='Footnote 2' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>2</sup>
         </li>
       
     </ol>
@@ -1800,11 +1804,11 @@
       <ol class='list-decimal pl-6 space-y-2'>
         
           <li data-footnote-id='1'>
-            <a href='emanote-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
+            <a href='emanote-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>emanote-template</a> also includes the GitHub Pages workflow for static site deployment.
           </li>
         
           <li data-footnote-id='2'>
-            If you are <a href='https://srid.ca/haskell' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Architecture</a>.
+            If you are <a href='https://srid.ca/haskell' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Haskell</a> developer, see <a href='architecture' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Architecture</a>.
           </li>
         
       </ol>
@@ -1840,19 +1844,19 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
+          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
         </li>
       
         <li>
-          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
+          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
         </li>
       
         <li>
-          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>Some text file</a>
+          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Some text file</a>
         </li>
       
         <li>
-          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors'>normal linking</a>.
+          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900'>normal linking</a>.
         </li>
       
     </ul>
@@ -1862,7 +1866,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:bg-primary-50 dark:hover:bg-primary-950 px-1 -mx-1 rounded transition-colors' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
+      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
     </p>
   
   </div>
@@ -1886,7 +1890,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      To start customizing, create a templates directory in your notebook. From there, you can override any templates you wish by copying them from Emanote’s default templates into your notebook’s templates directory. For example, if you want to customize the default pandoc styling, you can copy the <a href='https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc.tpl</a> file from Emanote’s GitHub repository into your templates/components directory and edit it accordingly.
+      To start customizing, create a templates directory in your notebook. From there, you can override any templates you wish by copying them from Emanote’s default templates into your notebook’s templates directory. For example, if you want to customize the default pandoc styling, you can copy the <a href='https://github.com/srid/emanote/blob/master/emanote/default/templates/components/pandoc.tpl' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc.tpl</a> file from Emanote’s GitHub repository into your templates/components directory and edit it accordingly.
     </p>
   
 
@@ -1915,7 +1919,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
+      This customization process works through a “union” of the default layer (provided by Emanote) and your notebook’s layer. Essentially, it’s similar to the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>unionfs</code> concept - both the default layer and your notebook are union-mounted in Haskell using <a href='https://github.com/srid/unionmount' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/unionmount</a>. This way, you only need to copy and modify the specific files you want to override, without affecting the rest of the default templates.
     </p>
   
   </div>
@@ -1934,25 +1938,25 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <a href='https://github.com/srid/srid/tree/master/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/srid</a>
+          <a href='https://github.com/srid/srid/tree/master/templates' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>srid/srid</a>
         </li>
       
         <li>
-          <a href='https://github.com/TheNeikos/hemera.systems/tree/master/content/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>TheNeikos/hemera.systems</a>
+          <a href='https://github.com/TheNeikos/hemera.systems/tree/master/content/templates' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>TheNeikos/hemera.systems</a>
         </li>
       
         <li>
-          <a href='https://gitlab.com/gil0mendes/website/-/tree/live/content/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>gil0mendes</a>
+          <a href='https://gitlab.com/gil0mendes/website/-/tree/live/content/templates' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>gil0mendes</a>
         </li>
       
         <li>
-          <a href='https://github.com/ChenghaoMou/chenghaomou.github.io/tree/master/templates' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>ChenghaoMou/chenghaomou</a>
+          <a href='https://github.com/ChenghaoMou/chenghaomou.github.io/tree/master/templates' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>ChenghaoMou/chenghaomou</a>
         </li>
       
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      For additional information and discussion on this topic, check out <a href='https://github.com/srid/emanote/discussions/438' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>this discussion on GitHub</a>.
+      For additional information and discussion on this topic, check out <a href='https://github.com/srid/emanote/discussions/438' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>this discussion on GitHub</a>.
     </p>
   
     <!-- Screen: hidden (popup is the UI). Print: revealed with standard
@@ -1962,7 +1966,7 @@
       <ol class='list-decimal pl-6 space-y-2'>
         
           <li data-footnote-id='1'>
-            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{class=".."}</code> syntax, rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lg:grid-cols-2</code>).
+            If you are viewing this page on mobile or smaller screens, the embedded notes will be stacked on top of one another because we use Tailwind’s <a href='https://tailwindcss.com/docs/responsive-design' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>responsive classes</a>. Incidentally, we use the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{class=".."}</code> syntax, rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{.someClass}</code> syntax, only because the former is <a href='https://github.com/jgm/commonmark-hs/issues/76' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>more lenient</a> in accepting non-standard class names, such as the Tailwind responsive classes (eg. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lg:grid-cols-2</code>).
           </li>
         
       </ol>
@@ -2052,35 +2056,38 @@
       
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
+
       
-  <div id='backlinks' class='flex-1 mt-8'>
-    <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>Links to this page</header>
-    <ul class='grid grid-cols-1 md:grid-cols-2 gap-3'>
+  <div id='backlinks' class='flex-1 mt-8 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm'>
+    <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>
+      Links to this page
+    </header>
+    <ul class='space-y-4'>
       
-        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
-          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='markdown'>
+        <li class='group'>
+          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='markdown'>
             Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
           </a>
           
-            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
+            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code>==</code> (ie. <code>==inline text==</code>).<sup>*</sup> The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.</p></div>
+      <div><p>You can highlight any <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>inline text</span> by wraping them in <code>==</code> (ie. <code>==inline text==</code>).<sup>*</sup> The CSS style for highlighted inlines can be specified in <a href='custom-style' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>index.yaml</a>. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🍓 give a <strong>distinction</strong> on top</span> of it all.</p></div>
     </div>
   
 </div>
           
         </li>
       
-        <li class='group bg-white dark:bg-gray-950 border-l-2 border-primary-400 dark:border-primary-500 rounded-r-md p-3 shadow-sm hover:shadow-md hover:border-primary-600 dark:hover:border-primary-300 transition-shadow has-[[data-wikilink-type=WikiLinkEmbed]]:border-l-4 has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-600 dark:has-[[data-wikilink-type=WikiLinkEmbed]]:border-primary-400'>
-          <a class="text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline block mb-1 after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-50 after:rounded after:align-[0.15em] dark:after:text-primary-200 dark:after:bg-primary-900" href='external-links'>
+        <li class='group'>
+          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='external-links'>
             External links
           </a>
           
-            <div class='overflow-x-auto text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em]'>
+            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-700 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-700 dark:text-primary-300 font-semibold no-underline hover:underline decoration-primary-500' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
+      <div><p>The displayed icon may depend on the link properties (e.g. the actual URI scheme). This is <a href='custom-style' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>customized using CSS</a>. By default, Emanote displays a different icon if the URI scheme component is <code>mailto:</code>. Check the <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/tree/master/emanote/default/templates/base.tpl</a> of <a href='html-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>HTML template</a> for details.</p></div>
     </div>
   
 </div>

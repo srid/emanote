@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=374e8f26-30db-4860-ae7f-5cd6e69eb746' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=51eae785-0ec8-4e50-a43d-9bc8cc76ee93' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -775,7 +775,7 @@
 
 
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -784,15 +784,16 @@
     <span class='flex-shrink-0'>
       
         
-          
+          <a href='daily-notes' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
+      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
+        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
       </svg>
     
   
-        
+          </a>
+          
       
     </span>
     <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
@@ -800,7 +801,10 @@
     </a>
     
       
-        
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
+      
     
   </div>
 
@@ -1375,7 +1379,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      MCP support is rolling out in phases (<a href='https://github.com/srid/emanote/issues/645' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><span class='font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm emanote:inline-tag:645' title='Tag' data-tag='645'>#645</span></a>). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
+      MCP support is rolling out in phases (<a href='https://github.com/srid/emanote/issues/645' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><span class='font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm emanote:inline-tag:645' title='Tag' data-tag='645'>#645</span></a>). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
     </p>
   
   </div>
@@ -1388,7 +1392,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote can expose an <a href='https://modelcontextprotocol.io' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>MCP (Model Context Protocol)</a> endpoint beside its <span title='Link is broken'><s>[[live-server|live server]]</s>❌</span>, so that <a href='https://claude.com/claude-code' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Claude Code</a>, <a href='https://github.com/openai/codex' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Codex</a>, or any other MCP-aware client can query your notebook directly from the same process that renders it.
+      Emanote can expose an <a href='https://modelcontextprotocol.io' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>MCP (Model Context Protocol)</a> endpoint beside its <span title='Link is broken'><s>[[live-server|live server]]</s>❌</span>, so that <a href='https://claude.com/claude-code' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Claude Code</a>, <a href='https://github.com/openai/codex' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Codex</a>, or any other MCP-aware client can query your notebook directly from the same process that renders it.
     </p>
   
     <p class='mb-4 leading-relaxed'>
@@ -1458,7 +1462,7 @@
     </h3>
   
     <p class='mb-4 leading-relaxed'>
-      Codex uses <a href='https://github.com/openai/codex#mcp-servers' class='text-primary-700 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>~/.codex/config.toml</code></a> for MCP servers. HTTP transport wiring looks like:
+      Codex uses <a href='https://github.com/openai/codex#mcp-servers' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>~/.codex/config.toml</code></a> for MCP servers. HTTP transport wiring looks like:
     </p>
   <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='toml'><span class='kw'>[mcp_servers.emanote]</span>
 <span class='dt'>url</span> <span class='op'>=</span> <span class='st'>"http://localhost:8079/mcp"</span>
@@ -1636,6 +1640,7 @@
       
     <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
       
+
       
 
     </div>

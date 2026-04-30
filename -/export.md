@@ -133,6 +133,51 @@ If you create notes named `YYYY-MM-DD.md`, Emanote will treat them as daily note
 1. The backlinks panel will render daily notes separate from regular notes. The daily notes will be rendered as a "timeline" in reverse chronological order.
 2. Each daily note automatically gets a hierarchical tag (eg: `#calendar/2025/03`) allowing you to browse them by calendar navigation in the tag index.
 
+## Timeline backlinks demo
+
+The sample notes below all link back to this page. Notes whose filenames begin
+with `YYYY-MM-DD` show up in the Timeline panel at the end of this page, while
+the ordinary backlink from the [[obsmd|Obsidian]] note shows up in the regular
+"Links to this page" panel.
+
+```query
+path:./*
+```
+
+
+===
+
+<!-- Source: guide/daily-notes/2025-03-14.md -->
+<!-- URL: https://emanote.srid.ca/guide/daily-notes/2025-03-14 -->
+<!-- Title: 2025-03-14 -->
+<!-- Wikilinks: [[guide/daily-notes/2025-03-14]], [[daily-notes/2025-03-14]], [[2025-03-14]] -->
+
+---
+date: 2025-03-14
+---
+
+# 2025-03-14
+
+Captured a short thought about [[daily-notes]] while reviewing how dated notes become
+timeline backlinks.
+
+
+===
+
+<!-- Source: guide/daily-notes/2025-03-15.md -->
+<!-- URL: https://emanote.srid.ca/guide/daily-notes/2025-03-15 -->
+<!-- Title: 2025-03-15 -->
+<!-- Wikilinks: [[guide/daily-notes/2025-03-15]], [[daily-notes/2025-03-15]], [[2025-03-15]] -->
+
+---
+date: 2025-03-15
+---
+
+# 2025-03-15
+
+Another daily note can mention [[daily-notes]] from a different day, making the target
+page read like a lightweight activity stream.
+
 
 ===
 
@@ -2312,11 +2357,12 @@ slug: obsidian
 
 # Obsidian
 
-The freeware software [Obsidian](https://obsidian.md/) can be used to edit Markdown files. Emanote's live preview can be embedded using the [builtin web viewer][wv].
+The freeware software [Obsidian](https://obsidian.md/) can be used to edit Markdown files. Emanote's live preview can be embedded using Obsidian's built-in web viewer.
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Works very well with Emanote. <br><br>Screenshot shows editing of <a href="https://twitter.com/nixos_asia?ref_src=twsrc%5Etfw">@nixos_asia</a> website. <a href="https://t.co/Arvm2G70ZV">https://t.co/Arvm2G70ZV</a> <a href="https://t.co/cHVkdhAiWa">pic.twitter.com/cHVkdhAiWa</a></p>&mdash; Sridhar Ratnakumar (@sridca) <a href="https://twitter.com/sridca/status/1885689843704807873?ref_src=twsrc%5Etfw">February 1, 2025</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-[wv]: https://x.com/sridca/status/1885689843704807873
+If you use Obsidian's Daily Notes plugin, Emanote can render those
+date-prefixed notes as [[daily-notes|daily notes]] with timeline backlinks.
+Emanote also supports other Obsidian-inspired Markdown features, including
+[[callout|callouts]] and [[embed|embeds]].
 
 
 ===
