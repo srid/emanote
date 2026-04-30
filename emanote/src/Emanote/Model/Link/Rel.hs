@@ -32,7 +32,12 @@ data Rel = Rel
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
   , _relSrcPos :: Int
-  -- ^ Tie-breaker index assigned in 'noteRels' construction order. Within
+  -- ^ Presentation-layer artifact, not a graph-semantics fact. Consumed
+  -- by 'Emanote.Model.Graph.modelLookupBacklinks' (transitively, via
+  -- 'IxSet.toList'\'s 'Ord'-driven order) to render backlink context
+  -- cards in the order their links appeared in the source note. Other
+  -- consumers of 'Rel' do not depend on this field; treat it as opaque.
+  -- Tie-breaker index assigned in 'noteRels' construction order. Within
   -- the rels that share @(_relFrom, _relTo)@, this preserves the order in
   -- which 'Text.Pandoc.LinkContext.queryLinksWithContext' yielded their
   -- contexts — i.e. source order for multiple links to the same target
