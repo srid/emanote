@@ -47,6 +47,22 @@ mkRouteFromSlugs :: NonEmpty Slug -> R ext
 mkRouteFromSlugs =
   R
 
+{- | Re-add a trailing @"index"@ slug when the route ends in @"index"@ and has
+more than one slug. Inverse of `mkRouteFromFilePath'` @True@'s "drop trailing
+index" rule.
+
+When an LML route is converted to an `R` @'Html@ for URL emission, the
+trailing @"index"@ slug must be re-added so that Ema's pretty URL strip
+still leaves the folder name visible. Without this, a folder named @index@
+collides with its grandparent: @foo\/index\/index.md@ (LML route
+@("foo","index")@) would encode to @foo\/index.html@ and pretty-URL to
+@\/foo\/@ (the URL of @foo.md@) instead of @\/foo\/index\/@. See #542.
+-}
+expandIndexSlug :: NonEmpty Slug -> NonEmpty Slug
+expandIndexSlug slugs
+  | length slugs > 1 && last slugs == "index" = slugs <> one "index"
+  | otherwise = slugs
+
 -- | If the route is a single-slug URL, return the only slug.
 routeSlug :: R ext -> Maybe Slug
 routeSlug r = do

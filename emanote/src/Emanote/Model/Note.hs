@@ -219,12 +219,12 @@ noteXmlRoute note
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
-  -- Favour slug if one exists, otherwise use the full path.
-  case noteSlug note of
-    Nothing ->
-      R.withLmlRoute coerce _noteRoute
-    Just slugs ->
-      R.mkRouteFromSlugs slugs
+  -- Favour slug if one exists, otherwise use the full path. In both cases
+  -- expand a trailing "index" slug so URL encoding round-trips through
+  -- pretty URLs (see `R.expandIndexSlug` and #542).
+  R.mkRouteFromSlugs $ R.expandIndexSlug $ case noteSlug note of
+    Just slugs -> slugs
+    Nothing -> R.unRoute (R.withLmlRoute coerce _noteRoute :: R 'R.Html)
 
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =

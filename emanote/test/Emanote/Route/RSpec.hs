@@ -13,6 +13,7 @@ spec :: Spec
 spec = do
   mkRouteFromFilePathSpec
   routeInitsSpec
+  expandIndexSlugSpec
 
 mkRouteFromFilePathSpec :: Spec
 mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
@@ -34,6 +35,13 @@ mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
       mkRouteFromFilePath' True "foo/index.md" === Just r1
     it "three slugs" . hedgehog $ do
       mkRouteFromFilePath' True "foo/bar/index.md" === Just r2
+    it "nested index folder file (#542)" . hedgehog $ do
+      -- foo/index/index.md keeps the folder slug; only the trailing
+      -- filename "index" is dropped.
+      mkRouteFromFilePath' True "foo/index/index.md" === Just (R $ "foo" :| ["index"])
+    it "deeply nested index folders (#542)" . hedgehog $ do
+      mkRouteFromFilePath' True "index/index/index/example.md"
+        === Just (R $ "index" :| ["index", "index", "example"])
 
 routeInitsSpec :: Spec
 routeInitsSpec = describe "routeInits" $ do
@@ -46,6 +54,23 @@ routeInitsSpec = describe "routeInits" $ do
       routeInits r2 === rIndex :| [r1, r2]
     it "three slugs returns index, first slug, second slug, and itself" . hedgehog $ do
       routeInits r3 === rIndex :| [r1, r2, r3]
+
+expandIndexSlugSpec :: Spec
+expandIndexSlugSpec = describe "expandIndexSlug" $ do
+  it "leaves the lone index slug alone" . hedgehog $ do
+    expandIndexSlug ("index" :| []) === "index" :| []
+  it "leaves a single non-index slug alone" . hedgehog $ do
+    expandIndexSlug ("foo" :| []) === "foo" :| []
+  it "leaves multi-slug routes ending in non-index alone" . hedgehog $ do
+    expandIndexSlug ("foo" :| ["bar"]) === "foo" :| ["bar"]
+  it "appends an index slug when a multi-slug route ends in index (#542)" . hedgehog $ do
+    -- LML route for `foo/index/index.md` is ("foo","index"); its HTML route
+    -- must encode to `foo/index/index.html` so pretty URL yields /foo/index/.
+    expandIndexSlug ("foo" :| ["index"]) === "foo" :| ["index", "index"]
+  it "appends index for nested index folders (#542)" . hedgehog $ do
+    -- Folder placeholder for index/index/index/.
+    expandIndexSlug ("index" :| ["index", "index"])
+      === "index" :| ["index", "index", "index"]
 
 r1 :: R ('LMLType 'Md)
 r1 = R $ "foo" :| []
