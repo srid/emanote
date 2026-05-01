@@ -38,10 +38,9 @@ mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
     it "nested index folder file (#542)" . hedgehog $ do
       -- foo/index/index.md keeps the folder slug; only the trailing
       -- filename "index" is dropped.
-      mkRouteFromFilePath' True "foo/index/index.md" === Just (R $ "foo" :| ["index"])
+      mkRouteFromFilePath' True "foo/index/index.md" === Just r1Index
     it "deeply nested index folders (#542)" . hedgehog $ do
-      mkRouteFromFilePath' True "index/index/index/example.md"
-        === Just (R $ "index" :| ["index", "index", "example"])
+      mkRouteFromFilePath' True "index/index/index/example.md" === Just rNested
 
 routeInitsSpec :: Spec
 routeInitsSpec = describe "routeInits" $ do
@@ -92,3 +91,7 @@ r3Index = R $ "foo" :| ["bar", "qux", "index"]
 
 rIndex :: R ('LMLType 'Md)
 rIndex = R $ "index" :| []
+
+-- Deeply nested index folders, exercising #542.
+rNested :: R ('LMLType 'Md)
+rNested = R $ "index" :| ["index", "index", "example"]
