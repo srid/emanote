@@ -34,6 +34,11 @@ mkRouteFromFilePath = mkRouteFromFilePath' False
 {- | Like `mkRouteFromFilePath` but drops the last slug if it's "index"
 
 Behaves like `mkRouteFromFilePath` for top-level files.
+
+Going the other way (route → URL) is therefore not the identity: callers
+emitting an HTML URL must run the slugs through `expandIndexSlug` so the
+folder slug survives Ema's pretty-URL strip when a folder is itself
+named @index@. See #542.
 -}
 mkRouteFromFilePath' :: forall a (ext :: FileType a). (HasExt ext) => Bool -> FilePath -> Maybe (R ext)
 mkRouteFromFilePath' dropIndex fp = do
