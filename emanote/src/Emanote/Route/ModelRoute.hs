@@ -17,6 +17,7 @@ module Emanote.Route.ModelRoute (
   possibleLmlRoutes,
   lmlRouteCase,
   withLmlRoute,
+  lmlToHtmlRoute,
   mkLMLRouteFromFilePath,
   mkLMLRouteFromKnownFilePath,
   isMdRoute,
@@ -25,7 +26,7 @@ module Emanote.Route.ModelRoute (
 ) where
 
 import Data.Aeson.Types (ToJSON)
-import Emanote.Route.Ext (FileType (AnyExt, LMLType, Xml), HasExt, LML (Md, Org))
+import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType, Xml), HasExt, LML (Md, Org))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
@@ -74,6 +75,26 @@ isMdRoute = \case
 
 withLmlRoute :: (forall lmlType. (HasExt ('LMLType lmlType)) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
+
+{- | Canonical `R 'Html` route for an LML route.
+
+The LML route is the *internal* identity Emanote assigns to a `.md` / `.org`
+note: `mkRouteFromFilePath' True` strips a trailing `index` slug so
+@foo/index.md@ and @foo.md@ share one route. Going the other way — to a URL —
+is therefore not the identity. `R.expandIndexSlug` re-adds the trailing
+@"index"@ slug whenever the LML route already ends in @"index"@ (and isn't
+the lone root) so that the encoded HTML path survives the second @"index"@
+strip Ema applies in `UrlPretty` mode. Without this step a folder also
+named @index@ collapses one real directory level — see #542.
+
+This is the only sanctioned way to convert an `LMLRoute` into an `R 'Html`
+intended for URL emission.
+-}
+lmlToHtmlRoute :: LMLRoute -> R 'Html
+lmlToHtmlRoute lmlR =
+  R.mkRouteFromSlugs
+    $ R.expandIndexSlug
+    $ R.unRoute (withLmlRoute coerce lmlR :: R 'Html)
 
 modelRouteCase ::
   ModelRoute ->
