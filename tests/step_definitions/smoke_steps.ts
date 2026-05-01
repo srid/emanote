@@ -771,6 +771,58 @@ Then(
   },
 );
 
+// #542 — for a note at `index/index/index/example.md`, the immediate-parent
+// breadcrumb (the folder placeholder for `index/index/index/`) used to emit
+// `/index/index/` because its LML route had its trailing `index` stripped by
+// the canonicalizer and Ema's URL strategy then stripped the next-trailing
+// `index`/`index.html`. Two strips composed and ate one real folder level.
+// The fix re-adds the trailing `index` slug at the LML→Html boundary, so the
+// breadcrumb now points to `/index/index/index/...`. Asserting on a substring
+// is enough — we don't care about the exact suffix shape (`/index/index/index`
+// vs `/index/index/index/index.html` etc.), only that *three* `index` segments
+// survive into the href. The negative assertion guards against any future
+// regression that produces a strict-prefix match where the third segment is
+// gone.
+const IMMEDIATE_PARENT_BREADCRUMB_SEL = "#breadcrumbs a";
+
+async function immediateParentBreadcrumbHref(
+  page: EmanoteWorld["page"],
+): Promise<string> {
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).last();
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Immediate-parent breadcrumb anchor has no href attribute. The breadcrumbs splice (Emanote.View.Common.routeBreadcrumbs) likely emitted the <a> without binding crumb:url.`,
+  );
+  return href;
+}
+
+Then(
+  "the immediate-parent breadcrumb href contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    assert.ok(
+      href.includes(needle),
+      `Immediate-parent breadcrumb href expected to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The trailing-index expansion regressed (R.expandIndexSlug or MR.lmlToHtmlRoute), so Ema's URL strip ate one folder level — see #542.`,
+    );
+  },
+);
+
+Then(
+  "the immediate-parent breadcrumb href does not equal {string}",
+  async function (this: EmanoteWorld, forbidden: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    // Tolerate a leading "/" or "./" — what we forbid is the exact buggy path.
+    const stripped = href.replace(/^\.?\//, "").replace(/\.html$/, "");
+    assert.notStrictEqual(
+      stripped,
+      forbidden,
+      `Immediate-parent breadcrumb href stripped to ${JSON.stringify(stripped)}, which equals the buggy #542 value ${JSON.stringify(forbidden)}. The expansion in noteHtmlRoute regressed.`,
+    );
+  },
+);
+
 // Stork dark/light theme mirror: stork.js's MutationObserver on
 // <html>.class flips the wrapper between stork-wrapper-edible and
 // stork-wrapper-edible-dark. Without one of those classes on the
