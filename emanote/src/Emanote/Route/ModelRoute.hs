@@ -79,7 +79,7 @@ withLmlRoute f = either f f . lmlRouteCase
 {- | Canonical `R 'Html` route for an LML route.
 
 The LML route is the *internal* identity Emanote assigns to a `.md` / `.org`
-note: `mkRouteFromFilePath' True` strips a trailing `index` slug so
+note: `mkLmlRouteFromFilePath` strips a trailing `index` slug so
 @foo/index.md@ and @foo.md@ share one route. Going the other way — to a URL —
 is therefore not the identity. `R.expandIndexSlug` re-adds the trailing
 @"index"@ slug whenever the LML route already ends in @"index"@ (and isn't
@@ -143,5 +143,5 @@ mkLMLRouteFromFilePath fp =
 mkLMLRouteFromKnownFilePath :: LML -> FilePath -> Maybe LMLRoute
 mkLMLRouteFromKnownFilePath lmlType fp =
   case lmlType of
-    Md -> fmap LMLRoute_Md (R.mkRouteFromFilePath' True fp)
-    Org -> fmap LMLRoute_Org (R.mkRouteFromFilePath' True fp)
+    Md -> fmap LMLRoute_Md (R.mkLmlRouteFromFilePath fp)
+    Org -> fmap LMLRoute_Org (R.mkLmlRouteFromFilePath fp)

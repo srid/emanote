@@ -97,7 +97,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
     R.Yaml ->
-      case R.mkRouteFromFilePath' True fp of
+      case R.mkLmlRouteFromFilePath fp of
         Nothing ->
           pure id
         Just r -> case action of

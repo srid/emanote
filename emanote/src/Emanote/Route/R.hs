@@ -29,22 +29,24 @@ instance (HasExt ext) => Show (R ext) where
 
 -- | Convert foo/bar.<ext> to a @R@
 mkRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
-mkRouteFromFilePath = mkRouteFromFilePath' False
+mkRouteFromFilePath fp = do
+  base <- withoutKnownExt @_ @ext fp
+  slugs <- nonEmpty $ fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
+  pure $ R slugs
 
-{- | Like `mkRouteFromFilePath` but drops the last slug if it's "index"
-
-Behaves like `mkRouteFromFilePath` for top-level files.
+{- | Like `mkRouteFromFilePath` but drops a trailing @"index"@ slug so that
+@foo/index.md@ shares one route with @foo.md@ (the LML "folder note"
+canonicalization). The lone root @index.md@ is preserved.
 
 Going the other way (route → URL) is therefore not the identity: callers
 emitting an HTML URL must run the slugs through `expandIndexSlug` so the
 folder slug survives Ema's pretty-URL strip when a folder is itself
 named @index@. See #542.
 -}
-mkRouteFromFilePath' :: forall a (ext :: FileType a). (HasExt ext) => Bool -> FilePath -> Maybe (R ext)
-mkRouteFromFilePath' dropIndex fp = do
-  base <- withoutKnownExt @_ @ext fp
-  slugs <- nonEmpty $ fromString . toString . T.dropWhileEnd (== '/') . toText <$> splitPath base
-  if dropIndex && length slugs > 1 && last slugs == "index"
+mkLmlRouteFromFilePath :: forall a (ext :: FileType a). (HasExt ext) => FilePath -> Maybe (R ext)
+mkLmlRouteFromFilePath fp = do
+  R slugs <- mkRouteFromFilePath @a @ext fp
+  if length slugs > 1 && last slugs == "index"
     then viaNonEmpty R $ init slugs
     else pure $ R slugs
 
@@ -53,7 +55,7 @@ mkRouteFromSlugs =
   R
 
 {- | Re-add a trailing @"index"@ slug when the route ends in @"index"@ and has
-more than one slug. Inverse of `mkRouteFromFilePath'` @True@'s "drop trailing
+more than one slug. Inverse of `mkLmlRouteFromFilePath`'s "drop trailing
 index" rule.
 
 When an LML route is converted to an `R` @'Html@ for URL emission, the

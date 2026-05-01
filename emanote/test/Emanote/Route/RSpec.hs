@@ -16,8 +16,8 @@ spec = do
   expandIndexSlugSpec
 
 mkRouteFromFilePathSpec :: Spec
-mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
-  describe "basic" $ do
+mkRouteFromFilePathSpec = do
+  describe "mkRouteFromFilePath" $ do
     it "index route" . hedgehog $ do
       mkRouteFromFilePath @_ @SomeExt "index.md" === Just indexRoute
     it "single slug" . hedgehog $ do
@@ -26,21 +26,21 @@ mkRouteFromFilePathSpec = describe "mkRouteFromFilePath" $ do
       mkRouteFromFilePath "foo/bar.md" === Just r2
     it "three slugs" . hedgehog $ do
       mkRouteFromFilePath "foo/bar/qux.md" === Just r3
-  describe "dropIndex" $ do
+  describe "mkLmlRouteFromFilePath" $ do
     it "index route" . hedgehog $ do
-      mkRouteFromFilePath' True "index.md" === Just rIndex
+      mkLmlRouteFromFilePath "index.md" === Just rIndex
     it "single slug" . hedgehog $ do
-      mkRouteFromFilePath' True "foo.md" === Just r1
+      mkLmlRouteFromFilePath "foo.md" === Just r1
     it "two slugs" . hedgehog $ do
-      mkRouteFromFilePath' True "foo/index.md" === Just r1
+      mkLmlRouteFromFilePath "foo/index.md" === Just r1
     it "three slugs" . hedgehog $ do
-      mkRouteFromFilePath' True "foo/bar/index.md" === Just r2
+      mkLmlRouteFromFilePath "foo/bar/index.md" === Just r2
     it "nested index folder file (#542)" . hedgehog $ do
       -- foo/index/index.md keeps the folder slug; only the trailing
       -- filename "index" is dropped.
-      mkRouteFromFilePath' True "foo/index/index.md" === Just r1Index
+      mkLmlRouteFromFilePath "foo/index/index.md" === Just r1Index
     it "deeply nested index folders (#542)" . hedgehog $ do
-      mkRouteFromFilePath' True "index/index/index/example.md" === Just rNested
+      mkLmlRouteFromFilePath "index/index/index/example.md" === Just rNested
 
 routeInitsSpec :: Spec
 routeInitsSpec = describe "routeInits" $ do
