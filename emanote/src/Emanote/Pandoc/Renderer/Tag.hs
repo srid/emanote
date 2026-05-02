@@ -12,6 +12,11 @@ import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Relude
 import Text.Pandoc.Definition qualified as B
 
+{- | Render semantic hashtag spans as links to their tag index page.
+
+This lives in the renderer rather than 'preparePandoc' so tag URLs use the
+model-aware site route encoder.
+-}
 tagLinkSplice :: PandocInlineRenderer Model R.LMLRoute
 tagLinkSplice model _nr (ctxSansCustomSplicing -> ctx) _route inline = do
   tag <- HT.getTagFromInline inline

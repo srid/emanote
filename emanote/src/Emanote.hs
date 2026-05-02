@@ -153,7 +153,8 @@ defaultEmanotePandocRenderers =
   let blockRenderers =
         PandocRenderers
           [ PF.tagLinkSplice
-          , PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          , -- Keep the embed resolver before the generic URL resolver so inline embed links render as embeds.
+            PF.embedInlineWikiLinkResolvingSplice
           , PF.urlResolvingSplice
           ]
           [ PF.embedBlockWikiLinkResolvingSplice
@@ -164,7 +165,8 @@ defaultEmanotePandocRenderers =
       inlineRenderers =
         PandocRenderers
           [ PF.tagLinkSplice
-          , PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          , -- Keep the embed resolver before the generic URL resolver so inline embed links render as embeds.
+            PF.embedInlineWikiLinkResolvingSplice
           , PF.urlResolvingSplice
           ]
           mempty
