@@ -120,16 +120,18 @@ defaultRouteMeta model =
       meta = Meta.getEffectiveRouteMeta r model
    in (r, meta)
 
-templateMeta :: Model -> Aeson.Value -> Aeson.Value
-templateMeta model meta =
-  SData.modifyAeson (one "tagMetas") (const $ Just $ Aeson.toJSON tagMetas) meta
-  where
-    tagMetas =
-      SData.lookupAeson @[HT.Tag] mempty (one "tags") meta <&> \tag ->
-        Aeson.object
-          [ "value" Aeson..= HT.unTag tag
-          , "url" Aeson..= SR.siteRouteUrl model (SR.tagIndexRoute $ toList $ HT.deconstructTag tag)
-          ]
+tagMetas :: Model -> Aeson.Value -> [(Text, Text)]
+tagMetas model meta =
+  SData.lookupAeson @[HT.Tag] mempty (one "tags") meta <&> \tag ->
+    ( HT.unTag tag
+    , SR.siteRouteUrl model (SR.tagIndexRoute $ toList $ HT.deconstructTag tag)
+    )
+
+tagMetasSplice :: Model -> Aeson.Value -> HI.Splice Identity
+tagMetasSplice model meta =
+  Splices.listSplice (tagMetas model meta) "ema:each-tagMeta" $ \(value, url) -> do
+    "tag:value" ## HI.textSplice value
+    "tag:url" ## HI.textSplice url
 
 commonSplices ::
   (HasCallStack) =>
@@ -169,7 +171,9 @@ commonSplices withCtx model meta routeTitle = do
   "ema:version" ##
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
-    HJ.bindJson (templateMeta model meta)
+    HJ.bindJson meta
+  "ema:tagMetas" ##
+    tagMetasSplice model meta
   "ema:title" ##
     withCtx
       $ \ctx ->

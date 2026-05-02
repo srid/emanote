@@ -1,13 +1,13 @@
-<ema:metadata>
-  <section
-    class="flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm">
-    <with var="tagMetas">
+<section
+  class="flex flex-wrap items-end justify-center my-4 space-x-2 space-y-2 font-mono text-sm">
+  <ema:tagMetas>
+    <ema:each-tagMeta>
       <a title="Tag" class="px-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-primary-500"
-        href="${url}">
+        href="${tag:url}">
         <!-- DoNotFormat -->
-        #<value var="value" />
+        #<tag:value />
         <!-- DoNotFormat -->
       </a>
-    </with>
-  </section>
-</ema:metadata>
+    </ema:each-tagMeta>
+  </ema:tagMetas>
+</section>
