@@ -130,29 +130,17 @@ encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
 
-{- | URL form of `encodeTagIndexR` that percent-encodes each path segment.
+{- | URL form of `encodeTagIndexR`, with each path segment percent-encoded
+via `Slug.encodeSlug`. Always emits the @.html@ suffix.
 
-Tags can contain characters reserved by RFC 3986 — most importantly @\#@,
-which Zettelkasten conventions use to mark "structure note" tags like
-@##§1@. Without encoding, the literal @\#@ in the @href@ truncates the
-URL into a fragment in the browser. See #199.
+Exists because the Pandoc filter that rewrites inline @\#tag@ syntax
+('Emanote.Pandoc.BuiltinFilters.linkifyInlineTags') has no @Model@ in
+scope and so cannot reach 'Emanote.Route.SiteRoute.Class.siteRouteUrl'.
+Anywhere a @Model@ /is/ available, prefer @siteRouteUrl@.
 
-Exists because the Pandoc filter that linkifies inline @\#tag@ syntax
-('Emanote.Pandoc.BuiltinFilters.linkifyInlineTags') has no @Model@
-reachable, so it cannot route through 'Emanote.Route.SiteRoute.Class.siteRouteUrl'
-(which percent-encodes via Ema's 'Ema.routeUrlWith' /
-@filepathToUrl@). Anywhere a @Model@ is in scope — e.g. the
-'Emanote.View.Common.commonSplices' tag-list splice or
-'Emanote.View.TagIndex' breadcrumbs — prefer @siteRouteUrl@ and let
-Ema's encoder do the work.
-
-Invariant: for any @tagNodes@, this must agree with
-@siteRouteUrl model (tagIndexRoute tagNodes)@ when the model's URL
-strategy is 'Ema.UrlDirect' (the Pandoc-filter site-wide assumption —
-inline tag links are always emitted with the @.html@ suffix because
-the filter cannot read the per-site URL strategy). If 'Slug.encodeSlug'
-or 'encodeTagIndexR' changes, both this function and Ema's encoder must
-keep producing the same output.
+Invariant: agrees with @siteRouteUrl model (tagIndexRoute t)@ under
+'Ema.UrlDirect'. If 'Slug.encodeSlug' or 'encodeTagIndexR' changes,
+both encoders must keep producing the same output. See #199.
 -}
 encodeTagIndexUrl :: [HT.TagNode] -> Text
 encodeTagIndexUrl tagNodes =
