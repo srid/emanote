@@ -31,6 +31,7 @@ import Emanote.Pandoc.Renderer
 import Emanote.Pandoc.Renderer.Callout qualified as PF
 import Emanote.Pandoc.Renderer.Embed qualified as PF
 import Emanote.Pandoc.Renderer.Query qualified as PF
+import Emanote.Pandoc.Renderer.Tag qualified as PF
 import Emanote.Pandoc.Renderer.Url qualified as PF
 import Emanote.Prelude (log, logE, logW)
 import Emanote.Route.ModelRoute (LMLRoute, lmlRouteCase)
@@ -151,7 +152,8 @@ defaultEmanotePandocRenderers :: EmanotePandocRenderers Model.Model LMLRoute
 defaultEmanotePandocRenderers =
   let blockRenderers =
         PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          [ PF.tagLinkSplice
+          , PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
           , PF.urlResolvingSplice
           ]
           [ PF.embedBlockWikiLinkResolvingSplice
@@ -161,7 +163,8 @@ defaultEmanotePandocRenderers =
           ]
       inlineRenderers =
         PandocRenderers
-          [ PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
+          [ PF.tagLinkSplice
+          , PF.embedInlineWikiLinkResolvingSplice -- embedInlineWikiLinkResolvingSplice should be first to recognize inline Link elements first
           , PF.urlResolvingSplice
           ]
           mempty

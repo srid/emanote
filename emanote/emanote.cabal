@@ -195,6 +195,7 @@ library
     Emanote.Pandoc.Renderer.Callout
     Emanote.Pandoc.Renderer.Embed
     Emanote.Pandoc.Renderer.Query
+    Emanote.Pandoc.Renderer.Tag
     Emanote.Pandoc.Renderer.Url
     Emanote.Prelude
     Emanote.Route

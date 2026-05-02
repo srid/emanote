@@ -7,8 +7,6 @@ module Emanote.Route.SiteRoute.Type (
   ResourceRoute (..),
   decodeVirtualRoute,
   encodeVirtualRoute,
-  encodeTagIndexR,
-  encodeTagIndexUrl,
 ) where
 
 import Data.Aeson (ToJSON)
@@ -128,15 +126,3 @@ encodeExportR = \case
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
-
-encodeTagIndexUrl :: [HT.TagNode] -> FilePath
-encodeTagIndexUrl =
-  R.encodeRoute . mapRouteSlugs encodeSlugForUrl . encodeTagIndexR
-  where
-    encodeSlugForUrl :: Slug.Slug -> Slug.Slug
-    encodeSlugForUrl =
-      fromString . toString . Slug.encodeSlug
-
-    mapRouteSlugs :: (Slug.Slug -> Slug.Slug) -> R.R ext -> R.R ext
-    mapRouteSlugs f (R.R slugs) =
-      R.R $ fmap f slugs

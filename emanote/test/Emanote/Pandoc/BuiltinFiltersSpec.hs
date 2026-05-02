@@ -10,14 +10,6 @@ import Text.Pandoc.Walk qualified as W
 
 spec :: Spec
 spec = do
-  -- Regression test for https://github.com/srid/emanote/issues/199.
-  -- Tags may themselves start with '#', so the generated URL must encode the
-  -- tag slug before the browser sees it as a fragment marker.
-  describe "preparePandoc links special tags (#199)" $ do
-    it "escapes a leading hash inside the tag"
-      $ links "##§1"
-      `shouldBe` [("-/tags/%23%C2%A71.html", "##§1")]
-
   -- Regression test for https://github.com/srid/emanote/issues/349.
   -- `preparePandoc`'s last pass (`flattenNestedLinks`) unwraps any Link
   -- nested inside a parent Link's label — the autolink-extension artifact

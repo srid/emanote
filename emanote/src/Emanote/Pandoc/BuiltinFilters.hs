@@ -3,35 +3,15 @@ module Emanote.Pandoc.BuiltinFilters (
 ) where
 
 import Emanote.Pandoc.ExternalLink (setExternalLinkIcon)
-import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Route.SiteRoute.Type (encodeTagIndexUrl)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
 
 preparePandoc :: (W.Walkable B.Inline b) => b -> b
 preparePandoc =
-  linkifyInlineTags
-    >>> fixEmojiFontFamily
+  fixEmojiFontFamily
     >>> setExternalLinkIcon
     >>> flattenNestedLinks
-
--- HashTag.hs generates a Span for inline tags.
--- Here, we must link them to the special tag index page.
-linkifyInlineTags :: (W.Walkable B.Inline b) => b -> b
-linkifyInlineTags =
-  W.walk $ \case
-    inline@(B.Span attr is) ->
-      if
-        | Just inlineTag <- HT.getTagFromInline inline ->
-            B.Span attr [B.Link mempty is (tagUrl inlineTag, "Tag")]
-        | otherwise ->
-            inline
-    x ->
-      x
-  where
-    tagUrl =
-      toText . encodeTagIndexUrl . toList . HT.deconstructTag
 
 -- Undo font-family on emoji spans, so the browser uses an emoji font.
 -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
