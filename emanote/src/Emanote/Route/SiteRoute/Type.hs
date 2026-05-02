@@ -8,9 +8,11 @@ module Emanote.Route.SiteRoute.Type (
   decodeVirtualRoute,
   encodeVirtualRoute,
   encodeTagIndexR,
+  encodeTagIndexUrl,
 ) where
 
 import Data.Aeson (ToJSON)
+import Data.Text qualified as T
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route.Ext qualified as Ext
 import Emanote.Route.ModelRoute (LMLRoute, LMLView, StaticFileRoute, lmlRouteCase)
@@ -127,3 +129,15 @@ encodeExportR = \case
 encodeTagIndexR :: [HT.TagNode] -> R.R 'Ext.Html
 encodeTagIndexR tagNodes =
   R.R $ "-" :| "tags" : fmap (fromString . toString . HT.unTagNode) tagNodes
+
+{- | URL form of `encodeTagIndexR` that percent-encodes each path segment.
+
+Tags can contain characters reserved by RFC 3986 — most importantly @\#@,
+which Zettelkasten conventions use to mark "structure note" tags like
+@##§1@. Without encoding, the literal @\#@ in the @href@ truncates the
+URL into a fragment in the browser. See #199.
+-}
+encodeTagIndexUrl :: [HT.TagNode] -> Text
+encodeTagIndexUrl tagNodes =
+  let parts = Slug.encodeSlug <$> R.unRoute (encodeTagIndexR tagNodes)
+   in T.intercalate "/" (toList parts) <> ".html"
