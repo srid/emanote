@@ -771,6 +771,109 @@ Then(
   },
 );
 
+// #542 — for a note at `index/index/index/example.md`, the immediate-parent
+// breadcrumb (the folder placeholder for `index/index/index/`) used to emit
+// `/index/index/` because its LML route had its trailing `index` stripped by
+// the canonicalizer and Ema's URL strategy then stripped the next-trailing
+// `index`/`index.html`. Two strips composed and ate one real folder level.
+// The fix re-adds the trailing `index` slug at the LML→Html boundary, so the
+// breadcrumb now points to `/index/index/index/...`. Asserting on a substring
+// is enough — we don't care about the exact suffix shape (`/index/index/index`
+// vs `/index/index/index/index.html` etc.), only that *three* `index` segments
+// survive into the href. The negative assertion guards against any future
+// regression that produces a strict-prefix match where the third segment is
+// gone.
+const IMMEDIATE_PARENT_BREADCRUMB_SEL = "#breadcrumbs a";
+
+async function immediateParentBreadcrumbHref(
+  page: EmanoteWorld["page"],
+): Promise<string> {
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).last();
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Immediate-parent breadcrumb anchor has no href attribute. The breadcrumbs splice (Emanote.View.Common.routeBreadcrumbs) likely emitted the <a> without binding crumb:url.`,
+  );
+  return href;
+}
+
+Then(
+  "the immediate-parent breadcrumb href contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    assert.ok(
+      href.includes(needle),
+      `Immediate-parent breadcrumb href expected to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The trailing-index expansion regressed (R.expandIndexSlug or MR.lmlToHtmlRoute), so Ema's URL strip ate one folder level — see #542.`,
+    );
+  },
+);
+
+Then(
+  "the immediate-parent breadcrumb href does not equal {string}",
+  async function (this: EmanoteWorld, forbidden: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    // Tolerate a leading "/" or "./" — what we forbid is the exact buggy path.
+    const stripped = href.replace(/^\.?\//, "").replace(/\.html$/, "");
+    assert.notStrictEqual(
+      stripped,
+      forbidden,
+      `Immediate-parent breadcrumb href stripped to ${JSON.stringify(stripped)}, which equals the buggy #542 value ${JSON.stringify(forbidden)}. The expansion in noteHtmlRoute regressed.`,
+    );
+  },
+);
+
+// Coexistence guard for #542: when a folder note (`foo/index.md`) sits next
+// to a deeper same-named folder (`foo/index/...`), each breadcrumb position
+// must point at a *different* URL. Pre-fix, both collapsed onto `/foo` —
+// the IxNote dedup would either drop one note or surface an "ambiguous
+// notes" error. Asserting on positional hrefs is the smallest change that
+// catches a re-collision: depth-1 must reach the folder note, depth-2 must
+// reach the deeper placeholder, and they must not be equal.
+async function breadcrumbHrefAt(
+  page: EmanoteWorld["page"],
+  depth: number,
+): Promise<string> {
+  // Skip the root indexRoute — emanote's routeInits emits it twice for any
+  // route whose first slug is "index", so depth-counting from "index"-first
+  // routes would otherwise drift by one. We index from the first non-root
+  // crumb the breadcrumb component renders, which is `<a>` #N (zero-based),
+  // matching how a reader counts "subfolder is the first link, subfolder/index
+  // is the second".
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).nth(depth);
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Breadcrumb anchor at depth ${depth} has no href attribute.`,
+  );
+  return href;
+}
+
+Then(
+  "the breadcrumb at depth {int} has href containing {string}",
+  async function (this: EmanoteWorld, depth: number, needle: string) {
+    const href = await breadcrumbHrefAt(this.page, depth);
+    assert.ok(
+      href.includes(needle),
+      `Breadcrumb at depth ${depth} expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The folder-note vs nested-index-folder distinction collapsed — likely the trailing-index expansion regressed.`,
+    );
+  },
+);
+
+Then(
+  "the breadcrumb at depth {int} has a different href from depth {int}",
+  async function (this: EmanoteWorld, a: number, b: number) {
+    const hrefA = await breadcrumbHrefAt(this.page, a);
+    const hrefB = await breadcrumbHrefAt(this.page, b);
+    assert.notStrictEqual(
+      hrefA,
+      hrefB,
+      `Breadcrumbs at depths ${a} and ${b} share href ${JSON.stringify(hrefA)} — the folder note at /foo/ has re-collided with the placeholder for /foo/index/ (the #542 regression at the IxNote level).`,
+    );
+  },
+);
+
 // Stork dark/light theme mirror: stork.js's MutationObserver on
 // <html>.class flips the wrapper between stork-wrapper-edible and
 // stork-wrapper-edible-dark. Without one of those classes on the

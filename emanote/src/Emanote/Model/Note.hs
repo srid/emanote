@@ -27,6 +27,7 @@ import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.Ext (FileType (Folder))
+import Emanote.Route.ModelRoute qualified as MR
 import Emanote.Route.R (R)
 import Emanote.Source.Loc (Loc)
 import Network.URI.Slug (Slug)
@@ -219,12 +220,14 @@ noteXmlRoute note
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
-  -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
-    Nothing ->
-      R.withLmlRoute coerce _noteRoute
     Just slugs ->
+      -- An explicit `slug:` is taken at face value: the user typed the URL.
       R.mkRouteFromSlugs slugs
+    Nothing ->
+      -- File-path-derived: route through the canonical LML→HTML conversion
+      -- so the trailing-index expansion isn't forgotten (see #542).
+      MR.lmlToHtmlRoute _noteRoute
 
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
