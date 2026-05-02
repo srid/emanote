@@ -28,13 +28,6 @@ spec = do
     it "URL inside emphasis inside a label"
       $ links "[**https://www.example.com**](http://target.com)"
       `shouldBe` [("http://target.com", "https://www.example.com")]
-  -- Regression test for https://github.com/srid/emanote/issues/199.
-  -- `linkifyInlineTags` rewrites inline `#tag` syntax into a Link to the
-  -- tag-index page. The URL it produces must percent-encode each path
-  -- segment, otherwise tags containing reserved URL characters (notably
-  -- `#`, used for Zettelkasten "structure note" tags like `##§1`) emit
-  -- a href the browser truncates at the literal `#` and treats as an
-  -- HTML fragment.
   describe "linkifyInlineTags percent-encodes special tag URLs (#199)" $ do
     -- Wrap each tag in a leading word so commonmark parses it as an inline
     -- (a bare `#tag` at start of line would be parsed as an ATX heading,
