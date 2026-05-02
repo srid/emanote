@@ -159,26 +159,9 @@ commonSplices withCtx model meta routeTitle = do
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
     HJ.bindJson meta
-  -- Iterate the page's tags with each tag bound to two child splices
-  -- consumed by `templates/components/metadata.tpl`:
-  --
-  --   ${ema:tag:url}    — the URL of the tag-index page for this tag,
-  --                       built via `siteRouteUrl` so it goes through
-  --                       Ema's `routeUrlWith` / `filepathToUrl` and
-  --                       picks up percent-encoding (so tags containing
-  --                       `#`, e.g. Zettelkasten "structure note" tags
-  --                       like `##§1`, or non-ASCII glyphs survive the
-  --                       trip through `href`) plus the configured URL
-  --                       strategy suffix (`.html` under `UrlDirect`,
-  --                       stripped under `UrlPretty`).
-  --                       Safe to drop straight into an `href` attribute.
-  --   <ema:tag:name />  — the raw tag string (e.g. `foo/bar`) for use
-  --                       as text content; HTML-escaped by Heist.
-  --
-  -- This precomputes the URL in Haskell because the encoding lives
-  -- there (Ema's encoder + the per-site URL strategy), not in the
-  -- JSON splices `ema:metadata` exposes — those continue to be
-  -- available for templates that just want raw tag names. See #199.
+  -- Precompute per-tag URLs because URL encoding lives in Haskell
+  -- (`siteRouteUrl` / Ema's `filepathToUrl`), not in the JSON-driven
+  -- splices `ema:metadata` exposes. See #199.
   "ema:tagsList" ## do
     let tags = SData.lookupAeson @[HT.Tag] mempty (one "tags") meta
     Splices.listSplice tags "ema:each-tag" $ \tag -> do
