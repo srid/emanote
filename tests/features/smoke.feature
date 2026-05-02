@@ -157,3 +157,9 @@ Feature: Smoke
     When I open "/index/index/index/example.html"
     Then the immediate-parent breadcrumb href contains "index/index/index"
     And the immediate-parent breadcrumb href does not equal "index/index"
+
+  Scenario: Folder note coexists with a same-named child folder (regression: #542)
+    When I open "/subfolder/index/example.html"
+    Then the breadcrumb at depth 1 has href containing "subfolder"
+    And the breadcrumb at depth 2 has href containing "subfolder/index"
+    And the breadcrumb at depth 1 has a different href from depth 2

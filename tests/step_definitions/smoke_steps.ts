@@ -823,6 +823,57 @@ Then(
   },
 );
 
+// Coexistence guard for #542: when a folder note (`foo/index.md`) sits next
+// to a deeper same-named folder (`foo/index/...`), each breadcrumb position
+// must point at a *different* URL. Pre-fix, both collapsed onto `/foo` —
+// the IxNote dedup would either drop one note or surface an "ambiguous
+// notes" error. Asserting on positional hrefs is the smallest change that
+// catches a re-collision: depth-1 must reach the folder note, depth-2 must
+// reach the deeper placeholder, and they must not be equal.
+async function breadcrumbHrefAt(
+  page: EmanoteWorld["page"],
+  depth: number,
+): Promise<string> {
+  // Skip the root indexRoute — emanote's routeInits emits it twice for any
+  // route whose first slug is "index", so depth-counting from "index"-first
+  // routes would otherwise drift by one. We index from the first non-root
+  // crumb the breadcrumb component renders, which is `<a>` #N (zero-based),
+  // matching how a reader counts "subfolder is the first link, subfolder/index
+  // is the second".
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).nth(depth);
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Breadcrumb anchor at depth ${depth} has no href attribute.`,
+  );
+  return href;
+}
+
+Then(
+  "the breadcrumb at depth {int} has href containing {string}",
+  async function (this: EmanoteWorld, depth: number, needle: string) {
+    const href = await breadcrumbHrefAt(this.page, depth);
+    assert.ok(
+      href.includes(needle),
+      `Breadcrumb at depth ${depth} expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The folder-note vs nested-index-folder distinction collapsed — likely the trailing-index expansion regressed.`,
+    );
+  },
+);
+
+Then(
+  "the breadcrumb at depth {int} has a different href from depth {int}",
+  async function (this: EmanoteWorld, a: number, b: number) {
+    const hrefA = await breadcrumbHrefAt(this.page, a);
+    const hrefB = await breadcrumbHrefAt(this.page, b);
+    assert.notStrictEqual(
+      hrefA,
+      hrefB,
+      `Breadcrumbs at depths ${a} and ${b} share href ${JSON.stringify(hrefA)} — the folder note at /foo/ has re-collided with the placeholder for /foo/index/ (the #542 regression at the IxNote level).`,
+    );
+  },
+);
+
 // Stork dark/light theme mirror: stork.js's MutationObserver on
 // <html>.class flips the wrapper between stork-wrapper-edible and
 // stork-wrapper-edible-dark. Without one of those classes on the
