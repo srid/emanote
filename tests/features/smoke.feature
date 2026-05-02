@@ -68,6 +68,10 @@ Feature: Smoke
     And the article link with text "https://issue349-case4.example.com" has href containing "issue349-case4-target.example.com"
     And the article body has exactly 4 hyperlinks to issue-349 case targets
 
+  Scenario: Tags beginning with # link to their encoded tag index (regression: #199)
+    When I open "/special-tags.html"
+    Then the page has 2 tag links with text "##§1" whose href contains "-/tags/%23%C2%A71"
+
   Scenario: A malformed YAML file is surfaced as a banner on its sibling note (regression: #285)
     When I open "/broken-285.html"
     Then the page rendered without an Ema exception

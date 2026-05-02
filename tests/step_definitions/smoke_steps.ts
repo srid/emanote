@@ -305,6 +305,36 @@ Then(
   },
 );
 
+Then(
+  "the page has {int} tag links with text {string} whose href contains {string}",
+  async function (
+    this: EmanoteWorld,
+    expectedCount: number,
+    linkText: string,
+    hrefNeedle: string,
+  ) {
+    const hrefs = await this.page.$$eval(
+      'a[title="Tag"]',
+      (anchors, text) =>
+        anchors
+          .filter((a) => (a.textContent ?? "").trim() === text)
+          .map((a) => a.getAttribute("href") ?? ""),
+      linkText,
+    );
+    assert.strictEqual(
+      hrefs.length,
+      expectedCount,
+      `Expected ${expectedCount} tag links with text ${JSON.stringify(linkText)}, got ${hrefs.length}: ${JSON.stringify(hrefs)}.`,
+    );
+    const offenders = hrefs.filter((href) => !href.includes(hrefNeedle));
+    assert.deepStrictEqual(
+      offenders,
+      [],
+      `Every tag link ${JSON.stringify(linkText)} should contain ${JSON.stringify(hrefNeedle)}; got ${JSON.stringify(hrefs)}. Literal '#' in the path is interpreted as a fragment, so the tag route must emit '%23'.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(

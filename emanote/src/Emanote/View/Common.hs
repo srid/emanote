@@ -22,6 +22,7 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Pandoc.Renderer.Embed qualified as Embed
@@ -119,6 +120,17 @@ defaultRouteMeta model =
       meta = Meta.getEffectiveRouteMeta r model
    in (r, meta)
 
+templateMeta :: Model -> Aeson.Value -> Aeson.Value
+templateMeta model meta =
+  SData.modifyAeson (one "tagMetas") (const $ Just $ Aeson.toJSON tagMetas) meta
+  where
+    tagMetas =
+      SData.lookupAeson @[HT.Tag] mempty (one "tags") meta <&> \tag ->
+        Aeson.object
+          [ "value" Aeson..= HT.unTag tag
+          , "url" Aeson..= SR.siteRouteUrl model (SR.tagIndexRoute $ toList $ HT.deconstructTag tag)
+          ]
+
 commonSplices ::
   (HasCallStack) =>
   ((RenderCtx -> HI.Splice Identity) -> HI.Splice Identity) ->
@@ -157,7 +169,7 @@ commonSplices withCtx model meta routeTitle = do
   "ema:version" ##
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
-    HJ.bindJson meta
+    HJ.bindJson (templateMeta model meta)
   "ema:title" ##
     withCtx
       $ \ctx ->

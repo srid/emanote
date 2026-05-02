@@ -21,6 +21,7 @@
 
 **Bug fixes**
 
+- Tags whose names start with `#` now link to their tag index with `%23` in the generated URL instead of emitting a literal fragment marker (closes [#199](https://github.com/srid/emanote/issues/199)).
 - Wiki link custom titles now render HTML entities like `&nbsp;` the same way regular Markdown link labels do. Previously `[[note|Spivak&nbsp;(2014)]]` rendered the entity text literally as `&nbsp;` (closes [#441](https://github.com/srid/emanote/issues/441)).
 - Atom feed: a feed query that matches no notes no longer crashes the build; an empty-but-valid Atom document is emitted instead. Configuration errors (missing/invalid query block, missing `page.siteUrl`) still fail loudly ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
 - Markdown links to a static `.xml` asset (e.g. `[Test](./test.xml)`) now resolve to the file. Previously a `.xml` URL was always interpreted as the Atom feed of a same-named note, leaving asset links broken when no such feed-enabled note existed. The missing-link page now also tailors its "you may create…" hint to the URL extension instead of always suggesting `<url>.md` / `<url>.org` (closes [#547](https://github.com/srid/emanote/issues/547))

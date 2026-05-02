@@ -4,8 +4,7 @@ module Emanote.Pandoc.BuiltinFilters (
 
 import Emanote.Pandoc.ExternalLink (setExternalLinkIcon)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
-import Emanote.Route (encodeRoute)
-import Emanote.Route.SiteRoute.Type (encodeTagIndexR)
+import Emanote.Route.SiteRoute.Type (encodeTagIndexUrl)
 import Relude
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.Walk qualified as W
@@ -32,7 +31,7 @@ linkifyInlineTags =
       x
   where
     tagUrl =
-      toText . encodeRoute . encodeTagIndexR . toList . HT.deconstructTag
+      toText . encodeTagIndexUrl . toList . HT.deconstructTag
 
 -- Undo font-family on emoji spans, so the browser uses an emoji font.
 -- Ref: https://github.com/jgm/commonmark-hs/blob/3d545d7afa6c91820b4eebf3efeeb80bf1b27128/commonmark-extensions/src/Commonmark/Extensions/Emoji.hs#L30-L33
