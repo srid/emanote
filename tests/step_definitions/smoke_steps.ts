@@ -874,6 +874,61 @@ Then(
   },
 );
 
+// #199: tag URLs must percent-encode each path segment so reserved
+// characters (notably `#`, used in Zettelkasten "structure note" tags
+// like `##structure`) survive the trip into `href`. Two distinct call
+// sites build these URLs — `Emanote.Pandoc.BuiltinFilters.linkifyInlineTags`
+// for inline `#tag` syntax in the article body, and the new `ema:tagsList`
+// splice for the page-metadata tag chips above the article. The two paths
+// don't share encoder code (the Pandoc filter has no `Model` reachable),
+// so each scenario asserts against both call sites — a regression in just
+// one would otherwise slip past.
+Then(
+  "the article tag link with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    const link = this.page
+      .locator(`article a[title="Tag"]:has-text("${linkText}")`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const href = await link.getAttribute("href");
+    assert.ok(
+      href && href.includes(needle),
+      `Inline article tag link "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The Pandoc filter (linkifyInlineTags / encodeTagIndexUrl) regressed — see #199.`,
+    );
+  },
+);
+
+Then(
+  "the metadata tag chip with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    // Scope outside <article> so the inline tag link with the same text
+    // doesn't shadow the metadata chip. metadata.tpl renders in the page
+    // header, before <article>; the article's body holds the inline
+    // linkifyInlineTags output. Playwright's locator.filter() works on
+    // descendants only, so the ancestor check runs in-page via evaluate.
+    const candidates = this.page.locator(
+      `a[title="Tag"]:has-text("${linkText}")`,
+    );
+    await candidates.first().waitFor({ state: "attached", timeout: 5_000 });
+    const total = await candidates.count();
+    let chipHref: string | null = null;
+    for (let i = 0; i < total; i++) {
+      const el = candidates.nth(i);
+      const inArticle = await el.evaluate(
+        (node) => !!(node as Element).closest("article"),
+      );
+      if (!inArticle) {
+        chipHref = await el.getAttribute("href");
+        break;
+      }
+    }
+    assert.ok(
+      chipHref && chipHref.includes(needle),
+      `Metadata tag chip "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(chipHref)} (searched ${total} candidate(s)). The ema:tagsList splice or metadata.tpl regressed — see #199.`,
+    );
+  },
+);
+
 // Stork dark/light theme mirror: stork.js's MutationObserver on
 // <html>.class flips the wrapper between stork-wrapper-edible and
 // stork-wrapper-edible-dark. Without one of those classes on the

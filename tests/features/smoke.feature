@@ -163,3 +163,8 @@ Feature: Smoke
     Then the breadcrumb at depth 1 has href containing "subfolder"
     And the breadcrumb at depth 2 has href containing "subfolder/index"
     And the breadcrumb at depth 1 has a different href from depth 2
+
+  Scenario: Tag URLs percent-encode reserved characters (regression: #199)
+    When I open "/issue-199.html"
+    Then the article tag link with text "###structure" has href containing "-/tags/%23%23structure.html"
+    And the metadata tag chip with text "###structure" has href containing "-/tags/%23%23structure.html"
