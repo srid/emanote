@@ -2,10 +2,11 @@ module Emanote.Model.Query where
 
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
+import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
-import Emanote.Model.Meta (effectiveNoteTags)
+import Emanote.Model.Meta (modelTags)
 import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelNotes)
@@ -73,9 +74,9 @@ runQuery :: R.LMLRoute -> Model -> Query -> [Note]
 runQuery currentRoute model =
   sortOn Calendar.noteSortKey . \case
     QueryByTag tag ->
-      filter (elem tag . effectiveNoteTags model) (Ix.toList $ model ^. modelNotes)
+      Map.findWithDefault [] tag (modelTags model)
     QueryByTagPattern pat ->
-      filter (any (HT.tagMatch pat) . effectiveNoteTags model) (Ix.toList $ model ^. modelNotes)
+      concat $ Map.elems $ Map.filterWithKey (\t _ -> HT.tagMatch pat t) (modelTags model)
     QueryByPath path ->
       maybeToMonoid $ do
         r <- R.mkRouteFromFilePath path

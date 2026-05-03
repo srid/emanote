@@ -77,11 +77,7 @@ effectiveNoteTags model note =
   let merged = getEffectiveRouteMetaWith (_noteMeta note) (_noteRoute note) model
    in SData.lookupAeson @[HT.Tag] mempty (one "tags") merged
 
-{- | Group notes by their effective tags, including tags inherited from
-sibling/parent YAML cascade. This is the single source of truth used
-by the tag-index page, virtual-route generation, and tag queries.
--}
-modelTags :: ModelT f -> [(HT.Tag, [Note])]
+-- | Group notes by their effective tags. See 'effectiveNoteTags' for cascade semantics.
+modelTags :: ModelT f -> Map HT.Tag [Note]
 modelTags model =
-  Map.toAscList
-    $ Map.fromListWith (<>) [(t, [n]) | n <- Ix.toList (model ^. modelNotes), t <- effectiveNoteTags model n]
+  Map.fromListWith (<>) [(t, [n]) | n <- Ix.toList (model ^. modelNotes), t <- effectiveNoteTags model n]

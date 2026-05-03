@@ -42,7 +42,7 @@ data TagIndex = TagIndex
 mkTagIndex :: Model -> [HT.TagNode] -> TagIndex
 mkTagIndex model tagPath' =
   let mTagPath = nonEmpty tagPath'
-      tagMap = Map.fromList $ M.modelTags model
+      tagMap = M.modelTags model
       tagForest = HT.tagTree tagMap
       childNodes =
         maybe
