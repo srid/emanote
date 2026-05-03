@@ -2,11 +2,10 @@ module Emanote.Model.Query where
 
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
-import Data.Set qualified as Set
 import Data.Text qualified as T
 import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
-import Emanote.Model.Meta (effectiveNoteTags, modelTags)
+import Emanote.Model.Meta (effectiveNoteTags)
 import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
 import Emanote.Model.Type (Model, modelNotes)
@@ -76,9 +75,7 @@ runQuery currentRoute model =
     QueryByTag tag ->
       filter (elem tag . effectiveNoteTags model) (Ix.toList $ model ^. modelNotes)
     QueryByTagPattern pat ->
-      let matchingTags = filter (HT.tagMatch pat) (fst <$> modelTags model)
-          tagSet = fromList @(Set HT.Tag) matchingTags
-       in filter (any (`Set.member` tagSet) . effectiveNoteTags model) (Ix.toList $ model ^. modelNotes)
+      filter (any (HT.tagMatch pat) . effectiveNoteTags model) (Ix.toList $ model ^. modelNotes)
     QueryByPath path ->
       maybeToMonoid $ do
         r <- R.mkRouteFromFilePath path
