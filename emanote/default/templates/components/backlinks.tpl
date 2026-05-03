@@ -1,12 +1,12 @@
 <ema:note:backlinks:nodaily>
   <div id="backlinks" class="flex-1 mt-8 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm">
     <header class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-      Links to this page
+      Linked from
     </header>
     <ul class="space-y-4">
       <backlink>
         <li class="group">
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]"
+          <a class="inline-block mb-1.5 bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]"
             href="${backlink:note:url}">
             <backlink:note:title />
           </a>

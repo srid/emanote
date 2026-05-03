@@ -105,9 +105,15 @@
     <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-primary-600 dark:text-primary-400">
-    <Internal class="bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900" />
-    <External class="no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
+  <!-- Internal links inherit the page-title strip's palette (bg + text +
+       tracking) one font-weight step lighter — they read as small inline
+       titles of the linked notes. box-decoration-clone keeps the tinted
+       background continuous across line breaks. External links keep the
+       underline-on-hover treatment plus the external-icon glyph for
+       differentiation. -->
+  <PandocLink class="transition-colors">
+    <Internal class="bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100 dark:hover:bg-primary-900" />
+    <External class="text-primary-700 dark:text-primary-300 font-semibold tracking-tight no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
   </PandocLink>
   <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
   <Code class="py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal" />

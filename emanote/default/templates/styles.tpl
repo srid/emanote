@@ -204,21 +204,19 @@
     color: var(--color-gray-600);
   }
 
-  /* Active TOC item — uses theme primary palette so per-site theme overrides
-     flow through without hardcoding a colour here. The selector is scoped
-     under #toc so it beats the per-depth color rules above. */
+  /* Active TOC item — neutral grey since TOC entries map to headings
+     in the prose, which render in plain text. Keeping primary out of
+     here lets the wikilink / title strip own the primary palette and
+     stand out as the page's only "destination" affordance. */
   #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid var(--color-primary-500);
-    padding-left: calc(0.5rem - 3px) !important;
-    background-color: var(--color-primary-50) !important;
-    color: var(--color-primary-700) !important;
+    background-color: var(--color-gray-100) !important;
+    color: var(--color-gray-900) !important;
   }
 
   .dark #toc a.--ema-toc.toc-item-active {
-    background-color: var(--color-primary-950) !important;
-    color: var(--color-primary-300) !important;
-    border-left-color: var(--color-primary-400);
+    background-color: var(--color-gray-800) !important;
+    color: var(--color-gray-100) !important;
   }
 </style>
 

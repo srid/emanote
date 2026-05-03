@@ -30,9 +30,9 @@
                       class="bg-white dark:bg-gray-800 py-1.5 px-2 my-1 rounded shadow border-2 border-gray-200 dark:border-gray-600 hover:border-primary-600 dark:hover:border-primary-400">
                       <apply template="/templates/components/checkbox-unchecked">
                         <task:description>
-                          <PandocLink class="text-primary-600 dark:text-primary-400">
-                            <Internal class="bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900" />
-                            <External class="underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
+                          <PandocLink class="transition-colors">
+                            <Internal class="bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100 dark:hover:bg-primary-900" />
+                            <External class="text-primary-700 dark:text-primary-300 font-semibold tracking-tight underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
                           </PandocLink>
                           <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
                           <BulletList class="ml-4 space-y-1 list-decimal list-inside" />

@@ -60,12 +60,17 @@
         </div>
         <else />
         <!-- No-sidebar layout (e.g. neuron-style): same card chrome,
-             same attached title strip, just no left/right panels. -->
+             same attached title strip, just no left/right panels.
+             Backlinks render as the full-card variant (visible at all
+             widths) since there's no right-panel to host the margin
+             variant and backlinks-bottom is gated on lg:hidden. -->
         <div id="container" class="relative flex flex-col md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
           <storkSearchButtonTopRight />
           <apply template="components/note-title" />
           <apply template="components/body" />
-          <apply template="components/backlinks-bottom" />
+          <div class="px-6 pb-8">
+            <apply template="components/backlinks" />
+          </div>
         </div>
       </ema:has:sidebar>
       <apply template="components/footer" />
