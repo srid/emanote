@@ -1,4 +1,4 @@
-module Emanote.Model (module X, effectiveNoteTags, modelTags) where
+module Emanote.Model (module X, modelTags) where
 
-import Emanote.Model.Meta (effectiveNoteTags, modelTags)
+import Emanote.Model.Meta (modelTags)
 import Emanote.Model.Type as X
