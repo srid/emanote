@@ -71,6 +71,12 @@ newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
 
+{- | Per-note IxSet indices. Notably absent: a tag index. Tags can be
+inherited from sibling YAML cascade (see issue #352), and that
+requires the model's SData — which 'ixFun' (a pure @Note -> [k]@)
+can't see. Tag-based queries go through 'Emanote.Model.Meta.modelTags'
+and the per-note effective-tag helper, which both consult cascade.
+-}
 type NoteIxs =
   '[ -- Route to this note
      R.LMLRoute
@@ -84,8 +90,6 @@ type NoteIxs =
      RAncestor
    , -- Parent folder
      Maybe (R 'R.Folder)
-   , -- Tag
-     HT.Tag
    , -- Alias route for this note. Can be "foo" or "foo/bar".
      NonEmpty Slug
    ]
@@ -101,7 +105,6 @@ instance Indexable NoteIxs Note where
       (ixFun $ maybeToList . noteXmlRoute)
       (ixFun noteAncestors)
       (ixFun $ one . noteParent)
-      (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
 -- | All possible wiki-links that refer to this note.

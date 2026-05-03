@@ -32,7 +32,6 @@ import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
-import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
@@ -311,10 +310,6 @@ modelWikiLinkTargets wl model =
 modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
 modelLookupStaticFileByRoute r =
   Ix.getOne . Ix.getEQ r . _modelStaticFiles
-
-modelTags :: ModelT f -> [(HT.Tag, [Note])]
-modelTags =
-  Ix.groupAscBy @HT.Tag . _modelNotes
 
 modelNoteRels :: Model -> [Rel.Rel]
 modelNoteRels =

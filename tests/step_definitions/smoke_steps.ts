@@ -128,6 +128,45 @@ Then(
   },
 );
 
+// #352 — Tags declared in a sibling folder YAML (`some_dir.yaml`)
+// cascade onto child notes for *display* but historically never
+// reached the global tag index (the IxNote tag index was fed by the
+// note's own `_noteMeta`, which doesn't include cascade). The fix
+// makes `modelTags` cascade-aware. Two fetch-style assertions guard
+// it: the per-tag page must list the cascaded note (catches both the
+// static-mode 404 and the live-mode `mkTagIndex` error path), and a
+// generic body-substring step backs it. Used by /-/tags/ scenarios.
+Then(
+  "the response body contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    const body = await resp.text();
+    assert.ok(
+      body.includes(needle),
+      `Expected response body to contain ${JSON.stringify(needle)} (status=${resp.status()}); first 400 chars: ${JSON.stringify(body.slice(0, 400))}.`,
+    );
+  },
+);
+
+// Page-scoped link assertion for the root /-/tags.html listing — the
+// root index doesn't crash on missing-from-cascade tags, it just
+// silently omits them. Asserting on a link's href substring is the
+// cheapest way to catch that omission.
+Then(
+  "a link in the page has href containing {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const hrefs = await this.page.$$eval("a[href]", (anchors) =>
+      anchors.map((a) => a.getAttribute("href") ?? ""),
+    );
+    const matches = hrefs.filter((h) => h.includes(needle));
+    assert.ok(
+      matches.length > 0,
+      `Expected the page to contain at least one <a> with href containing ${JSON.stringify(needle)}; saw ${hrefs.length} link(s) but none matched. First 20 hrefs: ${JSON.stringify(hrefs.slice(0, 20))}.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {

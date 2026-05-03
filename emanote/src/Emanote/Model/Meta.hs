@@ -3,15 +3,19 @@ module Emanote.Model.Meta (
   getEffectiveRouteMeta,
   getEffectiveRouteMetaWith,
   cascadeYamlErrors,
+  effectiveNoteTags,
+  modelTags,
 ) where
 
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
-import Emanote.Model (ModelT, modelLookupNoteByRoute', modelLookupSData, modelSData)
-import Emanote.Model.Note (_noteMeta)
+import Data.Map.Strict qualified as Map
+import Emanote.Model.Note (Note, _noteMeta, _noteRoute)
 import Emanote.Model.SData (sdataValue)
 import Emanote.Model.SData qualified as SData
+import Emanote.Model.Type (ModelT, modelLookupNoteByRoute', modelLookupSData, modelNotes, modelSData)
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Optics.Operators as Lens ((^.))
 import Relude
@@ -58,3 +62,26 @@ cascadeYamlErrors model r =
     leftToMaybe (s ^. sdataValue)
   where
     cascade = R.routeInits @'R.Yaml (R.withLmlRoute coerce r)
+
+{- | All effective tags for a note, including those cascaded from parent
+YAML files.
+
+Tags declared in @some_dir.yaml@ (or any @*.yaml@ above the note's
+route) propagate to every note under @some_dir/@ for display purposes.
+The IxNote tag index can't see this cascade — 'ixFun' is a pure
+@Note -> [k]@ — so the global tag index has to consult cascade
+explicitly. See issue #352.
+-}
+effectiveNoteTags :: ModelT f -> Note -> [HT.Tag]
+effectiveNoteTags model note =
+  let merged = getEffectiveRouteMetaWith (_noteMeta note) (_noteRoute note) model
+   in SData.lookupAeson @[HT.Tag] mempty (one "tags") merged
+
+{- | Group notes by their effective tags, including tags inherited from
+sibling/parent YAML cascade. This is the single source of truth used
+by the tag-index page, virtual-route generation, and tag queries.
+-}
+modelTags :: ModelT f -> [(HT.Tag, [Note])]
+modelTags model =
+  let pairs = [(t, n) | n <- Ix.toList (model ^. modelNotes), t <- effectiveNoteTags model n]
+   in Map.toAscList $ Map.fromListWith (<>) [(t, [n]) | (t, n) <- pairs]
