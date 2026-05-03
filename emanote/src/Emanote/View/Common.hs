@@ -22,6 +22,7 @@ import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Model.Type (Model)
 import Emanote.Model.Type qualified as M
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers (..), PandocRenderers (..))
 import Emanote.Pandoc.Renderer qualified as Renderer
 import Emanote.Pandoc.Renderer.Embed qualified as Embed
@@ -158,6 +159,15 @@ commonSplices withCtx model meta routeTitle = do
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
     HJ.bindJson meta
+  -- Precompute per-tag URLs because URL encoding lives in Haskell
+  -- (`siteRouteUrl` / Ema's `filepathToUrl`), not in the JSON-driven
+  -- splices `ema:metadata` exposes. See #199.
+  "ema:tagsList" ## do
+    let tags = SData.lookupAeson @[HT.Tag] mempty (one "tags") meta
+    Splices.listSplice tags "ema:each-tag" $ \tag -> do
+      let url = SR.siteRouteUrl model $ SR.tagIndexRoute (toList $ HT.deconstructTag tag)
+      "ema:tag:url" ## HI.textSplice url
+      "ema:tag:name" ## HI.textSplice (HT.unTag tag)
   "ema:title" ##
     withCtx
       $ \ctx ->
