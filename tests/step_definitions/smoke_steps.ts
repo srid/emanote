@@ -128,6 +128,21 @@ Then(
   },
 );
 
+// Asserts the body of the response captured by the most recent
+// `When I fetch …` step contains a substring.
+Then(
+  "the response body contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    const body = await resp.text();
+    assert.ok(
+      body.includes(needle),
+      `Expected response body to contain ${JSON.stringify(needle)} (status=${resp.status()}); first 400 chars: ${JSON.stringify(body.slice(0, 400))}.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {

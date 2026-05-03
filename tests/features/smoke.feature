@@ -168,3 +168,15 @@ Feature: Smoke
     When I open "/issue-199.html"
     Then the article tag link with text "###structure" has href containing "-/tags/%23%23structure.html"
     And the metadata tag chip with text "###structure" has href containing "-/tags/%23%23structure.html"
+
+  Scenario: Tag declared in sibling folder YAML appears as a metadata chip on the child note (regression: #352)
+    When I open "/issue-352/note.html"
+    Then the metadata tag chip with text "issue-352-cascaded" has href containing "-/tags/issue-352-cascaded.html"
+
+  Scenario: Tag declared in sibling folder YAML produces a tag-index page that lists the cascaded note (regression: #352)
+    When I fetch "/-/tags/issue-352-cascaded.html"
+    Then the response body contains "issue-352/note"
+
+  Scenario: Tag declared in sibling folder YAML appears on the root tag-index page (regression: #352)
+    When I fetch "/-/tags.html"
+    Then the response body contains "-/tags/issue-352-cascaded.html"
