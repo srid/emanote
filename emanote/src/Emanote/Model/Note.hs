@@ -157,10 +157,6 @@ hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
   not . Ix.null . Ix.getEQ (Just r)
 
-noteTags :: Note -> [HT.Tag]
-noteTags =
-  fmap HT.Tag . maybeToMonoid . lookupMeta (one "tags")
-
 noteSlug :: Note -> Maybe (NonEmpty Slug)
 noteSlug note = do
   slugPath :: Text <- lookupMeta (one "slug") note
