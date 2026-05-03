@@ -128,14 +128,8 @@ Then(
   },
 );
 
-// #352 — Tags declared in a sibling folder YAML (`some_dir.yaml`)
-// cascade onto child notes for *display* but historically never
-// reached the global tag index (the IxNote tag index was fed by the
-// note's own `_noteMeta`, which doesn't include cascade). The fix
-// makes `modelTags` cascade-aware. Two fetch-style assertions guard
-// it: the per-tag page must list the cascaded note (catches both the
-// static-mode 404 and the live-mode `mkTagIndex` error path), and a
-// generic body-substring step backs it. Used by /-/tags/ scenarios.
+// Asserts the body of the response captured by the most recent
+// `When I fetch …` step contains a substring.
 Then(
   "the response body contains {string}",
   async function (this: EmanoteWorld, needle: string) {
@@ -149,10 +143,10 @@ Then(
   },
 );
 
-// Page-scoped link assertion for the root /-/tags.html listing — the
-// root index doesn't crash on missing-from-cascade tags, it just
-// silently omits them. Asserting on a link's href substring is the
-// cheapest way to catch that omission.
+// Asserts at least one <a href=…> on the currently-open page has an
+// href whose substring matches. Page-scoped (no `article`/region
+// filter) — use the existing region-scoped variants when you need
+// more precision.
 Then(
   "a link in the page has href containing {string}",
   async function (this: EmanoteWorld, needle: string) {
