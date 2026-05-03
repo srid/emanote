@@ -1,7 +1,7 @@
 ---
 name: talk
 description: Enter talk mode — conversation and research, no repo changes. ONLY invoke when the user explicitly types `/talk` or `$talk`; never auto-select from a natural-language question or design discussion.
-argument-hint: "[--no-laconic] <topic or question>"
+argument-hint: "[--no-laconic] [--review-model=<opus|sonnet|haiku>] <topic or question>"
 ---
 
 # Probe (Talk Mode)
@@ -91,7 +91,7 @@ Any time the conversation produces a concrete code plan, diff proposal, or desig
 
 Skip both passes only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run them. `do` re-runs hickey + lowy post-implement on the real diff, so the talk-mode pass is the design-level rehearsal, not the final word.
 
-**Model selection lives in the skill, not here.** Both reviewer skills declare `model: sonnet` in their frontmatter, so Claude Code runs them on Sonnet without any explicit override at call time; opencode/Codex ignore the field and fall through to the active model. Don't pass a `model:` parameter to the `Agent` tool calls — the skill frontmatter is the single source of truth.
+**Model override.** If `ARGUMENTS` contains `--review-model=<model>` (accept `opus`, `sonnet`, or `haiku`; strip the flag before treating the rest as the topic), pass `model: "<model>"` in **both** the `Agent(subagent_type="lowy")` and `Agent(subagent_type="hickey")` calls. This overrides the `model: sonnet` in each sub-agent's frontmatter via the `Agent` tool's built-in `model` parameter. Without the flag, omit `model` so the default (sonnet) applies. Reject unknown values with a one-line error instead of silently falling back — a typo shouldn't quietly erase a budget decision.
 
 ## Laconic mode (default)
 
