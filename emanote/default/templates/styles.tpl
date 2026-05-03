@@ -24,13 +24,14 @@
 </emanoteStaticUrl>
 
 <style data-category="global-font">
-  /* Font option C (trial):
-     Prose: Lora (warm, variable, very readable book serif).
-     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
-     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  /* Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Mona Sans (variable display+text sans, more characterful
+     than Inter/Space Grotesk; GitHub uses it as their display face).
+     Code: Space Mono (pairs stylistically with the prose serif at body
+     sizes; the slab terminals echo Lora's serifs). */
   :root {
     --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
-    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
@@ -46,7 +47,9 @@
     font-weight: 600;
   }
 
-  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  #sidebar, #breadcrumbs, #toc, #footer,
+  #backlinks, #backlinks-margin, #backlinks-bottom, #right-panel,
+  .callout-title,
   ema\:metadata, section[class*="font-mono"] {
     font-family: var(--font-sans);
   }
