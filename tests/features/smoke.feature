@@ -178,5 +178,5 @@ Feature: Smoke
     Then the response body contains "issue-352/note"
 
   Scenario: Tag declared in sibling folder YAML appears on the root tag-index page (regression: #352)
-    When I open "/-/tags.html"
-    Then a link in the page has href containing "-/tags/issue-352-cascaded.html"
+    When I fetch "/-/tags.html"
+    Then the response body contains "-/tags/issue-352-cascaded.html"

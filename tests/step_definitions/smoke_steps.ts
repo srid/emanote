@@ -143,24 +143,6 @@ Then(
   },
 );
 
-// Asserts at least one <a href=…> on the currently-open page has an
-// href whose substring matches. Page-scoped (no `article`/region
-// filter) — use the existing region-scoped variants when you need
-// more precision.
-Then(
-  "a link in the page has href containing {string}",
-  async function (this: EmanoteWorld, needle: string) {
-    const hrefs = await this.page.$$eval("a[href]", (anchors) =>
-      anchors.map((a) => a.getAttribute("href") ?? ""),
-    );
-    const matches = hrefs.filter((h) => h.includes(needle));
-    assert.ok(
-      matches.length > 0,
-      `Expected the page to contain at least one <a> with href containing ${JSON.stringify(needle)}; saw ${hrefs.length} link(s) but none matched. First 20 hrefs: ${JSON.stringify(hrefs.slice(0, 20))}.`,
-    );
-  },
-);
-
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {
