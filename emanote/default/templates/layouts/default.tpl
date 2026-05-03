@@ -40,18 +40,32 @@
       </ema:has:breadcrumbs>
 
       <ema:has:sidebar>
+        <!-- Container is the rounded card. Children stack vertically:
+             [note-title strip] [inner row of columns] [backlinks-bottom strip].
+             The inner row is its own flex so columns sit side-by-side at md+
+             without forcing the strips to participate in flex-wrap (which
+             produced the buggy md layout #2). -->
         <div id="container"
-          class="flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
-          <!-- Sidebar column -->
-          <apply template="components/sidebar" />
-          <!-- Main body column -->
-          <apply template="components/body" />
+          class="flex flex-col bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
+          <!-- Top: note title attached as a strip. -->
+          <apply template="components/note-title" />
+          <!-- Middle row: sidebar (left), prose (center), right-panel (right at lg+). -->
+          <div class="flex flex-col md:flex-row">
+            <apply template="components/sidebar" />
+            <apply template="components/body" />
+            <apply template="components/right-panel" />
+          </div>
+          <!-- Bottom (<lg): backlinks attached as a footer panel. -->
+          <apply template="components/backlinks-bottom" />
         </div>
         <else />
-        <div id="container" class="relative md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
+        <!-- No-sidebar layout (e.g. neuron-style): same card chrome,
+             same attached title strip, just no left/right panels. -->
+        <div id="container" class="relative flex flex-col md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
           <storkSearchButtonTopRight />
-          <!-- Main body column -->
+          <apply template="components/note-title" />
           <apply template="components/body" />
+          <apply template="components/backlinks-bottom" />
         </div>
       </ema:has:sidebar>
       <apply template="components/footer" />

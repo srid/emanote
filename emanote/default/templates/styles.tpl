@@ -328,3 +328,25 @@
     --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
+
+<style data-category="page-load-reveal">
+  /* One orchestrated entrance on first paint: sidebar fades in; main
+     content fades and drifts up ~8px with a small stagger. Pure CSS so
+     it runs pre-paint without JS; gated on prefers-reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes ema-fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ema-rise-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #sidebar {
+      animation: ema-fade-in 400ms ease-out both;
+    }
+    main {
+      animation: ema-rise-in 480ms 60ms ease-out both;
+    }
+  }
+</style>
