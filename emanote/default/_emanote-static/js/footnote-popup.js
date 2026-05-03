@@ -30,7 +30,10 @@ const mobileMQL = window.matchMedia('(max-width: 640px)');
 const POPOVER_CLASS = [
   'fixed z-[9999] m-0 p-0 border-0 bg-transparent',
   'w-max max-w-[min(32rem,calc(100vw-2rem))]',
-  'text-[0.95rem] leading-relaxed',
+  // Match the backlink-margin flyout's reading rhythm so footnotes and
+  // backlink contexts feel like the same "side material" (see
+  // components/context.tpl).
+  'text-[0.85rem] leading-[1.55]',
   // Mobile: pin to viewport edge as a full-width bottom sheet.
   'max-sm:top-auto max-sm:left-0 max-sm:right-0 max-sm:bottom-0',
   'max-sm:w-full max-sm:max-w-full',
@@ -38,19 +41,31 @@ const POPOVER_CLASS = [
 
 const BODY_CLASS = [
   'relative bg-white dark:bg-gray-900',
-  'text-gray-800 dark:text-gray-200',
+  'text-gray-700 dark:text-gray-300',
   'px-[1.125rem] py-[0.875rem]',
   'rounded-lg border border-gray-200 dark:border-gray-700',
+  // Primary left rule anchors the popup to the in-prose <sup> ref's
+  // primary palette — the popup reads as "this primary thing belongs
+  // to that primary thing" without needing a tail/arrow.
+  'border-l-4 border-l-primary-500 dark:border-l-primary-400',
   'shadow-xl',
   // Cloned pandoc content inherits styling from the surrounding page
   // (paragraphs, stray <li> left from the <ol> the <li> came from).
-  '[&>:last-child]:mb-0 [&_p]:mb-2',
+  // Tight paragraph rhythm matches context.tpl: zero margins on <p>,
+  // mt-2 between adjacent paragraphs.
+  '[&>:last-child]:mb-0 [&_p]:m-0 [&_p+p]:mt-2',
   '[&>li]:list-none [&>li]:pl-0 [&>li]:ml-0',
   // Mobile bottom-sheet shape.
   'max-sm:rounded-t-2xl max-sm:rounded-b-none',
   'max-sm:px-5 max-sm:pt-4 max-sm:pb-6',
   'max-sm:max-h-[60vh] max-sm:overflow-y-auto',
   'max-sm:shadow-2xl',
+].join(' ');
+
+const HEADER_CLASS = [
+  'text-xs font-semibold uppercase tracking-wider',
+  'text-primary-600 dark:text-primary-400',
+  'mb-2',
 ].join(' ');
 
 let popoverEl = null;
@@ -144,6 +159,15 @@ function openFor(ref, target) {
   const popover = ensurePopover();
   const body = popover.firstElementChild;
   body.textContent = '';
+  // Self-identifying header — readers landing in the popup see "Footnote N"
+  // before the body content, so it doesn't read as a generic tooltip.
+  const idx = ref.getAttribute('data-footnote-ref');
+  if (idx) {
+    const header = document.createElement('div');
+    header.className = HEADER_CLASS;
+    header.textContent = 'Footnote ' + idx;
+    body.appendChild(header);
+  }
   body.appendChild(target.cloneNode(true));
   // hidePopover throws InvalidStateError if the popover is already
   // closed. That's the expected case on first open; the throw carries
