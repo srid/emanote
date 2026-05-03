@@ -83,5 +83,5 @@ by the tag-index page, virtual-route generation, and tag queries.
 -}
 modelTags :: ModelT f -> [(HT.Tag, [Note])]
 modelTags model =
-  let pairs = [(t, n) | n <- Ix.toList (model ^. modelNotes), t <- effectiveNoteTags model n]
-   in Map.toAscList $ Map.fromListWith (<>) [(t, [n]) | (t, n) <- pairs]
+  Map.toAscList
+    $ Map.fromListWith (<>) [(t, [n]) | n <- Ix.toList (model ^. modelNotes), t <- effectiveNoteTags model n]
