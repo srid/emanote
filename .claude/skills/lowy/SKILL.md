@@ -3,6 +3,7 @@ name: lowy
 description: Evaluate architecture and module boundaries for volatility-based decomposition using Juval Lowy's framework (from "Righting Software", building on Parnas 1972). Use when reviewing module splits, service boundaries, new abstractions, or any decomposition decision. Trigger on phrases like "where should this boundary be", "how to split this", "module boundaries", "encapsulate change", "volatility", or references to Lowy, Parnas, or "Righting Software". Complements /hickey (interleaved concerns) with a different lens (change encapsulation).
 context: fork
 agent: Explore
+model: sonnet
 ---
 
 # Lowy: Volatility-Based Decomposition Review

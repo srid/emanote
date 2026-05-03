@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-04-29T18:56:32.552725+00:00'
-apm_version: 0.10.0
+generated_at: '2026-05-03T18:46:34.781808+00:00'
+apm_version: 0.12.0
 dependencies:
 - repo_url: anthropics/skills
   host: github.com
@@ -24,8 +24,8 @@ dependencies:
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: f2e5082a20ee6051fbda7e5bdf411d2cf8be5a6d
-  resolved_ref: master
+  resolved_commit: 65092a7b1605b0fee4fceac1d5b629291e703b69
+  resolved_ref: mortal-nest
   package_type: apm_package
   deployed_files:
   - .agents/skills/code-police
@@ -54,14 +54,14 @@ dependencies:
   - .codex/agents/lowy.toml
   - .codex/hooks/agency/scripts/do-stop-guard.sh
   deployed_file_hashes:
-    .claude/agents/hickey.md: sha256:edde9b0d3b27b947b7372f662b2e8652d136e0bb9af7924892b00450a1e586bc
-    .claude/agents/lowy.md: sha256:a1c8e5ba115439bcfa0d7e331f96e71b2d690ff2e5fb9b824bb5f588eb43ac75
+    .claude/agents/hickey.md: sha256:10d9a4350a85752dc6658af8e0efb3d8be41803a2b6c73464e3d5b7a840435ad
+    .claude/agents/lowy.md: sha256:05aff7f6a91149a42c1fb9a3ca382a6f77bc39ac8a8d45436d443dd3349fb11e
     .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
     .claude/rules/apm-sources.md: sha256:65640c481c347cc4edf50603f784d0b448b6395acc43419a4f8ad0c53de2db4b
     .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
     .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
     .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-  content_hash: sha256:1f72f5be25055589bbd3f5523d47427598d6d51b28bcb7b9f3cf4032ada4a0c2
+  content_hash: sha256:7ca289e5b325c39894c2abf53e1c3cb9ba581cfcc8c344f2469bad31dfe06493
 local_deployed_files:
 - .agents/skills/dpella-mcp
 - .claude/rules/emanote.md

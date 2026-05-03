@@ -1,7 +1,7 @@
 ---
 name: talk
-description: Enter talk mode — conversation and research, no repo changes
-argument-hint: "[--no-laconic] [--review-model=<opus|sonnet|haiku>] <topic or question>"
+description: Enter talk mode — conversation and research, no repo changes. ONLY invoke when the user explicitly types `/talk` or `$talk`; never auto-select from a natural-language question or design discussion.
+argument-hint: "[--no-laconic] <topic or question>"
 ---
 
 # Probe (Talk Mode)
@@ -15,6 +15,7 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
 - You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
 - You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous, or to collaborate on a design decision (e.g. proposing a phase split — see below). You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
+- **Don't outsource follow-up research to the user either.** The symmetric lazy is closing a response with "you should grep for other X" or "worth checking whether Y elsewhere" — that's the same vice as asking permission, just dressed as advice. If you surface a follow-up as worth doing, do it before responding. Don't surface follow-ups you're not willing to investigate.
 - **Talk mode ends when the user invokes an action skill** (e.g., `do`). Until then, stay in talk mode.
 
 ## Research before answering — MANDATORY
@@ -59,6 +60,7 @@ If you're about to emit "probably", "almost certainly", "I suspect", "my #1 susp
 - ❌ "This pattern usually means..." (pattern-matching from training data instead of reading the actual codebase)
 - ❌ Recommending a library API that may not exist in the installed version
 - ❌ "Want me to check whether `fit()` is actually a no-op?" — don't ask, check.
+- ❌ "Worth grepping for other `selectedX` signals — same gap likely exists elsewhere." — if you flagged it, you check it; don't hand the user homework.
 - ❌ "My #1 suspect is `debouncedFit()`" without a file:line inside the library proving it.
 - ❌ Citing a subagent's claim about `FitAddon.ts:45` without opening `FitAddon.ts:45` yourself first.
 - ✅ "I read `Viewport.ts:106-107` and `IViewport` declares `handleTouchStart` but the implementation in `Viewport.ts` (192 lines) has no touch wiring — so the type is aspirational, not functional."
@@ -89,7 +91,7 @@ Any time the conversation produces a concrete code plan, diff proposal, or desig
 
 Skip both passes only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run them. `do` re-runs hickey + lowy post-implement on the real diff, so the talk-mode pass is the design-level rehearsal, not the final word.
 
-**Model override.** If `ARGUMENTS` contains `--review-model=<model>` (accept `opus`, `sonnet`, or `haiku`; strip the flag before treating the rest as the topic), pass `model: "<model>"` in **both** the `Agent(subagent_type="lowy")` and `Agent(subagent_type="hickey")` calls. This overrides the `model: sonnet` in each sub-agent's frontmatter via the `Agent` tool's built-in `model` parameter. Without the flag, omit `model` so the default (sonnet) applies. Reject unknown values with a one-line error instead of silently falling back — a typo shouldn't quietly erase a budget decision.
+**Model selection lives in the skill, not here.** Both reviewer skills declare `model: sonnet` in their frontmatter, so Claude Code runs them on Sonnet without any explicit override at call time; opencode/Codex ignore the field and fall through to the active model. Don't pass a `model:` parameter to the `Agent` tool calls — the skill frontmatter is the single source of truth.
 
 ## Laconic mode (default)
 

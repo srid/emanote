@@ -9,7 +9,7 @@ targets:
 
 dependencies:
   apm:
-  - srid/agency#master
+  - srid/agency#mortal-nest
   - juspay/skills/skills/nix-justfile
   - anthropics/skills/skills/frontend-design
   mcp: []
