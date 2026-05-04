@@ -1,7 +1,8 @@
 // When a sidebar tree node holds nothing but daily-note leaves of one
 // month (e.g. `Daily/2026/04/` containing 2026-04-21 … 2026-04-30),
 // swap the linear list for a 7-column calendar grid for that month.
-// Cells with notes are clickable; missing days are muted dots.
+// Days with notes show as clickable primary-coloured cells; days
+// without are muted day-numbers; both carry the day's date as text.
 //
 // Detection seam: the sidebar tree wraps each subtree in
 // `<div class="emanote-tree-children">` and stamps every leaf anchor
@@ -9,30 +10,27 @@
 // Both come from Heist; this module never re-parses dates from text.
 // See `routeTreeSplices` in `Emanote.View.Template`.
 //
+// Cell shape is sidebar-specific (day-numbered tile), distinct from
+// the timeline-heatmap's text-less colour-only square. Both share
+// `MONTH_LABELS` and `formatCellHeader` from `@emanote/calendar-grid`,
+// but the cell builders themselves live here.
+//
 // Re-runs on @emanote/morph for live-server in-app navigation.
 
 import { ready, onMorph } from '@emanote/morph';
-import {
-  MONTH_LABELS,
-  SIZE_NARROW,
-  createFilledCell,
-  createEmptyCell,
-  formatCellHeader,
-} from '@emanote/calendar-grid';
+import { MONTH_LABELS, formatCellHeader } from '@emanote/calendar-grid';
 
 const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 const CALENDAR_CLASS = 'emanote-sidebar-calendar';
 const WRAPPER_CLASSES = CALENDAR_CLASS + ' my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
 const HEADER_CLASSES = 'text-[0.7rem] font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1.5';
-const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 gap-1 mb-1';
+const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 mb-1';
 const WEEKDAY_LABEL_CLASSES = 'text-[0.55rem] uppercase tracking-wider text-gray-400 dark:text-gray-500 text-center select-none';
-// auto-rows-[1rem] gives every day-grid row a fixed 16px track regardless
-// of cell content, so the 4×4px cells sit in a comfortable square. The
-// row height used to come from a per-cell `<span class="flex items-center
-// justify-center h-4">` wrapper; place-items-center on the grid does the
-// same centering with one fewer DOM node per day.
-const GRID_CLASSES = 'grid grid-cols-7 gap-1 auto-rows-[1rem] place-items-center';
+const GRID_CLASSES = 'grid grid-cols-7 gap-0.5 place-items-center';
+const CELL_BASE = 'flex items-center justify-center text-[0.65rem] w-6 h-6 rounded-sm tabular-nums';
+const CELL_FILLED = CELL_BASE + ' font-semibold bg-primary-500 dark:bg-primary-400 text-white hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
+const CELL_EMPTY = CELL_BASE + ' text-gray-400 dark:text-gray-600';
 
 // Returns { year, month, leaves: Map<day, {url, title}> } when every
 // child of `wrapper` is a leaf with a parseable iso-date in the same
@@ -64,6 +62,25 @@ function classifyMonthGroup(wrapper) {
     leaves.set(d, { url: a.href, title: a.getAttribute('title') || iso });
   }
   return { year, month, leaves };
+}
+
+// Build one day cell. `entry` is the leaves-map value for this day, or
+// undefined when no daily note exists for it. Filled cells link to the
+// note; empty cells are non-interactive but still show the day number
+// so the calendar reads as a calendar at a glance.
+function buildDayCell(year, month, day, entry) {
+  if (entry) {
+    const a = document.createElement('a');
+    a.className = CELL_FILLED;
+    a.href = entry.url;
+    a.setAttribute('aria-label', formatCellHeader(year, month, day, entry.title));
+    a.textContent = String(day);
+    return a;
+  }
+  const sp = document.createElement('span');
+  sp.className = CELL_EMPTY;
+  sp.textContent = String(day);
+  return sp;
 }
 
 function buildCalendar({ year, month, leaves }) {
@@ -99,16 +116,7 @@ function buildCalendar({ year, month, leaves }) {
 
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   for (let day = 1; day <= lastDay; day++) {
-    const entry = leaves.get(day);
-    if (entry) {
-      grid.appendChild(createFilledCell({
-        url: entry.url,
-        headerText: formatCellHeader(year, month, day, entry.title),
-        sizeClass: SIZE_NARROW,
-      }));
-    } else {
-      grid.appendChild(createEmptyCell(SIZE_NARROW));
-    }
+    grid.appendChild(buildDayCell(year, month, day, leaves.get(day)));
   }
   wrapper.appendChild(grid);
 
