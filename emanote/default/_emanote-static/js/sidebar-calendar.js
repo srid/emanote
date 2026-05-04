@@ -21,15 +21,13 @@ import {
 
 const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-// Idempotence: a WeakSet of wrappers we've already rendered into. The
-// set entry vanishes when the wrapper is detached (idiomorph swap on
-// live-server nav), so a freshly-morphed wrapper is unmarked and
-// re-rendered. No CSS-class state-flag, no double-duty for the marker.
-const renderedWrappers = new WeakSet();
-
-// Class kept for dev-tools inspection only. The render lifecycle
-// no longer reads it — the WeakSet above is the single source of truth.
-const WRAPPER_CLASSES = 'emanote-sidebar-calendar my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
+// Marker class on the rendered calendar element. The DOM is the
+// single source of truth for "this wrapper already holds a calendar"
+// — see `isAlreadyRendered` below — so any external mutation
+// (devtools, a future utility, idiomorph dropping the subtree) leaves
+// the gate in sync with what's actually on screen.
+const CALENDAR_CLASS = 'emanote-sidebar-calendar';
+const WRAPPER_CLASSES = CALENDAR_CLASS + ' my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
 const HEADER_CLASSES = 'text-[0.7rem] font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1.5';
 const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 gap-1 mb-1';
 const WEEKDAY_LABEL_CLASSES = 'text-[0.55rem] uppercase tracking-wider text-gray-400 dark:text-gray-500 text-center select-none';
@@ -125,15 +123,18 @@ function buildCalendar({ year, month, leaves }) {
   return wrapper;
 }
 
+function isAlreadyRendered(wrapper) {
+  return wrapper.firstElementChild?.classList.contains(CALENDAR_CLASS) ?? false;
+}
+
 function render() {
   for (const wrapper of document.querySelectorAll('.emanote-tree-children')) {
-    if (renderedWrappers.has(wrapper)) continue;
+    if (isAlreadyRendered(wrapper)) continue;
     const group = classifyMonthGroup(wrapper);
     if (!group) continue;
     const calendar = buildCalendar(group);
     wrapper.textContent = '';
     wrapper.appendChild(calendar);
-    renderedWrappers.add(wrapper);
   }
 }
 
