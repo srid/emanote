@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-green-900);
   --color-primary-950: var(--color-green-950);
 }
-</style><link href='tailwind.css?instanceId=0d57dd5d-77d0-450a-b9d4-8bdd5da4956a' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=32c80fd9-760b-4efb-a087-c339bbd96a67' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1605,6 +1605,44 @@
 
 
 
+    <h2 id='cascade-merge-semantics' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Cascade merge semantics
+  
+  <a href='yaml-config#cascade-merge-semantics' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      When a child route’s frontmatter or YAML overlaps with values from parent YAMLs, Emanote merges them along three rules:
+    </p>
+  
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
+      
+        <li>
+          <strong>Objects</strong> are deep-merged by key — the child overrides individual nested fields without touching siblings.
+        </li>
+      
+        <li>
+          <strong>Arrays</strong> concatenate (with deduplication) — <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>tags: [team-doc]</code> in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>folder.yaml</code> plus <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>tags: [internal-note]</code> on a child note yields <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>[team-doc, internal-note]</code>. The same applies to other list-valued fields like <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters</code>.
+        </li>
+      
+        <li>
+          <strong>Scalars</strong> right-win — the most-specific value (the leaf) overrides ancestors.
+        </li>
+      
+    </ul>
+  
+    <p class='mb-4 leading-relaxed'>
+      The array rule is what makes a parent YAML’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>tags</code> survive to its children even when those children declare their own.
+    </p>
+  
     <h2 id='special-properties' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
   Special properties
@@ -1719,6 +1757,17 @@
     <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
     
         <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='Cascade merge semantics'>
+              <a href='yaml-config#cascade-merge-semantics' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Cascade merge semantics
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
           
             <li class='truncate' title='Special properties'>
               <a href='yaml-config#special-properties' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
