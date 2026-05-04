@@ -89,6 +89,9 @@ async function startLive(): Promise<{ url: string; resource: BackendResource }> 
     ["-L", fixtureDir, "run", "--port", String(port)],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
+  // Drain stdout too; otherwise a chatty live server can block once the pipe
+  // buffer fills, which surfaces as Playwright navigation timeouts.
+  proc.stdout?.on("data", () => {});
   proc.stderr?.on("data", (d: Buffer) =>
     process.stderr.write(`[emanote:live] ${d}`),
   );
