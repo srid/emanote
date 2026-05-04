@@ -13,7 +13,7 @@
  * (no WebSocket, no `window.ema`).
  */
 
-import { Then } from "@cucumber/cucumber";
+import { Given, Then } from "@cucumber/cucumber";
 import { EmanoteWorld } from "../support/world.ts";
 import * as assert from "node:assert";
 
@@ -29,6 +29,49 @@ async function waitForCalendar(page: EmanoteWorld["page"]): Promise<void> {
     .waitFor({ state: "attached", timeout: 5_000 });
 }
 
+async function getCalendarDay(
+  page: EmanoteWorld["page"],
+  day: number,
+): Promise<ReturnType<EmanoteWorld["page"]["locator"]>> {
+  await waitForCalendar(page);
+  const cell = page.locator(`${CALENDAR_SEL} [data-day="${day}"]`).first();
+  await cell.waitFor({ state: "attached", timeout: 5_000 });
+  return cell;
+}
+
+Given(
+  "the browser date is {string}",
+  async function (this: EmanoteWorld, isoDate: string) {
+    assert.match(
+      isoDate,
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Browser date fixture must be YYYY-MM-DD.",
+    );
+    await this.page.addInitScript({
+      content: `
+        (() => {
+          const date = ${JSON.stringify(isoDate)};
+          const RealDate = Date;
+          const [year, month, day] = date.split("-").map(Number);
+          const fixedTime = new RealDate(year, month - 1, day, 12).getTime();
+          function MockDate(...args) {
+            if (new.target) {
+              return args.length === 0
+                ? new RealDate(fixedTime)
+                : new RealDate(...args);
+            }
+            return new RealDate(fixedTime).toString();
+          }
+          Object.setPrototypeOf(MockDate, RealDate);
+          MockDate.prototype = RealDate.prototype;
+          MockDate.now = () => fixedTime;
+          window.Date = MockDate;
+        })();
+      `,
+    });
+  },
+);
+
 Then(
   "the sidebar month calendar is visible with header {string}",
   async function (this: EmanoteWorld, header: string) {
@@ -41,6 +84,53 @@ Then(
       (headerText ?? "").trim(),
       header,
       `Expected sidebar calendar header ${JSON.stringify(header)}, got ${JSON.stringify(headerText)}. Either sidebar-calendar.js didn't run (importmap regression / module dropped from emanoteJsModuleNames) or buildCalendar's header text format changed.`,
+    );
+  },
+);
+
+Then(
+  "the sidebar month calendar marks day {int} as the active route",
+  async function (this: EmanoteWorld, day: number) {
+    const cell = await getCalendarDay(this.page, day);
+    const active = await cell.getAttribute("data-active-route");
+    const ariaCurrent = await cell.getAttribute("aria-current");
+    const cls = (await cell.getAttribute("class")) ?? "";
+    assert.notStrictEqual(
+      active,
+      null,
+      `Expected day ${day} to carry data-active-route. Current route highlighting likely failed to compare the cell href with window.location.pathname.`,
+    );
+    assert.strictEqual(
+      ariaCurrent,
+      "page",
+      `Expected day ${day} to expose aria-current="page" for the active route.`,
+    );
+    assert.ok(
+      cls.includes("bg-primary-700"),
+      `Expected active route day ${day} to use the selected primary background; class=${JSON.stringify(cls)}.`,
+    );
+  },
+);
+
+Then(
+  "the sidebar month calendar marks day {int} as today",
+  async function (this: EmanoteWorld, day: number) {
+    const cell = await getCalendarDay(this.page, day);
+    const today = await cell.getAttribute("data-today");
+    const iso = await cell.getAttribute("data-iso-date");
+    const cls = (await cell.getAttribute("class")) ?? "";
+    const browserDate = await this.page.evaluate(() => {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    });
+    assert.notStrictEqual(
+      today,
+      null,
+      `Expected day ${day} to carry data-today. cell date=${JSON.stringify(iso)}, browser date=${JSON.stringify(browserDate)}. Today highlighting likely failed to compare the cell date with the browser's local date.`,
+    );
+    assert.ok(
+      cls.includes("underline"),
+      `Expected today day ${day} to include the visual today marker; class=${JSON.stringify(cls)}.`,
     );
   },
 );

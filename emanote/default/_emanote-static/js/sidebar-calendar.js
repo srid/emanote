@@ -28,9 +28,58 @@ const HEADER_CLASSES = 'text-[0.7rem] font-semibold tracking-tight text-gray-700
 const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 mb-1';
 const WEEKDAY_LABEL_CLASSES = 'text-[0.55rem] uppercase tracking-wider text-gray-400 dark:text-gray-500 text-center select-none';
 const GRID_CLASSES = 'grid grid-cols-7 gap-0.5 place-items-center';
-const CELL_BASE = 'flex items-center justify-center text-[0.65rem] w-6 h-6 rounded-sm tabular-nums';
-const CELL_FILLED = CELL_BASE + ' font-semibold bg-primary-500 dark:bg-primary-400 text-white hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
+const CELL_BASE = 'flex items-center justify-center text-[0.65rem] w-6 h-6 rounded-sm tabular-nums transition-colors';
+const CELL_FILLED = CELL_BASE + ' font-semibold bg-primary-500 dark:bg-primary-400 text-white hover:bg-primary-700 dark:hover:bg-primary-300';
+const CELL_TODAY_MARKER = ' underline decoration-2 underline-offset-2';
+const CELL_FILLED_TODAY = CELL_FILLED + ' ring-2 ring-primary-300/80 dark:ring-primary-500/80 ring-offset-1 ring-offset-gray-50 dark:ring-offset-gray-900' + CELL_TODAY_MARKER;
+const CELL_ACTIVE = CELL_BASE + ' font-bold bg-primary-700 dark:bg-primary-300 text-white dark:text-gray-950 ring-2 ring-primary-300/80 dark:ring-primary-500/80 ring-offset-1 ring-offset-gray-50 dark:ring-offset-gray-900 shadow-sm';
+const CELL_ACTIVE_TODAY = CELL_ACTIVE + CELL_TODAY_MARKER;
 const CELL_EMPTY = CELL_BASE + ' text-gray-400 dark:text-gray-600';
+const CELL_EMPTY_TODAY = CELL_BASE + ' font-semibold text-primary-700 dark:text-primary-300 bg-white dark:bg-gray-950 border border-primary-400/80 dark:border-primary-500/80' + CELL_TODAY_MARKER;
+
+function dateToIso(year, month, day) {
+  return [
+    String(year).padStart(4, '0'),
+    String(month).padStart(2, '0'),
+    String(day).padStart(2, '0'),
+  ].join('-');
+}
+
+function todayIso() {
+  const now = new Date();
+  return dateToIso(now.getFullYear(), now.getMonth() + 1, now.getDate());
+}
+
+function isCurrentRoute(url) {
+  return new URL(url, document.baseURI).pathname === window.location.pathname;
+}
+
+function refreshDayCell(cell, today) {
+  const isToday = cell.dataset.isoDate === today;
+  cell.toggleAttribute('data-today', isToday);
+
+  if (cell.tagName === 'A') {
+    const isActive = isCurrentRoute(cell.href);
+    cell.className = isActive
+      ? (isToday ? CELL_ACTIVE_TODAY : CELL_ACTIVE)
+      : (isToday ? CELL_FILLED_TODAY : CELL_FILLED);
+    cell.toggleAttribute('data-active-route', isActive);
+    if (isActive) {
+      cell.setAttribute('aria-current', 'page');
+    } else {
+      cell.removeAttribute('aria-current');
+    }
+  } else {
+    cell.className = isToday ? CELL_EMPTY_TODAY : CELL_EMPTY;
+  }
+}
+
+function refreshCalendar(calendar) {
+  const today = todayIso();
+  for (const cell of calendar.querySelectorAll('[data-iso-date]')) {
+    refreshDayCell(cell, today);
+  }
+}
 
 // Returns { year, month, leaves: Map<day, {url, title}> } when every
 // child of `wrapper` is a leaf with a parseable iso-date in the same
@@ -68,24 +117,30 @@ function classifyMonthGroup(wrapper) {
 // undefined when no daily note exists for it. Filled cells link to the
 // note; empty cells are non-interactive but still show the day number
 // so the calendar reads as a calendar at a glance.
-function buildDayCell(year, month, day, entry) {
+function buildDayCell(year, month, day, entry, today) {
+  const iso = dateToIso(year, month, day);
   if (entry) {
     const a = document.createElement('a');
-    a.className = CELL_FILLED;
     a.href = entry.url;
+    a.dataset.day = String(day);
+    a.dataset.isoDate = iso;
     a.setAttribute('aria-label', formatCellHeader(year, month, day, entry.title));
     a.textContent = String(day);
+    refreshDayCell(a, today);
     return a;
   }
   const sp = document.createElement('span');
-  sp.className = CELL_EMPTY;
+  sp.dataset.day = String(day);
+  sp.dataset.isoDate = iso;
   sp.textContent = String(day);
+  refreshDayCell(sp, today);
   return sp;
 }
 
 function buildCalendar({ year, month, leaves }) {
   const wrapper = document.createElement('div');
   wrapper.className = WRAPPER_CLASSES;
+  const today = todayIso();
 
   const header = document.createElement('div');
   header.className = HEADER_CLASSES;
@@ -116,7 +171,7 @@ function buildCalendar({ year, month, leaves }) {
 
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   for (let day = 1; day <= lastDay; day++) {
-    grid.appendChild(buildDayCell(year, month, day, leaves.get(day)));
+    grid.appendChild(buildDayCell(year, month, day, leaves.get(day), today));
   }
   wrapper.appendChild(grid);
 
@@ -129,7 +184,10 @@ function isAlreadyRendered(wrapper) {
 
 function render() {
   for (const wrapper of document.querySelectorAll('.emanote-tree-children')) {
-    if (isAlreadyRendered(wrapper)) continue;
+    if (isAlreadyRendered(wrapper)) {
+      refreshCalendar(wrapper.firstElementChild);
+      continue;
+    }
     const group = classifyMonthGroup(wrapper);
     if (!group) continue;
     const calendar = buildCalendar(group);

@@ -201,6 +201,13 @@ Feature: Smoke
     And the sidebar month calendar has 3 filled day cells
 
   @no-morph
+  Scenario: Sidebar month calendar distinguishes active route and today (issue #700)
+    Given the browser date is "2026-04-30"
+    When I open "/calendar-test/2026/04/2026-04-15.html"
+    Then the sidebar month calendar marks day 15 as the active route
+    And the sidebar month calendar marks day 30 as today
+
+  @no-morph
   Scenario: Sidebar month folder swaps the linear list, not augments it (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar has no plain link with text "2026-04-01"
@@ -217,3 +224,4 @@ Feature: Smoke
     And I navigate via Ema to "/calendar-test/2026/04/2026-04-30.html"
     Then the sidebar month calendar is visible with header "Apr 2026"
     And the sidebar month calendar links day 30 to "calendar-test/2026/04/2026-04-30"
+    And the sidebar month calendar marks day 30 as the active route
