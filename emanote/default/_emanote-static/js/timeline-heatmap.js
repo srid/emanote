@@ -27,6 +27,7 @@ import {
   FLYOUT_HEADER,
   createFilledCell,
   createEmptyCell,
+  formatCellHeader,
 } from '@emanote/calendar-grid';
 
 const DATE_RE = /(\d{4})-(\d{2})-(\d{2})/;
@@ -101,13 +102,9 @@ function renderMonthRow(year, month, dayMap, wide) {
   for (let day = 1; day <= 31; day++) {
     const entry = dayMap && dayMap.get(day);
     if (entry) {
-      const dStr = String(day).padStart(2, '0');
-      const moStr = String(month).padStart(2, '0');
-      const dateStr = year + '-' + moStr + '-' + dStr;
-      const headerText = dateStr + ' — ' + entry.title;
       cells.appendChild(createFilledCell({
         url: entry.url,
-        headerText,
+        headerText: formatCellHeader(year, month, day, entry.title),
         sizeClass,
         flyoutBuilder: (h) => buildFlyout(h, entry.contextHTML),
       }));

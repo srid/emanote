@@ -55,3 +55,12 @@ export function createEmptyCell(sizeClass) {
   sp.setAttribute('aria-hidden', 'true');
   return sp;
 }
+
+// Header text shown by the cell's tooltip / flyout. Shared so both
+// widgets format dates identically — a drift here would surface as
+// "the timeline says 2026-04-21 but the sidebar says 21 Apr 2026".
+export function formatCellHeader(year, month, day, title) {
+  const moStr = String(month).padStart(2, '0');
+  const dStr = String(day).padStart(2, '0');
+  return year + '-' + moStr + '-' + dStr + ' — ' + title;
+}
