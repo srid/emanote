@@ -17,22 +17,22 @@ import {
   SIZE_NARROW,
   createFilledCell,
   createEmptyCell,
+  formatCellHeader,
 } from '@emanote/calendar-grid';
 
 const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-// Marker class on the rendered calendar element. The DOM is the
-// single source of truth for "this wrapper already holds a calendar"
-// — see `isAlreadyRendered` below — so any external mutation
-// (devtools, a future utility, idiomorph dropping the subtree) leaves
-// the gate in sync with what's actually on screen.
 const CALENDAR_CLASS = 'emanote-sidebar-calendar';
 const WRAPPER_CLASSES = CALENDAR_CLASS + ' my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
 const HEADER_CLASSES = 'text-[0.7rem] font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1.5';
 const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 gap-1 mb-1';
 const WEEKDAY_LABEL_CLASSES = 'text-[0.55rem] uppercase tracking-wider text-gray-400 dark:text-gray-500 text-center select-none';
-const GRID_CLASSES = 'grid grid-cols-7 gap-1';
-const CELL_WRAPPER_CLASSES = 'flex items-center justify-center h-4';
+// auto-rows-[1rem] gives every day-grid row a fixed 16px track regardless
+// of cell content, so the 4×4px cells sit in a comfortable square. The
+// row height used to come from a per-cell `<span class="flex items-center
+// justify-center h-4">` wrapper; place-items-center on the grid does the
+// same centering with one fewer DOM node per day.
+const GRID_CLASSES = 'grid grid-cols-7 gap-1 auto-rows-[1rem] place-items-center';
 
 // Returns { year, month, leaves: Map<day, {url, title}> } when every
 // child of `wrapper` is a leaf with a parseable iso-date in the same
@@ -49,7 +49,7 @@ function classifyMonthGroup(wrapper) {
     // be present (empty) when `tree:open` is true on the leaf — we
     // care only whether the wrapper has content.
     if (child.querySelector(':scope > .emanote-tree-children > *')) return null;
-    const a = child.querySelector(':scope > .flex a[data-iso-date]');
+    const a = child.querySelector(':scope a[data-iso-date]');
     if (!a) return null;
     const iso = a.dataset.isoDate;
     if (!iso) return null;
@@ -93,30 +93,22 @@ function buildCalendar({ year, month, leaves }) {
   const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay() || 7;
   for (let i = 1; i < firstWeekday; i++) {
     const blank = document.createElement('span');
-    blank.className = CELL_WRAPPER_CLASSES;
     blank.setAttribute('aria-hidden', 'true');
     grid.appendChild(blank);
   }
 
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   for (let day = 1; day <= lastDay; day++) {
-    const cellWrap = document.createElement('span');
-    cellWrap.className = CELL_WRAPPER_CLASSES;
     const entry = leaves.get(day);
     if (entry) {
-      const dStr = String(day).padStart(2, '0');
-      const moStr = String(month).padStart(2, '0');
-      const dateStr = year + '-' + moStr + '-' + dStr;
-      const cell = createFilledCell({
+      grid.appendChild(createFilledCell({
         url: entry.url,
-        headerText: dateStr + ' — ' + entry.title,
+        headerText: formatCellHeader(year, month, day, entry.title),
         sizeClass: SIZE_NARROW,
-      });
-      cellWrap.appendChild(cell);
+      }));
     } else {
-      cellWrap.appendChild(createEmptyCell(SIZE_NARROW));
+      grid.appendChild(createEmptyCell(SIZE_NARROW));
     }
-    grid.appendChild(cellWrap);
   }
   wrapper.appendChild(grid);
 
