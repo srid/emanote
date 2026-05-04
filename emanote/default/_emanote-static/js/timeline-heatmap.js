@@ -84,9 +84,10 @@ function renderMonthRow(year, month, dayMap) {
       const moStr = String(month).padStart(2, '0');
       const dateStr = year + '-' + moStr + '-' + dStr;
       const headerText = dateStr + ' — ' + entry.title;
-      // Native title kept as the keyboard-focus / screen-reader label
-      // and as a fallback when the visual flyout is clipped off-screen.
-      a.title = headerText;
+      // aria-label (not title) so screen readers still announce the
+      // cell without the browser layering its native gray tooltip on
+      // top of the rich hover flyout.
+      a.setAttribute('aria-label', headerText);
       // CSS-only flyout: hidden by default, shown on group-hover /
       // group-focus-within (the cell carries `group relative`). Built
       // up programmatically rather than via innerHTML so the cloned
