@@ -7,12 +7,12 @@ slug: fonts
 Emanote ships with three self-hosted fonts served out of the bundled static layer (no third-party fetch at page load):
 
 - [Lora](https://fonts.google.com/specimen/Lora) — prose
-- [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) — UI chrome (sidebar, breadcrumbs, TOC, backlinks) and headings
+- [Mona Sans](https://github.com/github/mona-sans) — UI chrome (sidebar, right-panel, breadcrumbs, backlinks) and headings
 - [Space Mono](https://fonts.google.com/specimen/Space+Mono) — inline code and code blocks
 
 The woff2 files plus a generated `fonts.css` live under `_emanote-static/fonts/`, and `templates/styles.tpl` links them via `<emanoteStaticUrl path="fonts/fonts.css">…</emanoteStaticUrl>`. Generated static sites therefore work fully offline.
 
-The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) shows up in the note title, wikilinks, TOC accents, and backlink cards rather than in full-bleed body backgrounds.
+The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) drives the unified chip language used by the page title, wikilinks, [[backlinks]], query results, the [[right-panel|timeline heatmap]], and tags — every "linked note" surface reads as one family. The [[toc|table of contents]] sits deliberately outside this palette in neutral gray, since TOC entries map to plain-prose headings rather than other notes.
 
 ## Changing the Font Family
 
