@@ -54,34 +54,17 @@ mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
 mergeAesons =
   last . NE.scanl1 mergeAeson
 
-{- | Deep-merge two YAML-shaped Aeson values.
-
-Contract — applies uniformly regardless of caller:
+{- | Deep-merge two YAML-shaped Aeson values. The contract applies
+uniformly to every caller (cascade and non-cascade alike):
 
   * Objects merge by key, recursively.
   * Arrays concatenate, then deduplicate (left order preserved).
   * Scalars right-win.
 
-The array clause is the load-bearing one and the deliberate divergence
-from @aeson-extra@'s @lodashMerge@: lodash aligns arrays by index,
-which for list-valued fields like @tags@ silently clobbers cascade
-contributions the moment a child note declares any of its own — see
-issue #697.
-
-The function is general-purpose. The metadata cascade
-('parseSDataCascading', 'Emanote.Model.Meta.getEffectiveRouteMetaWith')
-is the case where every clause matters, but non-cascade callers
-('Emanote.Model.Note.withAesonDefault',
-'Emanote.Model.Note.overrideAesonText',
-'Emanote.View.Template.setErrorPageMeta') merge values that contain no
-arrays and so rely only on the object/scalar clauses; they share this
-single merger by design rather than coincidence.
-
-Stability note: the contract is fixed across keys. If a future change
-needs per-key strategies (e.g. \"replace, don't union, for field X\"),
-the right boundary is a new module that owns cascade folding and
-parameterises strategy — not a flag added here. Callers should keep
-treating this function as the universal deep-merge primitive.
+The array clause is the deliberate divergence from @aeson-extra@'s
+@lodashMerge@: lodash aligns arrays by index, which for list-valued
+fields like @tags@ silently clobbers cascade contributions the moment
+a child note declares any of its own — see issue #697.
 -}
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
 mergeAeson (Aeson.Object a) (Aeson.Object b) =
