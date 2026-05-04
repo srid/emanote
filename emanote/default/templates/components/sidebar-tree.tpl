@@ -61,7 +61,7 @@
         </has-children>
       </tree:open>
     </span>
-    <a class="${link-class} rounded-md px-2 py-1 truncate flex-1" title="${node:text}" href="${node:url}">
+    <a class="${link-class} rounded-md px-2 py-1 truncate flex-1" title="${node:text}" href="${node:url}" data-iso-date="${node:iso-date}">
       <node:text />
     </a>
     <tree:open>
@@ -77,10 +77,21 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   <tree:open>
-    <children>
-      <apply template="sidebar-tree" />
-    </children>
+    <div class="emanote-tree-children">
+      <children>
+        <apply template="sidebar-tree" />
+      </children>
+    </div>
   </tree:open>
 </div>

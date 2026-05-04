@@ -172,6 +172,8 @@ AfterAll(async () => {
   }
 });
 
+const MORPH_TAG = "@morph";
+
 Before(async function (this: EmanoteWorld) {
   this.browser = browser;
   this.context = await browser.newContext({
@@ -180,8 +182,6 @@ Before(async function (this: EmanoteWorld) {
   });
   this.page = await this.context.newPage();
 });
-
-const MORPH_TAG = "@morph";
 
 // Static mode has no WebSocket and `window.ema` is undefined, so any
 // `@morph` scenario would fail at the first `switchRoute` call.

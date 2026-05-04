@@ -50,7 +50,10 @@ doesn't appear here.
 -}
 emanoteJsModuleNames :: [Text]
 emanoteJsModuleNames =
-  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork", "timeline-heatmap"]
+  -- Sidebar widgets (e.g. sidebar-calendar) attach by scanning the
+  -- generic tree DOM emitted by `routeTreeSplices`; see the seam
+  -- contract in `templates/components/sidebar-tree.tpl`.
+  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork", "calendar-grid", "timeline-heatmap", "sidebar-calendar"]
 
 {- | Render the importmap + module entry script tags. Drop into the page
 \<head\> via a Heist splice; safe to call multiple times per render

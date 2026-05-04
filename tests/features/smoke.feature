@@ -190,3 +190,34 @@ Feature: Smoke
   Scenario: Cascaded YAML tag still indexes a child note that declares its own tags (regression: #697)
     When I fetch "/-/tags/issue-697-cascaded.html"
     Then the response body contains "issue-697/note"
+
+  Scenario: Sidebar month folder renders as a calendar grid (issue #700)
+    When I open "/calendar-test/2026/04/2026-04-15.html"
+    Then the sidebar month calendar is visible with header "Apr 2026"
+    And the sidebar month calendar links day 1 to "calendar-test/2026/04/2026-04-01"
+    And the sidebar month calendar links day 15 to "calendar-test/2026/04/2026-04-15"
+    And the sidebar month calendar links day 30 to "calendar-test/2026/04/2026-04-30"
+    And the sidebar month calendar has 3 filled day cells
+
+  Scenario: Sidebar month calendar distinguishes active route and today (issue #700)
+    Given the browser date is "2026-04-30"
+    When I open "/calendar-test/2026/04/2026-04-15.html"
+    Then the sidebar month calendar marks day 15 as the active route
+    And the sidebar month calendar marks day 30 as today
+
+  Scenario: Sidebar month folder swaps the linear list, not augments it (issue #700)
+    When I open "/calendar-test/2026/04/2026-04-15.html"
+    Then the sidebar has no plain link with text "2026-04-01"
+    And the sidebar has no plain link with text "2026-04-30"
+
+  Scenario: Sidebar non-month folders do not render as a calendar (issue #700)
+    When I open "/"
+    Then the sidebar tree has no calendar wrapper for non-month folders
+
+  @morph
+  Scenario: Sidebar calendar survives Ema's in-app morph navigation (issue #700)
+    When I open "/calendar-test/2026/04/2026-04-01.html"
+    And I navigate via Ema to "/calendar-test/2026/04/2026-04-30.html"
+    Then the sidebar month calendar is visible with header "Apr 2026"
+    And the sidebar month calendar links day 30 to "calendar-test/2026/04/2026-04-30"
+    And the sidebar month calendar marks day 30 as the active route
