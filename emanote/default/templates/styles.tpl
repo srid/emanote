@@ -85,9 +85,6 @@
   main tbody tr {
     border-bottom: 1px solid var(--color-gray-100);
   }
-  main tbody tr:last-child {
-    border-bottom: none;
-  }
   main tbody tr:hover {
     background-color: var(--color-gray-50);
   }

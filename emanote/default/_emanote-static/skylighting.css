@@ -1,13 +1,17 @@
 /* Skylighting syntax highlighting theme */
 /* To override, create your own _emanote-static/skylighting.css */
 
-/* Code block container styling */
+/* Code block container styling — use Tailwind v4 design tokens so the
+   chrome tracks the rest of the palette (and the theme toggle), and
+   matches the rounded-lg / gray-50 / gray-200 idiom used elsewhere
+   in the default theme. */
 pre {
-  background-color: #f8f8f8;
-  border: 1px solid #e1e4e8;
-  border-radius: 6px;
-  padding: 1rem;
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0.5rem; /* matches Tailwind rounded-lg */
+  padding: 0.875rem 1.125rem;
   overflow-x: auto;
+  line-height: 1.6;
 }
 
 pre code {
@@ -16,10 +20,9 @@ pre code {
   padding: 0;
 }
 
-/* Dark mode code block — keyed off .dark so the theme toggle controls it. */
 .dark pre {
-  background-color: #1e1e1e;
-  border-color: #333;
+  background-color: var(--color-gray-950);
+  border-color: var(--color-gray-800);
 }
 
 /* Token colors */

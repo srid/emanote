@@ -1,6 +1,6 @@
 # Revision history for emanote
 
-## 1.6.0.0 (Unreleased)
+## 2.0.0.0 (Unreleased)
 
 **Notable features**
 

@@ -120,7 +120,12 @@
     <Internal class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70" />
     <External class="text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
+  <!-- Wrapper just provides bottom margin + sets the size. The <pre>
+       inside owns its own bg / border / rounded / padding / overflow
+       (skylighting.css uses Tailwind design tokens). The previous
+       py-4 pr-4 layered a second padding on top of pre's own, with a
+       suspicious right-only padding that left visible asymmetry. -->
+  <CodeBlock class="mb-6 text-sm" />
   <Code class="py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal" />
 
   <Header:1>
