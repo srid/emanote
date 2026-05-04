@@ -217,15 +217,10 @@
 </style>
 
 <style data-category="sidebar-tree">
-  /* Folgezettel depth rails: nested tree levels get a subtle left border */
-  #sidebar .pl-2 .pl-2 {
-    border-left: 1px solid var(--color-gray-200);
-    margin-left: 0.25rem;
-  }
-
-  .dark #sidebar .pl-2 .pl-2 {
-    border-left-color: var(--color-gray-800);
-  }
+  /* Folgezettel depth rails removed — indent alone is enough to
+     convey hierarchy and the rule was visual noise the user can do
+     without. (Re-add later as a 1px gray-100 / gray-900 hairline
+     if deep trees become hard to follow.) */
 </style>
 
 <style data-category="toc">
