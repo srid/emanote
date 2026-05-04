@@ -63,6 +63,23 @@
     font-family: var(--font-mono);
   }
 
+  /* Block-level prose images (an <img> that's the only content of its
+     paragraph) get a subtle frame: thin gray border, rounded corners,
+     centered with a bit of vertical breathing room. Inline images
+     (e.g. emoji, small icons inside flowing text) stay un-styled via
+     the :only-child gate. */
+  main p > img:only-child {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-gray-200);
+  }
+  .dark main p > img:only-child {
+    border-color: var(--color-gray-800);
+  }
+
   /* Tables — Pandoc emits standard <table> HTML with no classes, so we
      style by element. Scoped under `main` to avoid hitting tables in
      chrome surfaces (sidebar tree, footnote popover, etc). */

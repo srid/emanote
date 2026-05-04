@@ -1,30 +1,31 @@
-<!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
+<!-- Variable bindings for this tree. The active item shares the wikilink
+     chip palette (bg-primary-50/70, text-primary-600, font-semibold,
+     tracking-tight) so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+<bind tag="link-class">hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors</bind>
 <node:active>
-  <bind tag="link-class">font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors</bind>
+  <bind tag="link-class">font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
+      <bind tag="link-class">font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>
 
 <has-children>
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   <bind tag="icon">
     <tree:open>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-        class="${iconSize} inline text-gray-700 dark:text-gray-300" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
-          clip-rule="evenodd" />
+        class="${iconSize} inline text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9" />
       </svg>
       <else />
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500 dark:text-gray-400"
-        viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-          clip-rule="evenodd" />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        class="${iconSize} inline text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 6 15 12 9 18" />
       </svg>
     </tree:open>
   </bind>

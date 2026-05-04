@@ -17,7 +17,7 @@
         <li class="group relative">
           <a class="block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors"
              href="${backlink:note:url}">
-            <span class="text-primary-400 dark:text-primary-700 mr-1.5 select-none" aria-hidden="true">→</span><backlink:note:title />
+            <span class="text-primary-400 dark:text-primary-700 mr-1.5 select-none" aria-hidden="true">←</span><backlink:note:title />
           </a>
           <!-- Outer wrapper extends right up against the li (right:full)
                with pr-3 of padding so the inner card visually sits 0.75rem
