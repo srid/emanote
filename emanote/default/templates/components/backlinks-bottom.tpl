@@ -23,14 +23,17 @@
       <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
         Linked from
       </h3>
-      <ul class="space-y-3 text-sm">
+      <!-- divide-y between rows + a left-rule on the context block
+           anchor each backlink + its context together as one unit, so
+           the list stops reading as undifferentiated prose. -->
+      <ul class="divide-y divide-gray-200 dark:divide-gray-800 text-sm">
         <backlink>
-          <li>
+          <li class="py-3 first:pt-0 last:pb-0">
             <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors"
                href="${backlink:note:url}">
               <backlink:note:title />
             </a>
-            <div class="text-gray-500 dark:text-gray-300 mt-1.5">
+            <div class="mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400">
               <backlink:note:contexts>
                 <apply template="context" />
               </backlink:note:contexts>
