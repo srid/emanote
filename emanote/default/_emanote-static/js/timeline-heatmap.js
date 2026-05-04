@@ -174,8 +174,10 @@ function render() {
     }
     section.hidden = false;
     // wide layout when the bottom strip hosts the timeline; narrow when
-    // it's in the right-panel column.
-    const wide = !!section.closest('#backlinks-bottom');
+    // it's in the right-panel column. The outer aside carries the
+    // .emanote-bottom-strip class (chrome only — its inner sections own
+    // the panel IDs).
+    const wide = !!section.closest('.emanote-bottom-strip');
     const years = [...grouped.keys()].sort((a, b) => b - a);
     for (const year of years) {
       target.appendChild(renderYear(year, grouped.get(year), wide));

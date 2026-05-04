@@ -8,12 +8,18 @@
      OR across two splices), and the [&:not(:has(*))]:hidden Tailwind
      guard hides it on pages where neither splice emitted anything —
      so the chrome doesn't show as an empty bar on backlink-less pages. -->
-<aside id="backlinks-bottom" class="lg:hidden [&:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6">
+<!-- The outer aside is the "bottom-strip" wrapper — chrome (bg / top
+     border / padding) only. The two inner sections own the IDs that
+     match the right-panel's section IDs (#backlinks-bottom for the
+     regular-backlinks list, .emanote-timeline for the heatmap), so
+     e2e selectors and JS context detection target the right scope
+     instead of conflating timeline anchors with backlink anchors. -->
+<aside class="emanote-bottom-strip lg:hidden [&:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6">
   <ema:note:backlinks:daily>
     <apply template="timeline" />
   </ema:note:backlinks:daily>
   <ema:note:backlinks:nodaily>
-    <section>
+    <section id="backlinks-bottom">
       <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
         Linked from
       </h3>
