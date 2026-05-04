@@ -22,12 +22,25 @@ const MONTH_LABELS = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
+// Two render contexts with different cell sizing:
+//   - "narrow"  → right-panel column (~150-210px content). Cells are
+//                 fixed 4×4px squares (w-1 h-1). Fits 31 cells in a row
+//                 at ~5px stride.
+//   - "wide"    → bottom strip at <lg (full container width, ~700-960px).
+//                 Cells are flex-1 with min-w + h-2.5 so they stretch to
+//                 fill the available row width as horizontal bars rather
+//                 than leaving the heatmap floating in 70% empty space.
+//
+// Detection: a section inside #backlinks-bottom uses the wide layout;
+// otherwise (the right-panel home) the narrow layout. Each render call
+// picks once per section.
 const ROW_CLASSES = 'flex items-center gap-1.5';
-const LABEL_CLASSES = 'w-7 text-[0.65rem] uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none';
-const CELLS_CLASSES = 'flex gap-px';
-const CELL_BASE = 'block w-1 h-1 rounded-[1px]';
-const CELL_EMPTY = CELL_BASE + ' bg-gray-200 dark:bg-gray-800';
-const CELL_FILLED = CELL_BASE + ' group relative bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
+const LABEL_CLASSES = 'w-7 text-[0.65rem] uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none shrink-0';
+const CELL_BASE = 'block rounded-[1px]';
+const CELL_FILLED_BASE = CELL_BASE + ' group relative bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
+const CELL_EMPTY_BG = ' bg-gray-200 dark:bg-gray-800';
+const SIZE_NARROW = ' w-1 h-1';
+const SIZE_WIDE = ' flex-1 min-w-[6px] h-2.5';
 const YEAR_LABEL_CLASSES = 'text-xs font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1';
 
 // Hover flyout: outer wrapper with pt-1.5 acts as a transparent
@@ -60,7 +73,7 @@ function parseEntries(listEl) {
   return out;
 }
 
-function renderMonthRow(year, month, dayMap) {
+function renderMonthRow(year, month, dayMap, wide) {
   const row = document.createElement('div');
   row.className = ROW_CLASSES;
 
@@ -69,8 +82,15 @@ function renderMonthRow(year, month, dayMap) {
   label.textContent = MONTH_LABELS[month - 1];
   row.appendChild(label);
 
+  const cellSize = wide ? SIZE_WIDE : SIZE_NARROW;
+  const cellEmptyClass = CELL_BASE + cellSize + CELL_EMPTY_BG;
+  const cellFilledClass = CELL_FILLED_BASE + cellSize;
+
   const cells = document.createElement('div');
-  cells.className = CELLS_CLASSES;
+  // flex-1 on the row's cells container only matters in the wide
+  // context — the cells inside use flex-1 to distribute the row's
+  // remaining width (after the month label).
+  cells.className = wide ? 'flex flex-1 gap-px' : 'flex gap-px';
   // 31 cells regardless of month length — empty trailing cells render as
   // "no day" placeholders for visual alignment across rows. (A 30-day month
   // gets one trailing empty; February gets 2 or 3.)
@@ -78,7 +98,7 @@ function renderMonthRow(year, month, dayMap) {
     const entry = dayMap && dayMap.get(day);
     if (entry) {
       const a = document.createElement('a');
-      a.className = CELL_FILLED;
+      a.className = cellFilledClass;
       a.href = entry.url;
       const dStr = String(day).padStart(2, '0');
       const moStr = String(month).padStart(2, '0');
@@ -110,7 +130,7 @@ function renderMonthRow(year, month, dayMap) {
       cells.appendChild(a);
     } else {
       const sp = document.createElement('span');
-      sp.className = CELL_EMPTY;
+      sp.className = cellEmptyClass;
       sp.setAttribute('aria-hidden', 'true');
       cells.appendChild(sp);
     }
@@ -119,7 +139,7 @@ function renderMonthRow(year, month, dayMap) {
   return row;
 }
 
-function renderYear(year, monthMap) {
+function renderYear(year, monthMap, wide) {
   const wrapper = document.createElement('div');
   wrapper.className = 'mb-3';
 
@@ -131,7 +151,7 @@ function renderYear(year, monthMap) {
   const rows = document.createElement('div');
   rows.className = 'space-y-[2px]';
   for (let month = 1; month <= 12; month++) {
-    rows.appendChild(renderMonthRow(year, month, monthMap.get(month)));
+    rows.appendChild(renderMonthRow(year, month, monthMap.get(month), wide));
   }
   wrapper.appendChild(rows);
   return wrapper;
@@ -153,9 +173,12 @@ function render() {
       continue;
     }
     section.hidden = false;
+    // wide layout when the bottom strip hosts the timeline; narrow when
+    // it's in the right-panel column.
+    const wide = !!section.closest('#backlinks-bottom');
     const years = [...grouped.keys()].sort((a, b) => b - a);
     for (const year of years) {
-      target.appendChild(renderYear(year, grouped.get(year)));
+      target.appendChild(renderYear(year, grouped.get(year), wide));
     }
   }
 }
