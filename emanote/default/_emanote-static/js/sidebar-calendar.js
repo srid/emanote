@@ -21,16 +21,15 @@ import {
 
 const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-// Marker class on the calendar wrapper. Idempotence check: if the
-// tree-children wrapper's first child carries this class, skip — already
-// rendered. Idiomorph re-running on live-server nav can replace the
-// wrapper's content back to tree divs; the next render() then sees no
-// marker and re-applies. Storing the marker on the calendar element
-// (not the wrapper) means it goes away exactly when the calendar
-// goes away, so there's no stale-flag failure mode.
-const CALENDAR_MARKER_CLASS = 'emanote-sidebar-calendar';
+// Idempotence: a WeakSet of wrappers we've already rendered into. The
+// set entry vanishes when the wrapper is detached (idiomorph swap on
+// live-server nav), so a freshly-morphed wrapper is unmarked and
+// re-rendered. No CSS-class state-flag, no double-duty for the marker.
+const renderedWrappers = new WeakSet();
 
-const WRAPPER_CLASSES = CALENDAR_MARKER_CLASS + ' my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
+// Class kept for dev-tools inspection only. The render lifecycle
+// no longer reads it — the WeakSet above is the single source of truth.
+const WRAPPER_CLASSES = 'emanote-sidebar-calendar my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';
 const HEADER_CLASSES = 'text-[0.7rem] font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1.5';
 const WEEKDAY_ROW_CLASSES = 'grid grid-cols-7 gap-1 mb-1';
 const WEEKDAY_LABEL_CLASSES = 'text-[0.55rem] uppercase tracking-wider text-gray-400 dark:text-gray-500 text-center select-none';
@@ -128,12 +127,13 @@ function buildCalendar({ year, month, leaves }) {
 
 function render() {
   for (const wrapper of document.querySelectorAll('.emanote-tree-children')) {
-    if (wrapper.firstElementChild?.classList.contains(CALENDAR_MARKER_CLASS)) continue;
+    if (renderedWrappers.has(wrapper)) continue;
     const group = classifyMonthGroup(wrapper);
     if (!group) continue;
     const calendar = buildCalendar(group);
     wrapper.textContent = '';
     wrapper.appendChild(calendar);
+    renderedWrappers.add(wrapper);
   }
 }
 
