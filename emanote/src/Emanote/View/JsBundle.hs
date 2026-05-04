@@ -50,7 +50,12 @@ doesn't appear here.
 -}
 emanoteJsModuleNames :: [Text]
 emanoteJsModuleNames =
-  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork", "timeline-heatmap"]
+  -- The sidebar tree is a generic API: leaves carry `data-iso-date`
+  -- and subtrees are wrapped in `.emanote-tree-children`, both emitted
+  -- by `routeTreeSplices`. Widgets like sidebar-calendar attach by
+  -- scanning that DOM. Don't push widget-specific bindings (e.g.
+  -- `node:month-group`) into the tree splice — keep the seam thin.
+  ["morph", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork", "calendar-grid", "timeline-heatmap", "sidebar-calendar"]
 
 {- | Render the importmap + module entry script tags. Drop into the page
 \<head\> via a Heist splice; safe to call multiple times per render

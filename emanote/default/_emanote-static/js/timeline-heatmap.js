@@ -13,43 +13,27 @@
 //
 // Re-renders on @emanote/morph navigation so live-server in-app nav picks
 // up new backlinks without a hard reload.
+//
+// Cell primitives (palette, sizes, filled/empty builders) live in
+// @emanote/calendar-grid; the row/grid composition is widget-specific.
 
 import { ready, onMorph } from '@emanote/morph';
+import {
+  MONTH_LABELS,
+  SIZE_NARROW,
+  SIZE_WIDE,
+  FLYOUT_OUTER,
+  FLYOUT_CARD,
+  FLYOUT_HEADER,
+  createFilledCell,
+  createEmptyCell,
+} from '@emanote/calendar-grid';
 
 const DATE_RE = /(\d{4})-(\d{2})-(\d{2})/;
-const MONTH_LABELS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
 
-// Two render contexts with different cell sizing:
-//   - "narrow"  → right-panel column (~150-210px content). Cells are
-//                 fixed 4×4px squares (w-1 h-1). Fits 31 cells in a row
-//                 at ~5px stride.
-//   - "wide"    → bottom strip at <lg (full container width, ~700-960px).
-//                 Cells are flex-1 with min-w + h-2.5 so they stretch to
-//                 fill the available row width as horizontal bars rather
-//                 than leaving the heatmap floating in 70% empty space.
-//
-// Detection: a section inside #backlinks-bottom uses the wide layout;
-// otherwise (the right-panel home) the narrow layout. Each render call
-// picks once per section.
 const ROW_CLASSES = 'flex items-center gap-1.5';
 const LABEL_CLASSES = 'w-7 text-[0.65rem] uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none shrink-0';
-const CELL_BASE = 'block rounded-[1px]';
-const CELL_FILLED_BASE = CELL_BASE + ' group relative bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
-const CELL_EMPTY_BG = ' bg-gray-200 dark:bg-gray-800';
-const SIZE_NARROW = ' w-1 h-1';
-const SIZE_WIDE = ' flex-1 min-w-[6px] h-2.5';
 const YEAR_LABEL_CLASSES = 'text-xs font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1';
-
-// Hover flyout: outer wrapper with pt-1.5 acts as a transparent
-// hover-bridge so cursor traversal between cell and visible card never
-// drops `group-hover`. Positioned below the cell (top-full) so flyouts
-// near the top of the heatmap don't clip on the viewport edge.
-const FLYOUT_OUTER = 'cell-flyout absolute z-50 hidden group-hover:block group-focus-within:block top-full left-1/2 -translate-x-1/2 pt-1.5';
-const FLYOUT_CARD = 'w-64 max-w-[min(16rem,80vw)] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.8rem] leading-[1.5] text-gray-700 dark:text-gray-300 [&_p]:m-0 [&_p+p]:mt-2';
-const FLYOUT_HEADER = 'text-[0.65rem] font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 mb-1.5';
 
 function parseEntries(listEl) {
   const out = new Map(); // year → Map<month, Map<day, {url, title, contextHTML}>>
@@ -73,6 +57,28 @@ function parseEntries(listEl) {
   return out;
 }
 
+function buildFlyout(headerText, contextHTML) {
+  // CSS-only flyout: hidden by default, shown on group-hover /
+  // group-focus-within (the cell carries `group relative`). Built up
+  // programmatically rather than via innerHTML so the cloned pandoc
+  // context HTML can't escape into outer attributes.
+  const flyout = document.createElement('div');
+  flyout.className = FLYOUT_OUTER;
+  const card = document.createElement('div');
+  card.className = FLYOUT_CARD;
+  const header = document.createElement('div');
+  header.className = FLYOUT_HEADER;
+  header.textContent = headerText;
+  card.appendChild(header);
+  if (contextHTML) {
+    const body = document.createElement('div');
+    body.innerHTML = contextHTML;
+    card.appendChild(body);
+  }
+  flyout.appendChild(card);
+  return flyout;
+}
+
 function renderMonthRow(year, month, dayMap, wide) {
   const row = document.createElement('div');
   row.className = ROW_CLASSES;
@@ -82,9 +88,7 @@ function renderMonthRow(year, month, dayMap, wide) {
   label.textContent = MONTH_LABELS[month - 1];
   row.appendChild(label);
 
-  const cellSize = wide ? SIZE_WIDE : SIZE_NARROW;
-  const cellEmptyClass = CELL_BASE + cellSize + CELL_EMPTY_BG;
-  const cellFilledClass = CELL_FILLED_BASE + cellSize;
+  const sizeClass = wide ? SIZE_WIDE : SIZE_NARROW;
 
   const cells = document.createElement('div');
   // flex-1 on the row's cells container only matters in the wide
@@ -97,42 +101,18 @@ function renderMonthRow(year, month, dayMap, wide) {
   for (let day = 1; day <= 31; day++) {
     const entry = dayMap && dayMap.get(day);
     if (entry) {
-      const a = document.createElement('a');
-      a.className = cellFilledClass;
-      a.href = entry.url;
       const dStr = String(day).padStart(2, '0');
       const moStr = String(month).padStart(2, '0');
       const dateStr = year + '-' + moStr + '-' + dStr;
       const headerText = dateStr + ' — ' + entry.title;
-      // aria-label (not title) so screen readers still announce the
-      // cell without the browser layering its native gray tooltip on
-      // top of the rich hover flyout.
-      a.setAttribute('aria-label', headerText);
-      // CSS-only flyout: hidden by default, shown on group-hover /
-      // group-focus-within (the cell carries `group relative`). Built
-      // up programmatically rather than via innerHTML so the cloned
-      // pandoc context HTML can't escape into outer attributes.
-      const flyout = document.createElement('div');
-      flyout.className = FLYOUT_OUTER;
-      const card = document.createElement('div');
-      card.className = FLYOUT_CARD;
-      const header = document.createElement('div');
-      header.className = FLYOUT_HEADER;
-      header.textContent = headerText;
-      card.appendChild(header);
-      if (entry.contextHTML) {
-        const body = document.createElement('div');
-        body.innerHTML = entry.contextHTML;
-        card.appendChild(body);
-      }
-      flyout.appendChild(card);
-      a.appendChild(flyout);
-      cells.appendChild(a);
+      cells.appendChild(createFilledCell({
+        url: entry.url,
+        headerText,
+        sizeClass,
+        flyoutBuilder: (h) => buildFlyout(h, entry.contextHTML),
+      }));
     } else {
-      const sp = document.createElement('span');
-      sp.className = cellEmptyClass;
-      sp.setAttribute('aria-hidden', 'true');
-      cells.appendChild(sp);
+      cells.appendChild(createEmptyCell(sizeClass));
     }
   }
   row.appendChild(cells);

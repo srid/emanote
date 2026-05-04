@@ -61,7 +61,7 @@
         </has-children>
       </tree:open>
     </span>
-    <a class="${link-class} rounded-md px-2 py-1 truncate flex-1" title="${node:text}" href="${node:url}">
+    <a class="${link-class} rounded-md px-2 py-1 truncate flex-1" title="${node:text}" href="${node:url}" data-iso-date="${node:iso-date}">
       <node:text />
     </a>
     <tree:open>
@@ -77,10 +77,17 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    The wrapper div is the seam sidebar-calendar.js scans: when every
+    immediate child is a daily-note leaf (anchor with data-iso-date) and
+    they share a year+month, the JS swaps the children for a calendar
+    grid in place. No-op for non-month groups.
   -->
   <tree:open>
-    <children>
-      <apply template="sidebar-tree" />
-    </children>
+    <div class="emanote-tree-children">
+      <children>
+        <apply template="sidebar-tree" />
+      </children>
+    </div>
   </tree:open>
 </div>

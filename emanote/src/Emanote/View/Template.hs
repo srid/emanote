@@ -6,11 +6,13 @@ import Data.List (partition)
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
+import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Tree qualified as Tree
 import Ema qualified
 import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
+import Emanote.Model.Calendar.Parser qualified as Calendar
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
@@ -242,6 +244,11 @@ routeTreeSplices tCtx mCurrentRoute model = do
         let shortTitle = Meta.lookupRouteMeta @(Maybe Text) Nothing ("short-title" :| []) nodeRoute model
         "node:text" ## maybe (C.titleSplice tCtx $ M.modelLookupTitle nodeRoute model) HI.textSplice shortTitle
         "node:url" ## HI.textSplice $ SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, nodeRoute)
+        -- ISO date for the route's basename if it parses as YYYY-MM-DD; empty
+        -- otherwise. Sole source of truth for daily-note dates on the JS side
+        -- (sidebar-calendar reads it via data-iso-date) so date detection
+        -- stays in Haskell, not duplicated as a regex per widget.
+        "node:iso-date" ## HI.textSplice (maybe "" (toText . formatTime defaultTimeLocale "%Y-%m-%d") $ Calendar.parseRouteDay nodeRoute)
         let isActiveNode = Just nodeRoute == mCurrentRoute
             isActiveTree =
               -- Active tree checking is applicable only when there is an
