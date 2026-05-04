@@ -222,6 +222,7 @@ backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
       -- TODO: reuse note splice
       "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
       "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
+      "backlink:note:iso-date" ## HI.textSplice (routeDayIsoText source)
       "backlink:note:contexts" ##
         Splices.listSplice (toList contexts) "context"
           $ \backlinkCtx -> do
@@ -230,6 +231,10 @@ backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
               C.withInlineCtx bctx
                 $ \ctx' ->
                   Splices.pandocSplice ctx' ctxDoc
+
+routeDayIsoText :: R.LMLRoute -> Text
+routeDayIsoText =
+  maybe "" (toText . formatTime defaultTimeLocale "%Y-%m-%d") . Calendar.parseRouteDay
 
 {- | Heist splice for the sidebar tree.
 
@@ -247,7 +252,7 @@ routeTreeSplices tCtx mCurrentRoute model = do
         -- otherwise. Sole source of truth for daily-note dates on the JS side
         -- (sidebar-calendar reads it via data-iso-date) so date detection
         -- stays in Haskell, not duplicated as a regex per widget.
-        "node:iso-date" ## HI.textSplice (maybe "" (toText . formatTime defaultTimeLocale "%Y-%m-%d") $ Calendar.parseRouteDay nodeRoute)
+        "node:iso-date" ## HI.textSplice (routeDayIsoText nodeRoute)
         let isActiveNode = Just nodeRoute == mCurrentRoute
             isActiveTree =
               -- Active tree checking is applicable only when there is an

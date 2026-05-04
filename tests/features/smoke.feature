@@ -142,6 +142,7 @@ Feature: Smoke
     When I open "/dailyhost.html"
     Then the Timeline panel links to "dailyhost/2025-01-01"
     And the Timeline panel links to "dailyhost/2025-01-02"
+    And every Timeline data entry has an ISO date
 
   Scenario: Non-daily backlinks land in the Backlinks panel and not the Timeline
     When I open "/dailyhost.html"
