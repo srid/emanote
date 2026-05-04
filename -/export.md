@@ -9,47 +9,6 @@ When referencing notes, you can use any of the wikilinks provided.
 The base URL is: https://emanote.srid.ca
 -->
 
-<!-- Source: architecture.md -->
-<!-- URL: https://emanote.srid.ca/architecture -->
-<!-- Title: Architecture -->
-<!-- Wikilinks: [[architecture]] -->
-
----
-order: 99
-tags: [emanote/dev]
-slug: architecture
----
-
-# Architecture
-
-Emanote is a [Haskell](https://srid.ca/haskell) program that, at its essense, transforms a bunch of "source files" (Markdown, static files, etc.) into a "target website". It does that in a [reactive](https://en.wikipedia.org/wiki/Reactive_programming) manner such that as the source files change the resultant website updates in real-time (thanks to [Ema](https://ema.srid.ca/)'s [hot-reload](https://ema.srid.ca/topics/hot-reload) via websocket). 
-
-Emanote's high-level architecture is as follows,
-
-- `Emanote.Source`: manages source files and communicates them to `Emanote.Model`.
-  - The key concept here is the notion of "union mount", implemented by `Emanote.Source.Mount`, which will eventually be made its own Haskell library.
-- `Emanote.Model`: Haskell types & machinary to represent the source files in memory, as well as a way to efficiently index and query into them.
-  - The individual modules in this package should be `import`ed separately to use the specific model types.
-- `Emanote.Route`: Route types
-  - `Emanote.Route.ModelRoute`: Haskell route types to point to somewhere in `Emanote.Model` (eg: route to a .md file, or a route to a .jpeg file)
-  - `Emanote.Route.SiteRoute`: Haskell route types pointing to somewhere in the generated site.
-- `Emanote.View`: Rendering code (HTML, templates, site routes)
-- `Emanote.Pandoc`: Everything to do with light-weight markup processing
-  - `Emanote.Pandoc.Markdown`: Markdown-specific parsers and syntax.
-  - `Emanote.Pandoc.Renderer`: Emanote-specific transformation of Pandoc AST, via Heist custom splicing.
-
-Ema acts as the framework orchestrating two things at the same time: 
-
-1. `Emanote.Source.emanate` which is responsible for keeping the in-memory `Model` in sync with what's on disk
-1. `Emanote.View.render` which, whilst querying the `Model`, is responsible for producing the final HTML for every `SiteRoute` in the target website.
-
-In addition, we have the following non-source files in the Git repository that are vital to Emanote's functionality:
-
-- `./default`: The primary and first "[[layer|layer]]" used, which provides the default HTML templates (we use Heist), `index.md` and a favicon. Users can override these by creating an equivalent file (same path) in their own layer.
-
-
-===
-
 <!-- Source: examples.md -->
 <!-- URL: https://emanote.srid.ca/examples -->
 <!-- Title: Examples -->
@@ -130,15 +89,16 @@ Emanote has special support for [Obsidian style daily notes](https://help.obsidi
 
 If you create notes named `YYYY-MM-DD.md`, Emanote will treat them as daily notes. This has a couple of effects:
 
-1. The backlinks panel will render daily notes separate from regular notes. The daily notes will be rendered as a "timeline" in reverse chronological order.
+1. The backlinks panel will render daily notes separate from regular notes. Daily notes render as a year-stacked **timeline heatmap** (see [[backlinks#timeline-backlinks]]); regular notes render as a "Linked from" chip list.
 2. Each daily note automatically gets a hierarchical tag (eg: `#calendar/2025/03`) allowing you to browse them by calendar navigation in the tag index.
 
 ## Timeline backlinks demo
 
 The sample notes below all link back to this page. Notes whose filenames begin
-with `YYYY-MM-DD` show up in the Timeline panel at the end of this page, while
-the ordinary backlink from the [[obsmd|Obsidian]] note shows up in the regular
-"Links to this page" panel.
+with `YYYY-MM-DD` show up in the timeline heatmap (in the [[right-panel]] at
+`lg:`+ widths, or the bottom strip at narrower widths), while the ordinary
+backlink from the [[obsmd|Obsidian]] note shows up in the "Linked from" chip
+list alongside it.
 
 ```query
 path:./*
@@ -456,6 +416,48 @@ children:.
 
 ===
 
+<!-- Source: guide/html-template/backlinks.md -->
+<!-- URL: https://emanote.srid.ca/backlinks -->
+<!-- Title: Backlinks -->
+<!-- Wikilinks: [[guide/html-template/backlinks]], [[html-template/backlinks]], [[backlinks]] -->
+
+---
+slug: backlinks
+---
+
+# Backlinks
+
+In [[html-template|the default template]], backlinks split into two flavors based on whether the linking note's filename matches an `YYYY-MM-DD[-…]` daily-note pattern:
+
+- **Regular backlinks** — non-daily notes that reference the current page.
+- **Timeline backlinks** — daily notes (filenames like `2025-03-14.md`) that reference the current page.
+
+The split is computed in `Calendar.parseRouteDay` and exposed to templates as the `<ema:note:backlinks:nodaily>` / `<ema:note:backlinks:daily>` Heist splices respectively.
+
+## Regular backlinks
+
+Render as a slim labelled list of "tiny title chips" — same chip language as wiki-links — in the right-panel column at `lg:` and above (`#backlinks-margin`), or stacked at the bottom of the card at narrower widths (`#backlinks-bottom`).
+
+Each chip is just the linking note's title; **hovering or focusing** a chip opens a flyout to the left over the prose column with the rendered context paragraphs (the prose around where this note is referenced). The flyout shares typography with the timeline heatmap's cell-hover popup, so all "side material" reads as one family.
+
+On `<lg` (when the right-panel is hidden), the bottom strip carries the same data. Touch devices skip the flyout entirely and see the contexts inlined under the chip.
+
+## Timeline backlinks
+
+Render as a **year-stacked heatmap**: 12 rows per year (one per month), each row 31 cells wide. Cells with a daily backlink are filled in the primary palette and clickable; empty cells are gray. Years stack newest-first.
+
+Hovering a filled cell opens a context flyout (header `YYYY-MM-DD — title`, then the rendered backlink context paragraphs). Same flyout chrome as regular-backlink chips. The heatmap renders in two homes:
+
+- Right-panel at `lg:`+ (compact 4×4 cells in the narrow column)
+- Bottom strip at `<lg` (cells stretch as horizontal bars to fill the wider row)
+
+Dates are parsed out of each linked note's title via a `YYYY-MM-DD` regex; entries without a parseable date are silently skipped (with the screen-reader fallback list still readable).
+
+See [[daily-notes]] for how the daily/non-daily split feeds these two surfaces.
+
+
+===
+
 <!-- Source: guide/html-template/breadcrumbs.md -->
 <!-- URL: https://emanote.srid.ca/breadcrumbs -->
 <!-- Title: Breadcrumbs -->
@@ -601,12 +603,12 @@ slug: fonts
 Emanote ships with three self-hosted fonts served out of the bundled static layer (no third-party fetch at page load):
 
 - [Lora](https://fonts.google.com/specimen/Lora) — prose
-- [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) — UI chrome (sidebar, breadcrumbs, TOC, backlinks) and headings
+- [Mona Sans](https://github.com/github/mona-sans) — UI chrome (sidebar, right-panel, breadcrumbs, backlinks) and headings
 - [Space Mono](https://fonts.google.com/specimen/Space+Mono) — inline code and code blocks
 
 The woff2 files plus a generated `fonts.css` live under `_emanote-static/fonts/`, and `templates/styles.tpl` links them via `<emanoteStaticUrl path="fonts/fonts.css">…</emanoteStaticUrl>`. Generated static sites therefore work fully offline.
 
-The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) shows up in the note title, wikilinks, TOC accents, and backlink cards rather than in full-bleed body backgrounds.
+The theme colour (set via `template.theme` — see [[yaml-config|YAML configuration]]) drives the unified chip language used by the page title, wikilinks, [[backlinks]], query results, the [[right-panel|timeline heatmap]], and tags — every "linked note" surface reads as one family. The [[toc|table of contents]] sits deliberately outside this palette in neutral gray, since TOC entries map to plain-prose headings rather than other notes.
 
 ## Changing the Font Family
 
@@ -724,6 +726,7 @@ In the absence of [[sidebar]], you may use the [[query|folgezettel children quer
 children:.
 ```
 
+
 ===
 
 <!-- Source: guide/html-template/ogp.md -->
@@ -758,6 +761,38 @@ Emanote generates OGP meta tags for each note, using the following rules:
 [^wl]: Wikilinks like `[[foo]]` render *as is* (due to a limitation). However, `[[foo|some text]]` will render as `some text` (the link text). If you do not wish to have wikilink syntax appearing in page description, specify a custom like in the second example.
 
 [^img]: Unfortunately, embed wikilinks (eg.: `![[foo.jpeg]]`) are not recognized here. You should use regular links, eg.: `![](foo.jpeg)`.
+
+
+===
+
+<!-- Source: guide/html-template/right-panel.md -->
+<!-- URL: https://emanote.srid.ca/right-panel -->
+<!-- Title: Right panel -->
+<!-- Wikilinks: [[guide/html-template/right-panel]], [[html-template/right-panel]], [[right-panel]] -->
+
+---
+slug: right-panel
+---
+
+# Right panel
+
+In [[html-template|the default template]], the right-panel is the column attached to the right edge of the main card at `lg:` (≥1024px) and above. It mirrors the [[sidebar]]'s chrome (gray background, sticky-scrolling, matching width tiers — `lg:w-52` / `xl:w-72`) so the two read as a symmetric pair.
+
+The panel hosts three kinds of "side material", stacked top-to-bottom:
+
+1. [[toc|Table of contents]] — neutral-gray hierarchy of the current page's headings, with scroll-spy highlighting the section in view.
+2. **Timeline heatmap** — year-stacked grid of cells where filled days are [[backlinks|daily-note backlinks]] to the current page (see [[backlinks#timeline-backlinks]]).
+3. **Linked from** — slim chip list of regular [[backlinks|backlinks]] (non-daily notes that reference the current page); each chip opens a context flyout on hover.
+
+Below `lg:`, the right-panel hides and a footer-attached strip at the bottom of the card carries the timeline heatmap + regular backlinks list (the TOC is omitted at narrow widths, since the prose dominates).
+
+## Why this column exists
+
+Pre-#699 the default theme rendered TOC as a side column nested inside the prose body and pushed backlinks below the article as a separate floating card. The right-panel consolidates both into one attached column inside the same `#container` card as the sidebar and prose, so the page reads as a single composed unit instead of stacked stripes.
+
+## Disabling
+
+The TOC and backlinks each have their own enable knobs (see [[toc]] and [[backlinks]]). The right-panel renders only when there's content for at least one of them — pages with no TOC and no backlinks omit it entirely (no empty gray column).
 
 
 ===
@@ -865,7 +900,13 @@ slug: toc
 
 # Table of contents
 
-In [[html-template|the default template]], the table of contents is rendered on the right side. TOC is rendered only if the page has more than one heading.
+In [[html-template|the default template]], the table of contents lives in the right-panel column at `lg:` (≥1024px) breakpoint and above, alongside [[backlinks]] and the timeline heatmap. Below that breakpoint the right-panel hides entirely and the TOC is omitted to keep the prose centered.
+
+A TOC is rendered only when a page has more than one heading.
+
+## Visual treatment
+
+TOC entries map directly to headings in the prose, which render in plain text — so the TOC stays in a **neutral gray palette** rather than the primary chip language. The currently-visible heading (tracked via `IntersectionObserver` in `_emanote-static/js/toc-spy.js`) is highlighted with a subtle gray background and bold weight. Reserving the primary palette for "this links to another note" affordances keeps the visual semantics tight: primary = navigation between notes, gray = navigation within a note.
 
 ## Disabling the ToC
 
@@ -876,6 +917,7 @@ template:
   toc:
     enable: false
 ```
+
 
 ===
 
@@ -1566,7 +1608,7 @@ slug: mcp
 > [!warning] Work in progress
 > MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
 
-Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [[live-server|live server]], so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
+Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [live server](https://ema.srid.ca/topics/live-server), so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
 
 Enable it by passing `--mcp-port PORT` to `emanote run`:
 
@@ -1667,7 +1709,7 @@ See [[file:../tips/syntax-highlighting.md][Syntax Highlighting]] for general inf
 
 *** LaTeX 
 
-See [[file:../tips/js/math.md][Math]] for general information.
+See [[file:../tips/math.md][Math]] for general information.
 
 The radius of the sun is R_sun = 6.96 x 10^8 m.  On the other hand,
 the radius of Alpha Centauri is R_{Alpha Centauri} = 1.28 x R_{sun}.
@@ -2641,31 +2683,10 @@ It basically automates the workflow of having to manually move the image file to
 
 ===
 
-<!-- Source: tips/js.md -->
-<!-- URL: https://emanote.srid.ca/js -->
-<!-- Title: JavaScript behaviours -->
-<!-- Wikilinks: [[tips/js]], [[js]] -->
-
----
-short-title: JavaScript
-slug: js
----
-
-# JavaScript behaviours
-
-Improve your Emanote website using custom JavaScript code. Emanote provides some predefined behaviours, like syntax highlighting or rendering of mathematical formulas. They can be accessed by including appropriate snippets in `page.headHtml` or `page.bodyHtml` of [[yaml-config|YAML configuration files]] (if adding to all or multiple routes) or Markdown frontmatter (if adding to a single route). The source code for the snippets can be found in the default [`index.yaml`](https://github.com/srid/emanote/blob/master/emanote/default/index.yaml) under the `js:` YAML map.
-
-```query
-path:./*
-```
-
-
-===
-
-<!-- Source: tips/js/math.md -->
+<!-- Source: tips/math.md -->
 <!-- URL: https://emanote.srid.ca/math -->
 <!-- Title: Math -->
-<!-- Wikilinks: [[tips/js/math]], [[js/math]], [[math]] -->
+<!-- Wikilinks: [[tips/math]], [[math]] -->
 
 ---
 slug: math
@@ -2724,10 +2745,10 @@ page:
 
 ===
 
-<!-- Source: tips/js/mermaid.md -->
+<!-- Source: tips/mermaid.md -->
 <!-- URL: https://emanote.srid.ca/mermaid -->
 <!-- Title: Mermaid Diagrams -->
-<!-- Wikilinks: [[tips/js/mermaid]], [[js/mermaid]], [[mermaid]] -->
+<!-- Wikilinks: [[tips/mermaid]], [[mermaid]] -->
 
 ---
 slug: mermaid

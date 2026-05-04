@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1f84cc36-8121-4ad8-8cd2-3abdd43035ed' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=0d57dd5d-77d0-450a-b9d4-8bdd5da4956a' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -90,13 +90,14 @@
 
 
 <style data-category='global-font'>
-  /* Font option C (trial):
-     Prose: Lora (warm, variable, very readable book serif).
-     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
-     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  /* Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Mona Sans (variable display+text sans, more characterful
+     than Inter/Space Grotesk; GitHub uses it as their display face).
+     Code: Space Mono (pairs stylistically with the prose serif at body
+     sizes; the slab terminals echo Lora's serifs). */
   :root {
     --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
-    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
@@ -107,18 +108,102 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
-    letter-spacing: -0.02em;
     line-height: 1.2;
     font-weight: 600;
   }
+  /* Negative tracking is a display-typography move; below ~24px it
+     makes Mona Sans glyphs touch and reduces legibility. Scope to the
+     larger headings only. */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
 
-  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  #sidebar, #breadcrumbs, #toc, #footer,
+  #backlinks, #backlinks-margin, #backlinks-bottom, #right-panel,
+  .callout-title,
   ema\:metadata, section[class*="font-mono"] {
     font-family: var(--font-sans);
   }
 
   code, pre, kbd, samp, .font-mono {
     font-family: var(--font-mono);
+  }
+
+  /* Block-level prose images (an <img> that's the only content of its
+     paragraph) get a subtle frame: thin gray border, rounded corners,
+     centered with a bit of vertical breathing room. Inline images
+     (e.g. emoji, small icons inside flowing text) stay un-styled via
+     the :only-child gate. */
+  main p > img:only-child {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-gray-200);
+  }
+  .dark main p > img:only-child {
+    border-color: var(--color-gray-800);
+  }
+
+  /* Tables — Pandoc emits standard <table> HTML with no classes, so we
+     style by element. Scoped under `main` to avoid hitting tables in
+     chrome surfaces (sidebar tree, footnote popover, etc). */
+  main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  main thead {
+    border-bottom: 2px solid var(--color-gray-200);
+    text-align: left;
+  }
+  main thead th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    letter-spacing: -0.01em;
+  }
+  main tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+  }
+  main tbody tr:hover {
+    background-color: var(--color-gray-50);
+  }
+  main tbody td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+  }
+  .dark main thead {
+    border-bottom-color: var(--color-gray-700);
+  }
+  .dark main thead th {
+    color: var(--color-gray-100);
+  }
+  .dark main tbody tr {
+    border-bottom-color: var(--color-gray-800);
+  }
+  .dark main tbody tr:hover {
+    background-color: rgb(255 255 255 / 0.03);
+  }
+  /* heist-extra's Pandoc renderer hardcodes
+     `border-r-2 border-l-2 border-gray-300` on every cell and
+     `border-b-2 border-t-2 border-gray-300` on every row, producing
+     a heavy "spreadsheet" look with vertical cell borders. !important
+     overrides win over those class utilities — leaving only the
+     thead bottom-rule and tbody row separators we set above for the
+     editorial GitHub-style table. (Upstream TODO note in
+     `Heist.Extra.Splices.Pandoc.Render`: "Move tailwind styles to
+     pandoc.tpl".) */
+  main table th,
+  main table td {
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+  }
+  main table thead tr,
+  main table tbody tr {
+    border-top-width: 0 !important;
   }
 </style>
 
@@ -197,30 +282,34 @@
 </style>
 
 <style data-category='task-list'>
-  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
-  main li:has(> svg.--ema-checkbox) {
-    list-style: none;
-    display: flex;
-    gap: 0.5rem;
-    align-items: baseline;
-    margin-left: -1rem;
-  }
+  /* In-prose Pandoc task list (a Markdown bullet list with `[ ]`/`[x]`
+     items). Pandoc emits the task as a regular <li> with a checkbox
+     SVG (.--ema-checkbox) followed by a <span> of inlines. We drop
+     the disc marker and absolutely position the checkbox in the
+     marker slot so task text shares the same left edge as plain
+     bullet text in the same list — mixed task/non-task lists then
+     read as one column instead of two subtly-misaligned ones.
 
-  main li:has(> svg.--ema-checkbox) > span {
-    flex: 1;
+     Scoped to `main ul.list-disc` so the special tasks index page
+     (`/-/tasks`, which uses its own list shape, not list-disc)
+     doesn't pick up the absolute-position rule and shove the
+     checkbox off-screen. */
+  main ul.list-disc li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    position: relative;
+  }
+  main ul.list-disc li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
+    position: absolute;
+    left: -1.5rem;
+    top: 0.3em;
   }
 </style>
 
 <style data-category='sidebar-tree'>
-  /* Folgezettel depth rails: nested tree levels get a subtle left border */
-  #sidebar .pl-2 .pl-2 {
-    border-left: 1px solid var(--color-gray-200);
-    margin-left: 0.25rem;
-  }
-
-  .dark #sidebar .pl-2 .pl-2 {
-    border-left-color: var(--color-gray-800);
-  }
+  /* Folgezettel depth rails removed — indent alone is enough to
+     convey hierarchy and the rule was visual noise the user can do
+     without. (Re-add later as a 1px gray-100 / gray-900 hairline
+     if deep trees become hard to follow.) */
 </style>
 
 <style data-category='toc'>
@@ -270,21 +359,19 @@
     color: var(--color-gray-600);
   }
 
-  /* Active TOC item — uses theme primary palette so per-site theme overrides
-     flow through without hardcoding a colour here. The selector is scoped
-     under #toc so it beats the per-depth color rules above. */
+  /* Active TOC item — neutral grey since TOC entries map to headings
+     in the prose, which render in plain text. Keeping primary out of
+     here lets the wikilink / title strip own the primary palette and
+     stand out as the page's only "destination" affordance. */
   #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid var(--color-primary-500);
-    padding-left: calc(0.5rem - 3px) !important;
-    background-color: var(--color-primary-50) !important;
-    color: var(--color-primary-700) !important;
+    background-color: var(--color-gray-100) !important;
+    color: var(--color-gray-900) !important;
   }
 
   .dark #toc a.--ema-toc.toc-item-active {
-    background-color: var(--color-primary-950) !important;
-    color: var(--color-primary-300) !important;
-    border-left-color: var(--color-primary-400);
+    background-color: var(--color-gray-800) !important;
+    color: var(--color-gray-100) !important;
   }
 </style>
 
@@ -394,6 +481,29 @@
     --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
+
+<style data-category='page-load-reveal'>
+  /* One orchestrated entrance on first paint: sidebar fades in; main
+     content fades and drifts up ~8px with a small stagger. Pure CSS so
+     it runs pre-paint without JS; gated on prefers-reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes ema-fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ema-rise-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #sidebar {
+      animation: ema-fade-in 400ms ease-out both;
+    }
+    main {
+      animation: ema-rise-in 480ms 60ms ease-out both;
+    }
+  }
+</style>
+
   <!-- Footnote popup CSS escape hatch. The behavior itself lives in
      _emanote-static/js/footnote-popup.js (see issue #643); the Popover
      ::backdrop pseudo-element is the one bit that has no Tailwind
@@ -440,7 +550,7 @@
        must run pre-paint; the vendor Stork WASM loader above stays
        inline because window.stork must be defined synchronously
        before the stork.js module evaluates. -->
-  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
+  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
 </head>
 
 <!-- DoNotFormat -->
@@ -451,7 +561,7 @@
 
 <body class='bg-gray-200 dark:bg-black text-gray-900 dark:text-gray-50 overflow-y-scroll'>
   
-    <div class='container mx-auto md:mt-8 '>
+    <div class='container mx-auto 2xl:max-w-[100rem] md:mt-8 '>
       
 
       
@@ -520,26 +630,45 @@
       
 
       
-        <div id='container' class='flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800'>
-          <!-- Sidebar column -->
-          <nav id='sidebar' class='flex-shrink hidden leading-relaxed md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
+        <!-- Container is the rounded card. Children stack vertically:
+             [note-title strip] [inner row of columns] [backlinks-bottom
+             strip] [footer strip]. The inner row is its own flex so
+             columns sit side-by-side at md+ without forcing the strips
+             to participate in flex-wrap. The footer is the last child
+             so its md:rounded-b-lg matches the container's bottom curve. -->
+        <div id='container' class='flex flex-col bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800'>
+          <!-- Note title attached as a top strip on the container card (see
+     layouts/default.tpl). The md:rounded-t-lg matches the container's
+     md:rounded-lg so the strip's top corners flow into the card's
+     curve; the bottom is square + thin border so it sits flush against
+     the inner row below.
+
+     Calm tint instead of a saturated banner — neuron-style "tinted
+     label" rather than a brand bar. The primary palette still anchors
+     the page identity but at low intensity, so the prose below isn't
+     out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
+  <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
+    File WikiLinks
+  </h1>
+</header>
+
+          <div class='flex flex-col md:flex-row'>
+            <nav id='sidebar' class='flex-shrink hidden leading-snug text-sm md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
   <div class='px-4 py-5 text-gray-800 dark:text-gray-200'>
     <div class='flex items-center justify-between mb-4'>
       <div id='site-logo' class='flex items-center space-x-2.5 min-w-0'>
         
-          
-            <a href='/' title='Go to Home' class='flex-shrink-0'>
-              <!-- The style width attribute here is to prevent huge
-                      icon from displaying at those rare occasions when Tailwind
-                      hasn't kicked in immediately on page load
-                      -->
-              <img style='width: 1.25rem;' class='transition transform hover:scale-110 hover:opacity-80' src='favicon.svg' alt='Site Icon' />
-            </a>
-            <a class='font-semibold text-base truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors' title='Go to Home' href='/'>
-              Home
-            </a>
-          
         
+        
+        <a href='/' title='Go to Home' class='flex-shrink-0'>
+          <!-- The style width attribute here is to prevent huge icon
+               from displaying at those rare occasions when Tailwind
+               hasn't kicked in immediately on page load. -->
+          <img style='width: 1.25rem;' class='transition transform hover:scale-110 hover:opacity-80' src='favicon.svg' alt='Site Icon' />
+        </a>
+        <a class='font-semibold text-base truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors' title='Go to Home' href='/'>
+          Emanote
+        </a>
       </div>
 
       <div id='indexing-links' class='flex flex-row space-x-2 text-gray-500 dark:text-gray-400 flex-shrink-0'>
@@ -561,12 +690,20 @@
     </div>
 
     
-      <!-- Variable bindings for this tree-->
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -580,8 +717,8 @@
           <a href='start' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
     
   
@@ -589,7 +726,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start'>
       Getting Started
     </a>
     
@@ -607,7 +744,12 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
     
@@ -617,6 +759,8 @@
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -628,14 +772,14 @@
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='6 9 12 15 18 9'></polyline>
       </svg>
       
   
         
     </span>
-    <a class='font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
       Guide
     </a>
     
@@ -647,7 +791,12 @@
   -->
   
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
     
@@ -657,6 +806,8 @@
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -668,14 +819,14 @@
       
         
     
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-700 dark:text-gray-300' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='6 9 12 15 18 9'></polyline>
       </svg>
       
   
         
     </span>
-    <a class='font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown'>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown'>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
@@ -687,12 +838,22 @@
   -->
   
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -704,17 +865,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Callouts' href='callout'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Callouts' href='callout'>
       Callouts
     </a>
     
@@ -729,12 +887,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -746,17 +914,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Custom CSS styling' href='custom-style'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Custom CSS styling' href='custom-style'>
       Custom CSS styling
     </a>
     
@@ -771,12 +936,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -788,17 +963,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Cyclic embed demo' href='cyclic-embed-demo'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Cyclic embed demo' href='cyclic-embed-demo'>
       Cyclic embed demo
     </a>
     
@@ -813,12 +985,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -830,17 +1012,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Embedding' href='embed'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Embedding' href='embed'>
       Embedding
     </a>
     
@@ -855,12 +1034,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
   
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -871,16 +1060,13 @@
     <span class='flex-shrink-0'>
       
         
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'>
-        </path>
-      </svg>
-      
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
     </span>
-    <a class='font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors rounded-md px-2 py-1 truncate flex-1' title='File WikiLinks' href='file-links'>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='File WikiLinks' href='file-links'>
       File WikiLinks
     </a>
     
@@ -898,12 +1084,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -915,17 +1111,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config'>
       YAML configuration
     </a>
     
@@ -940,12 +1133,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -957,17 +1160,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query'>
       Queries
     </a>
     
@@ -982,12 +1182,19 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -1001,8 +1208,8 @@
           <a href='daily-notes' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
     
   
@@ -1010,7 +1217,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
       Daily Notes
     </a>
     
@@ -1028,12 +1235,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1045,17 +1262,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export'>
       Export
     </a>
     
@@ -1070,12 +1284,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1087,17 +1311,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed'>
       ATOM feed
     </a>
     
@@ -1112,12 +1333,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1129,17 +1360,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note'>
       Folder notes
     </a>
     
@@ -1154,12 +1382,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1171,17 +1409,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel'>
       Folgezettel links
     </a>
     
@@ -1196,12 +1431,19 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -1215,8 +1457,8 @@
           <a href='html-template' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
     
   
@@ -1224,13 +1466,13 @@
           
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template'>
       HTML Templates
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='10 children inside'>
-          10
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='12 children inside'>
+          12
         </span>
       
     
@@ -1242,12 +1484,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1259,17 +1511,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer'>
       Layer system
     </a>
     
@@ -1284,12 +1533,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1301,17 +1560,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters'>
       Lua Filters
     </a>
     
@@ -1326,12 +1582,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1343,17 +1609,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp'>
       MCP server
     </a>
     
@@ -1368,12 +1631,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1385,17 +1658,14 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode'>
       Org Mode ✍️
     </a>
     
@@ -1413,12 +1683,19 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
   
 
@@ -1432,8 +1709,8 @@
           <a href='tips' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-5 h-5 flex-shrink-0 inline text-gray-500 dark:text-gray-400' viewBox='0 0 24 24' fill='currentColor'>
-        <path fill-rule='evenodd' d='M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z' clip-rule='evenodd'></path>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
     
   
@@ -1441,13 +1718,13 @@
           
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
       Tips
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
-          4
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='5 children inside'>
+          5
         </span>
       
     
@@ -1459,12 +1736,22 @@
   
 </div>
     
-      <!-- Variable bindings for this tree-->
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
 
   
 
 
 
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   
 
 
@@ -1476,60 +1763,15 @@
       
         
           
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
   
         
       
     </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples'>
       Examples
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-  -->
-  
-</div>
-    
-      <!-- Variable bindings for this tree-->
-
-  
-
-
-
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    
-      <svg class='w-5 h-5 flex-shrink-0 inline' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'>
-        </path>
-      </svg>
-    
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Architecture' href='architecture'>
-      Architecture
     </a>
     
       
@@ -1546,20 +1788,22 @@
 
   </div>
 </nav>
-          <!-- Main body column -->
-          <div class='flex-1 w-full bg-white dark:bg-gray-800'>
+            <!-- min-w-0 lets the flex item shrink below its min-content (default
+     min-width:auto on flex items would otherwise let a long URL in a
+     code block push the column past the container, dragging the
+     right-panel outside the card chrome). --><div class='flex-1 min-w-0 bg-white dark:bg-gray-800'>
   <main class='px-6 py-8 max-w-7xl mx-auto'>
-    <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
-  File WikiLinks
-</h1>
-
-    
-      <article class='overflow-auto'>
+    <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
 
 
+<!-- Heading scale ~1.20 ratio (text-4xl→base via Tailwind's discrete steps).
+     h2 keeps a subtle bottom rule as the "section break" cue but at 1px in a
+     light gray that doesn't compete with the heading itself. h5/h6 fade
+     gray-* one stop down each level so they recede without losing
+     hierarchy. All semibold (600) — uniform weight, hierarchy via size. -->
 
 
 
@@ -1578,19 +1822,19 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
+          Here is a link to some text file: <a href='guide/markdown/Sample.txt' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File:Sample.txt</a>
         </li>
       
         <li>
-          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
+          You can also specify the full, or subset of, the path: <a href='guide/markdown/Sample.txt' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File:markdown/Sample.txt</a>
         </li>
       
         <li>
-          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Some text file</a>
+          Of course, a custom link text may also be specified: <a href='guide/markdown/Sample.txt' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Some text file</a>
         </li>
       
         <li>
-          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900'>normal linking</a>.
+          All of this is equivalent to <a href='guide/markdown/Sample.txt' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>normal linking</a>.
         </li>
       
     </ul>
@@ -1600,7 +1844,7 @@
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
+      If a wikilink refers to a display-able resource like image or video, it will appear <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>embedded</a> in the generated HTML.
     </p>
   
   <div class='flex items-center justify-center mt-2'>
@@ -1612,118 +1856,291 @@
 </div>
 </article>
     
-    <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
-      
-
-      
-  <div id='backlinks' class='flex-1 mt-8 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm'>
-    <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>
-      Links to this page
-    </header>
-    <ul class='space-y-4'>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='neuron'>
-            Migrating from neuron
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>Flexible WikiLinks (link to directories, or based on path, eg: <code>[[Foo/Bar]]</code>) including <a href='file-links' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.</div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='embed'>
-            Embedding
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Embedding of <a href='file-links' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='custom-style'>
-            Custom CSS styling
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p><a href='file-links' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkEmbed'>File WikiLinks</a></p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-    </ul>
-  </div>
-
-
-    </div>
-    
 
     <!-- What goes in this file will at the very end of the main div -->
   </main>
 </div>
+            <!-- Right panel: TOC + slim backlinks list, attached to the right of the
+     main panel at md+ as a sibling of the sidebar inside #container.
+     Mirrors sidebar's chrome (bg, border, sticky+scroll, width tiers)
+     so the two read as a symmetric pair across the prose card.
+
+     Below md, this panel is hidden; backlinks-bottom.tpl renders the
+     same backlinks attached to the bottom of the same card via the
+     container's flex-col stacking. The Heist split below keeps the
+     panel from rendering as an empty gray column on pages that have
+     neither a TOC nor backlinks. --><!-- Note on overflow: the right-panel intentionally does NOT set
+     overflow-y:auto (unlike the sidebar). The backlink hover-flyout in
+     backlinks-margin.tpl uses position:absolute with right:100% to
+     escape leftward over the prose; an overflow:auto ancestor would
+     clip it. We trade internal panel scrolling for working flyouts —
+     fine for typical TOCs, and the page itself still scrolls. -->
+
+  
+    <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
+      <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
+        <!-- Daily-note backlinks rendered as a year-stacked heatmap.
+     Two visible homes:
+       - Right-panel (lg+): timeline as part of the side-material column.
+       - Bottom strip (<lg): timeline attached to the bottom of the
+         card, alongside the regular backlinks fallback.
+     Classes (not IDs) so both instances are valid HTML and the JS in
+     _emanote-static/js/timeline-heatmap.js can paint each independently
+     via querySelectorAll. The hidden <ul.timeline-data> is the
+     screen-reader / no-JS fallback. -->
+
+        <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
+     components/right-panel.tpl). Drops the card chrome of backlinks.tpl:
+     just a labelled list of titles. The full context paragraph(s) ride
+     along in the DOM but stay hidden until hover/focus, when a flyout
+     opens to the left over the prose column.
+
+     Tailwind's `hover:` variant is automatically gated on (hover: hover),
+     so on touch devices the flyout never triggers — touch users see the
+     labelled titles only and follow the link to read more. -->
+  <section id='backlinks-margin' class='text-sm text-gray-700 dark:text-gray-300'>
+    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
+      Linked from
+    </h3>
+    <ul class='space-y-1'>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='neuron'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Migrating from neuron
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div>Flexible WikiLinks (link to directories, or based on path, eg: <code>[[Foo/Bar]]</code>) including <a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.</div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='embed'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Embedding
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>Embedding of <a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='custom-style'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Custom CSS styling
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p><a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkEmbed'>File WikiLinks</a></p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+    </ul>
+  </section>
+
+
+      </div>
+    </aside>
+  
+
+
+          </div>
+          <!-- Side material attached to the bottom of the main card at <lg.
+     Hosts both the timeline heatmap (daily-note backlinks) and the
+     "Linked from" regular-backlink list — same content as the
+     right-panel at lg+, just rendered as a stacked footer strip when
+     the right-panel is hidden.
+
+     The aside renders unconditionally (Heist can't easily express an
+     OR across two splices), and the [&:not(:has(*))]:hidden Tailwind
+     guard hides it on pages where neither splice emitted anything —
+     so the chrome doesn't show as an empty bar on backlink-less pages. --><!-- The outer aside is the "bottom-strip" wrapper — chrome (bg / top
+     border / padding) only. The two inner sections own the IDs that
+     match the right-panel's section IDs (#backlinks-bottom for the
+     regular-backlinks list, .emanote-timeline for the heatmap), so
+     e2e selectors and JS context detection target the right scope
+     instead of conflating timeline anchors with backlink anchors. --><aside class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
+  
+  
+    <section id='backlinks-bottom'>
+      <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
+        Linked from
+      </h3>
+      <!-- divide-y between rows + a left-rule on the context block
+           anchor each backlink + its context together as one unit, so
+           the list stops reading as undifferentiated prose. -->
+      <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='neuron'>
+              Migrating from neuron
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div>Flexible WikiLinks (link to directories, or based on path, eg: <code>[[Foo/Bar]]</code>) including <a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>.</div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='embed'>
+              Embedding
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>Embedding of <a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File WikiLinks</a>, as indicated in the aforementioned Obsidian help page, will eventually be supported; for now, certain file types already work.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='custom-style'>
+              Custom CSS styling
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p><a href='file-links' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkEmbed'>File WikiLinks</a></p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+      </ul>
+    </section>
+  
+</aside>
+
+          <!-- Footer attached to the bottom of the main card as a thin text-link
+     strip — the previous unlabelled icon row read as an orphaned mobile
+     bottom-nav and floated outside the card. Now: muted text labels
+     left, the Emanote attribution right, sharing the card's chrome via
+     a top-border separator and the same bg-gray-50 the sidebar /
+     right-panel use. md:rounded-b-lg matches the container's rounded
+     corners so the footer's tinted bg curves with the card. --><footer class='border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-5 py-2.5 md:rounded-b-lg flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-xs text-gray-500 dark:text-gray-400'>
+  
+  <nav class='flex items-center gap-x-5'>
+    
+      
+        <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='/' title='Go to Home'>Home</a>
+      
+    
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/all' title='View Index'>Index</a>
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/tags' title='View tags'>Tags</a>
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/tasks' title='View tasks'>Tasks</a>
+  </nav>
+  <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 2.0.0.0' class='flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity'>
+    
+      <img class='w-3.5 h-3.5' src='_emanote-static/emanote-logo.svg' alt />
+    
+    <span>Emanote 2.0.0.0</span>
+  </a>
+</footer>
+
         </div>
         
-      <footer class='flex items-center justify-center mt-10 mb-10'>
-  <div class='inline-flex items-center justify-center space-x-6 px-8 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg'>
-    
-  <div>
-    
-      
-        <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
-          </svg>
-        </a>
-      
-    
-  </div>
-  <div>
-    <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
-      </svg>
-    </a>
-  </div>
-  <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.6.0.0'>
-      
-        <img class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
-      
-    </a>
-  </div>
-  <div>
-    <a href='-/tags' title='View tags'>
-      <svg class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
-        </path>
-      </svg>
-    </a>
-  </div>
-  <div>
-    <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
-      </svg>
-    </a>
-  </div>
-  </div>
-</footer>
     </div>
   
   <div id='stork-search-container' class='hidden fixed w-screen h-screen inset-0 backdrop-filter backdrop-blur-sm'>

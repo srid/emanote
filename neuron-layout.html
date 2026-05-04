@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=1f84cc36-8121-4ad8-8cd2-3abdd43035ed' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=0d57dd5d-77d0-450a-b9d4-8bdd5da4956a' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -90,13 +90,14 @@
 
 
 <style data-category='global-font'>
-  /* Font option C (trial):
-     Prose: Lora (warm, variable, very readable book serif).
-     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
-     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  /* Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Mona Sans (variable display+text sans, more characterful
+     than Inter/Space Grotesk; GitHub uses it as their display face).
+     Code: Space Mono (pairs stylistically with the prose serif at body
+     sizes; the slab terminals echo Lora's serifs). */
   :root {
     --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
-    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
@@ -107,18 +108,102 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
-    letter-spacing: -0.02em;
     line-height: 1.2;
     font-weight: 600;
   }
+  /* Negative tracking is a display-typography move; below ~24px it
+     makes Mona Sans glyphs touch and reduces legibility. Scope to the
+     larger headings only. */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
 
-  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  #sidebar, #breadcrumbs, #toc, #footer,
+  #backlinks, #backlinks-margin, #backlinks-bottom, #right-panel,
+  .callout-title,
   ema\:metadata, section[class*="font-mono"] {
     font-family: var(--font-sans);
   }
 
   code, pre, kbd, samp, .font-mono {
     font-family: var(--font-mono);
+  }
+
+  /* Block-level prose images (an <img> that's the only content of its
+     paragraph) get a subtle frame: thin gray border, rounded corners,
+     centered with a bit of vertical breathing room. Inline images
+     (e.g. emoji, small icons inside flowing text) stay un-styled via
+     the :only-child gate. */
+  main p > img:only-child {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-gray-200);
+  }
+  .dark main p > img:only-child {
+    border-color: var(--color-gray-800);
+  }
+
+  /* Tables — Pandoc emits standard <table> HTML with no classes, so we
+     style by element. Scoped under `main` to avoid hitting tables in
+     chrome surfaces (sidebar tree, footnote popover, etc). */
+  main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  main thead {
+    border-bottom: 2px solid var(--color-gray-200);
+    text-align: left;
+  }
+  main thead th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    letter-spacing: -0.01em;
+  }
+  main tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+  }
+  main tbody tr:hover {
+    background-color: var(--color-gray-50);
+  }
+  main tbody td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+  }
+  .dark main thead {
+    border-bottom-color: var(--color-gray-700);
+  }
+  .dark main thead th {
+    color: var(--color-gray-100);
+  }
+  .dark main tbody tr {
+    border-bottom-color: var(--color-gray-800);
+  }
+  .dark main tbody tr:hover {
+    background-color: rgb(255 255 255 / 0.03);
+  }
+  /* heist-extra's Pandoc renderer hardcodes
+     `border-r-2 border-l-2 border-gray-300` on every cell and
+     `border-b-2 border-t-2 border-gray-300` on every row, producing
+     a heavy "spreadsheet" look with vertical cell borders. !important
+     overrides win over those class utilities — leaving only the
+     thead bottom-rule and tbody row separators we set above for the
+     editorial GitHub-style table. (Upstream TODO note in
+     `Heist.Extra.Splices.Pandoc.Render`: "Move tailwind styles to
+     pandoc.tpl".) */
+  main table th,
+  main table td {
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+  }
+  main table thead tr,
+  main table tbody tr {
+    border-top-width: 0 !important;
   }
 </style>
 
@@ -197,30 +282,34 @@
 </style>
 
 <style data-category='task-list'>
-  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
-  main li:has(> svg.--ema-checkbox) {
-    list-style: none;
-    display: flex;
-    gap: 0.5rem;
-    align-items: baseline;
-    margin-left: -1rem;
-  }
+  /* In-prose Pandoc task list (a Markdown bullet list with `[ ]`/`[x]`
+     items). Pandoc emits the task as a regular <li> with a checkbox
+     SVG (.--ema-checkbox) followed by a <span> of inlines. We drop
+     the disc marker and absolutely position the checkbox in the
+     marker slot so task text shares the same left edge as plain
+     bullet text in the same list — mixed task/non-task lists then
+     read as one column instead of two subtly-misaligned ones.
 
-  main li:has(> svg.--ema-checkbox) > span {
-    flex: 1;
+     Scoped to `main ul.list-disc` so the special tasks index page
+     (`/-/tasks`, which uses its own list shape, not list-disc)
+     doesn't pick up the absolute-position rule and shove the
+     checkbox off-screen. */
+  main ul.list-disc li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    position: relative;
+  }
+  main ul.list-disc li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
+    position: absolute;
+    left: -1.5rem;
+    top: 0.3em;
   }
 </style>
 
 <style data-category='sidebar-tree'>
-  /* Folgezettel depth rails: nested tree levels get a subtle left border */
-  #sidebar .pl-2 .pl-2 {
-    border-left: 1px solid var(--color-gray-200);
-    margin-left: 0.25rem;
-  }
-
-  .dark #sidebar .pl-2 .pl-2 {
-    border-left-color: var(--color-gray-800);
-  }
+  /* Folgezettel depth rails removed — indent alone is enough to
+     convey hierarchy and the rule was visual noise the user can do
+     without. (Re-add later as a 1px gray-100 / gray-900 hairline
+     if deep trees become hard to follow.) */
 </style>
 
 <style data-category='toc'>
@@ -270,21 +359,19 @@
     color: var(--color-gray-600);
   }
 
-  /* Active TOC item — uses theme primary palette so per-site theme overrides
-     flow through without hardcoding a colour here. The selector is scoped
-     under #toc so it beats the per-depth color rules above. */
+  /* Active TOC item — neutral grey since TOC entries map to headings
+     in the prose, which render in plain text. Keeping primary out of
+     here lets the wikilink / title strip own the primary palette and
+     stand out as the page's only "destination" affordance. */
   #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid var(--color-primary-500);
-    padding-left: calc(0.5rem - 3px) !important;
-    background-color: var(--color-primary-50) !important;
-    color: var(--color-primary-700) !important;
+    background-color: var(--color-gray-100) !important;
+    color: var(--color-gray-900) !important;
   }
 
   .dark #toc a.--ema-toc.toc-item-active {
-    background-color: var(--color-primary-950) !important;
-    color: var(--color-primary-300) !important;
-    border-left-color: var(--color-primary-400);
+    background-color: var(--color-gray-800) !important;
+    color: var(--color-gray-100) !important;
   }
 </style>
 
@@ -394,6 +481,29 @@
     --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
   }
 </style>
+
+<style data-category='page-load-reveal'>
+  /* One orchestrated entrance on first paint: sidebar fades in; main
+     content fades and drifts up ~8px with a small stagger. Pure CSS so
+     it runs pre-paint without JS; gated on prefers-reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes ema-fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ema-rise-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #sidebar {
+      animation: ema-fade-in 400ms ease-out both;
+    }
+    main {
+      animation: ema-rise-in 480ms 60ms ease-out both;
+    }
+  }
+</style>
+
   <!-- Footnote popup CSS escape hatch. The behavior itself lives in
      _emanote-static/js/footnote-popup.js (see issue #643); the Popover
      ::backdrop pseudo-element is the one bit that has no Tailwind
@@ -444,7 +554,7 @@
        must run pre-paint; the vendor Stork WASM loader above stays
        inline because window.stork must be defined synchronously
        before the stork.js module evaluates. -->
-  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
+  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
 </head>
 
 <!-- DoNotFormat -->
@@ -543,7 +653,12 @@
       
 
       
-        <div id='container' class='relative md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800'>
+        <!-- No-sidebar layout (e.g. neuron-style): same card chrome,
+             same attached title strip, no left/right panels. Backlinks
+             render as the full-card variant since backlinks-bottom is
+             gated on lg:hidden and there's no right-panel here. Footer
+             is the last child so md:rounded-b-lg matches the curve. -->
+        <div id='container' class='relative flex flex-col md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800'>
           
   <div class='absolute -top-6 right-1 md:right-0 flex flex-row items-center justify-center space-x-2 text-gray-500 dark:text-gray-400'>
     <button title='Search (Ctrl+K)' class='cursor-pointer' data-emanote-stork-toggle>
@@ -562,20 +677,37 @@
     </button>
   </div>
 
-          <!-- Main body column -->
-          <div class='flex-1 w-full bg-white dark:bg-gray-800'>
-  <main class='px-6 py-8 max-w-7xl mx-auto'>
-    <h1 class='mb-10 px-8 py-5 text-4xl md:text-5xl font-bold text-white text-center bg-primary-600 dark:bg-primary-800 rounded-2xl shadow-sm'>
-  Neuron-like layout
-</h1>
+          <!-- Note title attached as a top strip on the container card (see
+     layouts/default.tpl). The md:rounded-t-lg matches the container's
+     md:rounded-lg so the strip's top corners flow into the card's
+     curve; the bottom is square + thin border so it sits flush against
+     the inner row below.
 
-    
-      <article class='overflow-auto'>
+     Calm tint instead of a saturated banner — neuron-style "tinted
+     label" rather than a brand bar. The primary palette still anchors
+     the page identity but at low intensity, so the prose below isn't
+     out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
+  <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
+    Neuron-like layout
+  </h1>
+</header>
+
+          <!-- min-w-0 lets the flex item shrink below its min-content (default
+     min-width:auto on flex items would otherwise let a long URL in a
+     code block push the column past the container, dragging the
+     right-panel outside the card chrome). --><div class='flex-1 min-w-0 bg-white dark:bg-gray-800'>
+  <main class='px-6 py-8 max-w-7xl mx-auto'>
+    <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
 
 
 
+<!-- Heading scale ~1.20 ratio (text-4xl→base via Tailwind's discrete steps).
+     h2 keeps a subtle bottom rule as the "section break" cue but at 1px in a
+     light gray that doesn't compete with the heading itself. h5/h6 fade
+     gray-* one stop down each level so they recede without losing
+     hierarchy. All semibold (600) — uniform weight, hierarchy via size. -->
 
 
 
@@ -584,9 +716,9 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote’s builtin <a href='html-template' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='text-primary-600 dark:text-primary-400 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
+      Emanote’s builtin <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML template</a> layout can be configured to toggle UX features on or off. The default configuration includes <a href='sidebar' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, <a href='toc' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Table of contents</a> and <a href='breadcrumbs' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Breadcrumbs</a> but hides the <a href='uptree' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Uplink tree</a>. To mimic the layout used by <a href='https://neuron.zettel.page/' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Neuron</a>, turn off sidebar and breadcrumbs while enabling the uptree. Add this to your <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>:
     </p>
-  <div class='py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto'><pre><code class='yml'><span class='fu'>template</span><span class='kw'>:</span>
+  <div class='mb-6 text-sm'><pre><code class='yml'><span class='fu'>template</span><span class='kw'>:</span>
 <span class='at'>  </span><span class='fu'>uptree</span><span class='kw'>:</span><span class='at'> </span>
 <span class='at'>    </span><span class='fu'>enable</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>true</span>
 <span class='at'>  </span><span class='fu'>sidebar</span><span class='kw'>:</span><span class='at'> </span>
@@ -599,7 +731,7 @@
 <span class='at'>    </span><span class='fu'>containerClass</span><span class='kw'>:</span><span class='at'> container mx-auto max-w-prose</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      This includes the <a href='uptree' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
+      This includes the <a href='uptree' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> of Neuron based on folgezettel links as well as directory layout. Note that all top-level notes are automatically made a folgezettel branch of the root note (index), such that the “home” link appears on top in the uplink tree of all notes.
     </p>
   
 
@@ -639,7 +771,7 @@
 
 
 
-    <h2 id='in-lieu-of-sidebar' class='group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800 text-4xl'>
+    <h2 id='in-lieu-of-sidebar' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
   In lieu of sidebar
   
@@ -654,34 +786,23 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      In the absence of <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
+      In the absence of <a href='sidebar' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, you may use the <a href='query' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>folgezettel children query</a> to show the children of the current note. Example below:
     </p>
-  <nav>
-  <div class='mb-8'>
-    <header data-nosnippet class='pb-2 mb-2 font-semibold text-gray-600 dark:text-gray-400'>
-      Folgezettel children
-    </header>
-    <ul>
-      
-        <li>
-          <div class='flex flex-wrap my-2'>
-            
-              <span data-nosnippet class='mr-2 text-right text-gray-600 dark:text-gray-400'>
-              </span>
-            
-            <a class='flex-1 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-2 py-1 rounded-md font-semibold border-l-2 no-underline hover:bg-primary-100 dark:hover:bg-primary-900' href='uptree'>
-              Uplink tree
-            </a>
-          </div>
-        </li>
-      
-    </ul>
-  </div>
+  <nav class='mb-8'>
+  <header data-nosnippet class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2'>
+    Folgezettel children
+  </header>
+  <ul class='space-y-0.5'>
+    
+      <li class='flex items-baseline gap-2 px-2 py-1 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'>
+        <span class='text-gray-300 dark:text-gray-700 select-none shrink-0' aria-hidden='true'>→</span>
+        <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='uptree'>
+          Uplink tree
+        </a>
+      </li>
+    
+  </ul>
 </nav>
-    <p class='mb-4 leading-relaxed'>
-      
-    </p>
-  
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/neuron-layout.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -691,148 +812,176 @@
 </div>
 </article>
     
-    <div class='flex flex-col lg:flex-row lg:space-x-4 mt-8'>
-      
-
-      
-  <div id='backlinks' class='flex-1 mt-8 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm'>
-    <header class='mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>
-      Links to this page
-    </header>
-    <ul class='space-y-4'>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='uptree'>
-            Uplink tree
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>[!tip] See also <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='neuron'>
-            Migrating from neuron
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>Configure it to use <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='html-template'>
-            HTML Templates
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='search'>
-            Full-text search
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li class='group'>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='breadcrumbs'>
-            Breadcrumbs
-          </a>
-          
-            <div class='text-sm text-gray-500 dark:text-gray-300 [&amp;_p]:m-0 [&amp;_p+p]:mt-[0.35em] [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='text-primary-600 dark:text-primary-400 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-    </ul>
-  </div>
-
-
-    </div>
-    
 
     <!-- What goes in this file will at the very end of the main div -->
   </main>
 </div>
+          <div class='px-6 pb-8'>
+            <!-- Card-style "Linked from" used by the no-sidebar layout (e.g.
+     /neuron-layout) and error.tpl, where there's no right-panel or
+     bottom-strip. Same row shape as backlinks-bottom.tpl: chip on
+     top, context indented under it with a left rule, divide-y rule
+     between adjacent entries. The outer chrome is light because
+     the parent container already supplies the rounded card. -->
+  <section id='backlinks' class='mt-8 border-t border-gray-200 dark:border-gray-800 pt-4'>
+    <header class='mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400'>
+      Linked from
+    </header>
+    <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
+      
+        <li class='group py-3 first:pt-0 last:pb-0'>
+          <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='uptree'>
+            Uplink tree
+          </a>
+          <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+            
+              <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>[!tip] See also <a href='neuron-layout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkTag'>Neuron-like layout</a>.</p></div>
+    </div>
+  
+</div>
+            
+          </div>
+        </li>
+      
+        <li class='group py-3 first:pt-0 last:pb-0'>
+          <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='neuron'>
+            Migrating from neuron
+          </a>
+          <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+            
+              <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div>Configure it to use <a href='neuron-layout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkBranch'>Neuron-like layout</a> (this is optional)</div>
+    </div>
+  
+</div>
+            
+          </div>
+        </li>
+      
+        <li class='group py-3 first:pt-0 last:pb-0'>
+          <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='html-template'>
+            HTML Templates
+          </a>
+          <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+            
+              <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>Emanote includes a default layout that includes a <a href='sidebar' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Sidebar</a>, but can be customized to mimic <a href='neuron-layout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>. You may also write your own HTML layout from scratch, as long as you specify that template in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>YAML configuration</a> for the notes in question. For eg., <a href='https://github.com/srid/srid/blob/master/templates/home.tpl' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>templates/home.tpl</code></a> is how <a href='https://srid.ca' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>https://srid.ca</a> homepage is generated, because its <a href='https://raw.githubusercontent.com/srid/srid/master/index.md' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>index.md</code></a> specifies this template as <code>template.name</code> in its YAML frontmatter (which could also be <code>index.yaml</code>).</p></div>
+    </div>
+  
+</div>
+            
+          </div>
+        </li>
+      
+        <li class='group py-3 first:pt-0 last:pb-0'>
+          <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='search'>
+            Full-text search
+          </a>
+          <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+            
+              <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div>If the sidebar is disabled (eg.: you are on <a href='neuron-layout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a>), the search lens icon will be on the top-right corner.</div>
+    </div>
+  
+</div>
+            
+          </div>
+        </li>
+      
+        <li class='group py-3 first:pt-0 last:pb-0'>
+          <a class="inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors after:content-none group-has-[[data-wikilink-type=WikiLinkEmbed]]:after:content-['embeds'] after:ml-2 after:px-[0.45em] after:py-[0.05em] after:text-[0.65em] after:font-medium after:tracking-wider after:uppercase after:text-primary-700 after:bg-primary-100 dark:after:text-primary-200 dark:after:bg-primary-800 after:rounded after:align-[0.15em]" href='breadcrumbs'>
+            Breadcrumbs
+          </a>
+          <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+            
+              <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>On mobile view, <a href='https://en.wikipedia.org/wiki/Breadcrumb_navigation' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>breadcrumbs</a> are displayed at the top. The path of the crumbs is determined from the filesystem path of the associated source file. Breadcrumbs can be disabled in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>; see <a href='neuron-layout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Neuron-like layout</a> for an example.</p></div>
+    </div>
+  
+</div>
+            
+          </div>
+        </li>
+      
+    </ul>
+  </section>
+
+
+          </div>
+          <!-- Footer attached to the bottom of the main card as a thin text-link
+     strip — the previous unlabelled icon row read as an orphaned mobile
+     bottom-nav and floated outside the card. Now: muted text labels
+     left, the Emanote attribution right, sharing the card's chrome via
+     a top-border separator and the same bg-gray-50 the sidebar /
+     right-panel use. md:rounded-b-lg matches the container's rounded
+     corners so the footer's tinted bg curves with the card. --><footer class='border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-5 py-2.5 md:rounded-b-lg flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-xs text-gray-500 dark:text-gray-400'>
+  
+  <nav class='flex items-center gap-x-5'>
+    
+      
+        <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='/' title='Go to Home'>Home</a>
+      
+    
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/all' title='View Index'>Index</a>
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/tags' title='View tags'>Tags</a>
+    <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='-/tasks' title='View tasks'>Tasks</a>
+  </nav>
+  <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 2.0.0.0' class='flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity'>
+    
+      <img class='w-3.5 h-3.5' src='_emanote-static/emanote-logo.svg' alt />
+    
+    <span>Emanote 2.0.0.0</span>
+  </a>
+</footer>
+
         </div>
       
-      <footer class='flex items-center justify-center mt-10 mb-10'>
-  <div class='inline-flex items-center justify-center space-x-6 px-8 py-4 bg-gray-50 dark:bg-gray-900 rounded-lg'>
-    
-  <div>
-    
-      
-        <a href='/' title='Go to Home'>
-          <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
-          </svg>
-        </a>
-      
-    
-  </div>
-  <div>
-    <a href='-/all' title='View Index'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'></path>
-      </svg>
-    </a>
-  </div>
-  <div>
-    <a href='https://emanote.srid.ca' target='_blank' title='Generated by Emanote 1.6.0.0'>
-      
-        <img class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' src='_emanote-static/emanote-logo.svg' alt='Emanote logo' />
-      
-    </a>
-  </div>
-  <div>
-    <a href='-/tags' title='View tags'>
-      <svg class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'>
-        </path>
-      </svg>
-    </a>
-  </div>
-  <div>
-    <a href='-/tasks' title='View tasks'>
-      <svg xmlns='http://www.w3.org/2000/svg' class='w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950 p-1.5 rounded-md transition-all hover:shadow-md hover:-translate-y-0.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path>
-      </svg>
-    </a>
-  </div>
-  </div>
-</footer>
     </div>
   
   <div id='stork-search-container' class='hidden fixed w-screen h-screen inset-0 backdrop-filter backdrop-blur-sm'>
