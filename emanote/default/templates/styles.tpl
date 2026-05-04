@@ -216,18 +216,23 @@
 </style>
 
 <style data-category="task-list">
-  /* Task-list items: Pandoc emits the task wrapper as a regular <li>
-     with a checkbox SVG (.--ema-checkbox) followed by a <span> of
-     inlines. We drop the disc marker and absolutely position the
-     checkbox in the marker slot, so task text shares the same
-     left edge as plain bullet text in the same list — mixed
-     task/non-task lists then read as one column instead of two
-     subtly-misaligned ones. */
-  main li:has(> svg.--ema-checkbox) {
+  /* In-prose Pandoc task list (a Markdown bullet list with `[ ]`/`[x]`
+     items). Pandoc emits the task as a regular <li> with a checkbox
+     SVG (.--ema-checkbox) followed by a <span> of inlines. We drop
+     the disc marker and absolutely position the checkbox in the
+     marker slot so task text shares the same left edge as plain
+     bullet text in the same list — mixed task/non-task lists then
+     read as one column instead of two subtly-misaligned ones.
+
+     Scoped to `main ul.list-disc` so the special tasks index page
+     (`/-/tasks`, which uses its own list shape, not list-disc)
+     doesn't pick up the absolute-position rule and shove the
+     checkbox off-screen. */
+  main ul.list-disc li:has(> svg.--ema-checkbox) {
     list-style: none;
     position: relative;
   }
-  main li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
+  main ul.list-disc li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
     position: absolute;
     left: -1.5rem;
     top: 0.3em;
