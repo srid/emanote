@@ -26,7 +26,7 @@ When a child route's frontmatter or YAML overlaps with values from parent YAMLs,
 - **Arrays** concatenate (with deduplication) — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` on a child note yields `[team-doc, internal-note]`. The same applies to other list-valued fields like `pandoc.filters`.
 - **Scalars** right-win — the most-specific value (the leaf) overrides ancestors.
 
-The array rule is what makes a parent YAML's `tags` survive to its children even when those children declare their own. (Prior to [#697](https://github.com/srid/emanote/issues/697), arrays were aligned by index, which silently clobbered cascaded entries.)
+The array rule is what makes a parent YAML's `tags` survive to its children even when those children declare their own.
 
 ## Special properties
 
