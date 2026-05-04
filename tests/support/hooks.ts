@@ -92,9 +92,6 @@ async function startLive(): Promise<{ url: string; resource: BackendResource }> 
     // making later page.goto("/") calls hang even though the backend started.
     { stdio: ["ignore", "ignore", "pipe"] },
   );
-  // Drain stdout too; otherwise a chatty live server can block once the pipe
-  // buffer fills, which surfaces as Playwright navigation timeouts.
-  proc.stdout?.on("data", () => {});
   proc.stderr?.on("data", (d: Buffer) =>
     process.stderr.write(`[emanote:live] ${d}`),
   );
