@@ -19,13 +19,15 @@
   <aside id="right-panel" class="${rightPanelClass}">
     <div class="px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8">
       <apply template="toc" />
+      <apply template="timeline" />
       <apply template="backlinks-margin" />
     </div>
   </aside>
   <else />
   <ema:note:backlinks:nodaily>
     <aside id="right-panel" class="${rightPanelClass}">
-      <div class="px-4 py-5 text-gray-800 dark:text-gray-200">
+      <div class="px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8">
+        <apply template="timeline" />
         <apply template="backlinks-margin" />
       </div>
     </aside>

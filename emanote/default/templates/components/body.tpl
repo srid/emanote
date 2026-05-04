@@ -5,7 +5,6 @@
 <div class="flex-1 min-w-0 bg-white dark:bg-gray-800">
   <main class="px-6 py-8 max-w-7xl mx-auto">
     <apply template="note-body" />
-    <apply template="timeline" />
     <apply template="metadata" />
     <apply template="/templates/hooks/note-end" />
   </main>
