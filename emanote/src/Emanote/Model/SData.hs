@@ -4,11 +4,11 @@
 module Emanote.Model.SData where
 
 import Data.Aeson qualified as Aeson
-import Data.Aeson.Extra.Merge qualified as AesonMerge
 import Data.Aeson.KeyMap qualified as KM
 import Data.Data (Data)
 import Data.IxSet.Typed (Indexable (..), IxSet, ixGen, ixList)
 import Data.List.NonEmpty qualified as NE
+import Data.Vector qualified as V
 import Data.Yaml qualified as Yaml
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
@@ -54,8 +54,21 @@ mergeAesons :: NonEmpty Aeson.Value -> Aeson.Value
 mergeAesons =
   last . NE.scanl1 mergeAeson
 
+{- | Deep-merge two YAML-shaped Aeson values for the metadata cascade.
+
+Objects merge by key (recursively), arrays concatenate (then dedup), and
+scalars right-win. The array case is the deliberate divergence from
+@aeson-extra@'s @lodashMerge@: lodash aligns arrays by index, which for
+list-valued fields like @tags@ silently clobbers cascade contributions
+the moment a child note declares any of its own. Cascade defaults are
+meant to extend, not align — see issue #697.
+-}
 mergeAeson :: Aeson.Value -> Aeson.Value -> Aeson.Value
-mergeAeson = AesonMerge.lodashMerge
+mergeAeson (Aeson.Object a) (Aeson.Object b) =
+  Aeson.Object $ KM.unionWith mergeAeson a b
+mergeAeson (Aeson.Array a) (Aeson.Array b) =
+  Aeson.Array $ V.fromList $ ordNub $ V.toList a <> V.toList b
+mergeAeson _ b = b
 
 -- TODO: Use https://hackage.haskell.org/package/lens-aeson
 lookupAeson :: forall a. (Aeson.FromJSON a) => a -> NonEmpty Text -> Aeson.Value -> a
