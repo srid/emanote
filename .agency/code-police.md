@@ -4,6 +4,20 @@ Project-specific additions to the built-in rule set in `.claude/skills/code-poli
 
 The patterns here came out of [#672](https://github.com/srid/emanote/pull/672) (Stork ES-module migration), where seven follow-up commits — three from `/code-police`, four from `/hickey` + `/lowy` — landed on top of the primary feature. Capture: same shape of mistake, same kind of fix, made into a recurring check.
 
+## emanote-tailwind-first
+
+When styling Heist templates or JS-generated DOM, prefer **inline Tailwind utility classes** over CSS rules in `styles.tpl`. The grandfathered CSS in that file lives there because the rule it expresses doesn't fit the utility-class shape (e.g. complex `@keyframes`, `:popover-open` pseudo-states, or selectors that target Pandoc-emitted HTML with no class hook). Everything else belongs as `class="…"` in the template.
+
+A new CSS rule in `styles.tpl` is only acceptable when:
+
+- The selector targets an element Pandoc / a vendor library emits without classes (`main table`, `pre`, `kbd`, `:popover-open` modifiers). Add a one-line comment explaining the no-class-hook constraint.
+- The rule needs `@keyframes` or other at-rule constructs Tailwind doesn't express inline.
+- The same property repeats across a CSS-property family that Tailwind would force you to spell as one arbitrary value per case (e.g. complex `font-feature-settings` runs).
+
+If you find yourself writing `.foo { color: …; padding: …; }` in CSS where `<div class="text-… p-…">` would do the job, the template is the right home — utility classes are scanned by Tailwind's JIT and tree-shaken with the rest of the build, while raw CSS in `styles.tpl` ships unconditionally.
+
+> _Rationale_: keeping styling in templates means a reader reviewing one component sees its full styling at the call site rather than having to cross-reference a separate `styles.tpl` `data-category` block. It also makes the surface visible to `/code-police`'s rule-of-three reviews — three sites of the same Tailwind class string become a candidate for `<bind>` or extraction; three CSS rules in `styles.tpl` are invisible.
+
 ## emanote-no-one-field-options-bag
 
 A function that takes a single-key options object — `fn(x, { onlyKey: value })` — is an options-bag larp dressed as future-proofing. Replace with a positional parameter (`fn(x, onlyKey = default)`). Threshold: **if at most one of N call sites actually passes anything, the bag has no users to justify it.**

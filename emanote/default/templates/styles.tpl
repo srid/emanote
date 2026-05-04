@@ -62,6 +62,51 @@
   code, pre, kbd, samp, .font-mono {
     font-family: var(--font-mono);
   }
+
+  /* Tables — Pandoc emits standard <table> HTML with no classes, so we
+     style by element. Scoped under `main` to avoid hitting tables in
+     chrome surfaces (sidebar tree, footnote popover, etc). */
+  main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  main thead {
+    border-bottom: 2px solid var(--color-gray-200);
+    text-align: left;
+  }
+  main thead th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    letter-spacing: -0.01em;
+  }
+  main tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+  }
+  main tbody tr:last-child {
+    border-bottom: none;
+  }
+  main tbody tr:hover {
+    background-color: var(--color-gray-50);
+  }
+  main tbody td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+  }
+  .dark main thead {
+    border-bottom-color: var(--color-gray-700);
+  }
+  .dark main thead th {
+    color: var(--color-gray-100);
+  }
+  .dark main tbody tr {
+    border-bottom-color: var(--color-gray-800);
+  }
+  .dark main tbody tr:hover {
+    background-color: rgb(255 255 255 / 0.03);
+  }
 </style>
 
 
@@ -139,17 +184,21 @@
 </style>
 
 <style data-category="task-list">
-  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
+  /* Task-list items: Pandoc emits the task wrapper as a regular <li>
+     with a checkbox SVG (.--ema-checkbox) followed by a <span> of
+     inlines. We drop the disc marker and absolutely position the
+     checkbox in the marker slot, so task text shares the same
+     left edge as plain bullet text in the same list — mixed
+     task/non-task lists then read as one column instead of two
+     subtly-misaligned ones. */
   main li:has(> svg.--ema-checkbox) {
     list-style: none;
-    display: flex;
-    gap: 0.5rem;
-    align-items: baseline;
-    margin-left: -1rem;
+    position: relative;
   }
-
-  main li:has(> svg.--ema-checkbox) > span {
-    flex: 1;
+  main li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
+    position: absolute;
+    left: -1.5rem;
+    top: 0.3em;
   }
 </style>
 

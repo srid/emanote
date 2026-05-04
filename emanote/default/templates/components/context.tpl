@@ -15,8 +15,8 @@
           <Internal class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70" />
           <External class="text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2" target="_blank" rel="noopener" />
         </PandocLink>
-        <OrderedList class="ml-4 space-y-1 list-decimal list-inside" />
-        <BulletList class="ml-4 space-y-1 list-decimal list-inside" />
+        <OrderedList class="ml-4 space-y-1 list-decimal list-inside marker:text-gray-400 dark:marker:text-gray-500" />
+        <BulletList class="ml-4 space-y-1 list-disc list-inside marker:text-gray-400 dark:marker:text-gray-500" />
         <Task:Checked>
           <apply template="/templates/components/checkbox-checked">
             <inlines />

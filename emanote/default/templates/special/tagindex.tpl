@@ -1,7 +1,7 @@
 <apply template="/templates/special/base">
   <bind tag="special-main">
-    <div class="bg-gray-200 dark:bg-gray-800 pb-2">
-      <nav id="tagcrumbs" class="w-full pl-2 bg-gray-100 dark:bg-gray-700">
+    <div class="pb-2">
+      <nav id="tagcrumbs" class="w-full pl-2 border-b border-gray-200 dark:border-gray-800 mb-4">
         <div class="flex items-center justify-left">
           <div class="w-full px-2 py-2 ">
             <ul class="flex flex-wrap text-lg">
