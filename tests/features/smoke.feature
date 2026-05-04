@@ -180,3 +180,13 @@ Feature: Smoke
   Scenario: Tag declared in sibling folder YAML appears on the root tag-index page (regression: #352)
     When I fetch "/-/tags.html"
     Then the response body contains "-/tags/issue-352-cascaded.html"
+
+  Scenario: Cascaded YAML tag survives when the child note declares its own tags (regression: #697)
+    When I open "/issue-697/note.html"
+    Then the metadata tag chip with text "issue-697-cascaded" has href containing "-/tags/issue-697-cascaded.html"
+    And the metadata tag chip with text "issue-697-own" has href containing "-/tags/issue-697-own.html"
+    And the metadata tag chip with text "issue-697-inline" has href containing "-/tags/issue-697-inline.html"
+
+  Scenario: Cascaded YAML tag still indexes a child note that declares its own tags (regression: #697)
+    When I fetch "/-/tags/issue-697-cascaded.html"
+    Then the response body contains "issue-697/note"

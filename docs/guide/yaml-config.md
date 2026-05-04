@@ -18,6 +18,16 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 >[!tip] Using in HTML templates
 > You can reference the YAML frontmatter config from [[html-template]]. See [here](https://github.com/srid/emanote/discussions/131#discussioncomment-1382189) for details.
 
+## Cascade merge semantics
+
+When a child route's frontmatter or YAML overlaps with values from parent YAMLs, Emanote merges them along three rules:
+
+- **Objects** are deep-merged by key — the child overrides individual nested fields without touching siblings.
+- **Arrays** concatenate (with deduplication) — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` on a child note yields `[team-doc, internal-note]`. The same applies to other list-valued fields like `pandoc.filters`.
+- **Scalars** right-win — the most-specific value (the leaf) overrides ancestors.
+
+The array rule is what makes a parent YAML's `tags` survive to its children even when those children declare their own.
+
 ## Special properties
 
 - `page.image`: The image to use for the page. This is used for the [[ogp]] meta tag `og:image` meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if `page.siteUrl` is non-empty.
