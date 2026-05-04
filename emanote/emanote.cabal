@@ -94,7 +94,6 @@ common library-common
   -- TODO: We could use the ghcid flag trick in neuron.cabal to avoid rebuilds.
   build-depends:
     , aeson
-    , aeson-extra
     , aeson-optics
     , async
     , base                   >=4.14    && <5
@@ -153,6 +152,7 @@ common library-common
     , uri-encode
     , url-slug
     , uuid
+    , vector
     , warp
     , which
     , with-utf8
@@ -256,6 +256,7 @@ test-suite test
     other-modules:
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
+      Emanote.Model.SDataSpec
       Emanote.Model.TocSpec
       Emanote.Pandoc.BuiltinFiltersSpec
       Emanote.Pandoc.ExternalLinkSpec

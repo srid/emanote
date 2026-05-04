@@ -181,6 +181,16 @@ Feature: Smoke
     When I fetch "/-/tags.html"
     Then the response body contains "-/tags/issue-352-cascaded.html"
 
+  Scenario: Cascaded YAML tag survives when the child note declares its own tags (regression: #697)
+    When I open "/issue-697/note.html"
+    Then the metadata tag chip with text "issue-697-cascaded" has href containing "-/tags/issue-697-cascaded.html"
+    And the metadata tag chip with text "issue-697-own" has href containing "-/tags/issue-697-own.html"
+    And the metadata tag chip with text "issue-697-inline" has href containing "-/tags/issue-697-inline.html"
+
+  Scenario: Cascaded YAML tag still indexes a child note that declares its own tags (regression: #697)
+    When I fetch "/-/tags/issue-697-cascaded.html"
+    Then the response body contains "issue-697/note"
+
   Scenario: Sidebar month folder renders as a calendar grid (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar month calendar is visible with header "Apr 2026"
