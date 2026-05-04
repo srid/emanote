@@ -27,14 +27,27 @@ const LABEL_CLASSES = 'w-7 text-[0.65rem] uppercase tracking-wider text-gray-500
 const CELLS_CLASSES = 'flex gap-px';
 const CELL_BASE = 'block w-1 h-1 rounded-[1px]';
 const CELL_EMPTY = CELL_BASE + ' bg-gray-200 dark:bg-gray-800';
-const CELL_FILLED = CELL_BASE + ' bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
+const CELL_FILLED = CELL_BASE + ' group relative bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';
 const YEAR_LABEL_CLASSES = 'text-xs font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1';
 
+// Hover flyout: outer wrapper with pt-1.5 acts as a transparent
+// hover-bridge so cursor traversal between cell and visible card never
+// drops `group-hover`. Positioned below the cell (top-full) so flyouts
+// near the top of the heatmap don't clip on the viewport edge.
+const FLYOUT_OUTER = 'cell-flyout absolute z-50 hidden group-hover:block group-focus-within:block top-full left-1/2 -translate-x-1/2 pt-1.5';
+const FLYOUT_CARD = 'w-64 max-w-[min(16rem,80vw)] px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.8rem] leading-[1.5] text-gray-700 dark:text-gray-300 [&_p]:m-0 [&_p+p]:mt-2';
+const FLYOUT_HEADER = 'text-[0.65rem] font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 mb-1.5';
+
 function parseEntries(listEl) {
-  const out = new Map(); // year → Map<month, Map<day, {url, title}>>
+  const out = new Map(); // year → Map<month, Map<day, {url, title, contextHTML}>>
   for (const li of listEl.querySelectorAll('li')) {
     const title = li.dataset.title || '';
     const url = li.dataset.url || '';
+    // The <li>'s inner HTML is the rendered backlink context (paragraphs
+    // around where this note is referenced from the daily note). Used
+    // verbatim inside the cell's hover flyout — same context shape as
+    // backlinks-margin so timeline + backlinks read as one family.
+    const contextHTML = li.innerHTML.trim();
     const m = title.match(DATE_RE);
     if (!m) continue;
     const [, y, mo, d] = m;
@@ -42,7 +55,7 @@ function parseEntries(listEl) {
     if (!out.has(year)) out.set(year, new Map());
     const yr = out.get(year);
     if (!yr.has(month)) yr.set(month, new Map());
-    yr.get(month).set(day, { url, title });
+    yr.get(month).set(day, { url, title, contextHTML });
   }
   return out;
 }
@@ -69,7 +82,30 @@ function renderMonthRow(year, month, dayMap) {
       a.href = entry.url;
       const dStr = String(day).padStart(2, '0');
       const moStr = String(month).padStart(2, '0');
-      a.title = year + '-' + moStr + '-' + dStr + ' — ' + entry.title;
+      const dateStr = year + '-' + moStr + '-' + dStr;
+      const headerText = dateStr + ' — ' + entry.title;
+      // Native title kept as the keyboard-focus / screen-reader label
+      // and as a fallback when the visual flyout is clipped off-screen.
+      a.title = headerText;
+      // CSS-only flyout: hidden by default, shown on group-hover /
+      // group-focus-within (the cell carries `group relative`). Built
+      // up programmatically rather than via innerHTML so the cloned
+      // pandoc context HTML can't escape into outer attributes.
+      const flyout = document.createElement('div');
+      flyout.className = FLYOUT_OUTER;
+      const card = document.createElement('div');
+      card.className = FLYOUT_CARD;
+      const header = document.createElement('div');
+      header.className = FLYOUT_HEADER;
+      header.textContent = headerText;
+      card.appendChild(header);
+      if (entry.contextHTML) {
+        const body = document.createElement('div');
+        body.innerHTML = entry.contextHTML;
+        card.appendChild(body);
+      }
+      flyout.appendChild(card);
+      a.appendChild(flyout);
       cells.appendChild(a);
     } else {
       const sp = document.createElement('span');
