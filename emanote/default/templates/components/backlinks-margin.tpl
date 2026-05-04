@@ -15,7 +15,7 @@
     <ul class="space-y-1">
       <backlink>
         <li class="group relative">
-          <a class="block py-1 px-2 rounded-sm bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
+          <a class="block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors"
              href="${backlink:note:url}">
             <span class="text-primary-400 dark:text-primary-700 mr-1.5 select-none" aria-hidden="true">→</span><backlink:note:title />
           </a>
