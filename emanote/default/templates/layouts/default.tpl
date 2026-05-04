@@ -40,21 +40,39 @@
       </ema:has:breadcrumbs>
 
       <ema:has:sidebar>
+        <!-- Container is the rounded card. Children stack vertically:
+             [note-title strip] [inner row of columns] [backlinks-bottom
+             strip] [footer strip]. The inner row is its own flex so
+             columns sit side-by-side at md+ without forcing the strips
+             to participate in flex-wrap. The footer is the last child
+             so its md:rounded-b-lg matches the container's bottom curve. -->
         <div id="container"
-          class="flex flex-nowrap flex-col md:flex-row bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
-          <!-- Sidebar column -->
-          <apply template="components/sidebar" />
-          <!-- Main body column -->
-          <apply template="components/body" />
+          class="flex flex-col bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
+          <apply template="components/note-title" />
+          <div class="flex flex-col md:flex-row">
+            <apply template="components/sidebar" />
+            <apply template="components/body" />
+            <apply template="components/right-panel" />
+          </div>
+          <apply template="components/backlinks-bottom" />
+          <apply template="components/footer" />
         </div>
         <else />
-        <div id="container" class="relative md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
+        <!-- No-sidebar layout (e.g. neuron-style): same card chrome,
+             same attached title strip, no left/right panels. Backlinks
+             render as the full-card variant since backlinks-bottom is
+             gated on lg:hidden and there's no right-panel here. Footer
+             is the last child so md:rounded-b-lg matches the curve. -->
+        <div id="container" class="relative flex flex-col md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
           <storkSearchButtonTopRight />
-          <!-- Main body column -->
+          <apply template="components/note-title" />
           <apply template="components/body" />
+          <div class="px-6 pb-8">
+            <apply template="components/backlinks" />
+          </div>
+          <apply template="components/footer" />
         </div>
       </ema:has:sidebar>
-      <apply template="components/footer" />
     </div>
   </bind>
 </apply>

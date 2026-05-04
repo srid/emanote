@@ -25,7 +25,7 @@ See [[file:../tips/syntax-highlighting.md][Syntax Highlighting]] for general inf
 
 *** LaTeX 
 
-See [[file:../tips/js/math.md][Math]] for general information.
+See [[file:../tips/math.md][Math]] for general information.
 
 The radius of the sun is R_sun = 6.96 x 10^8 m.  On the other hand,
 the radius of Alpha Centauri is R_{Alpha Centauri} = 1.28 x R_{sun}.

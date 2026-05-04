@@ -1,50 +1,46 @@
-<!-- Variable bindings for this tree-->
-<bind tag="link-class">hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
+<!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+<bind tag="link-class"><tree-link-rest-class /></bind>
 <node:active>
-  <bind tag="link-class">font-semibold bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors</bind>
+  <bind tag="link-class">font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors</bind>
   <else />
   <node:activeTree>
     <has-current-route>
-      <bind tag="link-class">font-semibold hover:bg-primary-50 dark:hover:bg-primary-950 hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
+      <bind tag="link-class">font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors</bind>
     </has-current-route>
   </node:activeTree>
 </node:active>
 
 <has-children>
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   <bind tag="icon">
     <tree:open>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-        class="${iconSize} inline text-gray-700 dark:text-gray-300" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
-          clip-rule="evenodd" />
+        class="${iconSize} inline text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9" />
       </svg>
       <else />
-      <svg xmlns="http://www.w3.org/2000/svg" class="${iconSize} inline text-gray-500 dark:text-gray-400"
-        viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
-          clip-rule="evenodd" />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        class="${iconSize} inline text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 6 15 12 9 18" />
       </svg>
     </tree:open>
   </bind>
   <else />
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
   <bind tag="icon">
-    <node:active>
-      <svg class="${iconSize} inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-        </path>
-      </svg>
-      <else />
-      <svg class="${iconSize} inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-        </path>
-      </svg>
-    </node:active>
+    <span class="${iconSize} inline-flex items-center justify-center" aria-hidden="true">
+      <span class="block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+    </span>
   </bind>
 </has-children>
 

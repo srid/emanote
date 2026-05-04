@@ -16,7 +16,10 @@ template:
   base:
     # The class to apply for <body> element when
     bodyClass: bg-gray-200 dark:bg-black text-gray-900 dark:text-gray-50 overflow-y-scroll
-    containerClass: container mx-auto
+    # `container` caps at 1536px (Tailwind's 2xl screen). Bump to 100rem
+    # (1600px) at 2xl+ so ultra-wide viewports don't waste horizontal
+    # gutter space on either side of the card.
+    containerClass: container mx-auto 2xl:max-w-[100rem]
   error:
     containerClass: container mx-auto max-w-prose
   uptree:
@@ -52,8 +55,11 @@ pandoc:
   # This feature is useful when managing a "library" of CSS styling to use on
   # Markdown text, especially when using Tailwind.
   rewriteClass:
-    # How to style inline tags. Tag-specific styles can be applied as well.
-    emanote:inline-tag: font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-1 px-3 rounded-lg shadow-sm
+    # How to style inline tags. Same chip language as wikilinks (see
+    # the <Internal> styling in components/pandoc.tpl) so all "linked
+    # note / tag" affordances read as one family. Tag-specific styles
+    # can be applied as well via emanote:inline-tag:<path>.
+    emanote:inline-tag: bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm
     # This style is used by `#a/red/tag` in addition to the generic style above.
     # As this class comes *after* the generic class, it can override the styles
     # in the generic class.
@@ -70,7 +76,7 @@ pandoc:
     emanote:error: emanote:error
     # YAML / Markdown parse-error banner — built by 'Emanote.Model.Note.errorDiv'
     # via 'Diagnostic.errorBlock "yaml"'. Used for the #285 bad-yaml banner.
-    emanote:error:yaml: text-l bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
+    emanote:error:yaml: text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     # Inline aside next to a broken / ambiguous link in live preview — built
     # by 'Renderer.Url.renderSomeInlineRefWith' via 'Diagnostic.errorInlineAside "aside"'.
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100

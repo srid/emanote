@@ -16,11 +16,16 @@
   <clickable-icon />
 </bind>
 
-<bind tag="h2-class">group mt-12 mb-6 font-bold text-gray-900 dark:text-gray-50 pb-2 border-b-2 border-gray-200 dark:border-gray-800</bind>
-<bind tag="h3-class">group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50</bind>
-<bind tag="h4-class">group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50</bind>
-<bind tag="h5-class">group mt-6 mb-3 font-semibold text-gray-800 dark:text-gray-100</bind>
-<bind tag="h6-class">group mt-6 mb-3 font-semibold text-gray-700 dark:text-gray-200</bind>
+<!-- Heading scale ~1.20 ratio (text-4xl→base via Tailwind's discrete steps).
+     h2 keeps a subtle bottom rule as the "section break" cue but at 1px in a
+     light gray that doesn't compete with the heading itself. h5/h6 fade
+     gray-* one stop down each level so they recede without losing
+     hierarchy. All semibold (600) — uniform weight, hierarchy via size. -->
+<bind tag="h2-class">group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700</bind>
+<bind tag="h3-class">group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h4-class">group mt-6 mb-3 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h5-class">group mt-5 mb-2 font-semibold text-gray-800 dark:text-gray-100</bind>
+<bind tag="h6-class">group mt-4 mb-2 font-semibold text-gray-700 dark:text-gray-200</bind>
 
 <ema:note:pandoc>
   <Para>
@@ -53,7 +58,7 @@
     <dl class="flex flex-col mb-3">
       <DefinitionList:Items>
         <div class="my-1">
-          <dt class="font-bold text-l">
+          <dt class="font-bold text-lg">
             <DefinitionList:Item:Term />
           </dt>
           <DefinitionList:Item:DescList>
@@ -105,40 +110,51 @@
     <hr class="my-8 border-gray-200 dark:border-gray-800" />
   </HorizontalRule>
   <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
-  <PandocLink class="text-primary-600 dark:text-primary-400">
-    <Internal class="bg-primary-50 dark:bg-primary-950 px-1.5 py-0.5 rounded-md font-semibold no-underline hover:bg-primary-100 dark:hover:bg-primary-900" />
-    <External class="no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
+  <!-- Internal links inherit the page-title strip's palette (bg + text +
+       tracking) one font-weight step lighter — they read as small inline
+       titles of the linked notes. box-decoration-clone keeps the tinted
+       background continuous across line breaks. External links keep the
+       underline-on-hover treatment plus the external-icon glyph for
+       differentiation. -->
+  <PandocLink class="transition-colors">
+    <Internal class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70" />
+    <External class="text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
   </PandocLink>
-  <CodeBlock class="py-4 pr-4 mb-6 text-sm font-mono rounded-lg overflow-x-auto" />
+  <!-- Wrapper just provides bottom margin + sets the size. The <pre>
+       inside owns its own bg / border / rounded / padding / overflow
+       (skylighting.css uses Tailwind design tokens). The previous
+       py-4 pr-4 layered a second padding on top of pre's own, with a
+       suspicious right-only padding that left visible asymmetry. -->
+  <CodeBlock class="mb-6 text-sm" />
   <Code class="py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal" />
 
   <Header:1>
-    <h1 id="${header:id}" class="group mt-12 mb-8 font-bold text-gray-900 dark:text-gray-50 text-5xl">
+    <h1 id="${header:id}" class="group mt-10 mb-6 font-semibold text-gray-900 dark:text-gray-50 text-4xl">
       <heading-inlines-with-anchor />
     </h1>
   </Header:1>
   <Header:2>
-    <h2 id="${header:id}" class="${h2-class} text-4xl">
+    <h2 id="${header:id}" class="${h2-class} text-3xl">
       <heading-inlines-with-anchor />
     </h2>
   </Header:2>
   <Header:3>
-    <h3 id="${header:id}" class="${h3-class} text-3xl">
+    <h3 id="${header:id}" class="${h3-class} text-2xl">
       <heading-inlines-with-anchor />
     </h3>
   </Header:3>
   <Header:4>
-    <h4 id="${header:id}" class="${h4-class} text-2xl">
+    <h4 id="${header:id}" class="${h4-class} text-xl">
       <heading-inlines-with-anchor />
     </h4>
   </Header:4>
   <Header:5>
-    <h5 id="${header:id}" class="${h5-class} text-xl">
+    <h5 id="${header:id}" class="${h5-class} text-lg">
       <heading-inlines-with-anchor />
     </h5>
   </Header:5>
   <Header:6>
-    <h6 id="${header:id}" class="${h6-class} text-lg">
+    <h6 id="${header:id}" class="${h6-class} text-base">
       <heading-inlines-with-anchor />
     </h6>
   </Header:6>

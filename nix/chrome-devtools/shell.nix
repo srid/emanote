@@ -22,9 +22,20 @@ let
     })
     { };
   mcpVersion = "0.21.0";
+  # nixpkgs ships no Chromium derivation for Darwin (its meta.platforms
+  # is Linux-only), so referencing pkgs.chromium fails eval on macOS.
+  # On Darwin, fall through to chrome-devtools-mcp's built-in browser
+  # discovery: Puppeteer locates a user-installed Google Chrome at the
+  # standard /Applications path, otherwise downloads chrome-headless-shell
+  # into its cache. On Linux we keep the pinned nixpkgs chromium so the
+  # shell stays fully self-contained.
+  executablePathFlag =
+    if pkgs.stdenv.isDarwin
+    then ""
+    else "--executable-path=${pkgs.chromium}/bin/chromium";
   mcp = pkgs.writeShellScriptBin "chrome-devtools-mcp" ''
     exec ${pkgs.nodejs}/bin/npx -y chrome-devtools-mcp@${mcpVersion} \
-      --executable-path=${pkgs.chromium}/bin/chromium "$@"
+      ${executablePathFlag} "$@"
   '';
 in
 pkgs.mkShell {

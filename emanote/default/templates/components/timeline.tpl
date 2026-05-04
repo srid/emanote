@@ -1,20 +1,26 @@
+<!-- Daily-note backlinks rendered as a year-stacked heatmap.
+     Two visible homes:
+       - Right-panel (lg+): timeline as part of the side-material column.
+       - Bottom strip (<lg): timeline attached to the bottom of the
+         card, alongside the regular backlinks fallback.
+     Classes (not IDs) so both instances are valid HTML and the JS in
+     _emanote-static/js/timeline-heatmap.js can paint each independently
+     via querySelectorAll. The hidden <ul.timeline-data> is the
+     screen-reader / no-JS fallback. -->
 <ema:note:backlinks:daily>
-  <div id="timeline" class="flex-1 mt-8 p-5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm">
-    <header class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+  <section class="emanote-timeline text-sm text-gray-700 dark:text-gray-300">
+    <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
       Timeline
-    </header>
-    <ul class="space-y-4">
+    </h3>
+    <ul class="timeline-data" hidden>
       <backlink>
-        <li>
-          <a class="inline-block mb-1.5 px-2.5 py-0.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-950 hover:bg-primary-100 dark:hover:bg-primary-900 rounded-md font-semibold no-underline"
-            href="${backlink:note:url}">
-            <backlink:note:title />
-          </a>
+        <li data-url="${backlink:note:url}" data-title="${backlink:note:title}">
           <backlink:note:contexts>
             <apply template="context" />
           </backlink:note:contexts>
         </li>
       </backlink>
     </ul>
-  </div>
+    <div class="timeline-heatmap"></div>
+  </section>
 </ema:note:backlinks:daily>
