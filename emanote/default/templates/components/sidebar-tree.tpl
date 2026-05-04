@@ -78,10 +78,14 @@
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
 
-    The wrapper div is the seam sidebar-calendar.js scans: when every
-    immediate child is a daily-note leaf (anchor with data-iso-date) and
-    they share a year+month, the JS swaps the children for a calendar
-    grid in place. No-op for non-month groups.
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   <tree:open>
     <div class="emanote-tree-children">
