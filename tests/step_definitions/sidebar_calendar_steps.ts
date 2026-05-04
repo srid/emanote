@@ -20,6 +20,29 @@ import * as assert from "node:assert";
 const CALENDAR_SEL = ".emanote-sidebar-calendar";
 const SIDEBAR_TREE_ROOT_SEL = "#sidebar-tree, nav";
 
+function mockDateScript(isoDate: string): string {
+  return `
+    (() => {
+      const date = ${JSON.stringify(isoDate)};
+      const RealDate = Date;
+      const [year, month, day] = date.split("-").map(Number);
+      const fixedTime = new RealDate(year, month - 1, day, 12).getTime();
+      function MockDate(...args) {
+        if (new.target) {
+          return args.length === 0
+            ? new RealDate(fixedTime)
+            : new RealDate(...args);
+        }
+        return new RealDate(fixedTime).toString();
+      }
+      Object.setPrototypeOf(MockDate, RealDate);
+      MockDate.prototype = RealDate.prototype;
+      MockDate.now = () => fixedTime;
+      window.Date = MockDate;
+    })();
+  `;
+}
+
 // Wait for at least one calendar wrapper to appear. The widget runs on
 // `ready`, so the wrapper materialises a frame or two after DOMContentLoaded.
 async function waitForCalendar(page: EmanoteWorld["page"]): Promise<void> {
@@ -47,28 +70,9 @@ Given(
       /^\d{4}-\d{2}-\d{2}$/,
       "Browser date fixture must be YYYY-MM-DD.",
     );
-    await this.page.addInitScript({
-      content: `
-        (() => {
-          const date = ${JSON.stringify(isoDate)};
-          const RealDate = Date;
-          const [year, month, day] = date.split("-").map(Number);
-          const fixedTime = new RealDate(year, month - 1, day, 12).getTime();
-          function MockDate(...args) {
-            if (new.target) {
-              return args.length === 0
-                ? new RealDate(fixedTime)
-                : new RealDate(...args);
-            }
-            return new RealDate(fixedTime).toString();
-          }
-          Object.setPrototypeOf(MockDate, RealDate);
-          MockDate.prototype = RealDate.prototype;
-          MockDate.now = () => fixedTime;
-          window.Date = MockDate;
-        })();
-      `,
-    });
+    const script = mockDateScript(isoDate);
+    await this.page.addInitScript({ content: script });
+    await this.page.evaluate((source) => new Function(source)(), script);
   },
 );
 

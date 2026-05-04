@@ -191,7 +191,6 @@ Feature: Smoke
     When I fetch "/-/tags/issue-697-cascaded.html"
     Then the response body contains "issue-697/note"
 
-  @no-morph
   Scenario: Sidebar month folder renders as a calendar grid (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar month calendar is visible with header "Apr 2026"
@@ -200,20 +199,17 @@ Feature: Smoke
     And the sidebar month calendar links day 30 to "calendar-test/2026/04/2026-04-30"
     And the sidebar month calendar has 3 filled day cells
 
-  @no-morph
   Scenario: Sidebar month calendar distinguishes active route and today (issue #700)
     Given the browser date is "2026-04-30"
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar month calendar marks day 15 as the active route
     And the sidebar month calendar marks day 30 as today
 
-  @no-morph
   Scenario: Sidebar month folder swaps the linear list, not augments it (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar has no plain link with text "2026-04-01"
     And the sidebar has no plain link with text "2026-04-30"
 
-  @no-morph
   Scenario: Sidebar non-month folders do not render as a calendar (issue #700)
     When I open "/"
     Then the sidebar tree has no calendar wrapper for non-month folders
