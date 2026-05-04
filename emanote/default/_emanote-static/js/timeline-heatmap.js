@@ -1,7 +1,7 @@
 // Render daily-note backlinks (`<ema:note:backlinks:daily>`) as a year-stacked
 // heatmap into #timeline-heatmap, using the hidden <ul id="timeline-data"> as
-// the data source. Dates are parsed out of each backlink's title via a
-// YYYY-MM-DD regex; entries without a parseable date are silently skipped
+// the data source. Dates come from Haskell-emitted data-iso-date attributes;
+// entries without a parseable date are silently skipped
 // (the hidden list is also the screen-reader / no-JS fallback so they're
 // still reachable).
 //
@@ -30,8 +30,6 @@ import {
   formatCellHeader,
 } from '@emanote/calendar-grid';
 
-const DATE_RE = /(\d{4})-(\d{2})-(\d{2})/;
-
 const ROW_CLASSES = 'flex items-center gap-1.5';
 const LABEL_CLASSES = 'w-7 text-[0.65rem] uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none shrink-0';
 const YEAR_LABEL_CLASSES = 'text-xs font-semibold tracking-tight text-gray-700 dark:text-gray-300 mb-1';
@@ -41,15 +39,17 @@ function parseEntries(listEl) {
   for (const li of listEl.querySelectorAll('li')) {
     const title = li.dataset.title || '';
     const url = li.dataset.url || '';
+    const isoDate = li.dataset.isoDate || '';
     // The <li>'s inner HTML is the rendered backlink context (paragraphs
     // around where this note is referenced from the daily note). Used
     // verbatim inside the cell's hover flyout — same context shape as
     // backlinks-margin so timeline + backlinks read as one family.
     const contextHTML = li.innerHTML.trim();
-    const m = title.match(DATE_RE);
-    if (!m) continue;
-    const [, y, mo, d] = m;
+    const parts = isoDate.split('-');
+    if (parts.length !== 3) continue;
+    const [y, mo, d] = parts;
     const year = +y, month = +mo, day = +d;
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) continue;
     if (!out.has(year)) out.set(year, new Map());
     const yr = out.get(year);
     if (!yr.has(month)) yr.set(month, new Map());

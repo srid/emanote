@@ -14,7 +14,7 @@
     </h3>
     <ul class="timeline-data" hidden>
       <backlink>
-        <li data-url="${backlink:note:url}" data-title="${backlink:note:title}">
+        <li data-url="${backlink:note:url}" data-title="${backlink:note:title}" data-iso-date="${backlink:note:iso-date}">
           <backlink:note:contexts>
             <apply template="context" />
           </backlink:note:contexts>
