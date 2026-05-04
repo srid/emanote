@@ -87,7 +87,10 @@ async function startLive(): Promise<{ url: string; resource: BackendResource }> 
   const proc = spawn(
     emanoteBin,
     ["-L", fixtureDir, "run", "--port", String(port)],
-    { stdio: ["ignore", "pipe", "pipe"] },
+    // Emanote writes routine request/build output to stdout. In long morph
+    // runs, an unread stdout pipe can fill and block the server process,
+    // making later page.goto("/") calls hang even though the backend started.
+    { stdio: ["ignore", "ignore", "pipe"] },
   );
   // Drain stdout too; otherwise a chatty live server can block once the pipe
   // buffer fills, which surfaces as Playwright navigation timeouts.
