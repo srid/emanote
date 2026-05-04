@@ -31,6 +31,10 @@ See [architecture](https://emanote.srid.ca/architecture) for a high-level overvi
 
 You may want to run `nix run github:juspay/vira ci -- -b` before opening a PR, but the Github Actions will run it as well.
 
+## AI-based coding
+
+This repository is set up for AI-based coding with [srid/agency](https://agency.srid.ca/) and [Microsoft APM](https://github.com/microsoft/apm). Following the motivation in [Kolu's contributing guide](https://github.com/juspay/kolu/blob/master/CONTRIBUTING.md), contributors are encouraged to open issues with detailed specifications rather than code changes per se.
+
 ## Discussion
 
 To discuss the emanote project, post in [GitHub Discussions][ghdiscuss].
