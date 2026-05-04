@@ -25,10 +25,12 @@ pre code {
   border-color: var(--color-gray-800);
 }
 
-/* Token colors — coordinated with the rest of the theme palette via
-   Tailwind v4 design tokens. Three-axis scheme:
-     - Primary (theme accent, default emerald) for keywords / control
-       flow / functions / imports — "what controls the program".
+/* Token colors — coordinated with the rest of the theme palette.
+   Three-axis scheme:
+     - Primary (theme accent, default emerald, follows index.yaml's
+       theme:) for keywords / control flow / functions / imports —
+       "what controls the program". Uses --color-primary-* design
+       tokens so the keyword colour follows the user's theme.
      - Slate for strings and verbatim text — cool, recedes from the
        active code path.
      - Orange/amber for numbers and preprocessor — warm, distinct
@@ -37,66 +39,73 @@ pre code {
      - Violet for types and variables — cool-purple, distinct from
        both keywords and values without competing.
      - Gray italic for comments / documentation — readers scan past
-       these without colour weight pulling the eye. */
+       these without colour weight pulling the eye.
 
-code span.al { color: var(--color-rose-700); font-weight: bold; } /* Alert */
-code span.an { color: var(--color-gray-500); font-style: italic; } /* Annotation */
-code span.at { color: var(--color-violet-700); } /* Attribute */
-code span.bn { color: var(--color-orange-700); } /* BaseN */
+   Non-primary palettes are hardcoded to Tailwind v4 default-palette
+   hex values rather than `var(--color-slate-600)` etc. — Tailwind v4
+   only emits CSS variables for palettes whose classes appear in scanned
+   files, so palettes the templates don't otherwise reference (slate,
+   orange, rose, violet, amber) wouldn't resolve and tokens would fall
+   through to inherit body text colour. */
+
+code span.al { color: #be123c; font-weight: bold; } /* Alert (rose-700) */
+code span.an { color: #6b7280; font-style: italic; } /* Annotation (gray-500) */
+code span.at { color: #6d28d9; } /* Attribute (violet-700) */
+code span.bn { color: #c2410c; } /* BaseN (orange-700) */
 code span.bu { color: var(--color-primary-700); } /* BuiltIn */
 code span.cf { color: var(--color-primary-700); font-weight: bold; } /* ControlFlow */
-code span.ch { color: var(--color-orange-700); } /* Char */
-code span.cn { color: var(--color-rose-700); } /* Constant */
-code span.co { color: var(--color-gray-500); font-style: italic; } /* Comment */
-code span.cv { color: var(--color-gray-500); font-style: italic; } /* CommentVar */
-code span.do { color: var(--color-gray-500); font-style: italic; } /* Documentation */
-code span.dt { color: var(--color-violet-700); } /* DataType */
-code span.dv { color: var(--color-orange-700); } /* DecVal */
-code span.er { color: var(--color-rose-700); font-weight: bold; } /* Error */
+code span.ch { color: #c2410c; } /* Char (orange-700) */
+code span.cn { color: #be123c; } /* Constant (rose-700) */
+code span.co { color: #6b7280; font-style: italic; } /* Comment (gray-500) */
+code span.cv { color: #6b7280; font-style: italic; } /* CommentVar */
+code span.do { color: #6b7280; font-style: italic; } /* Documentation */
+code span.dt { color: #6d28d9; } /* DataType (violet-700) */
+code span.dv { color: #c2410c; } /* DecVal (orange-700) */
+code span.er { color: #be123c; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
-code span.fl { color: var(--color-orange-700); } /* Float */
+code span.fl { color: #c2410c; } /* Float (orange-700) */
 code span.fu { color: var(--color-primary-600); } /* Function */
 code span.im { color: var(--color-primary-700); font-weight: bold; } /* Import */
-code span.in { color: var(--color-gray-500); font-style: italic; } /* Information */
+code span.in { color: #6b7280; font-style: italic; } /* Information */
 code span.kw { color: var(--color-primary-700); font-weight: bold; } /* Keyword */
-code span.op { color: var(--color-gray-500); } /* Operator */
+code span.op { color: #6b7280; } /* Operator (gray-500) */
 code span.ot { color: var(--color-primary-700); } /* Other */
-code span.pp { color: var(--color-amber-700); } /* Preprocessor */
+code span.pp { color: #b45309; } /* Preprocessor (amber-700) */
 code span.re { } /* RegionMarker */
-code span.sc { color: var(--color-orange-700); } /* SpecialChar */
-code span.ss { color: var(--color-rose-600); } /* SpecialString */
-code span.st { color: var(--color-slate-600); } /* String */
-code span.va { color: var(--color-violet-600); } /* Variable */
-code span.vs { color: var(--color-slate-600); } /* VerbatimString */
-code span.wa { color: var(--color-amber-700); font-weight: bold; font-style: italic; } /* Warning */
+code span.sc { color: #c2410c; } /* SpecialChar (orange-700) */
+code span.ss { color: #e11d48; } /* SpecialString (rose-600) */
+code span.st { color: #475569; } /* String (slate-600) */
+code span.va { color: #7c3aed; } /* Variable (violet-600) */
+code span.vs { color: #475569; } /* VerbatimString (slate-600) */
+code span.wa { color: #b45309; font-weight: bold; font-style: italic; } /* Warning */
 
 /* Dark mode — same hue families, lighter stops for readability against
    the dark gray code-block background. */
-.dark code span.al { color: var(--color-rose-400); }
-.dark code span.an { color: var(--color-gray-400); }
-.dark code span.at { color: var(--color-violet-400); }
-.dark code span.bn { color: var(--color-orange-400); }
+.dark code span.al { color: #fb7185; } /* rose-400 */
+.dark code span.an { color: #9ca3af; } /* gray-400 */
+.dark code span.at { color: #a78bfa; } /* violet-400 */
+.dark code span.bn { color: #fb923c; } /* orange-400 */
 .dark code span.bu { color: var(--color-primary-400); }
 .dark code span.cf { color: var(--color-primary-400); }
-.dark code span.ch { color: var(--color-orange-400); }
-.dark code span.cn { color: var(--color-rose-400); }
-.dark code span.co { color: var(--color-gray-400); }
-.dark code span.cv { color: var(--color-gray-400); }
-.dark code span.do { color: var(--color-gray-400); }
-.dark code span.dt { color: var(--color-violet-400); }
-.dark code span.dv { color: var(--color-orange-400); }
-.dark code span.er { color: var(--color-rose-400); }
-.dark code span.fl { color: var(--color-orange-400); }
+.dark code span.ch { color: #fb923c; }
+.dark code span.cn { color: #fb7185; }
+.dark code span.co { color: #9ca3af; }
+.dark code span.cv { color: #9ca3af; }
+.dark code span.do { color: #9ca3af; }
+.dark code span.dt { color: #a78bfa; }
+.dark code span.dv { color: #fb923c; }
+.dark code span.er { color: #fb7185; }
+.dark code span.fl { color: #fb923c; }
 .dark code span.fu { color: var(--color-primary-300); }
 .dark code span.im { color: var(--color-primary-400); }
-.dark code span.in { color: var(--color-gray-400); }
+.dark code span.in { color: #9ca3af; }
 .dark code span.kw { color: var(--color-primary-400); }
-.dark code span.op { color: var(--color-gray-400); }
+.dark code span.op { color: #9ca3af; }
 .dark code span.ot { color: var(--color-primary-400); }
-.dark code span.pp { color: var(--color-amber-400); }
-.dark code span.sc { color: var(--color-orange-400); }
-.dark code span.ss { color: var(--color-rose-300); }
-.dark code span.st { color: var(--color-slate-400); }
-.dark code span.va { color: var(--color-violet-300); }
-.dark code span.vs { color: var(--color-slate-400); }
-.dark code span.wa { color: var(--color-amber-400); }
+.dark code span.pp { color: #fbbf24; } /* amber-400 */
+.dark code span.sc { color: #fb923c; }
+.dark code span.ss { color: #fda4af; } /* rose-300 */
+.dark code span.st { color: #94a3b8; } /* slate-400 */
+.dark code span.va { color: #c4b5fd; } /* violet-300 */
+.dark code span.vs { color: #94a3b8; }
+.dark code span.wa { color: #fbbf24; }
