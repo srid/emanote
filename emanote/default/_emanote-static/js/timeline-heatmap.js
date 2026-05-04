@@ -101,23 +101,25 @@ function renderYear(year, monthMap) {
 }
 
 function render() {
-  const data = document.getElementById('timeline-data');
-  const target = document.getElementById('timeline-heatmap');
-  if (!data || !target) return;
-  const grouped = parseEntries(data);
-  target.textContent = '';
-  if (grouped.size === 0) {
-    // Hide the section if no parseable entries — the bare "Timeline" header
-    // alone is just visual noise.
-    const section = document.getElementById('timeline');
-    if (section) section.hidden = true;
-    return;
-  }
-  const section = document.getElementById('timeline');
-  if (section) section.hidden = false;
-  const years = [...grouped.keys()].sort((a, b) => b - a);
-  for (const year of years) {
-    target.appendChild(renderYear(year, grouped.get(year)));
+  // Two instances render on most pages: one in the right-panel (lg+) and
+  // one in the bottom strip (<lg). Each has its own .timeline-data and
+  // .timeline-heatmap children, so we paint them independently.
+  for (const section of document.querySelectorAll('.emanote-timeline')) {
+    const data = section.querySelector('.timeline-data');
+    const target = section.querySelector('.timeline-heatmap');
+    if (!data || !target) continue;
+    const grouped = parseEntries(data);
+    target.textContent = '';
+    if (grouped.size === 0) {
+      // Hide if no parseable entries — bare "Timeline" header is noise.
+      section.hidden = true;
+      continue;
+    }
+    section.hidden = false;
+    const years = [...grouped.keys()].sort((a, b) => b - a);
+    for (const year of years) {
+      target.appendChild(renderYear(year, grouped.get(year)));
+    }
   }
 }
 
