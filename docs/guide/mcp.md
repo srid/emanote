@@ -7,7 +7,7 @@ slug: mcp
 > [!warning] Work in progress
 > MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
 
-Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [[live-server|live server]], so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
+Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [live server](https://ema.srid.ca/topics/live-server), so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
 
 Enable it by passing `--mcp-port PORT` to `emanote run`:
 
