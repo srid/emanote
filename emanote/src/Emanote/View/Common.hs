@@ -238,7 +238,12 @@ commonSplices withCtx model meta routeTitle = do
               <> ".forEach(s => s.setAttribute('im-preserve', 'true'));"
               <> "});"
       H.script $ H.toHtml preserveScript
+      -- Tailwind's browser CDN installs a document-wide MutationObserver.
+      -- Ema's script reloader would otherwise execute it again on every
+      -- morph, multiplying observers and making morph navigation wait behind
+      -- repeated Tailwind rebuilds before EMAHotReload is observable.
       H.script
+        ! H.dataAttribute "ema-skip" "true"
         ! A.src (H.toValue localCdnUrl)
         $ mempty
 
