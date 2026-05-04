@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-green-900);
   --color-primary-950: var(--color-green-950);
 }
-</style><link href='tailwind.css?instanceId=32c80fd9-760b-4efb-a087-c339bbd96a67' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=64be3239-fd53-4730-bea3-25744aa84e29' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -550,7 +550,7 @@
        must run pre-paint; the vendor Stork WASM loader above stays
        inline because window.stork must be defined synchronously
        before the stork.js module evaluates. -->
-  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
+  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/calendar-grid":"./_emanote-static/js/calendar-grid.js","@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/sidebar-calendar":"./_emanote-static/js/sidebar-calendar.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
 </head>
 
 <!-- DoNotFormat -->
@@ -717,7 +717,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start' data-iso-date>
       Getting Started
     </a>
     
@@ -731,6 +731,15 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
@@ -770,7 +779,7 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide'>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide' data-iso-date>
       Guide
     </a>
     
@@ -779,10 +788,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+    <div class='emanote-tree-children'>
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -817,7 +836,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown' data-iso-date>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
@@ -831,11 +850,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -867,7 +895,7 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config'>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config' data-iso-date>
       YAML configuration
     </a>
     
@@ -876,13 +904,24 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
-    
+    <div class='emanote-tree-children'>
+      
+    </div>
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -916,7 +955,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query' data-iso-date>
       Queries
     </a>
     
@@ -927,11 +966,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -966,7 +1014,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes' data-iso-date>
       Daily Notes
     </a>
     
@@ -980,11 +1028,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1018,7 +1075,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Export' href='export' data-iso-date>
       Export
     </a>
     
@@ -1029,11 +1086,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1067,7 +1133,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='ATOM feed' href='feed' data-iso-date>
       ATOM feed
     </a>
     
@@ -1078,11 +1144,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1116,7 +1191,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note' data-iso-date>
       Folder notes
     </a>
     
@@ -1127,11 +1202,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1165,7 +1249,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel' data-iso-date>
       Folgezettel links
     </a>
     
@@ -1176,11 +1260,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1215,7 +1308,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template' data-iso-date>
       HTML Templates
     </a>
     
@@ -1229,11 +1322,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1267,7 +1369,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer' data-iso-date>
       Layer system
     </a>
     
@@ -1278,11 +1380,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1316,7 +1427,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
       Lua Filters
     </a>
     
@@ -1327,11 +1438,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1365,7 +1485,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp' data-iso-date>
       MCP server
     </a>
     
@@ -1376,11 +1496,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -1414,7 +1543,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode' data-iso-date>
       Org Mode ✍️
     </a>
     
@@ -1425,10 +1554,20 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
-    
+      
+    </div>
   
 </div>
     
@@ -1467,7 +1606,7 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips' data-iso-date>
       Tips
     </a>
     
@@ -1481,6 +1620,15 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
@@ -1519,7 +1667,7 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples'>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples' data-iso-date>
       Examples
     </a>
     
@@ -1530,6 +1678,15 @@
 
   <!-- Node's children forest, displayed only on active trees
     TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
   -->
   
 </div>
