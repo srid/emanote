@@ -1,8 +1,10 @@
-<!-- Variable bindings for this tree. The active item shares the wikilink
-     chip palette (bg-primary-50/70, text-primary-600, font-semibold,
-     tracking-tight) so "you are here" reads as the same family as
+<!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
      "this links to another note" — one primary palette, one weight. -->
-<bind tag="link-class">hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors</bind>
+<bind tag="link-class"><tree-link-rest-class /></bind>
 <node:active>
   <bind tag="link-class">font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors</bind>
   <else />

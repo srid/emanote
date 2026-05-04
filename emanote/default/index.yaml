@@ -76,7 +76,7 @@ pandoc:
     emanote:error: emanote:error
     # YAML / Markdown parse-error banner — built by 'Emanote.Model.Note.errorDiv'
     # via 'Diagnostic.errorBlock "yaml"'. Used for the #285 bad-yaml banner.
-    emanote:error:yaml: text-l bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
+    emanote:error:yaml: text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     # Inline aside next to a broken / ambiguous link in live preview — built
     # by 'Renderer.Url.renderSomeInlineRefWith' via 'Diagnostic.errorInlineAside "aside"'.
     emanote:error:aside: font-mono align-top text-xs mr-1 tracking-tighter opacity-50 hover:opacity-100

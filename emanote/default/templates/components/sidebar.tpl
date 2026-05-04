@@ -36,6 +36,7 @@
       </div>
     </div>
 
+    <bind tag="tree-link-rest-class">hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors</bind>
     <ema:route-tree>
       <apply template="sidebar-tree" />
     </ema:route-tree>

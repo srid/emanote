@@ -58,7 +58,7 @@
     <dl class="flex flex-col mb-3">
       <DefinitionList:Items>
         <div class="my-1">
-          <dt class="font-bold text-l">
+          <dt class="font-bold text-lg">
             <DefinitionList:Item:Term />
           </dt>
           <DefinitionList:Item:DescList>
