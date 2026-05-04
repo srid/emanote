@@ -678,24 +678,35 @@ When(
 
 // Daily backlinks split: notes whose basename matches `YYYY-MM-DD[-…]`
 // (Calendar.isDailyNote / parseRouteDay) feed the `<ema:note:backlinks:daily>`
-// splice (rendered by `components/timeline.tpl` into `#timeline`); everything
-// else feeds `<ema:note:backlinks:nodaily>` (rendered by `components/backlinks.tpl`
-// into `#backlinks`). Asserting by panel id + href substring keeps the test
-// resilient to template-styling churn — only the structural separation matters.
+// splice (rendered by `components/timeline.tpl` — class `.emanote-timeline`,
+// can render in two homes: right-panel at lg+ and bottom strip at <lg);
+// everything else feeds `<ema:note:backlinks:nodaily>` (rendered by
+// `components/backlinks-margin.tpl` / `backlinks-bottom.tpl` — ids
+// `#backlinks-margin` / `#backlinks-bottom`, plus the legacy `#backlinks`
+// card for the no-sidebar / error layouts). Asserting by panel selector
+// + href substring keeps the test resilient to template-styling churn —
+// only the structural separation matters.
+const PANEL_SELECTORS = {
+  timeline: ".emanote-timeline",
+  backlinks: "#backlinks-margin, #backlinks-bottom, #backlinks",
+};
+
 async function panelLinksTo(
   page: EmanoteWorld["page"],
-  panelId: "timeline" | "backlinks",
+  panelKey: "timeline" | "backlinks",
   hrefSubstring: string,
 ): Promise<boolean> {
   return page.evaluate(
-    ({ id, needle }) => {
-      const panel = document.getElementById(id);
-      if (!panel) return false;
-      return Array.from(panel.querySelectorAll("a[href]")).some((a) =>
-        (a.getAttribute("href") ?? "").includes(needle),
+    ({ selector, needle }) => {
+      const panels = Array.from(document.querySelectorAll(selector));
+      if (panels.length === 0) return false;
+      return panels.some((panel) =>
+        Array.from(panel.querySelectorAll("a[href]")).some((a) =>
+          (a.getAttribute("href") ?? "").includes(needle),
+        ),
       );
     },
-    { id: panelId, needle: hrefSubstring },
+    { selector: PANEL_SELECTORS[panelKey], needle: hrefSubstring },
   );
 }
 
@@ -703,12 +714,13 @@ Then(
   "the Timeline panel links to {string}",
   async function (this: EmanoteWorld, hrefSubstring: string) {
     await this.page
-      .locator("#timeline")
+      .locator(PANEL_SELECTORS.timeline)
+      .first()
       .waitFor({ state: "attached", timeout: 5_000 });
     const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
     assert.ok(
       found,
-      `Expected #timeline to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Either the daily-detection (Calendar.parseRouteDay on the basename) regressed, or timeline.tpl stopped iterating <ema:note:backlinks:daily>.`,
+      `Expected ${PANEL_SELECTORS.timeline} to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Either the daily-detection (Calendar.parseRouteDay on the basename) regressed, or timeline.tpl stopped iterating <ema:note:backlinks:daily>.`,
     );
   },
 );
@@ -717,12 +729,13 @@ Then(
   "the Backlinks panel links to {string}",
   async function (this: EmanoteWorld, hrefSubstring: string) {
     await this.page
-      .locator("#backlinks")
+      .locator(PANEL_SELECTORS.backlinks)
+      .first()
       .waitFor({ state: "attached", timeout: 5_000 });
     const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
     assert.ok(
       found,
-      `Expected #backlinks to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Non-daily backlinks should land here via <ema:note:backlinks:nodaily> in backlinks.tpl.`,
+      `Expected one of ${PANEL_SELECTORS.backlinks} to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Non-daily backlinks should land here via <ema:note:backlinks:nodaily>.`,
     );
   },
 );
@@ -733,7 +746,7 @@ Then(
     const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
     assert.ok(
       !found,
-      `#backlinks should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is daily-named and belongs in the Timeline. The daily/non-daily partition (Template.hs) likely regressed.`,
+      `${PANEL_SELECTORS.backlinks} should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is daily-named and belongs in the Timeline. The daily/non-daily partition (Template.hs) likely regressed.`,
     );
   },
 );
@@ -744,7 +757,7 @@ Then(
     const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
     assert.ok(
       !found,
-      `#timeline should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is non-daily and belongs in the Backlinks panel. The daily/non-daily partition regressed (or parseRouteDay started accepting non-date basenames).`,
+      `${PANEL_SELECTORS.timeline} should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is non-daily and belongs in the Backlinks panel. The daily/non-daily partition regressed (or parseRouteDay started accepting non-date basenames).`,
     );
   },
 );
@@ -761,21 +774,23 @@ Then(
 Then(
   "every backlink context wrapper has overflow-y {string}",
   async function (this: EmanoteWorld, expected: string) {
+    // context.tpl's outermost <div> is now nested inside a flyout (in
+    // backlinks-margin) or a card (backlinks-bottom / legacy backlinks),
+    // so a stable class hook (.emanote-backlink-context) is the
+    // structure-independent way to find it.
     await this.page
-      .locator("#backlinks")
+      .locator(".emanote-backlink-context")
+      .first()
       .waitFor({ state: "attached", timeout: 5_000 });
     const overflows = await this.page.evaluate(() => {
-      // The context.tpl outermost <div> renders as a direct child of the
-      // backlink <li> (sibling of the title <a>). Selecting "li > div"
-      // scoped to #backlinks targets exactly those wrappers.
       const wrappers = Array.from(
-        document.querySelectorAll("#backlinks li > div"),
+        document.querySelectorAll(".emanote-backlink-context"),
       );
       return wrappers.map((el) => getComputedStyle(el as Element).overflowY);
     });
     assert.ok(
       overflows.length > 0,
-      `No backlink context wrappers found under #backlinks li > div — the fixture has no non-daily backlinks, so this scenario isn't actually exercising the regression. Add a backlink to the dailyhost fixture.`,
+      `No .emanote-backlink-context elements found — the fixture has no non-daily backlinks, so this scenario isn't actually exercising the regression. Add a backlink to the dailyhost fixture.`,
     );
     const offenders = overflows.filter((v) => v !== expected);
     assert.strictEqual(

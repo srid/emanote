@@ -2,7 +2,12 @@
      every-but-first sibling makes the boundary between contexts obvious
      (otherwise adjacent contexts read as one continuous block of prose).
      Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. -->
-<div class="text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&_p]:m-0 [&_p+p]:mt-2 [&_pre]:overflow-x-auto [&_table]:overflow-x-auto">
+<!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. -->
+<div class="emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&_p]:m-0 [&_p+p]:mt-2 [&_pre]:overflow-x-auto [&_table]:overflow-x-auto">
   <context>
     <div>
       <context:body>

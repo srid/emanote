@@ -41,29 +41,28 @@
 
       <ema:has:sidebar>
         <!-- Container is the rounded card. Children stack vertically:
-             [note-title strip] [inner row of columns] [backlinks-bottom strip].
-             The inner row is its own flex so columns sit side-by-side at md+
-             without forcing the strips to participate in flex-wrap (which
-             produced the buggy md layout #2). -->
+             [note-title strip] [inner row of columns] [backlinks-bottom
+             strip] [footer strip]. The inner row is its own flex so
+             columns sit side-by-side at md+ without forcing the strips
+             to participate in flex-wrap. The footer is the last child
+             so its md:rounded-b-lg matches the container's bottom curve. -->
         <div id="container"
           class="flex flex-col bg-white dark:bg-gray-900 md:shadow-md md:rounded-lg md:mb-8 md:border md:border-gray-200 dark:md:border-gray-800">
-          <!-- Top: note title attached as a strip. -->
           <apply template="components/note-title" />
-          <!-- Middle row: sidebar (left), prose (center), right-panel (right at lg+). -->
           <div class="flex flex-col md:flex-row">
             <apply template="components/sidebar" />
             <apply template="components/body" />
             <apply template="components/right-panel" />
           </div>
-          <!-- Bottom (<lg): backlinks attached as a footer panel. -->
           <apply template="components/backlinks-bottom" />
+          <apply template="components/footer" />
         </div>
         <else />
         <!-- No-sidebar layout (e.g. neuron-style): same card chrome,
-             same attached title strip, just no left/right panels.
-             Backlinks render as the full-card variant (visible at all
-             widths) since there's no right-panel to host the margin
-             variant and backlinks-bottom is gated on lg:hidden. -->
+             same attached title strip, no left/right panels. Backlinks
+             render as the full-card variant since backlinks-bottom is
+             gated on lg:hidden and there's no right-panel here. Footer
+             is the last child so md:rounded-b-lg matches the curve. -->
         <div id="container" class="relative flex flex-col md:shadow-md md:rounded-lg md:mb-8 bg-white dark:bg-gray-900 md:border md:border-gray-200 dark:md:border-gray-800">
           <storkSearchButtonTopRight />
           <apply template="components/note-title" />
@@ -71,9 +70,9 @@
           <div class="px-6 pb-8">
             <apply template="components/backlinks" />
           </div>
+          <apply template="components/footer" />
         </div>
       </ema:has:sidebar>
-      <apply template="components/footer" />
     </div>
   </bind>
 </apply>
