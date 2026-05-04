@@ -12,7 +12,6 @@ import Ema qualified
 import Emanote.Model (Model, ModelEma)
 import Emanote.Model qualified as M
 import Emanote.Model.Calendar qualified as Calendar
-import Emanote.Model.Calendar.Parser qualified as Calendar
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
