@@ -49,6 +49,9 @@ template:
       home: Accueil
 ```
 
+See [[i18n.en|the English demo]] and [[i18n.fr|the French demo]] for a
+side-by-side example of `page.lang` selecting the default template chrome.
+
 ## Examples
 
 - https://github.com/srid/srid/blob/master/index.yaml
