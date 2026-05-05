@@ -36,12 +36,19 @@ lookupTextWith meta key params fallback =
 i18nSplices :: Aeson.Value -> H.Splices (HI.Splice Identity)
 i18nSplices meta = do
   "ema:i18n" ## HJ.bindJson (Aeson.toJSON table)
-  "ema:i18n:json" ## pure [X.TextNode $ jsonScriptText table]
+  "ema:i18n:script" ## pure [i18nScriptNode table]
   "ema:i18n:rich" ## richTextSplice table
   forM_ (Map.toList table) $ \(key, value) ->
     "ema:i18n:" <> key ## HI.textSplice value
   where
     table = selectedTranslations meta
+
+i18nScriptNode :: Map Text Text -> X.Node
+i18nScriptNode table =
+  X.Element
+    "script"
+    [("type", "application/json"), ("id", "emanote-i18n")]
+    [X.TextNode $ jsonScriptText table]
 
 richTextSplice :: Map Text Text -> HI.Splice Identity
 richTextSplice table = do

@@ -54,7 +54,7 @@
 
   <head-main />
   <apply template="components/stork/stork-search-head" />
-  <script type="application/json" id="emanote-i18n"><ema:i18n:json /></script>
+  <ema:i18n:script />
   <!-- Site-authored interactive behaviors (issue #643). The splice emits
        an importmap (so live-server's per-file ?t=<mtime> propagates
        through ES module imports) plus the main entry as a deferred
