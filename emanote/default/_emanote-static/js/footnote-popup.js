@@ -10,6 +10,7 @@
 // which has no Tailwind variant.
 
 import { ready } from '@emanote/morph';
+import { message } from '@emanote/i18n';
 
 // findTarget uses CSS.escape on a user-supplied id; the early guard for the
 // Popover API is the natural place to also gate on CSS.escape so we never
@@ -67,10 +68,6 @@ const HEADER_CLASS = [
   'text-primary-600 dark:text-primary-400',
   'mb-2',
 ].join(' ');
-
-function i18n(name, fallback) {
-  return document.body?.getAttribute('data-ema-i18n-' + name) || fallback;
-}
 
 let popoverEl = null;
 let currentRef = null;
@@ -169,7 +166,7 @@ function openFor(ref, target) {
   if (idx) {
     const header = document.createElement('div');
     header.className = HEADER_CLASS;
-    header.textContent = i18n('footnote', 'Footnote') + ' ' + idx;
+    header.textContent = message('footnoteLabel', { idx }, 'Footnote {idx}');
     body.appendChild(header);
   }
   body.appendChild(target.cloneNode(true));

@@ -3,6 +3,7 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.List (partition)
+import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
@@ -127,7 +128,7 @@ renderSRIndex model = do
       tCtx = C.mkTemplateRenderCtx model r meta
   C.renderModelTemplate model "templates/special/index" $ do
     C.commonSplices ($ emptyRenderCtx) model meta (fromString . toString $ C.i18nText meta "index" "Index")
-    routeTreeSplices tCtx Nothing model
+    routeTreeSplices tCtx meta Nothing model
 
 loaderHead :: LByteString
 loaderHead =
@@ -173,7 +174,7 @@ renderLmlHtml model note = do
           hasFlag = if flag == "toc" then hasFlag' && not (tocUnnecessaryToRender toc) else hasFlag'
       "ema:has:" <> flag ## Heist.ifElseISplice hasFlag
     -- Sidebar navigation
-    routeTreeSplices ctx (Just r) model
+    routeTreeSplices ctx meta (Just r) model
     "ema:breadcrumbs" ##
       C.routeBreadcrumbs ctx model r
     -- Note stuff
@@ -237,8 +238,8 @@ backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
 
 If there is no 'current route', all sub-trees are marked as active/open.
 -}
-routeTreeSplices :: (Monad n) => C.TemplateRenderCtx n -> Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice Identity)
-routeTreeSplices tCtx mCurrentRoute model = do
+routeTreeSplices :: (Monad n) => C.TemplateRenderCtx n -> Aeson.Value -> Maybe R.LMLRoute -> Model -> H.Splices (HI.Splice Identity)
+routeTreeSplices tCtx meta mCurrentRoute model = do
   "ema:route-tree" ##
     Splices.treeSplice getOrder (model ^. M.modelFolgezettelTree)
       $ \(last -> nodeRoute) children -> do
@@ -265,7 +266,16 @@ routeTreeSplices tCtx mCurrentRoute model = do
         "node:active" ## Heist.ifElseISplice isActiveNode
         "node:activeTree" ## Heist.ifElseISplice isActiveTree
         "node:terminal" ## Heist.ifElseISplice (null children)
-        "tree:childrenCount" ## HI.textSplice (show $ length children)
+        let childrenCount = show $ length children
+        "tree:childrenCount" ## HI.textSplice childrenCount
+        "tree:childrenInsideTitle" ##
+          HI.textSplice
+            ( C.i18nTextWith
+                meta
+                "childrenInsideTitle"
+                (Map.fromList [("count", childrenCount)])
+                (childrenCount <> " children inside")
+            )
         "tree:open" ## Heist.ifElseISplice openTree
         "has-current-route" ## Heist.ifElseISplice (isJust mCurrentRoute)
   where

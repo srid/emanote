@@ -24,8 +24,8 @@
               <div class="flex items-center justify-center text-xl text-gray-900 dark:text-gray-100">
                 <ema:metadata>
                   <with var="template">
-                    <div><ema:i18n:fixItPrefix /> <a class="font-bold underline text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200"
-                        href="${value:baseUrl}"><ema:i18n:goToRoot /></a>.
+                    <div><ema:i18n:rich key="fixIt"><a class="font-bold underline text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200"
+                          href="${value:baseUrl}"><ema:i18n:goToRoot /></a></ema:i18n:rich>
                     </div>
                   </with>
                 </ema:metadata>

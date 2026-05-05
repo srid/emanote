@@ -17,6 +17,7 @@ import Emanote.View.Common (
   commonSplices,
   defaultRouteMeta,
   i18nText,
+  i18nTextWith,
   mkTemplateRenderCtx,
   renderModelTemplate,
  )
@@ -87,7 +88,13 @@ renderTagIndex model tagPath = do
       viewTitle =
         fromString . toString $ case nonEmpty tagPath of
           Nothing -> tagIndexLabel
-          Just tagPath' -> "#" <> tagNodesText tagPath' <> " - " <> tagIndexLabel
+          Just tagPath' ->
+            let tagText = "#" <> tagNodesText tagPath'
+             in i18nTextWith
+                  meta
+                  "tagIndexTitle"
+                  (Map.fromList [("tag", tagText)])
+                  (tagText <> " - " <> tagIndexLabel)
   renderModelTemplate model "templates/special/tagindex" $ do
     commonSplices ($ emptyRenderCtx) model meta viewTitle
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)

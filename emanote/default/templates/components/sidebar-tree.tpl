@@ -68,7 +68,7 @@
       <else />
       <node:terminal>
         <else />
-        <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0" title="${tree:childrenCount} ${ema:i18n:childrenInside}">
+        <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0" title="${tree:childrenInsideTitle}">
           <tree:childrenCount />
         </span>
       </node:terminal>

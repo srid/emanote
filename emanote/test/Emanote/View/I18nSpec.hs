@@ -1,7 +1,7 @@
 module Emanote.View.I18nSpec where
 
 import Data.Aeson qualified as Aeson
-import Emanote.View.I18n (lookupText, selectedTranslations)
+import Emanote.View.I18n (lookupText, lookupTextWith, selectedTranslations)
 import Relude
 import Test.Hspec
 
@@ -23,8 +23,11 @@ spec = do
     it "uses the caller fallback when no translation table has the key" $ do
       lookupText frenchMeta "missing" "fallback" `shouldBe` "fallback"
 
+    it "substitutes placeholders after language fallback" $ do
+      lookupTextWith frenchMeta "title" (fromList [("name", "Emanote")]) "Hello {name}" `shouldBe` "Bonjour Emanote"
+
     it "exposes the merged selected table" $ do
-      selectedTranslations frenchMeta `shouldBe` fromList [("home", "Accueil"), ("tasks", "Tasks")]
+      selectedTranslations frenchMeta `shouldBe` fromList [("home", "Accueil"), ("tasks", "Tasks"), ("title", "Bonjour {name}")]
 
 frenchMeta :: Aeson.Value
 frenchMeta =
@@ -46,8 +49,8 @@ metaWithLang lang =
         Aeson..= Aeson.object
           [ "i18n"
               Aeson..= Aeson.object
-                [ "en" Aeson..= Aeson.object ["home" Aeson..= ("Home" :: Text), "tasks" Aeson..= ("Tasks" :: Text)]
-                , "fr" Aeson..= Aeson.object ["home" Aeson..= ("Accueil" :: Text)]
+                [ "en" Aeson..= Aeson.object ["home" Aeson..= ("Home" :: Text), "tasks" Aeson..= ("Tasks" :: Text), "title" Aeson..= ("Hello {name}" :: Text)]
+                , "fr" Aeson..= Aeson.object ["home" Aeson..= ("Accueil" :: Text), "title" Aeson..= ("Bonjour {name}" :: Text)]
                 ]
           ]
     ]

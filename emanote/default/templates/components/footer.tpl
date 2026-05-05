@@ -17,7 +17,7 @@
     <a class="${footerLink}" href="${ema:tagIndexUrl}" title="${ema:i18n:viewTags}"><ema:i18n:tags /></a>
     <a class="${footerLink}" href="${ema:taskIndexUrl}" title="${ema:i18n:viewTasks}"><ema:i18n:tasks /></a>
   </nav>
-  <a href="https://emanote.srid.ca" target="_blank" title="${ema:i18n:generatedBy} ${ema:version}"
+  <a href="https://emanote.srid.ca" target="_blank" title="${ema:generatedByVersion}"
      class="flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
     <emanoteStaticUrl path="emanote-logo.svg">
       <img class="w-3.5 h-3.5" src="${url}" alt="" />
