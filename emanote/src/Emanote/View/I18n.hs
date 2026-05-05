@@ -49,14 +49,19 @@ richTextSplice table = do
   let key =
         fromMaybe (error "<ema:i18n:rich> missing 'key' attribute")
           $ X.getAttribute "key" node
-      message = Map.findWithDefault "" key table
+      message =
+        fromMaybe (error $ "<ema:i18n:rich> unknown i18n key: " <> key)
+          $ Map.lookup key table
   slot <- HI.runNodeList (X.elementChildren node)
-  pure $ slotMessage "{link}" slot message
+  pure $ slotMessage key "{link}" slot message
 
-slotMessage :: Text -> [X.Node] -> Text -> [X.Node]
-slotMessage placeholder slot message =
+slotMessage :: Text -> Text -> [X.Node] -> Text -> [X.Node]
+slotMessage key placeholder slot message =
   case T.splitOn placeholder message of
-    [] -> []
+    [] ->
+      error $ "<ema:i18n:rich> impossible empty split for: " <> key
+    [_] ->
+      error $ "<ema:i18n:rich> message missing " <> placeholder <> " placeholder: " <> key
     firstPart : rest ->
       X.TextNode firstPart : concatMap (\part -> slot <> [X.TextNode part]) rest
 
