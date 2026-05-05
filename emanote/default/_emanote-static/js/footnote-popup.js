@@ -68,6 +68,10 @@ const HEADER_CLASS = [
   'mb-2',
 ].join(' ');
 
+function i18n(name, fallback) {
+  return document.body?.getAttribute('data-ema-i18n-' + name) || fallback;
+}
+
 let popoverEl = null;
 let currentRef = null;
 let topLevelAside = null;
@@ -165,7 +169,7 @@ function openFor(ref, target) {
   if (idx) {
     const header = document.createElement('div');
     header.className = HEADER_CLASS;
-    header.textContent = 'Footnote ' + idx;
+    header.textContent = i18n('footnote', 'Footnote') + ' ' + idx;
     body.appendChild(header);
   }
   body.appendChild(target.cloneNode(true));

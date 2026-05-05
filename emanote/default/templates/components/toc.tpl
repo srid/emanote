@@ -5,7 +5,7 @@
      containment for md+. We just emit the labelled list here. -->
 <nav id="toc" class="leading-relaxed">
   <div class="text-gray-700 dark:text-gray-300 text-sm pt-2">
-    <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2">On this page</h3>
+    <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2"><ema:i18n:onThisPage /></h3>
     <ema:note:toc>
       <Toc>
         <ul class="space-y-1 ml-2">

@@ -215,6 +215,7 @@ library
     Emanote.View.Export.Content
     Emanote.View.Export.JSON
     Emanote.View.Feed
+    Emanote.View.I18n
     Emanote.View.JsBundle
     Emanote.View.LiveServerFiles
     Emanote.View.StaticUrl
@@ -263,3 +264,4 @@ test-suite test
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec
       Emanote.View.FeedSpec
+      Emanote.View.I18nSpec

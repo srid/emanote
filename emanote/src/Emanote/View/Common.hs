@@ -2,6 +2,7 @@
 
 module Emanote.View.Common (
   commonSplices,
+  i18nText,
   renderModelTemplate,
   routeBreadcrumbs,
 
@@ -29,6 +30,7 @@ import Emanote.Pandoc.Renderer.Embed qualified as Embed
 import Emanote.Route (LMLRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Class qualified as SR
+import Emanote.View.I18n qualified as I18n
 import Emanote.View.JsBundle qualified as JsBundle
 import Emanote.View.LiveServerFiles qualified as LiveServerFiles
 import Emanote.View.StaticUrl qualified as StaticUrl
@@ -128,7 +130,7 @@ commonSplices ::
   Tit.Title ->
   H.Splices (HI.Splice Identity)
 commonSplices withCtx model meta routeTitle = do
-  let siteTitle = fromString . toString $ SData.lookupAeson @Text "Emanote Site" ("page" :| ["siteTitle"]) meta
+  let siteTitle = fromString . toString $ SData.lookupAeson @Text (i18nText meta "siteTitle" "Emanote Site") ("page" :| ["siteTitle"]) meta
       routeTitleFull =
         if routeTitle == siteTitle
           then siteTitle
@@ -159,6 +161,7 @@ commonSplices withCtx model meta routeTitle = do
     HI.textSplice (toText $ showVersion Paths_emanote.version)
   "ema:metadata" ##
     HJ.bindJson meta
+  I18n.i18nSplices meta
   -- Precompute per-tag URLs because URL encoding lives in Haskell
   -- (`siteRouteUrl` / Ema's `filepathToUrl`), not in the JSON-driven
   -- splices `ema:metadata` exposes. See #199.
@@ -265,3 +268,7 @@ routeBreadcrumbs TemplateRenderCtx {..} model r = do
   Splices.listSplice breadcrumbs "each-crumb" $ \crumbR -> do
     "crumb:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, crumbR))
     "crumb:title" ## titleSplice (M.modelLookupTitle crumbR model)
+
+i18nText :: Aeson.Value -> Text -> Text -> Text
+i18nText =
+  I18n.lookupText

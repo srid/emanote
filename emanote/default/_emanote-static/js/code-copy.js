@@ -10,20 +10,24 @@ const COPY_ICON =
 const CHECK_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
 
+function i18n(name, fallback) {
+  return document.body?.getAttribute('data-ema-i18n-' + name) || fallback;
+}
+
 onElement('pre > code', (codeBlock) => {
   const pre = codeBlock.parentElement;
   const button = document.createElement('button');
   button.className = 'code-copy-button';
   button.innerHTML = COPY_ICON;
-  button.setAttribute('aria-label', 'Copy code to clipboard');
-  button.setAttribute('title', 'Copy code');
+  button.setAttribute('aria-label', i18n('copy-code-to-clipboard', 'Copy code to clipboard'));
+  button.setAttribute('title', i18n('copy-code', 'Copy code'));
 
   button.addEventListener('click', () => {
     navigator.clipboard.writeText(codeBlock.textContent).then(
-      () => flash(button, CHECK_ICON, 'Copied!'),
+      () => flash(button, CHECK_ICON, i18n('copied', 'Copied!')),
       (err) => {
         console.error('Copy failed:', err);
-        flash(button, COPY_ICON, 'Copy failed');
+        flash(button, COPY_ICON, i18n('copy-failed', 'Copy failed'));
       },
     );
   });
@@ -46,7 +50,7 @@ function flash(button, icon, title) {
   button.setAttribute('title', title);
   flashTimers.set(button, setTimeout(() => {
     button.innerHTML = COPY_ICON;
-    button.setAttribute('title', 'Copy code');
+    button.setAttribute('title', i18n('copy-code', 'Copy code'));
     flashTimers.delete(button);
   }, 2000));
 }

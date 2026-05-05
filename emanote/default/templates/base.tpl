@@ -70,7 +70,12 @@
 <bind tag="bodyClass"><ema:metadata><value var="template.base.bodyClass" /></ema:metadata></bind>
 <!-- DoNotFormat -->
 
-<body class="${bodyClass}">
+<body class="${bodyClass}"
+  data-ema-i18n-copy-code="${ema:i18n:copyCode}"
+  data-ema-i18n-copy-code-to-clipboard="${ema:i18n:copyCodeToClipboard}"
+  data-ema-i18n-copied="${ema:i18n:copied}"
+  data-ema-i18n-copy-failed="${ema:i18n:copyFailed}"
+  data-ema-i18n-footnote="${ema:i18n:footnote}">
   <body-main />
   <apply template="components/stork/stork-search" />
   <ema:metadata>

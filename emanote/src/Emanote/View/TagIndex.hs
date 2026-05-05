@@ -16,6 +16,7 @@ import Emanote.View.Common (
   TemplateRenderCtx (withInlineCtx),
   commonSplices,
   defaultRouteMeta,
+  i18nText,
   mkTemplateRenderCtx,
   renderModelTemplate,
  )
@@ -28,8 +29,6 @@ import Relude
 data TagIndex = TagIndex
   { tagIndexPath :: [HT.TagNode]
   -- ^ The tag path under which this index is creatd
-  , tagIndexTitle :: Text
-  -- ^ User descriptive title of this index
   , tagIndexNotes :: [MN.Note]
   -- ^ All notes tagged precisely with this tag path
   , tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
@@ -59,12 +58,11 @@ mkTagIndex tagMap tagPath' =
    in case mTagPath of
         Nothing ->
           -- The root index displays all top-level tags (no notes)
-          TagIndex [] "Tag Index" [] childTags
+          TagIndex [] [] childTags
         Just tagPath ->
           let notes =
                 snd . Tree.rootLabel $ lookupForestMust tagPath tagForest
-              viewTitle = "#" <> tagNodesText tagPath <> " - Tag Index"
-           in TagIndex (toList tagPath) viewTitle notes childTags
+           in TagIndex (toList tagPath) notes childTags
   where
     lookupForestMust :: (Show k, Eq k) => NonEmpty k -> Forest (k, a) -> Tree (k, a)
     lookupForestMust path =
@@ -85,8 +83,13 @@ renderTagIndex model tagPath = do
       tCtx = mkTemplateRenderCtx model r meta
       tagMap = M.modelTags model
       tagIdx = mkTagIndex tagMap tagPath
+      tagIndexLabel = i18nText meta "tagIndex" "Tag Index"
+      viewTitle =
+        fromString . toString $ case nonEmpty tagPath of
+          Nothing -> tagIndexLabel
+          Just tagPath' -> "#" <> tagNodesText tagPath' <> " - " <> tagIndexLabel
   renderModelTemplate model "templates/special/tagindex" $ do
-    commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx
+    commonSplices ($ emptyRenderCtx) model meta viewTitle
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)

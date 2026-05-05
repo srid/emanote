@@ -104,6 +104,14 @@ Feature: Smoke
     When I open "/code.html"
     Then every <pre> with a child <code> has a .code-copy-button
 
+  Scenario: page.lang localizes default UI chrome
+    When I open "/i18n-fr.html"
+    Then the document language is "fr"
+    And the footer contains link text "Accueil"
+    And the TOC heading is "Sur cette page"
+    And the Stork search placeholder is "Rechercher (Ctrl+K) ..."
+    And the first code copy button title is "Copier le code"
+
   Scenario: Scrolling a section into view highlights its TOC link
     When I open "/toc.html"
     And I scroll the heading with id "cherry" into the active band

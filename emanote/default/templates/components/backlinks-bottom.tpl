@@ -21,7 +21,7 @@
   <ema:note:backlinks:nodaily>
     <section id="backlinks-bottom">
       <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-        Linked from
+        <ema:i18n:linkedFrom />
       </h3>
       <!-- divide-y between rows + a left-rule on the context block
            anchor each backlink + its context together as one unit, so

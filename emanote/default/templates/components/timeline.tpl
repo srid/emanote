@@ -10,7 +10,7 @@
 <ema:note:backlinks:daily>
   <section class="emanote-timeline text-sm text-gray-700 dark:text-gray-300">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-      Timeline
+      <ema:i18n:timeline />
     </h3>
     <ul class="timeline-data" hidden>
       <backlink>

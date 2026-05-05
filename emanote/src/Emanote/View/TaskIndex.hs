@@ -51,7 +51,7 @@ renderTasks model = do
         "note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, r))
 
   Common.renderModelTemplate model "templates/special/tasks" $ do
-    Common.commonSplices ($ emptyRenderCtx) model meta "Task Index"
+    Common.commonSplices ($ emptyRenderCtx) model meta (fromString . toString $ Common.i18nText meta "taskIndex" "Task Index")
     let groups =
           Map.toList (unTaskIndex taskIndex)
             & sortWith fst

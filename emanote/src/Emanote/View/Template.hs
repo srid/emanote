@@ -70,24 +70,26 @@ render :: (MonadIO m, MonadLoggerIO m) => Model -> SR.SiteRoute -> m (Ema.Asset 
 render m = \case
   SR.SiteRoute_MissingR urlPath -> do
     let hereRoute = R.decodeHtmlRoute urlPath
+        (_, meta) = C.defaultRouteMeta m
         note404 =
           MN.missingNote hereRoute (toText urlPath)
-            & setErrorPageMeta
+            & setErrorPageMeta meta
             & MN.noteTitle
-            .~ "! Missing link"
+            .~ fromString (toString $ C.i18nText meta "missingLink" "! Missing link")
     pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
   SR.SiteRoute_AmbiguousR urlPath notes -> do
-    let noteAmb =
+    let (_, meta) = C.defaultRouteMeta m
+        noteAmb =
           MN.ambiguousNoteURL urlPath notes
-            & setErrorPageMeta
+            & setErrorPageMeta meta
             & MN.noteTitle
-            .~ "! Ambiguous link"
+            .~ fromString (toString $ C.i18nText meta "ambiguousLink" "! Ambiguous link")
     pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
   SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
   SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
   where
-    setErrorPageMeta =
-      MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle "Emanote Error"])
+    setErrorPageMeta meta =
+      MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle (C.i18nText meta "emanoteError" "Emanote Error")])
 
 renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
 renderResourceRoute m = \case
@@ -124,7 +126,7 @@ renderSRIndex model = do
   let (r, meta) = C.defaultRouteMeta model
       tCtx = C.mkTemplateRenderCtx model r meta
   C.renderModelTemplate model "templates/special/index" $ do
-    C.commonSplices ($ emptyRenderCtx) model meta "Index"
+    C.commonSplices ($ emptyRenderCtx) model meta (fromString . toString $ C.i18nText meta "index" "Index")
     routeTreeSplices tCtx Nothing model
 
 loaderHead :: LByteString
@@ -151,7 +153,7 @@ renderLmlHtml :: Model -> MN.Note -> LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      doc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
       toc = newToc doc
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
@@ -301,7 +303,7 @@ Stays at render time so the banner can be scoped to this note's cascade
 affected note. Banner construction goes through 'MN.errorDiv' so the
 markdown and yaml error surfaces share one Div shape. Issue #285.
 -}
-prependDataErrors :: [Text] -> Pandoc -> Pandoc
-prependDataErrors [] doc = doc
-prependDataErrors errs (Pandoc m blocks) =
-  Pandoc m (MN.errorDiv "Emanote: bad YAML files" errs : blocks)
+prependDataErrors :: Aeson.Value -> [Text] -> Pandoc -> Pandoc
+prependDataErrors _ [] doc = doc
+prependDataErrors meta errs (Pandoc m blocks) =
+  Pandoc m (MN.errorDiv (C.i18nText meta "badYamlFiles" "Emanote: bad YAML files") errs : blocks)

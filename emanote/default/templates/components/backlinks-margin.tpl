@@ -10,7 +10,7 @@
 <ema:note:backlinks:nodaily>
   <section id="backlinks-margin" class="text-sm text-gray-700 dark:text-gray-300">
     <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-      Linked from
+      <ema:i18n:linkedFrom />
     </h3>
     <ul class="space-y-1">
       <backlink>

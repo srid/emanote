@@ -16,7 +16,7 @@
                 </span>
               </h1>
               <div class="flex items-center justify-center font-bold text-lg text-gray-900 dark:text-gray-100">
-                Your notebook has an issue.
+                <ema:i18n:notebookIssue />
               </div>
               <div class="bg-gray-50 dark:bg-gray-700 p-2 my-4">
                 <apply template="/templates/components/pandoc" />
@@ -24,9 +24,8 @@
               <div class="flex items-center justify-center text-xl text-gray-900 dark:text-gray-100">
                 <ema:metadata>
                   <with var="template">
-                    <div>Fix it (this page will reload), or <a class="font-bold underline text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200"
-                        href="${value:baseUrl}">go
-                        to /</a>.
+                    <div><ema:i18n:fixItPrefix /> <a class="font-bold underline text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200"
+                        href="${value:baseUrl}"><ema:i18n:goToRoot /></a>.
                     </div>
                   </with>
                 </ema:metadata>

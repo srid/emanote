@@ -557,6 +557,51 @@ Then(
   },
 );
 
+Then(
+  "the document language is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const lang = await this.page.locator("html").getAttribute("lang");
+    assert.strictEqual(lang, expected);
+  },
+);
+
+Then(
+  "the footer contains link text {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    await this.page
+      .locator("footer a", { hasText: expected })
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+  },
+);
+
+Then(
+  "the TOC heading is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const heading = this.page.locator("#toc h3").first();
+    await heading.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual((await heading.textContent())?.trim(), expected);
+  },
+);
+
+Then(
+  "the Stork search placeholder is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const input = this.page.locator("#stork-search-input");
+    await input.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await input.getAttribute("placeholder"), expected);
+  },
+);
+
+Then(
+  "the first code copy button title is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const button = this.page.locator("pre > .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await button.getAttribute("title"), expected);
+  },
+);
+
 When(
   "I navigate via Ema to {string}",
   async function (this: EmanoteWorld, path: string) {

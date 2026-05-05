@@ -19,9 +19,9 @@
         <header class="relative px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40">
           <ema:metadata>
             <with var="template">
-              <a href="${value:baseUrl}" title="Go to Home" class="hidden md:inline-flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-1.5 text-sm font-medium hover:opacity-70 transition-opacity">
+              <a href="${value:baseUrl}" title="${ema:i18n:goToHome}" class="hidden md:inline-flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-1.5 text-sm font-medium hover:opacity-70 transition-opacity">
                 <img class="w-4 h-4" src="${value:iconUrl}" alt="" />
-                <span>Home</span>
+                <span><ema:i18n:home /></span>
               </a>
             </with>
           </ema:metadata>
