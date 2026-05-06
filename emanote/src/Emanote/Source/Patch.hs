@@ -97,11 +97,8 @@ patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp acti
           Stork.clearStorkIndex storkIndexTVar
 
           case action of
-            UM.Refresh refreshAction overlays -> do
-              let fpAbs = head overlays
-              s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
-              pure $ M.modelInsertNote $ noteF note
+            UM.Refresh refreshAction overlays ->
+              parseAndInsert layers noteF scriptingEngine refreshAction r (head overlays)
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
@@ -200,6 +197,25 @@ patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp acti
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
 
+{- | Read a Markdown source from disk, parse it, and produce the
+'modelInsertNote' transformer. Shared by the 'LMLType' refresh path
+(initial scan + edits) and the 'LuaFilter' hot-reload path, which
+both end in "read → parseNote → insert".
+-}
+parseAndInsert ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  ScriptingEngine ->
+  UM.RefreshAction ->
+  R.LMLRoute ->
+  (Loc, FilePath) ->
+  m (ModelEma -> ModelEma)
+parseAndInsert layers noteF scriptingEngine refreshAction r src = do
+  s <- readRefreshedFile refreshAction (locResolve src)
+  note <- N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
+  pure $ M.modelInsertNote $ noteF note
+
 {- | Absolute paths to attempt when a 'LuaFilter' file is reported deleted.
 We don't know which layer it lived in, so try each user layer; lookups
 against the dependency index will only match the layers that actually
@@ -256,10 +272,9 @@ reparseOrDropNote layers noteF scriptingEngine model depRoute =
               logW $ "Lua dep target " <> toText srcFp <> " is gone; dropping edge for " <> show depRoute
               pure (modelSourceDependencies %~ SDeps.removeNote depRoute)
             True -> do
-              s <- readRefreshedFile UM.Update srcAbs
-              note <- N.parseNote scriptingEngine (userLayersToSearch layers) depRoute src (decodeUtf8 s)
+              result <- parseAndInsert layers noteF scriptingEngine UM.Update depRoute src
               logD $ "Re-parsed " <> toText srcFp <> " after lua filter change"
-              pure $ M.modelInsertNote $ noteF note
+              pure result
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =
