@@ -1213,6 +1213,10 @@ See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar
 
 Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).
 
+### Regular Markdown note links
+
+Regular Markdown links to notes can include their `.md` or `.org` extension, but they do not have to. For example, `[Neuron](../start/neuron)` renders as [Neuron](../start/neuron), just like `[Neuron](../start/neuron.md)` renders as [Neuron](../start/neuron.md). Folder-note links such as `[Guide](../guide)` resolve the same way, before Emanote falls back to looking for a static file at that path.
+
 ### Broken links
 
 Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
