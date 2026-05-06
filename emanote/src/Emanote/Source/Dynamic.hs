@@ -59,6 +59,11 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
       initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
+  -- NOTE: Per-layer ignore patterns are loaded once at startup. Edits
+  -- to a `.emanoteignore` file during a live-serve session do not take
+  -- effect until restart. Live reload (#228 phase 2) requires
+  -- threading an IO refresh through unionmount's recursive remount
+  -- path, which is currently a static `Map source [FilePattern]`.
   perLayerIgnore <- Ignore.loadIgnorePatterns layers
   Dynamic
     <$> UM.unionMount
