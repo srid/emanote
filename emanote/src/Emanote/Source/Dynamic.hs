@@ -65,12 +65,17 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   -- threading an IO refresh through unionmount's recursive remount
   -- path, which is currently a static `Map source [FilePattern]`.
   perLayerIgnore <- Ignore.loadIgnorePatterns layers
+  let
+    -- unionmount has only one ignore input (per-source); fold the
+    -- universal patterns into every layer's entry so they apply
+    -- regardless of whether the layer has its own `.emanoteignore`.
+    universalForEveryLayer = Map.fromSet (const Pattern.ignorePatterns) layers
+    ignoreByLayer = Map.unionWith (<>) universalForEveryLayer perLayerIgnore
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
-      Pattern.ignorePatterns
-      perLayerIgnore
+      ignoreByLayer
       initialModel
       (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
 
