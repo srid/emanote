@@ -2,6 +2,7 @@
 
 Home page for e2e tests. Site theme is `blue` (see `index.yaml`).
 See [themed](themed.md) for a per-page `theme: green` override.
+See [nested guide note without extension](guide/i18n) and [folder note without extension](subfolder).
 
 The bracketed-span below is a live-mode Tailwind palette probe. The CDN
 tree-shakes `--color-<palette>-*` unless it sees a matching class
