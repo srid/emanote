@@ -23,6 +23,8 @@ import Emanote.Model.Note (
  )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
+import Emanote.Model.SourceDependencies (SourceDependencies)
+import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Model.StaticFile (
   IxStaticFile,
   StaticFile (StaticFile),
@@ -66,6 +68,11 @@ data ModelT encF = Model
   , _modelStorkIndex :: Stork.IndexVar
   , _modelFolgezettelTree :: Forest R.LMLRoute
   -- ^ Folgezettel tree computed once for each update to model.
+  , _modelSourceDependencies :: SourceDependencies
+  -- ^ Reverse index from external source files (e.g. Pandoc Lua filter
+  -- @.lua@ files) to the notes whose parsed AST depends on them. Used
+  -- by the patcher to invalidate exactly the affected notes when a
+  -- dependency is edited.
   }
   deriving stock (Generic)
 
@@ -113,6 +120,7 @@ emptyModel layers act ren ctw instanceId storkVar =
     , _modelHeistTemplate = def
     , _modelStorkIndex = storkVar
     , _modelFolgezettelTree = mempty
+    , _modelSourceDependencies = SDeps.emptyDependencies
     }
 
 modelReadyForView :: ModelT f -> ModelT f
@@ -135,6 +143,8 @@ modelInsertNote note =
     %~ updateIxMulti r (Rel.noteRels note)
       >>> modelTasks
     %~ updateIxMulti r (Task.noteTasks note)
+      >>> modelSourceDependencies
+    %~ SDeps.setLuaDeps r (note ^. N.noteResolvedFilters)
   where
     r = note ^. N.noteRoute
 
@@ -190,6 +200,8 @@ modelDeleteNote k model =
     %~ deleteIxMulti k
       & modelTasks
     %~ deleteIxMulti k
+      & modelSourceDependencies
+    %~ SDeps.removeNote k
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.

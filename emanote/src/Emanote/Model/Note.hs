@@ -63,6 +63,12 @@ data Note = Note
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
   , _noteFeed :: Maybe Feed
+  , _noteResolvedFilters :: [FilePath]
+  -- ^ Absolute paths of the Pandoc Lua filters that were applied to
+  -- '_noteDoc'. Empty for non-Markdown notes and for Markdown notes
+  -- with no @pandoc.filters@ frontmatter. The patcher uses this to
+  -- maintain 'Emanote.Model.SourceDependencies' so that an edit to a
+  -- filter file re-parses exactly the notes that referenced it.
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
@@ -336,16 +342,16 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  mkNoteWith someR Nothing doc meta mempty
+  mkNoteWith someR Nothing doc meta mempty mempty
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [Text] -> Note
-mkNoteWith r src doc' meta errs =
+mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [Text] -> [FilePath] -> Note
+mkNoteWith r src doc' meta errs filters =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
-   in Note r src doc meta tit errs feed
+   in Note r src doc meta tit errs feed filters
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -380,16 +386,18 @@ parseNote ::
   Text ->
   m Note
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc, meta), errs) <- runWriterT $ do
+  (((doc, meta), filters), errs) <- runWriterT $ do
     case r of
-      R.LMLRoute_Md _ ->
-        parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
+      R.LMLRoute_Md _ -> do
+        (doc, meta, filters) <- parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
+        pure ((doc, meta), filters)
       R.LMLRoute_Org _ -> do
-        parseNoteOrg s
+        x <- parseNoteOrg s
+        pure (x, mempty)
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> meta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
-  pure $ mkNoteWith r (Just src) doc metaWithDateFromPath errs
+  pure $ mkNoteWith r (Just src) doc metaWithDateFromPath errs filters
   where
     dateParser = do
       year <- replicateM 4 P.digit
@@ -420,12 +428,12 @@ parseNoteMarkdown ::
   R.LMLRoute ->
   FilePath ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value)
+  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
 parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter)
+      pure (mempty, defaultFrontMatter, mempty)
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
       -- Apply the various transformation filters.
       --
@@ -446,7 +454,7 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
 
       doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta)
+      pure (doc, meta, filterPaths)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv

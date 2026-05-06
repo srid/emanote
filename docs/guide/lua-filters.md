@@ -21,8 +21,12 @@ pandoc:
     - path/to/your.lua
 ```
 
-> [!warning] Limitations
-> See [here](https://github.com/srid/emanote/pull/278#issue-1207537343) for known limitations.
+The filter path is resolved against your notebook layers, so a path like `filters/list-table.lua` works as long as `filters/list-table.lua` exists in any of your `-L`'d layers.
+
+Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
+
+> [!warning] Remaining limitation
+> Filters can only be declared in a note's own frontmatter. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
 
 ## Demo
 

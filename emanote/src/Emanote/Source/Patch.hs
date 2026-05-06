@@ -8,13 +8,15 @@ module Emanote.Source.Patch (
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List.NonEmpty qualified as NEL
+import Data.Set qualified as Set
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
+import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
-import Emanote.Model.Type (ModelEma)
+import Emanote.Model.Type (ModelEma, modelNotes, modelSourceDependencies)
 import Emanote.Prelude (
   log,
   logD,
@@ -27,6 +29,7 @@ import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
+import System.FilePath ((</>))
 import System.UnionMount qualified as UM
 import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
@@ -40,6 +43,10 @@ patchModel ::
   Stork.IndexVar ->
   -- | Lua scripting engine
   ScriptingEngine ->
+  -- | Snapshot of the model from before this batch of changes. Read by
+  -- handlers (e.g. 'LuaFilter') that must inspect existing state to
+  -- compute their effect; never mutated here.
+  TVar ModelEma ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -47,13 +54,13 @@ patchModel ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModel layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp action) newLogger
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel' ::
@@ -63,6 +70,7 @@ patchModel' ::
   Stork.IndexVar ->
   -- | Lua scripting engine
   ScriptingEngine ->
+  TVar ModelEma ->
   -- | Type of the file being changed
   R.FileType R.SourceExt ->
   -- | Path to the file being changed
@@ -70,7 +78,7 @@ patchModel' ::
   -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
@@ -96,6 +104,37 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
+    R.LuaFilter -> do
+      -- A change (or deletion) of a Pandoc Lua filter file invalidates
+      -- every note that referenced this filter at parse time. We re-read
+      -- those notes from disk and re-run 'parseNote' so their cached
+      -- 'Pandoc' AST reflects the new (or now-missing) filter. The set
+      -- of dependents is read from the pre-batch model snapshot in
+      -- 'modelTVar'; the snapshot is current enough because the per-batch
+      -- writer in 'Emanote.Source.Dynamic' updates it before the next
+      -- batch runs.
+      --
+      -- 'Refresh' carries the resolved layer overlay so we can compute
+      -- the absolute filter path directly. 'Delete' does not, so we try
+      -- the deleted relative path against every layer and union the
+      -- resulting dependent sets — the false-positive direction is
+      -- benign (a re-parse just yields the correct AST again).
+      model <- readTVarIO modelTVar
+      let candidatePaths = case action of
+            UM.Refresh _ overlays -> one (locResolve (head overlays))
+            UM.Delete -> luaFilterAbsPathsFor layers fp
+          dependents =
+            mconcat
+              [ SDeps.dependentsOnLua p (model ^. modelSourceDependencies)
+              | p <- candidatePaths
+              ]
+      if Set.null dependents
+        then do
+          logD $ "Lua filter changed but no notes depend on it: " <> toText fp
+          pure id
+        else do
+          log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Set.size dependents) <> " dependent note(s)"
+          foldr (>>>) id <$> traverse (reparseNoteFromDisk layers noteF scriptingEngine model) (Set.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
@@ -153,6 +192,46 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
                 pure $ M.modelInsertStaticFile t r fpAbs mInfo
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
+
+{- | Absolute paths to attempt when a 'LuaFilter' file is reported deleted.
+We don't know which layer it lived in, so try each user layer; lookups
+against the dependency index will only match the layers that actually
+registered an edge for this path.
+-}
+luaFilterAbsPathsFor :: Set Loc -> FilePath -> [FilePath]
+luaFilterAbsPathsFor layers fp =
+  userLayersToSearch layers <&> (</> fp)
+
+{- | Re-read a note's Markdown source from disk and produce a transformer
+that replaces the cached note in the model with the freshly parsed one.
+Returns 'id' if the note no longer exists or has no on-disk source.
+-}
+reparseNoteFromDisk ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  ScriptingEngine ->
+  ModelEma ->
+  R.LMLRoute ->
+  m (ModelEma -> ModelEma)
+reparseNoteFromDisk layers noteF scriptingEngine model depRoute =
+  case N.lookupNotesByRoute depRoute (model ^. modelNotes) of
+    Nothing ->
+      -- Note disappeared between dependency-edge creation and now;
+      -- drop the stale edge.
+      pure (modelSourceDependencies %~ SDeps.removeNote depRoute)
+    Just oldNote ->
+      case oldNote ^. N.noteSource of
+        Nothing ->
+          -- Synthesized notes (e.g. ancestor placeholders) have no
+          -- on-disk source; nothing to re-read.
+          pure id
+        Just src@(_, srcFp) -> do
+          let srcAbs = locResolve src
+          s <- readRefreshedFile UM.Update srcAbs
+          note <- N.parseNote scriptingEngine (userLayersToSearch layers) depRoute src (decodeUtf8 s)
+          logD $ "Re-parsed " <> toText srcFp <> " after lua filter change"
+          pure $ M.modelInsertNote $ noteF note
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =

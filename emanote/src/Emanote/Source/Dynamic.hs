@@ -58,13 +58,26 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
       initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
+  -- A snapshot mirror of the model that lives outside @unionMount@, so
+  -- patch handlers (e.g. the Lua filter hot-reload path) can read state
+  -- they cannot see through the @model -> model@ return type. The mirror
+  -- is updated by 'wrappedHandler' immediately before each batch
+  -- transformer is returned to @unionMount@, so it stays consistent
+  -- with @unionMount@'s internal @LVar@ as long as this remains the
+  -- single writer.
+  modelTVar <- newTVarIO initialModel
+  let baseHandler = Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine modelTVar
+      wrappedHandler change = do
+        transformer <- mapFsChanges baseHandler change
+        atomically $ modifyTVar' modelTVar transformer
+        pure transformer
   Dynamic
     <$> UM.unionMount
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       Pattern.ignorePatterns
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+      wrappedHandler
 
 type ChangeHandler tag model m =
   tag ->

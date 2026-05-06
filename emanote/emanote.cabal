@@ -177,6 +177,7 @@ library
     Emanote.Model.Note.Filter
     Emanote.Model.Query
     Emanote.Model.SData
+    Emanote.Model.SourceDependencies
     Emanote.Model.StaticFile
     Emanote.Model.Stork
     Emanote.Model.Stork.Index
@@ -259,6 +260,7 @@ test-suite test
       Emanote.Model.Link.RelSpec
       Emanote.Model.QuerySpec
       Emanote.Model.SDataSpec
+      Emanote.Model.SourceDependenciesSpec
       Emanote.Model.TocSpec
       Emanote.Pandoc.BuiltinFiltersSpec
       Emanote.Pandoc.ExternalLinkSpec
