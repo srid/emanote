@@ -140,7 +140,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp acti
           pure id
         else do
           log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Set.size dependents) <> " dependent note(s)"
-          foldr (>>>) id <$> traverse (reparseNoteFromDisk layers noteF scriptingEngine model) (Set.toList dependents)
+          foldr (>>>) id <$> traverse (reparseOrDropNote layers noteF scriptingEngine model) (Set.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
@@ -210,9 +210,14 @@ luaFilterAbsPathsFor layers fp =
 
 {- | Re-read a note's Markdown source from disk and produce a transformer
 that replaces the cached note in the model with the freshly parsed one.
-Returns 'id' if the note no longer exists or has no on-disk source.
+
+If the note no longer exists in the model, this drops the stale entry
+from 'modelSourceDependencies' instead — the function name's "OrDrop"
+suffix names that side effect, since callers reaching for "just re-read
+this note" should know the dependency index also gets pruned. Synthetic
+notes with no on-disk source are a no-op.
 -}
-reparseNoteFromDisk ::
+reparseOrDropNote ::
   (MonadIO m, MonadLogger m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
@@ -220,7 +225,7 @@ reparseNoteFromDisk ::
   ModelEma ->
   R.LMLRoute ->
   m (ModelEma -> ModelEma)
-reparseNoteFromDisk layers noteF scriptingEngine model depRoute =
+reparseOrDropNote layers noteF scriptingEngine model depRoute =
   case N.lookupNotesByRoute depRoute (model ^. modelNotes) of
     Nothing ->
       -- Note disappeared between dependency-edge creation and now;
