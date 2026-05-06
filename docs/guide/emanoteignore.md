@@ -12,7 +12,7 @@ Drop a file named `.emanoteignore` at the **top of any notebook layer** and Eman
 One [`FilePattern`][filepattern] per line. Blank lines and lines whose first non-whitespace character is `#` are ignored.
 
 ```text
-# Obsidian template directory
+# Auxiliary template directory you don't want rendered
 templates/**
 
 # Daily journal — kept private
@@ -36,7 +36,6 @@ Universal ignores (dotfile directories, editor backup files, the reserved `-/` d
 
 | Use case | Pattern |
 | --- | --- |
-| Obsidian template directory | `templates/**` |
 | Daily journal subtree | `journal/**` or `Daily/**` |
 | `node_modules/` from a remark setup | `node_modules/**` |
 | A single bot/agent doc | `AGENTS.md` |
