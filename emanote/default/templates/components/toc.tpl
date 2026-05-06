@@ -11,7 +11,7 @@
         <ul class="space-y-1 ml-2">
           <toc:entry>
             <li class="truncate" title="${toc:title}">
-              <a href="${ema:note:url}#${toc:anchor}"
+              <a href="${ema:note:html-url}#${toc:anchor}"
                 class="--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
                 <toc:title />
               </a>

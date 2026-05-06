@@ -5,7 +5,7 @@ import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Link.Rel
 import Emanote.Model.Note qualified as MN
 import Emanote.Route qualified as R
-import Emanote.Route.ModelRoute (LMLRoute (LMLRoute_Md), mkModelRouteCandidates)
+import Emanote.Route.ModelRoute (LMLRoute (LMLRoute_Md, LMLRoute_Org), LMLView (LMLView_Html), ModelRoute (ModelRoute_LML, ModelRoute_StaticFile), mkModelRouteCandidates)
 import Emanote.Route.R (R (..))
 import Hedgehog
 import Relude
@@ -51,6 +51,52 @@ spec = do
       let base = MN.resolveLinkBaseFromFilePath "subfolder/index.md"
           got = fst <$> parseUnresolvedRelTarget base [] "foo.md"
           want = viaNonEmpty URTResource (mkModelRouteCandidates "subfolder/foo.md")
+      got === want
+  describe "parseUnresolvedRelTarget (issue #347)" $ do
+    it "treats extensionless note links as LML candidates before static files" . hedgehog $ do
+      let got = fst <$> parseUnresolvedRelTarget Nothing [] "guide/neuron"
+          want =
+            Just
+              $ URTResource
+                ( ModelRoute_LML LMLView_Html (LMLRoute_Md $ R ("guide" :| ["neuron"]))
+                    :| [ ModelRoute_LML LMLView_Html (LMLRoute_Org $ R ("guide" :| ["neuron"]))
+                       , ModelRoute_StaticFile $ R ("guide" :| ["neuron"])
+                       ]
+                )
+      got === want
+    it "relocates extensionless note links under the source note directory" . hedgehog $ do
+      let base = MN.resolveLinkBaseFromFilePath "subfolder/index.md"
+          got = fst <$> parseUnresolvedRelTarget base [] "foo"
+          want =
+            Just
+              $ URTResource
+                ( ModelRoute_LML LMLView_Html (LMLRoute_Md $ R ("subfolder" :| ["foo"]))
+                    :| [ ModelRoute_LML LMLView_Html (LMLRoute_Org $ R ("subfolder" :| ["foo"]))
+                       , ModelRoute_StaticFile $ R ("subfolder" :| ["foo"])
+                       ]
+                )
+      got === want
+    it "uses LML folder-note canonicalization for trailing index targets" . hedgehog $ do
+      let got = fst <$> parseUnresolvedRelTarget Nothing [] "guide/index"
+          want =
+            Just
+              $ URTResource
+                ( ModelRoute_LML LMLView_Html (LMLRoute_Md $ R ("guide" :| []))
+                    :| [ ModelRoute_LML LMLView_Html (LMLRoute_Org $ R ("guide" :| []))
+                       , ModelRoute_StaticFile $ R ("guide" :| ["index"])
+                       ]
+                )
+      got === want
+    it "treats trailing slash folder links as extensionless note links" . hedgehog $ do
+      let got = fst <$> parseUnresolvedRelTarget Nothing [] "guide/"
+          want =
+            Just
+              $ URTResource
+                ( ModelRoute_LML LMLView_Html (LMLRoute_Md $ R ("guide" :| []))
+                    :| [ ModelRoute_LML LMLView_Html (LMLRoute_Org $ R ("guide" :| []))
+                       , ModelRoute_StaticFile $ R ("guide" :| [])
+                       ]
+                )
       got === want
   describe "noteRels source order (issue #186)" $ do
     it "orders rels by source position, not by lexicographic Ord on context" $ do

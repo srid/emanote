@@ -30,6 +30,7 @@ import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType, Xml), HasExt, LML (Md
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
+import System.FilePath qualified as FP
 
 type StaticFileRoute = R 'AnyExt
 
@@ -106,17 +107,29 @@ modelRouteCase = \case
 {- | All `ModelRoute`s a URL filepath could plausibly resolve to,
 ordered by preference.
 
-The same URL can map to multiple resource kinds — most importantly,
-@*.xml@ is both the natural URL for a feed-enabled note's Atom output
-and the natural URL for a static @.xml@ asset. Resolution at lookup
-time picks the first candidate that exists in the model; if the user
-intended one but the model only contains the other, the link still
-resolves correctly.
+The same URL can map to multiple resource kinds — extensionless Markdown
+links can mean a note, and @*.xml@ is both the natural URL for a
+feed-enabled note's Atom output and the natural URL for a static @.xml@
+asset. Resolution at lookup time picks the first candidate that exists in
+the model; if the user intended one but the model only contains the other,
+the link still resolves correctly.
 -}
 mkModelRouteCandidates :: FilePath -> [ModelRoute]
 mkModelRouteCandidates fp =
-  maybeToList (uncurry ModelRoute_LML <$> mkLMLRouteFromFilePath fp)
+  mkExtensionlessLMLRouteCandidates fp
+    <> maybeToList (uncurry ModelRoute_LML <$> mkLMLRouteFromFilePath fp)
     <> maybeToList (ModelRoute_StaticFile <$> R.mkRouteFromFilePath fp)
+
+mkExtensionlessLMLRouteCandidates :: FilePath -> [ModelRoute]
+mkExtensionlessLMLRouteCandidates fp = do
+  guard $ null $ FP.takeExtension fp
+  lmlType <- [Md, Org]
+  lmlR <- maybeToList $ mkLMLRouteFromKnownFilePath lmlType (FP.addExtension (FP.dropTrailingPathSeparator fp) $ lmlExt lmlType)
+  pure $ ModelRoute_LML LMLView_Html lmlR
+  where
+    lmlExt = \case
+      Md -> ".md"
+      Org -> ".org"
 
 -- | Encode a `ModelRoute` to its on-the-wire URL filepath.
 encodeModelRoute :: ModelRoute -> FilePath
