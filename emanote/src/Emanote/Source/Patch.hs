@@ -119,6 +119,12 @@ patchModel' layers noteF storkIndexTVar scriptingEngine modelTVar fpType fp acti
       -- the deleted relative path against every layer and union the
       -- resulting dependent sets — the false-positive direction is
       -- benign (a re-parse just yields the correct AST again).
+      --
+      -- The candidate-path expansion assumes the layer list is stable
+      -- across the lifetime of a single delete event, which is currently
+      -- the case (layers are fixed at startup; live layer-swap is not a
+      -- supported feature). If that ever changes, candidates derived from
+      -- a stale layer set could miss a dependent.
       model <- readTVarIO modelTVar
       let candidatePaths = case action of
             UM.Refresh _ overlays -> one (locResolve (head overlays))
