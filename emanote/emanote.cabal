@@ -205,6 +205,7 @@ library
     Emanote.Route.SiteRoute.Class
     Emanote.Route.SiteRoute.Type
     Emanote.Source.Dynamic
+    Emanote.Source.Ignore
     Emanote.Source.Loc
     Emanote.Source.Patch
     Emanote.Source.Pattern
@@ -264,5 +265,6 @@ test-suite test
       Emanote.Pandoc.ExternalLinkSpec
       Emanote.Pandoc.Renderer.CalloutSpec
       Emanote.Route.RSpec
+      Emanote.Source.IgnoreSpec
       Emanote.View.FeedSpec
       Emanote.View.I18nSpec

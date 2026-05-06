@@ -143,6 +143,26 @@ Then(
   },
 );
 
+// Mirror of `the response body contains`, used to prove a fixture that
+// SHOULD have been excluded didn't sneak through. We can't assert on
+// status code uniformly here: `emanote run` renders an Ema "! Missing
+// link" page with status 200 for routes not in the model, while
+// `emanote gen` + serve-handler emits a hard 404. Both modes agree
+// that the excluded fixture's unique marker is absent from the body,
+// so that's the assertion we use.
+Then(
+  "the response body does not contain {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    const body = await resp.text();
+    assert.ok(
+      !body.includes(needle),
+      `Response body unexpectedly contained ${JSON.stringify(needle)} (status=${resp.status()}); first 400 chars: ${JSON.stringify(body.slice(0, 400))}.`,
+    );
+  },
+);
+
 Then(
   "the response is a valid Atom feed",
   async function (this: EmanoteWorld) {
