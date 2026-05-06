@@ -393,14 +393,9 @@ parseNote ::
   Text ->
   m Note
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  (((doc, meta), filters), errs) <- runWriterT $ do
-    case r of
-      R.LMLRoute_Md _ -> do
-        (doc, meta, filters) <- parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
-        pure ((doc, meta), filters)
-      R.LMLRoute_Org _ -> do
-        x <- parseNoteOrg s
-        pure (x, mempty)
+  ((doc, meta, filters), errs) <- runWriterT $ case r of
+    R.LMLRoute_Md _ -> parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
+    R.LMLRoute_Org _ -> parseNoteOrg s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> meta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
@@ -415,15 +410,15 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
       _ <- P.satisfy (not . isDigit)
       pure $ toText $ mconcat [year, "-", month, "-", day]
 
-parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
+parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value, [FilePath])
 parseNoteOrg s =
   case runPure $ readOrg readerOpts s of
     Left err -> do
       tell [show err]
-      pure (mempty, defaultFrontMatter)
+      pure (mempty, defaultFrontMatter, mempty)
     Right doc ->
       -- TODO: Merge Pandoc's Meta in here?
-      pure (preparePandoc doc, defaultFrontMatter)
+      pure (preparePandoc doc, defaultFrontMatter, mempty)
   where
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]

@@ -11,7 +11,7 @@ spec :: Spec
 spec = do
   describe "basic-toc" $ do
     it "create toc tree" $ do
-      ((doc, _), []) <- runWriterT $ parseNoteOrg demo
+      ((doc, _, _), []) <- runWriterT $ parseNoteOrg demo
       (fmap headingName <$> newToc doc)
         `shouldBe` [ Node
                       { rootLabel = "h1 1"
