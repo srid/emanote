@@ -69,6 +69,13 @@ data Note = Note
   -- with no @pandoc.filters@ frontmatter. The patcher uses this to
   -- maintain 'Emanote.Model.SourceDependencies' so that an edit to a
   -- filter file re-parses exactly the notes that referenced it.
+  --
+  -- TODO (#263 follow-up): when @pandoc.filters@ cascades from
+  -- ancestor @index.yaml@ files, this field must reflect the merged
+  -- (cascade + frontmatter) result, not just the per-note frontmatter.
+  -- That likely means populating it after cascade resolution rather
+  -- than during 'parseNoteMarkdown' — at which point the single-call
+  -- 'modelInsertNote' invariant needs reconsidering.
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
