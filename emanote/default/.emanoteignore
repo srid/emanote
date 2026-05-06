@@ -1,4 +1,0 @@
-# Top-level Nix flake files. Emanote built from source ships these in
-# the default-layer source tree, and they should never appear as notes.
-flake.nix
-flake.lock
