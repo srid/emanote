@@ -28,7 +28,7 @@
     <ema:childTags>
       <section class="mb-6">
         <header data-nosnippet class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-          Subtags
+          <ema:i18n:subtags />
         </header>
         <ul class="space-y-0.5">
           <ema:each-childTag>
@@ -52,7 +52,7 @@
     <ema:notes>
       <section>
         <header data-nosnippet class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-          Notes
+          <ema:i18n:notes />
         </header>
         <ul class="space-y-0.5">
           <ema:each-note>

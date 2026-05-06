@@ -54,6 +54,7 @@
 
   <head-main />
   <apply template="components/stork/stork-search-head" />
+  <ema:i18n:script />
   <!-- Site-authored interactive behaviors (issue #643). The splice emits
        an importmap (so live-server's per-file ?t=<mtime> propagates
        through ES module imports) plus the main entry as a deferred

@@ -5,7 +5,7 @@
         <li class="inline-flex items-center shrink-0">
           <ema:metadata>
             <with var="template">
-              <img class="w-4 h-4" src="${value:iconUrl}" alt="Site Icon" />
+              <img class="w-4 h-4" src="${value:iconUrl}" alt="${ema:i18n:siteIcon}" />
             </with>
           </ema:metadata>
         </li>
@@ -26,12 +26,12 @@
       </ul>
     </div>
     <button class="shrink-0 px-3 border-l border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-      title="Search (Ctrl+K)" type="button" data-emanote-stork-toggle>
+      title="${ema:i18n:search}" type="button" data-emanote-stork-toggle>
       <apply template="stork/stork-icon" />
     </button>
     <button
       class="shrink-0 px-3 text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors cursor-pointer"
-      title="Toggle sidebar" type="button" onclick="toggleHidden('sidebar')">
+      title="${ema:i18n:toggleSidebar}" type="button" onclick="toggleHidden('sidebar')">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

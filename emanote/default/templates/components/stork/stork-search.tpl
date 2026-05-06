@@ -8,7 +8,7 @@
   <div class="container mx-auto p-10 mt-10">
     <div id="stork-wrapper" class="container mx-auto">
       <input id="stork-search-input" data-stork="emanote-search" class="stork-input"
-        placeholder="Search (Ctrl+K) ..." />
+        placeholder="${ema:i18n:searchPlaceholder}" />
       <div data-stork="emanote-search-output" class="stork-output"></div>
     </div>
   </div>

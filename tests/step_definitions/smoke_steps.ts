@@ -557,6 +557,78 @@ Then(
   },
 );
 
+Then(
+  "the first code copy button becomes visible when I hover its code block",
+  async function (this: EmanoteWorld) {
+    const pre = this.page.locator("pre:has(> code)").first();
+    const button = pre.locator("> .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+
+    const opacityBefore = await button.evaluate((el) =>
+      getComputedStyle(el).opacity,
+    );
+    assert.strictEqual(
+      opacityBefore,
+      "0",
+      `Expected the code copy button to start hidden before hover; got opacity ${opacityBefore}.`,
+    );
+
+    await pre.hover();
+    const buttonHandle = await button.elementHandle();
+    assert.ok(buttonHandle, "Copy button detached before hover opacity check.");
+    await this.page.waitForFunction(
+      (el) => Number(getComputedStyle(el).opacity) > 0.9,
+      buttonHandle,
+      { timeout: 5_000 },
+    );
+  },
+);
+
+Then(
+  "the document language is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const lang = await this.page.locator("html").getAttribute("lang");
+    assert.strictEqual(lang, expected);
+  },
+);
+
+Then(
+  "the footer contains link text {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    await this.page
+      .locator("footer a", { hasText: expected })
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+  },
+);
+
+Then(
+  "the TOC heading is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const heading = this.page.locator("#toc h3").first();
+    await heading.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual((await heading.textContent())?.trim(), expected);
+  },
+);
+
+Then(
+  "the Stork search placeholder is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const input = this.page.locator("#stork-search-input");
+    await input.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await input.getAttribute("placeholder"), expected);
+  },
+);
+
+Then(
+  "the first code copy button title is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const button = this.page.locator("pre > .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await button.getAttribute("title"), expected);
+  },
+);
+
 When(
   "I navigate via Ema to {string}",
   async function (this: EmanoteWorld, path: string) {

@@ -5,10 +5,27 @@
 // grid. Pulling the cell concept into one module keeps the primary palette
 // + sizing in one place; a Tailwind palette refresh edits one file, not N.
 
-export const MONTH_LABELS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
+function pageLocale() {
+  return document.documentElement.lang || undefined;
+}
+
+const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat(pageLocale(), {
+  month: 'short',
+  timeZone: 'UTC',
+});
+
+export const MONTH_LABELS = Array.from({ length: 12 }, (_, month) =>
+  MONTH_LABEL_FORMATTER.format(new Date(Date.UTC(2020, month, 1))),
+);
+
+const WEEKDAY_LABEL_FORMATTER = new Intl.DateTimeFormat(pageLocale(), {
+  weekday: 'narrow',
+  timeZone: 'UTC',
+});
+
+export const WEEKDAY_LABELS = Array.from({ length: 7 }, (_, day) =>
+  WEEKDAY_LABEL_FORMATTER.format(new Date(Date.UTC(2020, 0, 6 + day))),
+);
 
 export const CELL_BASE = 'block rounded-[1px]';
 export const CELL_FILLED_BASE = CELL_BASE + ' group relative bg-primary-500 dark:bg-primary-400 hover:bg-primary-700 dark:hover:bg-primary-300 transition-colors';

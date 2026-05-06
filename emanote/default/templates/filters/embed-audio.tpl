@@ -1,5 +1,4 @@
 <audio controls preload="metadata" src="${ema:url}">
-  Your browser doesn't support HTML5 audio. Here is a
-  <a class="text-primary-600 hover:underline" href="${ema:url}">link to the audio</a>
-  instead.
+  <ema:i18n:rich key="audioUnsupported"><a class="text-primary-600 hover:underline"
+      href="${ema:url}"><ema:i18n:audioLinkText /></a></ema:i18n:rich>
 </audio>

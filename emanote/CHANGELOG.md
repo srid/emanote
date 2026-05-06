@@ -5,6 +5,7 @@
 **Notable features**
 
 - **MCP server** scaffolding: new `emanote run --mcp-port PORT` flag runs an in-process Model Context Protocol HTTP endpoint beside the live server. Phase 1 ships only the lifecycle handshake and empty resource/tool inventories; richer surfaces follow in later phases ([#645](https://github.com/srid/emanote/issues/645))
+- Default template chrome can now be localized through `page.lang` and `template.i18n`. English remains the fallback language, and French strings are included for the built-in navigation, search, copy buttons, labels, and error chrome (closes [#486](https://github.com/srid/emanote/issues/486)).
 - Callouts: support **nested** and **foldable** Obsidian-style callouts (`> [!type]+` / `[!type]-`), rendering as `<details>`/`<summary>` ([#465](https://github.com/srid/emanote/issues/465), [#652](https://github.com/srid/emanote/pull/652))
 - **Tailwind v3 → v4 migration** with CSS-variable design tokens ([#633](https://github.com/srid/emanote/pull/633))
 - Built-in static syntax highlighting using skylighting, replacing client-side JS highlighters ([#624](https://github.com/srid/emanote/pull/624))

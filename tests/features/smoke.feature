@@ -103,6 +103,21 @@ Feature: Smoke
   Scenario: Every fenced code block gets a copy button at first paint
     When I open "/code.html"
     Then every <pre> with a child <code> has a .code-copy-button
+    And the first code copy button becomes visible when I hover its code block
+
+  @morph
+  Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
+    When I open "/i18n.fr"
+    And I navigate via Ema to "/i18n"
+    Then the first code copy button becomes visible when I hover its code block
+
+  Scenario: page.lang localizes default UI chrome
+    When I open "/i18n-fr.html"
+    Then the document language is "fr"
+    And the footer contains link text "Accueil"
+    And the TOC heading is "Sur cette page"
+    And the Stork search placeholder is "Rechercher (Ctrl+K) ..."
+    And the first code copy button title is "Copier le code"
 
   Scenario: Scrolling a section into view highlights its TOC link
     When I open "/toc.html"

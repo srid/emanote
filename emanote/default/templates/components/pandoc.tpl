@@ -2,7 +2,7 @@
   <a href="${ema:note:url}#${header:id}" class="--ema-anchor ml-2">
     <span
       class="text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
-      aria-label="Copy link" title="Copy link to heading"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+      aria-label="${ema:i18n:copyLink}" title="${ema:i18n:copyLinkToHeading}"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -72,12 +72,12 @@
       </DefinitionList:Items>
     </dl>
   </DefinitionList>
-  <Note:Ref><sup data-footnote-ref="${footnote:idx}" role="button" tabindex="0" aria-label="Footnote ${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none"><footnote:idx /></sup></Note:Ref>
+  <Note:Ref><sup data-footnote-ref="${footnote:idx}" role="button" tabindex="0" aria-label="${ema:i18n:footnote} ${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none"><footnote:idx /></sup></Note:Ref>
   <Note:List>
     <!-- Screen: hidden (popup is the UI). Print: revealed with standard
          footnote-list styling so printed output includes the cited bodies. -->
     <aside data-footnote-list aria-hidden="true" class="hidden print:block mt-10 text-sm">
-      <header class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Footnotes</header>
+      <header class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2"><ema:i18n:footnotes /></header>
       <ol class="list-decimal pl-6 space-y-2">
         <footnote>
           <li data-footnote-id="${footnote:idx}">

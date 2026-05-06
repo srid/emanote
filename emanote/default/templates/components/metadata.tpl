@@ -7,7 +7,7 @@
   <section
     class="flex flex-wrap items-end justify-center mt-8 mb-4 gap-x-2 gap-y-1.5 font-mono text-sm">
     <ema:each-tag>
-      <a title="Tag" class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors"
+      <a title="${ema:i18n:tag}" class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors"
         href="${ema:tag:url}">
         <!-- DoNotFormat -->
         #<ema:tag:name />

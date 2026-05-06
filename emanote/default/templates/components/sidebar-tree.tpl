@@ -53,7 +53,7 @@
         <icon />
         <else />
         <has-children>
-          <a href="${node:url}" title="View folgezettel children" class="hover:opacity-70 transition-opacity">
+          <a href="${node:url}" title="${ema:i18n:viewFolgezettelChildren}" class="hover:opacity-70 transition-opacity">
             <icon />
           </a>
           <else />
@@ -68,7 +68,7 @@
       <else />
       <node:terminal>
         <else />
-        <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0" title="${tree:childrenCount} children inside">
+        <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0" title="${tree:childrenInsideTitle}">
           <tree:childrenCount />
         </span>
       </node:terminal>
