@@ -68,7 +68,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=a8c6c119-b6d8-4ea6-b4cf-4724489888f3' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=f41976fd-9bfc-4c78-87d4-99c1ab4d3902' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -483,28 +483,6 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
   :root {
     --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g style="stroke:black;stroke-width:1;fill:none"><line x1="5" y1="5" x2="5" y2="14"/><line x1="14" y1="9" x2="14" y2="14"/><line x1="5" y1="14" x2="14" y2="14"/><line x1="5" y1="5" x2="9" y2="5"/><line x1="10" y1="2" x2="17" y2="2"/><line x1="17" y1="2" x2="17" y2="9"/><line x1="10" y1="9" x2="17" y2="2"/></g></svg>');
     --icon-mail: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>');
-  }
-</style>
-
-<style data-category='page-load-reveal'>
-  /* One orchestrated entrance on first paint: sidebar fades in; main
-     content fades and drifts up ~8px with a small stagger. Pure CSS so
-     it runs pre-paint without JS; gated on prefers-reduced-motion. */
-  @media (prefers-reduced-motion: no-preference) {
-    @keyframes ema-fade-in {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes ema-rise-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: none; }
-    }
-    #sidebar {
-      animation: ema-fade-in 400ms ease-out both;
-    }
-    main {
-      animation: ema-rise-in 480ms 60ms ease-out both;
-    }
   }
 </style>
 
