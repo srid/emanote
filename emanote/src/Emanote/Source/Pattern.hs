@@ -1,6 +1,7 @@
 module Emanote.Source.Pattern where
 
 import Emanote.Route qualified as R
+import Emanote.Source.Ignore (ignoreFilePattern)
 import Relude
 import System.FilePattern (FilePattern)
 
@@ -43,5 +44,5 @@ ignorePatterns =
   , -- /Top-level ./-/ directory is reserved by Emanote
     "-/**"
   , -- The ignore file itself is configuration, not a note or static asset.
-    "**/.emanoteignore"
+    ignoreFilePattern
   ]

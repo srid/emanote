@@ -9,6 +9,7 @@ so a pattern in layer A's file does not affect files inside layer B.
 module Emanote.Source.Ignore (
   loadIgnorePatterns,
   ignoreFileName,
+  ignoreFilePattern,
   parsePatterns,
 ) where
 
@@ -26,6 +27,13 @@ layer's root.
 -}
 ignoreFileName :: FilePath
 ignoreFileName = ".emanoteignore"
+
+{- | The `FilePattern` that matches the ignore file at any depth. Used
+by "Emanote.Source.Pattern" to keep the configuration file off the
+static-file route.
+-}
+ignoreFilePattern :: FilePattern
+ignoreFilePattern = "**/" <> ignoreFileName
 
 {- | Read @.emanoteignore@ from each layer's root and return a map keyed
 by `Loc`. Layers without an ignore file (or with an empty one) are
