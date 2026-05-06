@@ -124,7 +124,7 @@ mkExtensionlessLMLRouteCandidates :: FilePath -> [ModelRoute]
 mkExtensionlessLMLRouteCandidates fp = do
   guard $ null $ FP.takeExtension fp
   lmlType <- [Md, Org]
-  lmlR <- maybeToList $ mkLMLRouteFromKnownFilePath lmlType (FP.addExtension fp $ lmlExt lmlType)
+  lmlR <- maybeToList $ mkLMLRouteFromKnownFilePath lmlType (FP.addExtension (FP.dropTrailingPathSeparator fp) $ lmlExt lmlType)
   pure $ ModelRoute_LML LMLView_Html lmlR
   where
     lmlExt = \case
