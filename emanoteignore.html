@@ -30,15 +30,15 @@
     })();
   </script>
   <title>
-    Callouts – Emanote
+    .emanoteignore – Emanote
   </title>
   
     
-      <meta property='og:description' content='Emanote supports Obsidian-style callouts.' />
+      <meta property='og:description' content='Drop a file named .emanoteignore at the top of any notebook layer and Emanote will skip the matching files when building the model — both during emanote gen and in the live server.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Callouts' />
+      <meta property='og:title' content='.emanoteignore' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -597,15 +597,6 @@
               </svg>
             </li>
           
-            <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='markdown'>
-                Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-              </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
-                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
-              </svg>
-            </li>
-          
         
       </ul>
     </div>
@@ -649,7 +640,7 @@
      the page identity but at low intensity, so the prose below isn't
      out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
   <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-    Callouts
+    <code>.emanoteignore</code>
   </h1>
 </header>
 
@@ -820,10 +811,6 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-    
-      
-    
-  
 
 
 
@@ -839,135 +826,27 @@
     <span class='flex-shrink-0'>
       
         
+          <a href='markdown' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='6 9 12 15 18 9'></polyline>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
-      
+    
   
-        
+          </a>
+          
+      
     </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown' data-iso-date>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Markdown ✍️' href='markdown' data-iso-date>
       Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
     </a>
     
       
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='5 children inside'>
+          5
+        </span>
       
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-  
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-    </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Callouts' href='callout' data-iso-date>
-      Callouts
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
-      
-    </div>
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Custom CSS styling' href='custom-style' data-iso-date>
-      Custom CSS styling
-    </a>
-    
-      
-        
     
   </div>
 
@@ -983,188 +862,6 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Cyclic embed demo' href='cyclic-embed-demo' data-iso-date>
-      Cyclic embed demo
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Embedding' href='embed' data-iso-date>
-      Embedding
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='File WikiLinks' href='file-links' data-iso-date>
-      File WikiLinks
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-    </div>
   
 </div>
 
@@ -1956,7 +1653,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-
+  
 
 
   <!-- Leaf node marker: a tiny dot centered in the toggle column.
@@ -1974,21 +1671,17 @@
     <span class='flex-shrink-0'>
       
         
-          
     <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
       <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
     </span>
   
         
-      
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='.emanoteignore' href='emanoteignore' data-iso-date>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='.emanoteignore' href='emanoteignore' data-iso-date>
       <code>.emanoteignore</code>
     </a>
     
       
-        
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -2003,6 +1696,10 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
+  
+    <div class='emanote-tree-children'>
+      
+    </div>
   
 </div>
 
@@ -2162,309 +1859,14 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote supports <a href='https://help.obsidian.md/Editing+and+formatting/Callouts' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Obsidian-style callouts</a>.<sup data-footnote-ref='1' role='button' tabindex='0' aria-label='Footnote 1' class='footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none'>1</sup>
+      Drop a file named <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> at the <strong>top of any notebook layer</strong> and Emanote will skip the matching files when building the model — both during <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote gen</code> and in the live server.
     </p>
   
-    <h2 id='demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+    <h2 id='file-format' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  Demo
+  File format
   
-  <a href='callout.html#demo' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='note' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <line x1='18' y1='2' x2='22' y2='6'></line>
-    <path d='M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z'></path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Note
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      This is a note callout
-    </p>
-  
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='info' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <circle cx='12' cy='12' r='10'></circle>
-    <line x1='12' y1='16' x2='12' y2='12'></line>
-    <line x1='12' y1='8' x2='12.01' y2='8'></line>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Info
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      This is an info callout
-    </p>
-  
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='tip' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-    </path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-         Callouts can have <em>custom</em> titles
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Like this one.
-    </p>
-  
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='warning' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #EC7500 8%, transparent); border-left-color: #EC7500'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
-    <line x1='12' y1='9' x2='12' y2='13'></line>
-    <line x1='12' y1='17' x2='12.01' y2='17'></line>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Warning
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='failure' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #E93147 8%, transparent); border-left-color: #E93147'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #E93147'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <line x1='18' y1='6' x2='6' y2='18'></line>
-    <line x1='6' y1='6' x2='18' y2='18'></line>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Failure
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='quote' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #9E9E9E 8%, transparent); border-left-color: #9E9E9E'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #9E9E9E'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'>
-    </path>
-    <path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'>
-    </path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Quote
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit <em>amet</em>, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='quote' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #9E9E9E 8%, transparent); border-left-color: #9E9E9E'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #9E9E9E'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'>
-    </path>
-    <path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z'>
-    </path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-         Richard <a href='https://www.actualfreedom.com.au/library/topics/pce.htm' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>said</a>,
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      A <strong>PCE</strong> is when one’s sense of <em>identity</em> temporarily vacates the throne and apperception occurs. <a href='https://www.actualfreedom.com.au/sundry/frequentquestions/FAQ38.htm' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Apperception</a> is the mind’s perception of itself … it is a pure awareness.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <p class='mb-4 leading-relaxed'>
-      Callouts also work with <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a> syntax.
-    </p>
-  
-    <h2 id='fold' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Foldable callouts
-  
-  <a href='callout.html#fold' class='--ema-anchor ml-2'>
+  <a href='emanoteignore.html#file-format' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2475,115 +1877,33 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Append <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>+</code> or <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-</code> to the type to make a callout foldable. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>+</code> starts expanded; <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-</code> starts collapsed. Internally these render as <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;details&gt;</code>/<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;summary&gt;</code>, so folding works without JavaScript.
+      One <a href='https://hackage.haskell.org/package/filepattern' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FilePattern</code></a> per line. Blank lines and lines whose first non-whitespace character is <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>#</code> are ignored.
     </p>
-  
+  <div class='mb-6 text-sm'><pre><code class='text'># Auxiliary template directory you don't want rendered
+templates/**
 
+# Daily journal — kept private
+journal/**
 
-
-
-
-
-  <details open data-callout-metadata data-callout-fold='expanded' data-callout='tip' data-footnote-scope
- class='callout callout-foldable p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
-    <summary class='callout-title flex items-center font-semibold text-lg cursor-pointer select-none list-none' style='color: #08BFBC'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-    </path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3 flex-1'>
-         Foldable, initially expanded
-      </div>
-      
-  <div class='callout-fold-marker ml-auto flex-shrink-0' aria-hidden='true'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-4 h-4 transition-transform'>
-      <polyline points='6 9 12 15 18 9'></polyline>
-    </svg>
-  </div>
-
-    </summary>
-    <div class='mt-3'>
-      
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
+# Local node_modules from a remark/MDX setup
+node_modules/**</code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      Click the title to collapse this callout.
+      A <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>#</code> that appears mid-line is a literal character, not a comment marker.
     </p>
   
+    <blockquote class='py-3 px-6 mb-6 italic border-l-4 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 quote rounded-r-lg'>
+      
     <p class='mb-4 leading-relaxed'>
-      Lorem <strong>ipsum</strong> dolor sit amet, consectetur adipiscing elit.
+      <strong>Note</strong>: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> uses <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FilePattern</code> syntax (the same library Emanote already uses internally). It is <strong>not</strong> <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.gitignore</code> syntax — there is no negation (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>!</code>), no directory-only marker (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>foo/</code>), and patterns are matched against paths relative to the layer root.
     </p>
   
-  </div>
-
-    </div>
-  </details>
-
-
-
-
-
-
-
-
-
-
-
-
-  <details data-callout-metadata data-callout-fold='collapsed' data-callout='warning' data-footnote-scope
- class='callout callout-foldable p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #EC7500 8%, transparent); border-left-color: #EC7500'>
-    <summary class='callout-title flex items-center font-semibold text-lg cursor-pointer select-none list-none' style='color: #EC7500'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
-    <line x1='12' y1='9' x2='12' y2='13'></line>
-    <line x1='12' y1='17' x2='12.01' y2='17'></line>
+    </blockquote>
   
-    </svg>
-  </div>
-
-      <div class='ml-3 flex-1'>
-         Foldable, initially collapsed
-      </div>
+    <h2 id='layer-scoped-semantics' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  <div class='callout-fold-marker ml-auto flex-shrink-0' aria-hidden='true'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-4 h-4 transition-transform'>
-      <polyline points='6 9 12 15 18 9'></polyline>
-    </svg>
-  </div>
-
-    </summary>
-    <div class='mt-3'>
-      
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Click the title to expand this callout.
-    </p>
+  Layer-scoped semantics
   
-    <p class='mb-4 leading-relaxed'>
-      Hidden by default — useful for spoilers, long asides, or supplementary detail.
-    </p>
-  
-  </div>
-
-    </div>
-  </details>
-
-
-    <h2 id='nested' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Nested callouts
-  
-  <a href='callout.html#nested' class='--ema-anchor ml-2'>
+  <a href='emanoteignore.html#layer-scoped-semantics' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2594,92 +1914,32 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Callouts can be nested by indenting the inner blockquote with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&gt; &gt;</code>:
+      Patterns in a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> only suppress files inside the layer they live in. If you mount two layers <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-L public -L private</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>private/.emanoteignore</code> lists <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>secret.md</code>, a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>secret.md</code> file inside <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>public/</code> is <strong>unaffected</strong>. This means individual sub-notebooks can keep private exclusions without leaking those decisions to siblings.
     </p>
   
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='note' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <line x1='18' y1='2' x2='22' y2='6'></line>
-    <path d='M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z'></path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-         Outer note
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
     <p class='mb-4 leading-relaxed'>
-      The outer body sits before the nested callout.
+      Universal ignores (dotfile directories, editor backup files, the reserved <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-/</code> directory, the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> file itself) are still enforced globally — those don’t need to be repeated per layer.
     </p>
   
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='tip' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
+    <h2 id='common-patterns' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+  Common patterns
+  
+  <a href='emanoteignore.html#common-patterns' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Use case</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Pattern</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Daily journal subtree</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>journal/**</code> or <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Daily/**</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>node_modules/</code> from a remark setup</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>node_modules/**</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>A single bot/agent doc</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>AGENTS.md</code></td></tr></tbody></table>
+    <h2 id='when-to-use-the-alternative' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-    </path>
+  When to use the alternative
   
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-         A nested tip
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      Inner content. Nesting works to any depth.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <p class='mb-4 leading-relaxed'>
-      Content after the nested callout continues here.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <h2 id='custom' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Custom callouts
-  
-  <a href='callout.html#custom' class='--ema-anchor ml-2'>
+  <a href='emanoteignore.html#when-to-use-the-alternative' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2690,25 +1950,12 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      To add a new custom callout named <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>foo</code> (viz.: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>[!foo] ...</code>), create a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>/templates/filters/callout/foo.tpl</code> file in your <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>templates</a> folder. You can also change the layout and styling of existing callout types in <a href='https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>/templates/filters/callout/*.tpl</code></a>.
+      If you want files visible in your <strong>live server</strong> but excluded from the <strong>published</strong> site, the layer split that <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>srid</code> describes in <a href='https://github.com/srid/emanote/issues/228' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><span class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm emanote:inline-tag:228' title='Tag' data-tag='228'>#228</span></a> — <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote -L ./permanent gen ...</code> for the public build, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote -L .</code> for the live server — gives you finer control than a single <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> can. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.emanoteignore</code> is the right tool when you want the file gone from <strong>every</strong> mode.
     </p>
-  
-    <!-- Screen: hidden (popup is the UI). Print: revealed with standard
-         footnote-list styling so printed output includes the cited bodies. -->
-    <aside data-footnote-list aria-hidden='true' class='hidden print:block mt-10 text-sm'>
-      <header class='text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2'>Footnotes</header>
-      <ol class='list-decimal pl-6 space-y-2'>
-        
-          <li data-footnote-id='1'>
-            Not all of Obsidian spec may yet be supported. See <a href='https://github.com/srid/emanote/issues/465' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/465</a> for details.
-          </li>
-        
-      </ol>
-    </aside>
   
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown/callout.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/emanoteignore.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2716,6 +1963,21 @@
 </div>
 </article>
     
+  <!-- Metadata tag chips at the page footer. Same primary palette as
+       the in-prose `emanote:inline-tag` rewriteClass and the wikilink
+       chips, kept in font-mono since the tag string IS an identifier
+       (slashed paths read better in mono). Drop the older gray-100
+       pill chrome that pre-dated the chip language. -->
+  <section class='flex flex-wrap items-end justify-center mt-8 mb-4 gap-x-2 gap-y-1.5 font-mono text-sm'>
+    
+      <a title='Tag' class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='-/tags/228'>
+        <!-- DoNotFormat -->
+        #228
+        <!-- DoNotFormat -->
+      </a>
+    
+  </section>
+
 
     <!-- What goes in this file will at the very end of the main div -->
   </main>
@@ -2747,9 +2009,9 @@
     
         <ul class='space-y-1 ml-2'>
           
-            <li class='truncate' title='Demo'>
-              <a href='callout.html#demo' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Demo
+            <li class='truncate' title='File format'>
+              <a href='emanoteignore.html#file-format' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                File format
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2758,9 +2020,9 @@
       
             </li>
           
-            <li class='truncate' title='Foldable callouts'>
-              <a href='callout.html#fold' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Foldable callouts
+            <li class='truncate' title='Layer-scoped semantics'>
+              <a href='emanoteignore.html#layer-scoped-semantics' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Layer-scoped semantics
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2769,9 +2031,9 @@
       
             </li>
           
-            <li class='truncate' title='Nested callouts'>
-              <a href='callout.html#nested' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Nested callouts
+            <li class='truncate' title='Common patterns'>
+              <a href='emanoteignore.html#common-patterns' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Common patterns
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2780,9 +2042,9 @@
       
             </li>
           
-            <li class='truncate' title='Custom callouts'>
-              <a href='callout.html#custom' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Custom callouts
+            <li class='truncate' title='When to use the alternative'>
+              <a href='emanoteignore.html#when-to-use-the-alternative' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                When to use the alternative
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2816,83 +2078,6 @@
      Tailwind's `hover:` variant is automatically gated on (hover: hover),
      so on touch devices the flyout never triggers — touch users see the
      labelled titles only and follow the link to read more. -->
-  <section id='backlinks-margin' class='text-sm text-gray-700 dark:text-gray-300'>
-    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
-      Linked from
-    </h3>
-    <ul class='space-y-1'>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='obsidian'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Obsidian
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>If you use Obsidian’s Daily Notes plugin, Emanote can render those date-prefixed notes as <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>daily notes</a> with timeline backlinks. Emanote also supports other Obsidian-inspired Markdown features, including <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>callouts</a> and <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>embeds</a>.</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='markdown'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>See <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Callouts</a> for details.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Without the blank lines, the <code>&lt;details&gt;...&lt;/details&gt;</code> is treated as one opaque HTML block — markdown inside is not parsed. <em>For an Emanote-native foldable variant that doesn’t require raw HTML at all, see the <code>+</code> / <code>-</code> callout suffix in <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Callouts</a>.</em></p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-    </ul>
-  </section>
-
 
     </div>
   </aside>
@@ -2915,70 +2100,6 @@
      e2e selectors and JS context detection target the right scope
      instead of conflating timeline anchors with backlink anchors. --><aside class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
   
-  
-    <section id='backlinks-bottom'>
-      <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
-        Linked from
-      </h3>
-      <!-- divide-y between rows + a left-rule on the context block
-           anchor each backlink + its context together as one unit, so
-           the list stops reading as undifferentiated prose. -->
-      <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='obsidian'>
-              Obsidian
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>If you use Obsidian’s Daily Notes plugin, Emanote can render those date-prefixed notes as <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>daily notes</a> with timeline backlinks. Emanote also supports other Obsidian-inspired Markdown features, including <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>callouts</a> and <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>embeds</a>.</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='markdown'>
-              Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>See <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Callouts</a> for details.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Without the blank lines, the <code>&lt;details&gt;...&lt;/details&gt;</code> is treated as one opaque HTML block — markdown inside is not parsed. <em>For an Emanote-native foldable variant that doesn’t require raw HTML at all, see the <code>+</code> / <code>-</code> callout suffix in <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Callouts</a>.</em></p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-      </ul>
-    </section>
   
 </aside>
 
