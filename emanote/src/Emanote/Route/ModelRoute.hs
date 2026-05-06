@@ -26,7 +26,7 @@ module Emanote.Route.ModelRoute (
 ) where
 
 import Data.Aeson.Types (ToJSON)
-import Emanote.Route.Ext (FileType (AnyExt, Folder, Html, LMLType, Xml), HasExt, LML (Md, Org))
+import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType, Xml), HasExt, LML (Md, Org))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
@@ -123,8 +123,13 @@ mkModelRouteCandidates fp =
 mkExtensionlessLMLRouteCandidates :: FilePath -> [ModelRoute]
 mkExtensionlessLMLRouteCandidates fp = do
   guard $ null $ FP.takeExtension fp
-  folderR <- maybeToList $ R.mkRouteFromFilePath @_ @'Folder fp
-  ModelRoute_LML LMLView_Html <$> possibleLmlRoutes folderR
+  lmlType <- [Md, Org]
+  lmlR <- maybeToList $ mkLMLRouteFromKnownFilePath lmlType (FP.addExtension fp $ lmlExt lmlType)
+  pure $ ModelRoute_LML LMLView_Html lmlR
+  where
+    lmlExt = \case
+      Md -> ".md"
+      Org -> ".org"
 
 -- | Encode a `ModelRoute` to its on-the-wire URL filepath.
 encodeModelRoute :: ModelRoute -> FilePath

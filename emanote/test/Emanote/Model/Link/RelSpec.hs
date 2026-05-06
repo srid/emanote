@@ -76,6 +76,17 @@ spec = do
                        ]
                 )
       got === want
+    it "uses LML folder-note canonicalization for trailing index targets" . hedgehog $ do
+      let got = fst <$> parseUnresolvedRelTarget Nothing [] "guide/index"
+          want =
+            Just
+              $ URTResource
+                ( ModelRoute_LML LMLView_Html (LMLRoute_Md $ R ("guide" :| []))
+                    :| [ ModelRoute_LML LMLView_Html (LMLRoute_Org $ R ("guide" :| []))
+                       , ModelRoute_StaticFile $ R ("guide" :| ["index"])
+                       ]
+                )
+      got === want
   describe "noteRels source order (issue #186)" $ do
     it "orders rels by source position, not by lexicographic Ord on context" $ do
       -- 'Z' sorts last lexicographically but comes first in source; 'A'
