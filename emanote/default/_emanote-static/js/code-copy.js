@@ -1,9 +1,9 @@
 // Copy-to-clipboard button injected into every <pre> with a child <code>.
-// Uses morph.onElement so blocks added by Ema's live-server patches get
-// buttons too — the prior inline IIFE only wired buttons present at
-// DOMContentLoaded.
+// Uses morph.onElement for newly-added blocks and morph.onMorph for Ema
+// route changes that preserve the <pre>/<code> node while removing the
+// injected sibling button from the DOM.
 
-import { onElement } from '@emanote/morph';
+import { onElement, onMorph } from '@emanote/morph';
 import { text } from '@emanote/i18n';
 
 const COPY_ICON =
@@ -11,30 +11,63 @@ const COPY_ICON =
 const CHECK_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
 
-onElement('pre > code', (codeBlock) => {
-  const pre = codeBlock.parentElement;
-  const button = document.createElement('button');
-  button.className = 'code-copy-button';
-  button.innerHTML = COPY_ICON;
-  button.setAttribute('aria-label', text('copyCodeToClipboard', 'Copy code to clipboard'));
-  button.setAttribute('title', text('copyCode', 'Copy code'));
-
-  button.addEventListener('click', () => {
-    navigator.clipboard.writeText(codeBlock.textContent).then(
-      () => flash(button, CHECK_ICON, text('copied', 'Copied!')),
-      (err) => {
-        console.error('Copy failed:', err);
-        flash(button, COPY_ICON, text('copyFailed', 'Copy failed'));
-      },
-    );
-  });
-
-  pre.appendChild(button);
-});
-
 // WeakMap keeps the per-button reset timer out of the DOM node itself —
 // no expando, no name-collision risk with other code touching the button.
 const flashTimers = new WeakMap();
+
+function scanCodeBlocks() {
+  document.querySelectorAll('pre').forEach(ensureCopyButton);
+}
+
+function scanCodeBlocksAfterMorph() {
+  scanCodeBlocks();
+  requestAnimationFrame(scanCodeBlocks);
+}
+
+function ensureCopyButton(pre) {
+  if (!codeBlockFor(pre)) return;
+
+  const buttons = pre.querySelectorAll(':scope > .code-copy-button');
+  const button = buttons[0] || document.createElement('button');
+  buttons.forEach((extra, index) => {
+    if (index > 0) extra.remove();
+  });
+
+  button.type = 'button';
+  button.className = 'code-copy-button';
+  resetButton(button);
+
+  if (!button.dataset.emanoteCopyButtonWired) {
+    button.dataset.emanoteCopyButtonWired = '1';
+    button.addEventListener('click', () => {
+      const codeBlock = codeBlockFor(pre);
+      navigator.clipboard.writeText(codeBlock?.textContent || '').then(
+        () => flash(button, CHECK_ICON, text('copied', 'Copied!')),
+        (err) => {
+          console.error('Copy failed:', err);
+          flash(button, COPY_ICON, text('copyFailed', 'Copy failed'));
+        },
+      );
+    });
+  }
+
+  if (!button.parentElement) {
+    pre.appendChild(button);
+  }
+}
+
+function codeBlockFor(pre) {
+  return pre.querySelector(':scope > code');
+}
+
+function resetButton(button) {
+  const pending = flashTimers.get(button);
+  if (pending) clearTimeout(pending);
+  button.innerHTML = COPY_ICON;
+  button.setAttribute('aria-label', text('copyCodeToClipboard', 'Copy code to clipboard'));
+  button.setAttribute('title', text('copyCode', 'Copy code'));
+  flashTimers.delete(button);
+}
 
 function flash(button, icon, title) {
   // Cancel any pending reset on this same button — otherwise a click
@@ -51,3 +84,6 @@ function flash(button, icon, title) {
     flashTimers.delete(button);
   }, 2000));
 }
+
+onElement('pre', ensureCopyButton);
+onMorph(scanCodeBlocksAfterMorph);

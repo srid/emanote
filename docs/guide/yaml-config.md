@@ -49,8 +49,8 @@ template:
       home: Accueil
 ```
 
-See [[i18n.en|the English demo]] and [[i18n.fr|the French demo]] for a
-side-by-side example of `page.lang` selecting the default template chrome.
+See [[i18n|the internationalisation demo]] and its [[i18n/i18n.fr|French child page]]
+for a side-by-side example of `page.lang` selecting the default template chrome.
 
 ## Examples
 

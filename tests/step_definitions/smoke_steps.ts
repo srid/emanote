@@ -558,6 +558,33 @@ Then(
 );
 
 Then(
+  "the first code copy button becomes visible when I hover its code block",
+  async function (this: EmanoteWorld) {
+    const pre = this.page.locator("pre:has(> code)").first();
+    const button = pre.locator("> .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+
+    const opacityBefore = await button.evaluate((el) =>
+      getComputedStyle(el).opacity,
+    );
+    assert.strictEqual(
+      opacityBefore,
+      "0",
+      `Expected the code copy button to start hidden before hover; got opacity ${opacityBefore}.`,
+    );
+
+    await pre.hover();
+    const buttonHandle = await button.elementHandle();
+    assert.ok(buttonHandle, "Copy button detached before hover opacity check.");
+    await this.page.waitForFunction(
+      (el) => Number(getComputedStyle(el).opacity) > 0.9,
+      buttonHandle,
+      { timeout: 5_000 },
+    );
+  },
+);
+
+Then(
   "the document language is {string}",
   async function (this: EmanoteWorld, expected: string) {
     const lang = await this.page.locator("html").getAttribute("lang");

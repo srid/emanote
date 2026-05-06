@@ -103,6 +103,13 @@ Feature: Smoke
   Scenario: Every fenced code block gets a copy button at first paint
     When I open "/code.html"
     Then every <pre> with a child <code> has a .code-copy-button
+    And the first code copy button becomes visible when I hover its code block
+
+  @morph
+  Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
+    When I open "/i18n.fr"
+    And I navigate via Ema to "/i18n"
+    Then the first code copy button becomes visible when I hover its code block
 
   Scenario: page.lang localizes default UI chrome
     When I open "/i18n-fr.html"
