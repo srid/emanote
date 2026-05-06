@@ -21,6 +21,7 @@ import Emanote.Prelude (
   log,
   logD,
   logE,
+  logW,
  )
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
@@ -227,9 +228,12 @@ reparseOrDropNote ::
   m (ModelEma -> ModelEma)
 reparseOrDropNote layers noteF scriptingEngine model depRoute =
   case N.lookupNotesByRoute depRoute (model ^. modelNotes) of
-    Nothing ->
+    Nothing -> do
       -- Note disappeared between dependency-edge creation and now;
-      -- drop the stale edge.
+      -- drop the stale edge. This is a structurally unexpected state
+      -- (a normal note delete would have cleaned the edge via
+      -- 'modelDeleteNote'), so warn rather than silently recover.
+      logW $ "Stale lua dependency for missing note " <> show depRoute <> "; dropping edge"
       pure (modelSourceDependencies %~ SDeps.removeNote depRoute)
     Just oldNote ->
       case oldNote ^. N.noteSource of
