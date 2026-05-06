@@ -34,7 +34,7 @@ import System.FilePath ((</>))
 import System.UnionMount qualified as UM
 import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
-import UnliftIO.Directory (doesDirectoryExist)
+import UnliftIO.Directory (doesDirectoryExist, doesFileExist)
 
 -- | Map a filesystem change to the corresponding model change.
 patchModel ::
@@ -243,10 +243,23 @@ reparseOrDropNote layers noteF scriptingEngine model depRoute =
           pure id
         Just src@(_, srcFp) -> do
           let srcAbs = locResolve src
-          s <- readRefreshedFile UM.Update srcAbs
-          note <- N.parseNote scriptingEngine (userLayersToSearch layers) depRoute src (decodeUtf8 s)
-          logD $ "Re-parsed " <> toText srcFp <> " after lua filter change"
-          pure $ M.modelInsertNote $ noteF note
+          -- A batch can contain both a '.lua' change and a '.md'
+          -- deletion on the dependent note (within unionmount's debounce
+          -- window). The pre-batch model snapshot still has the note,
+          -- so we'd otherwise blindly re-read a now-missing file and
+          -- propagate an IOException up to unionmount's
+          -- 'interceptExceptions' — losing the entire batch's
+          -- transformer with it. Guard the read and drop the stale edge
+          -- if the source has already disappeared.
+          doesFileExist srcAbs >>= \case
+            False -> do
+              logW $ "Lua dep target " <> toText srcFp <> " is gone; dropping edge for " <> show depRoute
+              pure (modelSourceDependencies %~ SDeps.removeNote depRoute)
+            True -> do
+              s <- readRefreshedFile UM.Update srcAbs
+              note <- N.parseNote scriptingEngine (userLayersToSearch layers) depRoute src (decodeUtf8 s)
+              logD $ "Re-parsed " <> toText srcFp <> " after lua filter change"
+              pure $ M.modelInsertNote $ noteF note
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =
