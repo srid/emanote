@@ -4,7 +4,7 @@
 --- but adapted for Emanote's live-server pipeline: the upstream filter
 --- prints to stdout and calls `os.exit(0)`, both of which would corrupt or
 --- terminate `emanote run`. This version walks the body, counts, and
---- appends a styled footer block to the rendered document instead.
+--- appends a small styled footer block to the rendered document instead.
 ---
 --- FORMAT-agnostic: produces the same output regardless of the writer.
 
@@ -42,16 +42,58 @@ local count = {
   end,
 }
 
+local css = [[
+<style>
+.wordcount-footer {
+  margin-top: 3rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.8125rem;
+  color: var(--text-muted-color, #71717a);
+}
+.wordcount-footer dl {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+}
+.wordcount-footer div { display: flex; gap: 0.375rem; align-items: baseline; }
+.wordcount-footer dt { font-variant: small-caps; letter-spacing: 0.04em; }
+.wordcount-footer dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--text-color, #18181b);
+}
+@media (prefers-color-scheme: dark) {
+  .wordcount-footer { border-color: var(--border-color, #27272a); }
+  .wordcount-footer dd { color: var(--text-color, #fafafa); }
+}
+</style>
+]]
+
+local function dlEntry(label, value)
+  return string.format(
+    "<div><dt>%s</dt><dd>%d</dd></div>",
+    label, value
+  )
+end
+
 function Pandoc(doc)
   pandoc.walk_block(pandoc.Div(doc.blocks), count)
-  local summary = string.format(
-    "%d words · %d characters · %d characters (with spaces)",
-    words, characters, characters_and_spaces
-  )
+  local html = table.concat({
+    "<dl>",
+    dlEntry("words", words),
+    dlEntry("chars", characters),
+    dlEntry("chars + spaces", characters_and_spaces),
+    "</dl>",
+  })
   local footer = pandoc.Div(
-    { pandoc.Para({ pandoc.Emph(pandoc.Str(summary)) }) },
+    { pandoc.RawBlock("html", html) },
     pandoc.Attr("", { "wordcount-footer" }, {})
   )
+  table.insert(doc.blocks, pandoc.RawBlock("html", css))
   table.insert(doc.blocks, footer)
   return doc
 end

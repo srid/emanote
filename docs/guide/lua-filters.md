@@ -9,11 +9,6 @@ pandoc:
 
 # Pandoc Lua Filters
 
-**WARNING**: This is an ==🧪 experimental 🧪== feature and may change in future. It is being made available so users can try it out and give feedback to the author.
-
-> [!tip] Progress
-> See https://github.com/srid/emanote/issues/263
-
 To enable a [Pandoc Lua filter](https://pandoc.org/lua-filters.html) for a particular Markdown file, put that filter in your notebook and add the following to the Markdown file's YAML frontmatter:
 
 ```yaml
@@ -36,7 +31,7 @@ Three filters live under [`docs/filters/`](https://github.com/srid/emanote/tree/
 
 - [`list-table.lua`](https://github.com/srid/emanote/blob/master/docs/filters/list-table.lua) — turn nested bullet lists into HTML tables. From [pandoc/lua-filters](https://github.com/pandoc/lua-filters/tree/master/list-table).
 - [`wordcount.lua`](https://github.com/srid/emanote/blob/master/docs/filters/wordcount.lua) — append a `N words · M characters` footer to the document. Adapted from [pandoc/lua-filters](https://github.com/pandoc/lua-filters/tree/master/wordcount); upstream calls `os.exit(0)`, which would terminate the live server, so this fork sets the count as a footer block instead.
-- [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) — custom: turn a `:::slides` div into a navigable Markdown presentation, used by [[lua-filters-slides]].
+- [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) — custom: turn a `:::slides` div into a navigable Markdown presentation, used by [[lua-filters/slides]].
 
 ### `list-table.lua`
 
@@ -60,4 +55,4 @@ The footer at the bottom of this page is emitted by `wordcount.lua` — every sa
 
 ### `slides.lua`
 
-See [[lua-filters-slides]] for a full Markdown presentation _about_ Lua filters, rendered by `slides.lua`.
+See [[lua-filters/slides]] for a full Markdown presentation _about_ Lua filters, rendered by `slides.lua`.

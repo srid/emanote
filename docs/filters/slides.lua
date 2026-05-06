@@ -66,6 +66,11 @@ local css = [[
   text-decoration: none;
 }
 .emanote-slides-nav a:hover { border-color: currentColor; }
+.emanote-slides-nav a.active {
+  background: var(--primary-color, #2563eb);
+  border-color: var(--primary-color, #2563eb);
+  color: #fff;
+}
 .emanote-slides-track {
   display: flex;
   overflow-x: auto;
@@ -101,14 +106,23 @@ local css = [[
 local js = [[
 <script>
 (() => {
+  // Anchor-link defaults won't scroll the horizontal track — they'd
+  // scroll the page vertically — so the nav is wired by hand:
+  // scrollIntoView({inline:'start'}) on the targeted slide. Same path
+  // is reused for keyboard nav and for restoring deep-links on load.
   for (const deck of document.querySelectorAll('.emanote-slides')) {
     const track = deck.querySelector('.emanote-slides-track');
     const slides = [...deck.querySelectorAll('.emanote-slide')];
     if (!track || slides.length === 0) continue;
     deck.tabIndex = 0;
-    const go = (i) => {
+    const indexOf = (id) => slides.findIndex(s => s.id === id);
+    const go = (i, smooth = true) => {
       const j = Math.max(0, Math.min(slides.length - 1, i));
-      slides[j].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      slides[j].scrollIntoView({
+        behavior: smooth ? 'smooth' : 'instant',
+        inline: 'start',
+        block: 'nearest',
+      });
       history.replaceState(null, '', '#' + slides[j].id);
     };
     const current = () => {
@@ -120,12 +134,44 @@ local js = [[
       });
       return best;
     };
+    const navLinks = [...deck.querySelectorAll('.emanote-slides-nav a')];
+    const setActive = (id) => {
+      for (const a of navLinks) {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      }
+    };
+    navLinks.forEach(a => {
+      a.addEventListener('click', (e) => {
+        const href = a.getAttribute('href') || '';
+        if (!href.startsWith('#')) return;
+        const i = indexOf(href.slice(1));
+        if (i < 0) return;
+        e.preventDefault();
+        go(i);
+      });
+    });
+    if (slides[0]) setActive(slides[0].id);
+    const observer = new IntersectionObserver((entries) => {
+      let best = null, bestRatio = 0;
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+          best = entry.target;
+          bestRatio = entry.intersectionRatio;
+        }
+      }
+      if (best) setActive(best.id);
+    }, { root: track, threshold: [0.5, 0.75, 1] });
+    slides.forEach(s => observer.observe(s));
     deck.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(current() + 1); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current() - 1); }
       else if (e.key === 'Home') { e.preventDefault(); go(0); }
       else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
     });
+    if (location.hash) {
+      const i = indexOf(location.hash.slice(1));
+      if (i >= 0) requestAnimationFrame(() => go(i, false));
+    }
   }
 })();
 </script>

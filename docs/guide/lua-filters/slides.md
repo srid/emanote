@@ -1,6 +1,6 @@
 ---
-slug: lua-filters-slides
-short-title: Lua Filters · Slides Demo
+slug: lua-filters/slides
+short-title: Slides demo
 pandoc:
   filters:
     - filters/slides.lua
