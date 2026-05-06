@@ -18,9 +18,7 @@
 // Re-runs on @emanote/morph for live-server in-app navigation.
 
 import { ready, onMorph } from '@emanote/morph';
-import { MONTH_LABELS, formatCellHeader } from '@emanote/calendar-grid';
-
-const WEEKDAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+import { MONTH_LABELS, WEEKDAY_LABELS, formatCellHeader } from '@emanote/calendar-grid';
 
 const CALENDAR_CLASS = 'emanote-sidebar-calendar';
 const WRAPPER_CLASSES = CALENDAR_CLASS + ' my-1.5 px-2 py-2 rounded-md bg-gray-50 dark:bg-gray-900/50';

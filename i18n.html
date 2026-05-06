@@ -30,15 +30,16 @@
     })();
   </script>
   <title>
-    Daily Notes – Emanote
+    Internationalisation – Emanote
   </title>
   
     
-      <meta property='og:description' content='Emanote has special support for Obsidian style daily notes.' />
+      <meta property='og:description' content="A small English-language demo page showing how Emanote's default template
+chrome follows page.lang." />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Daily Notes' />
+      <meta property='og:title' content='Internationalisation' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -640,7 +641,7 @@
      the page identity but at low intensity, so the prose below isn't
      out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
   <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-    Daily Notes
+    Internationalisation
   </h1>
 </header>
 
@@ -992,7 +993,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-
+  
 
 
   <!-- Demoted toggle: light-gray chevron rather than a filled circle.
@@ -1007,27 +1008,76 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='i18n' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
-            
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='9 6 15 12 9 18'></polyline>
+        <polyline points='6 9 12 15 18 9'></polyline>
       </svg>
-    
-  
-          </a>
-          
       
+  
+        
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Internationalisation' href='i18n' data-iso-date>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Internationalisation' href='i18n' data-iso-date>
       Internationalisation
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='1 children inside'>
-          1
-        </span>
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+    <div class='emanote-tree-children'>
       
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Internationalisation en français' href='i18n.fr' data-iso-date>
+      Internationalisation en français
+    </a>
+    
+      
+        
     
   </div>
 
@@ -1043,6 +1093,11 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
+  
+</div>
+
+      
+    </div>
   
 </div>
 
@@ -1114,7 +1169,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-  
+
 
 
   <!-- Demoted toggle: light-gray chevron rather than a filled circle.
@@ -1129,76 +1184,27 @@
     <span class='flex-shrink-0'>
       
         
+          <a href='daily-notes' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='6 9 12 15 18 9'></polyline>
+        <polyline points='9 6 15 12 9 18'></polyline>
       </svg>
-      
+    
   
-        
+          </a>
+          
+      
     </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes' data-iso-date>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Daily Notes' href='daily-notes' data-iso-date>
       Daily Notes
     </a>
     
       
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
       
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='2025-03-14' href='guide/daily-notes/2025-03-14' data-iso-date='2025-03-14'>
-      2025-03-14
-    </a>
-    
-      
-        
     
   </div>
 
@@ -1214,70 +1220,6 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='2025-03-15' href='guide/daily-notes/2025-03-15' data-iso-date='2025-03-15'>
-      2025-03-15
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-    </div>
   
 </div>
 
@@ -1972,34 +1914,18 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote has special support for <a href='https://help.obsidian.md/plugins/daily-notes' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Obsidian style daily notes</a>.
+      This page explicitly sets <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.lang: en</code> in its <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>YAML configuration</a>. It demonstrates the default English <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>template</a> chrome used by Emanote.
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      If you create notes named <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>YYYY-MM-DD.md</code>, Emanote will treat them as daily notes. This has a couple of effects:
+      For the same note written in French, open <a href='i18n.fr' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the French child page</a>.
     </p>
   
-    <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
+    <h2 id='what-changes' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-        <li class='pl-1'>
-          The backlinks panel will render daily notes separate from regular notes. Daily notes render as a year-stacked <strong>timeline heatmap</strong> (see <a href='backlinks' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Backlinks</a>); regular notes render as a “Linked from” chip list.
-        </li>
-      
-        <li class='pl-1'>
-          Each daily note automatically gets a hierarchical tag (eg: <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>#calendar/2025/03</code>) allowing you to browse them by calendar navigation in the tag index.
-        </li>
-      
-        <li class='pl-1'>
-          Sidebar tree nodes whose immediate children are all daily notes of the same month (typically a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Daily/2026/04/</code> folder) render as a small <strong>7-column calendar grid</strong> in place of the linear list — each filled cell links to that day’s note, missing days are muted day numbers.
-        </li>
-      
-    </ol>
+  What changes
   
-    <h2 id='timeline-backlinks-demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Timeline backlinks demo
-  
-  <a href='daily-notes#timeline-backlinks-demo' class='--ema-anchor ml-2'>
+  <a href='i18n#what-changes' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2010,33 +1936,37 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      The sample notes below all link back to this page. Notes whose filenames begin with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>YYYY-MM-DD</code> show up in the timeline heatmap (in the <a href='right-panel' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Right panel</a> at <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lg:</code>+ widths, or the bottom strip at narrower widths), while the ordinary backlink from the <a href='obsidian' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Obsidian</a> note shows up in the “Linked from” chip list alongside it.
+      Emanote uses <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.lang</code> to choose the strings rendered by the default HTML templates. The footer, <a href='toc' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>table-of-contents</a> heading, <a href='search' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>search</a> placeholder, copy button labels, and built-in index pages all use the selected language.
     </p>
-  <nav class='mb-8'>
-  <header data-nosnippet class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2'>
-    Pages matching path './*'
-  </header>
-  <ul class='space-y-0.5'>
-    
-      <li class='flex items-baseline gap-2 px-2 py-1 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'>
-        <span class='text-gray-300 dark:text-gray-700 select-none shrink-0' aria-hidden='true'>→</span>
-        <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/daily-notes/2025-03-15'>
-          2025-03-15
-        </a>
-      </li>
-    
-      <li class='flex items-baseline gap-2 px-2 py-1 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'>
-        <span class='text-gray-300 dark:text-gray-700 select-none shrink-0' aria-hidden='true'>→</span>
-        <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/daily-notes/2025-03-14'>
-          2025-03-14
-        </a>
-      </li>
-    
-  </ul>
-</nav>
+  
+    <p class='mb-4 leading-relaxed'>
+      Most sites should set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>page.lang</code> once in their root <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>`index.yaml`</a>. Per-page language settings are useful for documentation demos like this one.
+    </p>
+  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>lang</span><span class='kw'>:</span><span class='at'> en</span>
+</code></pre></div>
+    <h2 id='copy-button' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Copy button
+  
+  <a href='i18n#copy-button' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      The code-copy button title on this block should be rendered in English.
+    </p>
+  <div class='mb-6 text-sm'><pre><code class='haskell'>main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'>"hello"</span>
+</code></pre></div>
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/daily-notes.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/i18n.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2064,10 +1994,46 @@
      clip it. We trade internal panel scrolling for working flyouts —
      fine for typical TOCs, and the page itself still scrolls. -->
 
-  
-    <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
-      <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
-        <!-- Daily-note backlinks rendered as a year-stacked heatmap.
+  <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
+    <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
+      <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
+     OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
+     pseudo-element. --><!-- TOC renders inside right-panel.tpl, which owns the sticky+scroll
+     containment for md+. We just emit the labelled list here. --><nav id='toc' class='leading-relaxed'>
+  <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
+    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
+    
+        <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='What changes'>
+              <a href='i18n#what-changes' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                What changes
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Copy button'>
+              <a href='i18n#copy-button' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Copy button
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+  </div>
+  <!-- Scroll-spy behavior moved to _emanote-static/js/toc-spy.js — see issue #643. -->
+</nav>
+
+      <!-- Daily-note backlinks rendered as a year-stacked heatmap.
      Two visible homes:
        - Right-panel (lg+): timeline as part of the side-material column.
        - Bottom strip (<lg): timeline attached to the bottom of the
@@ -2076,56 +2042,8 @@
      _emanote-static/js/timeline-heatmap.js can paint each independently
      via querySelectorAll. The hidden <ul.timeline-data> is the
      screen-reader / no-JS fallback. -->
-  <section class='emanote-timeline text-sm text-gray-700 dark:text-gray-300'>
-    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
-      Timeline
-    </h3>
-    <ul class='timeline-data' hidden>
-      
-        <li data-url='guide/daily-notes/2025-03-15' data-title='2025-03-15' data-iso-date='2025-03-15'>
-          
-            <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Another daily note can mention <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> from a different day, making the target page read like a lightweight activity stream.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li data-url='guide/daily-notes/2025-03-14' data-title='2025-03-14' data-iso-date='2025-03-14'>
-          
-            <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Captured a short thought about <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> while reviewing how dated notes become timeline backlinks.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-    </ul>
-    <div class='timeline-heatmap'></div>
-  </section>
 
-
-        <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
+      <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
      components/right-panel.tpl). Drops the card chrome of backlinks.tpl:
      just a labelled list of titles. The full context paragraph(s) ride
      along in the DOM but stay hidden until hover/focus, when a flyout
@@ -2141,8 +2059,8 @@
     <ul class='space-y-1'>
       
         <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='obsidian'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Obsidian
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='yaml-config'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>YAML configuration
           </a>
           <!-- Outer wrapper extends right up against the li (right:full)
                with pr-3 of padding so the inner card visually sits 0.75rem
@@ -2163,7 +2081,7 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>If you use Obsidian’s Daily Notes plugin, Emanote can render those date-prefixed notes as <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>daily notes</a> with timeline backlinks. Emanote also supports other Obsidian-inspired Markdown features, including <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>callouts</a> and <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>embeds</a>.</p></div>
+      <div><p>See <a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the internationalisation demo</a> and its <a href='i18n.fr' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>French child page</a> for a side-by-side example of <code>page.lang</code> selecting the default template chrome.</p></div>
     </div>
   
 </div>
@@ -2173,8 +2091,8 @@
         </li>
       
         <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='backlinks'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Backlinks
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='i18n.fr'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Internationalisation en français
           </a>
           <!-- Outer wrapper extends right up against the li (right:full)
                with pr-3 of padding so the inner card visually sits 0.75rem
@@ -2195,7 +2113,39 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>See <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> for how the daily/non-daily split feeds these two surfaces.</p></div>
+      <div><p>Pour la même note en anglais, ouvrez <a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>la démonstration anglaise</a>.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Guide
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><strong><a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Internationalisation</a></strong> — English and French pages using <code>page.lang</code></div>
     </div>
   
 </div>
@@ -2208,10 +2158,9 @@
   </section>
 
 
-      </div>
-    </aside>
+    </div>
+  </aside>
   
-
 
           </div>
           <!-- Side material attached to the bottom of the main card at <lg.
@@ -2230,65 +2179,6 @@
      e2e selectors and JS context detection target the right scope
      instead of conflating timeline anchors with backlink anchors. --><aside class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
   
-    <!-- Daily-note backlinks rendered as a year-stacked heatmap.
-     Two visible homes:
-       - Right-panel (lg+): timeline as part of the side-material column.
-       - Bottom strip (<lg): timeline attached to the bottom of the
-         card, alongside the regular backlinks fallback.
-     Classes (not IDs) so both instances are valid HTML and the JS in
-     _emanote-static/js/timeline-heatmap.js can paint each independently
-     via querySelectorAll. The hidden <ul.timeline-data> is the
-     screen-reader / no-JS fallback. -->
-  <section class='emanote-timeline text-sm text-gray-700 dark:text-gray-300'>
-    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
-      Timeline
-    </h3>
-    <ul class='timeline-data' hidden>
-      
-        <li data-url='guide/daily-notes/2025-03-15' data-title='2025-03-15' data-iso-date='2025-03-15'>
-          
-            <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Another daily note can mention <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> from a different day, making the target page read like a lightweight activity stream.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-        <li data-url='guide/daily-notes/2025-03-14' data-title='2025-03-14' data-iso-date='2025-03-14'>
-          
-            <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Captured a short thought about <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> while reviewing how dated notes become timeline backlinks.</p></div>
-    </div>
-  
-</div>
-          
-        </li>
-      
-    </ul>
-    <div class='timeline-heatmap'></div>
-  </section>
-
-
-  
   
     <section id='backlinks-bottom'>
       <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
@@ -2300,8 +2190,8 @@
       <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
         
           <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='obsidian'>
-              Obsidian
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='yaml-config'>
+              YAML configuration
             </a>
             <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
               
@@ -2315,7 +2205,7 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>If you use Obsidian’s Daily Notes plugin, Emanote can render those date-prefixed notes as <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>daily notes</a> with timeline backlinks. Emanote also supports other Obsidian-inspired Markdown features, including <a href='callout' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>callouts</a> and <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>embeds</a>.</p></div>
+      <div><p>See <a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the internationalisation demo</a> and its <a href='i18n.fr' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>French child page</a> for a side-by-side example of <code>page.lang</code> selecting the default template chrome.</p></div>
     </div>
   
 </div>
@@ -2324,8 +2214,8 @@
           </li>
         
           <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='backlinks'>
-              Backlinks
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='i18n.fr'>
+              Internationalisation en français
             </a>
             <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
               
@@ -2339,7 +2229,31 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>See <a href='daily-notes' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Daily Notes</a> for how the daily/non-daily split feeds these two surfaces.</p></div>
+      <div><p>Pour la même note en anglais, ouvrez <a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>la démonstration anglaise</a>.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide'>
+              Guide
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><strong><a href='i18n' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Internationalisation</a></strong> — English and French pages using <code>page.lang</code></div>
     </div>
   
 </div>
