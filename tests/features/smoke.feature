@@ -58,7 +58,7 @@ Feature: Smoke
 
   Scenario: Extensionless Markdown note links resolve as internal notes (issue #347)
     When I open "/"
-    Then the article link with text "nested guide note without extension" has href containing "guide/i18n"
+    Then the article link with text "nested note without extension" has href containing "subfolder/sibling"
     And the article link with text "folder note without extension" has href containing "subfolder"
 
   Scenario: Wiki link custom titles render HTML entities (regression: #441)
