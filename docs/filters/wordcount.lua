@@ -47,11 +47,11 @@ local css = [[
 .wordcount-footer {
   margin-top: 3rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-color, #e5e7eb);
+  border-top: 1px solid var(--color-gray-200);
   display: flex;
   justify-content: flex-end;
   font-size: 0.8125rem;
-  color: var(--text-muted-color, #71717a);
+  color: var(--color-gray-500);
 }
 .wordcount-footer dl {
   display: flex;
@@ -64,12 +64,10 @@ local css = [[
   margin: 0;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  color: var(--text-color, #18181b);
+  color: var(--color-gray-800);
 }
-@media (prefers-color-scheme: dark) {
-  .wordcount-footer { border-color: var(--border-color, #27272a); }
-  .wordcount-footer dd { color: var(--text-color, #fafafa); }
-}
+.dark .wordcount-footer { border-top-color: var(--color-gray-800); color: var(--color-gray-400); }
+.dark .wordcount-footer dd { color: var(--color-gray-100); }
 </style>
 ]]
 

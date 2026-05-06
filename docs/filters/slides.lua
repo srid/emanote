@@ -40,17 +40,17 @@ end
 local css = [[
 <style>
 .emanote-slides {
-  border: 1px solid var(--border-color, #d4d4d8);
+  border: 1px solid var(--color-gray-200);
   border-radius: 0.5rem;
   margin: 2rem 0;
-  background: var(--bg-color, #fafafa);
+  background: var(--color-gray-50);
 }
 .emanote-slides-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--border-color, #d4d4d8);
+  border-bottom: 1px solid var(--color-gray-200);
   font-size: 0.875rem;
 }
 .emanote-slides-nav a {
@@ -62,14 +62,22 @@ local css = [[
   padding: 0 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid transparent;
-  color: inherit;
+  color: var(--color-gray-700);
   text-decoration: none;
+  font-variant-numeric: tabular-nums;
 }
-.emanote-slides-nav a:hover { border-color: currentColor; }
+.emanote-slides-nav a:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-100);
+}
 .emanote-slides-nav a.active {
-  background: var(--primary-color, #2563eb);
-  border-color: var(--primary-color, #2563eb);
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
   color: #fff;
+}
+.emanote-slides-nav a.active:hover {
+  background: var(--color-primary-700);
+  border-color: var(--color-primary-700);
 }
 .emanote-slides-track {
   display: flex;
@@ -77,6 +85,7 @@ local css = [[
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   aspect-ratio: 16 / 9;
+  background: var(--color-gray-50);
 }
 .emanote-slide {
   flex: 0 0 100%;
@@ -87,19 +96,37 @@ local css = [[
   flex-direction: column;
   justify-content: center;
   overflow-y: auto;
+  color: var(--color-gray-900);
 }
 .emanote-slide > h2:first-child {
   margin-top: 0;
   font-size: 2rem;
+  color: var(--color-gray-900);
 }
 .emanote-slide :is(p, ul, ol, pre) { font-size: 1.125rem; }
-@media (prefers-color-scheme: dark) {
-  .emanote-slides {
-    background: var(--bg-color, #18181b);
-    border-color: var(--border-color, #27272a);
-  }
-  .emanote-slides-nav { border-color: var(--border-color, #27272a); }
+
+.dark .emanote-slides {
+  background: var(--color-gray-900);
+  border-color: var(--color-gray-800);
 }
+.dark .emanote-slides-nav { border-bottom-color: var(--color-gray-800); }
+.dark .emanote-slides-nav a { color: var(--color-gray-300); }
+.dark .emanote-slides-nav a:hover {
+  border-color: var(--color-gray-700);
+  background: var(--color-gray-800);
+}
+.dark .emanote-slides-nav a.active {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: var(--color-gray-950);
+}
+.dark .emanote-slides-nav a.active:hover {
+  background: var(--color-primary-400);
+  border-color: var(--color-primary-400);
+}
+.dark .emanote-slides-track { background: var(--color-gray-900); }
+.dark .emanote-slide,
+.dark .emanote-slide > h2:first-child { color: var(--color-gray-100); }
 </style>
 ]]
 
@@ -108,8 +135,12 @@ local js = [[
 (() => {
   // Anchor-link defaults won't scroll the horizontal track — they'd
   // scroll the page vertically — so the nav is wired by hand:
-  // scrollIntoView({inline:'start'}) on the targeted slide. Same path
-  // is reused for keyboard nav and for restoring deep-links on load.
+  // scrollIntoView({inline:'start'}) on the targeted slide. We
+  // deliberately do *not* touch history here: pushing/replacing the
+  // hash on every slide click clutters the back stack and interacts
+  // badly with the live-server's morph-DOM navigation (clicking back
+  // after leaving the deck can drop the page path). Deep-linking
+  // still works one-shot at load time via `location.hash`.
   for (const deck of document.querySelectorAll('.emanote-slides')) {
     const track = deck.querySelector('.emanote-slides-track');
     const slides = [...deck.querySelectorAll('.emanote-slide')];
@@ -123,7 +154,6 @@ local js = [[
         inline: 'start',
         block: 'nearest',
       });
-      history.replaceState(null, '', '#' + slides[j].id);
     };
     const current = () => {
       const x = track.scrollLeft + track.clientWidth / 2;
