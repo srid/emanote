@@ -186,7 +186,7 @@ renderLmlHtml model note = do
     "ema:note:url" ##
       HI.textSplice (SR.siteRouteUrl model . SR.lmlSiteRoute $ (R.LMLView_Html, r))
     "ema:note:html-url" ##
-      HI.textSplice (toText $ R.encodeRoute $ R.lmlToHtmlRoute r)
+      HI.textSplice (toText $ R.encodeRoute $ MN.noteHtmlRoute note)
     "emaNoteFeedUrl" ##
       pure
         . RX.renderHtmlNodes
