@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-05-03T22:12:15.454678+00:00'
-apm_version: 0.12.1
+generated_at: '2026-05-06T01:54:12.629575+00:00'
+apm_version: 0.12.2
 dependencies:
 - repo_url: anthropics/skills
   host: github.com
@@ -64,7 +64,9 @@ dependencies:
   content_hash: sha256:9b6be5d68deec70822327de7099ddce36c92918f618bf65becb621d7ca963d91
 local_deployed_files:
 - .agents/skills/dpella-mcp
+- .claude/rules/emanote-docs.md
 - .claude/rules/emanote.md
 - .claude/skills/dpella-mcp
 local_deployed_file_hashes:
-  .claude/rules/emanote.md: sha256:2c1e053fd639001f2fd12f8a21d0ff00568f2d21a26a51ef5d381600408813cc
+  .claude/rules/emanote-docs.md: sha256:e5d60e8cb4be27a0db561e9c3c233d421a58cd98f825f3c76a845d7a91be85f8
+  .claude/rules/emanote.md: sha256:d555a8211505067127b5198ae717b673c7bdd8d16c21b1c8c911163ab2a9d58f
