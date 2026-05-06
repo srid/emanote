@@ -1,0 +1,6 @@
+# Used by the e2e suite to verify .emanoteignore is honored end-to-end.
+# EMANOTEIGNORE_REGRESSION_SELF — if this string surfaces in the rendered
+# site, the universal `**/.emanoteignore` pattern was bypassed and the
+# ignore file was served as a static asset.
+secret-ignored.md
+private-dir/**

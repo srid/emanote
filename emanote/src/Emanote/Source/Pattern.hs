@@ -1,6 +1,7 @@
 module Emanote.Source.Pattern where
 
 import Emanote.Route qualified as R
+import Emanote.Source.Ignore (ignoreFilePattern)
 import Relude
 import System.FilePattern (FilePattern)
 
@@ -39,6 +40,10 @@ filePatterns =
         , R.AnyExt
         ]
 
+{- | Universal ignore patterns applied to every layer. Layer-specific
+ignores belong in a `.emanoteignore` file at the layer root — see
+"Emanote.Source.Ignore".
+-}
 ignorePatterns :: [FilePattern]
 ignorePatterns =
   [ -- Ignore all dotfile directories (eg: .git, .vscode)
@@ -47,11 +52,6 @@ ignorePatterns =
     "**/*~"
   , -- /Top-level ./-/ directory is reserved by Emanote
     "-/**"
-  , -- Special files that are not meant to be rendered
-    -- NOTE: We must hardcode this only because there is no user-controllable
-    -- `.emanoteignore` setting yet.{-# ANN annotation #-}
-    --
-    -- Any top-level Nix flake files
-    "flake.nix"
-  , "flake.lock"
+  , -- The ignore file itself is configuration, not a note or static asset.
+    ignoreFilePattern
   ]
