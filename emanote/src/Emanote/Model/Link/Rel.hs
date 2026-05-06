@@ -18,6 +18,7 @@ import Optics.Operators as Lens ((^.))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath (normalise, (</>))
+import System.FilePath qualified as FP
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.LinkContext qualified as LC
 
@@ -100,21 +101,31 @@ noteRels note =
         mkRel srcPos (target, ctx) = Rel (note ^. noteRoute) target srcPos ctx
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
-`ModelRoute`. The `URTResource` form is built from the canonical URL
-form of @r@ re-parsed via `mkModelRouteCandidates` so the candidate
-list matches what the parse path stored in the rel index — without
-that round-trip, a static-@.xml@ backlink lookup would search for
-@URTResource (one r)@ while parsed rels actually carry the joint
-@(feed-route :| [static])@ list and never match.
+`ModelRoute`. Each `URTResource` form is built by re-parsing a URL
+spelling through `mkModelRouteCandidates` so the candidate list matches
+what the parse path stored in the rel index — without that round-trip, a
+static-@.xml@ backlink lookup would search for @URTResource (one r)@
+while parsed rels actually carry the joint @(feed-route :| [static])@
+list and never match.
 -}
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
   let allowedWikiLinks = WL.allowedWikiLinks . R.unRoute
       wls = either (R.withLmlRoute allowedWikiLinks . snd) allowedWikiLinks $ R.modelRouteCase r
-      resourceURTs =
-        maybeToList
-          $ viaNonEmpty URTResource (R.mkModelRouteCandidates (R.encodeModelRoute r))
-   in (URTWikiLink <$> toList wls) <> resourceURTs
+   in (URTWikiLink <$> toList wls) <> resourceTargetsFor r
+
+resourceTargetsFor :: ModelRoute -> [UnresolvedRelTarget]
+resourceTargetsFor r =
+  resourceTargetFrom (R.encodeModelRoute r)
+    <> case r of
+      R.ModelRoute_LML R.LMLView_Html _ ->
+        resourceTargetFrom $ FP.dropExtension $ R.encodeModelRoute r
+      _ ->
+        []
+  where
+    resourceTargetFrom fp =
+      maybeToList
+        $ viaNonEmpty URTResource (R.mkModelRouteCandidates fp)
 
 {- | Parse a relative URL string for later resolution.
 
