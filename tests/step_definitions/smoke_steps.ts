@@ -726,6 +726,31 @@ Then(
 );
 
 Then(
+  "every Timeline data entry has an ISO date",
+  async function (this: EmanoteWorld) {
+    const entries = await this.page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll(".emanote-timeline .timeline-data li"),
+      ).map((li) => ({
+        title: (li as HTMLElement).dataset.title ?? "",
+        isoDate: (li as HTMLElement).dataset.isoDate ?? "",
+      })),
+    );
+    assert.ok(
+      entries.length > 0,
+      "Expected at least one hidden Timeline data entry in the fixture.",
+    );
+    for (const entry of entries) {
+      assert.match(
+        entry.isoDate,
+        /^\d{4}-\d{2}-\d{2}$/,
+        `Expected Timeline entry ${JSON.stringify(entry.title)} to carry data-iso-date from Haskell, got ${JSON.stringify(entry.isoDate)}.`,
+      );
+    }
+  },
+);
+
+Then(
   "the Backlinks panel links to {string}",
   async function (this: EmanoteWorld, hrefSubstring: string) {
     await this.page

@@ -2,10 +2,10 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
-import Data.List (partition)
 import Data.Map.Syntax ((##))
 import Data.Set qualified as Set
 import Data.Text qualified as T
+import Data.Time.Calendar (Day)
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Tree qualified as Tree
 import Ema qualified
@@ -190,9 +190,16 @@ renderLmlHtml model note = do
           else mempty
     "ema:note:backlinks" ##
       backlinksSplice model (G.modelLookupBacklinks r model)
-    let (backlinksDaily, backlinksNoDaily) = partition (Calendar.isDailyNote . fst) $ G.modelLookupBacklinks r model
+    let (backlinksDaily, backlinksNoDaily) =
+          partitionEithers
+            [ maybe
+              (Right (source, contexts))
+              (\day -> Left (source, day, contexts))
+              (Calendar.parseRouteDay source)
+            | (source, contexts) <- G.modelLookupBacklinks r model
+            ]
     "ema:note:backlinks:daily" ##
-      backlinksSplice model backlinksDaily
+      dailyBacklinksSplice model backlinksDaily
     "ema:note:backlinks:nodaily" ##
       backlinksSplice model backlinksNoDaily
     let folgeAnc = G.modelFolgezettelAncestorTree model r
@@ -216,20 +223,35 @@ backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Iden
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
   Splices.listSplice bs "backlink"
     $ \(source, contexts) -> do
-      let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
-          bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
-          bctx = C.mkTemplateRenderCtx model source bmeta
-      -- TODO: reuse note splice
-      "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
-      "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
-      "backlink:note:contexts" ##
-        Splices.listSplice (toList contexts) "context"
-          $ \backlinkCtx -> do
-            let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
-            "context:body" ##
-              C.withInlineCtx bctx
-                $ \ctx' ->
-                  Splices.pandocSplice ctx' ctxDoc
+      backlinkSplices model source contexts Nothing
+
+dailyBacklinksSplice :: Model -> [(R.LMLRoute, Day, NonEmpty [B.Block])] -> HI.Splice Identity
+dailyBacklinksSplice model bs =
+  Splices.listSplice bs "backlink"
+    $ \(source, day, contexts) ->
+      backlinkSplices model source contexts (Just day)
+
+backlinkSplices :: Model -> R.LMLRoute -> NonEmpty [B.Block] -> Maybe Day -> H.Splices (HI.Splice Identity)
+backlinkSplices model source contexts mDay = do
+  let bnote = fromMaybe (error "backlink note missing - impossible") $ M.modelLookupNoteByRoute' source model
+      bmeta = Meta.getEffectiveRouteMetaWith (bnote ^. MN.noteMeta) source model
+      bctx = C.mkTemplateRenderCtx model source bmeta
+  -- TODO: reuse note splice
+  "backlink:note:title" ## C.titleSplice bctx (M.modelLookupTitle source model)
+  "backlink:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, source))
+  "backlink:note:iso-date" ## HI.textSplice (maybe "" dayIsoText mDay)
+  "backlink:note:contexts" ##
+    Splices.listSplice (toList contexts) "context"
+      $ \backlinkCtx -> do
+        let ctxDoc = Pandoc mempty $ one $ B.Div B.nullAttr backlinkCtx
+        "context:body" ##
+          C.withInlineCtx bctx
+            $ \ctx' ->
+              Splices.pandocSplice ctx' ctxDoc
+
+dayIsoText :: Day -> Text
+dayIsoText =
+  toText . formatTime defaultTimeLocale "%Y-%m-%d"
 
 {- | Heist splice for the sidebar tree.
 
@@ -247,7 +269,7 @@ routeTreeSplices tCtx mCurrentRoute model = do
         -- otherwise. Sole source of truth for daily-note dates on the JS side
         -- (sidebar-calendar reads it via data-iso-date) so date detection
         -- stays in Haskell, not duplicated as a regex per widget.
-        "node:iso-date" ## HI.textSplice (maybe "" (toText . formatTime defaultTimeLocale "%Y-%m-%d") $ Calendar.parseRouteDay nodeRoute)
+        "node:iso-date" ## HI.textSplice (maybe "" dayIsoText $ Calendar.parseRouteDay nodeRoute)
         let isActiveNode = Just nodeRoute == mCurrentRoute
             isActiveTree =
               -- Active tree checking is applicable only when there is an

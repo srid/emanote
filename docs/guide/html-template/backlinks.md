@@ -28,6 +28,6 @@ Hovering a filled cell opens a context flyout (header `YYYY-MM-DD — title`, th
 - Right-panel at `lg:`+ (compact 4×4 cells in the narrow column)
 - Bottom strip at `<lg` (cells stretch as horizontal bars to fill the wider row)
 
-Dates are parsed out of each linked note's title via a `YYYY-MM-DD` regex; entries without a parseable date are silently skipped (with the screen-reader fallback list still readable).
+Dates come from the linked note's route via `Calendar.parseRouteDay`, the same parser used for the daily/non-daily split. A daily note can therefore have a custom title without disappearing from the heatmap.
 
 See [[daily-notes]] for how the daily/non-daily split feeds these two surfaces.

@@ -23,6 +23,7 @@
 
 **Bug fixes**
 
+- Timeline heatmap backlinks now use the daily note's route-derived date instead of parsing `YYYY-MM-DD` out of the rendered title, so custom-titled daily notes still appear in the heatmap.
 - Cascade-declared `tags` no longer disappear from a child note that declares any of its own. The metadata-cascade merger previously inherited `aeson-extra`'s `lodashMerge`, which aligns arrays by index — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` in `folder/note.md` produced `[internal-note]`, dropping the cascaded entry both from the per-page chip strip and from the `#352` global tag index. The merger now unions cascade arrays; see [yaml-config](docs/guide/yaml-config.md) for the full contract. `aeson-extra` is no longer a dependency (closes [#697](https://github.com/srid/emanote/issues/697)).
 - Wiki link custom titles now render HTML entities like `&nbsp;` the same way regular Markdown link labels do. Previously `[[note|Spivak&nbsp;(2014)]]` rendered the entity text literally as `&nbsp;` (closes [#441](https://github.com/srid/emanote/issues/441)).
 - Atom feed: a feed query that matches no notes no longer crashes the build; an empty-but-valid Atom document is emitted instead. Configuration errors (missing/invalid query block, missing `page.siteUrl`) still fail loudly ([#490](https://github.com/srid/emanote/issues/490), [#650](https://github.com/srid/emanote/pull/650))
