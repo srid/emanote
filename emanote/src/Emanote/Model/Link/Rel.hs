@@ -116,12 +116,13 @@ unresolvedRelsTo r =
 
 resourceTargetsFor :: ModelRoute -> [UnresolvedRelTarget]
 resourceTargetsFor r =
-  resourceTargetFrom (R.encodeModelRoute r)
-    <> case r of
-      R.ModelRoute_LML R.LMLView_Html _ ->
-        resourceTargetFrom $ FP.dropExtension $ R.encodeModelRoute r
-      _ ->
-        []
+  let encodedRoute = R.encodeModelRoute r
+   in resourceTargetFrom encodedRoute
+        <> case r of
+          R.ModelRoute_LML R.LMLView_Html _ ->
+            resourceTargetFrom $ FP.dropExtension encodedRoute
+          _ ->
+            []
   where
     resourceTargetFrom fp =
       maybeToList
