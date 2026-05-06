@@ -176,7 +176,14 @@ local js = [[
         if (!href.startsWith('#')) return;
         const i = indexOf(href.slice(1));
         if (i < 0) return;
+        // Ema's live-server installs a window-level click listener that
+        // intercepts every <a>. For bare-hash links, the page's
+        // <base href="/"> resolves them to "/#foo" — Ema then treats
+        // that as a route change to /. preventDefault alone can't stop
+        // it; the window listener fires later in the bubble phase.
+        // Stop propagation so the click never reaches it.
         e.preventDefault();
+        e.stopPropagation();
         go(i);
       });
     });
