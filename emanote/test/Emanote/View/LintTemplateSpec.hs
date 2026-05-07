@@ -35,6 +35,14 @@ spec = do
       scanRenderedHtml "ok.html" "<html><body><pre>${not-an-attr}</pre></body></html>"
         `shouldBe` []
 
+    it "still reports a valid ${...} that follows an unbalanced ${" $ do
+      scanRenderedHtml "ok.html" "<html><body><a title=\"${incomplete ${valid}\">x</a></body></html>"
+        `shouldBe` [SpliceAttribute "valid"]
+
+    it "ignores a trailing ${ with no closing brace" $ do
+      scanRenderedHtml "ok.html" "<html><body><a title=\"${valid} ${trailing\">x</a></body></html>"
+        `shouldBe` [SpliceAttribute "valid"]
+
   describe "formatWarning" $ do
     it "formats element warnings as a tag" $ do
       formatWarning (SpliceElement "ema:tite") `shouldBe` "<ema:tite/>"

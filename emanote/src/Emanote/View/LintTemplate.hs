@@ -57,7 +57,11 @@ elementSplice name
 attrSplices :: (Text, Text) -> Set UnboundSplice
 attrSplices (_, value) = Set.fromList (SpliceAttribute <$> attrSpliceRefs value)
 
--- | Extract the names from any @${name}@ tokens in a string.
+{- | Extract the names from any @${name}@ tokens in a string. A bare @${@
+with no closing brace (or one that wraps a nested @${@, e.g.
+@${incomplete ${valid}@) is treated as literal text — we step past it and
+keep scanning, so a real splice that follows is still reported on its own.
+-}
 attrSpliceRefs :: Text -> [Text]
 attrSpliceRefs t = case T.breakOn "${" t of
   (_, "") -> []
@@ -65,5 +69,7 @@ attrSpliceRefs t = case T.breakOn "${" t of
     let body = T.drop 2 rest
      in case T.breakOn "}" body of
           (name, suffix)
-            | "}" `T.isPrefixOf` suffix -> name : attrSpliceRefs (T.drop 1 suffix)
-            | otherwise -> []
+            | "}" `T.isPrefixOf` suffix
+            , not (T.any (== '$') name) ->
+                name : attrSpliceRefs (T.drop 1 suffix)
+          _ -> attrSpliceRefs body
