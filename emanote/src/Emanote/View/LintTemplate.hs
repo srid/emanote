@@ -15,6 +15,8 @@ module Emanote.View.LintTemplate (
   formatWarning,
 ) where
 
+import Data.ByteString qualified as BS
+import Data.ByteString.Char8 qualified as BSC
 import Data.Text qualified as T
 import Relude
 import Text.XmlHtml qualified as X
@@ -38,10 +40,39 @@ XML document is treated as having no warnings (Emanote does not emit XML
 through the Heist pipeline this lints).
 -}
 scanRenderedHtml :: FilePath -> ByteString -> Either Text [UnboundSplice]
-scanRenderedHtml fp bs = case X.parseHTML fp bs of
-  Left err -> Left (toText err)
-  Right (X.HtmlDocument _ _ nodes) -> Right (sortNub (foldMap nodeSplices nodes))
-  Right X.XmlDocument {} -> Right []
+scanRenderedHtml fp bs
+  -- Cheap byte-level pre-check: if the rendered output has neither a literal
+  -- @${@ token (an unbound attribute splice always survives as @${name}@) nor
+  -- a colon inside any tag opener (the only way a @<…:…>@ element can leak),
+  -- there is nothing to find. Lets the common case skip 'X.parseHTML' and
+  -- the AST walk entirely.
+  | not (hasSpliceMarker bs) = Right []
+  | otherwise = case X.parseHTML fp bs of
+      Left err -> Left (toText err)
+      Right (X.HtmlDocument _ _ nodes) -> Right (sortNub (foldMap nodeSplices nodes))
+      Right X.XmlDocument {} -> Right []
+
+{- | Conservative byte scan: returns 'True' when @bs@ /possibly/ contains an
+unbound splice survivor. False positives are fine — they trigger the full
+parse, which then correctly reports zero warnings.
+-}
+hasSpliceMarker :: ByteString -> Bool
+hasSpliceMarker bs = "${" `BS.isInfixOf` bs || hasColonTagName bs
+
+hasColonTagName :: ByteString -> Bool
+hasColonTagName = go
+  where
+    go bs = case BSC.elemIndex '<' bs of
+      Nothing -> False
+      Just i ->
+        let after = BS.drop (i + 1) bs
+            tagStart = case BSC.uncons after of
+              Just ('/', rest) -> rest
+              _ -> after
+            (name, _) = BSC.break isNameEnd tagStart
+         in BSC.elem ':' name
+              || maybe False (\j -> go (BS.drop (j + 1) after)) (BSC.elemIndex '>' after)
+    isNameEnd c = c == ' ' || c == '\t' || c == '\n' || c == '/' || c == '>'
 
 {- | Walk an 'X.Node' (and its descendants) into a list of splice references.
 Duplicates are collapsed at the document root in 'scanRenderedHtml' rather

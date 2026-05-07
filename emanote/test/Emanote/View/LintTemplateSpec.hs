@@ -43,9 +43,12 @@ spec = do
       scanRenderedHtml "ok.html" "<html><body><a title=\"${valid} ${trailing\">x</a></body></html>"
         `shouldBe` Right [SpliceAttribute "valid"]
 
-    it "surfaces a parse failure as Left so callers do not get a false-clean lint" $ do
+    it "skips the parse entirely when the bytes have no splice marker" $ do
+      -- The pre-check short-circuits to Right [] without invoking parseHTML,
+      -- so even malformed HTML returns clean — there is nothing for the lint
+      -- to find when the bytes contain neither '${' nor a colon-tag.
       scanRenderedHtml "bad.html" "<html><body><div></span></body></html>"
-        `shouldSatisfy` isLeft
+        `shouldBe` Right []
 
   describe "formatWarning" $ do
     it "formats element warnings as a tag" $ do
