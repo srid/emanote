@@ -218,6 +218,17 @@ Feature: Smoke
     And the page contains an element with class "emanote:broken-link__text"
     And the page contains an element with class "emanote:broken-link__icon"
 
+  Scenario: Ambiguous wikilinks render through the components/ambiguous-link template (issue #712)
+    When I open "/ambig-712.html"
+    Then the page contains an element with class "emanote:ambiguous-link"
+    And the page contains an element with class "emanote:ambiguous-link__text"
+    And the page contains an element with class "emanote:ambiguous-link__icon"
+
+  @live
+  Scenario: Ambiguous-link candidate list renders only in live preview (issue #712)
+    When I open "/ambig-712.html"
+    Then the page contains an element with class "emanote:ambiguous-link__candidate"
+
   Scenario: Sidebar month folder renders as a calendar grid (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar month calendar is visible with header "Apr 2026"

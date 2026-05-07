@@ -198,6 +198,14 @@ Before({ tags: MORPH_TAG }, function () {
   if (mode === "static") return "skipped" as const;
 });
 
+// `@live` marks scenarios that exercise behavior present only when the
+// notebook is served by `emanote run` — e.g. the ambiguous-link
+// candidate list, which is suppressed in static export. Both `live`
+// and `morph` modes use the same backend, so only `static` skips.
+Before({ tags: "@live" }, function () {
+  if (mode === "static") return "skipped" as const;
+});
+
 // Inverse safety: a scenario using the morph-nav step without `@morph`
 // would silently hang in static mode until the cucumber step ceiling.
 Before(function (this: EmanoteWorld, scenario) {

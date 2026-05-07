@@ -91,9 +91,8 @@ template:
       copyFailed: Copy failed
       missingLink: "! Missing link"
       ambiguousLink: "! Ambiguous link"
-      brokenLink: "Link is broken"
-      brokenLinkBacklinks: "backlinks"
-      brokenLinkBacklinksTooltip: "Find notes containing this broken link"
+      brokenLinkTooltip: "Link is broken"
+      ambiguousLinkTooltip: "Link is ambiguous"
       emanoteError: Emanote Error
       badYamlFiles: "Emanote: bad YAML files"
       notebookIssue: Your notebook has an issue.
@@ -144,9 +143,8 @@ template:
       copyFailed: Échec de la copie
       missingLink: "! Lien manquant"
       ambiguousLink: "! Lien ambigu"
-      brokenLink: "Lien brisé"
-      brokenLinkBacklinks: "rétroliens"
-      brokenLinkBacklinksTooltip: "Trouver les notes contenant ce lien brisé"
+      brokenLinkTooltip: "Lien brisé"
+      ambiguousLinkTooltip: "Lien ambigu"
       emanoteError: Erreur Emanote
       badYamlFiles: "Emanote : fichiers YAML invalides"
       notebookIssue: Votre carnet contient un problème.

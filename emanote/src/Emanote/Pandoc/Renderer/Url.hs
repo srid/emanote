@@ -13,17 +13,16 @@ import Emanote.Model.Link.Rel qualified as Rel
 import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Title qualified as Tit
-import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Heist.Extra qualified as HE
+import Heist.Extra.Splices.List (listSplice)
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
-import Heist.Splices qualified as Heist
 import Optics.Core (review)
 import Relude
 import Text.Pandoc.Definition qualified as B
@@ -58,7 +57,9 @@ openInNewTabAttr =
 
 renderSomeInlineRefWith ::
   (a -> SR.SiteRoute) ->
-  -- | AST Node attributes of @InlineRef@
+  -- | AST Node attributes of @InlineRef@ — kept in the signature for symmetry
+  -- with callers; the missing/ambiguous arms now route through templates and
+  -- don't need it. The 'RRTFound' arm passes 'sr' to @f@.
   ([B.Inline], (Text, Text)) ->
   Rel.ResolvedRelTarget a ->
   Model ->
@@ -66,46 +67,45 @@ renderSomeInlineRefWith ::
   B.Inline ->
   (a -> Maybe (HI.Splice Identity)) ->
   Maybe (HI.Splice Identity)
-renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing -> ctx) origInl f = do
+renderSomeInlineRefWith getSr _ rRel model (ctxSansCustomSplicing -> _ctx) origInl f =
   case rRel of
     Rel.RRTMissing -> do
       let linkText = Link.unParseLink origInl
       pure $ do
         tpl <- HE.lookupHtmlTemplateMust "/templates/components/broken-link"
-        HE.runCustomTemplate tpl $ do
-          "ema:broken-link:url" ## HI.textSplice url
-          "ema:broken-link:text" ## HI.textSplice linkText
-          "ema:broken-link:live" ## Heist.ifISplice (M.inLiveServer model)
+        HE.runCustomTemplate tpl
+          $ "ema:broken-link:text"
+          ## HI.textSplice linkText
     Rel.RRTAmbiguous srs -> do
+      let linkText = Link.unParseLink origInl
+          mkCandidate (getSr -> sr) =
+            let (rp, _) = M.withoutRoutePrism model
+                srRoute = toText $ review rp sr
+                candUrl = SR.siteRouteUrl model sr
+                isNotEmaLink = "?" `T.isInfixOf` candUrl
+                candTarget = if M.inLiveServer model && isNotEmaLink then "_blank" else ""
+                candLabel = show sr
+                candTooltip = candLabel <> " -> " <> srRoute
+             in (candLabel, candUrl, candTarget, candTooltip)
+          -- Candidates only render in live preview — in static export the URL
+          -- has already resolved to one of them via closest-ancestor disambiguation.
+          candidates =
+            if M.inLiveServer model
+              then mkCandidate <$> toList srs
+              else []
+          candidatesSplice =
+            listSplice candidates "each-candidate" $ \(label, candUrl, candTarget, candTooltip) -> do
+              "ema:candidate:label" ## HI.textSplice label
+              "ema:candidate:url" ## HI.textSplice candUrl
+              "ema:candidate:target" ## HI.textSplice candTarget
+              "ema:candidate:tooltip" ## HI.textSplice candTooltip
       pure $ do
-        raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
-        candidates <-
-          fmap
-            mconcat
-            ( mapM
-                ( \(getSr -> sr) -> do
-                    let (rp, _) = M.withoutRoutePrism model
-                        srRoute = toText $ review rp sr
-                        (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
-                        linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
-                        newIs = one $ B.Str $ show sr
-                    HP.rpInline ctx
-                      $ Diagnostic.errorInlineAside "aside"
-                      $ one
-                      $ tooltip (show sr <> " -> " <> srRoute)
-                      $ one
-                      $ B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
-                )
-                (toList srs)
-            )
-        if M.inLiveServer model
-          then pure $ raw <> candidates
-          else pure raw
+        tpl <- HE.lookupHtmlTemplateMust "/templates/components/ambiguous-link"
+        HE.runCustomTemplate tpl $ do
+          "ema:ambiguous-link:text" ## HI.textSplice linkText
+          "ema:ambiguous-link:candidates" ## candidatesSplice
     Rel.RRTFound sr -> do
       f sr
-  where
-    tooltip :: Text -> [B.Inline] -> B.Inline
-    tooltip s = B.Span ("", [], one ("title", s))
 
 plainifyWikiLinkSplice :: PandocInlineRenderer Model R.LMLRoute
 plainifyWikiLinkSplice _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do

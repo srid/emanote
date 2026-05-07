@@ -32,11 +32,13 @@ Regular Markdown links to notes can include their `.md` or `.org` extension, but
 
 Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
 
-The default rendering carries semantic class hooks — `emanote:broken-link` on the root span, `emanote:broken-link__text` on the strikethrough, `emanote:broken-link__icon` on the X, and `emanote:broken-link__aside` on the live-only backlinks span — so a notebook stylesheet can hide the icon, swap the strikethrough for an underline, or restyle the aside without replacing the template. To change structure, drop a `templates/components/broken-link.tpl` into your notebook; it overrides the default and receives `<ema:broken-link:url />`, `<ema:broken-link:text />`, and an `<ema:broken-link:live>…</ema:broken-link:live>` block whose contents render only in live preview ([#221](https://github.com/srid/emanote/issues/221)). The broken-link landing page (where clicking the link leads) is the existing `templates/error.tpl` and is overridden the same way.
+The default rendering carries semantic class hooks — `emanote:broken-link` on the root span, `emanote:broken-link__text` on the strikethrough, and `emanote:broken-link__icon` on the X — so a notebook stylesheet can hide the icon or swap the strikethrough for an underline without replacing the template. To change structure, drop a `templates/components/broken-link.tpl` into your notebook; it overrides the default and receives a single `<ema:broken-link:text />` splice with the source text of the offending link ([#221](https://github.com/srid/emanote/issues/221)). The broken-link landing page (where clicking the link leads) is the existing `templates/error.tpl` and is overridden the same way.
 
 ### Ambiguous links
 
-Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig]
+Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig] When no candidate is closer, the link is left unresolved and a list of routes is shown next to it in live preview so you can pick one.
+
+The default rendering goes through `templates/components/ambiguous-link.tpl` and carries `emanote:ambiguous-link[__text|__icon|__candidate]` class hooks. Notebook authors can drop in their own template; the override receives `<ema:ambiguous-link:text />` plus a `<ema:ambiguous-link:candidates><each-candidate>…</each-candidate></ema:ambiguous-link:candidates>` list-splice with per-candidate `${ema:candidate:url}`, `${ema:candidate:label}`, `${ema:candidate:tooltip}`, and `${ema:candidate:target}` splices ([#712](https://github.com/srid/emanote/issues/712)).
 
 [^ambig]: This particular selection process [was choosen](https://github.com/srid/emanote/pull/498) in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
 
