@@ -52,6 +52,11 @@ nodeSplices = \case
       <> foldMap nodeSplices children
   _ -> mempty
 
+{- | Empirical heuristic: any element name with a @:@ is a Heist splice.
+Plain HTML5 tag names never contain a colon, and SVG/MathML inlined into
+HTML5 uses unprefixed forms (@<svg>@, @<math>@, @<mfrac>@). If a future
+legitimate use of a colon-bearing tag arises, an allow-list belongs here.
+-}
 elementSplice :: Text -> Set UnboundSplice
 elementSplice name
   | T.any (== ':') name = one (SpliceElement name)
