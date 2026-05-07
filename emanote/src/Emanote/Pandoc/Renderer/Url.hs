@@ -78,12 +78,11 @@ renderSomeInlineRefWith getSr rRel model origInl f =
       let linkText = Link.unParseLink origInl
           mkCandidate (getSr -> sr) =
             let (rp, _) = M.withoutRoutePrism model
-                srRoute = toText $ review rp sr
+                candRoute = toText $ review rp sr
                 candUrl = SR.siteRouteUrl model sr
                 isNotEmaLink = "?" `T.isInfixOf` candUrl
                 candLabel = show sr
-                candTooltip = candLabel <> " -> " <> srRoute
-             in (candLabel, candUrl, isNotEmaLink, candTooltip)
+             in (candLabel, candUrl, isNotEmaLink, candRoute)
           -- Candidates only render in live preview — in static export the URL
           -- has already resolved to one of them via closest-ancestor disambiguation.
           candidates =
@@ -91,11 +90,11 @@ renderSomeInlineRefWith getSr rRel model origInl f =
               then mkCandidate <$> toList srs
               else []
           candidatesSplice =
-            listSplice candidates "each-candidate" $ \(label, candUrl, isNotEmaLink, candTooltip) -> do
+            listSplice candidates "each-candidate" $ \(label, candUrl, isNotEmaLink, candRoute) -> do
               "ema:candidate:label" ## HI.textSplice label
               "ema:candidate:url" ## HI.textSplice candUrl
               "ema:candidate:newtab" ## Heist.ifElseISplice isNotEmaLink
-              "ema:candidate:tooltip" ## HI.textSplice candTooltip
+              "ema:candidate:route" ## HI.textSplice candRoute
       pure $ do
         tpl <- HE.lookupHtmlTemplateMust "/templates/components/ambiguous-link"
         HE.runCustomTemplate tpl $ do
