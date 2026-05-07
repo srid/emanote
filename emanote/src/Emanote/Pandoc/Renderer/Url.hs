@@ -23,6 +23,7 @@ import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as Heist
 import Optics.Core (review)
 import Relude
 import Text.Pandoc.Definition qualified as B
@@ -83,10 +84,9 @@ renderSomeInlineRefWith getSr _ rRel model (ctxSansCustomSplicing -> _ctx) origI
                 srRoute = toText $ review rp sr
                 candUrl = SR.siteRouteUrl model sr
                 isNotEmaLink = "?" `T.isInfixOf` candUrl
-                candTarget = if M.inLiveServer model && isNotEmaLink then "_blank" else ""
                 candLabel = show sr
                 candTooltip = candLabel <> " -> " <> srRoute
-             in (candLabel, candUrl, candTarget, candTooltip)
+             in (candLabel, candUrl, isNotEmaLink, candTooltip)
           -- Candidates only render in live preview — in static export the URL
           -- has already resolved to one of them via closest-ancestor disambiguation.
           candidates =
@@ -94,10 +94,10 @@ renderSomeInlineRefWith getSr _ rRel model (ctxSansCustomSplicing -> _ctx) origI
               then mkCandidate <$> toList srs
               else []
           candidatesSplice =
-            listSplice candidates "each-candidate" $ \(label, candUrl, candTarget, candTooltip) -> do
+            listSplice candidates "each-candidate" $ \(label, candUrl, isNotEmaLink, candTooltip) -> do
               "ema:candidate:label" ## HI.textSplice label
               "ema:candidate:url" ## HI.textSplice candUrl
-              "ema:candidate:target" ## HI.textSplice candTarget
+              "ema:candidate:newtab" ## Heist.ifElseISplice isNotEmaLink
               "ema:candidate:tooltip" ## HI.textSplice candTooltip
       pure $ do
         tpl <- HE.lookupHtmlTemplateMust "/templates/components/ambiguous-link"
