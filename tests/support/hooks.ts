@@ -23,7 +23,7 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
-import { mode, requireEnv } from "./mode.ts";
+import { mode, requireEnv, skipUnlessMode, type Mode } from "./mode.ts";
 import { primeMorph } from "./navigation.ts";
 
 const emanoteBin = requireEnv("EMANOTE_BIN");
@@ -183,6 +183,12 @@ AfterAll(async () => {
 
 const MORPH_TAG = "@morph";
 
+// `@morph` and `@live` both require an active `emanote run` backend
+// (WebSocket / `window.ema`, or live-only behavior like the ambiguous-
+// link candidate list which is suppressed in static export). Only
+// `static` mode lacks them.
+const NON_STATIC_MODES = new Set<Mode>(["live", "morph"]);
+
 Before(async function (this: EmanoteWorld) {
   this.browser = browser;
   this.context = await browser.newContext({
@@ -192,19 +198,8 @@ Before(async function (this: EmanoteWorld) {
   this.page = await this.context.newPage();
 });
 
-// Static mode has no WebSocket and `window.ema` is undefined, so any
-// `@morph` scenario would fail at the first `switchRoute` call.
-Before({ tags: MORPH_TAG }, function () {
-  if (mode === "static") return "skipped" as const;
-});
-
-// `@live` marks scenarios that exercise behavior present only when the
-// notebook is served by `emanote run` — e.g. the ambiguous-link
-// candidate list, which is suppressed in static export. Both `live`
-// and `morph` modes use the same backend, so only `static` skips.
-Before({ tags: "@live" }, function () {
-  if (mode === "static") return "skipped" as const;
-});
+skipUnlessMode(MORPH_TAG, NON_STATIC_MODES);
+skipUnlessMode("@live", NON_STATIC_MODES);
 
 // Inverse safety: a scenario using the morph-nav step without `@morph`
 // would silently hang in static mode until the cucumber step ceiling.
