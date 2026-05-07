@@ -26,6 +26,7 @@ import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
+import Emanote.View.LintTemplate qualified as Lint
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
 import Heist qualified as H
@@ -45,7 +46,9 @@ import Text.Pandoc.Definition (Pandoc (..))
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
   let model = M.withRoutePrism rp model'
-  render model r <&> fmap fixStaticUrl
+  asset <- render model r <&> fmap fixStaticUrl
+  Lint.warnUnboundSplices (SR.siteRouteUrl model r) asset
+  pure asset
   where
     -- See the FIXME in more-head.tpl.
     fixStaticUrl :: LByteString -> LByteString
