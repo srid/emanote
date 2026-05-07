@@ -35,7 +35,6 @@
 /start/install /install 301
 /start/install/nix /nix 301
 /start/install/wsl /wsl 301
-/start/install/container /container 301
 /start/neuron /neuron 301
 /start/known-issues /known-issues 301
 /start/resources /resources 301
