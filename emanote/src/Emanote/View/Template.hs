@@ -1,6 +1,6 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
-import Control.Monad.Logger (MonadLoggerIO)
+import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
@@ -19,6 +19,7 @@ import Emanote.Model.Note qualified as MN
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
+import Emanote.Prelude (logW)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -26,9 +27,10 @@ import Emanote.Route.SiteRoute.Class (indexRoute)
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
-import Emanote.View.LintTemplate qualified as Lint
+import Emanote.View.LintTemplate (UnboundSplice, formatWarning, scanRenderedHtml)
 import Emanote.View.TagIndex qualified as TagIndex
 import Emanote.View.TaskIndex qualified as TaskIndex
+import GHC.IO.Unsafe (unsafePerformIO)
 import Heist qualified as H
 import Heist.Extra.Splices.List qualified as Splices
 import Heist.Extra.Splices.Pandoc qualified as Splices
@@ -47,7 +49,7 @@ emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -
 emanoteSiteOutput rp model' r = do
   let model = M.withRoutePrism rp model'
   asset <- render model r <&> fmap fixStaticUrl
-  Lint.warnUnboundSplices (SR.siteRouteUrl model r) asset
+  warnUnboundSplices (SR.siteRouteUrl model r) asset
   pure asset
   where
     -- See the FIXME in more-head.tpl.
@@ -69,6 +71,29 @@ emanoteSiteOutput rp model' r = do
           prefix <- T.stripSuffix "-/all.html" indexR
           guard $ not $ T.null prefix
           pure prefix
+
+{- | Scan the rendered HTML for unbound Heist splice references and log a
+warning for each fresh @(route, splice)@ pair.
+-}
+warnUnboundSplices :: (MonadIO m, MonadLogger m) => Text -> Ema.Asset LByteString -> m ()
+warnUnboundSplices routeUrl = \case
+  Ema.AssetGenerated Ema.Html bytes -> do
+    let warnings = scanRenderedHtml (toString routeUrl) (toStrict bytes)
+    fresh <- liftIO $ atomicModifyIORef' lintWarningCache $ \seen ->
+      let entries = Set.fromList ((routeUrl,) <$> warnings)
+          new = Set.difference entries seen
+       in (Set.union seen entries, snd <$> Set.toAscList new)
+    forM_ fresh $ \w ->
+      logW $ "Unbound template splice on '" <> routeUrl <> "': " <> formatWarning w
+  _ -> pass
+
+{- | Process-wide cache of @(route, splice)@ pairs already logged. Lives at the
+rendering orchestration layer rather than inside 'Emanote.View.LintTemplate'
+so the lint module stays a pure scanner.
+-}
+{-# NOINLINE lintWarningCache #-}
+lintWarningCache :: IORef (Set (Text, UnboundSplice))
+lintWarningCache = unsafePerformIO (newIORef mempty)
 
 render :: (MonadIO m, MonadLoggerIO m) => Model -> SR.SiteRoute -> m (Ema.Asset LByteString)
 render m = \case
