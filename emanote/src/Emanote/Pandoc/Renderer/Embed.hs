@@ -76,14 +76,14 @@ currentEmbedStack = fromMaybe emptyEmbedStack . getUserData
 embedBlockWikiLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
 embedBlockWikiLinkResolvingSplice model nr ctx noteRoute node = do
   B.Para [inl] <- pure node
-  (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
+  (inlRef, (_, _, otherAttrs), _, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
   -- TODO: Use anchor to embed a section?
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
-  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl $ \case
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute rRel model inl $ \case
     Left (R.LMLView_Html, r) -> embedResourceRoute model nr ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
@@ -91,7 +91,7 @@ embedBlockWikiLinkResolvingSplice model nr ctx noteRoute node = do
     _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockRegularLinkResolvingSplice model _nr ctx noteRoute node = do
+embedBlockRegularLinkResolvingSplice model _nr _ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
@@ -99,17 +99,17 @@ embedBlockRegularLinkResolvingSplice model _nr ctx noteRoute node = do
   (Rel.URTResource candidates, _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveModelRouteCandidates model candidates
-  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute rRel model inl
     $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
-embedInlineWikiLinkResolvingSplice model _nr ctx noteRoute inl = do
-  (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
+embedInlineWikiLinkResolvingSplice model _nr _ctx noteRoute inl = do
+  (inlRef, (_, _, otherAttrs), _, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
-  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute (is, (url, tit)) rRel model ctx inl
+  RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute rRel model inl
     $ either (const Nothing) (embedStaticFileRoute model $ show wl)
 
 runEmbedTemplate :: ByteString -> H.Splices (HI.Splice Identity) -> HI.Splice Identity

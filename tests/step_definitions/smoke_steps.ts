@@ -28,6 +28,19 @@ Then(
   },
 );
 
+// `[class~="…"]` matches without escaping the literal `:` in the class
+// name (which CSS selectors would otherwise need as `\:`).
+Then(
+  "the page contains an element with class {string}",
+  async function (this: EmanoteWorld, cls: string) {
+    const count = await this.page.locator(`[class~="${cls}"]`).count();
+    assert.ok(
+      count > 0,
+      `Expected an element carrying class ${JSON.stringify(cls)}; got ${count}. Either the renderer no longer emits the class or a notebook override stripped it.`,
+    );
+  },
+);
+
 // #433: orphan opener/closer raw-HTML tags around markdown content used to
 // produce two stranded `<rawhtml>` wrappers immediately adjacent to the
 // `<details>` opener and closer. Browsers' lenient HTML5 parser recovers
