@@ -23,6 +23,7 @@ import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as Heist
 import Optics.Core (review)
 import Relude
 import Text.Pandoc.Definition qualified as B
@@ -77,8 +78,7 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
         HE.runCustomTemplate tpl $ do
           "ema:broken-link:url" ## HI.textSplice url
           "ema:broken-link:text" ## HI.textSplice linkText
-          "ema:broken-link:live" ##
-            if M.inLiveServer model then HI.runChildren else pure []
+          "ema:broken-link:live" ## Heist.ifISplice (M.inLiveServer model)
     Rel.RRTAmbiguous srs -> do
       pure $ do
         raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
