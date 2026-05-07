@@ -23,12 +23,7 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
-import {
-  mode,
-  requireEnv,
-  skipUnlessMode,
-  NON_STATIC_MODES,
-} from "./mode.ts";
+import { mode, requireEnv, skipUnlessMode, NON_STATIC_MODES } from "./mode.ts";
 import { primeMorph } from "./navigation.ts";
 
 const emanoteBin = requireEnv("EMANOTE_BIN");

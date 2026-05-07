@@ -33,8 +33,7 @@ export const mode: Mode = rawMode;
 export const NON_STATIC_MODES: readonly Mode[] = ["live", "morph"];
 
 /** Register a Cucumber Before hook that skips scenarios tagged `tag`
- *  whenever the current run mode is not in `requiredModes`. Generalises
- *  to N-way gating — e.g. a future `@morph-only` would pass `["morph"]`. */
+ *  unless the current run mode is in `requiredModes`. */
 export function skipUnlessMode(
   tag: string,
   requiredModes: readonly Mode[],
