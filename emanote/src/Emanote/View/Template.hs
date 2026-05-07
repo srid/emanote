@@ -72,25 +72,26 @@ emanoteSiteOutput rp model' r = do
           guard $ not $ T.null prefix
           pure prefix
 
-{- | Scan the rendered HTML for unbound Heist splice references and log a
-warning for each fresh @(route, splice)@ pair.
+{- | See 'Emanote.View.LintTemplate.scanRenderedHtml' for the scanning
+rationale. This wrapper owns dedup (per @(route, splice)@) and log
+delivery so the lint module stays a pure scanner.
 -}
 warnUnboundSplices :: (MonadIO m, MonadLogger m) => Text -> Ema.Asset LByteString -> m ()
 warnUnboundSplices routeUrl = \case
   Ema.AssetGenerated Ema.Html bytes ->
     case scanRenderedHtml (toString routeUrl) (toStrict bytes) of
-      Left err ->
-        logW $ "Could not lint template output for '" <> routeUrl <> "': " <> err
+      Left err -> warn $ "lint parse failed: " <> err
       Right warnings -> do
         fresh <- liftIO $ atomicModifyIORef' lintWarningCache $ \seen ->
           let entries = Set.fromList ((routeUrl,) <$> warnings)
               new = Set.difference entries seen
            in (Set.union seen entries, snd <$> Set.toAscList new)
-        forM_ fresh $ \w ->
-          logW $ "Unbound template splice on '" <> routeUrl <> "': " <> formatWarning w
+        forM_ fresh $ warn . ("unbound splice " <>) . formatWarning
   -- Static files and Atom/JSON assets bypass the Heist render path, so
   -- there is no template-substitution surface to lint here.
   _ -> pass
+  where
+    warn detail = logW $ "Template lint on '" <> routeUrl <> "': " <> detail
 
 {- | Process-wide cache of @(route, splice)@ pairs already logged. Lives at the
 rendering orchestration layer rather than inside 'Emanote.View.LintTemplate'
