@@ -28,10 +28,6 @@ Then(
   },
 );
 
-// #221: broken-link inline rendering moved from a hard-coded Pandoc AST
-// to the `components/broken-link` Heist template. The class hooks here
-// (`emanote:broken-link`, `__text`, `__icon`) are the public surface for
-// notebook-level CSS overrides — drift here breaks user customizations.
 // `[class~="…"]` matches without escaping the literal `:` in the class
 // name (which CSS selectors would otherwise need as `\:`).
 Then(
