@@ -88,11 +88,15 @@ warnUnboundSplices routeUrl = \case
            in (Set.union seen entries, snd <$> Set.toAscList new)
         forM_ fresh $ \w ->
           logW $ "Unbound template splice on '" <> routeUrl <> "': " <> formatWarning w
+  -- Static files and Atom/JSON assets bypass the Heist render path, so
+  -- there is no template-substitution surface to lint here.
   _ -> pass
 
 {- | Process-wide cache of @(route, splice)@ pairs already logged. Lives at the
 rendering orchestration layer rather than inside 'Emanote.View.LintTemplate'
-so the lint module stays a pure scanner.
+so the lint module stays a pure scanner. Bounded in practice by (number of
+rendered routes) × (distinct splice typos in the user's templates), which is
+small for any reasonable site — there is no eviction.
 -}
 {-# NOINLINE lintWarningCache #-}
 lintWarningCache :: IORef (Set (Text, UnboundSplice))
