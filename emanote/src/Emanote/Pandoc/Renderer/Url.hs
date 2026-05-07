@@ -71,9 +71,6 @@ renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing
     Rel.RRTMissing -> do
       let linkText = Link.unParseLink origInl
       pure $ do
-        -- `<ema:i18n:*/>` splices come from the ambient Heist state set
-        -- up by 'renderModelTemplate' / 'I18n.i18nSplices' before any
-        -- inline renderer runs, so we don't thread the i18n table here.
         tpl <- HE.lookupHtmlTemplateMust "/templates/components/broken-link"
         HE.runCustomTemplate tpl $ do
           "ema:broken-link:url" ## HI.textSplice url
