@@ -20,7 +20,6 @@ import Emanote.Route.SiteRoute qualified as SR
 import Heist.Extra qualified as HE
 import Heist.Extra.Splices.List (listSplice)
 import Heist.Extra.Splices.Pandoc qualified as HP
-import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
 import Heist.Splices qualified as Heist
