@@ -32,6 +32,8 @@ Regular Markdown links to notes can include their `.md` or `.org` extension, but
 
 Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
 
+The default rendering carries semantic class hooks — `emanote:broken-link` on the root span, `emanote:broken-link__text` on the strikethrough, `emanote:broken-link__icon` on the X, and `emanote:broken-link__aside` on the live-only backlinks span — so a notebook stylesheet can hide the icon, swap the strikethrough for an underline, or restyle the aside without replacing the template. To change structure, drop a `templates/components/broken-link.tpl` into your notebook; it overrides the default and receives `<ema:broken-link:url />`, `<ema:broken-link:text />`, and an `<ema:broken-link:live>…</ema:broken-link:live>` block whose contents render only in live preview ([#221](https://github.com/srid/emanote/issues/221)). The broken-link landing page (where clicking the link leads) is the existing `templates/error.tpl` and is overridden the same way.
+
 ### Ambiguous links
 
 Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig]

@@ -5,6 +5,7 @@ module Emanote.Pandoc.Renderer.Url (
 ) where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
@@ -17,6 +18,7 @@ import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
+import Heist.Extra qualified as HE
 import Heist.Extra.Splices.Pandoc qualified as HP
 import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
@@ -66,28 +68,14 @@ renderSomeInlineRefWith ::
 renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing -> ctx) origInl f = do
   case rRel of
     Rel.RRTMissing -> do
+      let linkText = Link.unParseLink origInl
       pure $ do
-        raw <-
-          HP.rpInline
-            ctx
-            ( tooltip
-                "Link is broken"
-                [ B.Strikeout $ one $ B.Str $ Link.unParseLink origInl
-                , B.Str "❌"
-                ]
-            )
-        details <-
-          HP.rpInline ctx
-            -- FIXME: This aside is meaningless for non-wikilink links (regular
-            -- Markdown links)
-            $ Diagnostic.errorInlineAside "aside"
-            $ one
-            $ tooltip "Find notes containing this broken link"
-            $ one
-            $ B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
-        if M.inLiveServer model
-          then pure $ raw <> details
-          else pure raw
+        tpl <- HE.lookupHtmlTemplateMust "/templates/components/broken-link"
+        HE.runCustomTemplate tpl $ do
+          "ema:broken-link:url" ## HI.textSplice url
+          "ema:broken-link:text" ## HI.textSplice linkText
+          "ema:broken-link:live" ##
+            if M.inLiveServer model then HI.runChildren else pure []
     Rel.RRTAmbiguous srs -> do
       pure $ do
         raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])

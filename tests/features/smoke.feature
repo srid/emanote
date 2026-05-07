@@ -212,6 +212,12 @@ Feature: Smoke
     When I fetch "/-/tags/issue-697-cascaded.html"
     Then the response body contains "issue-697/note"
 
+  Scenario: Broken links render through the components/broken-link template (issue #221)
+    When I open "/broken-link-221.html"
+    Then the page contains an element with class "emanote:broken-link"
+    And the page contains an element with class "emanote:broken-link__text"
+    And the page contains an element with class "emanote:broken-link__icon"
+
   Scenario: Sidebar month folder renders as a calendar grid (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
     Then the sidebar month calendar is visible with header "Apr 2026"
