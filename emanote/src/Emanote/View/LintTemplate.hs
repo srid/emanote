@@ -33,13 +33,16 @@ formatWarning = \case
   SpliceAttribute nm -> "${" <> nm <> "}"
 
 {- | Re-parse rendered HTML and collect every unbound splice reference. Returns
-a deduplicated, sorted list. An unparseable document yields no warnings —
-broken HTML is a separate concern.
+@Left@ on a parse failure so the caller can surface that as its own
+diagnostic — silence on unparseable HTML would give a false-clean lint. An
+XML document is treated as having no warnings (Emanote does not emit XML
+through the Heist pipeline this lints).
 -}
-scanRenderedHtml :: FilePath -> ByteString -> [UnboundSplice]
+scanRenderedHtml :: FilePath -> ByteString -> Either Text [UnboundSplice]
 scanRenderedHtml fp bs = case X.parseHTML fp bs of
-  Right (X.HtmlDocument _ _ nodes) -> Set.toAscList (foldMap nodeSplices nodes)
-  _ -> []
+  Left err -> Left (toText err)
+  Right (X.HtmlDocument _ _ nodes) -> Right (Set.toAscList (foldMap nodeSplices nodes))
+  Right X.XmlDocument {} -> Right []
 
 nodeSplices :: X.Node -> Set UnboundSplice
 nodeSplices = \case

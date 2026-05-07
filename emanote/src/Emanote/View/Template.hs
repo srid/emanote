@@ -77,14 +77,17 @@ warning for each fresh @(route, splice)@ pair.
 -}
 warnUnboundSplices :: (MonadIO m, MonadLogger m) => Text -> Ema.Asset LByteString -> m ()
 warnUnboundSplices routeUrl = \case
-  Ema.AssetGenerated Ema.Html bytes -> do
-    let warnings = scanRenderedHtml (toString routeUrl) (toStrict bytes)
-    fresh <- liftIO $ atomicModifyIORef' lintWarningCache $ \seen ->
-      let entries = Set.fromList ((routeUrl,) <$> warnings)
-          new = Set.difference entries seen
-       in (Set.union seen entries, snd <$> Set.toAscList new)
-    forM_ fresh $ \w ->
-      logW $ "Unbound template splice on '" <> routeUrl <> "': " <> formatWarning w
+  Ema.AssetGenerated Ema.Html bytes ->
+    case scanRenderedHtml (toString routeUrl) (toStrict bytes) of
+      Left err ->
+        logW $ "Could not lint template output for '" <> routeUrl <> "': " <> err
+      Right warnings -> do
+        fresh <- liftIO $ atomicModifyIORef' lintWarningCache $ \seen ->
+          let entries = Set.fromList ((routeUrl,) <$> warnings)
+              new = Set.difference entries seen
+           in (Set.union seen entries, snd <$> Set.toAscList new)
+        forM_ fresh $ \w ->
+          logW $ "Unbound template splice on '" <> routeUrl <> "': " <> formatWarning w
   _ -> pass
 
 {- | Process-wide cache of @(route, splice)@ pairs already logged. Lives at the
