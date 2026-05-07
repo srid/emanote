@@ -36,7 +36,7 @@ urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   let parentR = M.modelResolveLinkBase model noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model noteRoute uRel
-  renderSomeInlineRefWith id (is, (url, tit)) rRel model ctx inl $ \sr ->
+  renderSomeInlineRefWith id rRel model inl $ \sr ->
     case inlRef of
       Link.InlineLink -> do
         -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
@@ -58,18 +58,16 @@ openInNewTabAttr =
 
 renderSomeInlineRefWith ::
   (a -> SR.SiteRoute) ->
-  -- | AST Node attributes of @InlineRef@ — kept in the signature for symmetry
-  -- with callers; the missing/ambiguous arms now route through templates and
-  -- don't need it. The 'RRTFound' arm passes 'sr' to @f@.
-  ([B.Inline], (Text, Text)) ->
   Rel.ResolvedRelTarget a ->
   Model ->
-  Splices.RenderCtx ->
   B.Inline ->
   (a -> Maybe (HI.Splice Identity)) ->
   Maybe (HI.Splice Identity)
-renderSomeInlineRefWith getSr _ rRel model (ctxSansCustomSplicing -> _ctx) origInl f =
+renderSomeInlineRefWith getSr rRel model origInl f =
   case rRel of
+    -- Broken-link rendering is mode-agnostic: the strikeout + ❌ marker
+    -- looks the same in live preview and static export. Click-through
+    -- still goes to the missing-link landing page in both.
     Rel.RRTMissing -> do
       let linkText = Link.unParseLink origInl
       pure $ do
