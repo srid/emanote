@@ -15,7 +15,6 @@ module Emanote.View.LintTemplate (
   formatWarning,
 ) where
 
-import Data.Set qualified as Set
 import Data.Text qualified as T
 import Relude
 import Text.XmlHtml qualified as X
@@ -41,29 +40,28 @@ through the Heist pipeline this lints).
 scanRenderedHtml :: FilePath -> ByteString -> Either Text [UnboundSplice]
 scanRenderedHtml fp bs = case X.parseHTML fp bs of
   Left err -> Left (toText err)
-  Right (X.HtmlDocument _ _ nodes) -> Right (Set.toAscList (foldMap nodeSplices nodes))
+  Right (X.HtmlDocument _ _ nodes) -> Right (sortNub (foldMap nodeSplices nodes))
   Right X.XmlDocument {} -> Right []
 
-nodeSplices :: X.Node -> Set UnboundSplice
-nodeSplices = \case
-  X.Element name attrs children ->
-    elementSplice name
-      <> foldMap attrSplices attrs
-      <> foldMap nodeSplices children
-  _ -> mempty
+{- | Walk an 'X.Node' (and its descendants) into a list of splice references.
+Duplicates are collapsed at the document root in 'scanRenderedHtml' rather
+than per node — it costs less to fold once than to merge intermediate Sets.
 
-{- | Empirical heuristic: any element name with a @:@ is a Heist splice.
-Plain HTML5 tag names never contain a colon, and SVG/MathML inlined into
-HTML5 uses unprefixed forms (@<svg>@, @<math>@, @<mfrac>@). If a future
+The colon heuristic: any element name with a @:@ is a Heist splice. Plain
+HTML5 tag names never contain a colon, and SVG/MathML inlined into HTML5
+uses unprefixed forms (@<svg>@, @<math>@, @<mfrac>@). If a future
 legitimate use of a colon-bearing tag arises, an allow-list belongs here.
 -}
-elementSplice :: Text -> Set UnboundSplice
-elementSplice name
-  | T.any (== ':') name = one (SpliceElement name)
-  | otherwise = mempty
+nodeSplices :: X.Node -> [UnboundSplice]
+nodeSplices = \case
+  X.Element name attrs children ->
+    [SpliceElement name | T.any (== ':') name]
+      <> concatMap attrSplices attrs
+      <> foldMap nodeSplices children
+  _ -> []
 
-attrSplices :: (Text, Text) -> Set UnboundSplice
-attrSplices (_, value) = Set.fromList (SpliceAttribute <$> attrSpliceRefs value)
+attrSplices :: (Text, Text) -> [UnboundSplice]
+attrSplices (_, value) = SpliceAttribute <$> attrSpliceRefs value
 
 {- | Extract the names from any @${name}@ tokens in a string. A bare @${@
 with no closing brace (or one that wraps a nested @${@, e.g.
