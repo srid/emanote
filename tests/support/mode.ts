@@ -26,6 +26,12 @@ if (rawMode !== "live" && rawMode !== "static" && rawMode !== "morph") {
 
 export const mode: Mode = rawMode;
 
+/** Modes that run a live `emanote run` backend — i.e. provide a
+ *  WebSocket and `window.ema`, plus live-only behavior such as the
+ *  ambiguous-link candidate list. `static` is the only mode that lacks
+ *  them. New backend-capable modes get appended here. */
+export const NON_STATIC_MODES: readonly Mode[] = ["live", "morph"];
+
 /** Register a Cucumber Before hook that skips scenarios tagged `tag`
  *  whenever the current run mode is not in `requiredModes`. Generalises
  *  to N-way gating — e.g. a future `@morph-only` would pass `["morph"]`. */
