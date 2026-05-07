@@ -187,7 +187,7 @@ const MORPH_TAG = "@morph";
 // (WebSocket / `window.ema`, or live-only behavior like the ambiguous-
 // link candidate list which is suppressed in static export). Only
 // `static` mode lacks them.
-const NON_STATIC_MODES = new Set<Mode>(["live", "morph"]);
+const NON_STATIC_MODES: readonly Mode[] = ["live", "morph"];
 
 Before(async function (this: EmanoteWorld) {
   this.browser = browser;

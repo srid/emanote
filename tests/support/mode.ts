@@ -27,11 +27,13 @@ if (rawMode !== "live" && rawMode !== "static" && rawMode !== "morph") {
 export const mode: Mode = rawMode;
 
 /** Register a Cucumber Before hook that skips scenarios tagged `tag`
- *  whenever the current run mode is not in `requiredModes`. The Set form
- *  generalises to N-way gating — e.g. a future `@morph-only` would just
- *  pass `new Set(["morph"])`. */
-export function skipUnlessMode(tag: string, requiredModes: Set<Mode>): void {
+ *  whenever the current run mode is not in `requiredModes`. Generalises
+ *  to N-way gating — e.g. a future `@morph-only` would pass `["morph"]`. */
+export function skipUnlessMode(
+  tag: string,
+  requiredModes: readonly Mode[],
+): void {
   Before({ tags: tag }, function () {
-    if (!requiredModes.has(mode)) return "skipped" as const;
+    if (!requiredModes.includes(mode)) return "skipped" as const;
   });
 }
