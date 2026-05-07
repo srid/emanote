@@ -114,9 +114,15 @@ async function startStatic(): Promise<{
   const outDir = path.join(runRoot, "site");
   fs.mkdirSync(outDir, { recursive: true });
   await new Promise<void>((resolve, reject) => {
-    const p = spawn(emanoteBin, ["-L", fixtureDir, "gen", outDir], {
-      stdio: "inherit",
-    });
+    // `--allow-broken-internal-links` because the fixture notebook
+    // intentionally contains broken links (broken-link-221.md tests #221's
+    // inline rendering). Without the flag, `emanote gen` exits 1 after
+    // generation and the static suite fails before the browser launches.
+    const p = spawn(
+      emanoteBin,
+      ["--allow-broken-internal-links", "-L", fixtureDir, "gen", outDir],
+      { stdio: "inherit" },
+    );
     p.on("exit", (code) =>
       code === 0
         ? resolve()
