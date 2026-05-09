@@ -72,9 +72,15 @@ data ModelT encF = Model
   -- ^ Reverse index from external source files (today only Pandoc Lua
   -- filter @.lua@ files) to the notes whose parsed AST depends on
   -- them. The patcher reads this index to invalidate exactly the
-  -- notes affected by an edit. Maintained by 'parseAndInsert' /
-  -- 'modelDeleteNote' callers in @Emanote.Source.Patch@; not touched
-  -- inside 'modelInsertNote'.
+  -- notes affected by an edit.
+  --
+  -- The insert path goes through 'parseAndInsert' in
+  -- @Emanote.Source.Patch@ since that step has the parsed
+  -- @[FilePath]@ side-channel; 'modelInsertNote' itself does not
+  -- touch the index. The delete path is symmetric in shape but
+  -- needs only the route, so 'modelDeleteNote' absorbs the index
+  -- pruning — no caller has to remember to chain
+  -- @modelSourceDependencies %~ SDeps.removeNote r@.
   }
   deriving stock (Generic)
 
@@ -200,6 +206,8 @@ modelDeleteNote k model =
     %~ deleteIxMulti k
       & modelTasks
     %~ deleteIxMulti k
+      & modelSourceDependencies
+    %~ SDeps.removeNote k
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.

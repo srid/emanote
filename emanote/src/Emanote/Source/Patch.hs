@@ -96,9 +96,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
               parseAndInsert layers noteF scriptingEngine refreshAction r (head overlays)
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
-              pure
-                $ M.modelDeleteNote r
-                >>> (modelSourceDependencies %~ SDeps.removeNote r)
+              pure $ M.modelDeleteNote r
     R.LuaFilter -> do
       -- An edit (or deletion) of a Pandoc Lua filter file invalidates
       -- every note that referenced it at parse time. We re-read those
