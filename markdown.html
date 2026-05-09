@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=7585c8b4-a93a-47ed-98c2-44836d0aeef2' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=e5763f3c-fef8-46c4-9ec6-a1b26038e763' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -2780,51 +2780,11 @@
 
     </h6>
   
-    <h2 id='more-extensions' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+    <h2 id='code' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  More extensions
+  Code
   
-  <a href='markdown.html#more-extensions' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  <div class='flex-row space-y-8'><section title='Embedded note' data-footnote-scope class='p-4 mx-2 mb-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner'>
-  <header class='flex items-center justify-center text-2xl italic bg-primary-50 dark:bg-primary-900 rounded py-1 px-2 mb-3'>
-    <a href='syntax-highlighting'>
-      Syntax Highlighting
-    </a>
-  </header>
-  <div>
-    
-
-
-
-<!-- Heading scale ~1.20 ratio (text-4xl→base via Tailwind's discrete steps).
-     h2 keeps a subtle bottom rule as the "section break" cue but at 1px in a
-     light gray that doesn't compete with the heading itself. h5/h6 fade
-     gray-* one stop down each level so they recede without losing
-     hierarchy. All semibold (600) — uniform weight, hierarchy via size. -->
-
-
-
-
-
-
-
-    <p class='mb-4 leading-relaxed'>
-      Emanote includes built-in syntax highlighting powered by <a href='https://github.com/jgm/skylighting' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>skylighting</a>, the same library used by Pandoc. Code blocks are highlighted at build time—no JavaScript required.
-    </p>
-  
-    <h2 id='how-it-works' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  How it Works
-  
-  <a href='markdown.html#how-it-works' class='--ema-anchor ml-2'>
+  <a href='markdown.html#code' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2835,140 +2795,23 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Code blocks are automatically tokenized during rendering. Each token gets a CSS class (like <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>kw</code> for keywords, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>st</code> for strings, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>co</code> for comments) and styled via CSS included in emanote’s default theme.
+      Fenced code blocks are tokenised at build time and shipped as styled <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;span&gt;</code>s, e.g.
     </p>
-  
-    <h3 id='example' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  Example
-  
-  <a href='markdown.html#example' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  <div class='mb-6 text-sm'><pre><code class='haskell'><span class='co'>-- A simple factorial function</span>
-<span class='ot'>factorial ::</span> <span class='dt'>Integer</span> <span class='ot'>-&gt;</span> <span class='dt'>Integer</span>
-factorial <span class='dv'>0</span> <span class='ot'>=</span> <span class='dv'>1</span>
-factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <span class='op'>-</span> <span class='dv'>1</span>)
-</code></pre></div><div class='mb-6 text-sm'><pre><code class='python'><span class='kw'>def</span> fibonacci(n):
-    <span class='co'>"""Generate fibonacci sequence up to n"""</span>
-    a, b <span class='op'>=</span> <span class='dv'>0</span>, <span class='dv'>1</span>
-    <span class='cf'>while</span> a <span class='op'>&lt;</span> n:
-        <span class='cf'>yield</span> a
-        a, b <span class='op'>=</span> b, a <span class='op'>+</span> b
-</code></pre></div><div class='mb-6 text-sm'><pre><code class='nix'><span class='op'>{</span> <span class='va'>pkgs</span><span class='op'>,</span> <span class='op'>...</span> <span class='op'>}</span>:
-<span class='op'>{</span>
-  <span class='va'>environment</span>.<span class='va'>systemPackages</span> <span class='op'>=</span> <span class='kw'>with</span> pkgs<span class='op'>;</span> <span class='op'>[</span>
-    vim
-    git
-  <span class='op'>];</span>
-<span class='op'>}</span>
-</code></pre></div>
-    <h2 id='supported-languages' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Supported Languages
-  
-  <a href='markdown.html#supported-languages' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      Skylighting supports <a href='https://github.com/jgm/skylighting/tree/master/skylighting-core/xml' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>over 140 languages</a> including:
-    </p>
-  
-    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
-      
-        <li>
-          Haskell, Python, JavaScript, TypeScript, Rust, Go
-        </li>
-      
-        <li>
-          Nix, Shell/Bash, YAML, JSON, TOML
-        </li>
-      
-        <li>
-          HTML, CSS, SQL, Markdown
-        </li>
-      
-        <li>
-          And many more…
-        </li>
-      
-    </ul>
-  
-    <h2 id='disabling-syntax-highlighting' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Disabling Syntax Highlighting
-  
-  <a href='markdown.html#disabling-syntax-highlighting' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      To disable built-in syntax highlighting (for example, to use a client-side highlighter like highlight.js instead), set in your <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>index.yaml</a>:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>emanote</span><span class='kw'>:</span>
-<span class='at'>  </span><span class='fu'>syntaxHighlighting</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>false</span>
-</code></pre></div>
-    <h2 id='customizing-the-theme' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Customizing the Theme
-  
-  <a href='markdown.html#customizing-the-theme' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      The default theme is in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/skylighting.css</code>. To customize, create your own <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_emanote-static/skylighting.css</code> in your notes directory to override the default.
-    </p>
-  
-    <p class='mb-4 leading-relaxed'>
-      Alternatively, add custom styles in your <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>index.yaml</a>:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>page</span><span class='kw'>:</span>
-<span class='fu'>  headHtml</span><span class='kw'>: </span><span class='ch'>|</span>
-    &lt;style&gt;
-    /* Override keyword color */
-    code span.kw { color: #ff79c6; font-weight: bold; }
-    /* Override string color */
-    code span.st { color: #f1fa8c; }
-    &lt;/style&gt;
+  <div class='mb-6 text-sm'><pre><code class='haskell'><span class='ot'>main ::</span> <span class='dt'>IO</span> ()
+main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'>"Hello, world!"</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      See the <a href='https://hackage.haskell.org/package/skylighting-core/docs/Skylighting-Types.html#t:TokenType' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>skylighting documentation</a> for a full list of token classes and their meanings.
+      See <a href='syntax-highlighting' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Syntax Highlighting</a> for the highlighter, the bundled language list, and how to disable highlighting per-page.
     </p>
   
-
-  </div>
-</section>
-
     <p class='mb-4 leading-relaxed'>
-      <a href='mermaid' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Mermaid Diagrams</a>
+      Source files can also be embedded into a note by wikilink — <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>![[foo.hs]]</code> inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Embedding</a> for the syntax and the recognised extensions.
     </p>
-  </div>
+  
+    <p class='mb-4 leading-relaxed'>
+      Diagrams written in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>mermaid</code> syntax render as SVG — see <a href='mermaid' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Mermaid Diagrams</a>.
+    </p>
+  
     <!-- Screen: hidden (popup is the UI). Print: revealed with standard
          footnote-list styling so printed output includes the cited bodies. -->
     <aside data-footnote-list aria-hidden='true' class='hidden print:block mt-10 text-sm'>
@@ -3222,9 +3065,9 @@ factorial n <span class='ot'>=</span> n <span class='op'>*</span> factorial (n <
       
             </li>
           
-            <li class='truncate' title='More extensions'>
-              <a href='markdown.html#more-extensions' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                More extensions
+            <li class='truncate' title='Code'>
+              <a href='markdown.html#code' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Code
               </a>
               
         <ul class='space-y-1 ml-2'>
