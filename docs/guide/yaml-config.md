@@ -52,6 +52,23 @@ template:
 See [[i18n|the internationalisation demo]] and its [[i18n/i18n.fr|French child page]]
 for a side-by-side example of `page.lang` selecting the default template chrome.
 
+- `next`, `prev`: Lists of wikilinks to be used for custom navigation. When set, the following template is available:
+
+```
+<ema:has:prev>
+  <div class="flex-1 p-4 mt-8 bg-gray-100 rounded">
+    <span class="mb-2 text-xl font-semibold text-gray-500">Next:
+      <ema:note:prev>
+        <a class="text-${theme}-600 mavenLinkBold hover:bg-${theme}-50 mr-2"
+           href="${nav:url}">
+          <nav:title />
+        </a>
+      </ema:note:prev>
+    </span>
+  </div>
+</ema:has:prev>
+```
+
 ## Examples
 
 - https://github.com/srid/srid/blob/master/index.yaml
