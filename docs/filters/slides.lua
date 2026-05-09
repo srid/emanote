@@ -214,32 +214,31 @@ local js = [[
       });
       return best;
     };
-    const navLinks = [...deck.querySelectorAll('.emanote-slides-nav a')];
+    // Nav links: <a> tags with data-slide-id (no href) — see slides.lua
+    // build_deck for why hrefs are omitted (htmlproofer + <base href="/">
+    // trap).
+    const navLinks = [...deck.querySelectorAll('.emanote-slides-nav [data-slide-id]')];
     const setActive = (id) => {
       for (const a of navLinks) {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+        a.classList.toggle('active', a.dataset.slideId === id);
       }
     };
     navLinks.forEach(a => {
-      a.addEventListener('click', (e) => {
-        const href = a.getAttribute('href') || '';
-        if (!href.startsWith('#')) return;
-        const i = indexOf(href.slice(1));
+      const activate = (e) => {
+        const i = indexOf(a.dataset.slideId);
         if (i < 0) return;
-        // Ema's live-server installs a window-level click listener that
-        // intercepts every <a>. For bare-hash links, the page's
-        // <base href="/"> resolves them to "/#foo" — Ema then treats
-        // that as a route change to /. preventDefault alone can't stop
-        // it; the window listener fires later in the bubble phase.
-        // Stop propagation so the click never reaches it.
         e.preventDefault();
         e.stopPropagation();
         go(i);
         // Move focus to the deck so subsequent arrow keys reach the
-        // deck-level keydown handler. Without this, focus stays on the
-        // clicked link and arrow keys may be consumed by browser
-        // defaults for in-link navigation before bubbling.
+        // deck-level keydown handler.
         requestAnimationFrame(() => deck.focus({ preventScroll: true }));
+      };
+      a.addEventListener('click', activate);
+      // role="button" + tabindex="0" make the bare <a> keyboard-focusable;
+      // wire Enter/Space to match native button activation.
+      a.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') activate(e);
       });
     });
     // Fullscreen toggle: requestFullscreen on click, exitFullscreen
@@ -323,10 +322,17 @@ local function build_deck(slides)
     local title = header_text(s.header)
     local id = slugify(title, i)
     s.header.identifier = id
-    local link = pandoc.Link(
-      { pandoc.Str(tostring(i)) },
-      "#" .. id,
-      title
+    -- Emit <a> without an href: a bare-hash href like "#id" gets
+    -- resolved to "/#id" by the page's <base href="/">, which the
+    -- static link-check follows to root and reports as a missing
+    -- anchor. JS handles navigation via the data-slide-id attribute,
+    -- so the href is unneeded.
+    local link = pandoc.RawInline(
+      "html",
+      string.format(
+        '<a role="button" tabindex="0" data-slide-id="%s" title="%s">%d</a>',
+        id, title, i
+      )
     )
     table.insert(nav_links, link)
     if i < #slides then
