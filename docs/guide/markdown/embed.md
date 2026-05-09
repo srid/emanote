@@ -67,8 +67,9 @@ PDFs can be embedded using the same syntax. The following is the result of using
 
 ### Code files
 
-Source code files can be embedded using the same syntax. The following is the result of using
-`![[haskell-code.hs]]` (note that `![](haskell-code.hs)` also works):
+Source-code, markup, and configuration files can be embedded using the same syntax. The file's extension is matched against [skylighting](https://github.com/jgm/skylighting)'s bundled syntax map, and the content is highlighted at build time through the same pipeline used for fenced code blocks (see [[syntax-highlighting]]) — an embedded `.hs` file renders identically to a fenced Haskell code block in a regular note.
+
+The following is the result of using `![[haskell-code.hs]]` (the regular Markdown form `![](haskell-code.hs)` also works):
 
 ![[haskell-code.hs]]
 
@@ -76,25 +77,20 @@ A C file:
 
 ![[c-code.c]]
 
-The following file extensions are currently supported:
+A JSON file:
 
-- `.hs`
-- `.sh`
-- `.py`
-- `.js`
-- `.java`
-- `.cpp`
-- `.cs`
-- `.rb`
-- `.go`
-- `.swift`
-- `.kt`
-- `.rs`
-- `.ts`
-- `.php`
-- `.c`
+![[data-demo.json]]
 
-To include a new one please see [here](https://github.com/srid/emanote/pull/444). 
+A TOML file:
 
-> [!warning] Firefox users
-> Please note that the wrong syntax highlighting might be applied if you are on Firefox due to what appears to be a browser bug.
+![[config-demo.toml]]
+
+A CSS snippet:
+
+![[styles-demo.css]]
+
+#### Supported extensions
+
+Anything skylighting's [`syntaxesByExtension`](https://hackage.haskell.org/package/skylighting-core/docs/Skylighting-Core.html#v:syntaxesByExtension) recognises will highlight — that's hundreds of languages spanning Ada through Zsh, including the common programming languages, shells, markup (`.html`, `.tex`, `.rst`, …), data formats (`.json`, `.yaml`, `.toml`, `.xml`, …), and config files (`.ini`, `.css`, `.scss`, …). The image, audio, video, and PDF extensions listed above take precedence and embed via their dedicated templates instead.
+
+To add support for a new language, contribute a Kate XML syntax file upstream to skylighting — Emanote picks it up automatically the next time the dependency is bumped.

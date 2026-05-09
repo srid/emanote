@@ -1,0 +1,9 @@
+{
+  "name": "emanote",
+  "languages": ["haskell", "nix"],
+  "embeds": {
+    "code": true,
+    "math": true,
+    "mermaid": true
+  }
+}

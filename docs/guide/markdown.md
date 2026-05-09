@@ -174,10 +174,17 @@ On default theme, an anchor is displayed when you hover on the heading allowing 
 
 ###### Heading `level` 6
 
-## More extensions
+## Code
 
-:::{.flex-row .space-y-8}
-![[syntax-highlighting]]
+Fenced code blocks are tokenised at build time and shipped as styled `<span>`s, e.g.
 
-[[mermaid]]
-:::
+```haskell
+main :: IO ()
+main = putStrLn "Hello, world!"
+```
+
+See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
+
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See [[embed]] for the syntax and the recognised extensions.
+
+Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].

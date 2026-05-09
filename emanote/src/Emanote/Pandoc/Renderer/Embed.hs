@@ -87,11 +87,11 @@ embedBlockWikiLinkResolvingSplice model nr ctx noteRoute node = do
     Left (R.LMLView_Html, r) -> embedResourceRoute model nr ctx noteRoute r
     Right sf
       | isJust (SF._staticFileInfo sf) ->
-          embedStaticFileRoute model (toText $ SF._staticFilePath sf) sf
+          embedStaticFileRoute ctx model (toText $ SF._staticFilePath sf) sf
     _ -> Nothing
 
 embedBlockRegularLinkResolvingSplice :: PandocBlockRenderer Model R.LMLRoute
-embedBlockRegularLinkResolvingSplice model _nr _ctx noteRoute node = do
+embedBlockRegularLinkResolvingSplice model _nr ctx noteRoute node = do
   B.Para [inl] <- pure node
   (inlRef, (_, _, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineImage
@@ -100,17 +100,17 @@ embedBlockRegularLinkResolvingSplice model _nr _ctx noteRoute node = do
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveModelRouteCandidates model candidates
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute rRel model inl
-    $ either (const Nothing) (embedStaticFileRoute model $ WL.plainify is)
+    $ either (const Nothing) (embedStaticFileRoute ctx model $ WL.plainify is)
 
 embedInlineWikiLinkResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
-embedInlineWikiLinkResolvingSplice model _nr _ctx noteRoute inl = do
+embedInlineWikiLinkResolvingSplice model _nr ctx noteRoute inl = do
   (inlRef, (_, _, otherAttrs), _, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
   RendererUrl.renderSomeInlineRefWith Resolve.resourceSiteRoute rRel model inl
-    $ either (const Nothing) (embedStaticFileRoute model $ show wl)
+    $ either (const Nothing) (embedStaticFileRoute ctx model $ show wl)
 
 runEmbedTemplate :: ByteString -> H.Splices (HI.Splice Identity) -> HI.Splice Identity
 runEmbedTemplate name splices = do
@@ -207,8 +207,18 @@ renderCyclicEmbedSplice model ctx embedStack note =
     renderRoute :: R.LMLRoute -> B.Inline
     renderRoute r = B.Str (Tit.toPlain (M.modelLookupTitle r model))
 
-embedStaticFileRoute :: Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
-embedStaticFileRoute model altText staticFile = do
+{- | Render an embedded static file (@![[file.ext]]@).
+
+For source-code files ('StaticFileInfoCode'), the file content is wrapped in
+a synthetic Pandoc 'B.CodeBlock' and rendered through 'rpBlock' so it goes
+through the same skylighting pipeline as a fenced code block in a regular
+note. Without this, the embed-code template's @\<ema:code:block /\>@ splice
+would produce raw text and the embed would render unhighlighted (a
+regression introduced when #624 moved highlighting from client-side
+@highlight.js@ to server-side skylighting).
+-}
+embedStaticFileRoute :: HP.RenderCtx -> Model -> Text -> SF.StaticFile -> Maybe (HI.Splice Identity)
+embedStaticFileRoute ctx model altText staticFile = do
   let url = SF.siteRouteUrl model $ SF.staticFileSiteRoute staticFile
   staticFileInfo <- SF._staticFileInfo staticFile
   pure . runEmbedTemplate (staticFileInfoTemplateName staticFileInfo) $ do
@@ -223,6 +233,13 @@ embedStaticFileRoute model altText staticFile = do
       StaticFileInfoPDF ->
         "ema:url" ## HI.textSplice url
       StaticFileInfoCode (CodeLanguage language) content -> do
-        "ema:code:content" ## HI.textSplice content
+        -- Strip pandoc.tpl's <CodeBlock class="…" /> from this rpBlock call.
+        -- That class targets the outer wrapper of a fenced code block — for
+        -- an embed it would inject a second styled <div> *inside*
+        -- embed-code.tpl's chrome, splitting presentation ownership across
+        -- two templates. embed-code.tpl owns all chrome here.
+        let codeCtx = ctx {HP.bAttr = const B.nullAttr}
+        "ema:code:block" ## rpBlock codeCtx (B.CodeBlock ("", [language], []) content)
+        -- Redundant with skylighting's own class — see embed-code.tpl.
         "ema:code:language" ## HI.textSplice language
         "ema:alt" ## HI.textSplice altText

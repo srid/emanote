@@ -110,6 +110,11 @@ Feature: Smoke
     Then every <pre> with a child <code> has a .code-copy-button
     And the first code copy button becomes visible when I hover its code block
 
+  Scenario: Wikilink-embedded source files are syntax-highlighted by skylighting (regression: #24)
+    When I open "/code-embed.html"
+    Then the page contains an element with class "kw"
+    And the page contains an element with class "fu"
+
   @morph
   Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
     When I open "/i18n.fr"
