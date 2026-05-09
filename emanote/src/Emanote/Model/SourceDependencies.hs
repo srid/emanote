@@ -26,16 +26,22 @@ import Relude
 newtype SourceDependencies = SourceDependencies
   { sdLuaDeps :: Map FilePath (Set R.LMLRoute)
   -- ^ Reverse map from a Lua filter file to the notes that reference
-  -- it. The key is the **absolute** path the filter was resolved to at
-  -- parse time (the same path the @LuaFilter@ refresh handler in
-  -- 'Emanote.Source.Patch' compares against), not the relative path
-  -- the user wrote in @pandoc.filters@. The value is the set of
-  -- 'R.LMLRoute's whose cached 'Text.Pandoc.Definition.Pandoc' AST
-  -- includes the output of that filter; a filter referenced by N notes
-  -- has one entry with a set of size N. Empty sets are pruned by
-  -- 'removeNote' so an absent key and an empty value are equivalent
-  -- (use 'maybeToMonoid' on lookup) — keeps invalidation walks linear
-  -- in the actual dependent count rather than total filter count.
+  -- it. The key is the layer-resolved path produced by
+  -- 'Emanote.Source.Loc.locResolve' — i.e. the layer's @-L@ value
+  -- joined to the user's @pandoc.filters@ spec via @\<\/\>@. That's
+  -- working-directory-relative if the user passed @-L docs@ and rooted
+  -- at @\/@ if they passed @-L \/abs\/path@; the index doesn't care
+  -- which form, only that it matches what the @LuaFilter@ refresh
+  -- handler in 'Emanote.Source.Patch' computes from the unionmount
+  -- event so producer and consumer collide on the same string.
+  --
+  -- The value is the set of 'R.LMLRoute's whose cached
+  -- 'Text.Pandoc.Definition.Pandoc' AST includes the output of that
+  -- filter; a filter referenced by N notes has one entry with a set of
+  -- size N. Empty sets are pruned by 'removeNote' so an absent key and
+  -- an empty value are equivalent (use 'maybeToMonoid' on lookup) —
+  -- keeps invalidation walks linear in the actual dependent count
+  -- rather than total filter count.
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (ToJSON)
