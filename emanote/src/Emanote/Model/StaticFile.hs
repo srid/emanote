@@ -6,11 +6,12 @@ module Emanote.Model.StaticFile where
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
 import Relude
+import Skylighting qualified
 import System.FilePath (takeExtension)
 
 data StaticFile = StaticFile
@@ -74,17 +75,17 @@ readStaticFileInfo ::
   (FilePath -> m Text) ->
   m (Maybe StaticFileInfo)
 readStaticFileInfo fp readFilePath = do
-  let extension = toText (takeExtension fp)
+  let extension = takeExtension fp
   if
-    | extension `elem` imageExts ->
+    | toText extension `elem` imageExts ->
         pure $ Just StaticFileInfoImage
-    | extension `elem` videoExts ->
+    | toText extension `elem` videoExts ->
         pure $ Just StaticFileInfoVideo
-    | extension `elem` audioExts ->
+    | toText extension `elem` audioExts ->
         pure $ Just StaticFileInfoAudio
     | extension == ".pdf" ->
         pure $ Just StaticFileInfoPDF
-    | Just lang <- Map.lookup extension codeExts -> do
+    | Just lang <- codeLanguageForExtension extension -> do
         code <- readFilePath fp
         pure $ Just $ StaticFileInfoCode lang code
     | otherwise -> return Nothing
@@ -93,96 +94,26 @@ readStaticFileInfo fp readFilePath = do
     videoExts = [".mp4", ".webm", ".ogv"]
     audioExts = [".aac", ".caf", ".flac", ".mp3", ".ogg", ".wav", ".wave"]
 
-{- | File-extension to skylighting language for source-code embedding.
+{- | Look up a source-code language for a file extension via skylighting's
+own bundled syntax map.
 
-When a static file's extension matches an entry here, its content is read
-into the model eagerly at build time and `![[file.ext]]` (or
-@!\[\](file.ext)@) renders it as a syntax-highlighted code block — see
-@docs/guide/markdown/embed.md@.
+Skylighting's @syntaxesByExtension@ globs the extension against the
+@sExtensions@ patterns parsed from each Kate syntax XML, so this delegates
+the entire ext→language mapping to the highlighter we render with. Adding
+support for a new language is upstream work in skylighting, not a list to
+edit here. The lower-cased short-name is used as the language identifier
+(matches the @\<code class="sourceCode haskell"\>@ convention skylighting
+itself emits).
 
-Language identifiers must match a name recognised by skylighting (the
-Pandoc-bundled highlighter); an unrecognised name silently falls back to
-no highlighting at render time.
-
-Adding an extension *registers every file with that extension in the
-notebook*, content and all, into the model — even files no note actually
-embeds. Avoid registering extensions for formats commonly used as data
-dumps (huge `.json` exports, multi-megabyte `.sql`, etc.) unless the
-notebook genuinely intends to embed them; otherwise the cost is paid on
-every build with no rendering benefit.
+Caveat: matching an extension causes the file's content to be read into
+the model eagerly at build time, even if no note actually embeds it. This
+is the same shape as the previous hand-curated map, just with broader
+coverage.
 -}
-codeExts :: Map Text CodeLanguage
-codeExts =
-  CodeLanguage
-    <$> Map.fromList
-      [ -- Programming languages
-        (".c", "c")
-      , (".clj", "clojure")
-      , (".cljc", "clojure")
-      , (".cljs", "clojure")
-      , (".cpp", "cpp")
-      , (".cs", "cs")
-      , (".dart", "dart")
-      , (".elm", "elm")
-      , (".erl", "erlang")
-      , (".ex", "elixir")
-      , (".exs", "elixir")
-      , (".fs", "fsharp")
-      , (".go", "go")
-      , (".groovy", "groovy")
-      , (".h", "c")
-      , (".hpp", "cpp")
-      , (".hs", "haskell")
-      , (".java", "java")
-      , (".jl", "julia")
-      , (".js", "javascript")
-      , (".jsx", "javascript")
-      , (".kt", "kotlin")
-      , (".lua", "lua")
-      , (".m", "objectivec")
-      , (".ml", "ocaml")
-      , (".nim", "nim")
-      , (".nix", "nix")
-      , (".php", "php")
-      , (".pl", "perl")
-      , (".purs", "purescript")
-      , (".py", "python")
-      , (".r", "r")
-      , (".rb", "ruby")
-      , (".rs", "rust")
-      , (".scala", "scala")
-      , (".scm", "scheme")
-      , (".swift", "swift")
-      , (".ts", "typescript")
-      , (".tsx", "typescript")
-      , (".v", "verilog")
-      , (".zig", "zig")
-      , -- Shell
-        (".bash", "bash")
-      , (".sh", "bash")
-      , (".zsh", "zsh")
-      , (".ps1", "powershell")
-      , -- Markup, data, config
-        (".css", "css")
-      , (".diff", "diff")
-      , (".dockerfile", "dockerfile")
-      , (".html", "html")
-      , (".htm", "html")
-      , (".ini", "ini")
-      , (".json", "json")
-      , (".latex", "latex")
-      , (".makefile", "makefile")
-      , (".patch", "diff")
-      , (".rst", "rest")
-      , (".sass", "sass")
-      , (".scss", "scss")
-      , (".sql", "sql")
-      , (".tex", "latex")
-      , (".toml", "toml")
-      , (".xml", "xml")
-      , (".xsl", "xml")
-      , (".yaml", "yaml")
-      , (".yml", "yaml")
-      ]
+codeLanguageForExtension :: String -> Maybe CodeLanguage
+codeLanguageForExtension extension =
+  case Skylighting.syntaxesByExtension Skylighting.defaultSyntaxMap extension of
+    syntax : _ -> Just $ CodeLanguage $ T.toLower $ Skylighting.sShortname syntax
+    [] -> Nothing
 
 makeLenses ''StaticFile
