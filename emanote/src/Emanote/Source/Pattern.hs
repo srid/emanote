@@ -23,11 +23,9 @@ filePattern = \case
   R.AnyExt ->
     "**"
 
-{- | The set of file types unionmount tags. 'R.AnyExt' is appended
-last *structurally* — adding a new known type to 'knownTypes' is
-automatically claimed before falling through to the catch-all,
-without anyone needing to remember a comment-enforced "AnyExt last"
-ordering rule.
+{- | unionmount assigns the first matching pattern's tag, so 'R.AnyExt'
+is appended last by construction — new known types add to
+'knownTypes' without disturbing the catch-all's trailing position.
 -}
 filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =

@@ -372,11 +372,9 @@ errorDiv header errs =
 
 {- | Result of parsing a single note's source: the parsed 'Note' plus
 side-channel information the patcher needs to keep its indices in
-sync. Today the only side-channel is @luaFilterDeps@ — the list of
-filter paths the note's @pandoc.filters@ frontmatter referenced, as
-written (typically layer-relative), independent of whether each path
-resolved on disk at parse time. Adding a new edge kind (e.g.
-yaml-cascade for [#721]) means a new field, not a wider tuple.
+sync. @luaFilterDeps@ carries filter paths *as written* in
+@pandoc.filters@ frontmatter, regardless of whether each resolved on
+disk at parse time — see "Emanote.Model.SourceDependencies".
 -}
 data ParseResult = ParseResult
   { parsedNote :: Note

@@ -3,16 +3,9 @@
 
  Today only @.lua@ filter files are tracked. Edges are keyed by the
  path as written in a note's @pandoc.filters@ frontmatter — *not* by
- the resolved absolute path. This means a filter referenced from a
- note but missing at parse time still gets an edge: when the file is
- later created, the same key matches and the dependent is re-parsed.
-
- Future dependency edges (e.g. cascaded @index.yaml@ files affecting a
- note's effective filter list) are out of scope for now. The single
- inhabitant 'sdLuaDeps' is intentionally not labelled "the only field
- forever" — adding a sibling field is mechanically straightforward,
- but the mutation API ('removeNote') will need extending to traverse
- the new field too. See [#721].
+ the resolved absolute path — so a filter referenced before it
+ exists on disk still gets an edge: when the file is later created,
+ the same key matches and the dependent is re-parsed.
 -}
 module Emanote.Model.SourceDependencies (
   SourceDependencies,

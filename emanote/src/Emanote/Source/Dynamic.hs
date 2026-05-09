@@ -47,20 +47,13 @@ data EmanoteConfig = EmanoteConfig
   -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
   }
 
-{- | Make an Ema `Dynamic` for the Emanote model.
+{- | Make an Ema `Dynamic` for the Emanote model. The bulk of logic
+for building the Dynamic is in @Source/Patch.hs@.
 
-The bulk of logic for building the Dynamic is in @Source/Patch.hs@.
-
-We use 'UM.unionMountStreaming' rather than 'UM.unionMount' for two
-reasons. First, the streaming handler folds per-file updates through
-the model one file at a time, so each file's parse closure is GC'd
-as soon as its update is applied — this caps initial-load memory on
-large notebooks (see @srid/emanote#66@). Second, the handler is
-handed the running model as an argument, which the Lua-filter
-hot-reload path in 'Patch.patchModel' uses to look up dependents in
-'Model.modelSourceDependencies' (see @srid/emanote#263@); without
-it, downstream would have to maintain a parallel mirror of the model
-just to read it inside the change loop.
+We use 'UM.unionMountStreaming' so per-file closures are GC'd as
+their updates land (caps initial-load memory on large notebooks —
+@srid/emanote#66@) and so 'Patch.patchModel' can read the running
+model when walking the Lua-filter dep index (@srid/emanote#263@).
 -}
 emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
 emanoteSiteInput cliAct EmanoteConfig {..} = do

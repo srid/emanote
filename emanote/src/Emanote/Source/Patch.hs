@@ -227,13 +227,10 @@ parseAndInsert layers noteF scriptingEngine refreshAction r src = do
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r filterPaths)
 
-{- | Re-read a note's Markdown source from disk and produce a transformer
-that replaces the cached note in the model with the freshly parsed
-one. If the note no longer exists in the model, drops the stale entry
-from 'modelSourceDependencies' instead — the @OrDrop@ suffix names
-this side effect, since callers reaching for "just re-read this
-note" should know the dependency index also gets pruned. Synthetic
-notes with no on-disk source are a no-op.
+{- | Re-read a note's Markdown source and produce a transformer that
+replaces the cached note. If the note no longer exists in the model,
+the stale dep edges are dropped instead — synthetic notes (no
+on-disk source) are a no-op.
 -}
 reparseOrDropNote ::
   (MonadIO m, MonadLogger m) =>

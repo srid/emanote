@@ -69,18 +69,9 @@ data ModelT encF = Model
   , _modelFolgezettelTree :: Forest R.LMLRoute
   -- ^ Folgezettel tree computed once for each update to model.
   , _modelSourceDependencies :: SourceDependencies
-  -- ^ Reverse index from external source files (today only Pandoc Lua
-  -- filter @.lua@ files) to the notes whose parsed AST depends on
-  -- them. The patcher reads this index to invalidate exactly the
-  -- notes affected by an edit.
-  --
-  -- The insert path goes through 'parseAndInsert' in
-  -- @Emanote.Source.Patch@ since that step has the parsed
-  -- @[FilePath]@ side-channel; 'modelInsertNote' itself does not
-  -- touch the index. The delete path is symmetric in shape but
-  -- needs only the route, so 'modelDeleteNote' absorbs the index
-  -- pruning — no caller has to remember to chain
-  -- @modelSourceDependencies %~ SDeps.removeNote r@.
+  -- ^ Reverse index from external source files to dependent notes,
+  -- read by the patcher to invalidate exactly the notes affected by
+  -- an edit. See "Emanote.Model.SourceDependencies".
   }
   deriving stock (Generic)
 
