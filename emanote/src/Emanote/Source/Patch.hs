@@ -38,10 +38,11 @@ import UnliftIO.Directory (doesDirectoryExist, doesFileExist)
 
 {- | Map a filesystem change to the corresponding model change.
 
-The 'ModelEma' argument is the model as it stands when this handler is
-invoked; only the 'R.LuaFilter' branch needs to consult it (to walk
-the reverse-dependency index), but the parameter is in scope for any
-future branch that needs the same. The returned transformer is then
+The streaming handler in 'Source.Dynamic' hands every per-file step
+the running model; we forward it uniformly so 'patchModel' has one
+shape across all file types. Only the 'R.LuaFilter' branch reads it
+today (to walk the reverse-dependency index in
+@Emanote.Model.SourceDependencies@). The returned transformer is
 applied to that same model by the caller.
 -}
 patchModel ::
