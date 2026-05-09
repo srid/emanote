@@ -19,6 +19,7 @@ import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type (ModelEma, modelNotes, modelSourceDependencies)
 import Emanote.Prelude (
+  chainM,
   log,
   logD,
   logE,
@@ -119,17 +120,16 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
               [ SDeps.dependentsOnLua k (model ^. modelSourceDependencies)
               | k <- candidates
               ]
-      if Set.null dependents
+      let depList = Set.toList dependents
+      if null depList
         then do
           logD $ "Lua filter changed but no notes depend on it: " <> toText fp
           pure id
         else do
-          log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Set.size dependents) <> " dependent note(s)"
-          -- A re-parse rewrites the notes' Pandoc AST, so the stork
-          -- index built off the old AST is stale. Same reason the LML
-          -- branch above clears it on every Refresh/Delete.
+          log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (length depList) <> " dependent note(s)"
+          -- Re-parse rewrites the AST, so the cached stork index is stale.
           Stork.clearStorkIndex storkIndexTVar
-          foldr (>>>) id <$> traverse (reparseOrDropNote layers noteF scriptingEngine model) (Set.toList dependents)
+          chainM (reparseOrDropNote layers noteF scriptingEngine model) depList
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
