@@ -67,8 +67,9 @@ PDFs can be embedded using the same syntax. The following is the result of using
 
 ### Code files
 
-Source code files can be embedded using the same syntax. The following is the result of using
-`![[haskell-code.hs]]` (note that `![](haskell-code.hs)` also works):
+Source-code, markup, and configuration files can be embedded using the same syntax. The file's extension picks the language, and the content is highlighted at build time via the same skylighting pipeline used for fenced code blocks (see [[syntax-highlighting]]) — so an embedded `.hs` file looks identical to the equivalent ` ```haskell ` block.
+
+The following is the result of using `![[haskell-code.hs]]` (the regular Markdown form `![](haskell-code.hs)` also works):
 
 ![[haskell-code.hs]]
 
@@ -76,25 +77,24 @@ A C file:
 
 ![[c-code.c]]
 
-The following file extensions are currently supported:
+A JSON config:
 
-- `.hs`
-- `.sh`
-- `.py`
-- `.js`
-- `.java`
-- `.cpp`
-- `.cs`
-- `.rb`
-- `.go`
-- `.swift`
-- `.kt`
-- `.rs`
-- `.ts`
-- `.php`
-- `.c`
+![[data-demo.json]]
 
-To include a new one please see [here](https://github.com/srid/emanote/pull/444). 
+A TOML config:
 
-> [!warning] Firefox users
-> Please note that the wrong syntax highlighting might be applied if you are on Firefox due to what appears to be a browser bug.
+![[config-demo.toml]]
+
+A CSS snippet:
+
+![[styles-demo.css]]
+
+#### Supported extensions
+
+Programming languages: `.c` `.clj` `.cljc` `.cljs` `.cpp` `.cs` `.dart` `.elm` `.erl` `.ex` `.exs` `.fs` `.go` `.groovy` `.h` `.hpp` `.hs` `.java` `.jl` `.js` `.jsx` `.kt` `.lua` `.m` `.ml` `.nim` `.nix` `.php` `.pl` `.purs` `.py` `.r` `.rb` `.rs` `.scala` `.scm` `.swift` `.ts` `.tsx` `.v` `.zig`.
+
+Shell: `.bash` `.sh` `.zsh` `.ps1`.
+
+Markup, data, config: `.css` `.diff` `.dockerfile` `.html` `.htm` `.ini` `.json` `.latex` `.makefile` `.patch` `.rst` `.sass` `.scss` `.sql` `.tex` `.toml` `.xml` `.xsl` `.yaml` `.yml`.
+
+To register an additional extension, edit `codeExts` in `Emanote.Model.StaticFile` — the value must be a language name that [skylighting](https://github.com/jgm/skylighting) recognises, otherwise the file embeds without highlighting.
