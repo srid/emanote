@@ -96,15 +96,20 @@ readStaticFileInfo fp readFilePath = do
 {- | File-extension to skylighting language for source-code embedding.
 
 When a static file's extension matches an entry here, its content is read
-into the model and `![[file.ext]]` (or @!\[\](file.ext)@) renders it as a
-syntax-highlighted code block — see @docs/guide/markdown/embed.md@.
+into the model eagerly at build time and `![[file.ext]]` (or
+@!\[\](file.ext)@) renders it as a syntax-highlighted code block — see
+@docs/guide/markdown/embed.md@.
 
 Language identifiers must match a name recognised by skylighting (the
 Pandoc-bundled highlighter); an unrecognised name silently falls back to
 no highlighting at render time.
 
-Add a new extension here to register it; the docs page lists the keys
-explicitly so users don't have to read the source.
+Adding an extension *registers every file with that extension in the
+notebook*, content and all, into the model — even files no note actually
+embeds. Avoid registering extensions for formats commonly used as data
+dumps (huge `.json` exports, multi-megabyte `.sql`, etc.) unless the
+notebook genuinely intends to embed them; otherwise the cost is paid on
+every build with no rendering benefit.
 -}
 codeExts :: Map Text CodeLanguage
 codeExts =

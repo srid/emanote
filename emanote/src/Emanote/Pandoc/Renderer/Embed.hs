@@ -240,8 +240,6 @@ embedStaticFileRoute ctx model altText staticFile = do
         -- two templates. embed-code.tpl owns all chrome here.
         let codeCtx = ctx {HP.bAttr = const B.nullAttr}
         "ema:code:block" ## rpBlock codeCtx (B.CodeBlock ("", [language], []) content)
-        -- Skylighting already encodes the language in <code class="sourceCode haskell">;
-        -- this splice survives so the outer wrapper can carry it as a
-        -- data-language="…" attribute for theme CSS / JS targeting.
+        -- Redundant with skylighting's own class — see embed-code.tpl.
         "ema:code:language" ## HI.textSplice language
         "ema:alt" ## HI.textSplice altText
