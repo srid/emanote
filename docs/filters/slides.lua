@@ -79,6 +79,28 @@ local css = [[
   background: var(--color-primary-700);
   border-color: var(--color-primary-700);
 }
+.emanote-slides-nav .emanote-slides-fs {
+  margin-left: auto;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-gray-700);
+  border-radius: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.emanote-slides-nav .emanote-slides-fs:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-100);
+}
+.emanote-slides-nav .emanote-slides-fs svg { width: 1rem; height: 1rem; display: block; }
+.emanote-slides-nav .emanote-slides-fs .icon-exit { display: none; }
+.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-enter { display: none; }
+.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-exit { display: block; }
 .emanote-slides-track {
   display: flex;
   overflow-x: auto;
@@ -87,6 +109,24 @@ local css = [[
   aspect-ratio: 16 / 9;
   background: var(--color-gray-50);
 }
+/* Fullscreen mode: fill the viewport, kill margins/border, scale slide
+   padding so the deck doesn't read as a tiny embedded frame. */
+.emanote-slides:fullscreen {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-gray-50);
+}
+.emanote-slides:fullscreen .emanote-slides-track {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  height: auto;
+}
+.emanote-slides:fullscreen .emanote-slide { padding: 4rem 6rem; }
+.emanote-slides:fullscreen .emanote-slide > h2:first-child { font-size: 3rem; }
+.emanote-slides:fullscreen .emanote-slide :is(p, ul, ol, pre) { font-size: 1.5rem; }
 .emanote-slide {
   flex: 0 0 100%;
   scroll-snap-align: start;
@@ -147,12 +187,16 @@ local js = [[
     if (!track || slides.length === 0) continue;
     deck.tabIndex = 0;
     const indexOf = (id) => slides.findIndex(s => s.id === id);
+    // Scroll the track horizontally to the chosen slide. Using
+    // track.scrollTo (vs slides[j].scrollIntoView) keeps scrolling
+    // contained to the track — scrollIntoView with block:'nearest'
+    // has been observed to drop horizontal scroll updates when the
+    // surrounding page is the actual scroll-container winner.
     const go = (i, smooth = true) => {
       const j = Math.max(0, Math.min(slides.length - 1, i));
-      slides[j].scrollIntoView({
+      track.scrollTo({
+        left: slides[j].offsetLeft,
         behavior: smooth ? 'smooth' : 'instant',
-        inline: 'start',
-        block: 'nearest',
       });
     };
     const current = () => {
@@ -185,8 +229,27 @@ local js = [[
         e.preventDefault();
         e.stopPropagation();
         go(i);
+        // Move focus to the deck so subsequent arrow keys reach the
+        // deck-level keydown handler. Without this, focus stays on the
+        // clicked link and arrow keys may be consumed by browser
+        // defaults for in-link navigation before bubbling.
+        requestAnimationFrame(() => deck.focus({ preventScroll: true }));
       });
     });
+    // Fullscreen toggle: requestFullscreen on click, exitFullscreen
+    // when already fullscreen. The CSS swaps the icon based on
+    // :fullscreen pseudo-class — no manual class juggling.
+    const fsBtn = deck.querySelector('.emanote-slides-fs');
+    if (fsBtn) {
+      fsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (document.fullscreenElement === deck) {
+          document.exitFullscreen?.();
+        } else {
+          deck.requestFullscreen?.().then(() => deck.focus({ preventScroll: true })).catch(() => {});
+        }
+      });
+    }
     if (slides[0]) setActive(slides[0].id);
     const observer = new IntersectionObserver((entries) => {
       let best = null, bestRatio = 0;
@@ -234,6 +297,11 @@ local function split_into_slides(blocks)
   return slides
 end
 
+-- Inline SVG icons for the fullscreen toggle (24x24 viewBox; CSS sizes
+-- them down to 1rem). Two icons, one shown at a time via the
+-- :fullscreen pseudo-class — no JS class toggling needed.
+local fs_icons = [[<svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg><svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>]]
+
 local function build_deck(slides)
   local nav_links = {}
   local sections = {}
@@ -255,6 +323,18 @@ local function build_deck(slides)
     local section = pandoc.Div(body, pandoc.Attr(id, { "emanote-slide" }, {}))
     table.insert(sections, section)
   end
+  -- Fullscreen toggle: sits on the right side of the nav (margin-left:
+  -- auto in CSS pushes it past the slide-number links). Inline raw HTML
+  -- because pandoc's Builder doesn't model <button>.
+  local fs_button =
+    pandoc.RawInline(
+      "html",
+      string.format(
+        '<button type="button" class="emanote-slides-fs" aria-label="Toggle fullscreen" title="Fullscreen">%s</button>',
+        fs_icons
+      )
+    )
+  table.insert(nav_links, fs_button)
   local nav = pandoc.Div(
     { pandoc.Plain(nav_links) },
     pandoc.Attr("", { "emanote-slides-nav" }, {})
