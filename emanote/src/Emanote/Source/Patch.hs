@@ -126,6 +126,10 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
           pure id
         else do
           log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Set.size dependents) <> " dependent note(s)"
+          -- A re-parse rewrites the notes' Pandoc AST, so the stork
+          -- index built off the old AST is stale. Same reason the LML
+          -- branch above clears it on every Refresh/Delete.
+          Stork.clearStorkIndex storkIndexTVar
           foldr (>>>) id <$> traverse (reparseOrDropNote layers noteF scriptingEngine model) (Set.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
