@@ -22,17 +22,19 @@ import Emanote.Model.Note.Filter (applyPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Pandoc.Markdown.Parser qualified as Markdown
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Route qualified as R
 import Emanote.Route.Ext (FileType (Folder))
+import Emanote.Route.ModelRoute qualified as MR
 import Emanote.Route.R (R)
 import Emanote.Source.Loc (Loc)
 import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import System.FilePath (takeFileName, (</>))
+import System.FilePath (takeDirectory, takeFileName, (</>))
 import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -69,6 +71,12 @@ newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
 
+{- | Per-note IxSet indices. Notably absent: a tag index. Tags can be
+inherited from sibling YAML cascade (see issue #352), and that
+requires the model's SData — which 'ixFun' (a pure @Note -> [k]@)
+can't see. Tag-based queries go through 'Emanote.Model.Meta.modelTags'
+and the per-note effective-tag helper, which both consult cascade.
+-}
 type NoteIxs =
   '[ -- Route to this note
      R.LMLRoute
@@ -82,8 +90,6 @@ type NoteIxs =
      RAncestor
    , -- Parent folder
      Maybe (R 'R.Folder)
-   , -- Tag
-     HT.Tag
    , -- Alias route for this note. Can be "foo" or "foo/bar".
      NonEmpty Slug
    ]
@@ -99,7 +105,6 @@ instance Indexable NoteIxs Note where
       (ixFun $ maybeToList . noteXmlRoute)
       (ixFun noteAncestors)
       (ixFun $ one . noteParent)
-      (ixFun noteTags)
       (ixFun $ maybeToList . noteSlug)
 
 -- | All possible wiki-links that refer to this note.
@@ -123,13 +128,34 @@ noteAncestors =
 noteParent :: Note -> Maybe (R 'R.Folder)
 noteParent = R.withLmlRoute R.routeParent . _noteRoute
 
+{- | Folder used as the base for resolving relative URLs from this note.
+
+For most notes, this is the parent folder of the note's route. For notes
+loaded from @\<dir\>/index.md@ (or @index.org@) the canonicalized route
+already drops the @index@ slug — but relative URLs should still resolve
+against the actual @\<dir\>/@ directory, not its parent. We use the note's
+on-disk source path (when known) to derive the correct base.
+
+See <https://github.com/srid/emanote/issues/608>.
+-}
+noteResolveLinkBase :: Note -> Maybe (R 'R.Folder)
+noteResolveLinkBase note =
+  case _noteSource note of
+    Just (_, fp) -> resolveLinkBaseFromFilePath fp
+    Nothing -> noteParent note
+
+-- | Folder route corresponding to the directory containing the given file.
+resolveLinkBaseFromFilePath :: FilePath -> Maybe (R 'R.Folder)
+resolveLinkBaseFromFilePath fp =
+  case takeDirectory fp of
+    "." -> Nothing
+    "" -> Nothing
+    "/" -> Nothing
+    dir -> R.mkRouteFromFilePath dir
+
 hasChildNotes :: R 'Folder -> IxNote -> Bool
 hasChildNotes r =
   not . Ix.null . Ix.getEQ (Just r)
-
-noteTags :: Note -> [HT.Tag]
-noteTags =
-  fmap HT.Tag . maybeToMonoid . lookupMeta (one "tags")
 
 noteSlug :: Note -> Maybe (NonEmpty Slug)
 noteSlug note = do
@@ -193,12 +219,14 @@ noteXmlRoute note
 -- | The HTML route intended by user for this note.
 noteHtmlRoute :: Note -> R 'R.Html
 noteHtmlRoute note@Note {..} =
-  -- Favour slug if one exists, otherwise use the full path.
   case noteSlug note of
-    Nothing ->
-      R.withLmlRoute coerce _noteRoute
     Just slugs ->
+      -- An explicit `slug:` is taken at face value: the user typed the URL.
       R.mkRouteFromSlugs slugs
+    Nothing ->
+      -- File-path-derived: route through the canonical LML→HTML conversion
+      -- so the trailing-index expansion isn't forgotten (see #542).
+      MR.lmlToHtmlRoute _noteRoute
 
 lookupNotesByHtmlRoute :: R 'R.Html -> IxNote -> [Note]
 lookupNotesByHtmlRoute htmlRoute =
@@ -249,13 +277,36 @@ missingNote route404 urlPath =
     $ B.Para
       [ B.Str "No note has the URL "
       , B.Code B.nullAttr $ "/" <> urlPath
-      , -- TODO: org
-        B.Span (cls "font-mono text-sm")
-          $ one
-          $ B.Str
-          $ ". You may create a file with that name, ie. one of: "
-          <> oneOfLmlFilenames route404
+      , B.Str ". "
+      , B.Span (cls "font-mono text-sm") $ one $ B.Str $ missingUrlHint urlPath route404
       ]
+
+{- | Hint text to show on the missing-link page. The naive form
+("create one of: foo.xml.md, foo.xml.org") is misleading whenever the
+requested URL has a non-LML extension — `foo.xml` is far more likely
+a static asset (or feed-enabled `foo.md`) than a note literally named
+`foo.xml.md`. See #547.
+-}
+missingUrlHint :: Text -> R.R ext -> Text
+missingUrlHint urlPath route404
+  | Just stem <- T.stripSuffix ".xml" urlPath =
+      "You may create a static file `"
+        <> urlPath
+        <> "`, or a feed-enabled note `"
+        <> stem
+        <> ".md`."
+  | hasNonLmlExt urlPath =
+      "You may create a static file with that name."
+  | otherwise =
+      "You may create a file with that name, ie. one of: "
+        <> oneOfLmlFilenames route404
+
+{- | True when @url@ has an extension that is neither LML (md/org)
+nor the canonical HTML/XML cases handled elsewhere in the hint.
+-}
+hasNonLmlExt :: Text -> Bool
+hasNonLmlExt url = case T.breakOnEnd "." url of
+  (prefix, ext) -> not (T.null prefix) && ext `notElem` ["md", "org", "html", "xml"]
 
 oneOfLmlFilenames :: R ext -> Text
 oneOfLmlFilenames r =
@@ -293,7 +344,7 @@ mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [T
 mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
-      doc = if null errs then doc'' else pandocPrepend (errorDiv errs) doc''
+      doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
    in Note r src doc meta tit errs feed
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
@@ -304,9 +355,20 @@ mkNoteWith r src doc' meta errs =
               h1 : prefix : rest
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
-    errorDiv :: [Text] -> B.Block
-    errorDiv s =
-      B.Div (cls "emanote:error") $ B.Para [B.Strong $ one $ B.Str "Emanote Errors 😔"] : (B.Para . one . B.Str <$> s)
+
+{- | Shared builder for the YAML / Markdown parse-error banner used by both
+the per-note markdown error path (in 'mkNoteWith') and the route-cascade
+yaml error path (in 'Emanote.View.Template').
+
+Delegates the AST shape to 'Diagnostic.errorBlock' so all Emanote-emitted
+diagnostics share a single rendering convention (universal @emanote:error@
+marker class plus a @yaml@ variant sub-class for this category).
+-}
+errorDiv :: Text -> [Text] -> B.Block
+errorDiv header errs =
+  Diagnostic.errorBlock "yaml"
+    $ B.Para [B.Strong $ one $ B.Str header]
+    : (B.Para . one . B.Str <$> errs)
 
 parseNote ::
   forall m.

@@ -1,83 +1,78 @@
 ---
 name: do
-description: Do a task end-to-end — implement, PR, CI loop, ship
-argument-hint: "<issue-url | prompt> [--review] [--no-git] [--skip-setup] [--from <step>] [--review-model=<opus|sonnet|haiku>]"
+description: Do a task end-to-end — implement, PR, CI loop, ship. ONLY invoke when the user explicitly types `/do` or `$do`; never auto-select from a natural-language request, even one that sounds like an end-to-end task.
+argument-hint: "<issue-url | prompt> [--review] [--no-git] [--minimal] [--from <step>]"
 ---
 
 # Do Workflow
 
 Take a task and do it top-to-bottom: research, branch, implement, pass CI, open a PR, and ship. (Under `--no-git`, extend the working tree in place — no branch, commit, or PR.)
 
-**Mostly autonomous.** Do NOT use `AskUserQuestion` at any point (except at the setup step gate, which runs by default — pass `--skip-setup` to suppress it — or during the `--review` planning pause). Make sensible default choices and keep moving.
+**Mostly autonomous.** Do NOT use `AskUserQuestion` at any point (except during the `--review` planning pause). Make sensible default choices and keep moving. If the user wants to skip specific steps, they can say so in the prompt — honor it.
 
 ## Arguments
 
-Parse the arguments string: `[--review] [--no-git] [--skip-setup] [--from <step-id>] [--review-model=<opus|sonnet|haiku>] <task description or issue-url>`
+Parse the arguments string: `[--review] [--no-git] [--minimal] [--from <step-id>] <task description or issue-url>`
 
 The workflow is **forge-aware**: it auto-detects whether the repo lives on GitHub or elsewhere during the **sync** step (see Forge Detection). Only GitHub has an active code path today — Bitbucket/other forges gracefully skip PR-related steps. Tracking: [srid/agency#10](https://github.com/srid/agency/issues/10).
 
 - `--review`: Pause after **research** for user plan approval via `EnterPlanMode`/`ExitPlanMode`, then continue autonomously. (hickey/lowy now runs post-implement on a concrete diff, so there's no plan-approval moment attached to that step anymore — the review point is pre-implement, before any code is written.)
 - `--no-git`: Extend the working tree **in place** — do not create a branch, commit, push, or touch any PR. Research, implement, check, docs, police, fmt, and test all run; git-mutating steps (**branch**, **commit**, **create-pr**) are skipped. Use this when you have uncommitted local work and want the agent to build on it without taking over git state. Feedback from a Bitbucket user in [#26](https://github.com/srid/agency/issues/26).
-- `--skip-setup`: Bypass the setup step gate and run every applicable step. By default, after **research** the workflow pauses to present a recommended step plan via `AskUserQuestion`: the AI assesses which steps are relevant to the task (e.g., a docs-only change doesn't need **check** or **test**; a trivial one-liner doesn't need **hickey+lowy** or **police**) and presents a multi-select checklist of skippable steps with pre-selected recommendations. The user confirms or adjusts, then the workflow continues autonomously. Steps the user deselects are recorded as `skipped` with reason `"setup: user skipped"`. Pass `--skip-setup` when you want fully hands-off behavior and don't want to be interrupted. **sync**, **research**, and **done** are never skippable. See the **Setup step gate** section below for details.
+- `--minimal`: Skip the steps whose value is disproportionate on trivially-scoped diffs: **docs**, **hickey+lowy**, **police**, and **evidence**. The remaining flow runs in order: sync → research → branch → implement → check → fmt → commit → test → create-pr → ci → done. Use this when the change is obviously confined (one-line bug fix, typo, config tweak) and structural review / docs sync / quality gate / PR evidence are overkill — PR comments on small `/do` runs frequently note this. The four skipped steps each record `status="skipped"` with `reason="--minimal"`.
 - `--from <step-id>`: Start from a specific step (see entry points below)
-- `--review-model=<model>`: Model to use for the **hickey+lowy** sub-agent invocations. Accepts `opus`, `sonnet`, or `haiku`. Defaults to `sonnet` — cheap enough to run on every task without thinking about cost. Pass `opus` when the task warrants deeper structural critique (large or architecturally significant diffs, refactors that cross module boundaries, work the user wants an extra-careful second pair of eyes on). Takes precedence over the `model: sonnet` in the hickey/lowy agent frontmatter via the `Agent` tool's `model` parameter.
 
 ## Results Tracking
 
-Each step is bookended by two calls to the `scripts/do-results` script (in this skill's directory): `step-start <name>` before the work begins, and `step-end <status> <verification> [reason]` after verification. This is what keeps per-step timing accurate — collapsing both into a single end-of-step call produces zero-second durations and worthless timing tables. The script manages a JSON file with this schema:
+Every step is bookended by two `scripts/do-results` calls: `step-start <name>` before the work begins, and `step-end <status> <verification> [reason]` after verification. This is what keeps per-step timing accurate — collapsing both into a single end-of-step call produces zero-second durations and worthless timing tables. The script tracks workflow state and emits the final timing table during **done**.
 
-```json
-{
-  "workflow": "do",
-  "startedAt": "<ISO timestamp>",
-  "active": "working",
-  "status": "running",
-  "forge": "github",
-  "noGit": false,
-  "steps": [
-    {
-      "name": "sync",
-      "status": "passed",
-      "verification": "...",
-      "startedAt": "...",
-      "completedAt": "..."
-    }
-  ]
-}
-```
+**Trust the script's stdout.** Every mutation echoes a one-line confirmation. Treat that line as your confirmation that the write succeeded; the script is the only public surface, and whatever it persists internally is private.
 
-- `forge` is set during **sync** (see Forge Detection below). One of `github`, `bitbucket`, `unknown`.
-- `noGit` is `true` if the user passed `--no-git`. When set, git-mutating steps (**branch**, **commit**, **create-pr**) record status `skipped` with reason `"--no-git"`.
-- Step `status` is one of `passed`, `failed`, or `skipped`. A `skipped` step must include a `reason` field explaining why (e.g., `"non-github forge: bitbucket"`, `"--no-git"`, `"no check command configured"`).
+**Lifecycle the script tracks intrinsically**:
 
-- `active` is a state enum, not a boolean. Set it to `"working"` when the workflow starts (**sync**), `"waiting"` when the agent is idle waiting for an external process (e.g., background CI), back to `"working"` when the external process returns, and `false` when the workflow ends (**done**). The stop hook uses this field: `"working"` blocks exits, `"waiting"` allows them (with a resume hint), `false` allows them.
-- Set `status` to `"completed"` when **done** is reached, or `"failed"` if halted. This field is informational only.
-- **Always use the `scripts/do-results` script** (in this skill's directory, alongside `scripts/steps/`) — never write the JSON file directly. Invoke with the full path (e.g. `.../skills/do/scripts/do-results ...`). Commands:
-  - **Initialize**: `scripts/do-results init <forge> <noGit>` — creates the skeleton with a timestamp
-  - **Start a step**: `scripts/do-results step-start <name>` — stamps `pendingStep` with the current UTC time. Call this **before** doing the step's work.
-  - **End a step**: `scripts/do-results step-end <status> "<verification>" ["<reason>"]` — pops `pendingStep` and appends the completed step with `completedAt` set to the current UTC time.
-  - **Record a step in one call** (advanced): `scripts/do-results step <name> <status> "<verification>" <startedAt> <completedAt> ["<reason>"]` — used by `scripts/steps/sync` where `startedAt` is captured in shell. Agent code should prefer `step-start` / `step-end`.
-  - **Update top-level field**: `scripts/do-results set <field> <value>` (e.g., `set active waiting`, `set status completed`)
-  - **Patch last step**: `scripts/do-results patch-last <field> <value>` (e.g., `patch-last completedAt "2026-..."`)
-- **Bookend every step with `step-start` at the top and `step-end` at the bottom.** Calling `step-end` without a prior `step-start` is an error, and calling `step` with `now` for both timestamps collapses duration to 0 — neither pattern is allowed. The only exceptions: `sync` is recorded by `scripts/steps/sync` itself, and skipped steps (where duration is always 0 by definition) may use `step-start` followed immediately by `step-end` with status `skipped`.
-- Do not run `date` yourself or guess timestamps — `do-results` resolves the current UTC time internally.
+- Step `status` — `passed`, `failed`, or `skipped`. A `skipped` step must include a `reason` (e.g. `"non-github forge: bitbucket"`, `"--no-git"`, `"--minimal"`, `"no check command configured"`).
+- `active` — state enum (not a boolean). Set to `working` when the workflow starts (**sync**), `waiting` when the agent is idle waiting for an external process (e.g. background CI), back to `working` when that process returns, and `false` when **done** is reached. The stop hook uses this: `working` blocks exits; `waiting` and `false` allow them.
+- Workflow `status` — `completed` when **done** finishes, `failed` if halted. Informational.
+
+**Workflow fields /do also stashes via `set`** (the script doesn't interpret these — it just remembers them):
+
+- `forge` — `github`, `bitbucket`, or `unknown`. Populated by `scripts/steps/sync` after forge detection.
+- `noGit` — `true` or `false`. Reflects the `--no-git` flag. Git-mutating steps (**branch**, **commit**, **create-pr**) skip with `reason="--no-git"` when set.
+
+**Commands** (invoke with the full path, e.g. `.../skills/do/scripts/do-results ...`):
+
+- `init` — initialize the workflow's lifecycle skeleton. Echoes `init: startedAt=<ts>`.
+- `step-start <name>` — call before step work. Echoes `pending: <name>`.
+- `step-end <status> "<verification>" ["<reason>"]` — call after verification. Echoes `recorded: <name> <status> (steps=<count>, pending=<none|name>)`.
+- `step <name> <status> "<verification>" <startedAt> <completedAt> ["<reason>"]` — single-call form used by `scripts/steps/sync` where `startedAt` was captured in shell. Echoes `recorded: <name> <status> (steps=<count>)`. Agent code should prefer `step-start` / `step-end`.
+- `set <field> <value>` — set an arbitrary top-level field. Used both for lifecycle (`set active waiting`, `set status completed`) and for /do-specific values that sync stashes (`set forge github`, `set noGit false`). Echoes `set: <field>=<value>`.
+
+**Discipline**:
+
+- Bookend every step with `step-start` at the top and `step-end` at the bottom. Calling `step-end` without a prior `step-start` is an error; calling `step` with `now` for both timestamps collapses duration to 0 — neither pattern is allowed. Exceptions: `sync` is recorded by `scripts/steps/sync` itself, and skipped steps (duration always 0) may use back-to-back `step-start` / `step-end skipped`.
+- Don't run `date` yourself or guess timestamps — `do-results` resolves UTC internally.
 
 ## Progress tracking
 
-Drive Claude Code's native todo UI via the `TaskCreate` tool so the user sees a live checklist of the workflow. At the start of **sync** (or the chosen `--from` entry point), seed a task list with all 14 step names in order:
+Drive Claude Code's native todo UI via the `TaskCreate` tool so the user sees a live checklist of the workflow. At the start of **sync** (or the chosen `--from` entry point), seed a task list with the step names in order:
 
 ```
-sync, research, branch, implement, check, docs, fmt, commit, hickey+lowy, police, test, create-pr, ci, done
+sync, research, branch, implement, check, docs, fmt, commit, hickey+lowy, police, test, create-pr, ci, evidence, done
 ```
 
-At each step boundary, update task state **alongside** the `scripts/do-results` script call — they are not redundant. The JSON file is machine state for the stop hook; the task list is the human-facing UI. Miss either and the workflow is inconsistent.
+**Emit all `TaskCreate` calls as parallel `tool_use` blocks in a single assistant turn** — one model round-trip, not one per task. The seeded steps have no `addBlocks` / `addBlockedBy` dependencies, so there is nothing to serialize on. Sequential seeding (15 round-trips before any real work) is a regression: it adds latency to every `/do` invocation and clutters the transcript with 15 wrapper turns of "Task #N created successfully" before `sync` even starts.
+
+**Under `--minimal`, omit the four steps the flag skips** (`docs`, `hickey+lowy`, `police`, `evidence`) from the seeded list — the user explicitly opted out of them, so they shouldn't clutter the human-facing checklist. The seeded list becomes 11 items in `--minimal` runs. (Run-inherent skips like `--no-git` and forge skips stay in the list — see the Skipped steps rule below.)
+
+The `scripts/do-results` lifecycle still records `--minimal`-skipped steps with `status="skipped"` and `reason="--minimal"` via back-to-back `step-start` / `step-end` calls — that's what keeps the final timing table and `completed`-status logic correct. The task UI is independent of that recording.
+
+At each step boundary, update task state **alongside** the `scripts/do-results` script call — they are not redundant. The script's state drives the stop hook; the task list is the human-facing UI. Miss either and the workflow is inconsistent.
 
 Rules:
 
 - **Flip to `in_progress` when a step starts, `completed` when it verifies.** One step `in_progress` at a time.
 - **Retries stay `in_progress`.** If `check`, `test`, or `ci` loop through their retry budget, do **not** bounce the task state back to `pending` or flicker it — leave it `in_progress` until the step finally verifies (or the retries exhaust and the workflow fails).
-- **`--from <step>` entry points**: still seed all 14 steps. Mark steps earlier than the entry point as `completed` immediately after seeding, so the checklist shows a consistent 14-item view regardless of entry point.
-- **Skipped steps** (e.g. `branch`/`commit`/`create-pr` under `--no-git`, or PR steps on non-GitHub forges) go straight to `completed`. Record the skip with a back-to-back `scripts/do-results step-start <name>` / `scripts/do-results step-end skipped ... "<reason>"`; the task list just shows the step as done.
+- **`--from <step>` entry points**: still seed the full list (minus any `--minimal` omissions). Mark steps earlier than the entry point as `completed` immediately after seeding, so the checklist shows a consistent view regardless of entry point.
+- **Skipped steps that stay in the list** (e.g. `branch`/`commit`/`create-pr` under `--no-git`, or PR steps on non-GitHub forges) go straight to `completed`. Record the skip with a back-to-back `scripts/do-results step-start <name>` / `scripts/do-results step-end skipped ... "<reason>"`; the task list just shows the step as done. `--minimal` skips are **not** in this category — they're omitted from the seeded list entirely (see above), so there's no task entry to flip.
 - **Failure**: if retries exhaust and the workflow halts, leave the failing step `in_progress`, mark `done` `completed` after the failure summary is written, and run `scripts/do-results set status failed`.
 
 ## Steps
@@ -104,7 +99,7 @@ The script:
 
 **Only `github` has an active code path today.** Both `bitbucket` and `unknown` cause forge-dependent steps (PR creation, PR comments, PR edits, CI status) to skip gracefully. Bitbucket support is planned — see [srid/agency#10](https://github.com/srid/agency/issues/10).
 
-**Verify**: Script exited 0 and printed a `forge=` line. `.do-results.json` exists and its `forge`/`noGit` fields match.
+**Verify**: Script exited 0 and printed `forge=`, `branch=`, `defaultBranch=` lines on stdout. (Sync silences `do-results`' own confirmation echoes so the protocol stays clean.)
 
 ---
 
@@ -114,13 +109,12 @@ Research the task thoroughly before writing code.
 
 - If given a GitHub issue URL **and** `forge == github`, fetch with `gh issue view`. On non-GitHub forges, treat any issue-like URL as opaque context — use the prompt text as-is and do not attempt to fetch. (Bitbucket issue/Jira fetching is tracked in #10.)
 - **Never assume** how something works. Read the code. Check the config.
-- If the prompt involves external tools/libraries, use WebSearch/WebFetch.
+- If the prompt involves external tools/libraries, prefer `git clone` to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read the source on disk with `Read`/`Grep`/`Glob`. Fall back to `WebSearch`/`WebFetch` only when the source genuinely isn't a clonable repo (vendor docs, blog posts, RFCs).
 
 **Delegation rule — keep the main context lean.** Before your third `Read` in this step, stop and delegate the rest via `Agent(subagent_type=Explore)`. Main-context reads are reserved for:
 
   (a) specific files the user named in the prompt,
-  (b) `.apm/instructions/**` and files referenced from them,
-  (c) verifying a specific file:line an Explore subagent cited — and only with `offset`/`limit`, never full-file.
+  (b) verifying a specific file:line an Explore subagent cited — and only with `offset`/`limit`, never full-file.
 
 Anything that smells like "map the codebase", "find all callers", "understand how X works across the repo" — delegate. The Explore subagent returns a file:line map; keep that map and reference it in later steps instead of re-reading. Use `Grep`/`Glob` before `Read`: if the question can be answered by searching, don't open the file.
 
@@ -132,34 +126,7 @@ Anything that smells like "map the codebase", "find all callers", "understand ho
 - **High-level plan**: what to do and why, not implementation details. Include an **Architecture section** (affected modules, new abstractions, ripple effects).
 - **Split non-trivial plans into phases** — MVP first, each phase functionally self-sufficient.
 
-Use `ExitPlanMode` to present the plan. Once approved, continue autonomously to the **Setup step gate** (or **branch** if `--skip-setup` is active). Structural critique from hickey/lowy isn't available at this point — it runs post-implement on a concrete diff and surfaces as commits + a PR comment later.
-
----
-
-### Setup step gate
-
-**Runs by default.** Skipped entirely if `--skip-setup` is active — in that case all steps run as normal.
-
-After **research** completes (and before **branch**), assess which of the remaining steps are relevant to this task. Consider:
-
-- **Nature of the change**: docs-only, config change, trivial fix, refactor, feature, bug fix
-- **Scope**: number of files, lines changed, complexity
-- **Project config**: whether check/test/fmt/docs commands are even configured
-
-Present a single `AskUserQuestion` with `multiSelect: true` listing the skippable steps (all except **sync**, **research**, and **done** — those always run). For each step, set a recommended default:
-
-- **Pre-select** (recommend running) steps that are relevant to the task
-- **Deselect** (recommend skipping) steps the AI judges as not useful for this particular change
-
-The question should explain the rationale briefly, e.g.:
-
-> "This looks like a docs-only change. Which steps should run? (Pre-selected = recommended)"
-
-Steps the user leaves deselected are skipped throughout the workflow with status `skipped` and reason `"setup: user skipped"`. Steps the user selects proceed normally. The gate's activation is recorded in the results JSON via `scripts/do-results set setup true`.
-
-**Interaction with other flags**: The setup gate composes with `--no-git` and `--from`. Steps already skipped by `--no-git` or `--from` are not shown in the checklist (they're already handled). Only steps that *would* normally run are presented for user selection. Passing `--skip-setup` disables the gate entirely regardless of the other flags.
-
-After the user confirms, continue autonomously from **branch** (or the next non-skipped step).
+Use `ExitPlanMode` to present the plan. Once approved, continue autonomously to **branch**. Structural critique from hickey/lowy isn't available at this point — it runs post-implement on a concrete diff and surfaces as commits + a PR comment later.
 
 ---
 
@@ -179,19 +146,25 @@ That's it — just the local branch. No commit, no push, no PR. The branch is pu
 
 ### implement
 
-If the task is a bug fix: write a failing test first (e2e or unit, whichever is appropriate), then fix the bug.
+The test-first rule depends on what the change is:
 
-Otherwise: implement the planned changes. Prefer simplicity. Do the boring obvious thing.
+- **Bug fix**: write a failing test first (e2e or unit, whichever is appropriate), then fix the bug.
+- **New behavior** — anything that fails at runtime if it's wrong: new endpoints or routes, new services or modules, configuration paths, environment variables, secrets wiring, network connectivity, data persistence (migrations, preStart scripts, schema changes), auth/OIDC flows. Write an integration or unit test covering the new behavior **before** implementing. NixOS service modules need a VM test; new HTTP endpoints need an e2e or integration test; new modules with logic need at least a unit test.
+- **Otherwise** — documentation, refactors with no behavioral change, purely internal cleanups, dependency bumps that don't change behavior. Just implement the planned changes; no test-first requirement.
+
+If you're not sure which bucket the change falls into, treat it as new behavior. The cost of an unnecessary test is small; the cost of a silent deployment failure is not.
+
+Prefer simplicity. Do the boring obvious thing.
 
 **E2E coverage**: When the change introduces multiple user-facing paths (e.g., a dialog that appears under different conditions), write e2e scenarios for **each distinct path**. Enumerate the user-visible paths, then check that every one has a corresponding test.
 
-**Verify**: Code changes match the planned approach. All distinct user-facing paths have test coverage.
+**Verify**: Code changes match the planned approach. For bug fixes and new-behavior changes, at least one test exercises the changed behavior; multi-path changes have one test per distinct user-visible path. Refactor/docs/cleanup diffs are exempt.
 
 ---
 
 ### check
 
-Read the project's instructions to find the check command — a fast static-correctness gate (e.g. `tsc --noEmit`, `cargo check`, `cabal build`, `mypy`, `dune build @check`). Run it.
+Read `.agency/do.md` and look for a `## Check command` section — a fast static-correctness gate (e.g. `tsc --noEmit`, `cargo check`, `cabal build`, `mypy`, `dune build @check`). Run it.
 
 This is the cheapest gate in the pipeline, so it runs first — fail fast on broken code before any downstream step does work over it. If no check command is documented, skip this step with a note.
 
@@ -202,7 +175,9 @@ This is the cheapest gate in the pipeline, so it runs first — fail fast on bro
 
 ### docs
 
-Read the project's instructions to find which documentation files to keep in sync (e.g., README.md). Compare those files against changes in this PR.
+**If `--minimal`**: Skip with status `skipped` and reason `"--minimal"`. Move to **fmt**.
+
+Read `.agency/do.md` and look for a `## Documentation` section listing which docs to keep in sync (e.g., README.md). Compare those files against changes in this PR.
 
 If no documentation files are documented, skip this step with a note.
 
@@ -213,7 +188,7 @@ If no documentation files are documented, skip this step with a note.
 
 ### fmt
 
-Read the project's instructions to find the format command (typically documented in a workflow instruction). Run it.
+Read `.agency/do.md` and look for a `## Format command` section. Run it.
 
 If no format command is documented, skip this step with a note.
 
@@ -235,7 +210,11 @@ This is the **primary feature commit**. Downstream **hickey+lowy** and **police*
 
 ### hickey + lowy
 
-Invoke `hickey` and `lowy` as two **parallel Claude Code sub-agents** via the `Agent` tool (`subagent_type: "hickey"` and `subagent_type: "lowy"`). Do NOT use the `Skill` tool for this step — `Skill` invocations serialize on the main conversation loop, so two back-to-back `Skill` calls run one after the other even when issued in the same response. Dedicated sub-agents run in isolated contexts and genuinely execute concurrently, cutting this step's wall-clock time roughly in half. Offloading their analysis into forked contexts also keeps the main context lean for the downstream police/ci steps.
+**If `--minimal`**: Skip with status `skipped` and reason `"--minimal"`. Move to **police** (which will also skip under `--minimal`). Do not spawn either sub-agent.
+
+Invoke `hickey` and `lowy` as two **parallel sub-agents** via the harness's agent tool (`subagent_type: "hickey"` and `subagent_type: "lowy"`). On Claude Code this is the `Agent` tool. On opencode this is the `task` tool (with `subagent_type` parameter). On Codex this is the sub-agent spawning tool for delegated work. Invoking `/do` is explicit authorization to run these two review agents; do not wait for a second user prompt before spawning them.
+
+**Fallback, never skip.** If the harness cannot honor the model declared in the reviewer skill's frontmatter, run hickey and lowy as sub-agents on the available model instead — this is the expected path on harnesses that ignore Claude Code's `model:` skill extension (opencode, Codex, etc.). If a sub-agent invocation fails for harness/tooling reasons before producing a review, retry that reviewer once; if it still cannot produce a sub-agent review, run that review in the main model by loading the reviewer skill against the same diff. This fallback is slower and uses more main-context budget, but it is still the `/do` hickey+lowy step. Do not replace it with an informal/manual review, and do not mark the step `skipped` because a preferred model was unavailable.
 
 **Why post-implement, not pre-implement.** Hickey's complecting critique and Lowy's volatility lens both bite harder on a concrete diff than on a plan sketch. Reviewing a plan tends to surface generic concerns; reviewing a real diff surfaces the specific interleavings and boundary misalignments that matter. Running here also means the review covers *everything* the diff contains — including whatever the plan glossed over and whatever drifted during implementation.
 
@@ -250,9 +229,17 @@ Each `Agent` prompt must be self-contained (sub-agents do not inherit this conve
 
 The sub-agent already knows to read its skill file and follow that methodology; don't re-state it in the prompt.
 
-**Model override.** If the user passed `--review-model=<model>`, pass `model: "<model>"` in **both** `Agent` tool calls — this overrides the `model: sonnet` in the agents' frontmatter via the `Agent` tool's built-in `model` parameter. If the flag was not passed, omit the `model` parameter entirely so the agent definition's default (sonnet) applies. Accept only `opus`, `sonnet`, and `haiku`; reject anything else at argument-parse time with a one-line error, since a typo silently falling back to sonnet would hide a budget decision the user was trying to express.
+**Model selection lives in the skill, not here.** Both `hickey/SKILL.md` and `lowy/SKILL.md` declare `model: sonnet` in their frontmatter — Claude Code honors this and runs the review on Sonnet to keep the per-task cost cheap; opencode/Codex ignore the field (it isn't part of the Agent Skills standard) and fall through to the active model, which is the right behavior for harnesses that don't have Sonnet. Don't pass `model:` at the `Agent` tool level — the skill frontmatter is the single source of truth.
 
-After both sub-agents return, synthesize their findings. Findings marked **"Defer #issue"** or **"No-op"** are surfaced in the PR comment (see **create-pr**) but not acted on here.
+**No deferrals.** The hickey and lowy skills emit two dispositions: **Fix in this PR** and **No-op**. There is no Defer. `/do` is not optimizing for minimal diff — it is optimizing for the simpler artifact landing in `master`. A PR that grows from 50 lines to 400 because hickey caught a real fragmentation bug is a *better* PR, not a worse one; the alternative is shipping the complected version and trusting a "broader refactor" follow-up that statistically never happens.
+
+If a sub-agent emits anything resembling a defer — `Defer #N`, "out of scope", "follow-up", "pre-existing, separate PR", "should be its own change", any phrasing that punts a finding to a future issue — treat it as a sub-agent rule violation. Flip the disposition to **Fix in this PR** unconditionally and apply the fix here. Do not create a follow-up issue, do not record the finding as deferred in the PR body, do not surface it as outstanding structural debt. The only way out of a finding is through it.
+
+(`No-op` survives without code action — but it is narrow: the diff already deletes the offending code, or the finding is subsumed verbatim by another entry in the same review. Anything resembling deferred-work-for-later is a Fix, not a No-op.)
+
+Findings that genuinely require coordination outside this repo (upstream library bug, breaking dep upgrade, schema migration that must ship separately) shouldn't have surfaced as findings of this structural review in the first place; if one did, apply a local workaround or interface boundary in this PR rather than punt — and flag the upstream dependency in the PR description as a strategic note, not as a deferred finding.
+
+After the audit, every finding lands as a commit, except entries dispositioned **No-op**.
 
 **Apply each "Fix in this PR" finding as its own commit** — do not batch multiple findings into one commit. A reviewer reading the PR's commit history should be able to read one "address hickey finding: decomplect viewportDimensions" commit at a time and follow the structural refinement as a sequence, not decode a grab-bag diff. For each finding in turn:
 
@@ -264,11 +251,13 @@ After both sub-agents return, synthesize their findings. Findings marked **"Defe
 
 **Under `--no-git`**: Skip the commit/push steps entirely. Apply fixes to the working tree and move on — the user will review the combined working-tree delta themselves. Record the step as passed with verification noting "--no-git: fixes applied to working tree, not committed."
 
-**Verify**: Every finding has an action recorded (fix, defer, or no-op). Every "Fix in this PR" finding has a corresponding commit on the feature branch (check via `git log origin/HEAD..HEAD --oneline`), except under `--no-git`. No unactioned findings.
+**Verify**: Both hickey and lowy produced review output using their respective skills, either through sub-agents or the main-model fallback. Every finding has an action recorded — either **Fix in this PR** or **No-op** (no defers; if the sub-agent emitted one, the audit step above flipped it to Fix in this PR). Every "Fix in this PR" finding has a corresponding commit on the feature branch (check via `git log origin/HEAD..HEAD --oneline`), except under `--no-git`. No unactioned findings; no deferred findings.
 
 ---
 
 ### police
+
+**If `--minimal`**: Skip with status `skipped` and reason `"--minimal"`. Move to **test**. Do not invoke `/code-police`.
 
 Use `git diff origin/HEAD...HEAD --name-only` to check if the PR contains code changes. If all changed files are documentation-only (e.g., `.md`, `.txt`, `README`, docs/) — skip this step with a note.
 
@@ -300,13 +289,15 @@ For the elegance pass specifically: `/simplify` applies fixes in batches across 
 
 ### test
 
-Read the project's instructions to find the test command and strategy. Run only the tests relevant to the code paths changed in this PR.
+Read `.agency/do.md` and look for a `## Test command` section. Run only the tests relevant to the code paths changed in this PR.
 
 Use `git diff origin/HEAD...HEAD --name-only` to identify changed files and determine which tests are relevant.
 
 If changes are purely internal with no user-facing impact, unit tests may suffice — skip e2e if no relevant scenarios exist. If no test command is documented, skip with a note.
 
-**Verify**: Tests pass (exit code 0), or no relevant tests to run.
+**Coverage gap check**: After the test command exits 0, confirm at least one of the tests run actually exercised the new behavior (per the **implement** step's classification). A green run that didn't touch the changed code paths — e.g. a new NixOS service module with no corresponding VM test, or a new endpoint with no integration test — is a coverage gap, not a pass. Refactor/docs/internal-cleanup diffs are exempt. The implement step should have caught this; if it didn't, treat it as a real failure: write the missing test, then loop through **fmt** → **commit** → **test** as below.
+
+**Verify**: Tests pass (exit code 0) **and** the new behavior is covered, or the diff is exempt from the coverage check, or no relevant tests to run.
 **If failed** (max 4 attempts): Analyze the failure. If flaky, re-run. If real: fix → go to **fmt**, then retry.
 
 ---
@@ -327,7 +318,7 @@ Check whether a PR already exists for this branch (`gh pr view`).
 
    **MANDATORY**: Load the `forge-pr` skill (via Skill tool) BEFORE writing the PR title/body.
 
-2. **Post hickey/lowy results**: Post the hickey and lowy analysis as a PR comment using `gh pr comment` with a `## [Hickey/Lowy](https://kolu.dev/blog/hickey-lowy/) Analysis` header (the heading links to the blog post explaining the two lenses, mirroring how the final step status comment links `/do` to the agency repo). Always post when the steps ran, even if all findings are deferred or out of scope — reviewers should see the structural analysis.
+2. **Post hickey/lowy results**: Post the hickey and lowy analysis as a PR comment using `gh pr comment` with a `## [Hickey/Lowy](https://kolu.dev/blog/hickey-lowy/) Analysis` header (the heading links to the blog post explaining the two lenses, mirroring how the final step status comment links `/do` to the agency repo). Always post when the steps ran — reviewers should see the structural analysis even if every finding was a No-op.
 
    **Format the comment with a leading findings ledger.** Compose a single table from both sub-agents' Actions sections — one row per finding — so a reviewer can see disposition at a glance without parsing paragraphs. Put each lens's prose underneath as rationale:
 
@@ -337,7 +328,7 @@ Check whether a PR already exists for this branch (`gh pr view`).
    | # | Lens   | Finding                                  | Disposition       |
    |---|--------|------------------------------------------|-------------------|
    | 1 | Hickey | viewportDimensions complects two roles   | Fixed in this PR  |
-   | 2 | Lowy   | useViewport encapsulates ghost concern   | Deferred [#123]   |
+   | 2 | Lowy   | useViewport encapsulates ghost concern   | Fixed in this PR  |
 
    ### Hickey rationale
    <prose from the hickey sub-agent>
@@ -346,31 +337,29 @@ Check whether a PR already exists for this branch (`gh pr view`).
    <prose from the lowy sub-agent>
    ```
 
-   The Disposition cell mirrors the sub-agent's Actions disposition verbatim — **Fixed in this PR**, **Deferred [#N]** (linked), or **No-op** (deletion-only / subsumed by another finding). The Finding cell is the short bolded label the sub-agent emits at the start of each Actions entry. If both lenses produced zero findings, write a one-line "No findings — analysis below" instead of an empty table.
+   The Disposition cell mirrors the sub-agent's Actions disposition verbatim — **Fixed in this PR** or **No-op** (deletion-only / subsumed by another finding). There is no Deferred disposition; if a sub-agent emitted one, the audit step above flipped it to Fixed in this PR. The Finding cell is the short bolded label the sub-agent emits at the start of each Actions entry. If both lenses produced zero findings, write a one-line "No findings — analysis below" instead of an empty table.
 
 **If PR already exists** (followup runs, `--from` entry points):
 
 Re-check the PR title/body against current scope. If scope changed, update via `gh pr edit` per the `forge-pr` skill.
 
-**Surface deferred hickey/lowy findings**: If the hickey or lowy steps produced any **"Defer `#issue`"** actions, append a `> **Deferred:** #123, #124` line to the PR body (via `gh pr edit`) so reviewers see the outstanding structural debt. These are easy to miss in a PR comment — the description is what reviewers actually read.
-
 **Why this runs before `ci`**: The draft PR is the canonical home for CI status. Opening it before CI runs means CI checks land directly on the PR, reviewers see the run history as it happens, and a failing run doesn't leave an orphaned branch with red statuses and no PR to explain them. If retries exhaust in **ci**, the draft PR remains as the artifact of the failed attempt — visible, reviewable, and ready to resume via `--from ci-only`.
 
-**Verify**: Draft PR exists (`gh pr view` succeeds), PR title/body matches the delivered scope, hickey/lowy findings posted if any, and any deferred issues are linked in the body.
+**Verify**: Draft PR exists (`gh pr view` succeeds), PR title/body matches the delivered scope, hickey/lowy findings posted if any.
 
 ---
 
 ### ci
 
-Read the project's instructions to find the CI command and verification method. Run CI with `run_in_background: true` if the command takes more than a few seconds.
+Read `.agency/do.md` and look for a `## CI command` section, plus any verification method documented there. Run CI with `run_in_background: true` if the command takes more than a few seconds.
 
 **Never pipe CI to `tail`/`head`**, and **never append `2>&1`** — background mode captures both streams.
 
 **Active state**: Before waiting for background CI, run `scripts/do-results set active waiting`. When CI returns (success or failure), run `scripts/do-results set active working` before proceeding. This lets the stop hook allow graceful exits while the agent is idle.
 
-CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) and are forge-independent — **run them regardless of forge**. Only the *verification method* may be forge-specific: if the project's instructions describe verification via `gh` commit-status checks and `forge != github`, fall back to exit code + command output for verification on non-GitHub forges, and note this in the step record. (Bitbucket `bkt pr checks` wiring is tracked in #10.)
+CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) and are forge-independent — **run them regardless of forge**. Only the *verification method* may be forge-specific: if `.agency/do.md` describes verification via `gh` commit-status checks and `forge != github`, fall back to exit code + command output for verification on non-GitHub forges, and note this in the step record. (Bitbucket `bkt pr checks` wiring is tracked in #10.)
 
-**Verify**: Use the verification method described in the project's instructions (e.g., checking commit statuses on GitHub, reading CI output elsewhere). If no CI command is documented, skip with a note. **The CI result must cover `HEAD`.** Before recording the step as passed, compare the commit SHA that CI ran against with `git rev-parse HEAD`. If they differ (e.g., a commit was pushed after CI started — whether from a fix retry, user-requested changes, or any other source), re-run CI against the current HEAD. CI passing on a stale commit does not satisfy verification.
+**Verify**: Use the verification method described in `.agency/do.md` (e.g., checking commit statuses on GitHub, reading CI output elsewhere). If no CI command is documented, skip with a note. **The CI result must cover `HEAD`.** Before recording the step as passed, compare the commit SHA that CI ran against with `git rev-parse HEAD`. If they differ (e.g., a commit was pushed after CI started — whether from a fix retry, user-requested changes, or any other source), re-run CI against the current HEAD. CI passing on a stale commit does not satisfy verification.
 
 **On failure** — read logs or output to diagnose.
 
@@ -382,21 +371,61 @@ CI commands are typically local (e.g. `nix flake check`, `just ci`, `make ci`) a
 
 ---
 
+### evidence
+
+**Opt-in step.** Most projects skip this. The step exists so projects with empirical "did the feature actually work" needs — UI screenshots, performance benchmarks, demo recordings, output transcripts — can attach that evidence to the PR without baking the mechanism into agency.
+
+**If `--minimal`**: Skip with status `skipped` and reason `"--minimal"`. Move to **done**.
+
+**If `--no-git`**: Skip with status `skipped` and reason `"--no-git"`. There is no PR to attach evidence to.
+
+**If `forge != github`**: Skip with status `skipped` and reason `"non-<forge> forge: <forge>"`. (Bitbucket comment wiring is tracked in #10.)
+
+**Otherwise**: Read `.agency/do.md` and look for a `## PR evidence` section. If `.agency/do.md` is missing, or the section is missing or empty, skip with status `skipped` and reason `"no PR evidence section in .agency/do.md"` — the default for projects that haven't opted in.
+
+**If the section is present**:
+
+The section is project-specific and free-form: it can be inline prose describing the capture procedure, a pointer to another file (`See ./scripts/capture-evidence.md`), a script reference (`Run ./scripts/capture-pr-evidence.sh and use its stdout`), or any combination. Don't second-guess the form — read it, then **spawn a sub-agent** (`Agent(subagent_type: "general-purpose", ...)`) so the capture work (MCP calls, screenshot uploads, gh API requests) doesn't pollute `/do`'s main context.
+
+The sub-agent prompt should include:
+
+- The literal section content from `.agency/do.md`.
+- Standard PR context: PR URL, branch name, base branch, current commit SHA, and `git diff origin/HEAD...HEAD --name-only` so the sub-agent knows which routes/files to exercise.
+- An explicit instruction that the sub-agent's job is to return a single block of markdown (image links embedded, table data inline, etc.) suitable for posting under a `## Evidence` heading. The sub-agent should not post the comment itself — only return the markdown.
+
+After the sub-agent returns, post its output as one PR comment using `gh pr comment` under a `## Evidence` heading. Use the **single-quoted heredoc** pattern (see `forge-pr` → "Passing the body to `gh` safely") so backticks and `$` survive unescaped:
+
+```sh
+gh pr comment --body "$(cat <<'EOF'
+## Evidence
+
+<markdown returned by the sub-agent>
+EOF
+)"
+```
+
+Embed image/asset URLs inline in the markdown — `gh pr comment` itself cannot attach files; the workflow section is responsible for telling the sub-agent how to host any binary artifacts so they end up referenceable.
+
+**Verify**: Either the step was skipped per the rules above, or a `## Evidence` PR comment exists (`gh pr view --comments` or equivalent) populated from the sub-agent's output.
+
+---
+
 ### done
 
 Present a summary of all steps with their verification status. If any step has a non-success status, retry it (max 3 attempts from done). If still failing after retries, set `status: "failed"`.
 
-`"completed"` requires **all steps `passed`**, with three exceptions that count toward completion:
+`"completed"` requires **all steps `passed`**, with four exceptions that count toward completion:
 
 1. A step `skipped` with `reason` beginning `"non-<forge> forge:"` (detected forge isn't GitHub).
 2. A step `skipped` with `reason` `"--no-git"` (user opted out of git operations).
-3. A step `skipped` with `reason` `"setup: user skipped"` (user deselected it at the setup gate).
+3. A step `skipped` with `reason` `"no PR evidence section in .agency/do.md"` (project hasn't opted into the evidence step — this is the default).
+4. A step `skipped` with `reason` `"--minimal"` (user opted out of structural review / docs / quality gate / evidence on a trivial diff).
 
 A `failed` step always blocks `"completed"`. No redefining "passed," no footnote caveats. Update via `scripts/do-results set status completed` or `scripts/do-results set status failed` accordingly.
 
 #### Timing summary
 
-Run `scripts/steps/done` in this skill's directory. The script reads `.do-results.json` and emits:
+Run `scripts/steps/done` in this skill's directory. It emits:
 
 1. A markdown timing table (step, status, duration, verification), with any step that took ≥30% of total time shown in **bold**.
 2. A total wall-clock line (`startedAt` of first step → `completedAt` of last step).
@@ -459,11 +488,11 @@ COMMENT
 
 ## Rules
 
-- **Never skip steps** (unless skipped by `--no-git`, the setup gate, or forge detection). Run them in order from entry point to **done**.
+- **Never skip steps** (unless skipped by `--no-git`, forge detection, or — for **evidence** — the project hasn't filled in a `## PR evidence` section in `.agency/do.md`). Run them in order from entry point to **done**.
 - **Every commit is NEW.** Never amend, rebase, or force-push.
 - **Feature branches only.** Never commit to master/main. (Under `--no-git`, no commits happen at all, so this rule is moot — the agent leaves the user on whatever branch they started on.)
 - **Background for CI.** Run CI with `run_in_background: true`.
-- **No questions.** Don't use `AskUserQuestion` outside the setup step gate (which runs by default unless `--skip-setup`) and the `--review` plan pause (post-research).
+- **No questions.** Don't use `AskUserQuestion` outside the `--review` plan pause (post-research).
 - **Never stop between steps.** After completing a step, immediately proceed to the next one.
 - **Complete the full workflow.** Implementing code is one step of many. The task is not done until a PR URL (GitHub), a pushed branch name (non-GitHub forges), or a working-tree summary (`--no-git`) is reported.
 - **Exhausted retries = halt.** If `ci` or `test` retries are exhausted, set status to `"failed"` and skip to **done**. On `ci` failure the draft PR (opened in the preceding **create-pr** step) stays open as the record of the failed attempt — do not close, undraft, or otherwise mutate it.

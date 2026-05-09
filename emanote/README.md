@@ -13,7 +13,7 @@ Emanote is spiritual successor to [neuron](https://neuron.zettel.page) based on 
 
 ## Installing and using
 
-https://emanote.srid.ca/start/install
+https://emanote.srid.ca/install
 
 ### Examples
 
@@ -23,13 +23,17 @@ https://emanote.srid.ca/examples
 
 Emanote is a Haskell software.[^licenses] Thanks to Nix, this repository is pre-configured to provide a delightful development experience with full IDE support in Visual Studio Code.
 
-See https://srid.ca/haskell-template/start for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
+See https://github.com/srid/haskell-template for complete instructions, but briefly: [Install Nix](https://nixos.asia/en/install) and run `nix develop -c just run`.
 
 See [architecture](https://emanote.srid.ca/architecture) for a high-level overview of the codebase.
 
 ### PR contribution guidelines
 
 You may want to run `nix run github:juspay/vira ci -- -b` before opening a PR, but the Github Actions will run it as well.
+
+## AI-based coding
+
+This repository is set up for AI-based coding with [srid/agency](https://agency.srid.ca/) and [Microsoft APM](https://github.com/microsoft/apm). Following the motivation in [Kolu's contributing guide](https://github.com/juspay/kolu/blob/master/CONTRIBUTING.md), contributors are encouraged to open issues with detailed specifications rather than code changes per se.
 
 ## Discussion
 

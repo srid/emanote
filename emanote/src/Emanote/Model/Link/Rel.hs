@@ -10,7 +10,7 @@ import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.Model.Note (Note, noteDoc, noteRoute)
+import Emanote.Model.Note (Note, noteDoc, noteResolveLinkBase, noteRoute)
 import Emanote.Route (LMLRoute, ModelRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type qualified as SR
@@ -18,6 +18,7 @@ import Optics.Operators as Lens ((^.))
 import Optics.TH (makeLenses)
 import Relude
 import System.FilePath (normalise, (</>))
+import System.FilePath qualified as FP
 import Text.Pandoc.Definition qualified as B
 import Text.Pandoc.LinkContext qualified as LC
 
@@ -26,11 +27,24 @@ import Text.Pandoc.LinkContext qualified as LC
  Target will remain unresolved in the `Rel`, and can be resolved at a latter
  time (eg: during rendering).
 -}
+
+-- '_relSrcPos' must precede '_relCtx' so the derived 'Ord' breaks ties
+-- between same-@(_relFrom, _relTo)@ rels by source position before
+-- falling back to lexicographic 'Ord' on '_relCtx' (issue #186).
 data Rel = Rel
   { -- The note containing this relation
     _relFrom :: LMLRoute
   , -- The target of the relation (can be a note or anything)
     _relTo :: UnresolvedRelTarget
+  , _relSrcPos :: !Int
+  -- ^ Tie-breaker for the derived 'Ord'. Within rels sharing
+  -- @(_relFrom, _relTo)@, ascending '_relSrcPos' reflects source-traversal
+  -- order of the originating links — which keeps backlink context cards
+  -- in source order in 'Emanote.Model.Graph.modelLookupBacklinks' (issue
+  -- #186) and prevents same-context multi-links from collapsing under
+  -- @IxSet.fromList@\'s set-dedup. Across distinct '_relTo' values this
+  -- index is /not/ document-wide source position; treat as opaque
+  -- outside 'noteRels'.
   , _relCtx :: [B.Block]
   -- ^ The relation context in LML
   }
@@ -44,7 +58,11 @@ data Rel = Rel
 -}
 data UnresolvedRelTarget
   = URTWikiLink (WL.WikiLinkType, WL.WikiLink)
-  | URTResource ModelRoute
+  | -- | One or more candidate `ModelRoute`s the URL could resolve to,
+    -- ordered by preference. A single URL can map to multiple kinds
+    -- (e.g. a @.xml@ URL → feed-enabled note OR static @.xml@ asset);
+    -- resolution picks the first candidate that exists in the model.
+    URTResource (NonEmpty ModelRoute)
   | URTVirtual SR.VirtualRoute
   deriving stock (Eq, Show, Ord, Generic)
   deriving anyclass (ToJSON)
@@ -65,23 +83,50 @@ noteRels :: Note -> IxRel
 noteRels note =
   extractLinks . LC.queryLinksWithContext $ note ^. noteDoc
   where
+    -- 'queryLinksWithContext' yields each per-URL 'NonEmpty' in /reverse/
+    -- traversal order: 'Map.fromListWith (<>)' applies its combiner as
+    -- @f new old@, so each later-traversed entry is prepended onto the
+    -- accumulator. Reverse it so the 'zipWith [0 ..]' below assigns
+    -- '_relSrcPos' in forward source order.
     extractLinks :: Map Text (NonEmpty ([(Text, Text)], [B.Block])) -> IxRel
     extractLinks m =
-      Ix.fromList
-        $ flip concatMap (Map.toList m)
-        $ \(url, instances) -> do
-          flip mapMaybe (toList instances) $ \(attrs, ctx) -> do
-            let parentR = R.withLmlRoute R.routeParent $ note ^. noteRoute
-            (target, _manchor) <- parseUnresolvedRelTarget parentR attrs url
-            pure $ Rel (note ^. noteRoute) target ctx
+      let parentR = noteResolveLinkBase note
+          links = do
+            (url, instances) <- Map.toList m
+            (attrs, ctx) <- reverse (toList instances)
+            (target, _manchor) <- maybeToList $ parseUnresolvedRelTarget parentR attrs url
+            pure (target, ctx)
+       in Ix.fromList $ zipWith mkRel [0 ..] links
+      where
+        mkRel srcPos (target, ctx) = Rel (note ^. noteRoute) target srcPos ctx
 
--- | Return all possible `UnresolvedRelTarget`s to the resource indexed by this `ModelRoute`.
+{- | All `UnresolvedRelTarget`s that could resolve to the given
+`ModelRoute`. Each `URTResource` form is built by re-parsing a URL
+spelling through `mkModelRouteCandidates` so the candidate list matches
+what the parse path stored in the rel index — without that round-trip, a
+static-@.xml@ backlink lookup would search for @URTResource (one r)@
+while parsed rels actually carry the joint @(feed-route :| [static])@
+list and never match.
+-}
 unresolvedRelsTo :: ModelRoute -> [UnresolvedRelTarget]
 unresolvedRelsTo r =
   let allowedWikiLinks = WL.allowedWikiLinks . R.unRoute
       wls = either (R.withLmlRoute allowedWikiLinks . snd) allowedWikiLinks $ R.modelRouteCase r
-   in (URTWikiLink <$> toList wls)
-        <> [URTResource r]
+   in (URTWikiLink <$> toList wls) <> resourceTargetsFor r
+
+resourceTargetsFor :: ModelRoute -> [UnresolvedRelTarget]
+resourceTargetsFor r =
+  let encodedRoute = R.encodeModelRoute r
+   in resourceTargetFrom encodedRoute
+        <> case r of
+          R.ModelRoute_LML R.LMLView_Html _ ->
+            resourceTargetFrom $ FP.dropExtension encodedRoute
+          _ ->
+            []
+  where
+    resourceTargetFrom fp =
+      maybeToList
+        $ viaNonEmpty URTResource (R.mkModelRouteCandidates fp)
 
 {- | Parse a relative URL string for later resolution.
 
@@ -95,11 +140,11 @@ parseUnresolvedRelTarget baseDir attrs url = do
       pure $ URTWikiLink wl
     Right fp ->
       fmap URTVirtual (SR.decodeVirtualRoute fp)
-        <|> fmap
+        <|> viaNonEmpty
           URTResource
           ( fp
               & relocateRelUrlUnder (R.encodeRoute <$> baseDir)
-              & R.mkModelRouteFromFilePath
+              & R.mkModelRouteCandidates
           )
   pure (res, manchor)
 

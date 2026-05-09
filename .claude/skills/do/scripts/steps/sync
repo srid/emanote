@@ -53,11 +53,16 @@ case "$origin_url" in
   *)             forge="unknown" ;;
 esac
 
-# Initialize results skeleton and record the sync step
-"$DO_RESULTS" init "$forge" "$noGit"
+# Initialize results, stash /do-specific top-level fields (forge, noGit) via
+# the generic `set` command, then record the sync step. Suppress do-results'
+# stdout confirmations — sync emits its own forge/branch/defaultBranch
+# protocol below and shouldn't pollute it with do-results' echo lines.
+"$DO_RESULTS" init >/dev/null
+"$DO_RESULTS" set forge "$forge" >/dev/null
+"$DO_RESULTS" set noGit "$noGit" >/dev/null
 "$DO_RESULTS" step sync passed \
   "git fetch ok; forge=$forge; noGit=$noGit" \
-  "$startedAt" now
+  "$startedAt" now >/dev/null
 
 # Emit structured facts the agent uses for downstream steps
 branch="$(git rev-parse --abbrev-ref HEAD)"

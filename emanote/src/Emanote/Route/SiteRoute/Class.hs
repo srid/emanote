@@ -19,6 +19,7 @@ module Emanote.Route.SiteRoute.Class (
 
 import Data.IxSet.Typed qualified as Ix
 import Data.List.NonEmpty qualified as NE
+import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Ema (UrlStrategy (..), routeUrlWith)
@@ -60,7 +61,7 @@ emanoteGeneratableRoutes model =
                 & filter (includeFile . R.encodeRoute . SF._staticFileRoute)
                 <&> staticFileSiteRoute
       virtualRoutes :: [VirtualRoute] =
-        let tags = fst <$> M.modelTags model
+        let tags = Map.keys $ M.modelTags model
             tagPaths =
               Set.fromList
                 $ ([] :)

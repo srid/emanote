@@ -5,6 +5,7 @@ module Emanote.Pandoc.Renderer.Url (
 ) where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Data.Map.Syntax ((##))
 import Data.Text qualified as T
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
@@ -16,10 +17,12 @@ import Emanote.Pandoc.Link qualified as Link
 import Emanote.Pandoc.Renderer (PandocInlineRenderer)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
+import Heist.Extra qualified as HE
+import Heist.Extra.Splices.List (listSplice)
 import Heist.Extra.Splices.Pandoc qualified as HP
-import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx (ctxSansCustomSplicing)
 import Heist.Interpreted qualified as HI
+import Heist.Splices qualified as Heist
 import Optics.Core (review)
 import Relude
 import Text.Pandoc.Definition qualified as B
@@ -29,10 +32,10 @@ import Text.Pandoc.Walk qualified as W
 urlResolvingSplice :: PandocInlineRenderer Model R.LMLRoute
 urlResolvingSplice model _nf (ctxSansCustomSplicing -> ctx) noteRoute inl = do
   (inlRef, attr@(id', cls, otherAttrs), is, (url, tit)) <- Link.parseInlineRef inl
-  let parentR = R.withLmlRoute R.routeParent noteRoute
+  let parentR = M.modelResolveLinkBase model noteRoute
   (uRel, mAnchor) <- Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveUnresolvedRelTarget model noteRoute uRel
-  renderSomeInlineRefWith id (is, (url, tit)) rRel model ctx inl $ \sr ->
+  renderSomeInlineRefWith id rRel model inl $ \sr ->
     case inlRef of
       Link.InlineLink -> do
         -- TODO: If uRel is `Rel.URTWikiLink (WL.WikiLinkEmbed, _)`, *and* it appears
@@ -54,70 +57,51 @@ openInNewTabAttr =
 
 renderSomeInlineRefWith ::
   (a -> SR.SiteRoute) ->
-  -- | AST Node attributes of @InlineRef@
-  ([B.Inline], (Text, Text)) ->
   Rel.ResolvedRelTarget a ->
   Model ->
-  Splices.RenderCtx ->
   B.Inline ->
   (a -> Maybe (HI.Splice Identity)) ->
   Maybe (HI.Splice Identity)
-renderSomeInlineRefWith getSr (is, (url, tit)) rRel model (ctxSansCustomSplicing -> ctx) origInl f = do
+renderSomeInlineRefWith getSr rRel model origInl f =
   case rRel of
+    -- Broken-link rendering is mode-agnostic: the strikeout + ❌ marker
+    -- looks the same in live preview and static export. Click-through
+    -- still goes to the missing-link landing page in both.
     Rel.RRTMissing -> do
+      let linkText = Link.unParseLink origInl
       pure $ do
-        raw <-
-          HP.rpInline
-            ctx
-            ( tooltip
-                "Link is broken"
-                [ B.Strikeout $ one $ B.Str $ Link.unParseLink origInl
-                , B.Str "❌"
-                ]
-            )
-        details <-
-          HP.rpInline ctx
-            $
-            -- FIXME: This aside is meaningless for non-wikilink links (regular
-            -- Markdown links)
-            B.Span ("", ["emanote:error:aside"], [])
-            $ one
-            $ tooltip "Find notes containing this broken link"
-            $ one
-            $ B.Link B.nullAttr (one $ B.Emph $ one $ B.Str "backlinks") (url, "")
-        if M.inLiveServer model
-          then pure $ raw <> details
-          else pure raw
+        tpl <- HE.lookupHtmlTemplateMust "/templates/components/broken-link"
+        HE.runCustomTemplate tpl
+          $ "ema:broken-link:text"
+          ## HI.textSplice linkText
     Rel.RRTAmbiguous srs -> do
+      let linkText = Link.unParseLink origInl
+          mkCandidate (getSr -> sr) =
+            let (rp, _) = M.withoutRoutePrism model
+                candRoute = toText $ review rp sr
+                candUrl = SR.siteRouteUrl model sr
+                isNotEmaLink = "?" `T.isInfixOf` candUrl
+                candLabel = show sr
+             in (candLabel, candUrl, isNotEmaLink, candRoute)
+          -- Candidates only render in live preview — in static export the URL
+          -- has already resolved to one of them via closest-ancestor disambiguation.
+          candidates =
+            if M.inLiveServer model
+              then mkCandidate <$> toList srs
+              else []
+          candidatesSplice =
+            listSplice candidates "each-candidate" $ \(label, candUrl, isNotEmaLink, candRoute) -> do
+              "ema:candidate:label" ## HI.textSplice label
+              "ema:candidate:url" ## HI.textSplice candUrl
+              "ema:candidate:newtab" ## Heist.ifElseISplice isNotEmaLink
+              "ema:candidate:route" ## HI.textSplice candRoute
       pure $ do
-        raw <- HP.rpInline ctx (tooltip "Link is ambiguous" [B.Strikeout $ one $ B.Str $ Link.unParseLink origInl, B.Str "❗"])
-        candidates <-
-          fmap
-            mconcat
-            ( mapM
-                ( \(getSr -> sr) -> do
-                    let (rp, _) = M.withoutRoutePrism model
-                        srRoute = toText $ review rp sr
-                        (_newIs, (newUrl, isNotEmaLink)) = replaceLinkNodeWithRoute model sr (is, srRoute)
-                        linkAttr = [openInNewTabAttr | M.inLiveServer model && isNotEmaLink]
-                        newIs = one $ B.Str $ show sr
-                    HP.rpInline ctx
-                      $ B.Span ("", ["emanote:error:aside"], [])
-                      $ one
-                      $ tooltip (show sr <> " -> " <> srRoute)
-                      $ one
-                      $ B.Link ("", mempty, linkAttr) newIs (newUrl, tit)
-                )
-                (toList srs)
-            )
-        if M.inLiveServer model
-          then pure $ raw <> candidates
-          else pure raw
+        tpl <- HE.lookupHtmlTemplateMust "/templates/components/ambiguous-link"
+        HE.runCustomTemplate tpl $ do
+          "ema:ambiguous-link:text" ## HI.textSplice linkText
+          "ema:ambiguous-link:candidates" ## candidatesSplice
     Rel.RRTFound sr -> do
       f sr
-  where
-    tooltip :: Text -> [B.Inline] -> B.Inline
-    tooltip s = B.Span ("", [], one ("title", s))
 
 plainifyWikiLinkSplice :: PandocInlineRenderer Model R.LMLRoute
 plainifyWikiLinkSplice _model _nf (ctxSansCustomSplicing -> ctx) _ inl = do

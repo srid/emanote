@@ -6,6 +6,10 @@
   };
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Independent pin tracking unstable HEAD, used by tests/shell.nix
+    # for playwright-driver. Decoupled from `nixpkgs` so the Haskell
+    # build's pin and the Playwright pin update on different cadences.
+    nixpkgs-latest.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
@@ -21,11 +25,11 @@
     lvar.flake = false;
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
-    unionmount.url = "github:srid/unionmount/0.3.0.0";
+    unionmount.url = "github:srid/unionmount";
     unionmount.flake = false;
     commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
     commonmark-simple.flake = false;
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink/0.2.0.0";
+    commonmark-wikilink.url = "github:srid/commonmark-wikilink/master";
     commonmark-wikilink.flake = false;
 
     emanote-template.url = "github:srid/emanote-template";

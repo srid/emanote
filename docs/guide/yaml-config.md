@@ -18,13 +18,39 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 >[!tip] Using in HTML templates
 > You can reference the YAML frontmatter config from [[html-template]]. See [here](https://github.com/srid/emanote/discussions/131#discussioncomment-1382189) for details.
 
+## Cascade merge semantics
+
+When a child route's frontmatter or YAML overlaps with values from parent YAMLs, Emanote merges them along three rules:
+
+- **Objects** are deep-merged by key — the child overrides individual nested fields without touching siblings.
+- **Arrays** concatenate (with deduplication) — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` on a child note yields `[team-doc, internal-note]`. The same applies to other list-valued fields like `pandoc.filters`.
+- **Scalars** right-win — the most-specific value (the leaf) overrides ancestors.
+
+The array rule is what makes a parent YAML's `tags` survive to its children even when those children declare their own.
+
 ## Special properties
 
 - `page.image`: The image to use for the page. This is used for the [[ogp]] meta tag `og:image` meta tag. If not specified, the first image in the page is used. Relative URLs are automatically rewritten to absolute URLs if `page.siteUrl` is non-empty.
 
+- `page.lang`: The language tag for the rendered HTML page. Emanote also uses this value to choose the default template chrome strings, so a site can render its built-in navigation and helper text in a non-English language. The default templates ship English and French strings. Regional tags fall back through their base language and then English; for example, `fr-CA` uses `template.i18n.fr` first and `template.i18n.en` for any missing keys.
+
 - `date`: The note timestamp. This is used to order note chronologically, such as for the timeline [[query|query]].
   The value can be set from the filename if it begins with `YYYY-MM-DD`, which is useful for including the date in the note URL.
   In case of conflict, the date from the YAML configuration takes priority.
+
+You can override or add template strings under `template.i18n`:
+
+```yaml
+page:
+  lang: fr
+template:
+  i18n:
+    fr:
+      home: Accueil
+```
+
+See [[i18n|the internationalisation demo]] and its [[i18n/i18n.fr|French child page]]
+for a side-by-side example of `page.lang` selecting the default template chrome.
 
 ## Examples
 

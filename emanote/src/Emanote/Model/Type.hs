@@ -32,7 +32,6 @@ import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Task (IxTask)
 import Emanote.Model.Task qualified as Task
 import Emanote.Model.Title qualified as Tit
-import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
@@ -244,6 +243,10 @@ modelDeleteData :: R.R 'R.Yaml -> ModelT f -> ModelT f
 modelDeleteData k =
   modelSData %~ Ix.deleteIx k
 
+modelLookupSData :: R.R 'R.Yaml -> ModelT f -> Maybe SData
+modelLookupSData r =
+  Ix.getOne . Ix.getEQ r . _modelSData
+
 modelLookupNoteByRoute :: (R.LMLView, LMLRoute) -> ModelT f -> Maybe (R.LMLView, Note)
 modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
   note <- N.lookupNotesByRoute r notes
@@ -256,6 +259,18 @@ modelLookupNoteByRoute (view, r) (_modelNotes -> notes) = do
 modelLookupNoteByRoute' :: LMLRoute -> ModelT f -> Maybe Note
 modelLookupNoteByRoute' r =
   fmap snd . modelLookupNoteByRoute (R.LMLView_Html, r)
+
+{- | Folder used as the base for resolving relative URLs from the note at the
+given route. Uses the note's on-disk source path when the note exists; falls
+back to the canonical route parent for synthesized notes (and for routes that
+have no matching note in the model).
+-}
+modelResolveLinkBase :: ModelT f -> LMLRoute -> Maybe (R.R 'R.Folder)
+modelResolveLinkBase model r =
+  maybe
+    (R.withLmlRoute R.routeParent r)
+    N.noteResolveLinkBase
+    (modelLookupNoteByRoute' r model)
 
 modelLookupNoteByHtmlRoute :: R 'R.Html -> ModelT f -> Rel.ResolvedRelTarget Note
 modelLookupNoteByHtmlRoute r =
@@ -295,10 +310,6 @@ modelWikiLinkTargets wl model =
 modelLookupStaticFileByRoute :: R 'AnyExt -> ModelT f -> Maybe StaticFile
 modelLookupStaticFileByRoute r =
   Ix.getOne . Ix.getEQ r . _modelStaticFiles
-
-modelTags :: ModelT f -> [(HT.Tag, [Note])]
-modelTags =
-  Ix.groupAscBy @HT.Tag . _modelNotes
 
 modelNoteRels :: Model -> [Rel.Rel]
 modelNoteRels =

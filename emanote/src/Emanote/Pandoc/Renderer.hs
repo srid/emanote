@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 {- | Types for custom render extensions to Pandoc AST nodes.
 
  Note that unlike Pandoc *filters* (which operate on entire document), these
@@ -15,6 +13,8 @@ module Emanote.Pandoc.Renderer (
   PandocInlineRenderer,
   PandocBlockRenderer,
   mkRenderCtxWithPandocRenderers,
+  dispatchBlock,
+  dispatchInline,
   EmanotePandocRenderers (..),
 ) where
 
@@ -25,7 +25,7 @@ import Heist.Interpreted qualified as HI
 import Relude
 import Text.Pandoc.Definition qualified as B
 
--- | Custom Heist renderer function for specific Pandoc AST nodes
+-- | Custom Heist renderer function for specific Pandoc AST nodes.
 type PandocRenderF model route astNode =
   model ->
   PandocRenderers model route ->
@@ -53,21 +53,41 @@ mkRenderCtxWithPandocRenderers ::
   -- | Rendering feature selection (code highlighting, static math, …)
   Splices.RenderFeatures ->
   HeistT Identity m Splices.RenderCtx
-mkRenderCtxWithPandocRenderers nr@PandocRenderers {..} classRules model x =
+mkRenderCtxWithPandocRenderers nr classRules model x =
   Splices.mkRenderCtx
     classRules
-    ( \ctx blk ->
-        asum
-          $ pandocBlockRenderers
-          <&> \f ->
-            f model nr ctx x blk
-    )
-    ( \ctx blk ->
-        asum
-          $ pandocInlineRenderers
-          <&> \f ->
-            f model nr ctx x blk
-    )
+    (\ctx -> dispatchBlock model nr ctx x)
+    (\ctx -> dispatchInline model nr ctx x)
+
+{- | Renderer-list dispatcher used both at ctx construction and when a sub-note
+descends with an augmented embed-ancestor stack.
+
+Heist-extra's 'Splices.RenderCtx' bakes its splice closures at construction
+time and the 'blockSplice' / 'inlineSplice' fields don't take the live ctx as
+an argument — so a renderer's view of @ctx@ is whatever was knot-tied in.
+'Renderer.Embed' rebuilds the closures (via 'withEmbedStack') with a derived
+ctx whenever it needs the renderers' 'HP.getUserData' lookup to see a fresh
+embed stack.
+-}
+dispatchBlock ::
+  model ->
+  PandocRenderers model route ->
+  Splices.RenderCtx ->
+  route ->
+  B.Block ->
+  Maybe (HI.Splice Identity)
+dispatchBlock model nr ctx x blk =
+  asum $ pandocBlockRenderers nr <&> \f -> f model nr ctx x blk
+
+dispatchInline ::
+  model ->
+  PandocRenderers model route ->
+  Splices.RenderCtx ->
+  route ->
+  B.Inline ->
+  Maybe (HI.Splice Identity)
+dispatchInline model nr ctx x inl =
+  asum $ pandocInlineRenderers nr <&> \f -> f model nr ctx x inl
 
 data EmanotePandocRenderers a r = EmanotePandocRenderers
   { blockRenderers :: PandocRenderers a r

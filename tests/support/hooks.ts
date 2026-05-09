@@ -1,14 +1,6 @@
 /**
- * Cucumber hooks — browser lifecycle + emanote backend launcher.
- *
- * `EMANOTE_MODE` is the only axis that distinguishes runs:
- *   - `live`   → spawn `emanote -L <fixture> run --port N`
- *   - `static` → `emanote -L <fixture> gen <tmp>` once, then serve `<tmp>`
- *                on a random port via `serve-handler`
- *
- * Step definitions only see `baseUrl` and never learn which mode they ran
- * in — any mode-specific branching in a step means the boundary has
- * leaked. Keep it encapsulated here.
+ * Cucumber lifecycle plumbing: backend start/stop, browser context,
+ * scenario filtering, screenshot-on-failure.
  */
 
 import {
@@ -31,22 +23,9 @@ import * as path from "node:path";
 import { spawn, type ChildProcess } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
+import { mode, requireEnv } from "./mode.ts";
+import { primeMorph } from "./navigation.ts";
 
-type Mode = "live" | "static";
-
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`${name} must be set`);
-  return v;
-}
-
-const rawMode = requireEnv("EMANOTE_MODE");
-if (rawMode !== "live" && rawMode !== "static") {
-  throw new Error(
-    `EMANOTE_MODE must be "live" or "static" (got ${JSON.stringify(rawMode)})`,
-  );
-}
-const mode: Mode = rawMode;
 const emanoteBin = requireEnv("EMANOTE_BIN");
 
 const fixtureDir = path.resolve(
@@ -101,10 +80,17 @@ async function waitForHtml(
 
 async function startLive(): Promise<{ url: string; resource: BackendResource }> {
   const port = await getPort();
+  // WS is enabled (no `--no-ws`) so scenarios tagged `@morph` can
+  // exercise Ema's in-app morph navigation via `window.ema.switchRoute`.
+  // The fixtures are static during a run, so the WS doesn't trigger
+  // spurious morphs in non-morph scenarios.
   const proc = spawn(
     emanoteBin,
-    ["-L", fixtureDir, "run", "--port", String(port), "--no-ws"],
-    { stdio: ["ignore", "pipe", "pipe"] },
+    ["-L", fixtureDir, "run", "--port", String(port)],
+    // Emanote writes routine request/build output to stdout. In long morph
+    // runs, an unread stdout pipe can fill and block the server process,
+    // making later page.goto("/") calls hang even though the backend started.
+    { stdio: ["ignore", "ignore", "pipe"] },
   );
   proc.stderr?.on("data", (d: Buffer) =>
     process.stderr.write(`[emanote:live] ${d}`),
@@ -128,9 +114,15 @@ async function startStatic(): Promise<{
   const outDir = path.join(runRoot, "site");
   fs.mkdirSync(outDir, { recursive: true });
   await new Promise<void>((resolve, reject) => {
-    const p = spawn(emanoteBin, ["-L", fixtureDir, "gen", outDir], {
-      stdio: "inherit",
-    });
+    // `--allow-broken-internal-links` because the fixture notebook
+    // intentionally contains broken links (broken-link-221.md tests #221's
+    // inline rendering). Without the flag, `emanote gen` exits 1 after
+    // generation and the static suite fails before the browser launches.
+    const p = spawn(
+      emanoteBin,
+      ["--allow-broken-internal-links", "-L", fixtureDir, "gen", outDir],
+      { stdio: "inherit" },
+    );
     p.on("exit", (code) =>
       code === 0
         ? resolve()
@@ -165,7 +157,7 @@ async function startStatic(): Promise<{
  *  here — so give this hook a deliberate 180s ceiling instead of racing
  *  the ~60s default. */
 BeforeAll({ timeout: 180_000 }, async () => {
-  const started = mode === "live" ? await startLive() : await startStatic();
+  const started = mode === "static" ? await startStatic() : await startLive();
   baseUrl = started.url;
   backend = started.resource;
   browser = await chromium.launch({
@@ -189,6 +181,8 @@ AfterAll(async () => {
   }
 });
 
+const MORPH_TAG = "@morph";
+
 Before(async function (this: EmanoteWorld) {
   this.browser = browser;
   this.context = await browser.newContext({
@@ -196,6 +190,41 @@ Before(async function (this: EmanoteWorld) {
     viewport: { width: 1280, height: 720 },
   });
   this.page = await this.context.newPage();
+});
+
+// Static mode has no WebSocket and `window.ema` is undefined, so any
+// `@morph` scenario would fail at the first `switchRoute` call.
+Before({ tags: MORPH_TAG }, function () {
+  if (mode === "static") return "skipped" as const;
+});
+
+// `@live` marks scenarios that exercise behavior present only when the
+// notebook is served by `emanote run` — e.g. the ambiguous-link
+// candidate list, which is suppressed in static export. Both `live`
+// and `morph` modes use the same backend, so only `static` skips.
+Before({ tags: "@live" }, function () {
+  if (mode === "static") return "skipped" as const;
+});
+
+// Inverse safety: a scenario using the morph-nav step without `@morph`
+// would silently hang in static mode until the cucumber step ceiling.
+Before(function (this: EmanoteWorld, scenario) {
+  const usesMorph = scenario.pickle.steps.some((s) =>
+    s.text.includes("navigate via Ema"),
+  );
+  const tagged = scenario.pickle.tags.some((t) => t.name === MORPH_TAG);
+  if (usesMorph && !tagged) {
+    throw new Error(
+      `Scenario ${JSON.stringify(scenario.pickle.name)} uses 'navigate via Ema' but is not tagged ${MORPH_TAG}. Add '${MORPH_TAG}' above the Scenario keyword so it is skipped in static mode (no WebSocket; window.ema is undefined there).`,
+    );
+  }
+});
+
+// In morph mode the first `openRoute` morph-switches via
+// `window.ema`, which only exists after a real page load — prime it.
+Before(async function (this: EmanoteWorld) {
+  if (mode !== "morph") return;
+  await primeMorph(this.page);
 });
 
 After(async function (this: EmanoteWorld, scenario) {

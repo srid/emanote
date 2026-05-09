@@ -43,6 +43,32 @@ Emanote supports [Obsidian-style callouts](https://help.obsidian.md/Editing+and+
 
 Callouts also work with [[orgmode]] syntax.
 
+## Foldable callouts {#fold}
+
+Append `+` or `-` to the type to make a callout foldable. `+` starts expanded; `-` starts collapsed. Internally these render as `<details>`/`<summary>`, so folding works without JavaScript.
+
+> [!tip]+ Foldable, initially expanded
+> Click the title to collapse this callout.
+>
+> Lorem **ipsum** dolor sit amet, consectetur adipiscing elit.
+
+> [!warning]- Foldable, initially collapsed
+> Click the title to expand this callout.
+>
+> Hidden by default — useful for spoilers, long asides, or supplementary detail.
+
+## Nested callouts {#nested}
+
+Callouts can be nested by indenting the inner blockquote with `> >`:
+
+> [!note] Outer note
+> The outer body sits before the nested callout.
+>
+> > [!tip] A nested tip
+> > Inner content. Nesting works to any depth.
+>
+> Content after the nested callout continues here.
+
 ## Custom callouts {#custom}
 
 To add a new custom callout named `foo` (viz.: `[!foo] ...`), create a `/templates/filters/callout/foo.tpl` file in your [[html-template|templates]] folder. You can also change the layout and styling of existing callout types in [`/templates/filters/callout/*.tpl`](https://github.com/srid/emanote/tree/master/emanote/default/templates/filters/callout).

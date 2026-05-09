@@ -16,6 +16,8 @@ import Emanote.View.Common (
   TemplateRenderCtx (withInlineCtx),
   commonSplices,
   defaultRouteMeta,
+  i18nText,
+  i18nTextWith,
   mkTemplateRenderCtx,
   renderModelTemplate,
  )
@@ -28,8 +30,6 @@ import Relude
 data TagIndex = TagIndex
   { tagIndexPath :: [HT.TagNode]
   -- ^ The tag path under which this index is creatd
-  , tagIndexTitle :: Text
-  -- ^ User descriptive title of this index
   , tagIndexNotes :: [MN.Note]
   -- ^ All notes tagged precisely with this tag path
   , tagIndexChildren :: [(NonEmpty HT.TagNode, [MN.Note])]
@@ -39,10 +39,13 @@ data TagIndex = TagIndex
   }
   deriving stock (Eq)
 
-mkTagIndex :: Model -> [HT.TagNode] -> TagIndex
-mkTagIndex model tagPath' =
+{- | @tagMap@ is taken as a parameter (rather than re-derived from @Model@) so
+the recursive call inside the @ema:childTags@ splice doesn't pay the
+O(notes × cascade) cost of 'M.modelTags' on every child.
+-}
+mkTagIndex :: Map HT.Tag [MN.Note] -> [HT.TagNode] -> TagIndex
+mkTagIndex tagMap tagPath' =
   let mTagPath = nonEmpty tagPath'
-      tagMap = Map.fromList $ M.modelTags model
       tagForest = HT.tagTree tagMap
       childNodes =
         maybe
@@ -56,12 +59,11 @@ mkTagIndex model tagPath' =
    in case mTagPath of
         Nothing ->
           -- The root index displays all top-level tags (no notes)
-          TagIndex [] "Tag Index" [] childTags
+          TagIndex [] [] childTags
         Just tagPath ->
           let notes =
                 snd . Tree.rootLabel $ lookupForestMust tagPath tagForest
-              viewTitle = "#" <> tagNodesText tagPath <> " - Tag Index"
-           in TagIndex (toList tagPath) viewTitle notes childTags
+           in TagIndex (toList tagPath) notes childTags
   where
     lookupForestMust :: (Show k, Eq k) => NonEmpty k -> Forest (k, a) -> Tree (k, a)
     lookupForestMust path =
@@ -80,9 +82,21 @@ renderTagIndex :: Model -> [HT.TagNode] -> LByteString
 renderTagIndex model tagPath = do
   let (r, meta) = defaultRouteMeta model
       tCtx = mkTemplateRenderCtx model r meta
-      tagIdx = mkTagIndex model tagPath
+      tagMap = M.modelTags model
+      tagIdx = mkTagIndex tagMap tagPath
+      tagIndexLabel = i18nText meta "tagIndex" "Tag Index"
+      viewTitle =
+        fromString . toString $ case nonEmpty tagPath of
+          Nothing -> tagIndexLabel
+          Just tagPath' ->
+            let tagText = "#" <> tagNodesText tagPath'
+             in i18nTextWith
+                  meta
+                  "tagIndexTitle"
+                  (Map.fromList [("tag", tagText)])
+                  (tagText <> " - " <> tagIndexLabel)
   renderModelTemplate model "templates/special/tagindex" $ do
-    commonSplices ($ emptyRenderCtx) model meta $ fromString . toString $ tagIndexTitle tagIdx
+    commonSplices ($ emptyRenderCtx) model meta viewTitle
     "ema:tag:title" ## HI.textSplice (maybe "/" (HT.unTagNode . last) $ nonEmpty tagPath)
     "ema:tag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute tagPath)
     let parents = maybe [] (inits . init) $ nonEmpty (tagIndexPath tagIdx)
@@ -96,7 +110,7 @@ renderTagIndex model tagPath = do
     "ema:childTags" ##
       Splices.listSplice (tagIndexChildren tagIdx) "ema:each-childTag"
         $ \childTag -> do
-          let childIndex = mkTagIndex model (toList . fst $ childTag)
+          let childIndex = mkTagIndex tagMap (toList . fst $ childTag)
           "ema:childTag:title" ## HI.textSplice (tagNodesText $ fst childTag)
           "ema:childTag:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.tagIndexRoute (toList $ fst childTag))
           "ema:childTag:count-note" ## HI.textSplice (show (length $ snd childTag))

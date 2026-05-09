@@ -1,0 +1,3 @@
+[mcp_servers.chrome-devtools]
+command = "just"
+args = ["mcp-chrome-devtools"]

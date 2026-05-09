@@ -1,8 +1,12 @@
-name: early-flower
+name: emanote
 version: 1.0.0
-description: APM project for early-flower
+description: APM project for emanote
 author: Sridhar Ratnakumar
-target: [claude,codex]
+
+targets:
+  - claude
+  - codex
+
 dependencies:
   apm:
   - srid/agency#master

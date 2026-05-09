@@ -35,7 +35,6 @@
 /start/install /install 301
 /start/install/nix /nix 301
 /start/install/wsl /wsl 301
-/start/install/container /container 301
 /start/neuron /neuron 301
 /start/known-issues /known-issues 301
 /start/resources /resources 301
@@ -52,7 +51,7 @@
 # Tips
 /tips/adding-images /adding-images 301
 /tips/js /js 301
-/tips/js/math /math 301
-/tips/js/mermaid /mermaid 301
+/tips/js/math /tips/math 301
+/tips/js/mermaid /tips/mermaid 301
 /tips/js/syntax-highlighting /syntax-highlighting 301
 /tips/sync /sync 301

@@ -5,7 +5,13 @@ description: Review code for quality, simplicity, and common mistakes before dec
 
 # Code Police
 
-Review the current changes (scoped to the current branch/PR) against the rules below **and any additional code-police rules from project instructions**, then run three passes in order.
+Review the current changes (scoped to the current branch/PR) against the rules below **plus any additional rules from the project**, then run three passes in order.
+
+## Project rules
+
+Before Pass 1, read `.agency/code-police.md` if it exists. Treat any rules declared there — whether inline or as a pointer to another file (`See ./code-police-rules.md`) — as additions to the built-in rules below. They appear as separate rows in the Pass 1 checklist with the project's chosen rule IDs.
+
+If `.agency/code-police.md` is missing, proceed with only the built-in rules. The file is project-defined and free-form (Markdown, no required frontmatter).
 
 ## Rules
 
@@ -94,6 +100,8 @@ For each finding: file, line, one-line risk, concrete fix. If no issues, say so 
 - Assume the code is wrong until proven right. You are a prosecutor, not a defense attorney.
 
 ## Pass 3: Elegance
+
+**Skip on tiny diffs.** Run `git diff origin/HEAD...HEAD --shortstat` (or the appropriate base-branch ref). If the diff is **under 10 lines**, skip this pass and report `Elegance | 0 | Skipped (tiny diff)` in the summary. The elegance pass's three-lens fan-out has overhead that's disproportionate to a few-line change; rules and fact-check still run. If the diff exceeds the threshold, proceed below.
 
 Review the changes for elegance and simplicity.
 

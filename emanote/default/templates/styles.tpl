@@ -12,21 +12,26 @@
      rule here. Only land in this file when the alternative would be a
      pile of [...] utilities so ugly that a CSS block reads cleaner. -->
 
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/skylighting.css" />
+<emanoteStaticUrl path="skylighting.css">
+  <link rel="stylesheet" href="${url}" />
+</emanoteStaticUrl>
 
 <!-- Fonts are self-hosted under _emanote-static/fonts to keep the
      generated static site fully offline-capable. See the README in
      that directory for how to refresh. -->
-<link rel="stylesheet" href="${ema:emanoteStaticLayerUrl}/fonts/fonts.css" />
+<emanoteStaticUrl path="fonts/fonts.css">
+  <link rel="stylesheet" href="${url}" />
+</emanoteStaticUrl>
 
 <style data-category="global-font">
-  /* Font option C (trial):
-     Prose: Lora (warm, variable, very readable book serif).
-     UI chrome: Space Grotesk (geometric with quirks — personal-webpage energy).
-     Code: Space Mono (pairs stylistically with Space Grotesk). */
+  /* Prose: Lora (warm, variable, very readable book serif).
+     UI chrome: Mona Sans (variable display+text sans, more characterful
+     than Inter/Space Grotesk; GitHub uses it as their display face).
+     Code: Space Mono (pairs stylistically with the prose serif at body
+     sizes; the slab terminals echo Lora's serifs). */
   :root {
     --font-serif: 'Lora', ui-serif, Georgia, 'Times New Roman', serif;
-    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Mona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
@@ -37,18 +42,102 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
-    letter-spacing: -0.02em;
     line-height: 1.2;
     font-weight: 600;
   }
+  /* Negative tracking is a display-typography move; below ~24px it
+     makes Mona Sans glyphs touch and reduces legibility. Scope to the
+     larger headings only. */
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
 
-  #sidebar, #breadcrumbs, #toc, #footer, #backlinks, .callout-title,
+  #sidebar, #breadcrumbs, #toc, #footer,
+  #backlinks, #backlinks-margin, #backlinks-bottom, #right-panel,
+  .callout-title,
   ema\:metadata, section[class*="font-mono"] {
     font-family: var(--font-sans);
   }
 
   code, pre, kbd, samp, .font-mono {
     font-family: var(--font-mono);
+  }
+
+  /* Block-level prose images (an <img> that's the only content of its
+     paragraph) get a subtle frame: thin gray border, rounded corners,
+     centered with a bit of vertical breathing room. Inline images
+     (e.g. emoji, small icons inside flowing text) stay un-styled via
+     the :only-child gate. */
+  main p > img:only-child {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-gray-200);
+  }
+  .dark main p > img:only-child {
+    border-color: var(--color-gray-800);
+  }
+
+  /* Tables — Pandoc emits standard <table> HTML with no classes, so we
+     style by element. Scoped under `main` to avoid hitting tables in
+     chrome surfaces (sidebar tree, footnote popover, etc). */
+  main table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+  main thead {
+    border-bottom: 2px solid var(--color-gray-200);
+    text-align: left;
+  }
+  main thead th {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    letter-spacing: -0.01em;
+  }
+  main tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+  }
+  main tbody tr:hover {
+    background-color: var(--color-gray-50);
+  }
+  main tbody td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+  }
+  .dark main thead {
+    border-bottom-color: var(--color-gray-700);
+  }
+  .dark main thead th {
+    color: var(--color-gray-100);
+  }
+  .dark main tbody tr {
+    border-bottom-color: var(--color-gray-800);
+  }
+  .dark main tbody tr:hover {
+    background-color: rgb(255 255 255 / 0.03);
+  }
+  /* heist-extra's Pandoc renderer hardcodes
+     `border-r-2 border-l-2 border-gray-300` on every cell and
+     `border-b-2 border-t-2 border-gray-300` on every row, producing
+     a heavy "spreadsheet" look with vertical cell borders. !important
+     overrides win over those class utilities — leaving only the
+     thead bottom-rule and tbody row separators we set above for the
+     editorial GitHub-style table. (Upstream TODO note in
+     `Heist.Extra.Splices.Pandoc.Render`: "Move tailwind styles to
+     pandoc.tpl".) */
+  main table th,
+  main table td {
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+  }
+  main table thead tr,
+  main table tbody tr {
+    border-top-width: 0 !important;
   }
 </style>
 
@@ -91,6 +180,29 @@
     color: inherit;
     text-decoration: underline;
   }
+
+  /* Foldable callouts (Obsidian [!type]+ / [!type]-): suppress the native
+     <details>/<summary> disclosure marker since we render our own chevron,
+     and rotate the chevron based on open state. */
+  details.callout-foldable > summary {
+    list-style: none;
+  }
+
+  details.callout-foldable > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.callout-foldable[open] > summary .callout-fold-marker svg {
+    transform: rotate(180deg);
+  }
+
+  /* Nested callouts: drop the outer block margin so the inner callout
+     hugs the body of its parent rather than introducing a paragraph gap.
+     Both foldable (<details>) and non-foldable (<div>) outer callouts wrap
+     their body in `.callout-content`, so a single selector covers both. */
+  .callout .callout-content > .callout:last-child {
+    margin-bottom: 0;
+  }
 </style>
 
 <style data-category="lists">
@@ -104,30 +216,34 @@
 </style>
 
 <style data-category="task-list">
-  /* Task-list items: swap the disc bullet for flex-aligned checkbox + body. */
-  main li:has(> svg.--ema-checkbox) {
-    list-style: none;
-    display: flex;
-    gap: 0.5rem;
-    align-items: baseline;
-    margin-left: -1rem;
-  }
+  /* In-prose Pandoc task list (a Markdown bullet list with `[ ]`/`[x]`
+     items). Pandoc emits the task as a regular <li> with a checkbox
+     SVG (.--ema-checkbox) followed by a <span> of inlines. We drop
+     the disc marker and absolutely position the checkbox in the
+     marker slot so task text shares the same left edge as plain
+     bullet text in the same list — mixed task/non-task lists then
+     read as one column instead of two subtly-misaligned ones.
 
-  main li:has(> svg.--ema-checkbox) > span {
-    flex: 1;
+     Scoped to `main ul.list-disc` so the special tasks index page
+     (`/-/tasks`, which uses its own list shape, not list-disc)
+     doesn't pick up the absolute-position rule and shove the
+     checkbox off-screen. */
+  main ul.list-disc li:has(> svg.--ema-checkbox) {
+    list-style: none;
+    position: relative;
+  }
+  main ul.list-disc li:has(> svg.--ema-checkbox) > svg.--ema-checkbox {
+    position: absolute;
+    left: -1.5rem;
+    top: 0.3em;
   }
 </style>
 
 <style data-category="sidebar-tree">
-  /* Folgezettel depth rails: nested tree levels get a subtle left border */
-  #sidebar .pl-2 .pl-2 {
-    border-left: 1px solid var(--color-gray-200);
-    margin-left: 0.25rem;
-  }
-
-  .dark #sidebar .pl-2 .pl-2 {
-    border-left-color: var(--color-gray-800);
-  }
+  /* Folgezettel depth rails removed — indent alone is enough to
+     convey hierarchy and the rule was visual noise the user can do
+     without. (Re-add later as a 1px gray-100 / gray-900 hairline
+     if deep trees become hard to follow.) */
 </style>
 
 <style data-category="toc">
@@ -177,21 +293,19 @@
     color: var(--color-gray-600);
   }
 
-  /* Active TOC item — uses theme primary palette so per-site theme overrides
-     flow through without hardcoding a colour here. The selector is scoped
-     under #toc so it beats the per-depth color rules above. */
+  /* Active TOC item — neutral grey since TOC entries map to headings
+     in the prose, which render in plain text. Keeping primary out of
+     here lets the wikilink / title strip own the primary palette and
+     stand out as the page's only "destination" affordance. */
   #toc a.--ema-toc.toc-item-active {
     font-weight: 600;
-    border-left: 3px solid var(--color-primary-500);
-    padding-left: calc(0.5rem - 3px) !important;
-    background-color: var(--color-primary-50) !important;
-    color: var(--color-primary-700) !important;
+    background-color: var(--color-gray-100) !important;
+    color: var(--color-gray-900) !important;
   }
 
   .dark #toc a.--ema-toc.toc-item-active {
-    background-color: var(--color-primary-950) !important;
-    color: var(--color-primary-300) !important;
-    border-left-color: var(--color-primary-400);
+    background-color: var(--color-gray-800) !important;
+    color: var(--color-gray-100) !important;
   }
 </style>
 
@@ -265,63 +379,8 @@
   }
 </style>
 
-<script>
-  // Theme toggle: persist choice in localStorage; the early-load script in
-  // base.tpl applies it before first paint so there's no FOUC on reload.
-  (function () {
-    window.emanote = window.emanote || {};
-    window.emanote.theme = {
-      toggle: function () {
-        var root = document.documentElement;
-        var isDark = root.classList.toggle('dark');
-        root.style.colorScheme = isDark ? 'dark' : 'light';
-        try { localStorage.setItem('emanote-theme', isDark ? 'dark' : 'light'); } catch (e) {}
-        // Mermaid reads system colour-scheme at init; reload so any diagrams re-render.
-        if (document.querySelector('.mermaid')) window.location.reload();
-      }
-    };
-  })();
-</script>
-
-<script>
-  // Add copy buttons to code blocks
-  document.addEventListener('DOMContentLoaded', function() {
-    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>';
-    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
-
-    document.querySelectorAll('pre code').forEach(function(codeBlock) {
-      const pre = codeBlock.parentElement;
-
-      // Create copy button
-      const button = document.createElement('button');
-      button.className = 'code-copy-button';
-      button.innerHTML = copyIcon;
-      button.setAttribute('aria-label', 'Copy code to clipboard');
-      button.setAttribute('title', 'Copy code');
-
-      button.addEventListener('click', function() {
-        const text = codeBlock.textContent;
-        navigator.clipboard.writeText(text).then(function() {
-          button.innerHTML = checkIcon;
-          button.setAttribute('title', 'Copied!');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        }).catch(function(err) {
-          console.error('Copy failed:', err);
-          button.setAttribute('title', 'Copy failed');
-          setTimeout(function() {
-            button.innerHTML = copyIcon;
-            button.setAttribute('title', 'Copy code');
-          }, 2000);
-        });
-      });
-
-      pre.appendChild(button);
-    });
-  });
-</script>
+<!-- Theme toggle and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
 
 <style data-category="external-link">
   /* External/mail link glyphs — drawn with mask-image so they inherit the

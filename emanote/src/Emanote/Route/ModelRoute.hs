@@ -8,7 +8,8 @@ module Emanote.Route.ModelRoute (
   -- Some route in a generated site
   ModelRoute (..),
   modelRouteCase,
-  mkModelRouteFromFilePath,
+  mkModelRouteCandidates,
+  encodeModelRoute,
   -- Only LML routes
   LMLView (..),
   LMLRoute (..),
@@ -16,6 +17,7 @@ module Emanote.Route.ModelRoute (
   possibleLmlRoutes,
   lmlRouteCase,
   withLmlRoute,
+  lmlToHtmlRoute,
   mkLMLRouteFromFilePath,
   mkLMLRouteFromKnownFilePath,
   isMdRoute,
@@ -24,10 +26,11 @@ module Emanote.Route.ModelRoute (
 ) where
 
 import Data.Aeson.Types (ToJSON)
-import Emanote.Route.Ext (FileType (AnyExt, LMLType, Xml), HasExt, LML (Md, Org))
+import Emanote.Route.Ext (FileType (AnyExt, Html, LMLType, Xml), HasExt, LML (Md, Org))
 import Emanote.Route.R (R)
 import Emanote.Route.R qualified as R
 import Relude
+import System.FilePath qualified as FP
 
 type StaticFileRoute = R 'AnyExt
 
@@ -74,6 +77,26 @@ isMdRoute = \case
 withLmlRoute :: (forall lmlType. (HasExt ('LMLType lmlType)) => R ('LMLType lmlType) -> r) -> LMLRoute -> r
 withLmlRoute f = either f f . lmlRouteCase
 
+{- | Canonical `R 'Html` route for an LML route.
+
+The LML route is the *internal* identity Emanote assigns to a `.md` / `.org`
+note: `mkLmlRouteFromFilePath` strips a trailing `index` slug so
+@foo/index.md@ and @foo.md@ share one route. Going the other way — to a URL —
+is therefore not the identity. `R.expandIndexSlug` re-adds the trailing
+@"index"@ slug whenever the LML route already ends in @"index"@ (and isn't
+the lone root) so that the encoded HTML path survives the second @"index"@
+strip Ema applies in `UrlPretty` mode. Without this step a folder also
+named @index@ collapses one real directory level — see #542.
+
+This is the only sanctioned way to convert an `LMLRoute` into an `R 'Html`
+intended for URL emission.
+-}
+lmlToHtmlRoute :: LMLRoute -> R 'Html
+lmlToHtmlRoute lmlR =
+  R.mkRouteFromSlugs
+    $ R.expandIndexSlug
+    $ R.unRoute (withLmlRoute coerce lmlR :: R 'Html)
+
 modelRouteCase ::
   ModelRoute ->
   Either (LMLView, LMLRoute) StaticFileRoute
@@ -81,10 +104,39 @@ modelRouteCase = \case
   ModelRoute_LML view r -> Left (view, r)
   ModelRoute_StaticFile r -> Right r
 
-mkModelRouteFromFilePath :: FilePath -> Maybe ModelRoute
-mkModelRouteFromFilePath fp =
-  fmap (uncurry ModelRoute_LML) (mkLMLRouteFromFilePath fp)
-    <|> fmap ModelRoute_StaticFile (R.mkRouteFromFilePath fp)
+{- | All `ModelRoute`s a URL filepath could plausibly resolve to,
+ordered by preference.
+
+The same URL can map to multiple resource kinds — extensionless Markdown
+links can mean a note, and @*.xml@ is both the natural URL for a
+feed-enabled note's Atom output and the natural URL for a static @.xml@
+asset. Resolution at lookup time picks the first candidate that exists in
+the model; if the user intended one but the model only contains the other,
+the link still resolves correctly.
+-}
+mkModelRouteCandidates :: FilePath -> [ModelRoute]
+mkModelRouteCandidates fp =
+  mkExtensionlessLMLRouteCandidates fp
+    <> maybeToList (uncurry ModelRoute_LML <$> mkLMLRouteFromFilePath fp)
+    <> maybeToList (ModelRoute_StaticFile <$> R.mkRouteFromFilePath fp)
+
+mkExtensionlessLMLRouteCandidates :: FilePath -> [ModelRoute]
+mkExtensionlessLMLRouteCandidates fp = do
+  guard $ null $ FP.takeExtension fp
+  lmlType <- [Md, Org]
+  lmlR <- maybeToList $ mkLMLRouteFromKnownFilePath lmlType (FP.addExtension (FP.dropTrailingPathSeparator fp) $ lmlExt lmlType)
+  pure $ ModelRoute_LML LMLView_Html lmlR
+  where
+    lmlExt = \case
+      Md -> ".md"
+      Org -> ".org"
+
+-- | Encode a `ModelRoute` to its on-the-wire URL filepath.
+encodeModelRoute :: ModelRoute -> FilePath
+encodeModelRoute = \case
+  ModelRoute_StaticFile r -> R.encodeRoute r
+  ModelRoute_LML LMLView_Html lmlR -> withLmlRoute R.encodeRoute lmlR
+  ModelRoute_LML LMLView_Atom lmlR -> R.encodeRoute @_ @'Xml (withLmlRoute coerce lmlR)
 
 mkLMLRouteFromFilePath :: FilePath -> Maybe (LMLView, LMLRoute)
 mkLMLRouteFromFilePath fp =
@@ -104,5 +156,5 @@ mkLMLRouteFromFilePath fp =
 mkLMLRouteFromKnownFilePath :: LML -> FilePath -> Maybe LMLRoute
 mkLMLRouteFromKnownFilePath lmlType fp =
   case lmlType of
-    Md -> fmap LMLRoute_Md (R.mkRouteFromFilePath' True fp)
-    Org -> fmap LMLRoute_Org (R.mkRouteFromFilePath' True fp)
+    Md -> fmap LMLRoute_Md (R.mkLmlRouteFromFilePath fp)
+    Org -> fmap LMLRoute_Org (R.mkLmlRouteFromFilePath fp)

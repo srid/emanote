@@ -1,7 +1,7 @@
 ---
 name: talk
-description: Enter talk mode — conversation only, no file changes
-argument-hint: "[--no-laconic] [--review-model=<opus|sonnet|haiku>] <topic or question>"
+description: Enter talk mode — conversation and research, no repo changes. ONLY invoke when the user explicitly types `/talk` or `$talk`; never auto-select from a natural-language question or design discussion.
+argument-hint: "[--no-laconic] <topic or question>"
 ---
 
 # Probe (Talk Mode)
@@ -10,10 +10,12 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 
 ## Rules
 
-- **Do NOT edit, write, or create any files.** No `Edit`, `Write`, `NotebookEdit` tool calls, and no Bash commands that create or modify files (`echo >`, `tee`, `sed -i`, etc.). Period.
-- **Do NOT run destructive commands.** No `git commit`, `git push`, or anything that mutates the repo.
+- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo.
+- **Do NOT run destructive repo commands.** No `git commit`, `git push`, `git add`, `git rm`, or anything else that mutates the current repo.
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
-- You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous. You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
+- You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
+- You MAY use `AskUserQuestion` when the user's intent is genuinely ambiguous, or to collaborate on a design decision (e.g. proposing a phase split — see below). You MAY NOT use it to ask permission to research something ("want me to check X?", "should I look at Y?") — if you're tempted to ask, just do the research and report back. Asking to research is the single most common way talk mode fails.
+- **Don't outsource follow-up research to the user either.** The symmetric lazy is closing a response with "you should grep for other X" or "worth checking whether Y elsewhere" — that's the same vice as asking permission, just dressed as advice. If you surface a follow-up as worth doing, do it before responding. Don't surface follow-ups you're not willing to investigate.
 - **Talk mode ends when the user invokes an action skill** (e.g., `do`). Until then, stay in talk mode.
 
 ## Research before answering — MANDATORY
@@ -37,7 +39,7 @@ Use `Agent(subagent_type=Explore)` for any of:
 
 For narrow, single-file lookups, `Grep`/`Read` directly is fine. The line is: if you would be guessing without reading, you must read first.
 
-**When the source isn't on disk.** If the relevant library isn't in `node_modules/`, `vendor/`, or similar, and isn't already checked out somewhere you can read, `git clone` it to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read it there. Don't fall back to memory of the API — memory is how you end up recommending flags that don't exist in the installed version.
+**When the source isn't on disk.** If the relevant library isn't in `node_modules/`, `vendor/`, or similar, and isn't already checked out somewhere you can read, `git clone` it to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read it there. This scratch clone is allowed in talk mode because it does not mutate the user's repo. Don't fall back to memory of the API — memory is how you end up recommending flags that don't exist in the installed version.
 
 **Subagent output is a lead, not ground truth.** Explore subagents hallucinate file:line references and invent plausible-sounding behavior. If you haven't verified a claim yourself, mark it "per subagent, unverified" so the user can weigh it — don't launder subagent guesses into confident statements.
 
@@ -58,6 +60,7 @@ If you're about to emit "probably", "almost certainly", "I suspect", "my #1 susp
 - ❌ "This pattern usually means..." (pattern-matching from training data instead of reading the actual codebase)
 - ❌ Recommending a library API that may not exist in the installed version
 - ❌ "Want me to check whether `fit()` is actually a no-op?" — don't ask, check.
+- ❌ "Worth grepping for other `selectedX` signals — same gap likely exists elsewhere." — if you flagged it, you check it; don't hand the user homework.
 - ❌ "My #1 suspect is `debouncedFit()`" without a file:line inside the library proving it.
 - ❌ Citing a subagent's claim about `FitAddon.ts:45` without opening `FitAddon.ts:45` yourself first.
 - ✅ "I read `Viewport.ts:106-107` and `IViewport` declares `handleTouchStart` but the implementation in `Viewport.ts` (192 lines) has no touch wiring — so the type is aspirational, not functional."
@@ -67,15 +70,28 @@ If you're about to emit "probably", "almost certainly", "I suspect", "my #1 susp
 - Be direct, opinionated, and concise.
 - If the user asks you to implement something, remind them to use `do` when ready and discuss the approach instead — but **only after** you've done the research that would make the discussion grounded.
 
-## Auto-Lowy
+## Phased delivery for feature work
 
-Any time the conversation produces a concrete code plan, diff proposal, or design sketch that could be implemented, **invoke the `lowy` sub-agent on that proposal before presenting your final recommendation** — do not wait for the user to ask. Fold its findings into the recommendation (flag boundaries that track functionality instead of volatility, flag where a seam would cleanly encapsulate an axis of change) rather than dumping raw sub-agent output on top. Use `Agent(subagent_type="lowy")`, not the `Skill` tool — the sub-agent runs in an isolated context and keeps the main turn lean.
+For **user-visible feature work** large enough that an unphased PR would be painful for a human to review, propose splitting the implementation into phases where each phase is independently useful when merged — any prefix of phases is itself a shippable improvement. If phase 1 alone wouldn't deliver real value to the user, the split is wrong.
 
-Hickey's complecting critique deliberately does **not** run here. It needs a concrete diff to bite — running it on a sketch tends to surface generic concerns rather than the specific interleavings that matter. `do` runs hickey post-implement on the real diff. Talk mode sticks with Lowy because volatility-based decomposition is the design-level lens that's useful while the design is still a sketch.
+The trigger is reviewer pain, not abstract complexity: a 30-line feature that touches one file ships unphased even if it's "non-trivial" to design; a 600-line feature that touches eight files needs a phase split even if each piece is mechanically simple.
 
-Skip the Lowy pass only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run it.
+This applies only to user-visible feature work. Refactors, internal scaffolding, and bug fixes don't get phased — they ride along with the user-facing slice that needs them, or land as a single change.
 
-**Model override.** If `ARGUMENTS` contains `--review-model=<model>` (accept `opus`, `sonnet`, or `haiku`; strip the flag before treating the rest as the topic), pass `model: "<model>"` in the `Agent(subagent_type="lowy")` call. This overrides the `model: sonnet` in `lowy`'s agent frontmatter via the `Agent` tool's built-in `model` parameter. Without the flag, omit `model` so the default (sonnet) applies. Reject unknown values with a one-line error instead of silently falling back — a typo shouldn't quietly erase a budget decision.
+Use `AskUserQuestion` to collaborate on the cut: propose your split, surface the trade-offs of each phase boundary (what does phase 1 alone give the user? what does deferring phase 3 cost?), and let the user adjust before they invoke `do`.
+
+## Auto-review (Lowy + Hickey)
+
+Any time the conversation produces a concrete code plan, diff proposal, or design sketch that could be implemented, **invoke both the `lowy` and `hickey` sub-agents on that proposal in parallel before presenting your final recommendation** — do not wait for the user to ask. Use `Agent(subagent_type="lowy")` and `Agent(subagent_type="hickey")` (not the `Skill` tool) so each runs in an isolated context and keeps the main turn lean.
+
+**Revise the recommendation in light of their findings before presenting it.** Invoking the reviewers is not the deliverable — the deliverable is a *post-review* proposal whose shape already reflects what landed. Concretely: when a finding lands (real complecting, fragmentation, or a missing volatility seam), change the design itself — don't tack the finding onto an unchanged sketch as a critique section the user has to reconcile. When a finding doesn't land, say briefly why. The headline the user reads should be the revised proposal, with the reviewer pass evident in what changed (and what was rejected), not the original sketch with raw sub-agent output appended.
+
+- **Lowy** flags boundaries that track functionality instead of volatility and where a seam would cleanly encapsulate an axis of change.
+- **Hickey** flags structural complecting and fragmentation — concept multiplication, sum-types-as-parallel-fields, hidden coupling at OS or shared-state layers, and the rest of the Layer 3-4 catalog. Hickey on a sketch can drift toward generic critique; in your prompt, instruct it to either land specific complecting/fragmentation risks in *this* sketch or say explicitly that there's nothing yet to bite into. Generic principles are not findings. Layer 5 (entanglement counts) and the diff-shaped Actions table will be thin on a sketch — that's expected; the design-level layers are the ones that bite here.
+
+Skip both passes only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run them. `do` re-runs hickey + lowy post-implement on the real diff, so the talk-mode pass is the design-level rehearsal, not the final word.
+
+**Model selection lives in the skill, not here.** Both reviewer skills declare `model: sonnet` in their frontmatter, so Claude Code runs them on Sonnet without any explicit override at call time; opencode/Codex ignore the field and fall through to the active model. Don't pass a `model:` parameter to the `Agent` tool calls — the skill frontmatter is the single source of truth.
 
 ## Laconic mode (default)
 

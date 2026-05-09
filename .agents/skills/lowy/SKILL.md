@@ -3,6 +3,7 @@ name: lowy
 description: Evaluate architecture and module boundaries for volatility-based decomposition using Juval Lowy's framework (from "Righting Software", building on Parnas 1972). Use when reviewing module splits, service boundaries, new abstractions, or any decomposition decision. Trigger on phrases like "where should this boundary be", "how to split this", "module boundaries", "encapsulate change", "volatility", or references to Lowy, Parnas, or "Righting Software". Complements /hickey (interleaved concerns) with a different lens (change encapsulation).
 context: fork
 agent: Explore
+model: sonnet
 ---
 
 # Lowy: Volatility-Based Decomposition Review
@@ -35,6 +36,16 @@ Conflating these two — putting orchestration logic and activity logic in the s
 
 Not everything that varies is volatile. Lowy makes a critical distinction: adding an attribute to a data model is *variable* but not *volatile* — the architecture won't suffer. **"If you cannot clearly state what the volatility is, why it is volatile, and what risk the volatility poses in terms of likelihood and effect, then you need to look further."** Decomposing around things that merely vary (rather than things that are genuinely volatile) produces over-engineered boundaries that add cost without containing real change.
 
+## Scope of Review
+
+The trigger — "review this boundary", "should we split X", "look at module Y", a `/do` diff inside one component — is a *starting point*, not a frame. Volatility-based decomposition is most legible at module boundaries; reviewing only the lines the user (or upstream issue) pointed at is how a missing volatility seam in the surrounding module gets missed.
+
+**Default to whole-module scope.** When the trigger lives inside a single file or component, read the whole file — not just the cited region. When invoked on a multi-file diff, each touched file is in scope, and cross-file boundary questions (does this volatility actually live in one place, or is it sprayed across modules?) are in scope too. Sibling modules are fair game when the same boundary question recurs there.
+
+**Don't let the user's framing define the scope.** A trigger that says "extract this into a new component" implies the boundary is the right shape and only the placement is wrong; if the surrounding module shows the volatility axis is actually elsewhere — the data model, the consumer pattern, a sequence/activity split — name *that*, even when the implied fix lands at a different layer than the trigger suggests. The reviewer's job is to surface what the evidence says about volatility, not to confirm the trigger's framing.
+
+**Push back when the evidence contradicts the trigger.** If the prompt narrows the question to one boundary but the surrounding code shows the volatility doesn't track that boundary at all, the redirected finding is the headline, not a footnote. *"Issue #N described a UI extraction; the volatility actually splits the data model into two kinds"* is a valid first finding, not an out-of-scope tangent.
+
 ## The Evaluation
 
 For every module boundary, service split, or new abstraction in the code under review:
@@ -43,7 +54,7 @@ For every module boundary, service split, or new abstraction in the code under r
 
 What is likely to change behind this boundary? Be specific — not "requirements might change" but "the payment provider, the auth protocol, the notification channel." If you can't name concrete axes of change, the boundary may be arbitrary.
 
-**Consider project-declared areas of volatility.** If the project has enumerated its own areas of volatility — the term of art Lowy uses throughout *Righting Software* — those declarations surface as system-reminders when you read a matching file (Claude Code's `paths:`-scoped rule mechanism; it is wiring, not Lowy doctrine). The schema, loosely modeled on Lowy's TradeMe enumeration (*Righting Software*, Ch. 5), is:
+**Consider project-declared areas of volatility.** If the project has enumerated its own areas of volatility — the term of art Lowy uses throughout *Righting Software* — read `.agency/lowy.md` if it exists. Its content is project-specific (inline rows or a pointer to another file). The schema, loosely modeled on Lowy's TradeMe enumeration (*Righting Software*, Ch. 5), is:
 
 | Area of volatility | What changes | Why volatile (likelihood × effect) | Expected encapsulation |
 |--------------------|--------------|------------------------------------|------------------------|
@@ -109,7 +120,7 @@ After completing all steps, **invoke `/fact-check` on your own output**. The fac
 - _"This module is only used in one place, but that's fine for now"_ — single-use is the reuse signal firing. Investigate.
 - _"The boundary follows the framework's conventions"_ — framework conventions are functional decomposition by default. Convention is not volatility analysis.
 - _"This could theoretically change independently"_ — theoretical independence without a concrete change scenario is wishful thinking.
-- _"Out of scope for this PR" / "pre-existing"_ — process judgment, not a volatility judgment. Defer with an issue link or fix it.
+- _"Out of scope for this PR" / "pre-existing"_ — process judgment, not a volatility judgment. There is no defer; fix it in this PR. The PR's scope expands to absorb the finding.
 - _"The module encapsulates [domain entity]"_ — domain entities are not volatility axes. What *about* the entity changes? Name the specific volatility or it's domain decomposition.
 - _"This is variable, so we should encapsulate it"_ — variable is not volatile. Can you state the risk in terms of likelihood and effect?
 
@@ -122,7 +133,11 @@ If fact-check finds issues, revise before presenting to the user.
 3. **Findings** — Boundaries that track functionality rather than volatility, with blast-radius analysis. Include symmetry violations and layering inversions.
 4. **Simplifications** — Concrete restructuring to align boundaries with axes of change.
 5. **Fact-check result** — Output of `/fact-check` on this evaluation, including the phrase-shape check.
-6. **Actions** — One entry per finding, formatted so a downstream step (e.g. `/do`'s PR comment composer) can lift each entry into a table row. Each entry **starts with a short bolded finding label (≤8 words)** naming *what* is wrong, then dispositions it as **Fix in this PR** or **Defer `#<issue>`**. Every finding must appear here — including those labeled "pre-existing" or "orthogonal". A finding that never reaches this section has been dismissed, not deferred.
+6. **Actions** — One entry per finding, formatted so a downstream step (e.g. `/do`'s PR comment composer) can lift each entry into a table row. Each entry **starts with a short bolded finding label (≤8 words)** naming *what* is wrong, then dispositions it as exactly one of:
+   - **Fix in this PR**: one-line description of what the implementation step must do. This is the only forward-action disposition. The PR's scope expands to absorb every finding.
+   - **No-op**: reserved for findings that need no code action — the diff already deletes the offending code, or the finding is subsumed verbatim by another finding in this same review. Treat this as the rare exception.
+
+   **There is no Defer disposition.** "Out of scope", "pre-existing", "follow-up refactor", "should be its own PR" are not dispositions — they are process judgments dressed up as volatility analysis. Every finding must appear here — including those labeled "pre-existing" or "orthogonal" — and every finding either gets fixed in this PR or is a No-op. A finding that never reaches this section has been dismissed.
 
 Example: `**useViewport encapsulates ghost concern** — Fix in this PR: delete the hook, let FitAddon measure per-tile.`
 

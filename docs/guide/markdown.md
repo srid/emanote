@@ -13,26 +13,7 @@ Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is a
 {#wikilink}
 ## Wiki Links
 
-You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;
-you can specify a custom title as `[[neuron|Moving off neuron]]` which renders as [[neuron|Moving off neuron]] or even force use of filename with `[[neuron|neuron]]` which renders as [[neuron|neuron]].
-
-### Structural links
-
-See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar]] (and [[uptree]]) heirarchy.
-
-### Anchors 
-
-Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).
-
-### Broken links
-
-Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
-
-### Ambiguous links
-
-Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig]
-
-[^ambig]: This particular selection process [was choosen](https://github.com/srid/emanote/pull/498) in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
+Emanote supports `[[…]]` wiki-link syntax. See [[wikilinks]] for the full reference — custom titles, [[folgezettel|structural links]], anchors, regular-Markdown forms, and how broken / ambiguous links render (templated, override-friendly).
 
 
 ## Emojis
@@ -127,6 +108,13 @@ Ordered lists,
 | Search Engine | [Brave Search] |
 | Chat          | [Element]      |
 
+Column alignment is honored on each cell — use `:---` for left, `---:` for right, and `:---:` for center.
+
+| Left   |  Center  | Right |
+| :----- | :------: | ----: |
+| Apple  |  Banana  |  Pear |
+| Carrot | Eggplant |  Kiwi |
+
 (Note that wiki links with a custom text must have their [pipe escaped](https://github.com/srid/emanote/issues/113#issuecomment-894808721) when used inside tables.)
 
 [Brave]: https://brave.com/
@@ -151,6 +139,19 @@ See [[callout]] for details.
 > This is a note callout
 > 
 > Lorem **ipsum** dolor sit *amet*, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+
+## Raw HTML
+
+Block-level HTML is passed through verbatim. When an opening tag and its matching closing tag each sit on their own line with blank lines on either side, the markdown between them is parsed as the element's children. This is how `<details>` renders as a working disclosure widget with rich content inside:
+
+<details>
+
+This paragraph is a child of the `<details>` element. Regular **markdown** still works inside — _emphasis_, [example links](https://example.com), `code spans`, and Emanote extensions like [[neuron|wiki links]] all parse normally.
+
+</details>
+
+Without the blank lines, the `<details>...</details>` is treated as one opaque HTML block — markdown inside is not parsed. _For an Emanote-native foldable variant that doesn't require raw HTML at all, see the `+` / `-` callout suffix in [[callout]]._
 
 
 {#hanchor}

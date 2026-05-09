@@ -20,16 +20,16 @@
     "commonmark-wikilink": {
       "flake": false,
       "locked": {
-        "lastModified": 1755567049,
-        "narHash": "sha256-MWOb0Ojc4EQd9fOnQEveRDdbH5Cr6kjUt04uWzBPLGQ=",
+        "lastModified": 1777254858,
+        "narHash": "sha256-dxjsU2SGG2txShwdXCl18ND18Y5Qbqt3J/FlrKhrkp4=",
         "owner": "srid",
         "repo": "commonmark-wikilink",
-        "rev": "5ab01515939047b58943cc1234e7ee0cb82d1c22",
+        "rev": "e47ba496ceaf68ec119e56eb22670ae017b35a42",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "0.2.0.0",
+        "ref": "master",
         "repo": "commonmark-wikilink",
         "type": "github"
       }
@@ -71,11 +71,11 @@
     "ema": {
       "flake": false,
       "locked": {
-        "lastModified": 1777055353,
-        "narHash": "sha256-9O6C7Z6gcCiay3LEdXiEru9pPmnGVHkAjlgt5+j4cM8=",
+        "lastModified": 1777214989,
+        "narHash": "sha256-bzypHo+Z/fLJRK1hTEuxCzK/ybxJixDrfML8M6cfDtk=",
         "owner": "srid",
         "repo": "ema",
-        "rev": "5dc98749dc0e132306c806d7c1d7fa1b4aafb667",
+        "rev": "87da4f3c678b78bc3ee96225910a3932b3e8b6f9",
         "type": "github"
       },
       "original": {
@@ -169,11 +169,11 @@
     "heist-extra": {
       "flake": false,
       "locked": {
-        "lastModified": 1776811520,
-        "narHash": "sha256-FCWJVrXjIu/du69h/rfkqXYcjA2+1CpJcxNVyDR6eyA=",
+        "lastModified": 1777548733,
+        "narHash": "sha256-YefkrB6jip7AV9ssRLngjSbp9xHE/xcSgfQMzDjpga0=",
         "owner": "srid",
         "repo": "heist-extra",
-        "rev": "13c70e98621740fda1d93f4a5bd766b357535377",
+        "rev": "85c433921629d0de9374bc5deaa866ec830748c2",
         "type": "github"
       },
       "original": {
@@ -230,6 +230,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-latest": {
+      "locked": {
+        "lastModified": 1776949667,
+        "narHash": "sha256-GMSVw35Q+294GlrTUKlx087E31z7KurReQ1YHSKp5iw=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "01fbdeef22b76df85ea168fbfe1bfd9e63681b30",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "commonmark-simple": "commonmark-simple",
@@ -246,22 +262,22 @@
         "lvar": "lvar",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-latest": "nixpkgs-latest",
         "unionmount": "unionmount"
       }
     },
     "unionmount": {
       "flake": false,
       "locked": {
-        "lastModified": 1755566785,
-        "narHash": "sha256-1TBIhcgbQxBF48ET7Dy+PM3U2lCROBDVg5PhOtm2Q/M=",
+        "lastModified": 1778089705,
+        "narHash": "sha256-Jd6lx0G3Y9VCaXVPx1wP1STEUul2XKckxLUDMFMd4tY=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "4387cdeca64d22ff02da318b1527ff8817123ced",
+        "rev": "af0b6b817d89bc86c318d8ea9680f628d0e4978f",
         "type": "github"
       },
       "original": {
         "owner": "srid",
-        "ref": "0.3.0.0",
         "repo": "unionmount",
         "type": "github"
       }

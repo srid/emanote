@@ -1,10 +1,202 @@
 import { Given, When, Then } from "@cucumber/cucumber";
 import { EmanoteWorld } from "../support/world.ts";
+import { morphNav, openRoute } from "../support/navigation.ts";
 import * as assert from "node:assert";
 
 When("I open {string}", async function (this: EmanoteWorld, url: string) {
-  await this.page.goto(url, { waitUntil: "domcontentloaded" });
+  await openRoute(this.page, url);
 });
+
+When("I fetch {string}", async function (this: EmanoteWorld, url: string) {
+  this.lastResponse = await this.page.request.get(url);
+});
+
+// #119: a raw HTML block containing a literal `</div>` used to truncate the
+// page mid-render with `div cannot contain text looking like its end tag`.
+// Asserting on a marker *inside* the raw block proves the page reached past
+// the offending node — a partial response wouldn't include the marker.
+Then(
+  "the page contains an element with data-marker {string}",
+  async function (this: EmanoteWorld, marker: string) {
+    const count = await this.page
+      .locator(`[data-marker="${marker}"]`)
+      .count();
+    assert.ok(
+      count > 0,
+      `Expected an element with data-marker="${marker}"; got ${count}. Either the raw-HTML wrapper regressed (xmlhtml's "div cannot contain text…" path) and the page was truncated, or Pandoc no longer recognises the source as a raw HTML block.`,
+    );
+  },
+);
+
+// `[class~="…"]` matches without escaping the literal `:` in the class
+// name (which CSS selectors would otherwise need as `\:`).
+Then(
+  "the page contains an element with class {string}",
+  async function (this: EmanoteWorld, cls: string) {
+    const count = await this.page.locator(`[class~="${cls}"]`).count();
+    assert.ok(
+      count > 0,
+      `Expected an element carrying class ${JSON.stringify(cls)}; got ${count}. Either the renderer no longer emits the class or a notebook override stripped it.`,
+    );
+  },
+);
+
+// #433: orphan opener/closer raw-HTML tags around markdown content used to
+// produce two stranded `<rawhtml>` wrappers immediately adjacent to the
+// `<details>` opener and closer. Browsers' lenient HTML5 parser recovers
+// the broken stream into a DOM that nests the marker under <details>, so a
+// DOM-level `closest("details")` check passes on master too. Catching the
+// regression requires inspecting the *emitted* HTML directly. The
+// load-bearing structural difference is the `<rawhtml ...><details>`
+// adjacency on master vs. a bare `<details>` on the fix.
+Then(
+  "the emitted HTML for {string} wraps no <rawhtml> around its <details> tags",
+  async function (this: EmanoteWorld, route: string) {
+    const response = await this.page.request.get(route);
+    assert.ok(response.ok(), `Failed to fetch ${route}: ${response.status()}`);
+    const html = await response.text();
+    const wrappedOpener = /<rawhtml[^>]*>\s*<details(?:\s|>)/.test(html);
+    const wrappedCloser = /<rawhtml[^>]*>\s*<\/details>/.test(html);
+    assert.ok(
+      !wrappedOpener && !wrappedCloser,
+      `Expected ${route} to emit a bare <details>...</details> with no surrounding <rawhtml> wrappers. Got wrappedOpener=${wrappedOpener}, wrappedCloser=${wrappedCloser}. The orphan-RawHtml grouping pass (heist-extra: groupRawHtmlBlocks) likely regressed.`,
+    );
+  },
+);
+
+// #285 — two complementary checks. The "no Ema exception" assertion
+// guards the *crash* (the original bug surface); the banner assertion
+// guards the *visibility* of the error so a parse failure can't fail
+// silently. Both must hold for the regression to be considered fixed.
+const EMA_EXCEPTION_MARKERS = [
+  "Ema App threw an exception",
+  "Unable to render template",
+];
+
+Then(
+  "the page rendered without an Ema exception",
+  async function (this: EmanoteWorld) {
+    const text = (await this.page.textContent("body")) ?? "";
+    for (const marker of EMA_EXCEPTION_MARKERS) {
+      assert.ok(
+        !text.includes(marker),
+        `Page body contains ${JSON.stringify(marker)} — #285 regressed: a malformed *.yaml file is again crashing the model patch handler. First 200 chars of body: ${JSON.stringify(text.slice(0, 200))}.`,
+      );
+    }
+  },
+);
+
+// #362 — `![[A]]` embedded in B and `![[B]]` embedded in A used to expand
+// without a fixpoint, producing arbitrarily deep nested output (or, on
+// older releases, hanging the live preview). The fix swaps the cyclic
+// embed for an inline placeholder block whose text names the offending
+// note. Match by the unique "↺ Cyclic embed:" prefix rather than by
+// the source class, which the pandoc.rewriteClass step transforms into
+// transient Tailwind utilities (same convention as the #285 banner step).
+const CYCLIC_EMBED_MARKER = "↺ Cyclic embed:";
+
+Then(
+  "the page contains a cyclic-embed placeholder for {string}",
+  async function (this: EmanoteWorld, title: string) {
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      text.includes(CYCLIC_EMBED_MARKER),
+      `Expected ${JSON.stringify(CYCLIC_EMBED_MARKER)} in the page body. Either the cycle wasn't detected (renderer recursing on its own AST) or the placeholder prefix was reworded.`,
+    );
+    const expected = new RegExp(`${CYCLIC_EMBED_MARKER}\\s*${title}\\b`);
+    assert.ok(
+      expected.test(text),
+      `Placeholder did not name the cyclic note. Expected to find ${JSON.stringify(`${CYCLIC_EMBED_MARKER} ${title}`)} adjacent in the page body; first 400 chars: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
+// The banner is a Pandoc Div with class `emanote:error`, which an existing
+// Heist splice rewrites into Tailwind utility classes. Match by the unique
+// header text instead of the source class — the test shouldn't break the
+// next time those utilities get tweaked.
+const YAML_BANNER_HEADER = "Emanote: bad YAML files";
+
+Then(
+  "the page shows the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    const header = this.page.getByText(YAML_BANNER_HEADER);
+    await header.waitFor({ state: "attached", timeout: 5_000 });
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      text.includes("broken-285.yaml"),
+      `Banner header rendered but did not name the broken fixture file — the per-file error message stopped propagating. Got: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
+Then(
+  "the page does not show the YAML errors banner",
+  async function (this: EmanoteWorld) {
+    const text = (await this.page.textContent("body")) ?? "";
+    assert.ok(
+      !text.includes(YAML_BANNER_HEADER),
+      `Banner header leaked onto a page whose route cascade does not include the broken yaml — yaml-error scoping regressed. First 400 chars: ${JSON.stringify(text.slice(0, 400))}.`,
+    );
+  },
+);
+
+// Asserts the body of the response captured by the most recent
+// `When I fetch …` step contains a substring.
+Then(
+  "the response body contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    const body = await resp.text();
+    assert.ok(
+      body.includes(needle),
+      `Expected response body to contain ${JSON.stringify(needle)} (status=${resp.status()}); first 400 chars: ${JSON.stringify(body.slice(0, 400))}.`,
+    );
+  },
+);
+
+// Mirror of `the response body contains`, used to prove a fixture that
+// SHOULD have been excluded didn't sneak through. We can't assert on
+// status code uniformly here: `emanote run` renders an Ema "! Missing
+// link" page with status 200 for routes not in the model, while
+// `emanote gen` + serve-handler emits a hard 404. Both modes agree
+// that the excluded fixture's unique marker is absent from the body,
+// so that's the assertion we use.
+Then(
+  "the response body does not contain {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    const body = await resp.text();
+    assert.ok(
+      !body.includes(needle),
+      `Response body unexpectedly contained ${JSON.stringify(needle)} (status=${resp.status()}); first 400 chars: ${JSON.stringify(body.slice(0, 400))}.`,
+    );
+  },
+);
+
+Then(
+  "the response is a valid Atom feed",
+  async function (this: EmanoteWorld) {
+    const resp = this.lastResponse;
+    assert.ok(resp, "No prior `When I fetch …` recorded a response.");
+    assert.strictEqual(
+      resp.status(),
+      200,
+      `Expected 200; got ${resp.status()}. The feed route should serve an empty-but-valid Atom document, not error out (see #490).`,
+    );
+    const body = await resp.text();
+    assert.ok(
+      body.startsWith("<?xml"),
+      `Expected an XML prolog; first 100 chars: ${JSON.stringify(body.slice(0, 100))}.`,
+    );
+    assert.ok(
+      body.includes("<feed"),
+      `Expected a top-level <feed> element; body did not contain one. First 200 chars: ${JSON.stringify(body.slice(0, 200))}.`,
+    );
+  },
+);
 
 Given(
   "I note the resolved primary palette at {string}",
@@ -107,6 +299,60 @@ Then(
   },
 );
 
+// Issue #608: a relative link inside `<dir>/index.md` must resolve against
+// `<dir>/`, not the parent of the canonicalized route. Scoped to <article>
+// because the sidebar nav also surfaces a child link to the same target —
+// and that path is auto-generated from the route hierarchy, so it stays
+// correct even when the bug is live. Only the article-body anchor exercises
+// the relative-URL resolver we're testing.
+Then(
+  "the article link with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    const link = this.page.locator(`article a:has-text("${linkText}")`).first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const href = await link.getAttribute("href");
+    assert.ok(
+      href && href.includes(needle),
+      `Article link "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}.`,
+    );
+  },
+);
+
+Then(
+  "the first article link has HTML containing {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const link = this.page.locator("article a").first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const html = await link.innerHTML();
+    assert.ok(
+      html.includes(needle),
+      `First article link expected HTML to contain ${JSON.stringify(needle)}, got ${JSON.stringify(html)}.`,
+    );
+  },
+);
+
+// #349: count assertion is the strongest regression guard. Before the fix,
+// each of the four cases produces 2-3 anchors (parent + autolinks); after
+// the fix, exactly 4 anchors target the four cases. Filter on the shared
+// `issue349` substring (matches both `issue349-caseN.example.com` and the
+// mailto form `case2@issue349.example.com`) so any regression that adds
+// stray autolinks bumps the count and trips the assertion.
+Then(
+  "the article body has exactly {int} hyperlinks to issue-349 case targets",
+  async function (this: EmanoteWorld, expected: number) {
+    const hrefs = await this.page.$$eval("article a[href]", (anchors) =>
+      anchors
+        .map((a) => a.getAttribute("href") ?? "")
+        .filter((h) => h.includes("issue349")),
+    );
+    assert.strictEqual(
+      hrefs.length,
+      expected,
+      `Expected ${expected} article links to issue349 targets, got ${hrefs.length}: ${JSON.stringify(hrefs)}.`,
+    );
+  },
+);
+
 const POPOVER_SEL = "#emanote-footnote-popover";
 
 When(
@@ -188,6 +434,33 @@ Then(
   },
 );
 
+// The popup body's Tailwind classes (bg-white, rounded-lg, shadow-xl,
+// etc.) are applied by JS at runtime — they never appear in any
+// generated HTML attribute, so the static-mode Tailwind CLI doesn't
+// see them and silently drops the corresponding rules. The visible
+// symptom is a popup with no background fill, no shadow, no rounding —
+// just a thin default border around plain text. Asserting on a
+// concrete computed style (the body's background-color) catches that
+// regression: the JS sets `bg-white dark:bg-gray-900`, which compiles
+// to a non-transparent rgb()/oklab() value. If Tailwind didn't pick up
+// the class, getComputedStyle returns rgba(0,0,0,0).
+Then(
+  "the footnote popup body has a non-transparent background",
+  async function (this: EmanoteWorld) {
+    const popover = this.page.locator(POPOVER_SEL);
+    const bg = await popover.evaluate((el) => {
+      const body = el.firstElementChild as HTMLElement | null;
+      if (!body) return null;
+      return getComputedStyle(body).backgroundColor;
+    });
+    assert.ok(bg, "Popover has no body element — script setup regressed.");
+    assert.ok(
+      bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent",
+      `Popover body background is ${JSON.stringify(bg)} — Tailwind dropped the popup classes (likely because the static-mode CSS compile didn't scan the JS module that applies them; see Tailwind.hs's @source for _emanote-static/js).`,
+    );
+  },
+);
+
 // Print-mode footnotes. The popup is screen-only; the hidden <aside
 // data-footnote-list> is revealed by `print:block` on paper so printed
 // copies still carry the cited bodies.
@@ -245,6 +518,597 @@ Then(
       `Visible print-mode footnote list did not contain ${JSON.stringify(
         needle,
       )}. Got: ${JSON.stringify(text.slice(0, 200))}.`,
+    );
+  },
+);
+
+// Theme toggle button lives in the sidebar header (sidebar.tpl) and the
+// minimal layout header (layouts/default.tpl); both wire it via inline
+// onclick="window.emanote.theme.toggle()" with title="Toggle dark mode".
+// Click the first one Playwright finds — both fire the same handler.
+When("I click the theme toggle", async function (this: EmanoteWorld) {
+  await this.page.locator('button[title="Toggle dark mode"]').first().click();
+});
+
+Then(
+  "the documentElement has class {string}",
+  async function (this: EmanoteWorld, cls: string) {
+    const has = await this.page.evaluate(
+      (c) => document.documentElement.classList.contains(c),
+      cls,
+    );
+    assert.ok(
+      has,
+      `Expected <html> to have class ${JSON.stringify(cls)}; classList was ${JSON.stringify(
+        await this.page.evaluate(() => document.documentElement.className),
+      )}. The theme-toggle module either failed to load or its onclick handler did not run.`,
+    );
+  },
+);
+
+Then(
+  "localStorage {string} is {string}",
+  async function (this: EmanoteWorld, key: string, expected: string) {
+    const value = await this.page.evaluate(
+      (k) => localStorage.getItem(k),
+      key,
+    );
+    assert.strictEqual(
+      value,
+      expected,
+      `Expected localStorage[${JSON.stringify(key)}] to be ${JSON.stringify(expected)}; got ${JSON.stringify(value)}. The persistence step in window.emanote.theme.toggle either threw silently or never ran.`,
+    );
+  },
+);
+
+// code-copy.js wires a button into every <pre> that has a child <code>.
+// Asserting parity (#buttons === #pre>code) catches both regressions:
+// missing buttons (selector mismatch, module not loaded) and duplicates
+// (idempotency-guard regressed in morph.js's dataset sentinel).
+Then(
+  "every <pre> with a child <code> has a .code-copy-button",
+  async function (this: EmanoteWorld) {
+    // Module loads via <script type="module"> which is defer-by-default —
+    // wait for at least one button before counting.
+    await this.page
+      .locator("pre > .code-copy-button")
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const counts = await this.page.evaluate(() => ({
+      preWithCode: document.querySelectorAll("pre:has(> code)").length,
+      buttons: document.querySelectorAll("pre > .code-copy-button").length,
+    }));
+    assert.ok(
+      counts.preWithCode > 0,
+      `Fixture has zero <pre><code> blocks; nothing to assert against.`,
+    );
+    assert.strictEqual(
+      counts.buttons,
+      counts.preWithCode,
+      `Expected one .code-copy-button per <pre><code>, got ${counts.buttons} buttons for ${counts.preWithCode} blocks. Mismatch means either the module didn't run, the selector drifted, or the dataset-sentinel idempotency guard regressed and produced duplicates.`,
+    );
+  },
+);
+
+Then(
+  "the first code copy button becomes visible when I hover its code block",
+  async function (this: EmanoteWorld) {
+    const pre = this.page.locator("pre:has(> code)").first();
+    const button = pre.locator("> .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+
+    const opacityBefore = await button.evaluate((el) =>
+      getComputedStyle(el).opacity,
+    );
+    assert.strictEqual(
+      opacityBefore,
+      "0",
+      `Expected the code copy button to start hidden before hover; got opacity ${opacityBefore}.`,
+    );
+
+    await pre.hover();
+    const buttonHandle = await button.elementHandle();
+    assert.ok(buttonHandle, "Copy button detached before hover opacity check.");
+    await this.page.waitForFunction(
+      (el) => Number(getComputedStyle(el).opacity) > 0.9,
+      buttonHandle,
+      { timeout: 5_000 },
+    );
+  },
+);
+
+Then(
+  "the document language is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const lang = await this.page.locator("html").getAttribute("lang");
+    assert.strictEqual(lang, expected);
+  },
+);
+
+Then(
+  "the footer contains link text {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    await this.page
+      .locator("footer a", { hasText: expected })
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+  },
+);
+
+Then(
+  "the TOC heading is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const heading = this.page.locator("#toc h3").first();
+    await heading.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual((await heading.textContent())?.trim(), expected);
+  },
+);
+
+Then(
+  "the Stork search placeholder is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const input = this.page.locator("#stork-search-input");
+    await input.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await input.getAttribute("placeholder"), expected);
+  },
+);
+
+Then(
+  "the first code copy button title is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const button = this.page.locator("pre > .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await button.getAttribute("title"), expected);
+  },
+);
+
+When(
+  "I navigate via Ema to {string}",
+  async function (this: EmanoteWorld, path: string) {
+    await morphNav(this.page, path);
+  },
+);
+
+// TOC scroll-spy: position a target heading inside the IntersectionObserver
+// "active band" (rootMargin "-80px 0px -60% 0px" → y=80..288 on a 720px
+// viewport), then assert its TOC link is highlighted. Putting the heading
+// at y=200 sits it firmly inside the band, so the firstVisible branch in
+// pickActive() picks it deterministically — no subpixel fragility on the
+// `top < 0` boundary that "scroll to viewport top" semantics would have.
+When(
+  "I scroll the heading with id {string} into the active band",
+  async function (this: EmanoteWorld, headingId: string) {
+    await this.page.evaluate((id) => {
+      const el = document.getElementById(id);
+      if (!el) throw new Error(`No element with id ${JSON.stringify(id)}`);
+      const headingTopInDoc = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: headingTopInDoc - 200, behavior: "instant" });
+    }, headingId);
+  },
+);
+
+Then(
+  "the TOC link for {string} has class {string}",
+  async function (this: EmanoteWorld, hrefSuffix: string, cls: string) {
+    // The TOC link's href is absolute (resolves against <base>); match by
+    // suffix to stay independent of the served origin.
+    const link = this.page
+      .locator(`#toc a.--ema-toc[href$="${hrefSuffix}"]`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    // Auto-retrying expectation — the IntersectionObserver fires async
+    // after scroll, so the active class arrives a frame or two later.
+    try {
+      await this.page.waitForFunction(
+        ({ suffix, mark }) => {
+          const a = document.querySelector(
+            `#toc a.--ema-toc[href$="${suffix}"]`,
+          );
+          return a?.classList.contains(mark) ?? false;
+        },
+        { suffix: hrefSuffix, mark: cls },
+        { timeout: 3_000 },
+      );
+    } catch {
+      const allMarked = await this.page.evaluate(
+        (mark) =>
+          Array.from(document.querySelectorAll(`#toc a.--ema-toc.${mark}`))
+            .map((a) => (a as HTMLAnchorElement).href)
+            .join(", ") || "(none)",
+        cls,
+      );
+      throw new Error(
+        `Expected TOC link with href ending ${JSON.stringify(hrefSuffix)} to have class ${JSON.stringify(cls)}. Currently active links: ${allMarked}. Either the IntersectionObserver never fired (toc-spy.js not loaded / module-mode timing changed the observed-set computation) or pickActive picked a different section than expected.`,
+      );
+    }
+  },
+);
+
+// Stork search modal. The container starts with `hidden` on the
+// class list (set in components/stork/stork-search.tpl); toggleSearch
+// in stork.js flips it. Asserting the class membership is more
+// reliable than computed visibility because the container is
+// position:fixed with a backdrop — getComputedStyle sees `display:
+// block` either way; only the .hidden class hides it.
+const STORK_CONTAINER_SEL = "#stork-search-container";
+
+Then(
+  "the Stork search modal is {string}",
+  async function (this: EmanoteWorld, state: string) {
+    const container = this.page.locator(STORK_CONTAINER_SEL);
+    await container.waitFor({ state: "attached", timeout: 5_000 });
+    // Module load is defer + dynamic-import async; give the click
+    // handler a couple frames to land before reading state.
+    try {
+      await this.page.waitForFunction(
+        ({ sel, want }) => {
+          const el = document.querySelector(sel);
+          if (!el) return false;
+          const hidden = el.classList.contains("hidden");
+          return want === "hidden" ? hidden : !hidden;
+        },
+        { sel: STORK_CONTAINER_SEL, want: state },
+        { timeout: 3_000 },
+      );
+    } catch {
+      const actual = await container.evaluate((el) =>
+        el.classList.contains("hidden") ? "hidden" : "visible",
+      );
+      throw new Error(
+        `Expected Stork modal to be ${JSON.stringify(state)}; was ${JSON.stringify(actual)}. Either stork.js didn't load (check importmap), the keyboard listener / data-emanote-stork-toggle delegation didn't fire, or toggleSearch didn't update the .hidden class on ${STORK_CONTAINER_SEL}.`,
+      );
+    }
+  },
+);
+
+When("I press {string}", async function (this: EmanoteWorld, key: string) {
+  await this.page.keyboard.press(key);
+});
+
+When(
+  "I click the Stork search trigger",
+  async function (this: EmanoteWorld) {
+    // Several buttons carry data-emanote-stork-toggle (sidebar +
+    // breadcrumbs); the breadcrumbs button is mobile-only (md:hidden)
+    // and at the test viewport (1280×720, md+) only the sidebar
+    // button is visible. Filter to the visible one — `.first()` alone
+    // would pick the hidden breadcrumbs button by document order and
+    // time out trying to click an invisible target.
+    await this.page
+      .locator("button[data-emanote-stork-toggle]:visible")
+      .first()
+      .click();
+  },
+);
+
+// Daily backlinks split: notes whose basename matches `YYYY-MM-DD[-…]`
+// (Calendar.isDailyNote / parseRouteDay) feed the `<ema:note:backlinks:daily>`
+// splice (rendered by `components/timeline.tpl` — class `.emanote-timeline`,
+// can render in two homes: right-panel at lg+ and bottom strip at <lg);
+// everything else feeds `<ema:note:backlinks:nodaily>` (rendered by
+// `components/backlinks-margin.tpl` / `backlinks-bottom.tpl` — ids
+// `#backlinks-margin` / `#backlinks-bottom`, plus the legacy `#backlinks`
+// card for the no-sidebar / error layouts). Asserting by panel selector
+// + href substring keeps the test resilient to template-styling churn —
+// only the structural separation matters.
+const PANEL_SELECTORS = {
+  timeline: ".emanote-timeline",
+  backlinks: "#backlinks-margin, #backlinks-bottom, #backlinks",
+};
+
+async function panelLinksTo(
+  page: EmanoteWorld["page"],
+  panelKey: "timeline" | "backlinks",
+  hrefSubstring: string,
+): Promise<boolean> {
+  return page.evaluate(
+    ({ selector, needle }) => {
+      const panels = Array.from(document.querySelectorAll(selector));
+      if (panels.length === 0) return false;
+      return panels.some((panel) =>
+        Array.from(panel.querySelectorAll("a[href]")).some((a) =>
+          (a.getAttribute("href") ?? "").includes(needle),
+        ),
+      );
+    },
+    { selector: PANEL_SELECTORS[panelKey], needle: hrefSubstring },
+  );
+}
+
+Then(
+  "the Timeline panel links to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    await this.page
+      .locator(PANEL_SELECTORS.timeline)
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
+    assert.ok(
+      found,
+      `Expected ${PANEL_SELECTORS.timeline} to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Either the daily-detection (Calendar.parseRouteDay on the basename) regressed, or timeline.tpl stopped iterating <ema:note:backlinks:daily>.`,
+    );
+  },
+);
+
+Then(
+  "every Timeline data entry has an ISO date",
+  async function (this: EmanoteWorld) {
+    const entries = await this.page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll(".emanote-timeline .timeline-data li"),
+      ).map((li) => ({
+        title: (li as HTMLElement).dataset.title ?? "",
+        isoDate: (li as HTMLElement).dataset.isoDate ?? "",
+      })),
+    );
+    assert.ok(
+      entries.length > 0,
+      "Expected at least one hidden Timeline data entry in the fixture.",
+    );
+    for (const entry of entries) {
+      assert.match(
+        entry.isoDate,
+        /^\d{4}-\d{2}-\d{2}$/,
+        `Expected Timeline entry ${JSON.stringify(entry.title)} to carry data-iso-date from Haskell, got ${JSON.stringify(entry.isoDate)}.`,
+      );
+    }
+  },
+);
+
+Then(
+  "the Backlinks panel links to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    await this.page
+      .locator(PANEL_SELECTORS.backlinks)
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
+    assert.ok(
+      found,
+      `Expected one of ${PANEL_SELECTORS.backlinks} to contain a link with href containing ${JSON.stringify(hrefSubstring)}. Non-daily backlinks should land here via <ema:note:backlinks:nodaily>.`,
+    );
+  },
+);
+
+Then(
+  "the Backlinks panel does not link to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    const found = await panelLinksTo(this.page, "backlinks", hrefSubstring);
+    assert.ok(
+      !found,
+      `${PANEL_SELECTORS.backlinks} should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is daily-named and belongs in the Timeline. The daily/non-daily partition (Template.hs) likely regressed.`,
+    );
+  },
+);
+
+Then(
+  "the Timeline panel does not link to {string}",
+  async function (this: EmanoteWorld, hrefSubstring: string) {
+    const found = await panelLinksTo(this.page, "timeline", hrefSubstring);
+    assert.ok(
+      !found,
+      `${PANEL_SELECTORS.timeline} should not contain a link to ${JSON.stringify(hrefSubstring)} — that backlink is non-daily and belongs in the Backlinks panel. The daily/non-daily partition regressed (or parseRouteDay started accepting non-date basenames).`,
+    );
+  },
+);
+
+// Regression guard for the spurious vertical scrollbar in backlink contexts:
+// `overflow-x: auto` on the wrapper coerces `overflow-y` from `visible` to
+// `auto` (per CSS spec — "if one axis is non-visible, the other becomes
+// auto"), so the panel grew an unwanted vertical scrollbar even when no
+// horizontal overflow existed. Fix: drop `overflow-x-auto` from the wrapper
+// and apply it via descendant selectors (`[&_pre]:overflow-x-auto
+// [&_table]:overflow-x-auto`) where it actually matters. The reliable assertion
+// is on the *computed* overflow-y of the wrapper itself: anything other than
+// `visible` means the implicit-coercion bug is back.
+Then(
+  "every backlink context wrapper has overflow-y {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    // context.tpl's outermost <div> is now nested inside a flyout (in
+    // backlinks-margin) or a card (backlinks-bottom / legacy backlinks),
+    // so a stable class hook (.emanote-backlink-context) is the
+    // structure-independent way to find it.
+    await this.page
+      .locator(".emanote-backlink-context")
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 });
+    const overflows = await this.page.evaluate(() => {
+      const wrappers = Array.from(
+        document.querySelectorAll(".emanote-backlink-context"),
+      );
+      return wrappers.map((el) => getComputedStyle(el as Element).overflowY);
+    });
+    assert.ok(
+      overflows.length > 0,
+      `No .emanote-backlink-context elements found — the fixture has no non-daily backlinks, so this scenario isn't actually exercising the regression. Add a backlink to the dailyhost fixture.`,
+    );
+    const offenders = overflows.filter((v) => v !== expected);
+    assert.strictEqual(
+      offenders.length,
+      0,
+      `Expected every backlink context wrapper's computed overflow-y to be ${JSON.stringify(expected)}; got ${JSON.stringify(overflows)}. A non-${expected} value (typically "auto" or "scroll") means context.tpl's outer wrapper grew an overflow rule on one axis again — per CSS spec that coerces the visible axis to auto, producing the spurious vertical scrollbar this fix removed.`,
+    );
+  },
+);
+
+// #542 — for a note at `index/index/index/example.md`, the immediate-parent
+// breadcrumb (the folder placeholder for `index/index/index/`) used to emit
+// `/index/index/` because its LML route had its trailing `index` stripped by
+// the canonicalizer and Ema's URL strategy then stripped the next-trailing
+// `index`/`index.html`. Two strips composed and ate one real folder level.
+// The fix re-adds the trailing `index` slug at the LML→Html boundary, so the
+// breadcrumb now points to `/index/index/index/...`. Asserting on a substring
+// is enough — we don't care about the exact suffix shape (`/index/index/index`
+// vs `/index/index/index/index.html` etc.), only that *three* `index` segments
+// survive into the href. The negative assertion guards against any future
+// regression that produces a strict-prefix match where the third segment is
+// gone.
+const IMMEDIATE_PARENT_BREADCRUMB_SEL = "#breadcrumbs a";
+
+async function immediateParentBreadcrumbHref(
+  page: EmanoteWorld["page"],
+): Promise<string> {
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).last();
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Immediate-parent breadcrumb anchor has no href attribute. The breadcrumbs splice (Emanote.View.Common.routeBreadcrumbs) likely emitted the <a> without binding crumb:url.`,
+  );
+  return href;
+}
+
+Then(
+  "the immediate-parent breadcrumb href contains {string}",
+  async function (this: EmanoteWorld, needle: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    assert.ok(
+      href.includes(needle),
+      `Immediate-parent breadcrumb href expected to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The trailing-index expansion regressed (R.expandIndexSlug or MR.lmlToHtmlRoute), so Ema's URL strip ate one folder level — see #542.`,
+    );
+  },
+);
+
+Then(
+  "the immediate-parent breadcrumb href does not equal {string}",
+  async function (this: EmanoteWorld, forbidden: string) {
+    const href = await immediateParentBreadcrumbHref(this.page);
+    // Tolerate a leading "/" or "./" — what we forbid is the exact buggy path.
+    const stripped = href.replace(/^\.?\//, "").replace(/\.html$/, "");
+    assert.notStrictEqual(
+      stripped,
+      forbidden,
+      `Immediate-parent breadcrumb href stripped to ${JSON.stringify(stripped)}, which equals the buggy #542 value ${JSON.stringify(forbidden)}. The expansion in noteHtmlRoute regressed.`,
+    );
+  },
+);
+
+// Coexistence guard for #542: when a folder note (`foo/index.md`) sits next
+// to a deeper same-named folder (`foo/index/...`), each breadcrumb position
+// must point at a *different* URL. Pre-fix, both collapsed onto `/foo` —
+// the IxNote dedup would either drop one note or surface an "ambiguous
+// notes" error. Asserting on positional hrefs is the smallest change that
+// catches a re-collision: depth-1 must reach the folder note, depth-2 must
+// reach the deeper placeholder, and they must not be equal.
+async function breadcrumbHrefAt(
+  page: EmanoteWorld["page"],
+  depth: number,
+): Promise<string> {
+  // Skip the root indexRoute — emanote's routeInits emits it twice for any
+  // route whose first slug is "index", so depth-counting from "index"-first
+  // routes would otherwise drift by one. We index from the first non-root
+  // crumb the breadcrumb component renders, which is `<a>` #N (zero-based),
+  // matching how a reader counts "subfolder is the first link, subfolder/index
+  // is the second".
+  const link = page.locator(IMMEDIATE_PARENT_BREADCRUMB_SEL).nth(depth);
+  await link.waitFor({ state: "attached", timeout: 5_000 });
+  const href = await link.getAttribute("href");
+  assert.ok(
+    href !== null && href !== undefined,
+    `Breadcrumb anchor at depth ${depth} has no href attribute.`,
+  );
+  return href;
+}
+
+Then(
+  "the breadcrumb at depth {int} has href containing {string}",
+  async function (this: EmanoteWorld, depth: number, needle: string) {
+    const href = await breadcrumbHrefAt(this.page, depth);
+    assert.ok(
+      href.includes(needle),
+      `Breadcrumb at depth ${depth} expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The folder-note vs nested-index-folder distinction collapsed — likely the trailing-index expansion regressed.`,
+    );
+  },
+);
+
+Then(
+  "the breadcrumb at depth {int} has a different href from depth {int}",
+  async function (this: EmanoteWorld, a: number, b: number) {
+    const hrefA = await breadcrumbHrefAt(this.page, a);
+    const hrefB = await breadcrumbHrefAt(this.page, b);
+    assert.notStrictEqual(
+      hrefA,
+      hrefB,
+      `Breadcrumbs at depths ${a} and ${b} share href ${JSON.stringify(hrefA)} — the folder note at /foo/ has re-collided with the placeholder for /foo/index/ (the #542 regression at the IxNote level).`,
+    );
+  },
+);
+
+// #199: tag URLs must percent-encode each path segment so reserved
+// characters (notably `#`, used in Zettelkasten "structure note" tags
+// like `##structure`) survive the trip into `href`. Two distinct call
+// sites build these URLs — `Emanote.Pandoc.BuiltinFilters.linkifyInlineTags`
+// for inline `#tag` syntax in the article body, and the new `ema:tagsList`
+// splice for the page-metadata tag chips above the article. The two paths
+// don't share encoder code (the Pandoc filter has no `Model` reachable),
+// so each scenario asserts against both call sites — a regression in just
+// one would otherwise slip past.
+Then(
+  "the article tag link with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    const link = this.page
+      .locator(`article a[title="Tag"]:has-text("${linkText}")`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const href = await link.getAttribute("href");
+    assert.ok(
+      href && href.includes(needle),
+      `Inline article tag link "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}. The Pandoc filter (linkifyInlineTags / encodeTagIndexUrl) regressed — see #199.`,
+    );
+  },
+);
+
+Then(
+  "the metadata tag chip with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    // Scope outside <article> so the inline tag link with the same text
+    // doesn't shadow the metadata chip. metadata.tpl renders in the page
+    // header, before <article>; the article's body holds the inline
+    // linkifyInlineTags output. Playwright's locator.filter() works on
+    // descendants only, so the ancestor check runs in-page via evaluate.
+    const candidates = this.page.locator(
+      `a[title="Tag"]:has-text("${linkText}")`,
+    );
+    await candidates.first().waitFor({ state: "attached", timeout: 5_000 });
+    const total = await candidates.count();
+    let chipHref: string | null = null;
+    for (let i = 0; i < total; i++) {
+      const el = candidates.nth(i);
+      const inArticle = await el.evaluate(
+        (node) => !!(node as Element).closest("article"),
+      );
+      if (!inArticle) {
+        chipHref = await el.getAttribute("href");
+        break;
+      }
+    }
+    assert.ok(
+      chipHref && chipHref.includes(needle),
+      `Metadata tag chip "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(chipHref)} (searched ${total} candidate(s)). The ema:tagsList splice or metadata.tpl regressed — see #199.`,
+    );
+  },
+);
+
+// Stork dark/light theme mirror: stork.js's MutationObserver on
+// <html>.class flips the wrapper between stork-wrapper-edible and
+// stork-wrapper-edible-dark. Without one of those classes on the
+// wrapper, the edible.css / edible-dark.css rules don't apply and
+// the search dialog renders as unstyled inputs. Asserting on the
+// presence of either class catches the morph-time regression where
+// the new #stork-wrapper element gets no class because the observer
+// only fires when <html>.class actually changes.
+Then(
+  "the Stork wrapper has the edible theme class",
+  async function (this: EmanoteWorld) {
+    const wrapper = this.page.locator("#stork-wrapper");
+    await wrapper.waitFor({ state: "attached", timeout: 5_000 });
+    const classes = (await wrapper.getAttribute("class")) ?? "";
+    const ok =
+      classes.includes("stork-wrapper-edible") ||
+      classes.includes("stork-wrapper-edible-dark");
+    assert.ok(
+      ok,
+      `Expected #stork-wrapper to carry stork-wrapper-edible{,-dark}; class list was ${JSON.stringify(classes)}. After Ema's morph nav the wrapper element is fresh and the JS theme-mirror only fires on <html>.class changes — if the user didn't flip themes, the new wrapper stays unstyled.`,
     );
   },
 );
