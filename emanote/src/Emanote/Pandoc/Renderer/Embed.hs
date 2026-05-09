@@ -233,6 +233,12 @@ embedStaticFileRoute ctx model altText staticFile = do
       StaticFileInfoPDF ->
         "ema:url" ## HI.textSplice url
       StaticFileInfoCode (CodeLanguage language) content -> do
-        "ema:code:block" ## rpBlock ctx (B.CodeBlock ("", [language], []) content)
+        -- Strip pandoc.tpl's <CodeBlock class="…" /> from this rpBlock call.
+        -- That class targets the outer wrapper of a fenced code block — for
+        -- an embed it would inject a second styled <div> *inside*
+        -- embed-code.tpl's chrome, splitting presentation ownership across
+        -- two templates. embed-code.tpl owns all chrome here.
+        let codeCtx = ctx {HP.bAttr = const B.nullAttr}
+        "ema:code:block" ## rpBlock codeCtx (B.CodeBlock ("", [language], []) content)
         "ema:code:language" ## HI.textSplice language
         "ema:alt" ## HI.textSplice altText
