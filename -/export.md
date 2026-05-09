@@ -1037,6 +1037,7 @@ It demonstrates the default English [[html-template|template]] chrome used by
 Emanote.
 
 For the same note written in French, open [[i18n/i18n.fr|the French child page]].
+For the same note written in Chinese, open [[i18n/i18n.zh|the Chinese child page]].
 
 ## What changes
 
@@ -1109,6 +1110,48 @@ Le titre du bouton de copie sur ce bloc devrait être affiché en français.
 
 ```haskell
 main = putStrLn "bonjour"
+```
+
+
+===
+
+<!-- Source: guide/i18n/i18n.zh.md -->
+<!-- URL: https://emanote.srid.ca/i18n.zh -->
+<!-- Title: 国际化（中文） -->
+<!-- Wikilinks: [[guide/i18n/i18n.zh]], [[i18n/i18n.zh]], [[i18n.zh]] -->
+
+---
+slug: i18n.zh
+order: -94
+page:
+  lang: zh
+  description: |
+    一个简单的中文演示页，展示 Emanote 默认模板界面如何跟随 page.lang 切换语言。
+---
+
+# 国际化（中文）
+
+本页在 [[yaml-config|YAML 配置]] 中显式设置了 `page.lang: zh`，展示 Emanote [[html-template|模板]]的默认界面在中文下的效果。
+
+查看英文版请访问 [[guide/i18n|英文演示页]]，法语版请访问 [[i18n/i18n.fr|法语演示页]]。
+
+## 哪些内容会变化
+
+Emanote 通过 `page.lang` 选择默认 HTML 模板所使用的字符串。页脚导航、[[toc|目录]]标题、[[search|搜索]]占位符、复制按钮标签以及内置索引页面均会使用所选语言。
+
+大多数站点只需在根目录的 [[yaml-config|`index.yaml`]] 中设置一次 `page.lang`，按页设置主要用于像这样的演示。
+
+```yaml
+page:
+  lang: zh
+```
+
+## 复制按钮
+
+下方代码块的复制按钮标题应显示为中文。
+
+```haskell
+main = putStrLn "你好"
 ```
 
 
