@@ -23,20 +23,25 @@ filePattern = \case
   R.AnyExt ->
     "**"
 
-{- | Order matters: 'unionMount' assigns the first matching pattern's
-tag, so 'LuaFilter' must precede 'AnyExt' for @.lua@ to be claimed
-by the filter type rather than swept into static assets.
+{- | The set of file types unionmount tags. 'R.AnyExt' is appended
+last *structurally* — adding a new known type to 'knownTypes' is
+automatically claimed before falling through to the catch-all,
+without anyone needing to remember a comment-enforced "AnyExt last"
+ordering rule.
 -}
 filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
-  (id &&& filePattern)
-    <$> [ R.LMLType R.Md
-        , R.LMLType R.Org
-        , R.Yaml
-        , R.HeistTpl
-        , R.LuaFilter
-        , R.AnyExt
-        ]
+  ((id &&& filePattern) <$> knownTypes)
+    <> [(R.AnyExt, filePattern R.AnyExt)]
+  where
+    knownTypes :: [R.FileType R.SourceExt]
+    knownTypes =
+      [ R.LMLType R.Md
+      , R.LMLType R.Org
+      , R.Yaml
+      , R.HeistTpl
+      , R.LuaFilter
+      ]
 
 {- | Universal ignore patterns applied to every layer. Layer-specific
 ignores belong in a `.emanoteignore` file at the layer root — see
