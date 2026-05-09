@@ -7,6 +7,7 @@ module Emanote.Source.Patch (
 
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
+import Data.List qualified as List
 import Data.List.NonEmpty qualified as NEL
 import Data.Set qualified as Set
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
@@ -24,7 +25,7 @@ import Emanote.Prelude (
   logW,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locMountPoint, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
@@ -107,11 +108,18 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
       -- capability 'unionMountStreaming' provides.
       --
       -- The dep index keys edges by the path *as written* in
-      -- @pandoc.filters@ frontmatter (typically layer-relative, like
-      -- @"filters/list-table.lua"@). 'fp' here arrives in the same
-      -- form, so a straight 'Map.lookup' suffices on both Refresh
-      -- (filter created or modified) and Delete (filter removed).
-      let dependents = SDeps.dependentsOnLua fp (model ^. modelSourceDependencies)
+      -- @pandoc.filters@ frontmatter — typically the layer-relative
+      -- form like @"filters/x.lua"@, with no mount-point prefix.
+      -- unionmount delivers 'fp' in the mounted form (it's the
+      -- @Change@ map's outer key — see @changeInsert@ in
+      -- @System.UnionMount@). To recover the frontmatter form we
+      -- additionally try stripping each layer's mount-point prefix.
+      let candidates = depKeyCandidates layers fp
+          dependents =
+            mconcat
+              [ SDeps.dependentsOnLua k (model ^. modelSourceDependencies)
+              | k <- candidates
+              ]
       if Set.null dependents
         then do
           logD $ "Lua filter changed but no notes depend on it: " <> toText fp
@@ -191,6 +199,23 @@ parseAndInsert ::
   R.LMLRoute ->
   (Loc, FilePath) ->
   m (ModelEma -> ModelEma)
+
+{- | Frontmatter-form keys an unionmount-delivered path could correspond
+to: the path itself, plus each layer-mount-prefix-stripped variant. The
+dep index stores the form the user wrote in @pandoc.filters@ (no mount
+prefix), so a delivered path like @"sub/filters/x.lua"@ from a layer
+mounted at @sub@ has to round-trip back to @"filters/x.lua"@ for the
+lookup to hit. The fp itself is included so single-layer-no-mount
+notebooks still hit on the first try.
+-}
+depKeyCandidates :: Set Loc -> FilePath -> [FilePath]
+depKeyCandidates layers fp =
+  fp : mapMaybe stripMP (toList layers)
+  where
+    stripMP loc = do
+      mp <- locMountPoint loc
+      List.stripPrefix (mp <> "/") fp
+
 parseAndInsert layers noteF scriptingEngine refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   (note, filterPaths) <- N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
