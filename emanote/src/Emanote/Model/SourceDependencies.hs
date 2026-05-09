@@ -23,25 +23,19 @@ import Data.Set qualified as Set
 import Emanote.Route qualified as R
 import Relude
 
-{- | Eager-parse-time edges only. A change to one of these source files
-invalidates the cached 'Text.Pandoc.Definition.Pandoc' AST stored on
-each 'Emanote.Model.Note.Note', which can only be recovered by
-re-running the parser — hence the explicit reverse index.
-
-Lazy-at-render-time inputs (yaml cascade via
-'Emanote.Model.Meta.getEffectiveRouteMetaWith', Heist templates via
-'_modelHeistTemplate') deliberately don't appear here: a fresh render
-reads them straight out of the model after the change handler updates
-it, so no per-note invalidation is needed.
-
-When @pandoc.filters@ starts cascading from ancestor @index.yaml@
-(tracked under #721), an @sdYamlDeps :: Map (R \'Yaml) (Set
-R.LMLRoute)@ sibling field belongs here too — at that point a yaml
-edit can change the effective filter list and so flips from
-lazy-at-render to eager-at-parse for that one frontmatter key.
--}
 newtype SourceDependencies = SourceDependencies
   { sdLuaDeps :: Map FilePath (Set R.LMLRoute)
+  -- ^ Reverse map from a Lua filter file to the notes that reference
+  -- it. The key is the **absolute** path the filter was resolved to at
+  -- parse time (the same path the @LuaFilter@ refresh handler in
+  -- 'Emanote.Source.Patch' compares against), not the relative path
+  -- the user wrote in @pandoc.filters@. The value is the set of
+  -- 'R.LMLRoute's whose cached 'Text.Pandoc.Definition.Pandoc' AST
+  -- includes the output of that filter; a filter referenced by N notes
+  -- has one entry with a set of size N. Empty sets are pruned by
+  -- 'removeNote' so an absent key and an empty value are equivalent
+  -- (use 'maybeToMonoid' on lookup) — keeps invalidation walks linear
+  -- in the actual dependent count rather than total filter count.
   }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (ToJSON)
