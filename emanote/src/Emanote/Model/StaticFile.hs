@@ -112,9 +112,9 @@ codeExts =
     <$> Map.fromList
       [ -- Programming languages
         (".c", "c")
-      , (".clj", "commonlisp")
-      , (".cljc", "commonlisp")
-      , (".cljs", "commonlisp")
+      , (".clj", "clojure")
+      , (".cljc", "clojure")
+      , (".cljs", "clojure")
       , (".cpp", "cpp")
       , (".cs", "cs")
       , (".dart", "dart")
@@ -155,7 +155,7 @@ codeExts =
       , -- Shell
         (".bash", "bash")
       , (".sh", "bash")
-      , (".zsh", "bash")
+      , (".zsh", "zsh")
       , (".ps1", "powershell")
       , -- Markup, data, config
         (".css", "css")
