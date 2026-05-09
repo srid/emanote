@@ -246,7 +246,15 @@ local js = [[
         if (document.fullscreenElement === deck) {
           document.exitFullscreen?.();
         } else {
-          deck.requestFullscreen?.().then(() => deck.focus({ preventScroll: true })).catch(() => {});
+          // requestFullscreen rejects when the user denies the
+          // permission gesture or the browser refuses (e.g. the
+          // page isn't allowed to take fullscreen at all). Log so
+          // a click that does nothing isn't a silent mystery.
+          deck.requestFullscreen?.()
+            .then(() => deck.focus({ preventScroll: true }))
+            .catch((err) =>
+              console.warn('emanote-slides: fullscreen request denied or unavailable:', err)
+            );
         }
       });
     }
