@@ -92,81 +92,92 @@ readStaticFileInfo fp readFilePath = do
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
     videoExts = [".mp4", ".webm", ".ogv"]
     audioExts = [".aac", ".caf", ".flac", ".mp3", ".ogg", ".wav", ".wave"]
-    -- Language identifiers must match a name recognised by the skylighting
-    -- library bundled with Pandoc — that's what produces the highlighted
-    -- HTML at build time. Adding an extension whose language name skylighting
-    -- doesn't know will silently fall back to no highlighting.
-    codeExts =
-      CodeLanguage
-        <$> Map.fromList
-          [ -- Programming languages
-            (".c", "c")
-          , (".clj", "commonlisp")
-          , (".cljc", "commonlisp")
-          , (".cljs", "commonlisp")
-          , (".cpp", "cpp")
-          , (".cs", "cs")
-          , (".dart", "dart")
-          , (".elm", "elm")
-          , (".erl", "erlang")
-          , (".ex", "elixir")
-          , (".exs", "elixir")
-          , (".fs", "fsharp")
-          , (".go", "go")
-          , (".groovy", "groovy")
-          , (".h", "c")
-          , (".hpp", "cpp")
-          , (".hs", "haskell")
-          , (".java", "java")
-          , (".jl", "julia")
-          , (".js", "javascript")
-          , (".jsx", "javascript")
-          , (".kt", "kotlin")
-          , (".lua", "lua")
-          , (".m", "objectivec")
-          , (".ml", "ocaml")
-          , (".nim", "nim")
-          , (".nix", "nix")
-          , (".php", "php")
-          , (".pl", "perl")
-          , (".purs", "purescript")
-          , (".py", "python")
-          , (".r", "r")
-          , (".rb", "ruby")
-          , (".rs", "rust")
-          , (".scala", "scala")
-          , (".scm", "scheme")
-          , (".swift", "swift")
-          , (".ts", "typescript")
-          , (".tsx", "typescript")
-          , (".v", "verilog")
-          , (".zig", "zig")
-          , -- Shell
-            (".bash", "bash")
-          , (".sh", "bash")
-          , (".zsh", "bash")
-          , (".ps1", "powershell")
-          , -- Markup, data, config
-            (".css", "css")
-          , (".diff", "diff")
-          , (".dockerfile", "dockerfile")
-          , (".html", "html")
-          , (".htm", "html")
-          , (".ini", "ini")
-          , (".json", "json")
-          , (".latex", "latex")
-          , (".makefile", "makefile")
-          , (".patch", "diff")
-          , (".rst", "rest")
-          , (".sass", "sass")
-          , (".scss", "scss")
-          , (".sql", "sql")
-          , (".tex", "latex")
-          , (".toml", "toml")
-          , (".xml", "xml")
-          , (".xsl", "xml")
-          , (".yaml", "yaml")
-          , (".yml", "yaml")
-          ]
+
+{- | File-extension to skylighting language for source-code embedding.
+
+When a static file's extension matches an entry here, its content is read
+into the model and `![[file.ext]]` (or @!\[\](file.ext)@) renders it as a
+syntax-highlighted code block — see @docs/guide/markdown/embed.md@.
+
+Language identifiers must match a name recognised by skylighting (the
+Pandoc-bundled highlighter); an unrecognised name silently falls back to
+no highlighting at render time.
+
+Add a new extension here to register it; the docs page lists the keys
+explicitly so users don't have to read the source.
+-}
+codeExts :: Map Text CodeLanguage
+codeExts =
+  CodeLanguage
+    <$> Map.fromList
+      [ -- Programming languages
+        (".c", "c")
+      , (".clj", "commonlisp")
+      , (".cljc", "commonlisp")
+      , (".cljs", "commonlisp")
+      , (".cpp", "cpp")
+      , (".cs", "cs")
+      , (".dart", "dart")
+      , (".elm", "elm")
+      , (".erl", "erlang")
+      , (".ex", "elixir")
+      , (".exs", "elixir")
+      , (".fs", "fsharp")
+      , (".go", "go")
+      , (".groovy", "groovy")
+      , (".h", "c")
+      , (".hpp", "cpp")
+      , (".hs", "haskell")
+      , (".java", "java")
+      , (".jl", "julia")
+      , (".js", "javascript")
+      , (".jsx", "javascript")
+      , (".kt", "kotlin")
+      , (".lua", "lua")
+      , (".m", "objectivec")
+      , (".ml", "ocaml")
+      , (".nim", "nim")
+      , (".nix", "nix")
+      , (".php", "php")
+      , (".pl", "perl")
+      , (".purs", "purescript")
+      , (".py", "python")
+      , (".r", "r")
+      , (".rb", "ruby")
+      , (".rs", "rust")
+      , (".scala", "scala")
+      , (".scm", "scheme")
+      , (".swift", "swift")
+      , (".ts", "typescript")
+      , (".tsx", "typescript")
+      , (".v", "verilog")
+      , (".zig", "zig")
+      , -- Shell
+        (".bash", "bash")
+      , (".sh", "bash")
+      , (".zsh", "bash")
+      , (".ps1", "powershell")
+      , -- Markup, data, config
+        (".css", "css")
+      , (".diff", "diff")
+      , (".dockerfile", "dockerfile")
+      , (".html", "html")
+      , (".htm", "html")
+      , (".ini", "ini")
+      , (".json", "json")
+      , (".latex", "latex")
+      , (".makefile", "makefile")
+      , (".patch", "diff")
+      , (".rst", "rest")
+      , (".sass", "sass")
+      , (".scss", "scss")
+      , (".sql", "sql")
+      , (".tex", "latex")
+      , (".toml", "toml")
+      , (".xml", "xml")
+      , (".xsl", "xml")
+      , (".yaml", "yaml")
+      , (".yml", "yaml")
+      ]
 
 makeLenses ''StaticFile
