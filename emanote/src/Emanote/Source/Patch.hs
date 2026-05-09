@@ -188,21 +188,6 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
 
-{- | Read a Markdown source from disk, parse it, and produce a transformer
-that inserts the note and refreshes its filter-dependency edges. Shared
-between the LML refresh path (initial scan + edits) and the LuaFilter
-hot-reload path, which both end in "read → parseNote → insert".
--}
-parseAndInsert ::
-  (MonadIO m, MonadLogger m) =>
-  Set Loc ->
-  (N.Note -> N.Note) ->
-  ScriptingEngine ->
-  UM.RefreshAction ->
-  R.LMLRoute ->
-  (Loc, FilePath) ->
-  m (ModelEma -> ModelEma)
-
 {- | Frontmatter-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The
 dep index stores the form the user wrote in @pandoc.filters@ (no mount
@@ -219,6 +204,20 @@ depKeyCandidates layers fp =
       mp <- locMountPoint loc
       List.stripPrefix (mp <> "/") fp
 
+{- | Read a Markdown source from disk, parse it, and produce a transformer
+that inserts the note and refreshes its filter-dependency edges. Shared
+between the LML refresh path (initial scan + edits) and the LuaFilter
+hot-reload path, which both end in "read → parseNote → insert".
+-}
+parseAndInsert ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  ScriptingEngine ->
+  UM.RefreshAction ->
+  R.LMLRoute ->
+  (Loc, FilePath) ->
+  m (ModelEma -> ModelEma)
 parseAndInsert layers noteF scriptingEngine refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
@@ -228,8 +227,12 @@ parseAndInsert layers noteF scriptingEngine refreshAction r src = do
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r filterPaths)
 
 {- | Re-read a note's Markdown source and produce a transformer that
-replaces the cached note. If the note no longer exists in the model,
-the stale dep edges are dropped instead — synthetic notes (no
+replaces the cached note. The @OrDrop@ suffix names a side effect
+the function name alone wouldn't telegraph: if the note no longer
+exists in the model, this drops the stale entry from
+'modelSourceDependencies' instead of erroring or silently doing
+nothing — callers reaching for "just re-read this note" need to
+know the dependency index also gets pruned. Synthetic notes (no
 on-disk source) are a no-op.
 -}
 reparseOrDropNote ::
