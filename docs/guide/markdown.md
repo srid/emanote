@@ -185,12 +185,6 @@ main = putStrLn "Hello, world!"
 
 See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
 
-Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See the [Code files](embed#code-files) section of [[embed]] for the syntax and the recognised extensions.
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See [[embed]] for the syntax and the recognised extensions.
 
-## More extensions
-
-:::{.flex-row .space-y-8}
-![[syntax-highlighting]]
-
-[[mermaid]]
-:::
+Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].
