@@ -220,7 +220,8 @@ depKeyCandidates layers fp =
 
 parseAndInsert layers noteF scriptingEngine refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
-  (note, filterPaths) <- N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
+  N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
+    N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r filterPaths)
