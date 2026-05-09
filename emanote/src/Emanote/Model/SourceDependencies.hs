@@ -49,10 +49,11 @@ dependentsOnLua fp = maybeToMonoid . Map.lookup fp . sdLuaDeps
 removing any stale edges from a previous parse of the same note.
 -}
 setLuaDeps :: R.LMLRoute -> [FilePath] -> SourceDependencies -> SourceDependencies
-setLuaDeps note paths =
-  addEdges . removeNote note
+setLuaDeps note paths (removeNote note -> SourceDependencies m) =
+  SourceDependencies $ foldl' addEdge m paths
   where
-    addEdges sd = foldl' (insertEdge note) sd paths
+    addEdge :: Map FilePath (Set R.LMLRoute) -> FilePath -> Map FilePath (Set R.LMLRoute)
+    addEdge m' fp = Map.insertWith Set.union fp (one note) m'
 
 -- | Drop every edge that points to @note@.
 removeNote :: R.LMLRoute -> SourceDependencies -> SourceDependencies
@@ -62,7 +63,3 @@ removeNote note (SourceDependencies m) =
     shrink s =
       let s' = Set.delete note s
        in if Set.null s' then Nothing else Just s'
-
-insertEdge :: R.LMLRoute -> SourceDependencies -> FilePath -> SourceDependencies
-insertEdge note (SourceDependencies m) fp =
-  SourceDependencies $ Map.alter (Just . Set.insert note . maybeToMonoid) fp m
