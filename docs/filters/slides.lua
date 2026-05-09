@@ -182,9 +182,15 @@ local js = [[
   // after leaving the deck can drop the page path). Deep-linking
   // still works one-shot at load time via `location.hash`.
   for (const deck of document.querySelectorAll('.emanote-slides')) {
+    // Ema's live-server uses morph-DOM for in-app navigation; if a
+    // slides page is re-entered the script tag may run again over a
+    // deck node that already has listeners. Idempotent guard: the
+    // first run flips a dataset flag; subsequent runs skip.
+    if (deck.dataset.emanoteSlidesInited) continue;
     const track = deck.querySelector('.emanote-slides-track');
     const slides = [...deck.querySelectorAll('.emanote-slide')];
     if (!track || slides.length === 0) continue;
+    deck.dataset.emanoteSlidesInited = '1';
     deck.tabIndex = 0;
     const indexOf = (id) => slides.findIndex(s => s.id === id);
     // Scroll the track horizontally to the chosen slide. Using
