@@ -13,30 +13,7 @@ Emanote notes are primarily written in **Markdown** format, but [[orgmode]] is a
 {#wikilink}
 ## Wiki Links
 
-You can link to a note by placing the filename (without extension) inside double square brackets. For example, `[[neuron]]` links to the file `neuron.md` and it will be rendered as [[neuron]]. Note that it is using the title of the note automatically;
-you can specify a custom title as `[[neuron|Moving off neuron]]` which renders as [[neuron|Moving off neuron]] or even force use of filename with `[[neuron|neuron]]` which renders as [[neuron|neuron]].
-
-### Structural links
-
-See [[folgezettel]] for a special type of wiki-link used to define the [[sidebar]] (and [[uptree]]) heirarchy.
-
-### Anchors 
-
-Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links, but they work for regular links ([example link](./markdown.md#lists)).
-
-### Regular Markdown note links
-
-Regular Markdown links to notes can include their `.md` or `.org` extension, but they do not have to. For example, `[Neuron](../start/neuron)` renders as [Neuron](../start/neuron), just like `[Neuron](../start/neuron.md)` renders as [Neuron](../start/neuron.md). Folder-note links such as `[Guide](../guide)` resolve the same way, before Emanote falls back to looking for a static file at that path.
-
-### Broken links
-
-Broken links render with a distinctive red/error style to help you identify missing notes. For example: [[Foo bar]] (wiki-link) or [Foo bar](foo-bar.md) (Markdown link). Fix by creating the target file or correcting the link path.
-
-### Ambiguous links
-
-Ambiguous wiki-links are disambiguated by selecting the one that shares the closest ancestor.[^ambig]
-
-[^ambig]: This particular selection process [was choosen](https://github.com/srid/emanote/pull/498) in particular to allow combining multiple notebooks (with similar note filenames) at the top-level.
+Emanote supports `[[…]]` wiki-link syntax. See [[wikilinks]] for the full reference — custom titles, [[folgezettel|structural links]], anchors, regular-Markdown forms, and how broken / ambiguous links render (templated, override-friendly).
 
 
 ## Emojis
@@ -197,10 +174,17 @@ On default theme, an anchor is displayed when you hover on the heading allowing 
 
 ###### Heading `level` 6
 
-## More extensions
+## Code
 
-:::{.flex-row .space-y-8}
-![[syntax-highlighting]]
+Fenced code blocks are tokenised at build time and shipped as styled `<span>`s, e.g.
 
-[[mermaid]]
-:::
+```haskell
+main :: IO ()
+main = putStrLn "Hello, world!"
+```
+
+See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
+
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See [[embed]] for the syntax and the recognised extensions.
+
+Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].

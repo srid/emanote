@@ -7,7 +7,8 @@ order: 2
 
 This guide covers Emanote's core features:
 
-- **[[markdown]]** — Markdown extensions: wiki-links, callouts, task lists, emojis
+- **[[markdown]]** — Markdown extensions: callouts, task lists, emojis, footnotes
+- **[[wikilinks]]** — `[[…]]` syntax, structural links, broken / ambiguous link rendering
 - **[[query]]** — Obsidian-style embed queries for dynamic content
 - **[[yaml-config]]** — Site metadata and per-page configuration
 - **[[i18n|Internationalisation]]** — English and French pages using `page.lang`

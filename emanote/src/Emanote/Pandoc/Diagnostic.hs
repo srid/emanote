@@ -2,17 +2,21 @@
 Pandoc AST.
 
 Emanote tells the reader something went wrong by injecting a styled block or
-inline span into the rendered note. Three trigger sites exist today:
+inline span into the rendered note. Two trigger sites use the AST helper
+in this module:
 
 * YAML cascade parse failures — surfaced as a banner on the affected notes
   (see 'Emanote.Model.Note.errorDiv', issue #285).
-* Broken or ambiguous wiki/Markdown links — surfaced as a strikethrough plus
-  an aside (see 'Emanote.Pandoc.Renderer.Url.renderSomeInlineRefWith').
 * Cyclic note embeds — surfaced as a placeholder block (see
   'Emanote.Pandoc.Renderer.Embed.renderCyclicEmbedSplice', issue #362).
 
-This module owns the *AST shape* of those diagnostics: every error block /
-span carries the universal @emanote:error@ marker class plus an
+Inline diagnostics for broken and ambiguous wikilinks live in their own
+Heist templates (@templates/components/broken-link.tpl@ and
+@templates/components/ambiguous-link.tpl@; see issues #221 and #712); they
+emit raw HTML and don't go through this module.
+
+This module owns the *AST shape* of the templated-block diagnostics: every
+error block carries the universal @emanote:error@ marker class plus an
 @emanote:error:\<category\>@ variant sub-class. Variant-specific styling
 lives in the @pandoc.rewriteClass@ map in @emanote/default/index.yaml@; a
 future "diagnostics mode" CSS rule can target @[class~="emanote:error"]@
@@ -33,7 +37,6 @@ multiple errors at once.
 -}
 module Emanote.Pandoc.Diagnostic (
   errorBlock,
-  errorInlineAside,
 ) where
 
 import Data.Text qualified as T
@@ -46,14 +49,6 @@ import Text.Pandoc.Definition qualified as B
 errorBlock :: Text -> [B.Block] -> B.Block
 errorBlock category =
   B.Div ("", errorClasses category, [])
-
-{- | Wrap inlines in an Emanote-emitted aside 'B.Span'. Used by inline
-diagnostics (broken / ambiguous links) where the marker sits next to the
-offending fragment in surrounding prose.
--}
-errorInlineAside :: Text -> [B.Inline] -> B.Inline
-errorInlineAside category =
-  B.Span ("", errorClasses category, [])
 
 errorClasses :: Text -> [Text]
 errorClasses category

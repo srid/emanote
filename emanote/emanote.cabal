@@ -140,6 +140,7 @@ common library-common
     , profunctors
     , relude                 >=1.0
     , shower
+    , skylighting            >=0.14
     , stm
     , tagged
     , tagtree

@@ -6,11 +6,12 @@ module Emanote.Model.StaticFile where
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
-import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
 import Optics.TH (makeLenses)
 import Relude
+import Skylighting qualified
 import System.FilePath (takeExtension)
 
 data StaticFile = StaticFile
@@ -74,17 +75,17 @@ readStaticFileInfo ::
   (FilePath -> m Text) ->
   m (Maybe StaticFileInfo)
 readStaticFileInfo fp readFilePath = do
-  let extension = toText (takeExtension fp)
+  let extension = takeExtension fp
   if
-    | extension `elem` imageExts ->
+    | toText extension `elem` imageExts ->
         pure $ Just StaticFileInfoImage
-    | extension `elem` videoExts ->
+    | toText extension `elem` videoExts ->
         pure $ Just StaticFileInfoVideo
-    | extension `elem` audioExts ->
+    | toText extension `elem` audioExts ->
         pure $ Just StaticFileInfoAudio
     | extension == ".pdf" ->
         pure $ Just StaticFileInfoPDF
-    | Just lang <- Map.lookup extension codeExts -> do
+    | Just lang <- codeLanguageForExtension extension -> do
         code <- readFilePath fp
         pure $ Just $ StaticFileInfoCode lang code
     | otherwise -> return Nothing
@@ -92,25 +93,27 @@ readStaticFileInfo fp readFilePath = do
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
     videoExts = [".mp4", ".webm", ".ogv"]
     audioExts = [".aac", ".caf", ".flac", ".mp3", ".ogg", ".wav", ".wave"]
-    codeExts =
-      CodeLanguage
-        <$> Map.fromList
-          [ (".hs", "haskell")
-          , (".nix", "nix")
-          , (".sh", "bash")
-          , (".py", "python")
-          , (".js", "javascript")
-          , (".java", "java")
-          , (".c", "c")
-          , (".cpp", "cpp")
-          , (".cs", "cs")
-          , (".rb", "ruby")
-          , (".go", "go")
-          , (".swift", "swift")
-          , (".kt", "kotlin")
-          , (".rs", "rust")
-          , (".ts", "typescript")
-          , (".php", "php")
-          ]
+
+{- | Look up a source-code language for a file extension via skylighting's
+own bundled syntax map.
+
+Skylighting's @syntaxesByExtension@ globs the extension against the
+@sExtensions@ patterns parsed from each Kate syntax XML, so this delegates
+the entire ext→language mapping to the highlighter we render with. Adding
+support for a new language is upstream work in skylighting, not a list to
+edit here. The lower-cased short-name is used as the language identifier
+(matches the @\<code class="sourceCode haskell"\>@ convention skylighting
+itself emits).
+
+Caveat: matching an extension causes the file's content to be read into
+the model eagerly at build time, even if no note actually embeds it. This
+is the same shape as the previous hand-curated map, just with broader
+coverage.
+-}
+codeLanguageForExtension :: String -> Maybe CodeLanguage
+codeLanguageForExtension extension =
+  case Skylighting.syntaxesByExtension Skylighting.defaultSyntaxMap extension of
+    syntax : _ -> Just $ CodeLanguage $ T.toLower $ Skylighting.sShortname syntax
+    [] -> Nothing
 
 makeLenses ''StaticFile

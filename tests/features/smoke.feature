@@ -110,6 +110,11 @@ Feature: Smoke
     Then every <pre> with a child <code> has a .code-copy-button
     And the first code copy button becomes visible when I hover its code block
 
+  Scenario: Wikilink-embedded source files are syntax-highlighted by skylighting (regression: #24)
+    When I open "/code-embed.html"
+    Then the page contains an element with class "kw"
+    And the page contains an element with class "fu"
+
   @morph
   Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
     When I open "/i18n.fr"
@@ -211,6 +216,23 @@ Feature: Smoke
   Scenario: Cascaded YAML tag still indexes a child note that declares its own tags (regression: #697)
     When I fetch "/-/tags/issue-697-cascaded.html"
     Then the response body contains "issue-697/note"
+
+  Scenario: Broken links render through the components/broken-link template (issue #221)
+    When I open "/broken-link-221.html"
+    Then the page contains an element with class "emanote:broken-link"
+    And the page contains an element with class "emanote:broken-link__text"
+    And the page contains an element with class "emanote:broken-link__icon"
+
+  Scenario: Ambiguous wikilinks render through the components/ambiguous-link template (issue #712)
+    When I open "/ambig-712.html"
+    Then the page contains an element with class "emanote:ambiguous-link"
+    And the page contains an element with class "emanote:ambiguous-link__text"
+    And the page contains an element with class "emanote:ambiguous-link__icon"
+
+  @live
+  Scenario: Ambiguous-link candidate list renders only in live preview (issue #712)
+    When I open "/ambig-712.html"
+    Then the page contains an element with class "emanote:ambiguous-link__candidate"
 
   Scenario: Sidebar month folder renders as a calendar grid (issue #700)
     When I open "/calendar-test/2026/04/2026-04-15.html"
