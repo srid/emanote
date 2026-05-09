@@ -67,7 +67,7 @@ PDFs can be embedded using the same syntax. The following is the result of using
 
 ### Code files
 
-Source-code, markup, and configuration files can be embedded using the same syntax. The file's extension is matched against [skylighting](https://github.com/jgm/skylighting)'s bundled syntax map, and the content is highlighted at build time through the same pipeline used for fenced code blocks (see [[syntax-highlighting]]) — so an embedded `.hs` file looks identical to the equivalent ` ```haskell ` block.
+Source-code, markup, and configuration files can be embedded using the same syntax. The file's extension is matched against [skylighting](https://github.com/jgm/skylighting)'s bundled syntax map, and the content is highlighted at build time through the same pipeline used for fenced code blocks (see [[syntax-highlighting]]) — an embedded `.hs` file renders identically to a fenced Haskell code block in a regular note.
 
 The following is the result of using `![[haskell-code.hs]]` (the regular Markdown form `![](haskell-code.hs)` also works):
 
