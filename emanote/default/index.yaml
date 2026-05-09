@@ -155,6 +155,58 @@ template:
       tagIndexTitle: "{tag} - Index des étiquettes"
       generatedByVersion: Généré par Emanote {version}
       embeds: intègre
+    zh:
+      siteTitle: Emanote 站点
+      home: 主页
+      goToHome: 返回主页
+      index: 索引
+      viewIndex: 查看索引
+      tags: 标签
+      viewTags: 查看标签
+      tasks: 任务
+      viewTasks: 查看任务
+      search: 搜索 (Ctrl+K)
+      searchPlaceholder: 搜索 (Ctrl+K) ...
+      toggleDarkMode: 切换深色模式
+      toggleSidebar: 切换侧栏
+      siteIcon: 站点图标
+      tag: 标签
+      viewFolgezettelChildren: 查看子笔记
+      childrenInsideTitle: "{count} 篇子笔记"
+      onThisPage: 本页目录
+      timeline: 时间线
+      linkedFrom: 反向链接
+      subtags: 子标签
+      notes: 笔记
+      footnotes: 脚注
+      footnote: 脚注
+      footnoteLabel: 脚注 {idx}
+      copyLink: 复制链接
+      copyLinkToHeading: 复制标题链接
+      embeddedNote: 嵌入笔记
+      openPdf: 打开 PDF
+      videoUnsupported: 您的浏览器不支持 HTML5 视频，{link}
+      videoLinkText: 点此查看
+      audioUnsupported: 您的浏览器不支持 HTML5 音频，{link}
+      audioLinkText: 点此收听
+      copyCode: 复制代码
+      copyCodeToClipboard: 复制代码到剪贴板
+      copied: 已复制！
+      copyFailed: 复制失败
+      missingLink: "! 链接缺失"
+      ambiguousLink: "! 链接不明确"
+      brokenLinkTooltip: 链接已失效
+      ambiguousLinkTooltip: 链接不明确
+      emanoteError: Emanote 错误
+      badYamlFiles: "Emanote：YAML 文件有误"
+      notebookIssue: 笔记库存在问题。
+      fixIt: 修复后页面将自动重载，或 {link}。
+      goToRoot: 返回根目录
+      taskIndex: 任务索引
+      tagIndex: 标签索引
+      tagIndexTitle: "{tag} - 标签索引"
+      generatedByVersion: 由 Emanote {version} 生成
+      embeds: 嵌入
 
 pandoc:
   # Rewrite the class specified in Pandoc's Div and Span nodes. You can specify the class using
