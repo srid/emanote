@@ -72,6 +72,14 @@ data ModelT encF = Model
   -- ^ Reverse index from external source files to dependent notes,
   -- read by the patcher to invalidate exactly the notes affected by
   -- an edit. See "Emanote.Model.SourceDependencies".
+  --
+  -- Maintenance is asymmetric across insert and delete by design:
+  -- 'modelInsertNote' does NOT touch the index — refreshing edges
+  -- needs the parsed @[FilePath]@ side-channel from
+  -- 'parseAndInsert' in @Emanote.Source.Patch@. 'modelDeleteNote'
+  -- absorbs the cleanup (the route is the only input it needs), so
+  -- callers don't have to remember to chain
+  -- @modelSourceDependencies %~ SDeps.removeNote r@ on every delete.
   }
   deriving stock (Generic)
 

@@ -6,6 +6,12 @@
  the resolved absolute path — so a filter referenced before it
  exists on disk still gets an edge: when the file is later created,
  the same key matches and the dependent is re-parsed.
+
+ A future second edge kind (e.g. cascaded @index.yaml@ files
+ affecting a note's effective filter list) cannot be added as a
+ sibling field without also extending the mutation API:
+ 'removeNote' currently iterates 'sdLuaDeps' alone, so a new field
+ would silently leak edges for deleted notes. See [#721].
 -}
 module Emanote.Model.SourceDependencies (
   SourceDependencies,
