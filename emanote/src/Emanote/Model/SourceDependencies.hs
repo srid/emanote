@@ -25,8 +25,8 @@ import Relude
 
 newtype SourceDependencies = SourceDependencies
   { sdLuaDeps :: Map FilePath (Set R.LMLRoute)
-  -- ^ E.g. @{"docs/filters/foo.lua" -> {a.md, b.md}}@ — both notes
-  -- include @foo.lua@'s output in their cached AST. Keys are whatever
+  -- ^ E.g. @{"docs/filters/foo.lua" -> {a.md, b.md}}@ — both notes'
+  -- '_noteDoc' was produced by running @foo.lua@. Keys are whatever
   -- 'Emanote.Source.Loc.locResolve' produces (layer @-L@ value @\<\/\>@
   -- the user's @pandoc.filters@ spec); empty sets are pruned by
   -- 'removeNote' so absent key ≡ empty value.
