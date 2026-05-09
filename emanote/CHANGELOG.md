@@ -25,6 +25,7 @@
 
 **Bug fixes**
 
+- Heist templates: a typo in a splice tag (e.g. `<ema:tite>` instead of `<ema:title>`) or in an attribute reference (e.g. `${value:sitURL}`) used to render through silently, with the malformed tag or `${...}` token leaking into the page. Each rendered route is now scanned post-render and a per-route warning is logged for every surviving splice reference (closes [#81](https://github.com/srid/emanote/issues/81)).
 - Timeline heatmap backlinks now use the daily note's route-derived date instead of parsing `YYYY-MM-DD` out of the rendered title, so custom-titled daily notes still appear in the heatmap.
 - Cascade-declared `tags` no longer disappear from a child note that declares any of its own. The metadata-cascade merger previously inherited `aeson-extra`'s `lodashMerge`, which aligns arrays by index — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` in `folder/note.md` produced `[internal-note]`, dropping the cascaded entry both from the per-page chip strip and from the `#352` global tag index. The merger now unions cascade arrays; see [yaml-config](docs/guide/yaml-config.md) for the full contract. `aeson-extra` is no longer a dependency (closes [#697](https://github.com/srid/emanote/issues/697)).
 - Wiki link custom titles now render HTML entities like `&nbsp;` the same way regular Markdown link labels do. Previously `[[note|Spivak&nbsp;(2014)]]` rendered the entity text literally as `&nbsp;` (closes [#441](https://github.com/srid/emanote/issues/441)).

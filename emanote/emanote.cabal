@@ -218,6 +218,7 @@ library
     Emanote.View.Feed
     Emanote.View.I18n
     Emanote.View.JsBundle
+    Emanote.View.LintTemplate
     Emanote.View.LiveServerFiles
     Emanote.View.StaticUrl
     Emanote.View.TagIndex
@@ -268,3 +269,4 @@ test-suite test
       Emanote.Source.IgnoreSpec
       Emanote.View.FeedSpec
       Emanote.View.I18nSpec
+      Emanote.View.LintTemplateSpec

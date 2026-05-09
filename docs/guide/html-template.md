@@ -17,3 +17,7 @@ Emanote includes a default layout that includes a [[sidebar]], but can be custom
 ```query
 children:.
 ```
+
+## Diagnosing typos
+
+Heist renders unknown splice tags and `${...}` references as literal text in the page, so a typo like `<ema:tite>` or `${value:sitURL}` used to fail silently. Emanote now scans every rendered route for those leftovers and logs a warning per typo per route — once per process, so a live-server reload does not redo the noise. Watch the `emanote run` console (or the `emanote gen` log) for a `Warn` line and grep your `.tpl` files for the reported tag.
