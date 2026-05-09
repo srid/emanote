@@ -17,6 +17,12 @@ data FileType a where
   Yaml :: FileType SourceExt
   Xml :: FileType ()
   HeistTpl :: FileType SourceExt
+  -- | A Pandoc Lua filter file. Tracked as its own file type (rather
+  -- than falling through to 'AnyExt') so that filter sources do not
+  -- leak into @_site/@ as static assets, and so that edits to a
+  -- @.lua@ file can be routed to the hot-reload path without parsing
+  -- it as a static file. See "Emanote.Model.SourceDependencies".
+  LuaFilter :: FileType SourceExt
   -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
   -- "catch all" type to capture files using an arbitrary.
   AnyExt :: FileType SourceExt
@@ -80,6 +86,11 @@ instance HasExt 'HeistTpl where
   fileType = HeistTpl
   withExt = flip FP.addExtension ".tpl"
   withoutKnownExt = fpWithoutExt ".tpl"
+
+instance HasExt 'LuaFilter where
+  fileType = LuaFilter
+  withExt = flip FP.addExtension ".lua"
+  withoutKnownExt = fpWithoutExt ".lua"
 
 instance HasExt 'Folder where
   fileType = Folder

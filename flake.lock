@@ -269,15 +269,16 @@
     "unionmount": {
       "flake": false,
       "locked": {
-        "lastModified": 1778089705,
-        "narHash": "sha256-Jd6lx0G3Y9VCaXVPx1wP1STEUul2XKckxLUDMFMd4tY=",
+        "lastModified": 1778339252,
+        "narHash": "sha256-aqkluTM4ORbpQrGsv36o9LNd8jKPpEupKHh/i+KKEnQ=",
         "owner": "srid",
         "repo": "unionmount",
-        "rev": "af0b6b817d89bc86c318d8ea9680f628d0e4978f",
+        "rev": "124ca4a12212d2c84a245a05b80d7333ede0fec7",
         "type": "github"
       },
       "original": {
         "owner": "srid",
+        "ref": "feat/streaming-mount-handler",
         "repo": "unionmount",
         "type": "github"
       }

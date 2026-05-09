@@ -25,7 +25,7 @@
     lvar.flake = false;
     heist-extra.url = "github:srid/heist-extra";
     heist-extra.flake = false;
-    unionmount.url = "github:srid/unionmount";
+    unionmount.url = "github:srid/unionmount/feat/streaming-mount-handler";
     unionmount.flake = false;
     commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
     commonmark-simple.flake = false;

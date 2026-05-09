@@ -18,9 +18,15 @@ filePattern = \case
   R.HeistTpl ->
     R.withExt @_ @'R.HeistTpl
       $ "**/*"
+  R.LuaFilter ->
+    R.withExt @_ @'R.LuaFilter "**/*"
   R.AnyExt ->
     "**"
 
+{- | Order matters: 'unionMount' assigns the first matching pattern's
+tag, so 'LuaFilter' must precede 'AnyExt' for @.lua@ to be claimed
+by the filter type rather than swept into static assets.
+-}
 filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
   (id &&& filePattern)
@@ -28,6 +34,7 @@ filePatterns =
         , R.LMLType R.Org
         , R.Yaml
         , R.HeistTpl
+        , R.LuaFilter
         , R.AnyExt
         ]
 

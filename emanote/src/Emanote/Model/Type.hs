@@ -23,6 +23,8 @@ import Emanote.Model.Note (
  )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
+import Emanote.Model.SourceDependencies (SourceDependencies)
+import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Model.StaticFile (
   IxStaticFile,
   StaticFile (StaticFile),
@@ -66,6 +68,13 @@ data ModelT encF = Model
   , _modelStorkIndex :: Stork.IndexVar
   , _modelFolgezettelTree :: Forest R.LMLRoute
   -- ^ Folgezettel tree computed once for each update to model.
+  , _modelSourceDependencies :: SourceDependencies
+  -- ^ Reverse index from external source files (today only Pandoc Lua
+  -- filter @.lua@ files) to the notes whose parsed AST depends on
+  -- them. The patcher reads this index to invalidate exactly the
+  -- notes affected by an edit. Maintained by 'parseAndInsert' /
+  -- 'modelDeleteNote' callers in @Emanote.Source.Patch@; not touched
+  -- inside 'modelInsertNote'.
   }
   deriving stock (Generic)
 
@@ -113,6 +122,7 @@ emptyModel layers act ren ctw instanceId storkVar =
     , _modelHeistTemplate = def
     , _modelStorkIndex = storkVar
     , _modelFolgezettelTree = mempty
+    , _modelSourceDependencies = SDeps.emptyDependencies
     }
 
 modelReadyForView :: ModelT f -> ModelT f
