@@ -53,7 +53,7 @@ local css = [[
   border-bottom: 1px solid var(--color-gray-200);
   font-size: 0.875rem;
 }
-.emanote-slides-nav a {
+.emanote-slides-nav [data-slide-id] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -66,16 +66,16 @@ local css = [[
   text-decoration: none;
   font-variant-numeric: tabular-nums;
 }
-.emanote-slides-nav a:hover {
+.emanote-slides-nav [data-slide-id]:hover {
   border-color: var(--color-gray-300);
   background: var(--color-gray-100);
 }
-.emanote-slides-nav a.active {
+.emanote-slides-nav [data-slide-id].active {
   background: var(--color-primary-600);
   border-color: var(--color-primary-600);
   color: #fff;
 }
-.emanote-slides-nav a.active:hover {
+.emanote-slides-nav [data-slide-id].active:hover {
   background: var(--color-primary-700);
   border-color: var(--color-primary-700);
 }
@@ -150,17 +150,17 @@ local css = [[
   border-color: var(--color-gray-800);
 }
 .dark .emanote-slides-nav { border-bottom-color: var(--color-gray-800); }
-.dark .emanote-slides-nav a { color: var(--color-gray-300); }
-.dark .emanote-slides-nav a:hover {
+.dark .emanote-slides-nav [data-slide-id] { color: var(--color-gray-300); }
+.dark .emanote-slides-nav [data-slide-id]:hover {
   border-color: var(--color-gray-700);
   background: var(--color-gray-800);
 }
-.dark .emanote-slides-nav a.active {
+.dark .emanote-slides-nav [data-slide-id].active {
   background: var(--color-primary-500);
   border-color: var(--color-primary-500);
   color: var(--color-gray-950);
 }
-.dark .emanote-slides-nav a.active:hover {
+.dark .emanote-slides-nav [data-slide-id].active:hover {
   background: var(--color-primary-400);
   border-color: var(--color-primary-400);
 }
@@ -173,14 +173,11 @@ local css = [[
 local js = [[
 <script>
 (() => {
-  // Anchor-link defaults won't scroll the horizontal track — they'd
-  // scroll the page vertically — so the nav is wired by hand:
-  // scrollIntoView({inline:'start'}) on the targeted slide. We
-  // deliberately do *not* touch history here: pushing/replacing the
-  // hash on every slide click clutters the back stack and interacts
-  // badly with the live-server's morph-DOM navigation (clicking back
-  // after leaving the deck can drop the page path). Deep-linking
-  // still works one-shot at load time via `location.hash`.
+  // Nav buttons drive horizontal scroll on the track. Deep-linking
+  // via `#slide-id` works one-shot at load time via `location.hash`,
+  // but we never push/replace the hash on click — the back stack
+  // would fill with intra-deck transitions and interact badly with
+  // the live-server's morph-DOM navigation.
   for (const deck of document.querySelectorAll('.emanote-slides')) {
     // Ema's live-server uses morph-DOM for in-app navigation; if a
     // slides page is re-entered the script tag may run again over a
@@ -214,9 +211,6 @@ local js = [[
       });
       return best;
     };
-    // Nav links: <a> tags with data-slide-id (no href) — see slides.lua
-    // build_deck for why hrefs are omitted (htmlproofer + <base href="/">
-    // trap).
     const navLinks = [...deck.querySelectorAll('.emanote-slides-nav [data-slide-id]')];
     const setActive = (id) => {
       for (const a of navLinks) {
@@ -224,7 +218,7 @@ local js = [[
       }
     };
     navLinks.forEach(a => {
-      const activate = (e) => {
+      a.addEventListener('click', (e) => {
         const i = indexOf(a.dataset.slideId);
         if (i < 0) return;
         e.preventDefault();
@@ -233,12 +227,6 @@ local js = [[
         // Move focus to the deck so subsequent arrow keys reach the
         // deck-level keydown handler.
         requestAnimationFrame(() => deck.focus({ preventScroll: true }));
-      };
-      a.addEventListener('click', activate);
-      // role="button" + tabindex="0" make the bare <a> keyboard-focusable;
-      // wire Enter/Space to match native button activation.
-      a.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') activate(e);
       });
     });
     // Fullscreen toggle: requestFullscreen on click, exitFullscreen
@@ -322,15 +310,16 @@ local function build_deck(slides)
     local title = header_text(s.header)
     local id = slugify(title, i)
     s.header.identifier = id
-    -- Emit <a> without an href: a bare-hash href like "#id" gets
-    -- resolved to "/#id" by the page's <base href="/">, which the
-    -- static link-check follows to root and reports as a missing
-    -- anchor. JS handles navigation via the data-slide-id attribute,
-    -- so the href is unneeded.
+    -- Use <button>, not <a>. A bare-hash <a href="#id"> gets resolved
+    -- to "/#id" via <base href="/">, and the static link-checker
+    -- follows it back to root and reports a missing anchor. <a> with
+    -- no href fails htmlproofer's "missing reference" check. <button>
+    -- carries no link semantics for the checker; JS handles
+    -- navigation via the data-slide-id attribute.
     local link = pandoc.RawInline(
       "html",
       string.format(
-        '<a role="button" tabindex="0" data-slide-id="%s" title="%s">%d</a>',
+        '<button type="button" data-slide-id="%s" title="%s">%d</button>',
         id, title, i
       )
     )
