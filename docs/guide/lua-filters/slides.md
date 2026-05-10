@@ -58,13 +58,14 @@ Both are bundled in Emanote's default layer and run on every save; the order mat
 
 ## Caveat: pandoc's writer-specific filters
 
-Many filters in [pandoc/lua-filters](https://github.com/pandoc/lua-filters) branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Emanote calls `applyFilters` with `FORMAT == "markdown"`, so a writer-specific branch may not fire as expected.
+Many Pandoc Lua filters branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Emanote calls `applyFilters` with `FORMAT == "markdown"`, so a writer-specific branch may not fire as expected.
 
 Filters that work cleanly here are **FORMAT-agnostic** — they operate at the AST level regardless of output format. `list-table`, `wordcount`, and this very `slides.lua` are all in that camp.
 
 ## Where to find more
 
-- [pandoc/lua-filters](https://github.com/pandoc/lua-filters) — the canonical collection
+- [pandoc-ext/list-table](https://github.com/pandoc-ext/list-table) — the maintained upstream for the bundled list-table filter
+- [pandoc-ext/info](https://github.com/pandoc-ext/info) — a catalog of Pandoc extensions
 - [Pandoc Lua filter reference](https://pandoc.org/lua-filters.html) — the API
 - [[lua-filters]] — Emanote's main guide
 

@@ -1,5 +1,9 @@
-MIT License
+MIT License Notices
 
+list-table.lua:
+Copyright (c) 2021 Martin Fischer, 2023-2024 Pandoc Extensions contributors
+
+wordcount.lua:
 Copyright (c) 2017-2021 pandoc Lua filters contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

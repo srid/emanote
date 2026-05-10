@@ -1,6 +1,6 @@
 --- wordcount.lua - append a word/character count footer to the document.
 ---
---- Inspired by https://github.com/pandoc/lua-filters/tree/master/wordcount,
+--- Derived from https://github.com/pandoc/lua-filters/tree/master/wordcount,
 --- but adapted for Emanote's live-server pipeline: the upstream filter
 --- prints to stdout and calls `os.exit(0)`, both of which would corrupt or
 --- terminate `emanote run`. This version walks the body, counts, and
