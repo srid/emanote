@@ -1,5 +1,7 @@
 Feature: Pandoc Lua filter hot-reload (issue #263)
-  A note's `pandoc.filters` frontmatter resolves at parse time.
+  A note's Lua filter declaration resolves at parse time.
+  Markdown notes use `pandoc.filters` frontmatter; Org notes use
+  `#+PANDOC_FILTERS` keywords.
   When a referenced `.lua` file is created, edited, or deleted,
   every dependent note's rendered HTML reflects the new filter
   behavior — without restarting `emanote run`.
@@ -19,12 +21,30 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     When I open "/lua-filter-bundled.html"
     Then the page contains a table element with class "bundled-list-table"
 
+  Scenario: An Org note's PANDOC_FILTERS keyword is applied at build time
+    When I open "/lua-filter-org-demo.html"
+    Then the article body contains "DEMO_FILTER:HELLO"
+    And the article body does not contain "EMANOTELUAORGDEMO"
+
+  Scenario: Lua filter sources remain linkable by wikilink
+    When I open "/lua-filter-demo.html"
+    Then the article link with text "demo filter source" has href containing "filters/demo-filter.lua"
+    When I fetch "/filters/demo-filter.lua"
+    Then the response body contains "EMANOTE_LUA_DEMO_TOKEN"
+
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent notes (#263)
     When I open "/lua-filter-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
     When I write "filters/demo-filter.lua" so EMANOTE_LUA_DEMO_TOKEN maps to "DEMO_FILTER:CHANGED"
     Then the article body contains "DEMO_FILTER:CHANGED" within 10 seconds
+
+  @live @hot-reload
+  Scenario: Editing a .lua filter live-updates dependent Org notes (#721)
+    When I open "/lua-filter-org-demo.html"
+    Then the article body contains "DEMO_FILTER:HELLO"
+    When I write "filters/demo-filter.lua" so EMANOTELUAORGDEMO maps to "DEMO_FILTER:ORG-CHANGED"
+    Then the article body contains "DEMO_FILTER:ORG-CHANGED" within 10 seconds
 
   @live @hot-reload
   Scenario: Creating a previously-missing .lua filter wires up its dependents (#263)
@@ -36,8 +56,24 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "LATE_BOUND:WIRED" within 10 seconds
 
   @live @hot-reload
+  Scenario: Creating a previously-missing .lua filter wires up Org dependents (#721)
+    When I write an Org note "lua-filter-late.org" that references missing filter "filters/late-bound.lua" containing token "EMANOTEORGLATETOKEN"
+    And I wait for "/lua-filter-late.html" to contain "EMANOTEORGLATETOKEN"
+    And I open "/lua-filter-late.html"
+    Then the article body contains "EMANOTEORGLATETOKEN"
+    When I write "filters/late-bound.lua" so EMANOTEORGLATETOKEN maps to "ORG_LATE_BOUND:WIRED"
+    Then the article body contains "ORG_LATE_BOUND:WIRED" within 10 seconds
+
+  @live @hot-reload
   Scenario: Deleting a .lua filter re-parses dependents without it (#263)
     When I open "/lua-filter-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
     When I delete "filters/demo-filter.lua"
     Then the article body contains "EMANOTE_LUA_DEMO_TOKEN" within 10 seconds
+
+  @live @hot-reload
+  Scenario: Deleting a .lua filter re-parses Org dependents without it (#721)
+    When I open "/lua-filter-org-demo.html"
+    Then the article body contains "DEMO_FILTER:HELLO"
+    When I delete "filters/demo-filter.lua"
+    Then the article body contains "EMANOTELUAORGDEMO" within 10 seconds

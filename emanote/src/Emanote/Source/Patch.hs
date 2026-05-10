@@ -77,7 +77,7 @@ patchModel' ::
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
 patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
-  case fpType of
+  sourcePatch <- case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
@@ -107,11 +107,11 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
       -- lookup, no @noteSource@ recovery, no @lookupNotesByRoute@.
       --
       -- The dep index keys edges by the path *as written* in
-      -- @pandoc.filters@ frontmatter — typically the layer-relative
-      -- form like @"filters/x.lua"@, with no mount-point prefix.
-      -- unionmount delivers 'fp' in the mounted form (it's the
+      -- the note-local Lua filter declaration — typically the
+      -- layer-relative form like @"filters/x.lua"@, with no mount-point
+      -- prefix. unionmount delivers 'fp' in the mounted form (it's the
       -- @Change@ map's outer key — see @changeInsert@ in
-      -- @System.UnionMount@). To recover the frontmatter form we
+      -- @System.UnionMount@). To recover the declaration form we
       -- additionally try stripping each layer's mount-point prefix.
       let candidates = depKeyCandidates layers fp
           dependents =
@@ -164,35 +164,75 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
-    R.AnyExt -> do
-      case R.mkRouteFromFilePath fp of
-        Nothing ->
-          pure id
-        Just r -> case action of
-          UM.Refresh refreshAction overlays -> do
-            let fpAbs = locResolve $ head overlays
-            doesDirectoryExist fpAbs >>= \case
-              True ->
-                -- A directory got added; this is not a static 'file'
-                pure id
-              False -> do
-                let logF = case refreshAction of
-                      UM.Existing -> logD . ("Registering" <>)
-                      _ -> log . ("Re-registering" <>)
-                logF $ " file: " <> toText fpAbs <> " " <> show r
-                t <- liftIO getCurrentTime
-                mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
-                pure $ M.modelInsertStaticFile t r fpAbs mInfo
-          UM.Delete -> do
-            pure $ M.modelDeleteStaticFile r
+    R.AnyExt ->
+      pure id
+  staticPatch <- patchStaticFileIndex fpType fp action
+  pure $ sourcePatch >>> staticPatch
 
-{- | Frontmatter-form keys an unionmount-delivered path could correspond
+{- | Project a source-file change into the static-file index when that source
+file should also be addressable by wikilinks or embeds.
+
+The structural branches in 'patchModel'' update their own model state first:
+notes, YAML cascades, Heist templates, and Lua filter dependents. Some of those
+same source files are also useful as browsable source files. Keeping this as a
+second, uniform projection makes the policy explicit and avoids duplicating the
+same insert/delete logic in every file-type branch.
+-}
+patchStaticFileIndex ::
+  (MonadIO m, MonadLogger m) =>
+  R.FileType R.SourceExt ->
+  FilePath ->
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
+  m (ModelEma -> ModelEma)
+patchStaticFileIndex fpType fp action
+  | not $ indexesAsStaticFile fpType = pure id
+  | otherwise =
+      maybe (pure id) patch
+        $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
+  where
+    patch r = case action of
+      UM.Refresh refreshAction overlays -> do
+        let fpAbs = locResolve $ head overlays
+        doesDirectoryExist fpAbs >>= \case
+          True ->
+            -- A directory got added; this is not a static 'file'
+            pure id
+          False -> do
+            let logF = case refreshAction of
+                  UM.Existing -> logD . ("Registering" <>)
+                  _ -> log . ("Re-registering" <>)
+            logF $ " file: " <> toText fpAbs <> " " <> show r
+            insertStaticFile refreshAction overlays r
+      UM.Delete ->
+        pure $ M.modelDeleteStaticFile r
+
+indexesAsStaticFile :: R.FileType R.SourceExt -> Bool
+indexesAsStaticFile = \case
+  R.LMLType _ -> False
+  R.LuaFilter -> True
+  R.Yaml -> True
+  R.HeistTpl -> True
+  R.AnyExt -> True
+
+insertStaticFile ::
+  (MonadIO m, MonadLogger m) =>
+  UM.RefreshAction ->
+  NonEmpty (Loc, FilePath) ->
+  R.R 'R.AnyExt ->
+  m (ModelEma -> ModelEma)
+insertStaticFile refreshAction overlays r = do
+  let fpAbs = locResolve $ head overlays
+  t <- liftIO getCurrentTime
+  mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
+  pure $ M.modelInsertStaticFile t r fpAbs mInfo
+
+{- | Declaration-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The
-dep index stores the form the user wrote in @pandoc.filters@ (no mount
-prefix), so a delivered path like @"sub/filters/x.lua"@ from a layer
-mounted at @sub@ has to round-trip back to @"filters/x.lua"@ for the
-lookup to hit. The fp itself is included so single-layer-no-mount
-notebooks still hit on the first try.
+dep index stores the form the user wrote in a note-local Lua filter
+declaration (no mount prefix), so a delivered path like
+@"sub/filters/x.lua"@ from a layer mounted at @sub@ has to round-trip
+back to @"filters/x.lua"@ for the lookup to hit. The fp itself is
+included so single-layer-no-mount notebooks still hit on the first try.
 -}
 depKeyCandidates :: Set Loc -> FilePath -> [FilePath]
 depKeyCandidates layers fp =

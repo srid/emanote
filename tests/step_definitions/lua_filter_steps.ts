@@ -56,3 +56,17 @@ A token a not-yet-existing filter will rewrite: ${token}
     fs.writeFileSync(path.join(stagedFixtureDir, mdPath), md);
   },
 );
+
+When(
+  "I write an Org note {string} that references missing filter {string} containing token {string}",
+  function (orgPath: string, filterPath: string, token: string) {
+    const org = `#+TITLE: Late-Bound Org Filter Test
+#+PANDOC_FILTERS: ${filterPath}
+
+* Late-Bound Org Filter Test
+
+A token a not-yet-existing filter will rewrite: ${token}
+`;
+    fs.writeFileSync(path.join(stagedFixtureDir, orgPath), org);
+  },
+);

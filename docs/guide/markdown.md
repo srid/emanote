@@ -185,6 +185,6 @@ main = putStrLn "Hello, world!"
 
 See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
 
-Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See [[embed]] for the syntax and the recognised extensions.
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. This also works for Emanote's own source files such as `index.yaml` and Heist `.tpl` templates. See [[embed]] for the syntax and the recognised extensions.
 
 Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].
