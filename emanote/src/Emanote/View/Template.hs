@@ -104,11 +104,14 @@ renderResourceRoute m = \case
         Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note
       Just (R.LMLView_Atom, note) ->
         case renderFeed m note of
-          Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
+          Left err -> liftIO . throwIO . userError . toString $ "Bad feed: " <> show r <> ": " <> err
           Right feed -> pure $ Ema.AssetGenerated Ema.Other feed
       Nothing ->
-        -- This should never be reached because decodeRoute looks up the model.
-        error $ "Bad route: " <> show r
+        -- decodeRoute already looked up the model, so reaching here means an
+        -- invariant break, not user input — surface as an IO exception so
+        -- the live server reports it through the same channel as other
+        -- render-time failures.
+        liftIO . throwIO . userError $ "Bad route: " <> show r
   SR.ResourceRoute_StaticFile _ fpAbs ->
     pure $ Ema.AssetStatic fpAbs
 
