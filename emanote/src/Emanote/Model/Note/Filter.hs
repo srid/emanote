@@ -6,6 +6,8 @@ module Emanote.Model.Note.Filter (
   applyParsePandocFilters,
   applyRenderHtmlPandocFilters,
   lookupPandocFilterDeclarations,
+  lookupOrgPandocFilterDeclarations,
+  pandocFilterDependencyPaths,
   filterDeclarationShapeErrors,
 ) where
 
@@ -47,14 +49,62 @@ instance Semigroup PandocFilterDeclarations where
 instance Monoid PandocFilterDeclarations where
   mempty = PandocFilterDeclarations mempty mempty
 
+data PandocFilterPhaseSpec = PandocFilterPhaseSpec
+  { pfpsYamlPath :: NonEmpty Text
+  , pfpsOrgKeys :: [Text]
+  , pfpsToDeclarations :: [FilePath] -> PandocFilterDeclarations
+  , pfpsDeclaredPaths :: PandocFilterDeclarations -> [FilePath]
+  }
+
+pandocFilterPhaseSpecs :: [PandocFilterPhaseSpec]
+pandocFilterPhaseSpecs =
+  [ PandocFilterPhaseSpec
+      ("pandoc" :| ["filters", "parse"])
+      ["#+pandoc_filters", "#+pandoc_filters_parse", "#+pandoc.filters", "#+pandoc.filters.parse"]
+      (\paths -> mempty {pfdParseFilters = paths})
+      pfdParseFilters
+  , PandocFilterPhaseSpec
+      ("pandoc" :| ["filters", "render", "html"])
+      ["#+pandoc_filters_render_html", "#+pandoc.filters.render.html"]
+      (\paths -> mempty {pfdRenderHtmlFilters = paths})
+      pfdRenderHtmlFilters
+  ]
+
+pandocFilterDependencyPaths :: PandocFilterDeclarations -> [FilePath]
+pandocFilterDependencyPaths declarations =
+  foldMap (`pfpsDeclaredPaths` declarations) pandocFilterPhaseSpecs
+
 lookupPandocFilterDeclarations :: Aeson.Value -> PandocFilterDeclarations
 lookupPandocFilterDeclarations frontmatter =
-  PandocFilterDeclarations
-    { pfdParseFilters =
-        SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "parse"]) frontmatter
-    , pfdRenderHtmlFilters =
-        SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) frontmatter
-    }
+  foldMap lookupPhase pandocFilterPhaseSpecs
+  where
+    lookupPhase spec =
+      pfpsToDeclarations spec
+        $ SData.lookupAeson @[FilePath] mempty (pfpsYamlPath spec) frontmatter
+
+lookupOrgPandocFilterDeclarations :: Text -> PandocFilterDeclarations
+lookupOrgPandocFilterDeclarations s =
+  foldMap lookupPhase pandocFilterPhaseSpecs
+  where
+    headerKeywords =
+      mapMaybe parseOrgKeyword
+        $ takeWhile orgHeaderLine
+        $ dropWhile (T.null . T.strip)
+        $ lines s
+    lookupPhase spec =
+      pfpsToDeclarations spec
+        $ toString
+        . snd
+        <$> filter (\(k, _) -> k `elem` pfpsOrgKeys spec) headerKeywords
+    orgHeaderLine line =
+      let stripped = T.strip line
+       in T.null stripped || "#+" `T.isPrefixOf` stripped
+    parseOrgKeyword line = do
+      let (rawKey, rawValue) = T.breakOn ":" $ T.stripStart line
+      guard $ not $ T.null rawValue
+      let value = T.strip $ T.drop 1 rawValue
+      guard $ not $ T.null value
+      pure (T.toCaseFold rawKey, value)
 
 {- | Diagnose frontmatter shape errors at the @pandoc.filters.{parse,render.html}@
 keys. 'lookupPandocFilterDeclarations' silently degrades to @mempty@ on a
@@ -69,9 +119,8 @@ filterDeclarationShapeErrors frontmatter =
   where
     keysToCheck :: [(Text, [Text])]
     keysToCheck =
-      [ ("pandoc.filters.parse", ["pandoc", "filters", "parse"])
-      , ("pandoc.filters.render.html", ["pandoc", "filters", "render", "html"])
-      ]
+      (\spec -> (T.intercalate "." $ toList $ pfpsYamlPath spec, toList $ pfpsYamlPath spec))
+        <$> pandocFilterPhaseSpecs
     checkPath :: Text -> [Text] -> Maybe Text
     checkPath label path =
       case lookupRaw path frontmatter of
@@ -104,11 +153,9 @@ filterDeclarationShapeErrors frontmatter =
 
 {- | Resolve and apply a note's declared parse-time Lua filters.
 
-Returns the requested filter paths unchanged alongside the filtered document so
-the source-dependency index records the declaration form, not the resolved
-absolute path. Parse-time-specific validation (rejecting filters that touch
-IO-capable APIs) lives here, not on a generic application record — render-time
-filters are allowed to use IO.
+Parse-time-specific validation (rejecting filters that touch IO-capable APIs)
+lives here, not on a generic application record — render-time filters are
+allowed to use IO.
 -}
 applyParsePandocFilters ::
   (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
@@ -116,7 +163,7 @@ applyParsePandocFilters ::
   [FilePath] ->
   PandocFilterDeclarations ->
   Pandoc ->
-  m (Pandoc, [FilePath])
+  m Pandoc
 applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdParseFilters declarations)
   ioCleanFilters <- filterM rejectParseTimeIO resolvedFilters
@@ -131,7 +178,7 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   guardedPaths <- liftIO $ acquireGuardedFilters ioCleanFilters
   filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
   liftIO $ cleanupGuardedParseFilters guardedPaths
-  pure (filteredDoc, pfdParseFilters declarations)
+  pure filteredDoc
   where
     rejectParseTimeIO rf = do
       uses <- liftIO $ parseTimeFilterIOUsesIn rf
@@ -292,9 +339,8 @@ parseTimeFilterIOUsesIn ResolvedPandocFilter {..} =
 
 parseTimeFilterIOErrorMsg :: ResolvedPandocFilter -> [Text] -> Text
 parseTimeFilterIOErrorMsg ResolvedPandocFilter {..} uses =
-  -- Phrased without naming a specific destination key — Org notes can't
-  -- declare render-time filters today, so "move to pandoc.filters.render.html"
-  -- would be misleading there.
+  -- Phrased without naming a specific destination key because Markdown and
+  -- Org use different declaration syntax for render-time filters.
   "Parse-time Lua filters cannot use IO-capable APIs: "
     <> toText rpfRequestedPath
     <> " references "

@@ -2,7 +2,7 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   A note's Lua filter declaration resolves from YAML frontmatter.
   Markdown notes use `pandoc.filters.parse` for parse-time filters and
   `pandoc.filters.render.html` for HTML render-time filters. Org notes
-  use `#+PANDOC_FILTERS` keywords.
+  use `#+PANDOC_FILTERS` and `#+PANDOC_FILTERS_RENDER_HTML` keywords.
   When a referenced `.lua` file is created, edited, or deleted,
   every dependent note's rendered HTML reflects the new filter
   behavior — without restarting `emanote run`.
@@ -32,6 +32,11 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:HELLO"
     And the article body does not contain "EMANOTELUAORGDEMO"
 
+  Scenario: An Org note's PANDOC_FILTERS_RENDER_HTML keyword is applied at render time
+    When I open "/lua-filter-org-render-demo.html"
+    Then the article body contains "RENDER_FILTER:ORG-HTML"
+    And the article body does not contain "EMANOTEORGRENDERFILTERTOKEN"
+
   Scenario: Lua filter sources remain linkable by wikilink
     When I open "/lua-filter-demo.html"
     Then the article link with text "demo filter source" has href containing "filters/demo-filter.lua"
@@ -51,6 +56,13 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "RENDER_FILTER:HTML"
     When I write "filters/render-format.lua" so EMANOTE_RENDER_FILTER_TOKEN maps to "RENDER_FILTER:CHANGED"
     Then the article body contains "RENDER_FILTER:CHANGED" within 10 seconds
+
+  @live @hot-reload
+  Scenario: Editing a render-time .lua filter live-updates dependent Org notes (#721)
+    When I open "/lua-filter-org-render-demo.html"
+    Then the article body contains "RENDER_FILTER:ORG-HTML"
+    When I write "filters/render-format.lua" so EMANOTEORGRENDERFILTERTOKEN maps to "RENDER_FILTER:ORG-CHANGED"
+    Then the article body contains "RENDER_FILTER:ORG-CHANGED" within 10 seconds
 
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent Org notes (#721)

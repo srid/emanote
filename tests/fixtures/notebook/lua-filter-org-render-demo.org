@@ -1,0 +1,6 @@
+#+TITLE: Lua Render Filter Org Demo
+#+PANDOC_FILTERS_RENDER_HTML: filters/render-format.lua
+
+* Lua Render Filter Org Demo
+
+A sentinel token the render-time filter rewrites: EMANOTEORGRENDERFILTERTOKEN

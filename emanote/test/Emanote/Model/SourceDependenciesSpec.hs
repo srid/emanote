@@ -2,6 +2,7 @@ module Emanote.Model.SourceDependenciesSpec where
 
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc (..))
@@ -22,6 +23,9 @@ src fp = (LocUser 1 "/test" Nothing, fp)
 routes :: SDeps.SourceDependencies -> FilePath -> Set R.LMLRoute
 routes sd fp = Map.keysSet (SDeps.dependentsOnLua fp sd)
 
+decls :: [FilePath] -> [FilePath] -> NoteFilter.PandocFilterDeclarations
+decls = NoteFilter.PandocFilterDeclarations
+
 spec :: Spec
 spec = do
   let n1 = mdRoute "a.md"
@@ -34,7 +38,7 @@ spec = do
       filterY = "filters/y.lua"
       filterRender = "filters/r.lua"
       missing = "filters/not-yet-on-disk.lua"
-      setParse note s ps = SDeps.setLuaDeps note s ps []
+      setParse note s ps = SDeps.setLuaDeps note s (decls ps [])
   describe "setLuaDeps" $ do
     it "registers a single edge" $ do
       let sd = setParse n1 (src "a.md") [filterX] SDeps.emptyDependencies
@@ -79,12 +83,12 @@ spec = do
       -- A note can declare a parse-time filter and a render-time filter
       -- simultaneously; both are reachable through dependentsOnLua so
       -- the patcher invalidates the note when either file changes.
-      let sd = SDeps.setLuaDeps n1 (src "a.md") [filterX] [filterRender] SDeps.emptyDependencies
+      let sd = SDeps.setLuaDeps n1 (src "a.md") (decls [filterX] [filterRender]) SDeps.emptyDependencies
       routes sd filterX `shouldBe` one n1
       routes sd filterRender `shouldBe` one n1
   describe "removeNote" $ do
     it "drops every edge originating at the removed note" $ do
-      let sd1 = SDeps.setLuaDeps n1 (src "a.md") [filterX, filterY] [filterRender] SDeps.emptyDependencies
+      let sd1 = SDeps.setLuaDeps n1 (src "a.md") (decls [filterX, filterY] [filterRender]) SDeps.emptyDependencies
           sd2 = SDeps.removeNote n1 sd1
       routes sd2 filterX `shouldBe` mempty
       routes sd2 filterY `shouldBe` mempty

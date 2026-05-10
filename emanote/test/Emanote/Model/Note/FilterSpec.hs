@@ -15,6 +15,7 @@ import System.Directory (createDirectoryIfMissing)
 import Test.Hspec
 import Text.Pandoc.Definition (Block (Para), Inline (Str), Meta (Meta), Pandoc (Pandoc))
 import Text.Pandoc.Lua (getEngine)
+import Text.Pandoc.Walk qualified as W
 import UnliftIO.Temporary (withSystemTempDirectory)
 
 spec :: Spec
@@ -87,7 +88,7 @@ spec = do
         writeFileText (dir <> "/filters/parse.lua") "function Pandoc(doc)\n  return doc\nend\n"
         writeFileText (dir <> "/filters/render.lua") "function Pandoc(doc)\n  local out = pandoc.pipe('printf', {'RENDER_IO_OK'}, '')\n  doc.blocks = { pandoc.Para({ pandoc.Str(out) }) }\n  return doc\nend\n"
         engine <- getEngine
-        ((parsedDoc, _), parseErrors) <-
+        (parsedDoc, parseErrors) <-
           runNoLoggingT
             $ runWriterT
             $ NoteFilter.applyParsePandocFilters
@@ -108,6 +109,44 @@ spec = do
         renderErrors `shouldBe` []
         renderedDoc `shouldBe` Pandoc (Meta mempty) [Para [Str "RENDER_IO_OK"]]
 
+  describe "Org filter declarations" $ do
+    it "supports render-time filters without applying them during parse"
+      $ withSystemTempDirectory "emanote-org-render-filter"
+      $ \dir -> do
+        createDirectoryIfMissing True $ dir <> "/filters"
+        writeFileText
+          (dir <> "/filters/render.lua")
+          "if FORMAT ~= 'html' then error('render filter ran during parse: ' .. FORMAT) end\nfunction Str(el)\n  if el.text == 'EMANOTEORGRENDERFILTERTOKEN' then\n    return pandoc.Str('RENDER_FILTER:ORG')\n  end\n  return nil\nend\n"
+        engine <- getEngine
+        let route = fromMaybe (error "bad org test route") $ R.mkLMLRouteFromKnownFilePath R.Org "note.org"
+            src = (LocUser 1 dir Nothing, "note.org")
+            org =
+              unlines
+                [ "#+TITLE: Org Render Filter"
+                , "#+PANDOC_FILTERS_RENDER_HTML: filters/render.lua"
+                , ""
+                , "* Org Render Filter"
+                , ""
+                , "A token the render filter rewrites: EMANOTEORGRENDERFILTERTOKEN"
+                ]
+        note <- runNoLoggingT $ Note.parseNote engine [dir] route src org
+        let declarations = Note._notePandocFilterDeclarations note
+        Note._noteErrors note `shouldBe` []
+        NoteFilter.pfdParseFilters declarations `shouldBe` []
+        NoteFilter.pfdRenderHtmlFilters declarations `shouldBe` ["filters/render.lua"]
+        pandocStrs (Note._noteDoc note) `shouldSatisfy` elem "EMANOTEORGRENDERFILTERTOKEN"
+        (renderedDoc, renderErrors) <-
+          runNoLoggingT
+            $ runWriterT
+            $ NoteFilter.applyRenderHtmlPandocFilters
+              engine
+              [dir]
+              declarations
+              Aeson.Null
+              (Note._noteDoc note)
+        renderErrors `shouldBe` []
+        pandocStrs renderedDoc `shouldSatisfy` elem "RENDER_FILTER:ORG"
+
 parseMarkdownWithFilter :: FilePath -> Text -> IO [Text]
 parseMarkdownWithFilter dir filterSource = do
   createDirectoryIfMissing True $ dir <> "/filters"
@@ -116,5 +155,11 @@ parseMarkdownWithFilter dir filterSource = do
   let route = fromMaybe (error "bad test route") $ R.mkLMLRouteFromKnownFilePath R.Md "note.md"
       src = (LocUser 1 dir Nothing, "note.md")
       md = "---\npandoc:\n  filters:\n    parse:\n      - filters/io.lua\n---\n\n# Hello\n"
-  result <- runNoLoggingT $ Note.parseNote engine [dir] route src md
-  pure $ Note._noteErrors $ Note.parsedNote result
+  note <- runNoLoggingT $ Note.parseNote engine [dir] route src md
+  pure $ Note._noteErrors note
+
+pandocStrs :: Pandoc -> [Text]
+pandocStrs =
+  W.query $ \case
+    Str s -> [s]
+    _ -> []

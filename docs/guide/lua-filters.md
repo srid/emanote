@@ -12,7 +12,7 @@ pandoc:
 
 A [Pandoc Lua filter](https://pandoc.org/lua-filters.html) rewrites the parsed Pandoc document before Emanote turns it into an [[html-template|HTML page]].
 
-Filters are note-local. Enable them in [[yaml-config|Markdown frontmatter]] or, for [[orgmode|Org notes]], with `#+PANDOC_FILTERS:`.
+Filters are note-local. Enable them in [[yaml-config|Markdown frontmatter]] or, for [[orgmode|Org notes]], with `#+PANDOC_FILTERS:` / `#+PANDOC_FILTERS_RENDER_HTML:`.
 
 ## Choose a phase
 
@@ -87,12 +87,15 @@ This page chains the bundled `list-table.lua` and `wordcount.lua`, and you can s
 
 ## Org notes
 
-[[orgmode|Org notes]] use an Org keyword. Add one `#+PANDOC_FILTERS:` line per parse-time filter:
+[[orgmode|Org notes]] use Org keywords. Add one keyword line per filter:
 
 ```org
 #+PANDOC_FILTERS: lua-filters/list-table.lua
 #+PANDOC_FILTERS: lua-filters/wordcount.lua
+#+PANDOC_FILTERS_RENDER_HTML: filters/slides.lua
 ```
+
+`#+PANDOC_FILTERS:` is parse-time. `#+PANDOC_FILTERS_PARSE:` is accepted as an explicit parse-time spelling. `#+PANDOC_FILTERS_RENDER_HTML:` is render-time HTML.
 
 ## Hot reload
 
@@ -109,7 +112,7 @@ Hot reload also covers missing-at-parse-time filter references:
 ## Limitations
 
 > [!warning] Remaining limitations
-> - Filter declarations are note-local: [[yaml-config|Markdown frontmatter]] or [[orgmode|Org]] `#+PANDOC_FILTERS:` keywords. Cascading `pandoc.filters` from an ancestor [[yaml-config|`index.yaml`]] is still tracked under [#263](https://github.com/srid/emanote/issues/263).
+> - Filter declarations are note-local: [[yaml-config|Markdown frontmatter]] or [[orgmode|Org]] `#+PANDOC_FILTERS*:` keywords. Cascading `pandoc.filters` from an ancestor [[yaml-config|`index.yaml`]] is still tracked under [#263](https://github.com/srid/emanote/issues/263).
 > - Parse-time filters run with `FORMAT == "markdown"`. Writer-specific [[html-template|HTML]] filters should use `pandoc.filters.render.html`, which runs with `FORMAT == "html"` and receives the note's effective [[yaml-config|metadata]] in `doc.meta`.
 > - Filters that need filesystem, process, media, module-loading, or dynamic-code IO belong under `pandoc.filters.render.html`, not `pandoc.filters.parse`.
 

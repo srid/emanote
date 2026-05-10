@@ -10,5 +10,8 @@ function Str(el)
   if el.text == "EMANOTE_RENDER_FILTER_TOKEN" then
     return pandoc.Str("RENDER_FILTER:HTML")
   end
+  if el.text == "EMANOTEORGRENDERFILTERTOKEN" then
+    return pandoc.Str("RENDER_FILTER:ORG-HTML")
+  end
   return nil
 end

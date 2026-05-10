@@ -1,14 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 
-{- | Reverse index from external source files to the notes whose parsed
- or rendered output depends on them.
+{- | Reverse index from external source files to the notes whose parsed or
+ rendered output depends on them.
 
- Today only @.lua@ filter files are tracked, and they are tracked by
- phase: parse-time filters live in their own edge map separate from
- render-time HTML filters. The two phases do not fail in the same
- way (a render-only filter change does not require re-parsing source)
- so the data shape preserves the option for a phase-specific refresh
- path even though the patcher today re-parses on either kind.
+ Today only @.lua@ filter files are tracked. The patcher re-parses a note when
+ any referenced filter changes, so this index records one relation from filter
+ path to dependent note. Filter phase remains in 'PandocFilterDeclarations',
+ where parse and render application actually diverge.
 
  Edges are keyed by the path as written in the note-local Lua filter
  declaration — *not* by the resolved absolute path — so a filter
@@ -37,56 +35,41 @@ module Emanote.Model.SourceDependencies (
 ) where
 
 import Data.Map.Strict qualified as Map
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc)
 import Relude
 
 type LuaDepEdges = Map FilePath (Map R.LMLRoute (Loc, FilePath))
 
-data SourceDependencies = SourceDependencies
-  { sdParseLuaDeps :: LuaDepEdges
-  -- ^ Filter paths declared under @pandoc.filters.parse@ (Markdown
-  -- frontmatter) or @#+PANDOC_FILTERS:@ (Org). Editing one of these
-  -- files invalidates the dependent note's *parse* output.
-  , sdRenderLuaDeps :: LuaDepEdges
-  -- ^ Filter paths declared under @pandoc.filters.render.html@. Editing
-  -- one of these invalidates only the dependent note's *render* output;
-  -- the parsed AST stays valid.
+newtype SourceDependencies = SourceDependencies
+  { sdLuaDeps :: LuaDepEdges
   }
   deriving stock (Eq, Show, Generic)
 
 emptyDependencies :: SourceDependencies
-emptyDependencies = SourceDependencies mempty mempty
+emptyDependencies = SourceDependencies mempty
 
-{- | Notes that reference the given filter path through *any* phase. The
-lookup key is the requested form — not a resolved absolute path.
-
-The patcher today re-parses on either kind, so the union is what it
-needs. A future render-only refresh path can switch to reading
-'sdRenderLuaDeps' directly.
--}
+-- | Notes that reference the given filter path through any phase.
 dependentsOnLua :: FilePath -> SourceDependencies -> Map R.LMLRoute (Loc, FilePath)
 dependentsOnLua fp SourceDependencies {..} =
-  Map.union
-    (maybeToMonoid $ Map.lookup fp sdParseLuaDeps)
-    (maybeToMonoid $ Map.lookup fp sdRenderLuaDeps)
+  maybeToMonoid $ Map.lookup fp sdLuaDeps
 
-{- | Replace the set of edges originating at @note@ with @parsePaths@ and
-@renderPaths@, removing any stale edges from a previous parse of the
-same note. The note's source @(Loc, FilePath)@ is recorded on every
-new edge.
+{- | Replace the set of edges originating at @note@ with its declared Lua filter
+paths, removing any stale edges from a previous parse of the same note. The
+note's source @(Loc, FilePath)@ is recorded on every new edge.
 -}
-setLuaDeps :: R.LMLRoute -> (Loc, FilePath) -> [FilePath] -> [FilePath] -> SourceDependencies -> SourceDependencies
-setLuaDeps note src parsePaths renderPaths (removeNote note -> SourceDependencies parseMap renderMap) =
-  SourceDependencies (foldl' addEdge parseMap parsePaths) (foldl' addEdge renderMap renderPaths)
+setLuaDeps :: R.LMLRoute -> (Loc, FilePath) -> NoteFilter.PandocFilterDeclarations -> SourceDependencies -> SourceDependencies
+setLuaDeps note src declarations (removeNote note -> SourceDependencies luaMap) =
+  SourceDependencies $ foldl' addEdge luaMap $ NoteFilter.pandocFilterDependencyPaths declarations
   where
     addEdge :: LuaDepEdges -> FilePath -> LuaDepEdges
     addEdge m fp = Map.insertWith Map.union fp (one (note, src)) m
 
--- | Drop every edge that points to @note@ in either phase.
+-- | Drop every edge that points to @note@.
 removeNote :: R.LMLRoute -> SourceDependencies -> SourceDependencies
-removeNote note (SourceDependencies parseMap renderMap) =
-  SourceDependencies (shrinkAll parseMap) (shrinkAll renderMap)
+removeNote note (SourceDependencies luaMap) =
+  SourceDependencies $ shrinkAll luaMap
   where
     shrinkAll = Map.mapMaybe shrink
     shrink inner =
