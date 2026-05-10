@@ -39,7 +39,7 @@ resolvePandocFilterPaths ::
 resolvePandocFilterPaths pluginBaseDir requestedFilters =
   fmap catMaybes $ forM requestedFilters $ \p -> do
     res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
-      doesPathExist (baseDir </> p) >>= \case
+      liftIO (doesPathExist $ baseDir </> p) >>= \case
         False -> do
           pure Nothing
         True ->
