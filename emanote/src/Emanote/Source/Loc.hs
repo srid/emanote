@@ -16,7 +16,6 @@ module Emanote.Source.Loc (
 
   -- * Dealing with layers of locs
   userLayersToSearch,
-  luaFilterSearchPaths,
 ) where
 
 import Data.Set qualified as Set
@@ -48,11 +47,6 @@ userLayersToSearch =
         LocDefault _ -> Nothing
     )
     . Set.toAscList
-
--- | Search roots for Pandoc Lua filters, including the default layer.
-luaFilterSearchPaths :: Set Loc -> [FilePath]
-luaFilterSearchPaths layers =
-  fst . locPath <$> Set.toAscList layers
 
 defaultLayer :: FilePath -> Loc
 defaultLayer = LocDefault

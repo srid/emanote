@@ -10,6 +10,7 @@ import Data.ByteString qualified as BS
 import Data.List qualified as List
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
@@ -25,7 +26,7 @@ import Emanote.Prelude (
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locMountPoint, locResolve, luaFilterSearchPaths)
+import Emanote.Source.Loc (Loc, locMountPoint, locPath, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
@@ -218,7 +219,7 @@ parseAndInsert ::
 parseAndInsert layers noteF scriptingEngine refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
-    N.parseNote scriptingEngine (luaFilterSearchPaths layers) r src (decodeUtf8 s)
+    N.parseNote scriptingEngine (fst . locPath <$> Set.toAscList layers) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)
