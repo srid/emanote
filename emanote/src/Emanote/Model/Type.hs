@@ -10,6 +10,7 @@ import Data.Default (Default (def))
 import Data.IxSet.Typed ((@=))
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
 import Data.Time (UTCTime)
 import Data.Tree (Forest)
 import Data.UUID (UUID)
@@ -38,7 +39,7 @@ import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
 import Emanote.Route (FileType (AnyExt), LMLRoute, R)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute.Type (SiteRoute)
-import Emanote.Source.Loc (Loc)
+import Emanote.Source.Loc (Loc, locPath)
 import Heist.Extra.TemplateState (TemplateState)
 import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
@@ -108,6 +109,14 @@ withRoutePrism :: Prism' FilePath SiteRoute -> ModelEma -> Model
 withRoutePrism enc Model {..} =
   let _modelRoutePrism = Identity enc
    in Model {..}
+
+{- | Layer base directories for resolving plugin-relative file references
+  (Pandoc Lua filters today). Sorted ascending by 'Loc' so a layer's
+  precedence in resolution matches its precedence in the union mount.
+-}
+modelPluginBaseDir :: ModelT f -> [FilePath]
+modelPluginBaseDir m =
+  fst . locPath <$> Set.toAscList (m ^. modelLayers)
 
 emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> UUID -> Stork.IndexVar -> ModelEma
 emptyModel layers act ren scriptingEngine ctw instanceId storkVar =

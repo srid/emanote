@@ -256,7 +256,7 @@ parseAndInsert ::
 parseAndInsert layers noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
-    N.parseNote (model ^. M.modelScriptingEngine) (fst . locPath <$> Set.toAscList layers) r src (decodeUtf8 s)
+    N.parseNote (model ^. M.modelScriptingEngine) (M.modelPluginBaseDir model) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)
