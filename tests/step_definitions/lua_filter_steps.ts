@@ -8,11 +8,9 @@
  * future dep-kind feature (YAML cascade, transclude, etc.).
  */
 
-import { Then, When } from "@cucumber/cucumber";
-import * as assert from "node:assert";
+import { When } from "@cucumber/cucumber";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { EmanoteWorld } from "../support/world.ts";
 import { stagedFixtureDir } from "../support/fixture.ts";
 
 /** Build a Pandoc Lua filter that rewrites a single token. The shape
@@ -56,16 +54,5 @@ pandoc:
 A token a not-yet-existing filter will rewrite: ${token}
 `;
     fs.writeFileSync(path.join(stagedFixtureDir, mdPath), md);
-  },
-);
-
-Then(
-  "the page contains a table with class {string}",
-  async function (this: EmanoteWorld, cls: string) {
-    const count = await this.page.locator(`table[class~="${cls}"]`).count();
-    assert.ok(
-      count > 0,
-      `Expected a table carrying class ${JSON.stringify(cls)}; got ${count}. The Lua filter may not have transformed the source div into a table.`,
-    );
   },
 );

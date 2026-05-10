@@ -17,7 +17,7 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
 
   Scenario: A note can use a bundled default-layer Lua filter
     When I open "/lua-filter-bundled.html"
-    Then the page contains a table with class "bundled-list-table"
+    Then the page contains a table element with class "bundled-list-table"
 
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent notes (#263)

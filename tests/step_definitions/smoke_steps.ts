@@ -41,6 +41,17 @@ Then(
   },
 );
 
+Then(
+  "the page contains a {word} element with class {string}",
+  async function (this: EmanoteWorld, tag: string, cls: string) {
+    const count = await this.page.locator(`${tag}[class~="${cls}"]`).count();
+    assert.ok(
+      count > 0,
+      `Expected a ${tag} element carrying class ${JSON.stringify(cls)}; got ${count}.`,
+    );
+  },
+);
+
 // #433: orphan opener/closer raw-HTML tags around markdown content used to
 // produce two stranded `<rawhtml>` wrappers immediately adjacent to the
 // `<details>` opener and closer. Browsers' lenient HTML5 parser recovers
