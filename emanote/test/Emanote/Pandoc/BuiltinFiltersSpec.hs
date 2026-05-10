@@ -5,17 +5,16 @@ import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
 import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Relude
-import System.Directory (doesFileExist)
 import Test.Hspec
 import Text.Pandoc.Definition (Inline (Link), Pandoc)
 import Text.Pandoc.Walk qualified as W
 
 spec :: Spec
 spec = do
-  describe "docs regression coverage" $ do
-    it "keeps the Lua filters phase-table wikilink inside its table cell" $ do
-      source <- readFirstExisting ["docs/guide/lua-filters.md", "../docs/guide/lua-filters.md"]
-      links source `shouldSatisfy` elem ("html-template", "HTML-specific")
+  describe "wikilinks inside pipe tables" $ do
+    it "keeps an escaped custom-title separator inside the wikilink"
+      $ links "| Phase | Best for |\n| --- | --- |\n| Render time | [[html-template\\|HTML-specific]] output |\n"
+      `shouldSatisfy` elem ("html-template", "HTML-specific")
 
   -- Regression test for https://github.com/srid/emanote/issues/349.
   -- `preparePandoc`'s last pass (`flattenNestedLinks`) unwraps any Link
@@ -73,10 +72,3 @@ tags :: Text -> [Text]
 tags =
   either error (fmap (\(HT.Tag tag) -> tag) . HT.inlineTagsInPandoc . preparePandoc . snd)
     . parseMarkdown "<test>"
-
-readFirstExisting :: [FilePath] -> IO Text
-readFirstExisting = \case
-  [] -> error "Could not find docs/guide/lua-filters.md from test working directory"
-  fp : rest -> do
-    exists <- doesFileExist fp
-    if exists then decodeUtf8 <$> readFileBS fp else readFirstExisting rest
