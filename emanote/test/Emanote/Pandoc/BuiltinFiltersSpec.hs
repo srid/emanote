@@ -3,6 +3,7 @@ module Emanote.Pandoc.BuiltinFiltersSpec where
 import Commonmark.Extensions.WikiLink (plainify)
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
 import Emanote.Pandoc.Markdown.Parser (parseMarkdown)
+import Emanote.Pandoc.Markdown.Syntax.HashTag qualified as HT
 import Relude
 import Test.Hspec
 import Text.Pandoc.Definition (Inline (Link), Pandoc)
@@ -44,6 +45,15 @@ spec = do
     it "tag with non-ASCII characters"
       $ links "tagged #§1"
       `shouldBe` [("-/tags/%C2%A71.html", "#§1")]
+    it "does not treat GitHub issue references as inline tags"
+      $ links "mentions #221, (#228), and #263)"
+      `shouldBe` []
+    it "does not extract GitHub issue references as body tags"
+      $ tags "mentions #221, (#228), and [#263](https://github.com/srid/emanote/issues/263)"
+      `shouldBe` []
+    it "still extracts tags that contain digits"
+      $ tags "tagged #foo #foo/bar #tag221 ###structure #§1"
+      `shouldBe` ["foo", "foo/bar", "tag221", "##structure", "§1"]
 
 links :: Text -> [(Text, Text)]
 links = either error (collect . preparePandoc . snd) . parseMarkdown "<test>"
@@ -52,3 +62,8 @@ links = either error (collect . preparePandoc . snd) . parseMarkdown "<test>"
     collect = W.query $ \case
       Link _ inlines (url, _) -> [(url, plainify inlines)]
       _ -> []
+
+tags :: Text -> [Text]
+tags =
+  either error (fmap (\(HT.Tag tag) -> tag) . HT.inlineTagsInPandoc . preparePandoc . snd)
+    . parseMarkdown "<test>"

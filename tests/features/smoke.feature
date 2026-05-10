@@ -206,6 +206,16 @@ Feature: Smoke
     Then the article tag link with text "###structure" has href containing "-/tags/%23%23structure.html"
     And the metadata tag chip with text "###structure" has href containing "-/tags/%23%23structure.html"
 
+  Scenario: Numeric GitHub issue references do not appear as tags
+    When I open "/numeric-issue-tags.html"
+    Then the article tag link with text "#real-tag" has href containing "-/tags/real-tag.html"
+    When I fetch "/-/tags.html"
+    Then the response body contains "-/tags/real-tag.html"
+    And the response body does not contain "-/tags/221"
+    And the response body does not contain "-/tags/228"
+    And the response body does not contain "-/tags/263"
+    And the response body does not contain "-/tags/712"
+
   Scenario: Tag declared in sibling folder YAML appears as a metadata chip on the child note (regression: #352)
     When I open "/issue-352/note.html"
     Then the metadata tag chip with text "issue-352-cascaded" has href containing "-/tags/issue-352-cascaded.html"
