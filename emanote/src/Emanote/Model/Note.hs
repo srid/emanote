@@ -18,7 +18,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Time.Calendar (toGregorian)
 import Emanote.Model.Calendar.Parser qualified as Calendar
-import Emanote.Model.Note.Filter (applyPandocFilters)
+import Emanote.Model.Note.Filter (applyDeclaredPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
@@ -34,7 +34,7 @@ import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
 import Relude
-import System.FilePath (takeDirectory, takeFileName, (</>))
+import System.FilePath (takeDirectory, takeFileName)
 import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
@@ -44,7 +44,6 @@ import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
 import Text.Parsec qualified as P
 import Text.Printf (printf)
-import UnliftIO.Directory (doesPathExist)
 
 data Feed = Feed
   { _feedEnable :: Bool
@@ -372,9 +371,9 @@ errorDiv header errs =
 
 {- | Result of parsing a single note's source: the parsed 'Note' plus
 side-channel information the patcher needs to keep its indices in
-sync. @luaFilterDeps@ carries filter paths *as written* in
-@pandoc.filters@ frontmatter, regardless of whether each resolved on
-disk at parse time — see "Emanote.Model.SourceDependencies".
+sync. @luaFilterDeps@ carries filter paths *as written* in the
+note-local Lua filter declaration, regardless of whether each resolved
+on disk at parse time — see "Emanote.Model.SourceDependencies".
 -}
 data ParseResult = ParseResult
   { parsedNote :: Note
@@ -424,9 +423,8 @@ parseNoteOrg ::
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
   let requestedFilters = odPandocFilters $ parseOrgDirectives s
-  resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
-  doc <- applyPandocFilters scriptingEngine resolvedFilters doc'
-  pure (doc, meta, requestedFilters)
+  (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters doc'
+  pure (doc, meta, filterDeps)
 
 parseNoteOrgDocument :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrgDocument s =
@@ -488,38 +486,13 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
       let requestedFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
-
-      doc <- applyPandocFilters scriptingEngine resolvedFilters $ preparePandoc doc'
+      (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
-      -- Return the *requested* filter paths (as written in frontmatter),
-      -- not the resolved absolute ones. The dep index keys edges by
-      -- requested form so a missing-at-parse-time filter still gets an
-      -- edge — re-parsing fires when that file is later created.
-      pure (doc, meta, requestedFilters)
+      pure (doc, meta, filterDeps)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv
         `SData.mergeAeson` default_
-
-resolvePandocFilterPaths ::
-  (MonadIO m, MonadWriter [Text] m) =>
-  [FilePath] ->
-  [FilePath] ->
-  m [FilePath]
-resolvePandocFilterPaths pluginBaseDir requestedFilters =
-  fmap catMaybes $ forM requestedFilters $ \p -> do
-    res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
-      doesPathExist (baseDir </> p) >>= \case
-        False -> do
-          pure Nothing
-        True ->
-          pure $ Just $ baseDir </> p
-    case res of
-      [] -> do
-        tell [toText $ "Pandoc filter " <> p <> " not found in any of: " <> show pluginBaseDir]
-        pure Nothing
-      (x : _) -> pure $ Just x
 
 defaultFrontMatter :: Aeson.Value
 defaultFrontMatter =
