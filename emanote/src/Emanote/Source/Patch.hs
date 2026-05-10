@@ -101,7 +101,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
               pure $ M.modelDeleteNote r
     R.LuaFilter -> do
       -- An edit (or deletion) of a Pandoc Lua filter file invalidates
-      -- every note that referenced it at parse time. The dep index
+      -- every note that declared it. The dep index
       -- carries each dependent's @(Loc, FilePath)@ on the edge value,
       -- so the refresh is a fold over 'parseAndInsert' — no model
       -- lookup, no @noteSource@ recovery, no @lookupNotesByRoute@.

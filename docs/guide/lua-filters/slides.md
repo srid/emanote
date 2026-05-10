@@ -3,7 +3,9 @@ slug: lua-filters/slides
 short-title: Slides demo
 pandoc:
   filters:
-    - filters/slides.lua
+    render:
+      html:
+        - filters/slides.lua
 ---
 
 # A Markdown Presentation about Lua Filters
@@ -26,22 +28,24 @@ Anything you can say about a node in Lua, you can transform.
 ```yaml
 pandoc:
   filters:
-    - filters/slides.lua
+    render:
+      html:
+        - filters/slides.lua
 ```
 
 3. Save. Emanote resolves the path against every `-L`'d layer.
 
 ## What this page does
 
-This page declares `pandoc.filters: [filters/slides.lua]`. Each `## ` heading inside a `::: slides` div becomes one slide; the filter wraps them in `<section>` elements, prepends a nav strip, and emits CSS + a tiny arrow-key handler.
+This page declares `pandoc.filters.render.html: [filters/slides.lua]`. Each `## ` heading inside a `::: slides` div becomes one slide; the filter wraps them in `<section>` elements, prepends a nav strip, and emits CSS + a tiny arrow-key handler.
 
 _See the source: [`docs/filters/slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua)._
 
 ## Hot-reload
 
-Edit `filters/slides.lua` — change a colour, tweak the layout, add a feature — and **every note that references it re-parses on the next save**. No `touch` of the `.md` required, no live-server restart.
+Edit `filters/slides.lua` — change a colour, tweak the layout, add a feature — and **every note that references it refreshes on the next save**. No `touch` of the `.md` required, no live-server restart.
 
-The reverse index from filter path → dependent notes is maintained inside Emanote's model; an edit fires exactly the affected re-parses.
+The reverse index from filter path → dependent notes is maintained inside Emanote's model; an edit invalidates exactly the affected notes, and the render-time filter runs again with `FORMAT == "html"`.
 
 ## A second example: word count
 
@@ -50,17 +54,18 @@ Pure-Lua filters compose cleanly. The [[lua-filters|main guide page]] chains `li
 ```yaml
 pandoc:
   filters:
-    - lua-filters/list-table.lua
-    - lua-filters/wordcount.lua
+    parse:
+      - lua-filters/list-table.lua
+      - lua-filters/wordcount.lua
 ```
 
 Both are bundled in Emanote's default layer and run on every save; the order matches the array.
 
-## Caveat: pandoc's writer-specific filters
+## Writer-specific filters
 
-Many Pandoc Lua filters branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Emanote calls `applyFilters` with `FORMAT == "markdown"`, so a writer-specific branch may not fire as expected.
+Many Pandoc Lua filters branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Put Markdown-agnostic AST rewrites under `pandoc.filters.parse`, and put HTML-specific filters under `pandoc.filters.render.html`.
 
-Filters that work cleanly here are **FORMAT-agnostic** — they operate at the AST level regardless of output format. `list-table`, `wordcount`, and this very `slides.lua` are all in that camp.
+This deck uses the render-time slot because `slides.lua` emits raw HTML, CSS, and JavaScript.
 
 ## Where to find more
 
@@ -73,4 +78,4 @@ The pattern is always the same: drop the `.lua` in, name it in frontmatter, save
 
 :::
 
-This deck is rendered by `slides.lua`. If you view source, you'll see _it_ is plain Markdown inside one fenced div — the filter does all the structural work at parse time.
+This deck is rendered by `slides.lua`. If you view source, you'll see _it_ is plain Markdown inside one fenced div — the filter does the HTML-specific structural work at render time.

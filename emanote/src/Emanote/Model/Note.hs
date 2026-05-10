@@ -18,7 +18,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Time.Calendar (toGregorian)
 import Emanote.Model.Calendar.Parser qualified as Calendar
-import Emanote.Model.Note.Filter (applyDeclaredPandocFilters)
+import Emanote.Model.Note.Filter (applyDeclaredPandocFilters, checkDeclaredPandocFilters)
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
@@ -372,8 +372,8 @@ errorDiv header errs =
 {- | Result of parsing a single note's source: the parsed 'Note' plus
 side-channel information the patcher needs to keep its indices in
 sync. @luaFilterDeps@ carries filter paths *as written* in the
-note-local Lua filter declaration, regardless of whether each resolved
-on disk at parse time — see "Emanote.Model.SourceDependencies".
+note-local Lua filter declarations, regardless of whether each resolved
+on disk while parsing — see "Emanote.Model.SourceDependencies".
 -}
 data ParseResult = ParseResult
   { parsedNote :: Note
@@ -481,14 +481,12 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
       tell [err]
       pure (mempty, defaultFrontMatter, [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
-      -- Apply the various transformation filters.
-      --
-      -- Some are user-defined; some builtin. They operate on Pandoc, or the
-      -- frontmatter meta.
-      let requestedFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters $ preparePandoc doc'
+      let parseFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "parse"]) frontmatter
+          renderFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) frontmatter
+      (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir parseFilters $ preparePandoc doc'
+      renderFilterDeps <- checkDeclaredPandocFilters pluginBaseDir renderFilters
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta, filterDeps)
+      pure (doc, meta, ordNub $ filterDeps <> renderFilterDeps)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv

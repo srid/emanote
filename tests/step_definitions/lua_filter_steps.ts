@@ -46,7 +46,8 @@ When(
     const md = `---
 pandoc:
   filters:
-    - ${filterPath}
+    parse:
+      - ${filterPath}
 ---
 
 # Late-Bound Filter Test

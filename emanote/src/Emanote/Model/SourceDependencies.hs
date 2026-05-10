@@ -1,5 +1,5 @@
 {- | Reverse index from external source files to the notes whose parsed
- AST depends on them.
+ or rendered output depends on them.
 
  Today only @.lua@ filter files are tracked. Edges are keyed by the
  path as written in the note-local Lua filter declaration — *not* by
@@ -15,8 +15,8 @@
  (no @lookupNotesByRoute@ → @noteSource@ recovery dance).
 
  A future second edge kind (e.g. cascaded @index.yaml@ files
- affecting a note's effective filter list) cannot be added as a
- sibling field without also extending the mutation API:
+affecting a note's effective filter list) cannot be added as a
+sibling field without also extending the mutation API:
  'removeNote' currently iterates 'sdLuaDeps' alone, so a new field
  would silently leak edges for deleted notes. See [#721].
 -}

@@ -1,6 +1,9 @@
 module Emanote.View.Template (emanoteSiteOutput, render) where
 
-import Control.Monad.Logger (MonadLoggerIO)
+import Control.Exception (throwIO)
+import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
+import Control.Monad.Writer.Strict (runWriterT)
+import Data.Aeson.KeyMap qualified as KeyMap
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
@@ -16,6 +19,7 @@ import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
@@ -23,6 +27,7 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (indexRoute)
+import Emanote.Source.Loc qualified as Loc
 import Emanote.View.Common qualified as C
 import Emanote.View.Export (renderExport)
 import Emanote.View.Feed (feedDiscoveryLink, renderFeed)
@@ -38,9 +43,10 @@ import Heist.Splices qualified as Heist
 import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
+import System.IO.Error (userError)
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
-import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Definition (Meta (..), MetaValue (..), Pandoc (..))
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -77,7 +83,7 @@ render m = \case
             & setErrorPageMeta meta
             & MN.noteTitle
             .~ fromString (toString $ C.i18nText meta "missingLink" "! Missing link")
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note404
   SR.SiteRoute_AmbiguousR urlPath notes -> do
     let (_, meta) = C.defaultRouteMeta m
         noteAmb =
@@ -85,28 +91,28 @@ render m = \case
             & setErrorPageMeta meta
             & MN.noteTitle
             .~ fromString (toString $ C.i18nText meta "ambiguousLink" "! Ambiguous link")
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-  SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m noteAmb
+  SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
   SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
   where
     setErrorPageMeta meta =
       MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle (C.i18nText meta "emanoteError" "Emanote Error")])
 
-renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
+renderResourceRoute :: (MonadIO m, MonadLogger m) => Model -> SR.ResourceRoute -> m (Ema.Asset LByteString)
 renderResourceRoute m = \case
   SR.ResourceRoute_LML view r -> do
     case M.modelLookupNoteByRoute (view, r) m of
       Just (R.LMLView_Html, note) ->
-        Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
+        Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note
       Just (R.LMLView_Atom, note) ->
         case renderFeed m note of
           Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
-          Right feed -> Ema.AssetGenerated Ema.Other feed
+          Right feed -> pure $ Ema.AssetGenerated Ema.Other feed
       Nothing ->
         -- This should never be reached because decodeRoute looks up the model.
         error $ "Bad route: " <> show r
   SR.ResourceRoute_StaticFile _ fpAbs ->
-    Ema.AssetStatic fpAbs
+    pure $ Ema.AssetStatic fpAbs
 
 renderVirtualRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.VirtualRoute -> m (Ema.Asset LByteString)
 renderVirtualRoute m = \case
@@ -150,12 +156,13 @@ patchMeta meta =
   where
     siteUrl = SData.lookupAeson @Text "" ("page" :| ["siteUrl"]) meta
 
-renderLmlHtml :: Model -> MN.Note -> LByteString
+renderLmlHtml :: (MonadIO m, MonadLogger m) => Model -> MN.Note -> m LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
-      toc = newToc doc
+      baseDoc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      renderFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) (note ^. MN.noteMeta)
+      pluginBaseDir = fst . Loc.locPath <$> Set.toAscList (model ^. M.modelLayers)
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
@@ -165,7 +172,18 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
+  ((filteredDoc, _), renderFilterErrors) <-
+    runWriterT
+      $ NoteFilter.applyDeclaredPandocFiltersForFormat
+        (model ^. M.modelScriptingEngine)
+        pluginBaseDir
+        "html"
+        renderFilters
+        (withPandocMeta meta baseDoc)
+  let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
+      toc = newToc doc
+  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
+  pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
@@ -223,6 +241,48 @@ renderLmlHtml model note = do
       C.withBlockCtx ctx
         $ \ctx' ->
           renderToc ctx' toc
+
+withPandocMeta :: Aeson.Value -> Pandoc -> Pandoc
+withPandocMeta meta (Pandoc _ blocks) =
+  Pandoc (aesonToPandocMeta meta) blocks
+
+aesonToPandocMeta :: Aeson.Value -> Meta
+aesonToPandocMeta = \case
+  Aeson.Object o -> Meta $ Map.mapMaybe aesonToPandocMetaValue $ KeyMap.toMapText o
+  _ -> mempty
+
+aesonToPandocMetaValue :: Aeson.Value -> Maybe MetaValue
+aesonToPandocMetaValue = \case
+  Aeson.Object o ->
+    Just . MetaMap . Map.mapMaybe aesonToPandocMetaValue $ KeyMap.toMapText o
+  Aeson.Array xs ->
+    Just . MetaList $ mapMaybe aesonToPandocMetaValue (toList xs)
+  Aeson.String s ->
+    Just $ MetaString s
+  Aeson.Number n ->
+    Just . MetaString $ show n
+  Aeson.Bool b ->
+    Just $ MetaBool b
+  Aeson.Null ->
+    Nothing
+
+failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
+failOnStaticRenderFilterErrors _ _ [] = pass
+failOnStaticRenderFilterErrors True _ _ = pass
+failOnStaticRenderFilterErrors False r errs =
+  liftIO
+    . throwIO
+    . userError
+    $ toString
+    $ "Pandoc Lua filter error for "
+    <> show r
+    <> ": "
+    <> T.intercalate "; " errs
+
+prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
+prependRenderFilterErrors [] doc = doc
+prependRenderFilterErrors errs (Pandoc meta blocks) =
+  Pandoc meta $ MN.errorDiv "Pandoc Lua filter error" errs : blocks
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =

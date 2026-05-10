@@ -1,7 +1,8 @@
 Feature: Pandoc Lua filter hot-reload (issue #263)
-  A note's Lua filter declaration resolves at parse time.
-  Markdown notes use `pandoc.filters` frontmatter; Org notes use
-  `#+PANDOC_FILTERS` keywords.
+  A note's Lua filter declaration resolves from YAML frontmatter.
+  Markdown notes use `pandoc.filters.parse` for parse-time filters and
+  `pandoc.filters.render.html` for HTML render-time filters. Org notes
+  use `#+PANDOC_FILTERS` keywords.
   When a referenced `.lua` file is created, edited, or deleted,
   every dependent note's rendered HTML reflects the new filter
   behavior — without restarting `emanote run`.
@@ -12,10 +13,15 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   it self-heal), so the missing-at-parse-time case is exercised
   only in live mode below.
 
-  Scenario: A note's pandoc.filters is applied at build time
+  Scenario: A note's pandoc.filters.parse is applied at build time
     When I open "/lua-filter-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
     And the article body does not contain "EMANOTE_LUA_DEMO_TOKEN"
+
+  Scenario: A note's pandoc.filters.render.html is applied at render time
+    When I open "/lua-filter-render-demo.html"
+    Then the article body contains "RENDER_FILTER:HTML"
+    And the article body does not contain "EMANOTE_RENDER_FILTER_TOKEN"
 
   Scenario: A note can use a bundled default-layer Lua filter
     When I open "/lua-filter-bundled.html"
@@ -38,6 +44,13 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:HELLO"
     When I write "filters/demo-filter.lua" so EMANOTE_LUA_DEMO_TOKEN maps to "DEMO_FILTER:CHANGED"
     Then the article body contains "DEMO_FILTER:CHANGED" within 10 seconds
+
+  @live @hot-reload
+  Scenario: Editing a render-time .lua filter live-updates dependent notes (#721)
+    When I open "/lua-filter-render-demo.html"
+    Then the article body contains "RENDER_FILTER:HTML"
+    When I write "filters/render-format.lua" so EMANOTE_RENDER_FILTER_TOKEN maps to "RENDER_FILTER:CHANGED"
+    Then the article body contains "RENDER_FILTER:CHANGED" within 10 seconds
 
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent Org notes (#721)

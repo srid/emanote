@@ -1,4 +1,8 @@
-module Emanote.Model.Note.Filter (applyDeclaredPandocFilters) where
+module Emanote.Model.Note.Filter (
+  applyDeclaredPandocFilters,
+  applyDeclaredPandocFiltersForFormat,
+  checkDeclaredPandocFilters,
+) where
 
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer.Strict (MonadWriter (tell))
@@ -26,10 +30,33 @@ applyDeclaredPandocFilters ::
   [FilePath] ->
   Pandoc ->
   m (Pandoc, [FilePath])
-applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters doc = do
+applyDeclaredPandocFilters scriptingEngine pluginBaseDir =
+  applyDeclaredPandocFiltersForFormat scriptingEngine pluginBaseDir "markdown"
+
+applyDeclaredPandocFiltersForFormat ::
+  (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
+  ScriptingEngine ->
+  [FilePath] ->
+  String ->
+  [FilePath] ->
+  Pandoc ->
+  m (Pandoc, [FilePath])
+applyDeclaredPandocFiltersForFormat scriptingEngine pluginBaseDir format requestedFilters doc = do
   resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
-  filteredDoc <- applyPandocFilters scriptingEngine resolvedFilters doc
+  filteredDoc <- applyPandocFilters scriptingEngine format resolvedFilters doc
   pure (filteredDoc, requestedFilters)
+
+checkDeclaredPandocFilters ::
+  (MonadIO m, MonadWriter [Text] m) =>
+  [FilePath] ->
+  [FilePath] ->
+  m [FilePath]
+checkDeclaredPandocFilters pluginBaseDir requestedFilters = do
+  resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
+  res <- traverse mkLuaFilter resolvedFilters
+  forM_ (lefts res) $ \err ->
+    tell [err]
+  pure requestedFilters
 
 resolvePandocFilterPaths ::
   (MonadIO m, MonadWriter [Text] m) =>
@@ -50,8 +77,8 @@ resolvePandocFilterPaths pluginBaseDir requestedFilters =
         pure Nothing
       (x : _) -> pure $ Just x
 
-applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> [FilePath] -> Pandoc -> m Pandoc
-applyPandocFilters scriptingEngine paths doc = do
+applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [FilePath] -> Pandoc -> m Pandoc
+applyPandocFilters scriptingEngine format paths doc = do
   res <- traverse mkLuaFilter paths
   forM_ (lefts res) $ \err ->
     tell [err]
@@ -59,7 +86,7 @@ applyPandocFilters scriptingEngine paths doc = do
     [] ->
       pure doc
     filters ->
-      applyPandocLuaFilters scriptingEngine filters doc >>= \case
+      applyPandocLuaFilters scriptingEngine format filters doc >>= \case
         Left err -> tell [err] >> pure doc
         Right x -> pure x
 
@@ -72,11 +99,11 @@ mkLuaFilter relPath = do
         False -> pure $ Left $ toText $ "Lua filter missing: " <> relPath
     else pure $ Left $ "Unsupported filter: " <> toText relPath
 
-applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
-applyPandocLuaFilters scriptingEngine filters x = do
-  log $ "Applying pandoc filters: " <> show filters
+applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
+applyPandocLuaFilters scriptingEngine format filters x = do
+  log $ "Applying pandoc filters (" <> toText format <> "): " <> show filters
   -- TODO: Can we constrain this to run Lua code purely (embedded) without using IO?
-  liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters ["markdown"] x) >>= \case
+  liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters [format] x) >>= \case
     Left err -> do
       logE $ "Error applying pandoc filters: " <> show err
       pure $ Left (show err)
