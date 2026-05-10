@@ -78,7 +78,7 @@ hashTagSpec =
       -- A tag cannot end with a slash (which is a separator in hierarchical tags)
       guard $ not $ "/" `T.isSuffixOf` tag
       -- Common GitHub issue references like #221 are not semantic tags.
-      guard $ T.any (not . isDigit) tag
+      guard $ not $ T.all isDigit tag
       pure s
       where
         disallowed = [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation
