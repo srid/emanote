@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=ed61fd25-9b18-4b1b-a5a6-f223da8dfa7d' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=0f5d11d6-daf3-45d4-b74b-aa68f8b407bb' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -2601,6 +2601,10 @@
       Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>YAML frontmatter</a>. Hash tags can also be “hierarchical”, for instance: <span class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm emanote:inline-tag:emanote/syntax/demo' title='Tag' data-tag='emanote/syntax/demo'><a href='-/tags/emanote/syntax/demo' title='Tag' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>#emanote/syntax/demo</a></span>
     </p>
   
+    <p class='mb-4 leading-relaxed'>
+      All-numeric issue references such as #221 are left as plain text rather than tags. If a numeric identifier should be a tag, use a hierarchical tag such as <span class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm emanote:inline-tag:issue/221' title='Tag' data-tag='issue/221'><a href='-/tags/issue/221' title='Tag' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>#issue/221</a></span>.
+    </p>
+  
     <h2 id='highlighting' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
   Highlighting
@@ -2857,6 +2861,12 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
       <a title='Tag' class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='-/tags/emanote/syntax/demo'>
         <!-- DoNotFormat -->
         #emanote/syntax/demo
+        <!-- DoNotFormat -->
+      </a>
+    
+      <a title='Tag' class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='-/tags/issue/221'>
+        <!-- DoNotFormat -->
+        #issue/221
         <!-- DoNotFormat -->
       </a>
     
