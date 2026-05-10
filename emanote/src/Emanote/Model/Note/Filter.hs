@@ -292,11 +292,14 @@ parseTimeFilterIOUsesIn ResolvedPandocFilter {..} =
 
 parseTimeFilterIOErrorMsg :: ResolvedPandocFilter -> [Text] -> Text
 parseTimeFilterIOErrorMsg ResolvedPandocFilter {..} uses =
+  -- Phrased without naming a specific destination key — Org notes can't
+  -- declare render-time filters today, so "move to pandoc.filters.render.html"
+  -- would be misleading there.
   "Parse-time Lua filters cannot use IO-capable APIs: "
     <> toText rpfRequestedPath
     <> " references "
     <> T.intercalate ", " uses
-    <> ". Move the filter to pandoc.filters.render.html if it needs IO."
+    <> ". Run IO-capable work from a render-time filter instead (see Lua filters guide)."
 
 parseTimeFilterIOUses :: Text -> [Text]
 parseTimeFilterIOUses =
