@@ -423,7 +423,7 @@ parseNoteOrg ::
   WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
-  let requestedFilters = orgPandocFilters s
+  let requestedFilters = odPandocFilters $ parseOrgDirectives s
   resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
   doc <- applyPandocFilters scriptingEngine resolvedFilters doc'
   pure (doc, meta, requestedFilters)
@@ -441,10 +441,16 @@ parseNoteOrgDocument s =
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]
 
-orgPandocFilters :: Text -> [FilePath]
-orgPandocFilters =
-  fmap toString
-    . mapMaybe orgPandocFilterKeyword
+newtype OrgDirectives = OrgDirectives
+  { odPandocFilters :: [FilePath]
+  }
+  deriving stock (Eq, Show)
+
+parseOrgDirectives :: Text -> OrgDirectives
+parseOrgDirectives =
+  OrgDirectives
+    . fmap toString
+    . mapMaybe orgPandocFilterValue
     . takeWhile orgHeaderLine
     . dropWhile (T.null . T.strip)
     . lines
@@ -452,15 +458,16 @@ orgPandocFilters =
     orgHeaderLine line =
       let stripped = T.strip line
        in T.null stripped || "#+" `T.isPrefixOf` stripped
-    orgPandocFilterKeyword line = do
-      let stripped = T.stripStart line
-          (rawKey, rawValue) = T.breakOn ":" stripped
-          key = T.toCaseFold rawKey
-      guard $ not $ T.null rawValue
+    orgPandocFilterValue line = do
+      (key, value) <- parseOrgKeyword line
       guard $ key `elem` ["#+pandoc_filters", "#+pandoc.filters"]
+      pure value
+    parseOrgKeyword line = do
+      let (rawKey, rawValue) = T.breakOn ":" $ T.stripStart line
+      guard $ not $ T.null rawValue
       let value = T.strip $ T.drop 1 rawValue
       guard $ not $ T.null value
-      pure value
+      pure (T.toCaseFold rawKey, value)
 
 parseNoteMarkdown ::
   (MonadIO m, MonadLogger m) =>
