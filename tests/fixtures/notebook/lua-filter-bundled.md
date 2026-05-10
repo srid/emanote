@@ -6,7 +6,7 @@ pandoc:
 
 # Bundled Lua Filter Demo
 
-:::list-table {.bundled-list-table}
+::: {.list-table .bundled-list-table}
    * - bundled row 1, column 1
      - bundled row 1, column 2
 

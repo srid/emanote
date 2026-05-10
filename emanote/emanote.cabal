@@ -35,7 +35,6 @@ data-files:
   index.yaml
   lua-filters/*.lua
   lua-filters/LICENSE
-  lua-filters/README.md
   templates/**/*.tpl
 
 flag ghcid

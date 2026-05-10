@@ -38,7 +38,7 @@ This docs notebook also includes a local custom filter:
 
 ### `list-table.lua`
 
-:::list-table
+::: {.list-table}
    * - row 1, column 1
      - row 1, column 2
      - row 1, column 3
