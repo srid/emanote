@@ -76,7 +76,7 @@ patchModel' ::
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
 patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
-  case fpType of
+  sourcePatch <- case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
         Nothing ->
@@ -143,11 +143,10 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
             let sData = SD.parseSDataCascading r yamlContents
             whenLeft_ (sData ^. SD.sdataValue) $ \err ->
               logE $ "Bad YAML file: " <> err
-            staticFileAct <- insertStaticFileByPath refreshAction overlays fp
-            pure $ M.modelInsertData sData >>> staticFileAct
+            pure $ M.modelInsertData sData
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
-            pure $ M.modelDeleteData r >>> deleteStaticFileByPath fp
+            pure $ M.modelDeleteData r
     R.HeistTpl ->
       case action of
         UM.Refresh refreshAction overlays -> do
@@ -160,40 +159,50 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
             s <- readRefreshedFile refreshAction fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ M.modelHeistTemplate %~ T.addTemplateFile fpAbs fp s
-          staticFileAct <- insertStaticFileByPath refreshAction overlays fp
-          pure $ readyOnTemplates >>> act >>> staticFileAct
+          pure $ readyOnTemplates >>> act
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
-          pure $ (M.modelHeistTemplate %~ T.removeTemplateFile fp) >>> deleteStaticFileByPath fp
-    R.AnyExt -> do
-      case R.mkRouteFromFilePath fp of
-        Nothing ->
-          pure id
-        Just r -> case action of
-          UM.Refresh refreshAction overlays -> do
-            let fpAbs = locResolve $ head overlays
-            doesDirectoryExist fpAbs >>= \case
-              True ->
-                -- A directory got added; this is not a static 'file'
-                pure id
-              False -> do
-                let logF = case refreshAction of
-                      UM.Existing -> logD . ("Registering" <>)
-                      _ -> log . ("Re-registering" <>)
-                logF $ " file: " <> toText fpAbs <> " " <> show r
-                insertStaticFile refreshAction overlays r
-          UM.Delete -> do
-            pure $ M.modelDeleteStaticFile r
+          pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
+    R.AnyExt ->
+      pure id
+  staticPatch <- patchStaticFileIndex fpType fp action
+  pure $ sourcePatch >>> staticPatch
 
-insertStaticFileByPath ::
+patchStaticFileIndex ::
   (MonadIO m, MonadLogger m) =>
-  UM.RefreshAction ->
-  NonEmpty (Loc, FilePath) ->
+  R.FileType R.SourceExt ->
   FilePath ->
+  UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-insertStaticFileByPath refreshAction overlays fp =
-  maybe (pure id) (insertStaticFile refreshAction overlays)
-    $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
+patchStaticFileIndex fpType fp action
+  | not $ indexesAsStaticFile fpType = pure id
+  | otherwise =
+      maybe (pure id) patch
+        $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
+  where
+    patch r = case action of
+      UM.Refresh refreshAction overlays -> do
+        let fpAbs = locResolve $ head overlays
+        doesDirectoryExist fpAbs >>= \case
+          True ->
+            -- A directory got added; this is not a static 'file'
+            pure id
+          False -> do
+            let logF = case refreshAction of
+                  UM.Existing -> logD . ("Registering" <>)
+                  _ -> log . ("Re-registering" <>)
+            logF $ " file: " <> toText fpAbs <> " " <> show r
+            insertStaticFile refreshAction overlays r
+      UM.Delete ->
+        pure $ M.modelDeleteStaticFile r
+
+indexesAsStaticFile :: R.FileType R.SourceExt -> Bool
+indexesAsStaticFile = \case
+  R.LMLType _ -> False
+  R.LuaFilter -> False
+  R.Yaml -> True
+  R.HeistTpl -> True
+  R.AnyExt -> True
 
 insertStaticFile ::
   (MonadIO m, MonadLogger m) =>
@@ -206,11 +215,6 @@ insertStaticFile refreshAction overlays r = do
   t <- liftIO getCurrentTime
   mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
   pure $ M.modelInsertStaticFile t r fpAbs mInfo
-
-deleteStaticFileByPath :: FilePath -> ModelEma -> ModelEma
-deleteStaticFileByPath fp =
-  maybe id M.modelDeleteStaticFile
-    $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
 
 {- | Frontmatter-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The
