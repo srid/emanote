@@ -41,10 +41,10 @@ const mutatedSubtrees: string[] = [
 /** Files that hot-reload scenarios create from scratch at the
  *  notebook root and that must be removed before the next scenario.
  *  They are absent from the source fixture by design — for example,
- *  `lua-filter-late.md` exercises the missing-at-parse-time case
- *  (issue #263), and a stray copy in the source tree would crash
- *  `emanote gen` (which treats a missing `pandoc.filters` reference
- *  as a fatal note error). */
+ *  `lua-filter-late.md` and `lua-filter-late.org` exercise the
+ *  missing-at-parse-time case (issue #263), and a stray copy in the
+ *  source tree would crash `emanote gen` (which treats a missing Lua
+ *  filter declaration as a fatal note error). */
 const ephemeralFiles: string[] = [
   "lua-filter-late.md",
   "lua-filter-late.org",

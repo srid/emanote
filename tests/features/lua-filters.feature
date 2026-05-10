@@ -1,5 +1,7 @@
 Feature: Pandoc Lua filter hot-reload (issue #263)
-  A note's `pandoc.filters` frontmatter resolves at parse time.
+  A note's Lua filter declaration resolves at parse time.
+  Markdown notes use `pandoc.filters` frontmatter; Org notes use
+  `#+PANDOC_FILTERS` keywords.
   When a referenced `.lua` file is created, edited, or deleted,
   every dependent note's rendered HTML reflects the new filter
   behavior — without restarting `emanote run`.
