@@ -1036,8 +1036,10 @@ This page explicitly sets `page.lang: en` in its [[yaml-config|YAML configuratio
 It demonstrates the default English [[html-template|template]] chrome used by
 Emanote.
 
-For the same note written in French, open [[i18n/i18n.fr|the French child page]].
-For the same note written in Chinese, open [[i18n/i18n.zh|the Chinese child page]].
+Demos in other languages:
+
+- [[i18n/i18n.fr|Français]]
+- [[i18n/i18n.zh|中文]]
 
 ## What changes
 
@@ -1067,7 +1069,7 @@ main = putStrLn "hello"
 
 <!-- Source: guide/i18n/i18n.fr.md -->
 <!-- URL: https://emanote.srid.ca/i18n.fr -->
-<!-- Title: Internationalisation en français -->
+<!-- Title: Français -->
 <!-- Wikilinks: [[guide/i18n/i18n.fr]], [[i18n/i18n.fr]], [[i18n.fr]] -->
 
 ---
@@ -1080,13 +1082,16 @@ page:
     par défaut d'Emanote suit page.lang.
 ---
 
-# Internationalisation en français
+# Français
 
 Cette page définit explicitement `page.lang: fr` dans sa
 [[yaml-config|configuration YAML]]. Elle montre le chrome de
 [[html-template|modèle]] par défaut d'Emanote en français.
 
-Pour la même note en anglais, ouvrez [[guide/i18n|la démonstration anglaise]].
+Autres langues :
+
+- [[guide/i18n|English]]
+- [[i18n/i18n.zh|中文]]
 
 ## Ce qui change
 
@@ -1117,7 +1122,7 @@ main = putStrLn "bonjour"
 
 <!-- Source: guide/i18n/i18n.zh.md -->
 <!-- URL: https://emanote.srid.ca/i18n.zh -->
-<!-- Title: 国际化（中文） -->
+<!-- Title: 中文 -->
 <!-- Wikilinks: [[guide/i18n/i18n.zh]], [[i18n/i18n.zh]], [[i18n.zh]] -->
 
 ---
@@ -1126,20 +1131,23 @@ order: -94
 page:
   lang: zh
   description: |
-    一个简单的中文演示页，展示 Emanote 默认模板界面如何跟随 page.lang 切换语言。
+    一个中文演示页，展示 Emanote 默认模板界面如何随 page.lang 变化。
 ---
 
-# 国际化（中文）
+# 中文
 
-本页在 [[yaml-config|YAML 配置]] 中显式设置了 `page.lang: zh`，展示 Emanote [[html-template|模板]]的默认界面在中文下的效果。
+本页在 [[yaml-config|YAML 配置]] 中显式设置了 `page.lang: zh`，展示 Emanote [[html-template|模板]]默认界面在中文下的样子。
 
-查看英文版请访问 [[guide/i18n|英文演示页]]，法语版请访问 [[i18n/i18n.fr|法语演示页]]。
+其他语言：
+
+- [[guide/i18n|English]]
+- [[i18n/i18n.fr|Français]]
 
 ## 哪些内容会变化
 
-Emanote 通过 `page.lang` 选择默认 HTML 模板所使用的字符串。页脚导航、[[toc|目录]]标题、[[search|搜索]]占位符、复制按钮标签以及内置索引页面均会使用所选语言。
+Emanote 根据 `page.lang` 决定默认 HTML 模板中各处显示的文字，涵盖页脚、[[toc|目录]]标题、[[search|搜索]]框占位符、复制按钮标签以及内置索引页面。
 
-大多数站点只需在根目录的 [[yaml-config|`index.yaml`]] 中设置一次 `page.lang`，按页设置主要用于像这样的演示。
+大多数站点在根目录的 [[yaml-config|`index.yaml`]] 中设置一次 `page.lang` 即可。按页设置语言通常用于像这样的演示文档。
 
 ```yaml
 page:
@@ -1148,7 +1156,7 @@ page:
 
 ## 复制按钮
 
-下方代码块的复制按钮标题应显示为中文。
+下方代码块的复制按钮提示文字应显示为中文。
 
 ```haskell
 main = putStrLn "你好"
