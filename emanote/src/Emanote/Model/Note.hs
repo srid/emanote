@@ -435,8 +435,10 @@ parseNoteOrg ::
   WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath], [FilePath])
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
-  let requestedFilters = odPandocFilters $ parseOrgDirectives s
-      filterDeclarations = mempty {NoteFilter.pfdParseFilters = requestedFilters}
+  let directives = parseOrgDirectives s
+      filterDeclarations = mempty {NoteFilter.pfdParseFilters = odPandocFilters directives}
+  forM_ (odUnsupportedDirectives directives) $ \(key, _) ->
+    tell ["Org keyword " <> key <> " is not supported. Render-time Lua filters can only be declared from Markdown frontmatter (pandoc.filters.render.html); see lua-filters guide."]
   (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations doc'
   pure (doc, meta, filterDeclarations, filterDeps, [])
 
@@ -453,27 +455,36 @@ parseNoteOrgDocument s =
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]
 
-newtype OrgDirectives = OrgDirectives
+data OrgDirectives = OrgDirectives
   { odPandocFilters :: [FilePath]
+  -- ^ Parse-time Pandoc Lua filters declared via @#+PANDOC_FILTERS:@.
+  , odUnsupportedDirectives :: [(Text, Text)]
+  -- ^ Pandoc-filter-shaped keywords Org can't act on yet (render-time
+  -- variants); surfaced so 'parseNoteOrg' can warn the user instead of
+  -- silently dropping the declaration.
   }
   deriving stock (Eq, Show)
 
 parseOrgDirectives :: Text -> OrgDirectives
-parseOrgDirectives =
+parseOrgDirectives s =
   OrgDirectives
-    . fmap toString
-    . mapMaybe orgPandocFilterValue
-    . takeWhile orgHeaderLine
-    . dropWhile (T.null . T.strip)
-    . lines
+    { odPandocFilters = toString . snd <$> parseTimeKws
+    , odUnsupportedDirectives = unsupportedKws
+    }
   where
+    headerKeywords =
+      mapMaybe parseOrgKeyword
+        $ takeWhile orgHeaderLine
+        $ dropWhile (T.null . T.strip)
+        $ lines s
+    parseTimeKws = filter (\(k, _) -> k `elem` parseTimeKeys) headerKeywords
+    unsupportedKws =
+      filter (\(k, _) -> k `notElem` parseTimeKeys && any (`T.isPrefixOf` k) unsupportedKeyPrefixes) headerKeywords
+    parseTimeKeys = ["#+pandoc_filters", "#+pandoc.filters"]
+    unsupportedKeyPrefixes = ["#+pandoc_filters_render", "#+pandoc.filters.render"]
     orgHeaderLine line =
       let stripped = T.strip line
        in T.null stripped || "#+" `T.isPrefixOf` stripped
-    orgPandocFilterValue line = do
-      (key, value) <- parseOrgKeyword line
-      guard $ key `elem` ["#+pandoc_filters", "#+pandoc.filters"]
-      pure value
     parseOrgKeyword line = do
       let (rawKey, rawValue) = T.breakOn ":" $ T.stripStart line
       guard $ not $ T.null rawValue
