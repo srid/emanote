@@ -163,51 +163,43 @@ cleanupGuardedParseFilters =
     -- semantic state to recover and the OS temp cleaner can handle stragglers.
     removeFile path `catchIOError` const pass
 
+{- | Lua chunk prepended to every parse-time filter to enforce the no-IO
+policy at runtime. Generated from the same name lists the static scanner
+uses ('standaloneIOApis', 'pandocIOMembers', 'pandocUtilsIOMembers') so the
+two layers of defence can't drift.
+
+Emitted on a single physical line so a runtime/syntax error in the user's
+filter still reports nearly the right line number (chunk line N + 1 = user
+file line N).
+-}
 parseTimeNoIOPrelude :: Text
 parseTimeNoIOPrelude =
-  unlines
-    [ "local function emanote_no_parse_io(name)"
-    , "  return function() error('Parse-time Lua filters cannot use IO: ' .. name, 2) end"
-    , "end"
-    , "local emanote_outer_env = _ENV"
-    , "local emanote_pandoc = {}"
-    , "if pandoc then"
-    , "  for k, v in pairs(pandoc) do emanote_pandoc[k] = v end"
-    , "end"
-    , "if type(emanote_pandoc.utils) == 'table' then"
-    , "  local emanote_utils = {}"
-    , "  for k, v in pairs(emanote_pandoc.utils) do emanote_utils[k] = v end"
-    , "  emanote_pandoc.utils = emanote_utils"
-    , "end"
-    , "emanote_pandoc.pipe = emanote_no_parse_io('pandoc.pipe')"
-    , "emanote_pandoc.system = false"
-    , "emanote_pandoc.mediabag = false"
-    , "emanote_pandoc.image = false"
-    , "emanote_pandoc.cli = false"
-    , "emanote_pandoc.template = false"
-    , "emanote_pandoc.zip = false"
-    , "emanote_pandoc.log = false"
-    , "if emanote_pandoc.utils then"
-    , "  emanote_pandoc.utils.run_json_filter = emanote_no_parse_io('pandoc.utils.run_json_filter')"
-    , "  emanote_pandoc.utils.run_lua_filter = emanote_no_parse_io('pandoc.utils.run_lua_filter')"
-    , "end"
-    , "local emanote_env = setmetatable({"
-    , "  io = false,"
-    , "  os = false,"
-    , "  package = false,"
-    , "  debug = false,"
-    , "  _G = false,"
-    , "  require = emanote_no_parse_io('require'),"
-    , "  dofile = emanote_no_parse_io('dofile'),"
-    , "  loadfile = emanote_no_parse_io('loadfile'),"
-    , "  load = emanote_no_parse_io('load'),"
-    , "  loadstring = emanote_no_parse_io('loadstring'),"
-    , "  print = emanote_no_parse_io('print'),"
-    , "  warn = emanote_no_parse_io('warn'),"
-    , "  pandoc = emanote_pandoc,"
-    , "}, { __index = emanote_outer_env, __newindex = emanote_outer_env, __metatable = false })"
-    , "_ENV = emanote_env"
-    ]
+  T.intercalate " "
+    $ [ "local function emanote_no_parse_io(name) return function() error('Parse-time Lua filters cannot use IO: ' .. name, 2) end end;"
+      , "local emanote_outer_env = _ENV;"
+      , "local emanote_pandoc = {};"
+      , "if pandoc then for k, v in pairs(pandoc) do emanote_pandoc[k] = v end end;"
+      , "if type(emanote_pandoc.utils) == 'table' then local emanote_utils = {} for k, v in pairs(emanote_pandoc.utils) do emanote_utils[k] = v end emanote_pandoc.utils = emanote_utils end;"
+      ]
+    <> map (banLuaMember "emanote_pandoc" "pandoc") pandocIOMembers
+    <> [ "if emanote_pandoc.utils then "
+          <> T.intercalate " " (map (banLuaMember "emanote_pandoc.utils" "pandoc.utils") pandocUtilsIOMembers)
+          <> " end;"
+       ]
+    <> [ "local emanote_env = setmetatable({"
+          <> T.intercalate ", " (map standaloneEntry standaloneIOApis <> ["pandoc = emanote_pandoc"])
+          <> "}, { __index = emanote_outer_env, __newindex = emanote_outer_env, __metatable = false });"
+       , "_ENV = emanote_env"
+       ]
+  where
+    banLuaMember accessExpr humanName api =
+      let q = ioApiName api
+       in accessExpr <> "." <> q <> " = " <> banExpression (humanName <> "." <> q) (ioApiKind api) <> ";"
+    standaloneEntry api =
+      ioApiName api <> " = " <> banExpression (ioApiName api) (ioApiKind api)
+    banExpression diagName = \case
+      IOCallable -> "emanote_no_parse_io('" <> diagName <> "')"
+      IOTable -> "false"
 
 applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
 applyPandocLuaFilters scriptingEngine format filters x = do
@@ -259,28 +251,75 @@ bannedUses tokens =
     pandocUses = \case
       LuaName "pandoc" : rest
         | Just (member, rest') <- luaMemberAccess rest
-        , member `elem` pandocIOMembers ->
+        , member `elem` ioApiNames pandocIOMembers ->
             ("pandoc." <> member) : pandocUses rest'
         | Just ("utils", rest') <- luaMemberAccess rest
         , Just (member, rest'') <- luaMemberAccess rest'
-        , member `elem` pandocUtilsIOMembers ->
+        , member `elem` ioApiNames pandocUtilsIOMembers ->
             ("pandoc.utils." <> member) : pandocUses rest''
       _ : rest ->
         pandocUses rest
       [] ->
         []
 
+{- | A Lua name the parse-time filter must not touch. The 'IOKind'
+discriminates how the runtime sandbox neuters the name: callables get an
+error-thunk so the call site fails loudly, table-typed names get @false@
+so the user filter chokes on the first index access.
+-}
+data IOApi = IOApi
+  { ioApiName :: Text
+  , ioApiKind :: IOKind
+  }
+  deriving stock (Eq, Show)
+
+data IOKind = IOCallable | IOTable
+  deriving stock (Eq, Show)
+
+ioApiNames :: [IOApi] -> [Text]
+ioApiNames = fmap ioApiName
+
+standaloneIOApis :: [IOApi]
+standaloneIOApis =
+  [ IOApi "io" IOTable
+  , IOApi "os" IOTable
+  , IOApi "package" IOTable
+  , IOApi "debug" IOTable
+  , IOApi "_G" IOTable
+  , -- _ENV is shadowed via setmetatable, not via the entry table itself,
+    -- so it appears only in the static scanner's banned-name list below.
+    IOApi "require" IOCallable
+  , IOApi "dofile" IOCallable
+  , IOApi "loadfile" IOCallable
+  , IOApi "load" IOCallable
+  , IOApi "loadstring" IOCallable
+  , IOApi "print" IOCallable
+  , IOApi "warn" IOCallable
+  ]
+
+{- | Names the static scanner flags as IO references, including @_ENV@
+which the runtime sandbox handles via metatable rather than table entry.
+-}
 standaloneIOGlobals :: [Text]
-standaloneIOGlobals =
-  ["io", "os", "package", "require", "dofile", "loadfile", "load", "loadstring", "debug", "print", "warn", "_G", "_ENV"]
+standaloneIOGlobals = "_ENV" : ioApiNames standaloneIOApis
 
-pandocIOMembers :: [Text]
+pandocIOMembers :: [IOApi]
 pandocIOMembers =
-  ["pipe", "system", "mediabag", "image", "cli", "template", "zip", "log"]
+  [ IOApi "pipe" IOCallable
+  , IOApi "system" IOTable
+  , IOApi "mediabag" IOTable
+  , IOApi "image" IOTable
+  , IOApi "cli" IOTable
+  , IOApi "template" IOTable
+  , IOApi "zip" IOTable
+  , IOApi "log" IOTable
+  ]
 
-pandocUtilsIOMembers :: [Text]
+pandocUtilsIOMembers :: [IOApi]
 pandocUtilsIOMembers =
-  ["run_json_filter", "run_lua_filter"]
+  [ IOApi "run_json_filter" IOCallable
+  , IOApi "run_lua_filter" IOCallable
+  ]
 
 luaMemberAccess :: [LuaToken] -> Maybe (Text, [LuaToken])
 luaMemberAccess = \case
