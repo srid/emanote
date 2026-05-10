@@ -336,12 +336,12 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  mkNoteWith someR Nothing doc meta mempty
+  mkNoteWith someR Nothing doc meta mempty mempty
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [Text] -> Note
-mkNoteWith r src doc' meta errs =
+mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> NoteFilter.PandocFilterDeclarations -> [Text] -> Note
+mkNoteWith r src doc' meta filterDeclarations errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "yaml" "Emanote Errors 😔" errs) doc''
@@ -350,7 +350,7 @@ mkNoteWith r src doc' meta errs =
         , _noteSource = src
         , _noteDoc = doc
         , _noteMeta = meta
-        , _notePandocFilterDeclarations = NoteFilter.PandocFilterDeclarations mempty mempty
+        , _notePandocFilterDeclarations = filterDeclarations
         , _noteTitle = tit
         , _noteErrors = errs
         , _noteFeed = feed
@@ -413,10 +413,7 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
   pure
     ParseResult
-      { parsedNote =
-          (mkNoteWith r (Just src) doc metaWithDateFromPath errs)
-            { _notePandocFilterDeclarations = filterDeclarations
-            }
+      { parsedNote = mkNoteWith r (Just src) doc metaWithDateFromPath filterDeclarations errs
       , luaParseFilterDeps = parseFilters
       , luaRenderFilterDeps = renderFilters
       }
@@ -439,7 +436,7 @@ parseNoteOrg ::
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
   let requestedFilters = odPandocFilters $ parseOrgDirectives s
-      filterDeclarations = NoteFilter.PandocFilterDeclarations requestedFilters mempty
+      filterDeclarations = mempty {NoteFilter.pfdParseFilters = requestedFilters}
   (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations doc'
   pure (doc, meta, filterDeclarations, filterDeps, [])
 
@@ -496,7 +493,7 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter, NoteFilter.PandocFilterDeclarations mempty mempty, [], [])
+      pure (mempty, defaultFrontMatter, mempty, [], [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
       let filterDeclarations = NoteFilter.lookupPandocFilterDeclarations frontmatter
       (doc, parseDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'

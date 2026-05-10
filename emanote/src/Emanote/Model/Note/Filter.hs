@@ -38,6 +38,13 @@ data PandocFilterDeclarations = PandocFilterDeclarations
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)
 
+instance Semigroup PandocFilterDeclarations where
+  PandocFilterDeclarations a b <> PandocFilterDeclarations a' b' =
+    PandocFilterDeclarations (a <> a') (b <> b')
+
+instance Monoid PandocFilterDeclarations where
+  mempty = PandocFilterDeclarations mempty mempty
+
 lookupPandocFilterDeclarations :: Aeson.Value -> PandocFilterDeclarations
 lookupPandocFilterDeclarations frontmatter =
   PandocFilterDeclarations
