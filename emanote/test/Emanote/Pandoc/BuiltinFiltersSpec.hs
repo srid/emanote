@@ -46,10 +46,10 @@ spec = do
       $ links "tagged #§1"
       `shouldBe` [("-/tags/%C2%A71.html", "#§1")]
     it "does not treat GitHub issue references as inline tags"
-      $ links "mentions #221 and #228"
+      $ links "mentions #221, (#228), and #263)"
       `shouldBe` []
     it "does not extract GitHub issue references as body tags"
-      $ tags "mentions #221, #228, and [#263](https://github.com/srid/emanote/issues/263)"
+      $ tags "mentions #221, (#228), and [#263](https://github.com/srid/emanote/issues/263)"
       `shouldBe` []
     it "still extracts tags that contain digits"
       $ tags "tagged #foo #foo/bar #tag221 ###structure #§1"

@@ -82,4 +82,4 @@ hashTagSpec =
       pure s
       where
         disallowed = [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation
-        punctuation = "[];:,.?!"
+        punctuation = "()[];:,.?!"
