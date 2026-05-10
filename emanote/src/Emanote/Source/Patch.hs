@@ -10,7 +10,6 @@ import Data.ByteString qualified as BS
 import Data.List qualified as List
 import Data.List.NonEmpty qualified as NEL
 import Data.Map.Strict qualified as Map
-import Data.Set qualified as Set
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
@@ -26,7 +25,7 @@ import Emanote.Prelude (
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locMountPoint, locPath, locResolve)
+import Emanote.Source.Loc (Loc, locMountPoint, locResolve)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
@@ -92,7 +91,7 @@ patchModel' layers noteF storkIndexTVar model fpType fp action = do
 
           case action of
             UM.Refresh refreshAction overlays ->
-              parseAndInsert layers noteF model refreshAction r (head overlays)
+              parseAndInsert noteF model refreshAction r (head overlays)
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
@@ -124,7 +123,7 @@ patchModel' layers noteF storkIndexTVar model fpType fp action = do
           log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Map.size dependents) <> " dependent note(s)"
           -- Re-parse rewrites the AST, so the cached stork index is stale.
           Stork.clearStorkIndex storkIndexTVar
-          chainM (uncurry (parseAndInsert layers noteF model UM.Update)) (Map.toList dependents)
+          chainM (uncurry (parseAndInsert noteF model UM.Update)) (Map.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
@@ -246,14 +245,13 @@ hot-reload path, which both end in "read → parseNote → insert".
 -}
 parseAndInsert ::
   (MonadIO m, MonadLogger m) =>
-  Set Loc ->
   (N.Note -> N.Note) ->
   ModelEma ->
   UM.RefreshAction ->
   R.LMLRoute ->
   (Loc, FilePath) ->
   m (ModelEma -> ModelEma)
-parseAndInsert layers noteF model refreshAction r src = do
+parseAndInsert noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaParseFilterDeps = parseDeps, N.luaRenderFilterDeps = renderDeps} <-
     N.parseNote (model ^. M.modelScriptingEngine) (M.modelPluginBaseDir model) r src (decodeUtf8 s)
