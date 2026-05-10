@@ -2,7 +2,7 @@
  AST depends on them.
 
  Today only @.lua@ filter files are tracked. Edges are keyed by the
- path as written in a note's @pandoc.filters@ frontmatter — *not* by
+ path as written in the note-local Lua filter declaration — *not* by
  the resolved absolute path — so a filter referenced before it
  exists on disk still gets an edge: when the file is later created,
  the same key matches and the dependent is re-parsed.
@@ -36,11 +36,11 @@ import Relude
 newtype SourceDependencies = SourceDependencies
   { sdLuaDeps :: Map FilePath (Map R.LMLRoute (Loc, FilePath))
   -- ^ Outer key is a filter path as written in the dependent note's
-  -- @pandoc.filters@ frontmatter — typically a layer-relative form
-  -- like @"filters/list-table.lua"@. Inner key is the dependent
-  -- note's route; inner value is its on-disk source — enough to
-  -- drive the rebuild without consulting the model. Both resolved
-  -- and unresolved references live here; see the module haddock.
+  -- note-local Lua filter declaration — typically a layer-relative
+  -- form like @"filters/list-table.lua"@. Inner key is the dependent
+  -- note's route; inner value is its on-disk source — enough to drive
+  -- the rebuild without consulting the model. Both resolved and
+  -- unresolved references live here; see the module haddock.
   }
   deriving stock (Eq, Show, Generic)
 

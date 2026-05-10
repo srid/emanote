@@ -106,11 +106,11 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
       -- lookup, no @noteSource@ recovery, no @lookupNotesByRoute@.
       --
       -- The dep index keys edges by the path *as written* in
-      -- @pandoc.filters@ frontmatter — typically the layer-relative
-      -- form like @"filters/x.lua"@, with no mount-point prefix.
-      -- unionmount delivers 'fp' in the mounted form (it's the
+      -- the note-local Lua filter declaration — typically the
+      -- layer-relative form like @"filters/x.lua"@, with no mount-point
+      -- prefix. unionmount delivers 'fp' in the mounted form (it's the
       -- @Change@ map's outer key — see @changeInsert@ in
-      -- @System.UnionMount@). To recover the frontmatter form we
+      -- @System.UnionMount@). To recover the declaration form we
       -- additionally try stripping each layer's mount-point prefix.
       let candidates = depKeyCandidates layers fp
           dependents =
@@ -216,13 +216,13 @@ insertStaticFile refreshAction overlays r = do
   mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
   pure $ M.modelInsertStaticFile t r fpAbs mInfo
 
-{- | Frontmatter-form keys an unionmount-delivered path could correspond
+{- | Declaration-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The
-dep index stores the form the user wrote in @pandoc.filters@ (no mount
-prefix), so a delivered path like @"sub/filters/x.lua"@ from a layer
-mounted at @sub@ has to round-trip back to @"filters/x.lua"@ for the
-lookup to hit. The fp itself is included so single-layer-no-mount
-notebooks still hit on the first try.
+dep index stores the form the user wrote in a note-local Lua filter
+declaration (no mount prefix), so a delivered path like
+@"sub/filters/x.lua"@ from a layer mounted at @sub@ has to round-trip
+back to @"filters/x.lua"@ for the lookup to hit. The fp itself is
+included so single-layer-no-mount notebooks still hit on the first try.
 -}
 depKeyCandidates :: Set Loc -> FilePath -> [FilePath]
 depKeyCandidates layers fp =
