@@ -1,7 +1,8 @@
 ---
 pandoc:
   filters:
-    - lua-filters/list-table.lua
+    parse:
+      - lua-filters/list-table.lua
 ---
 
 # Bundled Lua Filter Demo

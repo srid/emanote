@@ -1,7 +1,8 @@
 ---
 pandoc:
   filters:
-    - filters/demo-filter.lua
+    parse:
+      - filters/demo-filter.lua
 ---
 
 # Lua Filter Demo

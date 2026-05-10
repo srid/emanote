@@ -1,7 +1,7 @@
 /**
  * Lua-filter-specific steps. These shape the file content the
  * scenarios write — a Pandoc Lua filter that rewrites a known token,
- * or a Markdown note that references a (possibly-missing) Lua filter.
+ * or a note that references a (possibly-missing) Lua filter.
  *
  * Generic file mutation primitives (`I delete`, page-content
  * assertions) live in `notebook_edit_steps.ts` and are reused by any
@@ -35,7 +35,7 @@ When(
   },
 );
 
-// Used to set up the missing-at-parse-time case: the .md is created
+// Used to set up the missing-at-parse-time case: the note is created
 // before its referenced filter exists. `parseNote` registers a dep
 // edge keyed by the (still-unresolved) frontmatter path; when the
 // .lua is later created, the existing edge fires and the note
@@ -46,7 +46,8 @@ When(
     const md = `---
 pandoc:
   filters:
-    - ${filterPath}
+    parse:
+      - ${filterPath}
 ---
 
 # Late-Bound Filter Test

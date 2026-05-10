@@ -60,9 +60,9 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   defaultLayer <- Loc.defaultLayer <$> liftIO Paths_emanote.getDataDir
   instanceId <- liftIO UUID.nextRandom
   storkIndex <- Stork.newIndex
-  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers _emanoteCompileTailwind instanceId storkIndex
   scriptingEngine <- getEngine
+  let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
+      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers scriptingEngine _emanoteCompileTailwind instanceId storkIndex
   -- NOTE: Per-layer ignore patterns are loaded once at startup. Edits
   -- to a `.emanoteignore` file during a live-serve session do not take
   -- effect until restart. Live reload (#228 phase 2) requires
@@ -80,7 +80,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
       foldlM applyOne m0 (changeEntries change)
     applyOne :: (MonadUnliftIO m, MonadLoggerIO m) => Model.ModelEma -> (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) -> m Model.ModelEma
     applyOne m (fpType, fp, action) = do
-      trans <- Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine m fpType fp action
+      trans <- Patch.patchModel layers _emanoteConfigNoteFn storkIndex m fpType fp action
       pure $! trans m
   Dynamic
     <$> UM.unionMountStreaming

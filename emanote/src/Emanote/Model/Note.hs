@@ -18,7 +18,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Time.Calendar (toGregorian)
 import Emanote.Model.Calendar.Parser qualified as Calendar
-import Emanote.Model.Note.Filter (applyDeclaredPandocFilters)
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
@@ -59,6 +59,7 @@ data Note = Note
   -- ^ The layer from which this note came. Nothing if the note was auto-generated.
   , _noteDoc :: Pandoc
   , _noteMeta :: Aeson.Value
+  , _notePandocFilterDeclarations :: NoteFilter.PandocFilterDeclarations
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
   , _noteFeed :: Maybe Feed
@@ -335,16 +336,25 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  mkNoteWith someR Nothing doc meta mempty
+  mkNoteWith someR Nothing doc meta mempty mempty
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [Text] -> Note
-mkNoteWith r src doc' meta errs =
+mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> NoteFilter.PandocFilterDeclarations -> [Text] -> Note
+mkNoteWith r src doc' meta filterDeclarations errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
-      doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
-   in Note r src doc meta tit errs feed
+      doc = if null errs then doc'' else pandocPrepend (errorDiv "yaml" "Emanote Errors 😔" errs) doc''
+   in Note
+        { _noteRoute = r
+        , _noteSource = src
+        , _noteDoc = doc
+        , _noteMeta = meta
+        , _notePandocFilterDeclarations = filterDeclarations
+        , _noteTitle = tit
+        , _noteErrors = errs
+        , _noteFeed = feed
+        }
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -355,29 +365,22 @@ mkNoteWith r src doc' meta errs =
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
 
-{- | Shared builder for the YAML / Markdown parse-error banner used by both
-the per-note markdown error path (in 'mkNoteWith') and the route-cascade
-yaml error path (in 'Emanote.View.Template').
-
-Delegates the AST shape to 'Diagnostic.errorBlock' so all Emanote-emitted
-diagnostics share a single rendering convention (universal @emanote:error@
-marker class plus a @yaml@ variant sub-class for this category).
+{- | Shared builder for diagnostic banners. The @category@ is what
+'Diagnostic.errorBlock' turns into the @emanote:error:<category>@ variant
+class, so callers stay honest about *why* a banner is being shown — yaml
+cascade errors, markdown parse errors, and Lua filter errors each carry
+their own CSS hook for theming and selectors.
 -}
-errorDiv :: Text -> [Text] -> B.Block
-errorDiv header errs =
-  Diagnostic.errorBlock "yaml"
+errorDiv :: Text -> Text -> [Text] -> B.Block
+errorDiv category header errs =
+  Diagnostic.errorBlock category
     $ B.Para [B.Strong $ one $ B.Str header]
     : (B.Para . one . B.Str <$> errs)
 
-{- | Result of parsing a single note's source: the parsed 'Note' plus
-side-channel information the patcher needs to keep its indices in
-sync. @luaFilterDeps@ carries filter paths *as written* in the
-note-local Lua filter declaration, regardless of whether each resolved
-on disk at parse time — see "Emanote.Model.SourceDependencies".
--}
-data ParseResult = ParseResult
-  { parsedNote :: Note
-  , luaFilterDeps :: [FilePath]
+data ParsedNoteSource = ParsedNoteSource
+  { pnsDoc :: Pandoc
+  , pnsMeta :: Aeson.Value
+  , pnsFilterDeclarations :: NoteFilter.PandocFilterDeclarations
   }
 
 parseNote ::
@@ -388,22 +391,18 @@ parseNote ::
   R.LMLRoute ->
   (Loc, FilePath) ->
   Text ->
-  m ParseResult
+  m Note
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc, meta, filters), errs) <- runWriterT $ do
+  (ParsedNoteSource {..}, errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
       R.LMLRoute_Org _ ->
         parseNoteOrg scriptingEngine pluginBaseDir s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
-        Left _ -> meta
-        Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
-  pure
-    ParseResult
-      { parsedNote = mkNoteWith r (Just src) doc metaWithDateFromPath errs
-      , luaFilterDeps = filters
-      }
+        Left _ -> pnsMeta
+        Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) pnsMeta
+  pure $ mkNoteWith r (Just src) pnsDoc metaWithDateFromPath pnsFilterDeclarations errs
   where
     dateParser = do
       year <- replicateM 4 P.digit
@@ -419,12 +418,12 @@ parseNoteOrg ::
   ScriptingEngine ->
   [FilePath] ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
+  WriterT [Text] m ParsedNoteSource
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
-  let requestedFilters = odPandocFilters $ parseOrgDirectives s
-  (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters doc'
-  pure (doc, meta, filterDeps)
+  let filterDeclarations = NoteFilter.lookupOrgPandocFilterDeclarations s
+  doc <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations doc'
+  pure $ ParsedNoteSource doc meta filterDeclarations
 
 parseNoteOrgDocument :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrgDocument s =
@@ -439,34 +438,6 @@ parseNoteOrgDocument s =
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]
 
-newtype OrgDirectives = OrgDirectives
-  { odPandocFilters :: [FilePath]
-  }
-  deriving stock (Eq, Show)
-
-parseOrgDirectives :: Text -> OrgDirectives
-parseOrgDirectives =
-  OrgDirectives
-    . fmap toString
-    . mapMaybe orgPandocFilterValue
-    . takeWhile orgHeaderLine
-    . dropWhile (T.null . T.strip)
-    . lines
-  where
-    orgHeaderLine line =
-      let stripped = T.strip line
-       in T.null stripped || "#+" `T.isPrefixOf` stripped
-    orgPandocFilterValue line = do
-      (key, value) <- parseOrgKeyword line
-      guard $ key `elem` ["#+pandoc_filters", "#+pandoc.filters"]
-      pure value
-    parseOrgKeyword line = do
-      let (rawKey, rawValue) = T.breakOn ":" $ T.stripStart line
-      guard $ not $ T.null rawValue
-      let value = T.strip $ T.drop 1 rawValue
-      guard $ not $ T.null value
-      pure (T.toCaseFold rawKey, value)
-
 parseNoteMarkdown ::
   (MonadIO m, MonadLogger m) =>
   ScriptingEngine ->
@@ -474,21 +445,18 @@ parseNoteMarkdown ::
   R.LMLRoute ->
   FilePath ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
+  WriterT [Text] m ParsedNoteSource
 parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter, [])
+      pure $ ParsedNoteSource mempty defaultFrontMatter mempty
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
-      -- Apply the various transformation filters.
-      --
-      -- Some are user-defined; some builtin. They operate on Pandoc, or the
-      -- frontmatter meta.
-      let requestedFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters $ preparePandoc doc'
+      tell $ NoteFilter.filterDeclarationShapeErrors frontmatter
+      let filterDeclarations = NoteFilter.lookupPandocFilterDeclarations frontmatter
+      doc <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta, filterDeps)
+      pure $ ParsedNoteSource doc meta filterDeclarations
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv
