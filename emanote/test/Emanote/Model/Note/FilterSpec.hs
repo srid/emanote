@@ -54,6 +54,18 @@ spec = do
         errors <- parseMarkdownWithFilter dir "-- io.open\nlocal x = 'pandoc.pipe'\nfunction Pandoc(doc)\n  return doc\nend\n"
         errors `shouldBe` []
 
+    it "ignores IO API names hidden inside level-N long strings"
+      $ withSystemTempDirectory "emanote-parse-filter-long-string"
+      $ \dir -> do
+        errors <- parseMarkdownWithFilter dir "local s = [==[ pandoc.pipe and io.open ]==]\nfunction Pandoc(doc)\n  return doc\nend\n"
+        errors `shouldBe` []
+
+    it "ignores IO API names hidden inside level-N long comments"
+      $ withSystemTempDirectory "emanote-parse-filter-long-comment"
+      $ \dir -> do
+        errors <- parseMarkdownWithFilter dir "--[==[ pandoc.pipe and io.open ]==]\nfunction Pandoc(doc)\n  return doc\nend\n"
+        errors `shouldBe` []
+
     it "guards dynamic access to parse-time IO APIs"
       $ withSystemTempDirectory "emanote-parse-filter-dynamic-io"
       $ \dir -> do

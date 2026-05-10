@@ -332,14 +332,14 @@ luaMemberAccess = \case
 
 luaTokens :: String -> [LuaToken]
 luaTokens = \case
-  '-' : '-' : '[' : '[' : rest ->
-    luaTokens $ dropLuaLongString rest
+  '-' : '-' : '[' : rest -> case openLongBracket rest of
+    Just (level, body) -> luaTokens $ dropLongString level body
+    Nothing -> luaTokens $ drop 1 $ dropWhile (/= '\n') rest
   '-' : '-' : rest ->
     luaTokens $ drop 1 $ dropWhile (/= '\n') rest
-  '[' : '[' : rest ->
-    luaTokens $ dropLuaLongString rest
-  '[' : rest ->
-    LuaLBracket : luaTokens rest
+  '[' : rest -> case openLongBracket rest of
+    Just (level, body) -> luaTokens $ dropLongString level body
+    Nothing -> LuaLBracket : luaTokens rest
   ']' : rest ->
     LuaRBracket : luaTokens rest
   '"' : rest ->
@@ -363,13 +363,28 @@ luaTokens = \case
       isAlpha c || c == '_'
     isLuaIdentContinue c =
       isAlphaNum c || c == '_'
-    dropLuaLongString = \case
-      ']' : ']' : rest ->
-        rest
-      _ : rest ->
-        dropLuaLongString rest
-      [] ->
-        []
+    -- After consuming a leading '[', try to parse the rest of a Lua long-
+    -- bracket opener: any number of '=' signs followed by another '['.
+    -- Returns (level, body) on success, where level is the equals count
+    -- and body is the input past the entire opener.
+    openLongBracket :: String -> Maybe (Int, String)
+    openLongBracket s =
+      let (eqs, after) = span (== '=') s
+       in case after of
+            '[' : body -> Just (length eqs, body)
+            _ -> Nothing
+    -- Skip past the matching long-bracket close: ']' + N '=' + ']'.
+    dropLongString :: Int -> String -> String
+    dropLongString level = go
+      where
+        go = \case
+          ']' : rest ->
+            let (eqs, after) = span (== '=') rest
+             in case after of
+                  ']' : tailRest | length eqs == level -> tailRest
+                  _ -> go rest
+          _ : rest -> go rest
+          [] -> []
     takeQuoted quote =
       go []
       where
