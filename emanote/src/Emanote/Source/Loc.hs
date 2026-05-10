@@ -16,6 +16,7 @@ module Emanote.Source.Loc (
 
   -- * Dealing with layers of locs
   userLayersToSearch,
+  luaFilterSearchPaths,
 ) where
 
 import Data.Set qualified as Set
@@ -47,6 +48,21 @@ userLayersToSearch =
         LocDefault _ -> Nothing
     )
     . Set.toAscList
+
+{- | Search roots for Pandoc Lua filters.
+
+User notebook layers keep precedence over bundled filters. The default layer
+itself is searched so explicit paths like @lua-filters/list-table.lua@ work;
+its @lua-filters/@ directory is searched last so users can opt into bundled
+filters with bare names like @list-table.lua@.
+-}
+luaFilterSearchPaths :: Set Loc -> [FilePath]
+luaFilterSearchPaths layers =
+  userLayersToSearch layers <> concatMap defaultFilterPaths (Set.toAscList layers)
+  where
+    defaultFilterPaths = \case
+      LocDefault fp -> [fp, fp </> "lua-filters"]
+      LocUser {} -> []
 
 defaultLayer :: FilePath -> Loc
 defaultLayer = LocDefault

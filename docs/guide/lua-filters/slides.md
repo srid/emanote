@@ -50,17 +50,17 @@ Pure-Lua filters compose cleanly. The [[lua-filters|main guide page]] chains `li
 ```yaml
 pandoc:
   filters:
-    - filters/list-table.lua
-    - filters/wordcount.lua
+    - list-table.lua
+    - wordcount.lua
 ```
 
-Both run on every save; the order matches the array.
+Both are bundled in Emanote's default layer and run on every save; the order matches the array.
 
 ## Caveat: pandoc's writer-specific filters
 
 Many filters in [pandoc/lua-filters](https://github.com/pandoc/lua-filters) branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Emanote calls `applyFilters` with `FORMAT == "markdown"`, so a writer-specific branch may not fire as expected.
 
-Filters that work cleanly here are **FORMAT-agnostic** — they operate at the AST level regardless of output format. `list-table`, `include-files`, `wordcount`, and this very `slides.lua` are all in that camp.
+Filters that work cleanly here are **FORMAT-agnostic** — they operate at the AST level regardless of output format. `list-table`, `wordcount`, and this very `slides.lua` are all in that camp.
 
 ## Where to find more
 

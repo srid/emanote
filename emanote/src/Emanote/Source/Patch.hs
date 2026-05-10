@@ -25,7 +25,7 @@ import Emanote.Prelude (
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locMountPoint, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locMountPoint, locResolve, luaFilterSearchPaths)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
@@ -111,7 +111,8 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
       -- unionmount delivers 'fp' in the mounted form (it's the
       -- @Change@ map's outer key — see @changeInsert@ in
       -- @System.UnionMount@). To recover the frontmatter form we
-      -- additionally try stripping each layer's mount-point prefix.
+      -- additionally try stripping each layer's mount-point prefix and
+      -- the bundled default-layer @lua-filters/@ alias.
       let candidates = depKeyCandidates layers fp
           dependents =
             Map.unions
@@ -195,11 +196,13 @@ notebooks still hit on the first try.
 -}
 depKeyCandidates :: Set Loc -> FilePath -> [FilePath]
 depKeyCandidates layers fp =
-  fp : mapMaybe stripMP (toList layers)
+  fp : mapMaybe stripMP (toList layers) <> maybeToList (stripBundledFilterPrefix fp)
   where
     stripMP loc = do
       mp <- locMountPoint loc
       List.stripPrefix (mp <> "/") fp
+    stripBundledFilterPrefix =
+      List.stripPrefix "lua-filters/"
 
 {- | Read a Markdown source from disk, parse it, and produce a transformer
 that inserts the note and refreshes its filter-dependency edges. Shared
@@ -218,7 +221,7 @@ parseAndInsert ::
 parseAndInsert layers noteF scriptingEngine refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
-    N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
+    N.parseNote scriptingEngine (luaFilterSearchPaths layers) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)

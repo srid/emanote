@@ -1,4 +1,4 @@
---- wordcount.lua — append a word/character count footer to the document.
+--- wordcount.lua - append a word/character count footer to the document.
 ---
 --- Inspired by https://github.com/pandoc/lua-filters/tree/master/wordcount,
 --- but adapted for Emanote's live-server pipeline: the upstream filter
