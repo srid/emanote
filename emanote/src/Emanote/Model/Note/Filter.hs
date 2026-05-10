@@ -60,12 +60,12 @@ pandocFilterPhaseSpecs :: [PandocFilterPhaseSpec]
 pandocFilterPhaseSpecs =
   [ PandocFilterPhaseSpec
       ("pandoc" :| ["filters", "parse"])
-      ["#+pandoc_filters", "#+pandoc_filters_parse", "#+pandoc.filters", "#+pandoc.filters.parse"]
+      ["#+pandoc_filters_parse"]
       (\paths -> mempty {pfdParseFilters = paths})
       pfdParseFilters
   , PandocFilterPhaseSpec
       ("pandoc" :| ["filters", "render", "html"])
-      ["#+pandoc_filters_render_html", "#+pandoc.filters.render.html"]
+      ["#+pandoc_filters_render_html"]
       (\paths -> mempty {pfdRenderHtmlFilters = paths})
       pfdRenderHtmlFilters
   ]

@@ -1,5 +1,5 @@
 #+TITLE: Lua Filter Org Demo
-#+PANDOC_FILTERS: filters/demo-filter.lua
+#+PANDOC_FILTERS_PARSE: filters/demo-filter.lua
 
 * Lua Filter Org Demo
 
