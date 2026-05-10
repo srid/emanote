@@ -470,6 +470,13 @@ luaTokens = \case
             | otherwise -> go (c : acc) rest
           [] ->
             (reverse acc, [])
+
+{- | Replace the document's Pandoc Meta with one materialized from the
+note's effective JSON metadata (frontmatter + cascaded YAML). Render-time
+Lua filters often branch on @doc.meta.something@; without this, they'd
+see only the meta Pandoc itself parsed out of the front of the source,
+losing every cascaded value.
+-}
 withPandocMeta :: Aeson.Value -> Pandoc -> Pandoc
 withPandocMeta meta (Pandoc _ blocks) =
   Pandoc (aesonToPandocMeta meta) blocks
