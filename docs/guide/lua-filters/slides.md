@@ -10,6 +10,8 @@ pandoc:
 
 # A Markdown Presentation about Lua Filters
 
+For setup, phase guidance, and bundled filters, see [[lua-filters|the main Lua filters guide]].
+
 This page is itself a demo of two things at once: a custom **`slides.lua`** filter that turns a `::: slides` div into a navigable deck, *and* a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <kbd>←</kbd> / <kbd>→</kbd> keys, after clicking inside the deck) to step through.
 
 ::: slides
