@@ -172,6 +172,10 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
+  -- applyRenderHtmlPandocFilters speaks MonadWriter for diagnostics; capture
+  -- them here so we can both render them inline on the page (so the live
+  -- server keeps serving — the user sees the error and can fix the filter)
+  -- and abort the static build (so a broken filter doesn't ship to disk).
   (filteredDoc, renderFilterErrors) <-
     runWriterT
       $ NoteFilter.applyRenderHtmlPandocFilters
@@ -242,6 +246,15 @@ renderLmlHtml model note = do
         $ \ctx' ->
           renderToc ctx' toc
 
+{- | Static-build escape hatch for render-time Lua filter errors. The
+inline-on-page banner (via 'prependRenderFilterErrors') is the right
+UX for the live server — keep serving, surface the error visibly so
+the user can fix it. For static generation no one is watching the
+server, and a broken filter would ship a banner-only page to disk;
+abort instead so CI fails loudly.
+
+The first 'Bool' is @inLiveServer@: @True@ skips, @False@ aborts.
+-}
 failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
 failOnStaticRenderFilterErrors _ _ [] = pass
 failOnStaticRenderFilterErrors True _ _ = pass

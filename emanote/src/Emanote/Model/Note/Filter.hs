@@ -313,6 +313,12 @@ data LuaToken
   | LuaRBracket
   deriving stock (Eq, Show)
 
+{- | Surface IO-API names the user filter references. Detects the literal
+shapes @pandoc.X@ / @pandoc[\"X\"]@ and @pandoc.utils.X@ / @pandoc.utils[\"X\"]@
+and the bare standalone names; aliasing (@local p = pandoc; p.pipe(...)@)
+and dynamic concatenation (@pandoc[\"pi\" .. \"pe\"]@) slip past — the runtime
+sandbox in 'parseTimeNoIOPrelude' is the second-line catch for those.
+-}
 bannedUses :: [LuaToken] -> [Text]
 bannedUses tokens =
   standaloneUses <> pandocUses tokens
@@ -495,6 +501,9 @@ aesonToPandocMetaValue = \case
   Aeson.String s ->
     Just $ MetaString s
   Aeson.Number n ->
+    -- Pandoc's MetaValue has no number constructor; show keeps the
+    -- value visible to filters as a string, accepting the loss of
+    -- type fidelity for round-trips.
     Just . MetaString $ show n
   Aeson.Bool b ->
     Just $ MetaBool b
