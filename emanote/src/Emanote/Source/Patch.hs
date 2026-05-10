@@ -168,6 +168,15 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
   staticPatch <- patchStaticFileIndex fpType fp action
   pure $ sourcePatch >>> staticPatch
 
+{- | Project a source-file change into the static-file index when that source
+file should also be addressable by wikilinks or embeds.
+
+The structural branches in 'patchModel'' update their own model state first:
+notes, YAML cascades, Heist templates, and Lua filter dependents. Some of those
+same source files are also useful as browsable source files. Keeping this as a
+second, uniform projection makes the policy explicit and avoids duplicating the
+same insert/delete logic in every file-type branch.
+-}
 patchStaticFileIndex ::
   (MonadIO m, MonadLogger m) =>
   R.FileType R.SourceExt ->
@@ -199,7 +208,7 @@ patchStaticFileIndex fpType fp action
 indexesAsStaticFile :: R.FileType R.SourceExt -> Bool
 indexesAsStaticFile = \case
   R.LMLType _ -> False
-  R.LuaFilter -> False
+  R.LuaFilter -> True
   R.Yaml -> True
   R.HeistTpl -> True
   R.AnyExt -> True

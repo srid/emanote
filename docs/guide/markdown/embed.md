@@ -89,6 +89,10 @@ A CSS snippet:
 
 ![[styles-demo.css]]
 
+A Lua filter:
+
+![[filters/wordcount.lua]]
+
 Emanote source files that also have structural meaning are still available to wikilinks. For example, `index.yaml` continues to feed the metadata cascade, but `![[index.yaml]]` can also inline the topmost file from the layer stack as a highlighted YAML block:
 
 ![[index.yaml]]
