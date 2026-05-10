@@ -17,6 +17,10 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:HELLO"
     And the article body does not contain "EMANOTE_LUA_DEMO_TOKEN"
 
+  Scenario: A note can use a bundled default-layer Lua filter
+    When I open "/lua-filter-bundled.html"
+    Then the page contains a table element with class "bundled-list-table"
+
   Scenario: An Org note's PANDOC_FILTERS keyword is applied at build time
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"

@@ -33,6 +33,8 @@ data-files:
   _emanote-static/stork/stork.wasm
   favicon.svg
   index.yaml
+  lua-filters/*.lua
+  lua-filters/LICENSE
   templates/**/*.tpl
 
 flag ghcid
