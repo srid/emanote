@@ -125,7 +125,7 @@ Column alignment is honored on each cell — use `:---` for left, `---:` for rig
 
 Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the [[yaml-config|YAML frontmatter]]. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
 
-All-numeric issue references such as #221 are left as plain text rather than tags. If a numeric identifier should be a tag, include a non-digit prefix, such as #issue-221.
+All-numeric issue references such as #221 are left as plain text rather than tags. If a numeric identifier should be a tag, use a hierarchical tag such as #issue/221.
 
 ## Highlighting
 
