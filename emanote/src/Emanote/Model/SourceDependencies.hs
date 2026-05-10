@@ -40,6 +40,7 @@ import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc)
 import Relude
 
+-- | Declared Lua filter path -> dependent note route -> source location used to re-read it.
 type LuaDepEdges = Map FilePath (Map R.LMLRoute (Loc, FilePath))
 
 newtype SourceDependencies = SourceDependencies
