@@ -12,5 +12,5 @@ pandoc:
      - bundled row 1, column 2
 
    * - bundled row 2, column 1
-     - bundled row 2 links to [[subfolder/sibling\|a sibling note]]
+     - bundled row 2 links to [[subfolder/sibling|a sibling note]]
 :::
