@@ -1243,7 +1243,7 @@ Org notes use an Org keyword instead. Add one `#+PANDOC_FILTERS:` line per filte
 #+PANDOC_FILTERS: filters/wordcount.lua
 ```
 
-Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
+Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are recognised as filters for hot-reload and remain linkable as source files; see [[embed|Embedding]] for a source-file embed example.
 
 > [!warning] Remaining limitations
 > - Filters can only be declared in a note's own Markdown frontmatter or Org `#+PANDOC_FILTERS:` keywords. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
@@ -1560,7 +1560,7 @@ main = putStrLn "Hello, world!"
 
 See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
 
-Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. See [[embed]] for the syntax and the recognised extensions.
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. This also works for Emanote's own source files such as `index.yaml` and Heist `.tpl` templates. See [[embed]] for the syntax and the recognised extensions.
 
 Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].
 
@@ -1855,6 +1855,16 @@ A TOML file:
 A CSS snippet:
 
 ![[styles-demo.css]]
+
+A Lua filter:
+
+![[filters/wordcount.lua]]
+
+Emanote source files that also have structural meaning are still available to wikilinks. For example, `index.yaml` continues to feed the metadata cascade, but `![[index.yaml]]` can also inline the topmost file from the layer stack as a highlighted YAML block:
+
+![[index.yaml]]
+
+Template sources are linkable the same way, so a guide can point readers at a live override such as [[templates/hooks/after-note.tpl|after-note.tpl]].
 
 #### Supported extensions
 

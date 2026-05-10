@@ -1,0 +1,161 @@
+<bind tag="clickable-icon">
+  <a href="${ema:note:html-url}#${header:id}" class="--ema-anchor ml-2">
+    <span
+      class="text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity"
+      aria-label="${ema:i18n:copyLink}" title="${ema:i18n:copyLinkToHeading}"><svg class="inline w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+      </svg></span>
+  </a>
+</bind>
+
+<bind tag="heading-inlines-with-anchor">
+  <inlines />
+  <clickable-icon />
+</bind>
+
+<!-- Heading scale ~1.20 ratio (text-4xl→base via Tailwind's discrete steps).
+     h2 keeps a subtle bottom rule as the "section break" cue but at 1px in a
+     light gray that doesn't compete with the heading itself. h5/h6 fade
+     gray-* one stop down each level so they recede without losing
+     hierarchy. All semibold (600) — uniform weight, hierarchy via size. -->
+<bind tag="h2-class">group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700</bind>
+<bind tag="h3-class">group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h4-class">group mt-6 mb-3 font-semibold text-gray-900 dark:text-gray-50</bind>
+<bind tag="h5-class">group mt-5 mb-2 font-semibold text-gray-800 dark:text-gray-100</bind>
+<bind tag="h6-class">group mt-4 mb-2 font-semibold text-gray-700 dark:text-gray-200</bind>
+
+<ema:note:pandoc>
+  <Para>
+    <p class="mb-4 leading-relaxed">
+      <inlines />
+    </p>
+  </Para>
+  <Task:Checked>
+    <apply template="/templates/components/checkbox-checked">
+      <inlines />
+    </apply>
+  </Task:Checked>
+  <Task:Unchecked>
+    <apply template="/templates/components/checkbox-unchecked">
+      <inlines />
+    </apply>
+  </Task:Unchecked>
+  <Cite>
+    <cite>
+      <inlines />
+    </cite>
+  </Cite>
+  <BlockQuote>
+    <blockquote
+      class="py-3 px-6 mb-6 italic border-l-4 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 quote rounded-r-lg">
+      <blocks />
+    </blockquote>
+  </BlockQuote>
+  <DefinitionList>
+    <dl class="flex flex-col mb-3">
+      <DefinitionList:Items>
+        <div class="my-1">
+          <dt class="font-bold text-lg">
+            <DefinitionList:Item:Term />
+          </dt>
+          <DefinitionList:Item:DescList>
+            <div class="flex flex-col pl-1">
+              <dd class="pl-2 my-1 text-gray-700 dark:text-gray-300 border-l-2 border-gray-300 dark:border-gray-600">
+                <DefinitionList:Item:Desc />
+              </dd>
+            </div>
+          </DefinitionList:Item:DescList>
+        </div>
+      </DefinitionList:Items>
+    </dl>
+  </DefinitionList>
+  <Note:Ref><sup data-footnote-ref="${footnote:idx}" role="button" tabindex="0" aria-label="${ema:i18n:footnote} ${footnote:idx}" class="footnote-ref text-[0.7em] leading-[0] align-super pr-[0.08em] font-medium cursor-pointer select-none text-primary-600 dark:text-primary-400 hover:underline hover:underline-offset-2 hover:decoration-1 [font-variant-numeric:lining-nums] [&.emanote-footnote-active]:bg-primary-100 dark:[&.emanote-footnote-active]:bg-primary-900 [&.emanote-footnote-active]:rounded [&.emanote-footnote-active]:px-[0.2em] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:rounded-sm focus-visible:outline-none"><footnote:idx /></sup></Note:Ref>
+  <Note:List>
+    <!-- Screen: hidden (popup is the UI). Print: revealed with standard
+         footnote-list styling so printed output includes the cited bodies. -->
+    <aside data-footnote-list aria-hidden="true" class="hidden print:block mt-10 text-sm">
+      <header class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2"><ema:i18n:footnotes /></header>
+      <ol class="list-decimal pl-6 space-y-2">
+        <footnote>
+          <li data-footnote-id="${footnote:idx}">
+            <footnote:content />
+          </li>
+        </footnote>
+      </ol>
+    </aside>
+  </Note:List>
+
+  <BulletList>
+    <ul class="my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500">
+      <BulletList:Items>
+        <li>
+          <BulletList:Item />
+        </li>
+      </BulletList:Items>
+    </ul>
+  </BulletList>
+  <OrderedList>
+    <ol class="my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400">
+      <OrderedList:Items>
+        <li class="pl-1">
+          <OrderedList:Item />
+        </li>
+      </OrderedList:Items>
+    </ol>
+  </OrderedList>
+  <HorizontalRule>
+    <hr class="my-8 border-gray-200 dark:border-gray-800" />
+  </HorizontalRule>
+  <!-- TODO: Expand the above kind of overriding (full DOM control) to other AST nodes (below) -->
+  <!-- Internal links inherit the page-title strip's palette (bg + text +
+       tracking) one font-weight step lighter — they read as small inline
+       titles of the linked notes. box-decoration-clone keeps the tinted
+       background continuous across line breaks. External links keep the
+       underline-on-hover treatment plus the external-icon glyph for
+       differentiation. -->
+  <PandocLink class="transition-colors">
+    <Internal class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70" />
+    <External class="text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4" target="_blank" rel="noopener" />
+  </PandocLink>
+  <!-- Wrapper just provides bottom margin + sets the size. The <pre>
+       inside owns its own bg / border / rounded / padding / overflow
+       (skylighting.css uses Tailwind design tokens). The previous
+       py-4 pr-4 layered a second padding on top of pre's own, with a
+       suspicious right-only padding that left visible asymmetry. -->
+  <CodeBlock class="mb-6 text-sm" />
+  <Code class="py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal" />
+
+  <Header:1>
+    <h1 id="${header:id}" class="group mt-10 mb-6 font-semibold text-gray-900 dark:text-gray-50 text-4xl">
+      <heading-inlines-with-anchor />
+    </h1>
+  </Header:1>
+  <Header:2>
+    <h2 id="${header:id}" class="${h2-class} text-3xl">
+      <heading-inlines-with-anchor />
+    </h2>
+  </Header:2>
+  <Header:3>
+    <h3 id="${header:id}" class="${h3-class} text-2xl">
+      <heading-inlines-with-anchor />
+    </h3>
+  </Header:3>
+  <Header:4>
+    <h4 id="${header:id}" class="${h4-class} text-xl">
+      <heading-inlines-with-anchor />
+    </h4>
+  </Header:4>
+  <Header:5>
+    <h5 id="${header:id}" class="${h5-class} text-lg">
+      <heading-inlines-with-anchor />
+    </h5>
+  </Header:5>
+  <Header:6>
+    <h6 id="${header:id}" class="${h6-class} text-base">
+      <heading-inlines-with-anchor />
+    </h6>
+  </Header:6>
+</ema:note:pandoc>

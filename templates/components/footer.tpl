@@ -1,0 +1,27 @@
+<!-- Footer attached to the bottom of the main card as a thin text-link
+     strip — the previous unlabelled icon row read as an orphaned mobile
+     bottom-nav and floated outside the card. Now: muted text labels
+     left, the Emanote attribution right, sharing the card's chrome via
+     a top-border separator and the same bg-gray-50 the sidebar /
+     right-panel use. md:rounded-b-lg matches the container's rounded
+     corners so the footer's tinted bg curves with the card. -->
+<footer class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-5 py-2.5 md:rounded-b-lg flex flex-wrap items-center justify-between gap-x-5 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+  <bind tag="footerLink">hover:text-primary-700 dark:hover:text-primary-300 transition-colors</bind>
+  <nav class="flex items-center gap-x-5">
+    <ema:metadata>
+      <with var="template">
+        <a class="${footerLink}" href="${value:baseUrl}" title="${ema:i18n:goToHome}"><ema:i18n:home /></a>
+      </with>
+    </ema:metadata>
+    <a class="${footerLink}" href="${ema:indexUrl}" title="${ema:i18n:viewIndex}"><ema:i18n:index /></a>
+    <a class="${footerLink}" href="${ema:tagIndexUrl}" title="${ema:i18n:viewTags}"><ema:i18n:tags /></a>
+    <a class="${footerLink}" href="${ema:taskIndexUrl}" title="${ema:i18n:viewTasks}"><ema:i18n:tasks /></a>
+  </nav>
+  <a href="https://emanote.srid.ca" target="_blank" title="${ema:generatedByVersion}"
+     class="flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity">
+    <emanoteStaticUrl path="emanote-logo.svg">
+      <img class="w-3.5 h-3.5" src="${url}" alt="" />
+    </emanoteStaticUrl>
+    <span>Emanote <ema:version /></span>
+  </a>
+</footer>
