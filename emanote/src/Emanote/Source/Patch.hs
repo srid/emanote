@@ -255,11 +255,11 @@ parseAndInsert ::
   m (ModelEma -> ModelEma)
 parseAndInsert layers noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
-  N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
+  N.ParseResult {N.parsedNote = note, N.luaParseFilterDeps = parseDeps, N.luaRenderFilterDeps = renderDeps} <-
     N.parseNote (model ^. M.modelScriptingEngine) (M.modelPluginBaseDir model) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
-    >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)
+    >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src parseDeps renderDeps)
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =

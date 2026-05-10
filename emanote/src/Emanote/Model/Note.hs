@@ -379,13 +379,17 @@ errorDiv category header errs =
 
 {- | Result of parsing a single note's source: the parsed 'Note' plus
 side-channel information the patcher needs to keep its indices in
-sync. @luaFilterDeps@ carries filter paths *as written* in the
-note-local Lua filter declarations, regardless of whether each resolved
-on disk while parsing — see "Emanote.Model.SourceDependencies".
+sync. The dep lists carry filter paths *as written* in the note-local
+Lua filter declarations, split by phase so the dependency index can
+record each kind of edge — see "Emanote.Model.SourceDependencies".
+The @parse@ list reflects only filters that actually ran (IO-rejected
+parse-time filters are dropped); the @render@ list passes through
+verbatim because render-time filters are resolved at render time.
 -}
 data ParseResult = ParseResult
   { parsedNote :: Note
-  , luaFilterDeps :: [FilePath]
+  , luaParseFilterDeps :: [FilePath]
+  , luaRenderFilterDeps :: [FilePath]
   }
 
 parseNote ::
@@ -398,7 +402,7 @@ parseNote ::
   Text ->
   m ParseResult
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc, meta, filterDeclarations, filters), errs) <- runWriterT $ do
+  ((doc, meta, filterDeclarations, parseFilters, renderFilters), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
@@ -413,7 +417,8 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
           (mkNoteWith r (Just src) doc metaWithDateFromPath errs)
             { _notePandocFilterDeclarations = filterDeclarations
             }
-      , luaFilterDeps = filters
+      , luaParseFilterDeps = parseFilters
+      , luaRenderFilterDeps = renderFilters
       }
   where
     dateParser = do
@@ -430,13 +435,13 @@ parseNoteOrg ::
   ScriptingEngine ->
   [FilePath] ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath])
+  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath], [FilePath])
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
   let requestedFilters = odPandocFilters $ parseOrgDirectives s
       filterDeclarations = NoteFilter.PandocFilterDeclarations requestedFilters mempty
   (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations doc'
-  pure (doc, meta, filterDeclarations, filterDeps)
+  pure (doc, meta, filterDeclarations, filterDeps, [])
 
 parseNoteOrgDocument :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrgDocument s =
@@ -486,18 +491,17 @@ parseNoteMarkdown ::
   R.LMLRoute ->
   FilePath ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath])
+  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath], [FilePath])
 parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter, NoteFilter.PandocFilterDeclarations mempty mempty, [])
+      pure (mempty, defaultFrontMatter, NoteFilter.PandocFilterDeclarations mempty mempty, [], [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
       let filterDeclarations = NoteFilter.lookupPandocFilterDeclarations frontmatter
-      (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'
-      renderFilterDeps <- NoteFilter.checkRenderPandocFilters pluginBaseDir filterDeclarations
+      (doc, parseDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta, filterDeclarations, ordNub $ filterDeps <> renderFilterDeps)
+      pure (doc, meta, filterDeclarations, parseDeps, NoteFilter.pfdRenderHtmlFilters filterDeclarations)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv

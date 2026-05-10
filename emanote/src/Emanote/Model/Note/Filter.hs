@@ -5,7 +5,6 @@ module Emanote.Model.Note.Filter (
   PandocFilterDeclarations (..),
   applyParsePandocFilters,
   applyRenderHtmlPandocFilters,
-  checkRenderPandocFilters,
   lookupPandocFilterDeclarations,
 ) where
 
@@ -88,15 +87,6 @@ applyRenderHtmlPandocFilters ::
 applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
   applyPandocFilters scriptingEngine "html" (PF.LuaFilter . rpfResolvedPath <$> resolvedFilters) (withPandocMeta meta doc)
-
-checkRenderPandocFilters ::
-  (MonadIO m, MonadWriter [Text] m) =>
-  [FilePath] ->
-  PandocFilterDeclarations ->
-  m [FilePath]
-checkRenderPandocFilters pluginBaseDir declarations = do
-  void $ resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
-  pure $ pfdRenderHtmlFilters declarations
 
 data ResolvedPandocFilter = ResolvedPandocFilter
   { rpfRequestedPath :: FilePath
