@@ -34,7 +34,7 @@
   </title>
   
     
-      <meta property='og:description' content='This page is itself a demo of two things at once: a custom slides.lua filter that turns a ::: slides div into a navigable deck, and a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <kbd>←</kbd> / <kbd>→</kbd> keys, after clicking inside the deck) to step through.' />
+      <meta property='og:description' content='For setup, phase guidance, and bundled filters, see the main Lua filters guide.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=0f5d11d6-daf3-45d4-b74b-aa68f8b407bb' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=f0a2a0f9-8876-4bed-b048-99556cba3f4f' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1967,7 +1967,11 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      This page is itself a demo of two things at once: a custom <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code></strong> filter that turns a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>::: slides</code> div into a navigable deck, <em>and</em> a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <rawhtml xmlhtmlRaw style='display: contents'><kbd>←</kbd></rawhtml> / <rawhtml xmlhtmlRaw style='display: contents'><kbd>→</kbd></rawhtml> keys, after clicking inside the deck) to step through.
+      For setup, phase guidance, and bundled filters, see <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the main Lua filters guide</a>.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      This page is itself a demo of two things at once: a custom <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code></strong> filter that turns a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>::: slides</code> div into a navigable deck, <em>and</em> a tour of what Pandoc Lua filters look like inside <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> notes. Use the numbered nav above the deck (or the <rawhtml xmlhtmlRaw style='display: contents'><kbd>←</kbd></rawhtml> / <rawhtml xmlhtmlRaw style='display: contents'><kbd>→</kbd></rawhtml> keys, after clicking inside the deck) to step through.
     </p>
   <rawhtml xmlhtmlRaw style='display: contents'><style>
 .emanote-slides {
@@ -2099,7 +2103,7 @@
 .dark .emanote-slide,
 .dark .emanote-slide > h2:first-child { color: var(--color-gray-100); }
 </style>
-</rawhtml><div class='emanote-slides'><div class='emanote-slides-nav'><rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="why-filters-1" title="Why filters?">1</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="adding-one-to-your-notebook-2" title="Adding one to your notebook">2</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="what-this-page-does-3" title="What this page does">3</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="hot-reload-4" title="Hot-reload">4</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="a-second-example-word-count-5" title="A second example: word count">5</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="caveat-pandoc-s-writer-specific-filters-6" title="Caveat: pandoc’s writer-specific filters">6</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="where-to-find-more-7" title="Where to find more">7</button></rawhtml><rawhtml xmlhtmlRaw style='display: contents'><button type="button" class="emanote-slides-fs" aria-label="Toggle fullscreen" title="Fullscreen"><svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg><svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg></button></rawhtml></div><div class='emanote-slides-track'><div id='why-filters-1' class='emanote-slide'>
+</rawhtml><div class='emanote-slides'><div class='emanote-slides-nav'><rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="why-filters-1" title="Why filters?">1</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="adding-one-to-your-notebook-2" title="Adding one to your notebook">2</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="what-this-page-does-3" title="What this page does">3</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="hot-reload-4" title="Hot-reload">4</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="a-second-example-word-count-5" title="A second example: word count">5</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="writer-specific-filters-6" title="Writer-specific filters">6</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="where-to-find-more-7" title="Where to find more">7</button></rawhtml><rawhtml xmlhtmlRaw style='display: contents'><button type="button" class="emanote-slides-fs" aria-label="Toggle fullscreen" title="Fullscreen"><svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg><svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg></button></rawhtml></div><div class='emanote-slides-track'><div id='why-filters-1' class='emanote-slide'>
     <h2 id='why-filters-1' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
   Why filters?
@@ -2115,7 +2119,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Pandoc parses your Markdown into a typed AST — paragraphs, headings, links, code blocks. <strong>A Lua filter is a function that walks that tree and rewrites it</strong> before Emanote renders to HTML.
+      Pandoc parses your <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> into a typed AST — paragraphs, headings, <a href='wikilinks' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>links</a>, code blocks. <strong>A Lua filter is a function that walks that tree and rewrites it</strong> before Emanote renders to <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a>.
     </p>
   
     <p class='mb-4 leading-relaxed'>
@@ -2139,22 +2143,24 @@
     <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
         <li class='pl-1'>
-          Drop a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> file anywhere in your notebook (convention: a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/</code> folder).
+          Drop a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> file anywhere in your <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>notebook layer</a> (convention: a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/</code> folder).
         </li>
       
         <li class='pl-1'>
-          Reference it from the note’s frontmatter:
+          Reference it from the note’s <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>frontmatter</a>:
         </li>
       
     </ol>
   <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
 <span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
-<span class='at'>    </span><span class='kw'>-</span><span class='at'> filters/slides.lua</span>
+<span class='at'>    </span><span class='fu'>render</span><span class='kw'>:</span>
+<span class='at'>      </span><span class='fu'>html</span><span class='kw'>:</span>
+<span class='at'>        </span><span class='kw'>-</span><span class='at'> filters/slides.lua</span>
 </code></pre></div>
     <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
       
         <li class='pl-1'>
-          Save. Emanote resolves the path against every <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-L</code>’d layer.
+          Save. Emanote resolves the path against every <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-L</code>’d <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Layer system</a>.
         </li>
       
     </ol>
@@ -2174,7 +2180,7 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      This page declares <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters: [filters/slides.lua]</code>. Each <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>## </code> heading inside a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>::: slides</code> div becomes one slide; the filter wraps them in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;section&gt;</code> elements, prepends a nav strip, and emits CSS + a tiny arrow-key handler.
+      This page declares <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.render.html: [filters/slides.lua]</code>. Each <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>## </code> heading inside a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>::: slides</code> div becomes one slide; the filter wraps them in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;section&gt;</code> elements, prepends a nav strip, and emits <a href='custom-style' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>CSS</a> + a tiny arrow-key handler.
     </p>
   
     <p class='mb-4 leading-relaxed'>
@@ -2196,11 +2202,11 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Edit <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/slides.lua</code> — change a colour, tweak the layout, add a feature — and <strong>every note that references it re-parses on the next save</strong>. No <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>touch</code> of the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.md</code> required, no live-server restart.
+      Edit <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/slides.lua</code> — change a colour, tweak the layout, add a feature — and <strong>every note that references it refreshes on the next save</strong>. No <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>touch</code> of the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.md</code> required, no live-server restart.
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      The reverse index from filter path → dependent notes is maintained inside Emanote’s model; an edit fires exactly the affected re-parses.
+      The reverse index from filter path → dependent notes is maintained inside Emanote’s model; an edit invalidates exactly the affected notes, and the render-time filter runs again with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "html"</code>.
     </p>
   </div><div id='a-second-example-word-count-5' class='emanote-slide'>
     <h2 id='a-second-example-word-count-5' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
@@ -2222,18 +2228,19 @@
     </p>
   <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
 <span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
-<span class='at'>    </span><span class='kw'>-</span><span class='at'> lua-filters/list-table.lua</span>
-<span class='at'>    </span><span class='kw'>-</span><span class='at'> lua-filters/wordcount.lua</span>
+<span class='at'>    </span><span class='fu'>parse</span><span class='kw'>:</span>
+<span class='at'>      </span><span class='kw'>-</span><span class='at'> lua-filters/list-table.lua</span>
+<span class='at'>      </span><span class='kw'>-</span><span class='at'> lua-filters/wordcount.lua</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      Both are bundled in Emanote’s default layer and run on every save; the order matches the array.
+      Both are bundled in Emanote’s <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>default layer</a> and run on every save; the order matches the array.
     </p>
-  </div><div id='caveat-pandoc-s-writer-specific-filters-6' class='emanote-slide'>
-    <h2 id='caveat-pandoc-s-writer-specific-filters-6' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+  </div><div id='writer-specific-filters-6' class='emanote-slide'>
+    <h2 id='writer-specific-filters-6' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  Caveat: pandoc’s writer-specific filters
+  Writer-specific filters
   
-  <a href='lua-filters/slides.html#caveat-pandoc-s-writer-specific-filters-6' class='--ema-anchor ml-2'>
+  <a href='lua-filters/slides.html#writer-specific-filters-6' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2244,11 +2251,11 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Many Pandoc Lua filters branch on Pandoc’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT</code> variable to emit HTML or LaTeX. Emanote calls <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>applyFilters</code> with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "markdown"</code>, so a writer-specific branch may not fire as expected.
+      Many Pandoc Lua filters branch on Pandoc’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT</code> variable to emit <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a> or LaTeX. Put <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a>-agnostic AST rewrites under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.parse</code>, and put HTML-specific filters under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.render.html</code>.
     </p>
   
     <p class='mb-4 leading-relaxed'>
-      Filters that work cleanly here are <strong>FORMAT-agnostic</strong> — they operate at the AST level regardless of output format. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount</code>, and this very <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code> are all in that camp.
+      This deck uses the render-time slot because <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code> emits raw <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a>, <a href='custom-style' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>CSS</a>, and JavaScript.
     </p>
   </div><div id='where-to-find-more-7' class='emanote-slide'>
     <h2 id='where-to-find-more-7' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
@@ -2286,7 +2293,7 @@
     </ul>
   
     <p class='mb-4 leading-relaxed'>
-      The pattern is always the same: drop the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> in, name it in frontmatter, save.
+      The pattern is always the same: drop the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> in, name it in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>frontmatter</a>, save.
     </p>
   </div></div></div><rawhtml xmlhtmlRaw style='display: contents'><script>
 (() => {
@@ -2407,7 +2414,7 @@
 </script>
 </rawhtml>
     <p class='mb-4 leading-relaxed'>
-      This deck is rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>. If you view source, you’ll see <em>it</em> is plain Markdown inside one fenced div — the filter does all the structural work at parse time.
+      This deck is rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>. If you view source, you’ll see <em>it</em> is plain <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> inside one fenced div — the filter does the <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML-specific</a> structural work at render time.
     </p>
   
 
@@ -2491,11 +2498,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — turn a <code>:::slides</code> div into a navigable Markdown presentation, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation at <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a> render time, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
     </div>
   
     <div>
-      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code>.</p></div>
+      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code> with <code>FORMAT == "html"</code>.</p></div>
     </div>
   
 </div>
@@ -2556,11 +2563,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — turn a <code>:::slides</code> div into a navigable Markdown presentation, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation at <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a> render time, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
     </div>
   
     <div>
-      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code>.</p></div>
+      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code> with <code>FORMAT == "html"</code>.</p></div>
     </div>
   
 </div>

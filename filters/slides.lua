@@ -25,7 +25,11 @@
 ---   - It hot-reloads
 ---   :::
 ---
---- FORMAT-agnostic at the AST level; the emitted RawBlocks target HTML.
+--- HTML render-time filter; the emitted RawBlocks target HTML.
+
+if FORMAT ~= "html" then
+  return {}
+end
 
 local function slugify(s, idx)
   local base = s:lower():gsub("[^%w]+", "-"):gsub("^%-+", ""):gsub("%-+$", "")
