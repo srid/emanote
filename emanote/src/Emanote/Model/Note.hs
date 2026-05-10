@@ -506,6 +506,7 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
       tell [err]
       pure (mempty, defaultFrontMatter, mempty, [], [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
+      tell $ NoteFilter.filterDeclarationShapeErrors frontmatter
       let filterDeclarations = NoteFilter.lookupPandocFilterDeclarations frontmatter
       (doc, parseDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter

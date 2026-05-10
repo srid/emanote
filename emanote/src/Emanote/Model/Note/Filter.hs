@@ -6,6 +6,7 @@ module Emanote.Model.Note.Filter (
   applyParsePandocFilters,
   applyRenderHtmlPandocFilters,
   lookupPandocFilterDeclarations,
+  filterDeclarationShapeErrors,
 ) where
 
 import Control.Exception qualified as CE
@@ -54,6 +55,52 @@ lookupPandocFilterDeclarations frontmatter =
     , pfdRenderHtmlFilters =
         SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) frontmatter
     }
+
+{- | Diagnose frontmatter shape errors at the @pandoc.filters.{parse,render.html}@
+keys. 'lookupPandocFilterDeclarations' silently degrades to @mempty@ on a
+type mismatch (e.g. a YAML string where a list of paths was expected),
+which would silently disable the filter. This walks the same paths and
+reports any value that isn't a list of strings, so callers can 'tell' a
+diagnostic instead.
+-}
+filterDeclarationShapeErrors :: Aeson.Value -> [Text]
+filterDeclarationShapeErrors frontmatter =
+  mapMaybe (uncurry checkPath) keysToCheck
+  where
+    keysToCheck :: [(Text, [Text])]
+    keysToCheck =
+      [ ("pandoc.filters.parse", ["pandoc", "filters", "parse"])
+      , ("pandoc.filters.render.html", ["pandoc", "filters", "render", "html"])
+      ]
+    checkPath :: Text -> [Text] -> Maybe Text
+    checkPath label path =
+      case lookupRaw path frontmatter of
+        Nothing -> Nothing
+        Just Aeson.Null -> Nothing
+        Just (Aeson.Array xs) | all isString xs -> Nothing
+        Just other ->
+          Just
+            $ "Bad shape for "
+            <> label
+            <> ": expected a list of file paths, got "
+            <> describe other
+            <> ". The declaration was ignored."
+    isString = \case
+      Aeson.String _ -> True
+      _ -> False
+    lookupRaw :: [Text] -> Aeson.Value -> Maybe Aeson.Value
+    lookupRaw [] v = Just v
+    lookupRaw (k : ks) (Aeson.Object o) =
+      KeyMap.lookup (fromString $ toString k) o >>= lookupRaw ks
+    lookupRaw _ _ = Nothing
+    describe :: Aeson.Value -> Text
+    describe = \case
+      Aeson.String _ -> "a string"
+      Aeson.Number _ -> "a number"
+      Aeson.Bool _ -> "a boolean"
+      Aeson.Object _ -> "an object"
+      Aeson.Array _ -> "a list with non-string entries"
+      Aeson.Null -> "null"
 
 {- | Resolve and apply a note's declared parse-time Lua filters.
 
