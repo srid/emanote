@@ -8,6 +8,7 @@ module Emanote.Model.Note.Filter (
   lookupPandocFilterDeclarations,
 ) where
 
+import Control.Exception qualified as CE
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Aeson.KeyMap qualified as KeyMap
@@ -72,7 +73,15 @@ applyParsePandocFilters ::
 applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdParseFilters declarations)
   ioCleanFilters <- filterM rejectParseTimeIO resolvedFilters
-  guardedPaths <- liftIO $ traverse writeGuardedParseFilter ioCleanFilters
+  -- Acquire all guarded-temp files atomically: a mid-list write failure
+  -- triggers cleanup of the partial successes before re-raising, instead
+  -- of leaking them into $TMPDIR. Pandoc errors during applyPandocFilters
+  -- are caught internally by runIOCatchingErrors, so the cleanup call
+  -- below runs in normal flow; the only remaining leak window is an
+  -- async exception between acquire and the post-apply cleanup, accepted
+  -- rather than threading MonadUnliftIO/MonadMask through the WriterT
+  -- stack here.
+  guardedPaths <- liftIO $ acquireGuardedFilters ioCleanFilters
   filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
   liftIO $ cleanupGuardedParseFilters guardedPaths
   pure (filteredDoc, pfdParseFilters declarations)
@@ -82,6 +91,14 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
       if null uses
         then pure True
         else tell [parseTimeFilterIOErrorMsg rf uses] >> pure False
+
+acquireGuardedFilters :: [ResolvedPandocFilter] -> IO [FilePath]
+acquireGuardedFilters = go []
+  where
+    go acc [] = pure (reverse acc)
+    go acc (f : rest) = do
+      p <- writeGuardedParseFilter f `CE.onException` cleanupGuardedParseFilters acc
+      go (p : acc) rest
 
 applyRenderHtmlPandocFilters ::
   (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
