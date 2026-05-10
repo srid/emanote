@@ -48,30 +48,13 @@ lookupPandocFilterDeclarations frontmatter =
         SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) frontmatter
     }
 
-data PandocFilterApplication = PandocFilterApplication
-  { pfaFormat :: String
-  , pfaValidate :: FilePath -> FilePath -> IO [Text]
-  }
-
-parseFilterApplication :: PandocFilterApplication
-parseFilterApplication =
-  PandocFilterApplication
-    { pfaFormat = "markdown"
-    , pfaValidate = parseTimeFilterIOErrors
-    }
-
-renderHtmlFilterApplication :: PandocFilterApplication
-renderHtmlFilterApplication =
-  PandocFilterApplication
-    { pfaFormat = "html"
-    , pfaValidate = \_ _ -> pure []
-    }
-
-{- | Resolve and apply a note's declared Lua filters.
+{- | Resolve and apply a note's declared parse-time Lua filters.
 
 Returns the requested filter paths unchanged alongside the filtered document so
 the source-dependency index records the declaration form, not the resolved
-absolute path.
+absolute path. Parse-time-specific validation (rejecting filters that touch
+IO-capable APIs) lives here, not on a generic application record — render-time
+filters are allowed to use IO.
 -}
 applyParsePandocFilters ::
   (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
@@ -81,11 +64,18 @@ applyParsePandocFilters ::
   Pandoc ->
   m (Pandoc, [FilePath])
 applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
-  resolvedFilters <- preparePandocFilters parseFilterApplication pluginBaseDir (pfdParseFilters declarations)
-  guardedPaths <- liftIO $ traverse writeGuardedParseFilter resolvedFilters
-  filteredDoc <- applyPandocFilters scriptingEngine (pfaFormat parseFilterApplication) (PF.LuaFilter <$> guardedPaths) doc
+  resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdParseFilters declarations)
+  ioCleanFilters <- filterM rejectParseTimeIO resolvedFilters
+  guardedPaths <- liftIO $ traverse writeGuardedParseFilter ioCleanFilters
+  filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
   liftIO $ cleanupGuardedParseFilters guardedPaths
   pure (filteredDoc, pfdParseFilters declarations)
+  where
+    rejectParseTimeIO rf = do
+      uses <- liftIO $ parseTimeFilterIOUsesIn rf
+      if null uses
+        then pure True
+        else tell [parseTimeFilterIOErrorMsg rf uses] >> pure False
 
 applyRenderHtmlPandocFilters ::
   (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
@@ -95,14 +85,9 @@ applyRenderHtmlPandocFilters ::
   Aeson.Value ->
   Pandoc ->
   m Pandoc
-applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc =
-  fst
-    <$> applyDeclaredPandocFilters
-      scriptingEngine
-      pluginBaseDir
-      renderHtmlFilterApplication
-      (pfdRenderHtmlFilters declarations)
-      (withPandocMeta meta doc)
+applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc = do
+  resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
+  applyPandocFilters scriptingEngine "html" (PF.LuaFilter . rpfResolvedPath <$> resolvedFilters) (withPandocMeta meta doc)
 
 checkRenderPandocFilters ::
   (MonadIO m, MonadWriter [Text] m) =>
@@ -110,22 +95,8 @@ checkRenderPandocFilters ::
   PandocFilterDeclarations ->
   m [FilePath]
 checkRenderPandocFilters pluginBaseDir declarations = do
-  void $ preparePandocFilters renderHtmlFilterApplication pluginBaseDir (pfdRenderHtmlFilters declarations)
+  void $ resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
   pure $ pfdRenderHtmlFilters declarations
-
-applyDeclaredPandocFilters ::
-  (MonadIO m, MonadLogger m, MonadWriter [Text] m) =>
-  ScriptingEngine ->
-  [FilePath] ->
-  PandocFilterApplication ->
-  [FilePath] ->
-  Pandoc ->
-  m (Pandoc, [FilePath])
-applyDeclaredPandocFilters scriptingEngine pluginBaseDir application@PandocFilterApplication {..} requestedFilters doc = do
-  resolvedFilters <- preparePandocFilters application pluginBaseDir requestedFilters
-  let filters = PF.LuaFilter . rpfResolvedPath <$> resolvedFilters
-  filteredDoc <- applyPandocFilters scriptingEngine pfaFormat filters doc
-  pure (filteredDoc, requestedFilters)
 
 data ResolvedPandocFilter = ResolvedPandocFilter
   { rpfRequestedPath :: FilePath
@@ -133,22 +104,17 @@ data ResolvedPandocFilter = ResolvedPandocFilter
   }
   deriving stock (Eq, Ord, Show)
 
-preparePandocFilters ::
+resolveLuaFilters ::
   (MonadIO m, MonadWriter [Text] m) =>
-  PandocFilterApplication ->
   [FilePath] ->
   [FilePath] ->
   m [ResolvedPandocFilter]
-preparePandocFilters PandocFilterApplication {..} pluginBaseDir requestedFilters = do
+resolveLuaFilters pluginBaseDir requestedFilters = do
   resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
-  fmap catMaybes $ forM resolvedFilters $ \(requestedPath, resolvedPath) -> do
+  fmap catMaybes $ forM resolvedFilters $ \(requestedPath, resolvedPath) ->
     checkLuaFilter requestedPath resolvedPath >>= \case
       Left err -> tell [err] >> pure Nothing
-      Right resolvedFilter -> do
-        validationErrors <- liftIO $ pfaValidate requestedPath resolvedPath
-        case validationErrors of
-          [] -> pure $ Just resolvedFilter
-          errs -> tell errs >> pure Nothing
+      Right resolvedFilter -> pure $ Just resolvedFilter
 
 resolvePandocFilterPaths ::
   (MonadIO m, MonadWriter [Text] m) =>
@@ -267,17 +233,17 @@ applyPandocLuaFilters scriptingEngine format filters x = do
     runIOCatchingErrors =
       handle (pure . Left) . runIO
 
-parseTimeFilterIOErrors :: FilePath -> FilePath -> IO [Text]
-parseTimeFilterIOErrors requestedPath resolvedPath = do
-  uses <- parseTimeFilterIOUses . decodeUtf8 <$> readFileBS resolvedPath
-  pure
-    [ "Parse-time Lua filters cannot use IO-capable APIs: "
-      <> toText requestedPath
-      <> " references "
-      <> T.intercalate ", " uses
-      <> ". Move the filter to pandoc.filters.render.html if it needs IO."
-    | not $ null uses
-    ]
+parseTimeFilterIOUsesIn :: ResolvedPandocFilter -> IO [Text]
+parseTimeFilterIOUsesIn ResolvedPandocFilter {..} =
+  parseTimeFilterIOUses . decodeUtf8 <$> readFileBS rpfResolvedPath
+
+parseTimeFilterIOErrorMsg :: ResolvedPandocFilter -> [Text] -> Text
+parseTimeFilterIOErrorMsg ResolvedPandocFilter {..} uses =
+  "Parse-time Lua filters cannot use IO-capable APIs: "
+    <> toText rpfRequestedPath
+    <> " references "
+    <> T.intercalate ", " uses
+    <> ". Move the filter to pandoc.filters.render.html if it needs IO."
 
 parseTimeFilterIOUses :: Text -> [Text]
 parseTimeFilterIOUses =
