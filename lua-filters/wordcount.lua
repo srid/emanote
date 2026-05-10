@@ -1,6 +1,6 @@
---- wordcount.lua — append a word/character count footer to the document.
+--- wordcount.lua - append a word/character count footer to the document.
 ---
---- Inspired by https://github.com/pandoc/lua-filters/tree/master/wordcount,
+--- Derived from https://github.com/pandoc/lua-filters/tree/master/wordcount,
 --- but adapted for Emanote's live-server pipeline: the upstream filter
 --- prints to stdout and calls `os.exit(0)`, both of which would corrupt or
 --- terminate `emanote run`. This version walks the body, counts, and
@@ -8,39 +8,45 @@
 ---
 --- FORMAT-agnostic: produces the same output regardless of the writer.
 
-local words = 0
-local characters = 0
-local characters_and_spaces = 0
+local function new_counts()
+  return {
+    words = 0,
+    characters = 0,
+    characters_and_spaces = 0,
+  }
+end
 
-local count = {
-  Str = function(el)
-    if el.text:match("%P") then
-      words = words + 1
-    end
-    characters = characters + utf8.len(el.text)
-    characters_and_spaces = characters_and_spaces + utf8.len(el.text)
-  end,
+local function count_filter(counts)
+  return {
+    Str = function(el)
+      if el.text:match("%P") then
+        counts.words = counts.words + 1
+      end
+      counts.characters = counts.characters + utf8.len(el.text)
+      counts.characters_and_spaces = counts.characters_and_spaces + utf8.len(el.text)
+    end,
 
-  Space = function()
-    characters_and_spaces = characters_and_spaces + 1
-  end,
+    Space = function()
+      counts.characters_and_spaces = counts.characters_and_spaces + 1
+    end,
 
-  Code = function(el)
-    local _, n = el.text:gsub("%S+", "")
-    words = words + n
-    local nospace = el.text:gsub("%s", "")
-    characters = characters + utf8.len(nospace)
-    characters_and_spaces = characters_and_spaces + utf8.len(el.text)
-  end,
+    Code = function(el)
+      local _, n = el.text:gsub("%S+", "")
+      counts.words = counts.words + n
+      local nospace = el.text:gsub("%s", "")
+      counts.characters = counts.characters + utf8.len(nospace)
+      counts.characters_and_spaces = counts.characters_and_spaces + utf8.len(el.text)
+    end,
 
-  CodeBlock = function(el)
-    local _, n = el.text:gsub("%S+", "")
-    words = words + n
-    local nospace = el.text:gsub("%s", "")
-    characters = characters + utf8.len(nospace)
-    characters_and_spaces = characters_and_spaces + utf8.len(el.text)
-  end,
-}
+    CodeBlock = function(el)
+      local _, n = el.text:gsub("%S+", "")
+      counts.words = counts.words + n
+      local nospace = el.text:gsub("%s", "")
+      counts.characters = counts.characters + utf8.len(nospace)
+      counts.characters_and_spaces = counts.characters_and_spaces + utf8.len(el.text)
+    end,
+  }
+end
 
 local css = [[
 <style>
@@ -79,12 +85,13 @@ local function dlEntry(label, value)
 end
 
 function Pandoc(doc)
-  pandoc.walk_block(pandoc.Div(doc.blocks), count)
+  local counts = new_counts()
+  pandoc.walk_block(pandoc.Div(doc.blocks), count_filter(counts))
   local html = table.concat({
     "<dl>",
-    dlEntry("words", words),
-    dlEntry("chars", characters),
-    dlEntry("chars + spaces", characters_and_spaces),
+    dlEntry("words", counts.words),
+    dlEntry("chars", counts.characters),
+    dlEntry("chars + spaces", counts.characters_and_spaces),
     "</dl>",
   })
   local footer = pandoc.Div(
