@@ -7,21 +7,25 @@ module Emanote.Source.Patch (
 
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
+import Data.List qualified as List
 import Data.List.NonEmpty qualified as NEL
+import Data.Map.Strict qualified as Map
 import Data.Time (defaultTimeLocale, formatTime, getCurrentTime)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData qualified as SD
+import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Model.StaticFile (readStaticFileInfo)
 import Emanote.Model.Stork.Index qualified as Stork
-import Emanote.Model.Type (ModelEma)
+import Emanote.Model.Type (ModelEma, modelSourceDependencies)
 import Emanote.Prelude (
+  chainM,
   log,
   logD,
   logE,
  )
 import Emanote.Route qualified as R
-import Emanote.Source.Loc (Loc, locResolve, userLayersToSearch)
+import Emanote.Source.Loc (Loc, locMountPoint, locResolve, userLayersToSearch)
 import Emanote.Source.Pattern (filePatterns, ignorePatterns)
 import Heist.Extra.TemplateState qualified as T
 import Optics.Operators ((%~), (^.))
@@ -32,45 +36,46 @@ import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
--- | Map a filesystem change to the corresponding model change.
+{- | Map a filesystem change to the corresponding model change.
+
+The streaming handler in 'Source.Dynamic' hands every per-file step
+the running model; we forward it uniformly so 'patchModel' has one
+shape across all file types. Only the 'R.LuaFilter' branch reads it
+today (to walk the reverse-dependency index in
+@Emanote.Model.SourceDependencies@). The returned transformer is
+applied to that same model by the caller.
+-}
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
   ScriptingEngine ->
-  -- | Type of the file being changed
+  ModelEma ->
   R.FileType R.SourceExt ->
-  -- | Path to the file being changed
   FilePath ->
-  -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModel layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action) newLogger
 
--- | Map a filesystem change to the corresponding model change.
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  -- | Lua scripting engine
   ScriptingEngine ->
-  -- | Type of the file being changed
+  ModelEma ->
   R.FileType R.SourceExt ->
-  -- | Path to the file being changed
   FilePath ->
-  -- | Specific change to the file, along with its paths from other "layers"
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
+patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
   case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
@@ -88,14 +93,40 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
           Stork.clearStorkIndex storkIndexTVar
 
           case action of
-            UM.Refresh refreshAction overlays -> do
-              let fpAbs = head overlays
-              s <- readRefreshedFile refreshAction $ locResolve fpAbs
-              note <- N.parseNote scriptingEngine (userLayersToSearch layers) r fpAbs (decodeUtf8 s)
-              pure $ M.modelInsertNote $ noteF note
+            UM.Refresh refreshAction overlays ->
+              parseAndInsert layers noteF scriptingEngine refreshAction r (head overlays)
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
+    R.LuaFilter -> do
+      -- An edit (or deletion) of a Pandoc Lua filter file invalidates
+      -- every note that referenced it at parse time. The dep index
+      -- carries each dependent's @(Loc, FilePath)@ on the edge value,
+      -- so the refresh is a fold over 'parseAndInsert' — no model
+      -- lookup, no @noteSource@ recovery, no @lookupNotesByRoute@.
+      --
+      -- The dep index keys edges by the path *as written* in
+      -- @pandoc.filters@ frontmatter — typically the layer-relative
+      -- form like @"filters/x.lua"@, with no mount-point prefix.
+      -- unionmount delivers 'fp' in the mounted form (it's the
+      -- @Change@ map's outer key — see @changeInsert@ in
+      -- @System.UnionMount@). To recover the frontmatter form we
+      -- additionally try stripping each layer's mount-point prefix.
+      let candidates = depKeyCandidates layers fp
+          dependents =
+            Map.unions
+              [ SDeps.dependentsOnLua k (model ^. modelSourceDependencies)
+              | k <- candidates
+              ]
+      if Map.null dependents
+        then do
+          logD $ "Lua filter changed but no notes depend on it: " <> toText fp
+          pure id
+        else do
+          log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Map.size dependents) <> " dependent note(s)"
+          -- Re-parse rewrites the AST, so the cached stork index is stale.
+          Stork.clearStorkIndex storkIndexTVar
+          chainM (uncurry (parseAndInsert layers noteF scriptingEngine UM.Update)) (Map.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
@@ -153,6 +184,44 @@ patchModel' layers noteF storkIndexTVar scriptingEngine fpType fp action = do
                 pure $ M.modelInsertStaticFile t r fpAbs mInfo
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
+
+{- | Frontmatter-form keys an unionmount-delivered path could correspond
+to: the path itself, plus each layer-mount-prefix-stripped variant. The
+dep index stores the form the user wrote in @pandoc.filters@ (no mount
+prefix), so a delivered path like @"sub/filters/x.lua"@ from a layer
+mounted at @sub@ has to round-trip back to @"filters/x.lua"@ for the
+lookup to hit. The fp itself is included so single-layer-no-mount
+notebooks still hit on the first try.
+-}
+depKeyCandidates :: Set Loc -> FilePath -> [FilePath]
+depKeyCandidates layers fp =
+  fp : mapMaybe stripMP (toList layers)
+  where
+    stripMP loc = do
+      mp <- locMountPoint loc
+      List.stripPrefix (mp <> "/") fp
+
+{- | Read a Markdown source from disk, parse it, and produce a transformer
+that inserts the note and refreshes its filter-dependency edges. Shared
+between the LML refresh path (initial scan + edits) and the LuaFilter
+hot-reload path, which both end in "read → parseNote → insert".
+-}
+parseAndInsert ::
+  (MonadIO m, MonadLogger m) =>
+  Set Loc ->
+  (N.Note -> N.Note) ->
+  ScriptingEngine ->
+  UM.RefreshAction ->
+  R.LMLRoute ->
+  (Loc, FilePath) ->
+  m (ModelEma -> ModelEma)
+parseAndInsert layers noteF scriptingEngine refreshAction r src = do
+  s <- readRefreshedFile refreshAction (locResolve src)
+  N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
+    N.parseNote scriptingEngine (userLayersToSearch layers) r src (decodeUtf8 s)
+  pure
+    $ M.modelInsertNote (noteF note)
+    >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)
 
 readRefreshedFile :: (MonadLogger m, MonadIO m) => UM.RefreshAction -> FilePath -> m ByteString
 readRefreshedFile refreshAction fp =

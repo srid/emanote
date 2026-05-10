@@ -370,6 +370,17 @@ errorDiv header errs =
     $ B.Para [B.Strong $ one $ B.Str header]
     : (B.Para . one . B.Str <$> errs)
 
+{- | Result of parsing a single note's source: the parsed 'Note' plus
+side-channel information the patcher needs to keep its indices in
+sync. @luaFilterDeps@ carries filter paths *as written* in
+@pandoc.filters@ frontmatter, regardless of whether each resolved on
+disk at parse time — see "Emanote.Model.SourceDependencies".
+-}
+data ParseResult = ParseResult
+  { parsedNote :: Note
+  , luaFilterDeps :: [FilePath]
+  }
+
 parseNote ::
   forall m.
   (MonadIO m, MonadLogger m) =>
@@ -378,18 +389,23 @@ parseNote ::
   R.LMLRoute ->
   (Loc, FilePath) ->
   Text ->
-  m Note
+  m ParseResult
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc, meta), errs) <- runWriterT $ do
+  ((doc, meta, filters), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
       R.LMLRoute_Org _ -> do
-        parseNoteOrg s
+        (d, m) <- parseNoteOrg s
+        pure (d, m, [])
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> meta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
-  pure $ mkNoteWith r (Just src) doc metaWithDateFromPath errs
+  pure
+    ParseResult
+      { parsedNote = mkNoteWith r (Just src) doc metaWithDateFromPath errs
+      , luaFilterDeps = filters
+      }
   where
     dateParser = do
       year <- replicateM 4 P.digit
@@ -420,18 +436,19 @@ parseNoteMarkdown ::
   R.LMLRoute ->
   FilePath ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value)
+  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
 parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter)
+      pure (mempty, defaultFrontMatter, [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
       -- Apply the various transformation filters.
       --
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
-      filterPaths <- fmap catMaybes $ forM (SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter) $ \p -> do
+      let requestedFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
+      resolvedFilters <- fmap catMaybes $ forM requestedFilters $ \p -> do
         res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
           doesPathExist (baseDir </> p) >>= \case
             False -> do
@@ -444,9 +461,13 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
             pure Nothing
           (x : _) -> pure $ Just x
 
-      doc <- applyPandocFilters scriptingEngine filterPaths $ preparePandoc doc'
+      doc <- applyPandocFilters scriptingEngine resolvedFilters $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta)
+      -- Return the *requested* filter paths (as written in frontmatter),
+      -- not the resolved absolute ones. The dep index keys edges by
+      -- requested form so a missing-at-parse-time filter still gets an
+      -- edge — re-parsing fires when that file is later created.
+      pure (doc, meta, requestedFilters)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv

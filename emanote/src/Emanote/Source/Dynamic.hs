@@ -10,7 +10,7 @@ module Emanote.Source.Dynamic (
   emanoteConfigPandocRenderers,
 ) where
 
-import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
+import Control.Monad.Logger (MonadLoggerIO)
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Data.UUID.V4 qualified as UUID
@@ -21,8 +21,8 @@ import Emanote.Model.Note (Note)
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
-import Emanote.Prelude (chainM)
 import Emanote.Route (LMLRoute)
+import Emanote.Route qualified as R
 import Emanote.Source.Ignore qualified as Ignore
 import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
@@ -47,9 +47,13 @@ data EmanoteConfig = EmanoteConfig
   -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
   }
 
-{- | Make an Ema `Dynamic` for the Emanote model.
+{- | Make an Ema `Dynamic` for the Emanote model. The bulk of logic
+for building the Dynamic is in @Source/Patch.hs@.
 
- The bulk of logic for building the Dynamic is in `Patch.hs`.
+We use 'UM.unionMountStreaming' so per-file closures are GC'd as
+their updates land (caps initial-load memory on large notebooks —
+@srid/emanote#66@) and so 'Patch.patchModel' can read the running
+model when walking the Lua-filter dep index (@srid/emanote#263@).
 -}
 emanoteSiteInput :: (MonadUnliftIO m, MonadLoggerIO m) => Ema.CLI.Action -> EmanoteConfig -> m (Dynamic m Model.ModelEma)
 emanoteSiteInput cliAct EmanoteConfig {..} = do
@@ -71,40 +75,32 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
     -- regardless of whether the layer has its own `.emanoteignore`.
     universalForEveryLayer = Map.fromSet (const Pattern.ignorePatterns) layers
     ignoreByLayer = Map.unionWith (<>) universalForEveryLayer perLayerIgnore
+    handle :: (MonadUnliftIO m, MonadLoggerIO m) => UM.Change Loc (R.FileType R.SourceExt) -> Model.ModelEma -> m Model.ModelEma
+    handle change m0 =
+      foldlM applyOne m0 (changeEntries change)
+    applyOne :: (MonadUnliftIO m, MonadLoggerIO m) => Model.ModelEma -> (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) -> m Model.ModelEma
+    applyOne m (fpType, fp, action) = do
+      trans <- Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine m fpType fp action
+      pure $! trans m
   Dynamic
-    <$> UM.unionMount
+    <$> UM.unionMountStreaming
       (layers & Set.map (id &&& Loc.locPath))
       Pattern.filePatterns
       ignoreByLayer
       initialModel
-      (mapFsChanges $ Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine)
+      handle
 
-type ChangeHandler tag model m =
-  tag ->
-  FilePath ->
-  UM.FileAction (NonEmpty (Loc, FilePath)) ->
-  m (model -> model)
-
-mapFsChanges :: (MonadIO m, MonadLogger m) => ChangeHandler tag model m -> UM.Change Loc tag -> m (model -> model)
-mapFsChanges h ch = do
-  uncurry (mapFsChangesOnExt h) `chainM` Map.toList ch
-  where
-    -- Temporarily use block buffering before calling an IO action that is
-    -- known ahead to log rapidly, so as to not hamper serial processing speed.
-    -- FIXME: This buffers warnings and errors (when parsing .md file) without
-    -- dumping them to console. So disabling for now. But we need a proper fix.
-    _withBlockBuffering f =
-      (hSetBuffering stdout (BlockBuffering Nothing) >> hSetBuffering stderr LineBuffering)
-        *> f
-        <* (hFlush stdout >> hFlush stderr >> hSetBuffering stdout LineBuffering)
-
-mapFsChangesOnExt ::
-  (MonadIO m, MonadLogger m) =>
-  ChangeHandler tag model m ->
-  tag ->
-  Map FilePath (UM.FileAction (NonEmpty (Loc, FilePath))) ->
-  m (model -> model)
-mapFsChangesOnExt h fpType fps = do
-  uncurry (h fpType) `chainM` Map.toList fps
+{- | Flatten a `Change` into per-file entries so a streaming handler can
+fold them one at a time (the GC-eager pattern unionMountStreaming
+exists for; see its haddock).
+-}
+changeEntries ::
+  UM.Change Loc (R.FileType R.SourceExt) ->
+  [(R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath)))]
+changeEntries ch =
+  [ (fpType, fp, action)
+  | (fpType, files) <- Map.toList ch
+  , (fp, action) <- Map.toList files
+  ]
 
 makeLenses ''EmanoteConfig

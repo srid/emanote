@@ -1,0 +1,77 @@
+/**
+ * Owns the fixture-staging volatility: hot-reload scenarios need to
+ * mutate files inside the notebook to exercise dependency-driven
+ * re-rendering, but the source `tests/fixtures/notebook/` tree must
+ * stay clean across runs. We copy the source fixture into a
+ * process-scoped tmpdir at import time and point the backend at the
+ * copy. Mutating steps write directly into the staged copy; a Before
+ * hook tagged @hot-reload resets it between scenarios.
+ *
+ * The infrastructure is dep-kind-agnostic by design — today only
+ * Pandoc Lua filters use it (issue #263), but the same staging,
+ * reset, and tag plumbing applies to any future "X depends on Y"
+ * relation (e.g. cascaded `index.yaml`).
+ */
+
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+
+export const sourceFixtureDir = path.resolve(
+  import.meta.dirname,
+  "..",
+  "fixtures",
+  "notebook",
+);
+
+const stagedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "emanote-e2e-stage-"));
+
+export const stagedFixtureDir = path.join(stagedRoot, "notebook");
+fs.cpSync(sourceFixtureDir, stagedFixtureDir, { recursive: true });
+
+/** Subtrees the hot-reload scenarios mutate wholesale. The reset
+ *  removes the staged copy and re-copies from source, which both
+ *  restores edited files and cleans up any files a scenario created
+ *  inside the subtree (e.g. a previously-missing filter). New
+ *  dep-kinds add their own subtree here as they come online. */
+const mutatedSubtrees: string[] = [
+  "filters", // Pandoc Lua filters (issue #263)
+];
+
+/** Files that hot-reload scenarios create from scratch at the
+ *  notebook root and that must be removed before the next scenario.
+ *  They are absent from the source fixture by design — for example,
+ *  `lua-filter-late.md` exercises the missing-at-parse-time case
+ *  (issue #263), and a stray copy in the source tree would crash
+ *  `emanote gen` (which treats a missing `pandoc.filters` reference
+ *  as a fatal note error). */
+const ephemeralFiles: string[] = [
+  "lua-filter-late.md",
+];
+
+/** Reset the staged notebook so the next scenario starts from
+ *  baseline. Called from the @hot-reload Before hook in
+ *  `support/hooks.ts`.
+ *
+ *  We rm + cp each declared mutated subtree rather than walking the
+ *  whole notebook so unrelated state (the static-gen output dir, the
+ *  user's other notebooks) stays untouched, and so a test-created
+ *  file inside a tracked subtree is cleaned up automatically without
+ *  the scenario needing to declare it. Top-level ephemeral files are
+ *  listed explicitly. */
+export function resetStagedNotebookMutations(): void {
+  for (const sub of mutatedSubtrees) {
+    const staged = path.join(stagedFixtureDir, sub);
+    const source = path.join(sourceFixtureDir, sub);
+    fs.rmSync(staged, { recursive: true, force: true });
+    if (fs.existsSync(source)) {
+      fs.cpSync(source, staged, { recursive: true });
+    }
+  }
+  for (const fp of ephemeralFiles) {
+    const target = path.join(stagedFixtureDir, fp);
+    if (fs.existsSync(target)) {
+      fs.unlinkSync(target);
+    }
+  }
+}

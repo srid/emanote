@@ -25,15 +25,11 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { EmanoteWorld } from "./world.ts";
 import { mode, requireEnv } from "./mode.ts";
 import { primeMorph } from "./navigation.ts";
+import { resetStagedNotebookMutations, stagedFixtureDir } from "./fixture.ts";
 
 const emanoteBin = requireEnv("EMANOTE_BIN");
 
-const fixtureDir = path.resolve(
-  import.meta.dirname,
-  "..",
-  "fixtures",
-  "notebook",
-);
+const fixtureDir = stagedFixtureDir;
 
 const runRoot = fs.mkdtempSync(path.join(os.tmpdir(), "emanote-e2e-"));
 
@@ -204,6 +200,23 @@ Before({ tags: MORPH_TAG }, function () {
 // and `morph` modes use the same backend, so only `static` skips.
 Before({ tags: "@live" }, function () {
   if (mode === "static") return "skipped" as const;
+});
+
+// `@hot-reload` scenarios mutate files in the staged notebook to
+// exercise dependency-driven re-rendering. They require a live
+// backend (no fsnotify watcher in static export) and they must each
+// start from a known-clean state — otherwise a scenario that deletes
+// or creates a file would leak into the next scenario's baseline.
+// The infrastructure is dep-kind-agnostic; today only Lua filters
+// (issue #263) carry the @hot-reload tag, but YAML cascade,
+// transclusion-driven invalidation, etc. would use the same plumbing.
+Before({ tags: "@hot-reload" }, async function () {
+  if (mode === "static") return "skipped" as const;
+  resetStagedNotebookMutations();
+  // fsnotify needs a moment to deliver the rm/cp events to the
+  // emanote watcher before the scenario opens the page; otherwise
+  // the first assertion can race a stale model.
+  await sleep(800);
 });
 
 // Inverse safety: a scenario using the morph-nav step without `@morph`

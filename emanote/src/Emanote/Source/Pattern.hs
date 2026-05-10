@@ -18,18 +18,28 @@ filePattern = \case
   R.HeistTpl ->
     R.withExt @_ @'R.HeistTpl
       $ "**/*"
+  R.LuaFilter ->
+    R.withExt @_ @'R.LuaFilter "**/*"
   R.AnyExt ->
     "**"
 
+{- | unionmount assigns the first matching pattern's tag, so 'R.AnyExt'
+is appended last by construction — new known types add to
+'knownTypes' without disturbing the catch-all's trailing position.
+-}
 filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
-  (id &&& filePattern)
-    <$> [ R.LMLType R.Md
-        , R.LMLType R.Org
-        , R.Yaml
-        , R.HeistTpl
-        , R.AnyExt
-        ]
+  ((id &&& filePattern) <$> knownTypes)
+    <> [(R.AnyExt, filePattern R.AnyExt)]
+  where
+    knownTypes :: [R.FileType R.SourceExt]
+    knownTypes =
+      [ R.LMLType R.Md
+      , R.LMLType R.Org
+      , R.Yaml
+      , R.HeistTpl
+      , R.LuaFilter
+      ]
 
 {- | Universal ignore patterns applied to every layer. Layer-specific
 ignores belong in a `.emanoteignore` file at the layer root — see

@@ -23,6 +23,8 @@ import Emanote.Model.Note (
  )
 import Emanote.Model.Note qualified as N
 import Emanote.Model.SData (IxSData, SData, sdataRoute)
+import Emanote.Model.SourceDependencies (SourceDependencies)
+import Emanote.Model.SourceDependencies qualified as SDeps
 import Emanote.Model.StaticFile (
   IxStaticFile,
   StaticFile (StaticFile),
@@ -66,6 +68,18 @@ data ModelT encF = Model
   , _modelStorkIndex :: Stork.IndexVar
   , _modelFolgezettelTree :: Forest R.LMLRoute
   -- ^ Folgezettel tree computed once for each update to model.
+  , _modelSourceDependencies :: SourceDependencies
+  -- ^ Reverse index from external source files to dependent notes,
+  -- read by the patcher to invalidate exactly the notes affected by
+  -- an edit. See "Emanote.Model.SourceDependencies".
+  --
+  -- Maintenance is asymmetric across insert and delete by design:
+  -- 'modelInsertNote' does NOT touch the index — refreshing edges
+  -- needs the parsed @[FilePath]@ side-channel from
+  -- 'parseAndInsert' in @Emanote.Source.Patch@. 'modelDeleteNote'
+  -- absorbs the cleanup (the route is the only input it needs), so
+  -- callers don't have to remember to chain
+  -- @modelSourceDependencies %~ SDeps.removeNote r@ on every delete.
   }
   deriving stock (Generic)
 
@@ -113,6 +127,7 @@ emptyModel layers act ren ctw instanceId storkVar =
     , _modelHeistTemplate = def
     , _modelStorkIndex = storkVar
     , _modelFolgezettelTree = mempty
+    , _modelSourceDependencies = SDeps.emptyDependencies
     }
 
 modelReadyForView :: ModelT f -> ModelT f
@@ -190,6 +205,8 @@ modelDeleteNote k model =
     %~ deleteIxMulti k
       & modelTasks
     %~ deleteIxMulti k
+      & modelSourceDependencies
+    %~ SDeps.removeNote k
   where
     -- If the note being deleted is $folder.md *and* folder/ has .md files, this
     -- will be `Just folderRoute`.
