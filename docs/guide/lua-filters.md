@@ -3,8 +3,8 @@ slug: lua-filters
 short-title: Lua Filters
 pandoc:
   filters:
-    - list-table.lua
-    - wordcount.lua
+    - lua-filters/list-table.lua
+    - lua-filters/wordcount.lua
 ---
 
 # Pandoc Lua Filters
@@ -14,10 +14,10 @@ To enable a [Pandoc Lua filter](https://pandoc.org/lua-filters.html) for a parti
 ```yaml
 pandoc:
   filters:
-    - list-table.lua
+    - lua-filters/list-table.lua
 ```
 
-The filter path is resolved against your notebook layers first, then against Emanote's default layer. That means `filters/custom.lua` works when the file exists in your notebook, while bundled filters like `list-table.lua` and `wordcount.lua` work without copying anything into your notes. Multiple filters run in declaration order — this very page chains the bundled `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer right at the bottom.
+The filter path is resolved against your notebook layers first, then against Emanote's default layer. That means `filters/custom.lua` works when the file exists in your notebook, while bundled filters like `lua-filters/list-table.lua` and `lua-filters/wordcount.lua` work without copying anything into your notes. Multiple filters run in declaration order — this very page chains the bundled `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer right at the bottom.
 
 Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
 

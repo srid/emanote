@@ -7,12 +7,12 @@ frontmatter without copying files into their own notebook:
 ```yaml
 pandoc:
   filters:
-    - list-table.lua
-    - wordcount.lua
+    - lua-filters/list-table.lua
+    - lua-filters/wordcount.lua
 ```
 
 Emanote searches user notebook layers first. A user-provided `list-table.lua`
-or `filters/list-table.lua` therefore still overrides or supplements this
+or `lua-filters/list-table.lua` therefore still overrides or supplements this
 bundle according to the path named in frontmatter.
 
 ## Included Filters

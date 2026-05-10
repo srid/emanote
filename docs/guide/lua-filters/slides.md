@@ -50,8 +50,8 @@ Pure-Lua filters compose cleanly. The [[lua-filters|main guide page]] chains `li
 ```yaml
 pandoc:
   filters:
-    - list-table.lua
-    - wordcount.lua
+    - lua-filters/list-table.lua
+    - lua-filters/wordcount.lua
 ```
 
 Both are bundled in Emanote's default layer and run on every save; the order matches the array.
