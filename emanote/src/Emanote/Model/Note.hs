@@ -344,7 +344,7 @@ mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> [T
 mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
-      doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
+      doc = if null errs then doc'' else pandocPrepend (errorDiv "yaml" "Emanote Errors 😔" errs) doc''
    in Note
         { _noteRoute = r
         , _noteSource = src
@@ -365,17 +365,15 @@ mkNoteWith r src doc' meta errs =
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
 
-{- | Shared builder for the YAML / Markdown parse-error banner used by both
-the per-note markdown error path (in 'mkNoteWith') and the route-cascade
-yaml error path (in 'Emanote.View.Template').
-
-Delegates the AST shape to 'Diagnostic.errorBlock' so all Emanote-emitted
-diagnostics share a single rendering convention (universal @emanote:error@
-marker class plus a @yaml@ variant sub-class for this category).
+{- | Shared builder for diagnostic banners. The @category@ is what
+'Diagnostic.errorBlock' turns into the @emanote:error:<category>@ variant
+class, so callers stay honest about *why* a banner is being shown — yaml
+cascade errors, markdown parse errors, and Lua filter errors each carry
+their own CSS hook for theming and selectors.
 -}
-errorDiv :: Text -> [Text] -> B.Block
-errorDiv header errs =
-  Diagnostic.errorBlock "yaml"
+errorDiv :: Text -> Text -> [Text] -> B.Block
+errorDiv category header errs =
+  Diagnostic.errorBlock category
     $ B.Para [B.Strong $ one $ B.Str header]
     : (B.Para . one . B.Str <$> errs)
 

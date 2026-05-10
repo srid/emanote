@@ -256,7 +256,7 @@ failOnStaticRenderFilterErrors False r errs =
 prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
 prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
-  Pandoc meta $ MN.errorDiv "Pandoc Lua filter error" errs : blocks
+  Pandoc meta $ MN.errorDiv "lua-filter" "Pandoc Lua filter error" errs : blocks
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
@@ -374,4 +374,4 @@ markdown and yaml error surfaces share one Div shape. Issue #285.
 prependDataErrors :: Aeson.Value -> [Text] -> Pandoc -> Pandoc
 prependDataErrors _ [] doc = doc
 prependDataErrors meta errs (Pandoc m blocks) =
-  Pandoc m (MN.errorDiv (C.i18nText meta "badYamlFiles" "Emanote: bad YAML files") errs : blocks)
+  Pandoc m (MN.errorDiv "yaml" (C.i18nText meta "badYamlFiles" "Emanote: bad YAML files") errs : blocks)
