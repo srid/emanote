@@ -80,7 +80,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
       foldlM applyOne m0 (changeEntries change)
     applyOne :: (MonadUnliftIO m, MonadLoggerIO m) => Model.ModelEma -> (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) -> m Model.ModelEma
     applyOne m (fpType, fp, action) = do
-      trans <- Patch.patchModel layers _emanoteConfigNoteFn storkIndex scriptingEngine m fpType fp action
+      trans <- Patch.patchModel layers _emanoteConfigNoteFn storkIndex m fpType fp action
       pure $! trans m
   Dynamic
     <$> UM.unionMountStreaming

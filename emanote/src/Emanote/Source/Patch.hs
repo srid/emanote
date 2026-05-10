@@ -33,7 +33,6 @@ import Optics.Operators ((%~), (^.))
 import Relude
 import Relude.Extra (traverseToSnd)
 import System.UnionMount qualified as UM
-import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Concurrent (threadDelay)
 import UnliftIO.Directory (doesDirectoryExist)
 
@@ -41,42 +40,40 @@ import UnliftIO.Directory (doesDirectoryExist)
 
 The streaming handler in 'Source.Dynamic' hands every per-file step
 the running model; we forward it uniformly so 'patchModel' has one
-shape across all file types. Only the 'R.LuaFilter' branch reads it
-today (to walk the reverse-dependency index in
-@Emanote.Model.SourceDependencies@). The returned transformer is
-applied to that same model by the caller.
+shape across all file types. Note parsing reads the model's Pandoc
+scripting engine, and the 'R.LuaFilter' branch also walks the
+reverse-dependency index in @Emanote.Model.SourceDependencies@. The
+returned transformer is applied to that same model by the caller.
 -}
 patchModel ::
   (MonadIO m, MonadLogger m, MonadLoggerIO m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  ScriptingEngine ->
   ModelEma ->
   R.FileType R.SourceExt ->
   FilePath ->
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
+patchModel layers noteF storkIndexTVar model fpType fp action = do
   logger <- askLoggerIO
   now <- liftIO getCurrentTime
   -- Prefix all patch logging with timestamp.
   let newLogger loc src lvl s =
         logger loc src lvl $ fromString (formatTime defaultTimeLocale "[%H:%M:%S] " now) <> s
-  runLoggingT (patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action) newLogger
+  runLoggingT (patchModel' layers noteF storkIndexTVar model fpType fp action) newLogger
 
 patchModel' ::
   (MonadIO m, MonadLogger m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
   Stork.IndexVar ->
-  ScriptingEngine ->
   ModelEma ->
   R.FileType R.SourceExt ->
   FilePath ->
   UM.FileAction (NonEmpty (Loc, FilePath)) ->
   m (ModelEma -> ModelEma)
-patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action = do
+patchModel' layers noteF storkIndexTVar model fpType fp action = do
   sourcePatch <- case fpType of
     R.LMLType lmlType -> do
       case R.mkLMLRouteFromKnownFilePath lmlType fp of
@@ -95,7 +92,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
 
           case action of
             UM.Refresh refreshAction overlays ->
-              parseAndInsert layers noteF scriptingEngine refreshAction r (head overlays)
+              parseAndInsert layers noteF model refreshAction r (head overlays)
             UM.Delete -> do
               log $ "Removing note: " <> toText fp
               pure $ M.modelDeleteNote r
@@ -127,7 +124,7 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
           log $ "Lua filter changed (" <> toText fp <> "); re-parsing " <> show (Map.size dependents) <> " dependent note(s)"
           -- Re-parse rewrites the AST, so the cached stork index is stale.
           Stork.clearStorkIndex storkIndexTVar
-          chainM (uncurry (parseAndInsert layers noteF scriptingEngine UM.Update)) (Map.toList dependents)
+          chainM (uncurry (parseAndInsert layers noteF model UM.Update)) (Map.toList dependents)
     R.Yaml ->
       case R.mkLmlRouteFromFilePath fp of
         Nothing ->
@@ -251,15 +248,15 @@ parseAndInsert ::
   (MonadIO m, MonadLogger m) =>
   Set Loc ->
   (N.Note -> N.Note) ->
-  ScriptingEngine ->
+  ModelEma ->
   UM.RefreshAction ->
   R.LMLRoute ->
   (Loc, FilePath) ->
   m (ModelEma -> ModelEma)
-parseAndInsert layers noteF scriptingEngine refreshAction r src = do
+parseAndInsert layers noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   N.ParseResult {N.parsedNote = note, N.luaFilterDeps = filterPaths} <-
-    N.parseNote scriptingEngine (fst . locPath <$> Set.toAscList layers) r src (decodeUtf8 s)
+    N.parseNote (model ^. M.modelScriptingEngine) (fst . locPath <$> Set.toAscList layers) r src (decodeUtf8 s)
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src filterPaths)

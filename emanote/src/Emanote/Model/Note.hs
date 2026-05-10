@@ -18,7 +18,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Time.Calendar (toGregorian)
 import Emanote.Model.Calendar.Parser qualified as Calendar
-import Emanote.Model.Note.Filter (applyDeclaredPandocFilters, checkDeclaredPandocFilters)
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Title qualified as Tit
 import Emanote.Pandoc.BuiltinFilters (preparePandoc)
@@ -59,6 +59,7 @@ data Note = Note
   -- ^ The layer from which this note came. Nothing if the note was auto-generated.
   , _noteDoc :: Pandoc
   , _noteMeta :: Aeson.Value
+  , _notePandocFilterDeclarations :: NoteFilter.PandocFilterDeclarations
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
   , _noteFeed :: Maybe Feed
@@ -344,7 +345,16 @@ mkNoteWith r src doc' meta errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "Emanote Errors 😔" errs) doc''
-   in Note r src doc meta tit errs feed
+   in Note
+        { _noteRoute = r
+        , _noteSource = src
+        , _noteDoc = doc
+        , _noteMeta = meta
+        , _notePandocFilterDeclarations = NoteFilter.PandocFilterDeclarations mempty mempty
+        , _noteTitle = tit
+        , _noteErrors = errs
+        , _noteFeed = feed
+        }
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -390,7 +400,7 @@ parseNote ::
   Text ->
   m ParseResult
 parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
-  ((doc, meta, filters), errs) <- runWriterT $ do
+  ((doc, meta, filterDeclarations, filters), errs) <- runWriterT $ do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
@@ -401,7 +411,10 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
   pure
     ParseResult
-      { parsedNote = mkNoteWith r (Just src) doc metaWithDateFromPath errs
+      { parsedNote =
+          (mkNoteWith r (Just src) doc metaWithDateFromPath errs)
+            { _notePandocFilterDeclarations = filterDeclarations
+            }
       , luaFilterDeps = filters
       }
   where
@@ -419,12 +432,13 @@ parseNoteOrg ::
   ScriptingEngine ->
   [FilePath] ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
+  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath])
 parseNoteOrg scriptingEngine pluginBaseDir s = do
   (doc', meta) <- parseNoteOrgDocument s
   let requestedFilters = odPandocFilters $ parseOrgDirectives s
-  (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir requestedFilters doc'
-  pure (doc, meta, filterDeps)
+      filterDeclarations = NoteFilter.PandocFilterDeclarations requestedFilters mempty
+  (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations doc'
+  pure (doc, meta, filterDeclarations, filterDeps)
 
 parseNoteOrgDocument :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
 parseNoteOrgDocument s =
@@ -474,19 +488,18 @@ parseNoteMarkdown ::
   R.LMLRoute ->
   FilePath ->
   Text ->
-  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
+  WriterT [Text] m (Pandoc, Aeson.Value, NoteFilter.PandocFilterDeclarations, [FilePath])
 parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
   case Markdown.parseMarkdown fp md of
     Left err -> do
       tell [err]
-      pure (mempty, defaultFrontMatter, [])
+      pure (mempty, defaultFrontMatter, NoteFilter.PandocFilterDeclarations mempty mempty, [])
     Right (withAesonDefault defaultFrontMatter -> frontmatter, doc') -> do
-      let parseFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "parse"]) frontmatter
-          renderFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) frontmatter
-      (doc, filterDeps) <- applyDeclaredPandocFilters scriptingEngine pluginBaseDir parseFilters $ preparePandoc doc'
-      renderFilterDeps <- checkDeclaredPandocFilters pluginBaseDir renderFilters
+      let filterDeclarations = NoteFilter.lookupPandocFilterDeclarations frontmatter
+      (doc, filterDeps) <- NoteFilter.applyParsePandocFilters scriptingEngine pluginBaseDir filterDeclarations $ preparePandoc doc'
+      renderFilterDeps <- NoteFilter.checkRenderPandocFilters pluginBaseDir filterDeclarations
       let meta = applyNoteMetaFilters doc r frontmatter
-      pure (doc, meta, ordNub $ filterDeps <> renderFilterDeps)
+      pure (doc, meta, filterDeclarations, ordNub $ filterDeps <> renderFilterDeps)
   where
     withAesonDefault default_ mv =
       fromMaybe default_ mv

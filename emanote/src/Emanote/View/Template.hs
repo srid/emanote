@@ -3,7 +3,6 @@ module Emanote.View.Template (emanoteSiteOutput, render) where
 import Control.Exception (throwIO)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
 import Control.Monad.Writer.Strict (runWriterT)
-import Data.Aeson.KeyMap qualified as KeyMap
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
@@ -46,7 +45,7 @@ import Relude
 import System.IO.Error (userError)
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
-import Text.Pandoc.Definition (Meta (..), MetaValue (..), Pandoc (..))
+import Text.Pandoc.Definition (Pandoc (..))
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -161,7 +160,6 @@ renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
       baseDoc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
-      renderFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters", "render", "html"]) (note ^. MN.noteMeta)
       pluginBaseDir = fst . Loc.locPath <$> Set.toAscList (model ^. M.modelLayers)
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
@@ -172,14 +170,14 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  ((filteredDoc, _), renderFilterErrors) <-
+  (filteredDoc, renderFilterErrors) <-
     runWriterT
-      $ NoteFilter.applyDeclaredPandocFiltersForFormat
+      $ NoteFilter.applyRenderHtmlPandocFilters
         (model ^. M.modelScriptingEngine)
         pluginBaseDir
-        "html"
-        renderFilters
-        (withPandocMeta meta baseDoc)
+        (note ^. MN.notePandocFilterDeclarations)
+        meta
+        baseDoc
   let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
       toc = newToc doc
   failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
@@ -241,30 +239,6 @@ renderLmlHtml model note = do
       C.withBlockCtx ctx
         $ \ctx' ->
           renderToc ctx' toc
-
-withPandocMeta :: Aeson.Value -> Pandoc -> Pandoc
-withPandocMeta meta (Pandoc _ blocks) =
-  Pandoc (aesonToPandocMeta meta) blocks
-
-aesonToPandocMeta :: Aeson.Value -> Meta
-aesonToPandocMeta = \case
-  Aeson.Object o -> Meta $ Map.mapMaybe aesonToPandocMetaValue $ KeyMap.toMapText o
-  _ -> mempty
-
-aesonToPandocMetaValue :: Aeson.Value -> Maybe MetaValue
-aesonToPandocMetaValue = \case
-  Aeson.Object o ->
-    Just . MetaMap . Map.mapMaybe aesonToPandocMetaValue $ KeyMap.toMapText o
-  Aeson.Array xs ->
-    Just . MetaList $ mapMaybe aesonToPandocMetaValue (toList xs)
-  Aeson.String s ->
-    Just $ MetaString s
-  Aeson.Number n ->
-    Just . MetaString $ show n
-  Aeson.Bool b ->
-    Just $ MetaBool b
-  Aeson.Null ->
-    Nothing
 
 failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
 failOnStaticRenderFilterErrors _ _ [] = pass

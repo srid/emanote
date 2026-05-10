@@ -29,6 +29,8 @@ pandoc:
         - filters/slides.lua
 ```
 
+Prefer parse-time filters for cheap, pure AST rewrites that should affect Emanote's model: title extraction, tags, links, backlinks, tasks, table structure, and search text all see the parse-filtered document. Parse-time filters cannot use IO-capable Lua/Pandoc APIs such as `io`, `os`, `print`, `require`, `load`, `pandoc.pipe`, `pandoc.system`, `pandoc.mediabag`, `pandoc.template`, `pandoc.zip`, or Pandoc's nested filter runners; Emanote rejects direct references before running the filter and also runs parse filters with those APIs disabled. Prefer render-time filters for HTML-specific output or IO work such as calling external tools, reading caches, emitting raw HTML/CSS/JavaScript, or generating diagrams. That keeps note parsing fast and avoids doing expensive IO when Emanote only needs the semantic note model.
+
 The filter path is resolved against your notebook layers first, then against Emanote's default layer. That means `filters/custom.lua` works when the file exists in your notebook, while bundled filters like `lua-filters/list-table.lua` and `lua-filters/wordcount.lua` work without copying anything into your notes. Multiple filters run in declaration order — this very page chains the bundled `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer right at the bottom.
 
 Org notes use an Org keyword instead. Add one `#+PANDOC_FILTERS:` line per parse-time filter:
@@ -43,6 +45,7 @@ Edits to the `.lua` file hot-reload: the live server re-parses every note that r
 > [!warning] Remaining limitations
 > - Filter declarations are note-local: Markdown frontmatter or Org `#+PANDOC_FILTERS:` keywords. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
 > - Parse-time filters run with `FORMAT == "markdown"`. Writer-specific HTML filters should use `pandoc.filters.render.html`, which runs with `FORMAT == "html"` and receives the note's effective metadata in `doc.meta`.
+> - Filters that need filesystem, process, media, module-loading, or dynamic-code IO belong under `pandoc.filters.render.html`, not `pandoc.filters.parse`.
 
 ## Demos
 
