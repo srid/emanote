@@ -143,10 +143,11 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
             let sData = SD.parseSDataCascading r yamlContents
             whenLeft_ (sData ^. SD.sdataValue) $ \err ->
               logE $ "Bad YAML file: " <> err
-            pure $ M.modelInsertData sData
+            staticFileAct <- insertStaticFileByPath refreshAction overlays fp
+            pure $ M.modelInsertData sData >>> staticFileAct
           UM.Delete -> do
             log $ "Removing data: " <> toText fp
-            pure $ M.modelDeleteData r
+            pure $ M.modelDeleteData r >>> deleteStaticFileByPath fp
     R.HeistTpl ->
       case action of
         UM.Refresh refreshAction overlays -> do
@@ -159,10 +160,11 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
             s <- readRefreshedFile refreshAction fpAbs
             logD $ "Read " <> show (BS.length s) <> " bytes of template"
             pure $ M.modelHeistTemplate %~ T.addTemplateFile fpAbs fp s
-          pure $ readyOnTemplates >>> act
+          staticFileAct <- insertStaticFileByPath refreshAction overlays fp
+          pure $ readyOnTemplates >>> act >>> staticFileAct
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
-          pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
+          pure $ (M.modelHeistTemplate %~ T.removeTemplateFile fp) >>> deleteStaticFileByPath fp
     R.AnyExt -> do
       case R.mkRouteFromFilePath fp of
         Nothing ->
@@ -179,11 +181,36 @@ patchModel' layers noteF storkIndexTVar scriptingEngine model fpType fp action =
                       UM.Existing -> logD . ("Registering" <>)
                       _ -> log . ("Re-registering" <>)
                 logF $ " file: " <> toText fpAbs <> " " <> show r
-                t <- liftIO getCurrentTime
-                mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
-                pure $ M.modelInsertStaticFile t r fpAbs mInfo
+                insertStaticFile refreshAction overlays r
           UM.Delete -> do
             pure $ M.modelDeleteStaticFile r
+
+insertStaticFileByPath ::
+  (MonadIO m, MonadLogger m) =>
+  UM.RefreshAction ->
+  NonEmpty (Loc, FilePath) ->
+  FilePath ->
+  m (ModelEma -> ModelEma)
+insertStaticFileByPath refreshAction overlays fp =
+  maybe (pure id) (insertStaticFile refreshAction overlays)
+    $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
+
+insertStaticFile ::
+  (MonadIO m, MonadLogger m) =>
+  UM.RefreshAction ->
+  NonEmpty (Loc, FilePath) ->
+  R.R 'R.AnyExt ->
+  m (ModelEma -> ModelEma)
+insertStaticFile refreshAction overlays r = do
+  let fpAbs = locResolve $ head overlays
+  t <- liftIO getCurrentTime
+  mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
+  pure $ M.modelInsertStaticFile t r fpAbs mInfo
+
+deleteStaticFileByPath :: FilePath -> ModelEma -> ModelEma
+deleteStaticFileByPath fp =
+  maybe id M.modelDeleteStaticFile
+    $ R.mkRouteFromFilePath @_ @'R.AnyExt fp
 
 {- | Frontmatter-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The

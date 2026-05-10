@@ -115,6 +115,17 @@ Feature: Smoke
     Then the page contains an element with class "kw"
     And the page contains an element with class "fu"
 
+  Scenario: Wikilink-embedded YAML files resolve as code files (regression: #720)
+    When I open "/special-source-files.html"
+    Then the page contains an element with class "yaml"
+    And the page contains an element with class "kw"
+
+  Scenario: Wikilinks to Heist template files resolve as static files (regression: #720)
+    When I open "/special-source-files.html"
+    Then the article link with text "template source" has href containing "view-source.tpl"
+    When I fetch "/view-source.tpl"
+    Then the response body contains "data-special-template-source=\"issue-720\""
+
   @morph
   Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
     When I open "/i18n.fr"

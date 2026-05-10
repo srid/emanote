@@ -89,6 +89,12 @@ A CSS snippet:
 
 ![[styles-demo.css]]
 
+Emanote source files that also have structural meaning are still available to wikilinks. For example, `index.yaml` continues to feed the metadata cascade, but `![[index.yaml]]` can also inline the topmost file from the layer stack as a highlighted YAML block:
+
+![[index.yaml]]
+
+Template sources are linkable the same way, so a guide can point readers at a live override such as [[templates/hooks/after-note.tpl|after-note.tpl]].
+
 #### Supported extensions
 
 Anything skylighting's [`syntaxesByExtension`](https://hackage.haskell.org/package/skylighting-core/docs/Skylighting-Core.html#v:syntaxesByExtension) recognises will highlight — that's hundreds of languages spanning Ada through Zsh, including the common programming languages, shells, markup (`.html`, `.tex`, `.rst`, …), data formats (`.json`, `.yaml`, `.toml`, `.xml`, …), and config files (`.ini`, `.css`, `.scss`, …). The image, audio, video, and PDF extensions listed above take precedence and embed via their dedicated templates instead.
