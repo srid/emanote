@@ -22,6 +22,12 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:HELLO"
     And the article body does not contain "EMANOTELUAORGDEMO"
 
+  Scenario: Lua filter sources remain linkable by wikilink
+    When I open "/lua-filter-demo.html"
+    Then the article link with text "demo filter source" has href containing "filters/demo-filter.lua"
+    When I fetch "/filters/demo-filter.lua"
+    Then the response body contains "EMANOTE_LUA_DEMO_TOKEN"
+
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent notes (#263)
     When I open "/lua-filter-demo.html"

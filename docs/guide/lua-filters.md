@@ -26,7 +26,7 @@ Org notes use an Org keyword instead. Add one `#+PANDOC_FILTERS:` line per filte
 #+PANDOC_FILTERS: filters/wordcount.lua
 ```
 
-Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
+Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are recognised as filters for hot-reload and remain linkable as source files; see [[embed|Embedding]] for a source-file embed example.
 
 > [!warning] Remaining limitations
 > - Filters can only be declared in a note's own Markdown frontmatter or Org `#+PANDOC_FILTERS:` keywords. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).

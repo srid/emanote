@@ -85,14 +85,21 @@ readStaticFileInfo fp readFilePath = do
         pure $ Just StaticFileInfoAudio
     | extension == ".pdf" ->
         pure $ Just StaticFileInfoPDF
+    | toText extension `elem` yamlExts ->
+        readCodeFile $ CodeLanguage "yaml"
+    | extension == ".tpl" ->
+        readCodeFile $ CodeLanguage "html"
     | Just lang <- codeLanguageForExtension extension -> do
-        code <- readFilePath fp
-        pure $ Just $ StaticFileInfoCode lang code
+        readCodeFile lang
     | otherwise -> return Nothing
   where
     imageExts = [".jpg", ".jpeg", ".png", ".svg", ".gif", ".bmp", ".webp"]
     videoExts = [".mp4", ".webm", ".ogv"]
     audioExts = [".aac", ".caf", ".flac", ".mp3", ".ogg", ".wav", ".wave"]
+    yamlExts = [".yaml", ".yml"]
+    readCodeFile lang = do
+      code <- readFilePath fp
+      pure $ Just $ StaticFileInfoCode lang code
 
 {- | Look up a source-code language for a file extension via skylighting's
 own bundled syntax map.
