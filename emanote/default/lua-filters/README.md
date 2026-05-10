@@ -11,9 +11,9 @@ pandoc:
     - lua-filters/wordcount.lua
 ```
 
-Emanote searches user notebook layers first. A user-provided `list-table.lua`
-or `lua-filters/list-table.lua` therefore still overrides or supplements this
-bundle according to the path named in frontmatter.
+Emanote searches user notebook layers first. A user-provided file at the same
+path named in frontmatter, such as `lua-filters/list-table.lua`, therefore
+overrides this bundle.
 
 ## Included Filters
 
