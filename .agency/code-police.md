@@ -4,6 +4,17 @@ Project-specific additions to the built-in rule set in `.claude/skills/code-poli
 
 The patterns here came out of [#672](https://github.com/srid/emanote/pull/672) (Stork ES-module migration), where seven follow-up commits — three from `/code-police`, four from `/hickey` + `/lowy` — landed on top of the primary feature. Capture: same shape of mistake, same kind of fix, made into a recurring check.
 
+## docs-internal-wikilinks
+
+When reviewing documentation changes under `docs/`, check internal documentation references for wikilinks.
+
+- Use wikilinks for references to existing docs pages, such as `[[yaml-config]]`, `[[html-template]]`, `[[wikilinks]]`, `[[layer]]`, `[[markdown]]`, `[[query]]`, `[[search]]`, and related guide pages.
+- Prefer wikilinks over raw relative Markdown links for internal docs references.
+- Replace bare mentions of concepts covered by existing docs pages with wikilinks, unless doing so would make the sentence noisy or misleading.
+- New or newly promoted guide pages should be linked from the nearest relevant index page, usually `docs/guide.md`.
+
+This rule is meant to catch isolated docs pages that repeat or mention existing Emanote concepts without connecting to the surrounding guide.
+
 ## emanote-tailwind-first
 
 When styling Heist templates or JS-generated DOM, prefer **inline Tailwind utility classes** over CSS rules in `styles.tpl`. The grandfathered CSS in that file lives there because the rule it expresses doesn't fit the utility-class shape (e.g. complex `@keyframes`, `:popover-open` pseudo-states, or selectors that target Pandoc-emitted HTML with no class hook). Everything else belongs as `class="…"` in the template.
