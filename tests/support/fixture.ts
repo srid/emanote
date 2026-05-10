@@ -47,6 +47,7 @@ const mutatedSubtrees: string[] = [
  *  as a fatal note error). */
 const ephemeralFiles: string[] = [
   "lua-filter-late.md",
+  "lua-filter-late.org",
 ];
 
 /** Reset the staged notebook so the next scenario starts from

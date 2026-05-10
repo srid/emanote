@@ -395,9 +395,8 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
     case r of
       R.LMLRoute_Md _ ->
         parseNoteMarkdown scriptingEngine pluginBaseDir r fp s
-      R.LMLRoute_Org _ -> do
-        (d, m) <- parseNoteOrg s
-        pure (d, m, [])
+      R.LMLRoute_Org _ ->
+        parseNoteOrg scriptingEngine pluginBaseDir s
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> meta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) meta
@@ -416,8 +415,21 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
       _ <- P.satisfy (not . isDigit)
       pure $ toText $ mconcat [year, "-", month, "-", day]
 
-parseNoteOrg :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
-parseNoteOrg s =
+parseNoteOrg ::
+  (MonadIO m, MonadLogger m) =>
+  ScriptingEngine ->
+  [FilePath] ->
+  Text ->
+  WriterT [Text] m (Pandoc, Aeson.Value, [FilePath])
+parseNoteOrg scriptingEngine pluginBaseDir s = do
+  (doc', meta) <- parseNoteOrgDocument s
+  let requestedFilters = orgPandocFilters s
+  resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
+  doc <- applyPandocFilters scriptingEngine resolvedFilters doc'
+  pure (doc, meta, requestedFilters)
+
+parseNoteOrgDocument :: (MonadWriter [Text] m) => Text -> m (Pandoc, Aeson.Value)
+parseNoteOrgDocument s =
   case runPure $ readOrg readerOpts s of
     Left err -> do
       tell [show err]
@@ -428,6 +440,27 @@ parseNoteOrg s =
   where
     readerOpts = def {readerExtensions = extensionsFromList (exts)}
     exts = [Ext_auto_identifiers]
+
+orgPandocFilters :: Text -> [FilePath]
+orgPandocFilters =
+  fmap toString
+    . mapMaybe orgPandocFilterKeyword
+    . takeWhile orgHeaderLine
+    . dropWhile (T.null . T.strip)
+    . lines
+  where
+    orgHeaderLine line =
+      let stripped = T.strip line
+       in T.null stripped || "#+" `T.isPrefixOf` stripped
+    orgPandocFilterKeyword line = do
+      let stripped = T.stripStart line
+          (rawKey, rawValue) = T.breakOn ":" stripped
+          key = T.toCaseFold rawKey
+      guard $ not $ T.null rawValue
+      guard $ key `elem` ["#+pandoc_filters", "#+pandoc.filters"]
+      let value = T.strip $ T.drop 1 rawValue
+      guard $ not $ T.null value
+      pure value
 
 parseNoteMarkdown ::
   (MonadIO m, MonadLogger m) =>
@@ -448,18 +481,7 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
       -- Some are user-defined; some builtin. They operate on Pandoc, or the
       -- frontmatter meta.
       let requestedFilters = SData.lookupAeson @[FilePath] mempty ("pandoc" :| ["filters"]) frontmatter
-      resolvedFilters <- fmap catMaybes $ forM requestedFilters $ \p -> do
-        res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
-          doesPathExist (baseDir </> p) >>= \case
-            False -> do
-              pure Nothing
-            True ->
-              pure $ Just $ baseDir </> p
-        case res of
-          [] -> do
-            tell [toText $ "Pandoc filter " <> p <> " not found in any of: " <> show pluginBaseDir]
-            pure Nothing
-          (x : _) -> pure $ Just x
+      resolvedFilters <- resolvePandocFilterPaths pluginBaseDir requestedFilters
 
       doc <- applyPandocFilters scriptingEngine resolvedFilters $ preparePandoc doc'
       let meta = applyNoteMetaFilters doc r frontmatter
@@ -472,6 +494,25 @@ parseNoteMarkdown scriptingEngine pluginBaseDir r fp md = do
     withAesonDefault default_ mv =
       fromMaybe default_ mv
         `SData.mergeAeson` default_
+
+resolvePandocFilterPaths ::
+  (MonadIO m, MonadWriter [Text] m) =>
+  [FilePath] ->
+  [FilePath] ->
+  m [FilePath]
+resolvePandocFilterPaths pluginBaseDir requestedFilters =
+  fmap catMaybes $ forM requestedFilters $ \p -> do
+    res :: [FilePath] <- flip mapMaybeM pluginBaseDir $ \baseDir -> do
+      doesPathExist (baseDir </> p) >>= \case
+        False -> do
+          pure Nothing
+        True ->
+          pure $ Just $ baseDir </> p
+    case res of
+      [] -> do
+        tell [toText $ "Pandoc filter " <> p <> " not found in any of: " <> show pluginBaseDir]
+        pure Nothing
+      (x : _) -> pure $ Just x
 
 defaultFrontMatter :: Aeson.Value
 defaultFrontMatter =

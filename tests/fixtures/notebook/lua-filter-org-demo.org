@@ -1,0 +1,6 @@
+#+TITLE: Lua Filter Org Demo
+#+PANDOC_FILTERS: filters/demo-filter.lua
+
+* Lua Filter Org Demo
+
+A sentinel token the filter rewrites: EMANOTE_LUA_DEMO_TOKEN
