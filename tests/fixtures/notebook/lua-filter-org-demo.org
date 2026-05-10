@@ -3,4 +3,4 @@
 
 * Lua Filter Org Demo
 
-A sentinel token the filter rewrites: EMANOTE_LUA_DEMO_TOKEN
+A sentinel token the filter rewrites: EMANOTELUAORGDEMO

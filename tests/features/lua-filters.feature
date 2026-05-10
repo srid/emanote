@@ -20,7 +20,7 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   Scenario: An Org note's PANDOC_FILTERS keyword is applied at build time
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
-    And the article body does not contain "EMANOTE_LUA_DEMO_TOKEN"
+    And the article body does not contain "EMANOTELUAORGDEMO"
 
   @live @hot-reload
   Scenario: Editing a .lua filter live-updates dependent notes (#263)
@@ -33,7 +33,7 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   Scenario: Editing a .lua filter live-updates dependent Org notes (#721)
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
-    When I write "filters/demo-filter.lua" so EMANOTE_LUA_DEMO_TOKEN maps to "DEMO_FILTER:ORG-CHANGED"
+    When I write "filters/demo-filter.lua" so EMANOTELUAORGDEMO maps to "DEMO_FILTER:ORG-CHANGED"
     Then the article body contains "DEMO_FILTER:ORG-CHANGED" within 10 seconds
 
   @live @hot-reload
@@ -47,11 +47,11 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
 
   @live @hot-reload
   Scenario: Creating a previously-missing .lua filter wires up Org dependents (#721)
-    When I write an Org note "lua-filter-late.org" that references missing filter "filters/late-bound.lua" containing token "EMANOTE_ORG_LATE_TOKEN"
-    And I wait for "/lua-filter-late.html" to contain "EMANOTE_ORG_LATE_TOKEN"
+    When I write an Org note "lua-filter-late.org" that references missing filter "filters/late-bound.lua" containing token "EMANOTEORGLATETOKEN"
+    And I wait for "/lua-filter-late.html" to contain "EMANOTEORGLATETOKEN"
     And I open "/lua-filter-late.html"
-    Then the article body contains "EMANOTE_ORG_LATE_TOKEN"
-    When I write "filters/late-bound.lua" so EMANOTE_ORG_LATE_TOKEN maps to "ORG_LATE_BOUND:WIRED"
+    Then the article body contains "EMANOTEORGLATETOKEN"
+    When I write "filters/late-bound.lua" so EMANOTEORGLATETOKEN maps to "ORG_LATE_BOUND:WIRED"
     Then the article body contains "ORG_LATE_BOUND:WIRED" within 10 seconds
 
   @live @hot-reload
@@ -66,4 +66,4 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
     When I delete "filters/demo-filter.lua"
-    Then the article body contains "EMANOTE_LUA_DEMO_TOKEN" within 10 seconds
+    Then the article body contains "EMANOTELUAORGDEMO" within 10 seconds
