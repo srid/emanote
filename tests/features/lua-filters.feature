@@ -2,7 +2,7 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   A note's Lua filter declaration resolves from YAML frontmatter.
   Markdown notes use `pandoc.filters.parse` for parse-time filters and
   `pandoc.filters.render.html` for HTML render-time filters. Org notes
-  use `#+PANDOC_FILTERS` and `#+PANDOC_FILTERS_RENDER_HTML` keywords.
+  use `#+PANDOC_FILTERS_PARSE` and `#+PANDOC_FILTERS_RENDER_HTML` keywords.
   When a referenced `.lua` file is created, edited, or deleted,
   every dependent note's rendered HTML reflects the new filter
   behavior — without restarting `emanote run`.
@@ -26,8 +26,9 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
   Scenario: A note can use a bundled default-layer Lua filter
     When I open "/lua-filter-bundled.html"
     Then the page contains a table element with class "bundled-list-table"
+    And the article table link with text "a sibling note" has href containing "subfolder/sibling"
 
-  Scenario: An Org note's PANDOC_FILTERS keyword is applied at build time
+  Scenario: An Org note's PANDOC_FILTERS_PARSE keyword is applied at build time
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
     And the article body does not contain "EMANOTELUAORGDEMO"

@@ -62,7 +62,7 @@ When(
   "I write an Org note {string} that references missing filter {string} containing token {string}",
   function (orgPath: string, filterPath: string, token: string) {
     const org = `#+TITLE: Late-Bound Org Filter Test
-#+PANDOC_FILTERS: ${filterPath}
+#+PANDOC_FILTERS_PARSE: ${filterPath}
 
 * Late-Bound Org Filter Test
 
