@@ -195,18 +195,30 @@ local js = [[
     // contained to the track — scrollIntoView with block:'nearest'
     // has been observed to drop horizontal scroll updates when the
     // surrounding page is the actual scroll-container winner.
+    //
+    // Use getBoundingClientRect rather than offsetLeft: offsetLeft
+    // is relative to the slide's offsetParent, which is whatever
+    // ancestor happens to be positioned. The track itself has no
+    // explicit position, so offsetLeft mixes track-internal scroll
+    // coords with outer-wrapper coords and current() mis-identifies
+    // the visible slide whenever the track has a non-zero left in
+    // the page (any sidebar layout, in practice).
     const go = (i, smooth = true) => {
       const j = Math.max(0, Math.min(slides.length - 1, i));
+      const slideLeft = slides[j].getBoundingClientRect().left;
+      const trackLeft = track.getBoundingClientRect().left;
       track.scrollTo({
-        left: slides[j].offsetLeft,
+        left: track.scrollLeft + (slideLeft - trackLeft),
         behavior: smooth ? 'smooth' : 'instant',
       });
     };
     const current = () => {
-      const x = track.scrollLeft + track.clientWidth / 2;
+      const trackRect = track.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
       let best = 0, bestDist = Infinity;
       slides.forEach((s, i) => {
-        const d = Math.abs(s.offsetLeft + s.clientWidth / 2 - x);
+        const r = s.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - trackCenter);
         if (d < bestDist) { bestDist = d; best = i; }
       });
       return best;
