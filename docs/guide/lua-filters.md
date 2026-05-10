@@ -19,10 +19,17 @@ pandoc:
 
 The filter path is resolved against your notebook layers, so a path like `filters/list-table.lua` works as long as `filters/list-table.lua` exists in any of your `-L`'d layers. Multiple filters run in declaration order — this very page chains `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer right at the bottom.
 
+Org notes use an Org keyword instead. Add one `#+PANDOC_FILTERS:` line per filter:
+
+```org
+#+PANDOC_FILTERS: filters/list-table.lua
+#+PANDOC_FILTERS: filters/wordcount.lua
+```
+
 Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
 
 > [!warning] Remaining limitations
-> - Filters can only be declared in a note's own frontmatter. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
+> - Filters can only be declared in a note's own Markdown frontmatter or Org `#+PANDOC_FILTERS:` keywords. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
 > - Emanote calls `pandoc.applyFilters` with `FORMAT == "markdown"`, so filters that branch on `FORMAT` to emit writer-specific output (HTML, LaTeX) won't fire those branches. Stick to **FORMAT-agnostic** filters that operate on the AST regardless of writer. Most pure-Lua transforms (`list-table`, `include-files`, `wordcount`, the custom `slides.lua` below) are in this camp.
 
 ## Demos

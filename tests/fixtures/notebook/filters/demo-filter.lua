@@ -8,5 +8,8 @@ function Str(el)
   if el.text == "EMANOTE_LUA_DEMO_TOKEN" then
     return pandoc.Str("DEMO_FILTER:HELLO")
   end
+  if el.text == "EMANOTELUAORGDEMO" then
+    return pandoc.Str("DEMO_FILTER:HELLO")
+  end
   return nil
 end
