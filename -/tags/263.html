@@ -33,7 +33,7 @@
     })();
   </script>
   <title>
-    Task Index – Emanote
+    #263 - Tag Index – Emanote
   </title>
   
     
@@ -42,7 +42,7 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Task Index' />
+      <meta property='og:title' content='#263 - Tag Index' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -557,78 +557,55 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
             
           
           <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-            Task Index
+            #263 - Tag Index
           </h1>
         </header>
         <main class='w-full px-6 py-8 max-w-7xl mx-auto'>
           
-    <div class='w-full'>
-      <div class='w-full px-1'>
+    <!-- Tag breadcrumbs as tag-chips with `/` separator. Mirrors the
+         tasks.tpl breadcrumb pattern but with the tag-chip (font-mono,
+         primary palette) since each crumb segment IS a tag. -->
+    <nav id='tagcrumbs' class='mb-6 pb-3 border-b border-gray-100 dark:border-gray-800'>
+      <ol class='flex flex-wrap items-baseline gap-x-1.5 gap-y-1 font-mono text-sm'>
         
           
-            <section class='mt-6 mb-8'>
-              <header class='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800'>
-                <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='markdown'>
-                  Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-                </a>
-                <ol class='text-xs text-gray-500 dark:text-gray-400 inline-flex flex-wrap items-center gap-x-1.5'>
-                  
-                    
-                      <li class="inline-flex items-center gap-x-1.5 [&amp;:not(:last-child)]:after:content-['/'] [&amp;:not(:last-child)]:after:text-gray-300 dark:[&amp;:not(:last-child)]:after:text-gray-600">
-                        <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='/'>
-                          Emanote
-                        </a>
-                      </li>
-                    
-                      <li class="inline-flex items-center gap-x-1.5 [&amp;:not(:last-child)]:after:content-['/'] [&amp;:not(:last-child)]:after:text-gray-300 dark:[&amp;:not(:last-child)]:after:text-gray-600">
-                        <a class='hover:text-primary-700 dark:hover:text-primary-300 transition-colors' href='guide'>
-                          Guide
-                        </a>
-                      </li>
-                    
-                  
-                </ol>
-              </header>
-              <ul class='space-y-1.5'>
-                
-                  
-                    <li class='rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors px-2 py-1'>
-                      <svg xmlns='http://www.w3.org/2000/svg' class='--ema-checkbox inline-block h-[0.9em] w-[0.9em] shrink-0 mr-1 align-[-0.1em] text-gray-400 dark:text-gray-500 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='2' x='2' y='2' width='24' height='24' rx='4'></rect></svg>
-<span>
-  
-                        A task that is to be done.
-                      
-</span>
-
-                    </li>
-                  
-                    <li class='rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors px-2 py-1'>
-                      <svg xmlns='http://www.w3.org/2000/svg' class='--ema-checkbox inline-block h-[0.9em] w-[0.9em] shrink-0 mr-1 align-[-0.1em] text-gray-400 dark:text-gray-500 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='2' x='2' y='2' width='24' height='24' rx='4'></rect></svg>
-<span>
-  
-                        Task with <em>Markdown</em> and links (eg: <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>)
-                      
-</span>
-
-                    </li>
-                  
-                    <li class='rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors px-2 py-1'>
-                      <svg xmlns='http://www.w3.org/2000/svg' class='--ema-checkbox inline-block h-[0.9em] w-[0.9em] shrink-0 mr-1 align-[-0.1em] text-gray-400 dark:text-gray-500 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='2' x='2' y='2' width='24' height='24' rx='4'></rect></svg>
-<span>
-  
-                        This is a task on its own paragraph.
-                      
-</span>
-
-                    </li>
-                  
-                
-              </ul>
-            </section>
+            <li class="inline-flex items-baseline gap-x-1.5 [&amp;:not(:last-child)]:after:content-['/'] [&amp;:not(:last-child)]:after:text-gray-300 dark:[&amp;:not(:last-child)]:after:text-gray-600">
+              <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='-/tags'>
+                #/
+              </a>
+            </li>
           
         
-      </div>
-    </div>
+        <li class='inline-flex items-baseline'>
+          <span class='bg-primary-100/80 dark:bg-primary-900/70 text-primary-700 dark:text-primary-200 font-semibold px-1.5 py-0.5 rounded-sm'>
+            #263
+          </span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Child tags: tag-chip + count. The (N+M) notation reads as
+         (subtags + notes-with-this-tag). -->
+    
+
+    <!-- Notes tagged here: same chip language as queries / wikilinks. -->
+    
+      <section>
+        <header data-nosnippet class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2'>
+          Notes
+        </header>
+        <ul class='space-y-0.5'>
+          
+            <li class='flex items-baseline gap-2 px-2 py-1 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors'>
+              <span class='text-gray-300 dark:text-gray-700 select-none shrink-0' aria-hidden='true'>→</span>
+              <a class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
+                Pandoc Lua Filters
+              </a>
+            </li>
+          
+        </ul>
+      </section>
+    
   
         </main>
         <!-- Footer attached to the bottom of the main card as a thin text-link
@@ -683,4 +660,5 @@ Markdown, Wiki-links, directories, HTML templates for complete theming.' />
 </body>
 
 </html>
+
 

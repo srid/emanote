@@ -34,7 +34,7 @@
   </title>
   
     
-      <meta property='og:description' content='WARNING: This is an 🧪 experimental 🧪 feature and may change in future. It is being made available so users can try it out and give feedback to the author.' />
+      <meta property='og:description' content='To enable a Pandoc Lua filter for a particular Markdown file, put that filter in your notebook and add the following to the Markdown file’s YAML frontmatter:' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=149b6486-fc11-4cc2-b335-b94adcea8299' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=1b84973b-e808-4564-b356-31014819bfcf' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1457,13 +1457,10 @@
   
 
 
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -1472,9 +1469,11 @@
     <span class='flex-shrink-0'>
       
         
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='6 9 12 15 18 9'></polyline>
+      </svg>
+      
   
         
     </span>
@@ -1499,6 +1498,65 @@
   -->
   
     <div class='emanote-tree-children'>
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Slides demo' href='lua-filters/slides' data-iso-date>
+      Slides demo
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
       
     </div>
   
@@ -1896,53 +1954,20 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      <strong>WARNING</strong>: This is an <span class='bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded-md'>🧪 experimental 🧪</span> feature and may change in future. It is being made available so users can try it out and give feedback to the author.
-    </p>
-  
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='tip' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #08BFBC 8%, transparent); border-left-color: #08BFBC'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #08BFBC'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'>
-    </path>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-         Progress
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <p class='mb-4 leading-relaxed'>
-      See <a href='https://github.com/srid/emanote/issues/263' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>https://github.com/srid/emanote/issues/263</a>
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <p class='mb-4 leading-relaxed'>
       To enable a <a href='https://pandoc.org/lua-filters.html' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Pandoc Lua filter</a> for a particular Markdown file, put that filter in your notebook and add the following to the Markdown file’s YAML frontmatter:
     </p>
   <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
 <span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
 <span class='at'>    </span><span class='kw'>-</span><span class='at'> path/to/your.lua</span>
 </code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      The filter path is resolved against your notebook layers, so a path like <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/list-table.lua</code> works as long as <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/list-table.lua</code> exists in any of your <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-L</code>’d layers. Multiple filters run in declaration order — this very page chains <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code>, and you can see the wordcount footer right at the bottom.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      Edits to the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>touch</code> of the note required. The reverse-dependency lookup also covers <em>missing-at-parse-time</em> filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> files are not copied to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_site/</code> — they are recognised as filters, not static assets.
+    </p>
+  
 
 
 
@@ -1962,30 +1987,38 @@
   </div>
 
       <div class='ml-3'>
-         Limitations
+         Remaining limitations
       </div>
     </div>
     
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
-    <p class='mb-4 leading-relaxed'>
-      See <a href='https://github.com/srid/emanote/pull/278#issue-1207537343' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>here</a> for known limitations.
-    </p>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <h2 id='demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
-  Demo
+        <li>
+          Filters can only be declared in a note’s own frontmatter. Cascading <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters</code> from an ancestor <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code> is still tracked under <a href='https://github.com/srid/emanote/issues/263' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><span class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm emanote:inline-tag:263' title='Tag' data-tag='263'>#263</span></a>.
+        </li>
+      
+        <li>
+          Emanote calls <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.applyFilters</code> with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "markdown"</code>, so filters that branch on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT</code> to emit writer-specific output (HTML, LaTeX) won’t fire those branches. Stick to <strong>FORMAT-agnostic</strong> filters that operate on the AST regardless of writer. Most pure-Lua transforms (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>include-files</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount</code>, the custom <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code> below) are in this camp.
+        </li>
+      
+    </ul>
   
-  <a href='lua-filters.html#demo' class='--ema-anchor ml-2'>
+  </div>
+
+  </div>
+
+
+
+
+
+
+    <h2 id='demos' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Demos
+  
+  <a href='lua-filters.html#demos' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -1996,8 +2029,24 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      This uses the <a href='https://github.com/pandoc/lua-filters/tree/master/list-table' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>list table</a> filter (copied as <a href='filters/list-table.lua' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>File:list-table.lua</a>):
+      Three filters live under <a href='https://github.com/srid/emanote/tree/master/docs/filters' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>docs/filters/</code></a>:
     </p>
+  
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
+      
+        <li>
+          <a href='https://github.com/srid/emanote/blob/master/docs/filters/list-table.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code></a> — turn nested bullet lists into HTML tables. From <a href='https://github.com/pandoc/lua-filters/tree/master/list-table' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc/lua-filters</a>.
+        </li>
+      
+        <li>
+          <a href='https://github.com/srid/emanote/blob/master/docs/filters/wordcount.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code></a> — append a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>N words · M characters</code> footer to the document. Adapted from <a href='https://github.com/pandoc/lua-filters/tree/master/wordcount' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc/lua-filters</a>; upstream calls <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>os.exit(0)</code>, which would terminate the live server, so this fork sets the count as a footer block instead.
+        </li>
+      
+        <li>
+          <a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code></a> — custom: turn a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>:::slides</code> div into a navigable Markdown presentation, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.
+        </li>
+      
+    </ul>
   
     <h3 id='list-tablelua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
       
@@ -2013,6 +2062,68 @@
 
     </h3>
   <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 1</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 2</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 3</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 2, column 1</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 2, column 3</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 3, column 1</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 3, column 2</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Well!</td></tr></tbody></table>
+    <h3 id='wordcountlua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
+      
+  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code>
+  
+  <a href='lua-filters.html#wordcountlua' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      The footer at the bottom of this page is emitted by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code> — every save recomputes it.
+    </p>
+  
+    <h3 id='slideslua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
+      
+  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>
+  
+  <a href='lua-filters.html#slideslua' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>.
+    </p>
+  <rawhtml xmlhtmlRaw style='display: contents'><style>
+.wordcount-footer {
+  margin-top: 3rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-gray-200);
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.8125rem;
+  color: var(--color-gray-500);
+}
+.wordcount-footer dl {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+}
+.wordcount-footer div { display: flex; gap: 0.375rem; align-items: baseline; }
+.wordcount-footer dt { font-variant: small-caps; letter-spacing: 0.04em; }
+.wordcount-footer dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--color-gray-800);
+}
+.dark .wordcount-footer { border-top-color: var(--color-gray-800); color: var(--color-gray-400); }
+.dark .wordcount-footer dd { color: var(--color-gray-100); }
+</style>
+</rawhtml><div class='wordcount-footer'><rawhtml xmlhtmlRaw style='display: contents'><dl><div><dt>words</dt><dd>362</dd></div><div><dt>chars</dt><dd>1956</dd></div><div><dt>chars + spaces</dt><dd>2299</dd></div></dl></rawhtml></div>
 
   <div class='flex items-center justify-center mt-2'>
   <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters.md'>
@@ -2023,6 +2134,21 @@
 </div>
 </article>
     
+  <!-- Metadata tag chips at the page footer. Same primary palette as
+       the in-prose `emanote:inline-tag` rewriteClass and the wikilink
+       chips, kept in font-mono since the tag string IS an identifier
+       (slashed paths read better in mono). Drop the older gray-100
+       pill chrome that pre-dated the chip language. -->
+  <section class='flex flex-wrap items-end justify-center mt-8 mb-4 gap-x-2 gap-y-1.5 font-mono text-sm'>
+    
+      <a title='Tag' class='bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 px-1.5 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='-/tags/263'>
+        <!-- DoNotFormat -->
+        #263
+        <!-- DoNotFormat -->
+      </a>
+    
+  </section>
+
 
     <!-- What goes in this file will at the very end of the main div -->
   </main>
@@ -2054,9 +2180,9 @@
     
         <ul class='space-y-1 ml-2'>
           
-            <li class='truncate' title='Demo'>
-              <a href='lua-filters.html#demo' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Demo
+            <li class='truncate' title='Demos'>
+              <a href='lua-filters.html#demos' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Demos
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2064,6 +2190,28 @@
             <li class='truncate' title='list-table.lua'>
               <a href='lua-filters.html#list-tablelua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
                 list-table.lua
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='wordcount.lua'>
+              <a href='lua-filters.html#wordcountlua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                wordcount.lua
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='slides.lua'>
+              <a href='lua-filters.html#slideslua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                slides.lua
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2179,6 +2327,42 @@
           </div>
         </li>
       
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters/slides'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>A Markdown Presentation about Lua Filters
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>Pure-Lua filters compose cleanly. The <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>main guide page</a> chains <code>list-table.lua</code> with <code>wordcount.lua</code>:</p></div>
+    </div>
+  
+    <div>
+      <div><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> — Emanote’s main guide</div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
     </ul>
   </section>
 
@@ -2263,6 +2447,34 @@
 </span>
 
         </div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters/slides'>
+              A Markdown Presentation about Lua Filters
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>Pure-Lua filters compose cleanly. The <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>main guide page</a> chains <code>list-table.lua</code> with <code>wordcount.lua</code>:</p></div>
+    </div>
+  
+    <div>
+      <div><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> — Emanote’s main guide</div>
     </div>
   
 </div>

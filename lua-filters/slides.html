@@ -30,15 +30,15 @@
     })();
   </script>
   <title>
-    Dark Mode – Emanote
+    A Markdown Presentation about Lua Filters – Emanote
   </title>
   
     
-      <meta property='og:description' content='Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in localStorage and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS prefers-color-scheme preference.' />
+      <meta property='og:description' content='This page is itself a demo of two things at once: a custom slides.lua filter that turns a :::slides div into a navigable deck, and a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <kbd>←</kbd> / <kbd>→</kbd> keys, after clicking inside the deck) to step through.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Dark Mode' />
+      <meta property='og:title' content='A Markdown Presentation about Lua Filters' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -576,8 +576,8 @@
             </li>
           
             <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='html-template'>
-                HTML Templates
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='lua-filters'>
+                Pandoc Lua Filters
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -627,7 +627,7 @@
      the page identity but at low intensity, so the prose below isn't
      out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
   <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-    Dark Mode
+    A Markdown Presentation about Lua Filters
   </h1>
 </header>
 
@@ -1341,10 +1341,6 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-    
-      
-    
-  
 
 
 
@@ -1360,414 +1356,7 @@
     <span class='flex-shrink-0'>
       
         
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='6 9 12 15 18 9'></polyline>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template' data-iso-date>
-      HTML Templates
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Full-text search' href='search' data-iso-date>
-      Full-text search
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Backlinks' href='backlinks' data-iso-date>
-      Backlinks
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Breadcrumbs' href='breadcrumbs' data-iso-date>
-      Breadcrumbs
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-  
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-    </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Dark Mode' href='dark-mode' data-iso-date>
-      Dark Mode
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
-      
-    </div>
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='External links' href='external-links' data-iso-date>
-      External links
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Fonts and Typography' href='fonts' data-iso-date>
-      Fonts and Typography
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
-       The eye lands on the title now, not on the toggle. -->
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          <a href='neuron-layout' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='html-template' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -1779,13 +1368,13 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Neuron layout' href='neuron-layout' data-iso-date>
-      Neuron layout
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template' data-iso-date>
+      HTML Templates
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='1 children inside'>
-          1
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='12 children inside'>
+          12
         </span>
       
     
@@ -1803,306 +1392,6 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Open Graph Protocol (OGP)' href='ogp' data-iso-date>
-      Open Graph Protocol (OGP)
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Right panel' href='right-panel' data-iso-date>
-      Right panel
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Sidebar' href='sidebar' data-iso-date>
-      Sidebar
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Table of contents' href='toc' data-iso-date>
-      Table of contents
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Uplink tree' href='uptree' data-iso-date>
-      Uplink tree
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-    </div>
   
 </div>
 
@@ -2174,6 +1463,10 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
+    
+      
+    
+  
 
 
 
@@ -2189,28 +1482,19 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='lua-filters' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
-            
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='9 6 15 12 9 18'></polyline>
+        <polyline points='6 9 12 15 18 9'></polyline>
       </svg>
-    
-  
-          </a>
-          
       
+  
+        
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
       Lua Filters
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='1 children inside'>
-          1
-        </span>
-      
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -2225,6 +1509,69 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
+  
+    <div class='emanote-tree-children'>
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+  
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+    </span>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Slides demo' href='lua-filters/slides' data-iso-date>
+      Slides demo
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+    <div class='emanote-tree-children'>
+      
+    </div>
+  
+</div>
+
+      
+    </div>
   
 </div>
 
@@ -2620,14 +1967,295 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> preference.
+      This page is itself a demo of two things at once: a custom <strong><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code></strong> filter that turns a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>:::slides</code> div into a navigable deck, <em>and</em> a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <rawhtml xmlhtmlRaw style='display: contents'><kbd>←</kbd></rawhtml> / <rawhtml xmlhtmlRaw style='display: contents'><kbd>→</kbd></rawhtml> keys, after clicking inside the deck) to step through.
+    </p>
+  <rawhtml xmlhtmlRaw style='display: contents'><style>
+.emanote-slides {
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+  background: var(--color-gray-50);
+}
+.emanote-slides-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-gray-200);
+  font-size: 0.875rem;
+}
+.emanote-slides-nav [data-slide-id] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  color: var(--color-gray-700);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.emanote-slides-nav [data-slide-id]:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-100);
+}
+.emanote-slides-nav [data-slide-id].active {
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: #fff;
+}
+.emanote-slides-nav [data-slide-id].active:hover {
+  background: var(--color-primary-700);
+  border-color: var(--color-primary-700);
+}
+.emanote-slides-nav .emanote-slides-fs {
+  margin-left: auto;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-gray-700);
+  border-radius: 0.25rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.emanote-slides-nav .emanote-slides-fs:hover {
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-100);
+}
+.emanote-slides-nav .emanote-slides-fs svg { width: 1rem; height: 1rem; display: block; }
+.emanote-slides-nav .emanote-slides-fs .icon-exit { display: none; }
+.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-enter { display: none; }
+.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-exit { display: block; }
+.emanote-slides-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  aspect-ratio: 16 / 9;
+  background: var(--color-gray-50);
+}
+/* Fullscreen mode: fill the viewport, kill margins/border, scale slide
+   padding so the deck doesn't read as a tiny embedded frame. */
+.emanote-slides:fullscreen {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-gray-50);
+}
+.emanote-slides:fullscreen .emanote-slides-track {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  height: auto;
+}
+.emanote-slides:fullscreen .emanote-slide { padding: 4rem 6rem; }
+.emanote-slides:fullscreen .emanote-slide > h2:first-child { font-size: 3rem; }
+.emanote-slides:fullscreen .emanote-slide :is(p, ul, ol, pre) { font-size: 1.5rem; }
+.emanote-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  color: var(--color-gray-900);
+}
+.emanote-slide > h2:first-child {
+  margin-top: 0;
+  font-size: 2rem;
+  color: var(--color-gray-900);
+}
+.emanote-slide :is(p, ul, ol, pre) { font-size: 1.125rem; }
+
+.dark .emanote-slides {
+  background: var(--color-gray-900);
+  border-color: var(--color-gray-800);
+}
+.dark .emanote-slides-nav { border-bottom-color: var(--color-gray-800); }
+.dark .emanote-slides-nav [data-slide-id] { color: var(--color-gray-300); }
+.dark .emanote-slides-nav [data-slide-id]:hover {
+  border-color: var(--color-gray-700);
+  background: var(--color-gray-800);
+}
+.dark .emanote-slides-nav [data-slide-id].active {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: var(--color-gray-950);
+}
+.dark .emanote-slides-nav [data-slide-id].active:hover {
+  background: var(--color-primary-400);
+  border-color: var(--color-primary-400);
+}
+.dark .emanote-slides-track { background: var(--color-gray-900); }
+.dark .emanote-slide,
+.dark .emanote-slide > h2:first-child { color: var(--color-gray-100); }
+</style>
+</rawhtml><div class='emanote-slides'><div class='emanote-slides-nav'><rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="why-filters-1" title="Why filters?">1</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="adding-one-to-your-notebook-2" title="Adding one to your notebook">2</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="what-this-page-does-3" title="What this page does">3</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="hot-reload-4" title="Hot-reload">4</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="a-second-example-word-count-5" title="A second example: word count">5</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="caveat-pandoc-s-writer-specific-filters-6" title="Caveat: pandoc’s writer-specific filters">6</button></rawhtml> <rawhtml xmlhtmlRaw style='display: contents'><button type="button" data-slide-id="where-to-find-more-7" title="Where to find more">7</button></rawhtml><rawhtml xmlhtmlRaw style='display: contents'><button type="button" class="emanote-slides-fs" aria-label="Toggle fullscreen" title="Fullscreen"><svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg><svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg></button></rawhtml></div><div class='emanote-slides-track'><div id='why-filters-1' class='emanote-slide'>
+    <h2 id='why-filters-1' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Why filters?
+  
+  <a href='lua-filters/slides.html#why-filters-1' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Pandoc parses your Markdown into a typed AST — paragraphs, headings, links, code blocks. <strong>A Lua filter is a function that walks that tree and rewrites it</strong> before Emanote renders to HTML.
     </p>
   
-    <h2 id='how-it-works' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+    <p class='mb-4 leading-relaxed'>
+      Anything you can say about a node in Lua, you can transform.
+    </p>
+  </div><div id='adding-one-to-your-notebook-2' class='emanote-slide'>
+    <h2 id='adding-one-to-your-notebook-2' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  How it works
+  Adding one to your notebook
   
-  <a href='dark-mode.html#how-it-works' class='--ema-anchor ml-2'>
+  <a href='lua-filters/slides.html#adding-one-to-your-notebook-2' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
+      
+        <li class='pl-1'>
+          Drop a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> file anywhere in your notebook (convention: a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/</code> folder).
+        </li>
+      
+        <li class='pl-1'>
+          Reference it from the note’s frontmatter:
+        </li>
+      
+    </ol>
+  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='kw'>-</span><span class='at'> filters/slides.lua</span>
+</code></pre></div>
+    <ol class='my-4 ml-6 list-decimal space-y-1.5 leading-relaxed marker:font-semibold marker:text-primary-600 dark:marker:text-primary-400'>
+      
+        <li class='pl-1'>
+          Save. Emanote resolves the path against every <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>-L</code>’d layer.
+        </li>
+      
+    </ol>
+  </div><div id='what-this-page-does-3' class='emanote-slide'>
+    <h2 id='what-this-page-does-3' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  What this page does
+  
+  <a href='lua-filters/slides.html#what-this-page-does-3' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      This page declares <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters: [filters/slides.lua]</code>. Each <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>## </code> heading inside a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>::: slides</code> div becomes one slide; the filter wraps them in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;section&gt;</code> elements, prepends a nav strip, and emits CSS + a tiny arrow-key handler.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      <em>See the source: <a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>docs/filters/slides.lua</code></a>.</em>
+    </p>
+  </div><div id='hot-reload-4' class='emanote-slide'>
+    <h2 id='hot-reload-4' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Hot-reload
+  
+  <a href='lua-filters/slides.html#hot-reload-4' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Edit <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/slides.lua</code> — change a colour, tweak the layout, add a feature — and <strong>every note that references it re-parses on the next save</strong>. No <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>touch</code> of the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.md</code> required, no live-server restart.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      The reverse index from filter path → dependent notes is maintained inside Emanote’s model; an edit fires exactly the affected re-parses.
+    </p>
+  </div><div id='a-second-example-word-count-5' class='emanote-slide'>
+    <h2 id='a-second-example-word-count-5' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  A second example: word count
+  
+  <a href='lua-filters/slides.html#a-second-example-word-count-5' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Pure-Lua filters compose cleanly. The <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>main guide page</a> chains <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code> with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code>:
+    </p>
+  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>pandoc</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='kw'>-</span><span class='at'> filters/list-table.lua</span>
+<span class='at'>    </span><span class='kw'>-</span><span class='at'> filters/wordcount.lua</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Both run on every save; the order matches the array.
+    </p>
+  </div><div id='caveat-pandoc-s-writer-specific-filters-6' class='emanote-slide'>
+    <h2 id='caveat-pandoc-s-writer-specific-filters-6' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Caveat: pandoc’s writer-specific filters
+  
+  <a href='lua-filters/slides.html#caveat-pandoc-s-writer-specific-filters-6' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Many filters in <a href='https://github.com/pandoc/lua-filters' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc/lua-filters</a> branch on Pandoc’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT</code> variable to emit HTML or LaTeX. Emanote calls <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>applyFilters</code> with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "markdown"</code>, so a writer-specific branch may not fire as expected.
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      Filters that work cleanly here are <strong>FORMAT-agnostic</strong> — they operate at the AST level regardless of output format. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>include-files</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount</code>, and this very <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code> are all in that camp.
+    </p>
+  </div><div id='where-to-find-more-7' class='emanote-slide'>
+    <h2 id='where-to-find-more-7' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Where to find more
+  
+  <a href='lua-filters/slides.html#where-to-find-more-7' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2640,110 +2268,147 @@
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          The toggle button lives in the sidebar (next to the search icon), and also in the top-right corner of the no-sidebar “neuron-style” layout.
+          <a href='https://github.com/pandoc/lua-filters' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc/lua-filters</a> — the canonical collection
         </li>
       
         <li>
-          Clicking the toggle flips a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;html&gt;</code> and stores the choice in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> under the key <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote-theme</code>.
+          <a href='https://pandoc.org/lua-filters.html' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Pandoc Lua filter reference</a> — the API
         </li>
       
         <li>
-          An inline <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;script&gt;</code> in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>base.tpl</code> runs in the document head before any stylesheets, reads <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> (falling back to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code>), and adds the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
-        </li>
-      
-        <li>
-          All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> media query, so everything tracks the manual toggle.
+          <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> — Emanote’s main guide
         </li>
       
     </ul>
   
-    <h2 id='customization' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Customization
-  
-  <a href='dark-mode.html#customization' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <h3 id='adding-dark-mode-classes' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  Adding Dark Mode Classes
-  
-  <a href='dark-mode.html#adding-dark-mode-classes' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
     <p class='mb-4 leading-relaxed'>
-      When customizing templates, use Tailwind’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>dark:</code> variant:
+      The pattern is always the same: drop the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> in, name it in frontmatter, save.
     </p>
-  <div class='mb-6 text-sm'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>div</span><span class='ot'> class</span><span class='op'>=</span><span class='st'>"bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"</span><span class='dt'>&gt;</span>
-  Content that adapts to dark mode
-<span class='dt'>&lt;/</span><span class='kw'>div</span><span class='dt'>&gt;</span>
-</code></pre></div>
-    <h3 id='css-custom-styles' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  CSS Custom Styles
-  
-  <a href='dark-mode.html#css-custom-styles' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
+  </div></div></div><rawhtml xmlhtmlRaw style='display: contents'><script>
+(() => {
+  // Nav buttons drive horizontal scroll on the track. Deep-linking
+  // via `#slide-id` works one-shot at load time via `location.hash`,
+  // but we never push/replace the hash on click — the back stack
+  // would fill with intra-deck transitions and interact badly with
+  // the live-server's morph-DOM navigation.
+  for (const deck of document.querySelectorAll('.emanote-slides')) {
+    // Ema's live-server uses morph-DOM for in-app navigation; if a
+    // slides page is re-entered the script tag may run again over a
+    // deck node that already has listeners. Idempotent guard: the
+    // first run flips a dataset flag; subsequent runs skip.
+    if (deck.dataset.emanoteSlidesInited) continue;
+    const track = deck.querySelector('.emanote-slides-track');
+    const slides = [...deck.querySelectorAll('.emanote-slide')];
+    if (!track || slides.length === 0) continue;
+    deck.dataset.emanoteSlidesInited = '1';
+    deck.tabIndex = 0;
+    const indexOf = (id) => slides.findIndex(s => s.id === id);
+    // Scroll the track horizontally to the chosen slide. Using
+    // track.scrollTo (vs slides[j].scrollIntoView) keeps scrolling
+    // contained to the track — scrollIntoView with block:'nearest'
+    // has been observed to drop horizontal scroll updates when the
+    // surrounding page is the actual scroll-container winner.
+    //
+    // Use getBoundingClientRect rather than offsetLeft: offsetLeft
+    // is relative to the slide's offsetParent, which is whatever
+    // ancestor happens to be positioned. The track itself has no
+    // explicit position, so offsetLeft mixes track-internal scroll
+    // coords with outer-wrapper coords and current() mis-identifies
+    // the visible slide whenever the track has a non-zero left in
+    // the page (any sidebar layout, in practice).
+    const go = (i, smooth = true) => {
+      const j = Math.max(0, Math.min(slides.length - 1, i));
+      const slideLeft = slides[j].getBoundingClientRect().left;
+      const trackLeft = track.getBoundingClientRect().left;
+      track.scrollTo({
+        left: track.scrollLeft + (slideLeft - trackLeft),
+        behavior: smooth ? 'smooth' : 'instant',
+      });
+    };
+    const current = () => {
+      const trackRect = track.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
+      let best = 0, bestDist = Infinity;
+      slides.forEach((s, i) => {
+        const r = s.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - trackCenter);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      return best;
+    };
+    const navLinks = [...deck.querySelectorAll('.emanote-slides-nav [data-slide-id]')];
+    const setActive = (id) => {
+      for (const a of navLinks) {
+        a.classList.toggle('active', a.dataset.slideId === id);
+      }
+    };
+    navLinks.forEach(a => {
+      a.addEventListener('click', (e) => {
+        const i = indexOf(a.dataset.slideId);
+        if (i < 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        go(i);
+        // Move focus to the deck so subsequent arrow keys reach the
+        // deck-level keydown handler.
+        requestAnimationFrame(() => deck.focus({ preventScroll: true }));
+      });
+    });
+    // Fullscreen toggle: requestFullscreen on click, exitFullscreen
+    // when already fullscreen. The CSS swaps the icon based on
+    // :fullscreen pseudo-class — no manual class juggling.
+    const fsBtn = deck.querySelector('.emanote-slides-fs');
+    if (fsBtn) {
+      fsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (document.fullscreenElement === deck) {
+          document.exitFullscreen?.();
+        } else {
+          // requestFullscreen rejects when the user denies the
+          // permission gesture or the browser refuses (e.g. the
+          // page isn't allowed to take fullscreen at all). Log so
+          // a click that does nothing isn't a silent mystery.
+          deck.requestFullscreen?.()
+            .then(() => deck.focus({ preventScroll: true }))
+            .catch((err) =>
+              console.warn('emanote-slides: fullscreen request denied or unavailable:', err)
+            );
+        }
+      });
+    }
+    if (slides[0]) setActive(slides[0].id);
+    const observer = new IntersectionObserver((entries) => {
+      let best = null, bestRatio = 0;
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+          best = entry.target;
+          bestRatio = entry.intersectionRatio;
+        }
+      }
+      if (best) setActive(best.id);
+    }, { root: track, threshold: [0.5, 0.75, 1] });
+    slides.forEach(s => observer.observe(s));
+    deck.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(current() + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current() - 1); }
+      else if (e.key === 'Home') { e.preventDefault(); go(0); }
+      else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+    });
+    if (location.hash) {
+      const i = indexOf(location.hash.slice(1));
+      if (i >= 0) requestAnimationFrame(() => go(i, false));
+    }
+  }
+})();
+</script>
+</rawhtml>
     <p class='mb-4 leading-relaxed'>
-      For custom CSS, target the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class that gets added to the HTML root:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='css'><span class='fu'>.my-element</span> {
-  <span class='kw'>background-color</span><span class='ch'>:</span> <span class='cn'>#ffffff</span><span class='op'>;</span>
-  <span class='kw'>color</span><span class='ch'>:</span> <span class='cn'>#1f2937</span><span class='op'>;</span>
-}
-
-<span class='fu'>.dark</span> <span class='fu'>.my-element</span> {
-  <span class='kw'>background-color</span><span class='ch'>:</span> <span class='cn'>#1f2937</span><span class='op'>;</span>
-  <span class='kw'>color</span><span class='ch'>:</span> <span class='cn'>#f3f4f6</span><span class='op'>;</span>
-}
-</code></pre></div>
-    <p class='mb-4 leading-relaxed'>
-      Avoid <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@media (prefers-color-scheme: dark)</code> in new code — it won’t respond to the manual toggle. If you’re porting CSS from elsewhere that uses the media query, convert it to a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class selector.
-    </p>
-  
-    <h3 id='mermaid-diagrams' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  Mermaid diagrams
-  
-  <a href='dark-mode.html#mermaid-diagrams' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      Mermaid reads the active colour scheme at initialization, so toggling the theme triggers a full-page reload when a Mermaid diagram is present — just enough to re-initialize the renderer with the new palette.
+      This deck is rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>. If you view source, you’ll see <em>it</em> is plain Markdown inside one fenced div — the filter does all the structural work at parse time.
     </p>
   
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/dark-mode.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters/slides.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2771,79 +2436,10 @@
      clip it. We trade internal panel scrolling for working flyouts —
      fine for typical TOCs, and the page itself still scrolls. -->
 
-  <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
-    <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
-      <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
-     OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
-     pseudo-element. --><!-- TOC renders inside right-panel.tpl, which owns the sticky+scroll
-     containment for md+. We just emit the labelled list here. --><nav id='toc' class='leading-relaxed'>
-  <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
-    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
-    
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='How it works'>
-              <a href='dark-mode.html#how-it-works' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                How it works
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Customization'>
-              <a href='dark-mode.html#customization' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Customization
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='Adding Dark Mode Classes'>
-              <a href='dark-mode.html#adding-dark-mode-classes' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Adding Dark Mode Classes
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='CSS Custom Styles'>
-              <a href='dark-mode.html#css-custom-styles' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                CSS Custom Styles
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Mermaid diagrams'>
-              <a href='dark-mode.html#mermaid-diagrams' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Mermaid diagrams
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-  </div>
-  <!-- Scroll-spy behavior moved to _emanote-static/js/toc-spy.js — see issue #643. -->
-</nav>
-
-      <!-- Daily-note backlinks rendered as a year-stacked heatmap.
+  
+    <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
+      <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
+        <!-- Daily-note backlinks rendered as a year-stacked heatmap.
      Two visible homes:
        - Right-panel (lg+): timeline as part of the side-material column.
        - Bottom strip (<lg): timeline attached to the bottom of the
@@ -2853,7 +2449,7 @@
      via querySelectorAll. The hidden <ul.timeline-data> is the
      screen-reader / no-JS fallback. -->
 
-      <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
+        <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
      components/right-panel.tpl). Drops the card chrome of backlinks.tpl:
      just a labelled list of titles. The full context paragraph(s) ride
      along in the DOM but stay hidden until hover/focus, when a flyout
@@ -2862,10 +2458,56 @@
      Tailwind's `hover:` variant is automatically gated on (hover: hover),
      so on touch devices the flyout never triggers — touch users see the
      labelled titles only and follow the link to read more. -->
-
-    </div>
-  </aside>
+  <section id='backlinks-margin' class='text-sm text-gray-700 dark:text-gray-300'>
+    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
+      Linked from
+    </h3>
+    <ul class='space-y-1'>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Pandoc Lua Filters
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
+    <div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — custom: turn a <code>:::slides</code> div into a navigable Markdown presentation, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+    </div>
+  
+    <div>
+      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by <code>slides.lua</code>.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+    </ul>
+  </section>
+
+
+      </div>
+    </aside>
+  
+
 
           </div>
           <!-- Side material attached to the bottom of the main card at <lg.
@@ -2884,6 +2526,46 @@
      e2e selectors and JS context detection target the right scope
      instead of conflating timeline anchors with backlink anchors. --><aside class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
   
+  
+    <section id='backlinks-bottom'>
+      <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3'>
+        Linked from
+      </h3>
+      <!-- divide-y between rows + a left-rule on the context block
+           anchor each backlink + its context together as one unit, so
+           the list stops reading as undifferentiated prose. -->
+      <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
+              Pandoc Lua Filters
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — custom: turn a <code>:::slides</code> div into a navigable Markdown presentation, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+    </div>
+  
+    <div>
+      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by <code>slides.lua</code>.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+      </ul>
+    </section>
   
 </aside>
 

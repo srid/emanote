@@ -1221,14 +1221,10 @@ short-title: Lua Filters
 pandoc:
   filters:
     - filters/list-table.lua
+    - filters/wordcount.lua
 ---
 
 # Pandoc Lua Filters
-
-**WARNING**: This is an ==🧪 experimental 🧪== feature and may change in future. It is being made available so users can try it out and give feedback to the author.
-
-> [!tip] Progress
-> See https://github.com/srid/emanote/issues/263
 
 To enable a [Pandoc Lua filter](https://pandoc.org/lua-filters.html) for a particular Markdown file, put that filter in your notebook and add the following to the Markdown file's YAML frontmatter:
 
@@ -1238,12 +1234,21 @@ pandoc:
     - path/to/your.lua
 ```
 
-> [!warning] Limitations
-> See [here](https://github.com/srid/emanote/pull/278#issue-1207537343) for known limitations.
+The filter path is resolved against your notebook layers, so a path like `filters/list-table.lua` works as long as `filters/list-table.lua` exists in any of your `-L`'d layers. Multiple filters run in declaration order — this very page chains `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer right at the bottom.
 
-## Demo
+Edits to the `.lua` file hot-reload: the live server re-parses every note that references it the next time the filter changes on disk, no `touch` of the note required. The reverse-dependency lookup also covers _missing-at-parse-time_ filter references — declare a filter in frontmatter before creating it on disk, then create the file: every dependent re-parses when the file lands. `.lua` files are not copied to `_site/` — they are recognised as filters, not static assets.
 
-This uses the [list table](https://github.com/pandoc/lua-filters/tree/master/list-table) filter (copied as [[list-table.lua]]):
+> [!warning] Remaining limitations
+> - Filters can only be declared in a note's own frontmatter. Cascading `pandoc.filters` from an ancestor `index.yaml` is still tracked under [#263](https://github.com/srid/emanote/issues/263).
+> - Emanote calls `pandoc.applyFilters` with `FORMAT == "markdown"`, so filters that branch on `FORMAT` to emit writer-specific output (HTML, LaTeX) won't fire those branches. Stick to **FORMAT-agnostic** filters that operate on the AST regardless of writer. Most pure-Lua transforms (`list-table`, `include-files`, `wordcount`, the custom `slides.lua` below) are in this camp.
+
+## Demos
+
+Three filters live under [`docs/filters/`](https://github.com/srid/emanote/tree/master/docs/filters):
+
+- [`list-table.lua`](https://github.com/srid/emanote/blob/master/docs/filters/list-table.lua) — turn nested bullet lists into HTML tables. From [pandoc/lua-filters](https://github.com/pandoc/lua-filters/tree/master/list-table).
+- [`wordcount.lua`](https://github.com/srid/emanote/blob/master/docs/filters/wordcount.lua) — append a `N words · M characters` footer to the document. Adapted from [pandoc/lua-filters](https://github.com/pandoc/lua-filters/tree/master/wordcount); upstream calls `os.exit(0)`, which would terminate the live server, so this fork sets the count as a footer block instead.
+- [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) — custom: turn a `:::slides` div into a navigable Markdown presentation, used by [[lua-filters/slides]].
 
 ### `list-table.lua`
 
@@ -1260,6 +1265,98 @@ This uses the [list table](https://github.com/pandoc/lua-filters/tree/master/lis
      - row 3, column 2
      - Well!
 :::
+
+### `wordcount.lua`
+
+The footer at the bottom of this page is emitted by `wordcount.lua` — every save recomputes it.
+
+### `slides.lua`
+
+See [[lua-filters/slides]] for a full Markdown presentation _about_ Lua filters, rendered by `slides.lua`.
+
+
+===
+
+<!-- Source: guide/lua-filters/slides.md -->
+<!-- URL: https://emanote.srid.ca/lua-filters/slides -->
+<!-- Title: A Markdown Presentation about Lua Filters -->
+<!-- Wikilinks: [[guide/lua-filters/slides]], [[lua-filters/slides]], [[slides]] -->
+
+---
+slug: lua-filters/slides
+short-title: Slides demo
+pandoc:
+  filters:
+    - filters/slides.lua
+---
+
+# A Markdown Presentation about Lua Filters
+
+This page is itself a demo of two things at once: a custom **`slides.lua`** filter that turns a `:::slides` div into a navigable deck, *and* a tour of what Pandoc Lua filters look like inside Emanote. Use the numbered nav above the deck (or the <kbd>←</kbd> / <kbd>→</kbd> keys, after clicking inside the deck) to step through.
+
+::: slides
+
+## Why filters?
+
+Pandoc parses your Markdown into a typed AST — paragraphs, headings, links, code blocks. **A Lua filter is a function that walks that tree and rewrites it** before Emanote renders to HTML.
+
+Anything you can say about a node in Lua, you can transform.
+
+## Adding one to your notebook
+
+1. Drop a `.lua` file anywhere in your notebook (convention: a `filters/` folder).
+2. Reference it from the note's frontmatter:
+
+```yaml
+pandoc:
+  filters:
+    - filters/slides.lua
+```
+
+3. Save. Emanote resolves the path against every `-L`'d layer.
+
+## What this page does
+
+This page declares `pandoc.filters: [filters/slides.lua]`. Each `## ` heading inside a `::: slides` div becomes one slide; the filter wraps them in `<section>` elements, prepends a nav strip, and emits CSS + a tiny arrow-key handler.
+
+_See the source: [`docs/filters/slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua)._
+
+## Hot-reload
+
+Edit `filters/slides.lua` — change a colour, tweak the layout, add a feature — and **every note that references it re-parses on the next save**. No `touch` of the `.md` required, no live-server restart.
+
+The reverse index from filter path → dependent notes is maintained inside Emanote's model; an edit fires exactly the affected re-parses.
+
+## A second example: word count
+
+Pure-Lua filters compose cleanly. The [[lua-filters|main guide page]] chains `list-table.lua` with `wordcount.lua`:
+
+```yaml
+pandoc:
+  filters:
+    - filters/list-table.lua
+    - filters/wordcount.lua
+```
+
+Both run on every save; the order matches the array.
+
+## Caveat: pandoc's writer-specific filters
+
+Many filters in [pandoc/lua-filters](https://github.com/pandoc/lua-filters) branch on Pandoc's `FORMAT` variable to emit HTML or LaTeX. Emanote calls `applyFilters` with `FORMAT == "markdown"`, so a writer-specific branch may not fire as expected.
+
+Filters that work cleanly here are **FORMAT-agnostic** — they operate at the AST level regardless of output format. `list-table`, `include-files`, `wordcount`, and this very `slides.lua` are all in that camp.
+
+## Where to find more
+
+- [pandoc/lua-filters](https://github.com/pandoc/lua-filters) — the canonical collection
+- [Pandoc Lua filter reference](https://pandoc.org/lua-filters.html) — the API
+- [[lua-filters]] — Emanote's main guide
+
+The pattern is always the same: drop the `.lua` in, name it in frontmatter, save.
+
+:::
+
+This deck is rendered by `slides.lua`. If you view source, you'll see _it_ is plain Markdown inside one fenced div — the filter does all the structural work at parse time.
 
 
 ===

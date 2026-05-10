@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=149b6486-fc11-4cc2-b335-b94adcea8299' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=1b84973b-e808-4564-b356-31014819bfcf' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1760,13 +1760,10 @@
 
 
 
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -1775,12 +1772,16 @@
     <span class='flex-shrink-0'>
       
         
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
+          <a href='lua-filters' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
   
-        
+          </a>
+          
       
     </span>
     <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
@@ -1788,7 +1789,10 @@
     </a>
     
       
-        
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='1 children inside'>
+          1
+        </span>
+      
     
   </div>
 
@@ -2608,7 +2612,7 @@
     </p>
   <!-- The data-language attribute is for theme CSS/JS that wants to target a
      specific language; skylighting itself encodes the language inside the
-     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/zbvn8aq1vij67hflshjy19iz4cb5ghir-docs/guide/markdown/code-samples/haskell-code.hs' data-language='haskell'>
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/bg5khrd60yh54j6lv4fwb0q1s3k55413-docs/guide/markdown/code-samples/haskell-code.hs' data-language='haskell'>
   <div><pre><code class='haskell'><span class='kw'>module</span> <span class='dt'>HaskellCode</span> <span class='kw'>where</span>
 
 <span class='ot'>main ::</span> <span class='dt'>IO</span> ()
@@ -2622,7 +2626,7 @@ main <span class='ot'>=</span> <span class='kw'>do</span>
     </p>
   <!-- The data-language attribute is for theme CSS/JS that wants to target a
      specific language; skylighting itself encodes the language inside the
-     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/zbvn8aq1vij67hflshjy19iz4cb5ghir-docs/guide/markdown/code-samples/c-code.c' data-language='c'>
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/bg5khrd60yh54j6lv4fwb0q1s3k55413-docs/guide/markdown/code-samples/c-code.c' data-language='c'>
   <div><pre><code class='c'><span class='pp'>#include </span><span class='im'>&lt;stdio.h&gt;</span>
 
 <span class='dt'>int</span> main<span class='op'>()</span> <span class='op'>{</span>
@@ -2638,7 +2642,7 @@ main <span class='ot'>=</span> <span class='kw'>do</span>
     </p>
   <!-- The data-language attribute is for theme CSS/JS that wants to target a
      specific language; skylighting itself encodes the language inside the
-     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/zbvn8aq1vij67hflshjy19iz4cb5ghir-docs/guide/markdown/code-samples/data-demo.json' data-language='json'>
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/bg5khrd60yh54j6lv4fwb0q1s3k55413-docs/guide/markdown/code-samples/data-demo.json' data-language='json'>
   <div><pre><code class='json'><span class='fu'>{</span>
   <span class='dt'>"name"</span><span class='fu'>:</span> <span class='st'>"emanote"</span><span class='fu'>,</span>
   <span class='dt'>"languages"</span><span class='fu'>:</span> <span class='ot'>[</span><span class='st'>"haskell"</span><span class='ot'>,</span> <span class='st'>"nix"</span><span class='ot'>]</span><span class='fu'>,</span>
@@ -2656,7 +2660,7 @@ main <span class='ot'>=</span> <span class='kw'>do</span>
     </p>
   <!-- The data-language attribute is for theme CSS/JS that wants to target a
      specific language; skylighting itself encodes the language inside the
-     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/zbvn8aq1vij67hflshjy19iz4cb5ghir-docs/guide/markdown/code-samples/config-demo.toml' data-language='toml'>
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/bg5khrd60yh54j6lv4fwb0q1s3k55413-docs/guide/markdown/code-samples/config-demo.toml' data-language='toml'>
   <div><pre><code class='toml'><span class='kw'>[package]</span>
 <span class='dt'>name</span> <span class='op'>=</span> <span class='st'>"emanote"</span>
 <span class='dt'>version</span> <span class='op'>=</span> <span class='st'>"2.0.0"</span>
@@ -2675,7 +2679,7 @@ main <span class='ot'>=</span> <span class='kw'>do</span>
     </p>
   <!-- The data-language attribute is for theme CSS/JS that wants to target a
      specific language; skylighting itself encodes the language inside the
-     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/zbvn8aq1vij67hflshjy19iz4cb5ghir-docs/guide/markdown/code-samples/styles-demo.css' data-language='css'>
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/bg5khrd60yh54j6lv4fwb0q1s3k55413-docs/guide/markdown/code-samples/styles-demo.css' data-language='css'>
   <div><pre><code class='css'><span class='co'>/* A small CSS sample used to demonstrate the ![[..]] code embed feature. */</span>
 <span class='fu'>.emanote-code-embed</span> {
   <span class='kw'>border-radius</span><span class='ch'>:</span> <span class='dv'>0.5</span><span class='dt'>rem</span><span class='op'>;</span>
