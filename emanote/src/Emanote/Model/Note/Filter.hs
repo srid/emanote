@@ -3,7 +3,7 @@ module Emanote.Model.Note.Filter (applyDeclaredPandocFilters) where
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer.Strict (MonadWriter (tell))
 import Data.Default (def)
-import Emanote.Prelude (logE, logW)
+import Emanote.Prelude (logE)
 import Relude
 import System.Directory (doesFileExist, doesPathExist)
 import System.FilePath (takeExtension, (</>))
@@ -74,7 +74,6 @@ mkLuaFilter relPath = do
 
 applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
 applyPandocLuaFilters scriptingEngine filters x = do
-  logW $ "[Experimental feature] Applying pandoc filters: " <> show filters
   -- TODO: Can we constrain this to run Lua code purely (embedded) without using IO?
   liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters ["markdown"] x) >>= \case
     Left err -> do
