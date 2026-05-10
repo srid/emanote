@@ -51,7 +51,7 @@ instance Monoid PandocFilterDeclarations where
 
 data PandocFilterPhaseSpec = PandocFilterPhaseSpec
   { pfpsYamlPath :: NonEmpty Text
-  , pfpsOrgKeys :: [Text]
+  , pfpsOrgKey :: Text
   , pfpsToDeclarations :: [FilePath] -> PandocFilterDeclarations
   , pfpsDeclaredPaths :: PandocFilterDeclarations -> [FilePath]
   }
@@ -60,12 +60,12 @@ pandocFilterPhaseSpecs :: [PandocFilterPhaseSpec]
 pandocFilterPhaseSpecs =
   [ PandocFilterPhaseSpec
       ("pandoc" :| ["filters", "parse"])
-      ["#+pandoc_filters_parse"]
+      "#+pandoc_filters_parse"
       (\paths -> mempty {pfdParseFilters = paths})
       pfdParseFilters
   , PandocFilterPhaseSpec
       ("pandoc" :| ["filters", "render", "html"])
-      ["#+pandoc_filters_render_html"]
+      "#+pandoc_filters_render_html"
       (\paths -> mempty {pfdRenderHtmlFilters = paths})
       pfdRenderHtmlFilters
   ]
@@ -95,7 +95,7 @@ lookupOrgPandocFilterDeclarations s =
       pfpsToDeclarations spec
         $ toString
         . snd
-        <$> filter (\(k, _) -> k `elem` pfpsOrgKeys spec) headerKeywords
+        <$> filter (\(k, _) -> k == pfpsOrgKey spec) headerKeywords
     orgHeaderLine line =
       let stripped = T.strip line
        in T.null stripped || "#+" `T.isPrefixOf` stripped
