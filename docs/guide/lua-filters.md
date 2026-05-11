@@ -118,10 +118,11 @@ Hot reload also covers missing-at-parse-time filter references:
 
 ## Bundled filters
 
-Two curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
+Three curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
 
 - [`list-table.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/list-table.lua) turns nested bullet lists into HTML tables. It is bundled from the maintained [pandoc-ext/list-table](https://github.com/pandoc-ext/list-table) extension.
 - [`wordcount.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/wordcount.lua) appends a `N words Â· M characters` footer to the document. This Emanote-specific filter is derived from the retired [`pandoc/lua-filters` wordcount filter](https://github.com/pandoc/lua-filters/tree/master/wordcount); upstream prints to stdout and calls `os.exit(0)`, which would terminate the live server.
+- [`diagram.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua) renders fenced code blocks (`d2`, `cetz`, and the other engines [`pandoc-ext/diagram`](https://github.com/pandoc-ext/diagram) supports) into inline SVG at HTML render time. The wrapped Emanote binary carries `d2`, `typst`, and an offline `@preview/cetz` package cache; see [[diagrams]] for the opt-in snippet and worked examples.
 
 ## Local demo filter
 
@@ -154,3 +155,7 @@ The footer at the bottom of this page is emitted by parse-time `wordcount.lua` â
 ### `slides.lua`
 
 See [[lua-filters/slides]] for a full Markdown presentation _about_ Lua filters, rendered by this notebook's local `filters/slides.lua` with `FORMAT == "html"`.
+
+### `diagram.lua`
+
+See [[diagrams]] for inline-SVG demos of `d2` and `cetz` fenced code blocks, both rendered offline by the bundled filter at HTML render time.

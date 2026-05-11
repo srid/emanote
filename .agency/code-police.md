@@ -4,6 +4,21 @@ Project-specific additions to the built-in rule set in `.claude/skills/code-poli
 
 The patterns here came out of [#672](https://github.com/srid/emanote/pull/672) (Stork ES-module migration), where seven follow-up commits — three from `/code-police`, four from `/hickey` + `/lowy` — landed on top of the primary feature. Capture: same shape of mistake, same kind of fix, made into a recurring check.
 
+## emanote-docs-single-segment-slug
+
+A docs-page `slug:` must be a **single path segment**, not a multi-segment slash-path. Two reasons:
+
+- The page's directory location already encodes hierarchy. A slug that re-encodes that hierarchy is duplicated state that drifts the moment one of the two moves (a page at `docs/guide/lua-filters/diagrams.md` with `slug: lua-filters/diagrams` carries the same path in two places — a rename of the parent or the page silently breaks the mirror).
+- Public URLs stay short and rename-stable. `[[diagrams]]` survives a future reshuffle of where the page sits in the docs tree; `[[lua-filters/diagrams]]` does not.
+
+Acceptable: `slug: diagrams`, `slug: yaml-config`, `slug: html-template`, `slug: i18n.fr` (single segment; dot-namespaced for locale or close variants).
+
+Unacceptable: `slug: lua-filters/diagrams`, `slug: guide/whatever` — anything containing `/`.
+
+Wikilinks that reference the page use the single-segment form too: `[[diagrams]]`, not `[[lua-filters/diagrams]]`.
+
+> _New rule from this PR_: an early draft of [[diagrams]] used `slug: lua-filters/diagrams` to mirror its directory placement under `docs/guide/lua-filters/`. The slug was reduced to `diagrams` so a future move of the file doesn't invalidate every inbound wikilink.
+
 ## docs-internal-wikilinks
 
 When reviewing documentation changes under `docs/`, check internal documentation references for wikilinks.
