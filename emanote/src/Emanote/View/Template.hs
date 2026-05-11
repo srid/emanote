@@ -172,11 +172,14 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  -- applyRenderHtmlPandocFilters speaks MonadWriter for diagnostics; capture
-  -- them here so we can both render them inline on the page (so the live
-  -- server keeps serving — the user sees the error and can fix the filter)
-  -- and abort the static build (so a broken filter doesn't ship to disk).
-  (filteredDoc, renderFilterErrors) <-
+  -- applyRenderHtmlPandocFilters splits diagnostics into two channels:
+  -- fatal errors (filter-not-found, PandocError) flow through the
+  -- MonadWriter the static-build abort path watches, and non-fatal
+  -- `warn(...)` ScriptingWarnings ride along in the explicit return.
+  -- The on-page banner shows both; only fatals abort a static build,
+  -- so an engine that gracefully reports "no, that's a broken diagram"
+  -- via `warn` keeps the static build green.
+  ((filteredDoc, renderFilterWarnings), renderFilterFatals) <-
     runWriterT
       $ NoteFilter.applyRenderHtmlPandocFilters
         (model ^. M.modelScriptingEngine)
@@ -184,9 +187,9 @@ renderLmlHtml model note = do
         (note ^. MN.notePandocFilterDeclarations)
         meta
         baseDoc
-  let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
+  let doc = prependRenderFilterErrors (renderFilterFatals <> renderFilterWarnings) filteredDoc
       toc = newToc doc
-  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
+  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterFatals
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)

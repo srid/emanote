@@ -177,7 +177,10 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   -- rather than threading MonadUnliftIO/MonadMask through the WriterT
   -- stack here.
   guardedPaths <- liftIO $ acquireGuardedFilters ioCleanFilters
-  filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
+  -- Parse-time discards the warnings list: the sandbox prelude neuters
+  -- `warn(...)` so warnings are always empty in practice; the explicit
+  -- discard makes that contract structural rather than incidental.
+  (filteredDoc, _warnings) <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
   liftIO $ cleanupGuardedParseFilters guardedPaths
   pure filteredDoc
   where
@@ -202,7 +205,7 @@ applyRenderHtmlPandocFilters ::
   PandocFilterDeclarations ->
   Aeson.Value ->
   Pandoc ->
-  m Pandoc
+  m (Pandoc, [Text])
 applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
   applyPandocFilters scriptingEngine "html" (PF.LuaFilter . rpfResolvedPath <$> resolvedFilters) (withPandocMeta meta doc)
@@ -244,15 +247,24 @@ resolvePandocFilterPaths pluginBaseDir requestedFilters =
         pure Nothing
       (x : _) -> pure $ Just (p, x)
 
-applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m Pandoc
+{- | Run the Lua-filter pipeline and split the diagnostic streams: fatal
+errors flow through the @MonadWriter [Text]@ channel the upstream call
+sites already plumb (filter-not-found, IO violations, PandocError); the
+returned @[Text]@ carries non-fatal @ScriptingWarning@ messages a filter
+emitted via @warn(...)@. Callers decide how to route each — render-time
+prepends both to the page banner but only fatals abort a static build,
+parse-time discards the warnings list (the sandbox prelude neuters
+@warn@ in practice).
+-}
+applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Pandoc, [Text])
 applyPandocFilters scriptingEngine format paths doc = do
   case paths of
     [] ->
-      pure doc
+      pure (doc, [])
     filters ->
       applyPandocLuaFilters scriptingEngine format filters doc >>= \case
-        Left err -> tell [err] >> pure doc
-        Right (x, warnings) -> tell warnings >> pure x
+        Left err -> tell [err] >> pure (doc, [])
+        Right (x, warnings) -> pure (x, warnings)
 
 checkLuaFilter :: (MonadIO m) => FilePath -> FilePath -> m (Either Text ResolvedPandocFilter)
 checkLuaFilter requestedPath resolvedPath = do
