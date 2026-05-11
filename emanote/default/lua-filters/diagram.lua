@@ -274,10 +274,15 @@ local cetz = {
     if not format then
       format, mime_type = 'svg', 'image/svg+xml'
     end
-    local preamble = [[
-#import "@preview/cetz:0.3.4"
+    -- Emanote-local patch: pin the cetz version from a single source
+    -- (set by `nix/modules/flake-parts/diagrams.nix` via the wrapper),
+    -- falling back to upstream's hard-coded value for hand-driven
+    -- pandoc invocations.
+    local cetz_version = os.getenv('EMANOTE_CETZ_VERSION') or '0.3.4'
+    local preamble = string.format([[
+#import "@preview/cetz:%s"
 #set page(width: auto, height: auto, margin: .5cm)
-]]
+]], cetz_version)
 
     local typst_code = preamble .. code
 
