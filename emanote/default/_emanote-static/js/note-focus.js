@@ -10,8 +10,6 @@ const BUTTON_SELECTOR = 'button[data-emanote-note-focus-toggle]';
 
 window.emanote = window.emanote || {};
 
-let enabled = readStored(window.emanote.noteFocus?.enabled === true);
-
 function readStored(fallback) {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
@@ -22,30 +20,40 @@ function readStored(fallback) {
   }
 }
 
-function persist() {
+function persist(next) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
+    sessionStorage.setItem(STORAGE_KEY, next ? 'true' : 'false');
   } catch (err) {
     console.warn('[emanote] note focus preference not persisted; focus may reset on reload', err);
   }
 }
 
+function isEnabled() {
+  return document.documentElement.classList.contains(ROOT_CLASS);
+}
+
 function setEnabled(next) {
-  enabled = Boolean(next);
-  persist();
-  apply();
+  const enabled = Boolean(next);
+  document.documentElement.classList.toggle(ROOT_CLASS, enabled);
+  persist(enabled);
+  updateButtons(enabled);
 }
 
 function toggle() {
-  setEnabled(!enabled);
+  setEnabled(!isEnabled());
 }
 
 function apply() {
+  const enabled = readStored(isEnabled());
   document.documentElement.classList.toggle(ROOT_CLASS, enabled);
-  document.querySelectorAll(BUTTON_SELECTOR).forEach(updateButton);
+  updateButtons(enabled);
 }
 
-function updateButton(button) {
+function updateButtons(enabled) {
+  document.querySelectorAll(BUTTON_SELECTOR).forEach((button) => updateButton(button, enabled));
+}
+
+function updateButton(button, enabled) {
   const label = enabled
     ? text('restoreNoteArea', 'Restore note layout')
     : text('maximizeNoteArea', 'Maximize note area');
@@ -70,7 +78,7 @@ document.addEventListener('click', (event) => {
 
 window.emanote.noteFocus = {
   get enabled() {
-    return enabled;
+    return isEnabled();
   },
   setEnabled,
   toggle,
