@@ -30,15 +30,15 @@
     })();
   </script>
   <title>
-    Dark Mode – Emanote
+    Focus mode – Emanote
   </title>
   
     
-      <meta property='og:description' content='Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in localStorage and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS prefers-color-scheme preference.' />
+      <meta property='og:description' content='The default [[html-template]] includes a note focus button at the top of the note area. It expands the central note column within the current browser window by hiding side chrome:' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Dark Mode' />
+      <meta property='og:title' content='Focus mode' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -642,7 +642,7 @@
      the page identity but at low intensity, so the prose below isn't
      out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
   <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-    Dark Mode
+    Focus mode
   </h1>
 </header>
 
@@ -1590,7 +1590,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-  
+
 
 
   <!-- Leaf node marker: a tiny dot centered in the toggle column.
@@ -1608,17 +1608,21 @@
     <span class='flex-shrink-0'>
       
         
+          
     <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
       <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
     </span>
   
         
+      
     </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Dark Mode' href='dark-mode' data-iso-date>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Dark Mode' href='dark-mode' data-iso-date>
       Dark Mode
     </a>
     
       
+        
+    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -1633,10 +1637,6 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
-  
-    <div class='emanote-tree-children'>
-      
-    </div>
   
 </div>
 
@@ -1708,7 +1708,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-
+  
 
 
   <!-- Leaf node marker: a tiny dot centered in the toggle column.
@@ -1726,21 +1726,17 @@
     <span class='flex-shrink-0'>
       
         
-          
     <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
       <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
     </span>
   
         
-      
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Focus mode' href='focus-mode' data-iso-date>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Focus mode' href='focus-mode' data-iso-date>
       Focus mode
     </a>
     
       
-        
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -1755,6 +1751,10 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
+  
+    <div class='emanote-tree-children'>
+      
+    </div>
   
 </div>
 
@@ -2716,130 +2716,36 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote ships with a manual light/dark theme toggle. The user’s choice is persisted in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> and applied before first paint, so there’s no flash of the wrong theme on reload. If the user has never toggled, the site falls back to the OS <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> preference.
+      The default <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML Templates</a> includes a note focus button at the top of the note area. It expands the central note column within the current browser window by hiding side chrome:
     </p>
-  
-    <h2 id='how-it-works' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  How it works
-  
-  <a href='dark-mode.html#how-it-works' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
   
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          The toggle button lives in the sidebar (next to the search icon), and also in the top-right corner of the no-sidebar “neuron-style” layout.
+          <a href='sidebar' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Sidebar</a>
         </li>
       
         <li>
-          Clicking the toggle flips a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;html&gt;</code> and stores the choice in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> under the key <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote-theme</code>.
+          <a href='right-panel' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Right panel</a>
         </li>
       
         <li>
-          An inline <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;script&gt;</code> in <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>base.tpl</code> runs in the document head before any stylesheets, reads <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>localStorage</code> (falling back to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code>), and adds the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class immediately — this prevents the dark-flash-on-light-reload problem that plagues most naïve implementations.
-        </li>
-      
-        <li>
-          All theme-dependent styling — including the stork search dialog and skylighting syntax highlighting — keys off the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class rather than the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>prefers-color-scheme</code> media query, so everything tracks the manual toggle.
+          the narrow-screen bottom strip that mirrors right-panel <a href='backlinks' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Backlinks</a> and timeline content
         </li>
       
     </ul>
   
-    <h2 id='customization' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Customization
-  
-  <a href='dark-mode.html#customization' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <h3 id='adding-dark-mode-classes' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  Adding Dark Mode Classes
-  
-  <a href='dark-mode.html#adding-dark-mode-classes' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
     <p class='mb-4 leading-relaxed'>
-      When customizing templates, use Tailwind’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>dark:</code> variant:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='html'><span class='dt'>&lt;</span><span class='kw'>div</span><span class='ot'> class</span><span class='op'>=</span><span class='st'>"bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"</span><span class='dt'>&gt;</span>
-  Content that adapts to dark mode
-<span class='dt'>&lt;/</span><span class='kw'>div</span><span class='dt'>&gt;</span>
-</code></pre></div>
-    <h3 id='css-custom-styles' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  CSS Custom Styles
-  
-  <a href='dark-mode.html#css-custom-styles' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      For custom CSS, target the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class that gets added to the HTML root:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='css'><span class='fu'>.my-element</span> {
-  <span class='kw'>background-color</span><span class='ch'>:</span> <span class='cn'>#ffffff</span><span class='op'>;</span>
-  <span class='kw'>color</span><span class='ch'>:</span> <span class='cn'>#1f2937</span><span class='op'>;</span>
-}
-
-<span class='fu'>.dark</span> <span class='fu'>.my-element</span> {
-  <span class='kw'>background-color</span><span class='ch'>:</span> <span class='cn'>#1f2937</span><span class='op'>;</span>
-  <span class='kw'>color</span><span class='ch'>:</span> <span class='cn'>#f3f4f6</span><span class='op'>;</span>
-}
-</code></pre></div>
-    <p class='mb-4 leading-relaxed'>
-      Avoid <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@media (prefers-color-scheme: dark)</code> in new code — it won’t respond to the manual toggle. If you’re porting CSS from elsewhere that uses the media query, convert it to a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.dark</code> class selector.
+      The button is shown only when the page renders side chrome that focus mode can collapse. It is hidden on narrow screens, and pages that only use <a href='uptree' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Uplink tree</a> without sidebar or right-panel do not show it. Focus mode does not hide the uptree.
     </p>
   
-    <h3 id='mermaid-diagrams' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  Mermaid diagrams
-  
-  <a href='dark-mode.html#mermaid-diagrams' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
     <p class='mb-4 leading-relaxed'>
-      Mermaid reads the active colour scheme at initialization, so toggling the theme triggers a full-page reload when a Mermaid diagram is present — just enough to re-initialize the renderer with the new palette.
+      Focus mode does not use the browser fullscreen API and does not maximize the browser window itself. In live preview, Ema hot reloads keep the note focused after the page DOM is patched. The layout is restored only when you click the same note focus button again.
     </p>
   
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/dark-mode.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/html-template/focus-mode.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2868,101 +2774,8 @@
      clip it. We trade internal panel scrolling for working flyouts —
      fine for typical TOCs, and the page itself still scrolls. -->
 
-  <aside id='right-panel' data-emanote-note-focus-hide='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
-    <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
-      <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
-     OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
-     pseudo-element. --><!-- TOC renders inside right-panel.tpl, which owns the sticky+scroll
-     containment for md+. We just emit the labelled list here. --><nav id='toc' class='leading-relaxed'>
-  <div class='text-gray-700 dark:text-gray-300 text-sm pt-2'>
-    <h3 class='text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2'>On this page</h3>
-    
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='How it works'>
-              <a href='dark-mode.html#how-it-works' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                How it works
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Customization'>
-              <a href='dark-mode.html#customization' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Customization
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='Adding Dark Mode Classes'>
-              <a href='dark-mode.html#adding-dark-mode-classes' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Adding Dark Mode Classes
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='CSS Custom Styles'>
-              <a href='dark-mode.html#css-custom-styles' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                CSS Custom Styles
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Mermaid diagrams'>
-              <a href='dark-mode.html#mermaid-diagrams' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Mermaid diagrams
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-            </li>
-          
-        </ul>
-      
-  </div>
-  <!-- Scroll-spy behavior moved to _emanote-static/js/toc-spy.js — see issue #643. -->
-</nav>
-
-      <!-- Daily-note backlinks rendered as a year-stacked heatmap.
-     Two visible homes:
-       - Right-panel (lg+): timeline as part of the side-material column.
-       - Bottom strip (<lg): timeline attached to the bottom of the
-         card, alongside the regular backlinks fallback.
-     Classes (not IDs) so both instances are valid HTML and the JS in
-     _emanote-static/js/timeline-heatmap.js can paint each independently
-     via querySelectorAll. The hidden <ul.timeline-data> is the
-     screen-reader / no-JS fallback. -->
-
-      <!-- Slim backlinks variant rendered inside the right-panel at md+ (see
-     components/right-panel.tpl). Drops the card chrome of backlinks.tpl:
-     just a labelled list of titles. The full context paragraph(s) ride
-     along in the DOM but stay hidden until hover/focus, when a flyout
-     opens to the left over the prose column.
-
-     Tailwind's `hover:` variant is automatically gated on (hover: hover),
-     so on touch devices the flyout never triggers — touch users see the
-     labelled titles only and follow the link to read more. -->
-
-    </div>
-  </aside>
   
+
 
           </div>
           <!-- Side material attached to the bottom of the main card at <lg.

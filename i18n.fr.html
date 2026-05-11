@@ -65,7 +65,7 @@ par défaut d'Emanote suit page.lang." />
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=838f5bef-3537-45ae-82d0-b2c8d3230c4d' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=d32580a4-659b-4283-81bb-0df20a96ec17' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -444,10 +444,25 @@ par défaut d'Emanote suit page.lang." />
   .code-copy-button:active {
     transform: scale(0.95);
   }
+
+  /* Focus mode spans several template components, so the shared root-state
+     selector stays centralized instead of repeating arbitrary variants. */
+  html.emanote-note-focus [data-emanote-note-focus-hide] {
+    display: none !important;
+  }
+
+  html.emanote-note-focus [data-emanote-note-focus-main] {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  html.emanote-note-focus [data-emanote-note-focus-main] > main {
+    max-width: none;
+  }
 </style>
 
-<!-- Theme toggle and code-copy behaviors moved to
-     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
+<!-- Theme toggle, note-focus, and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,note-focus,code-copy}.js — see issue #643. -->
 
 <style data-category='external-link'>
   /* External/mail link glyphs — drawn with mask-image so they inherit the
@@ -522,7 +537,7 @@ par défaut d'Emanote suit page.lang." />
   <script src='_emanote-static/stork/stork.js'></script>
 
 
-  <script type='application/json' id='emanote-i18n'>{"ambiguousLink":"! Lien ambigu","ambiguousLinkTooltip":"Lien ambigu","audioLinkText":"lien vers l'audio","audioUnsupported":"Votre navigateur ne prend pas en charge l'audio HTML5. Voici un {link} à la place.","badYamlFiles":"Emanote : fichiers YAML invalides","brokenLinkTooltip":"Lien brisé","childrenInsideTitle":"{count} enfants à l'intérieur","copied":"Copié !","copyCode":"Copier le code","copyCodeToClipboard":"Copier le code dans le presse-papiers","copyFailed":"Échec de la copie","copyLink":"Copier le lien","copyLinkToHeading":"Copier le lien vers le titre","emanoteError":"Erreur Emanote","embeddedNote":"Note intégrée","embeds":"intègre","fixIt":"Corrigez-le (cette page se rechargera), ou {link}.","footnote":"Note de bas de page","footnoteLabel":"Note de bas de page {idx}","footnotes":"Notes de bas de page","generatedByVersion":"Généré par Emanote {version}","goToHome":"Aller à l'accueil","goToRoot":"aller à /","home":"Accueil","index":"Index","linkedFrom":"Lié depuis","missingLink":"! Lien manquant","notebookIssue":"Votre carnet contient un problème.","notes":"Notes","onThisPage":"Sur cette page","openPdf":"Ouvrir le PDF","search":"Rechercher (Ctrl+K)","searchPlaceholder":"Rechercher (Ctrl+K) ...","siteIcon":"Icône du site","siteTitle":"Site Emanote","subtags":"Sous-étiquettes","tag":"Étiquette","tagIndex":"Index des étiquettes","tagIndexTitle":"{tag} - Index des étiquettes","tags":"Étiquettes","taskIndex":"Index des tâches","tasks":"Tâches","timeline":"Chronologie","toggleDarkMode":"Basculer le mode sombre","toggleSidebar":"Basculer la barre latérale","videoLinkText":"lien vers la vidéo","videoUnsupported":"Votre navigateur ne prend pas en charge la vidéo HTML5. Voici un {link} à la place.","viewFolgezettelChildren":"Voir les enfants folgezettel","viewIndex":"Voir l'index","viewTags":"Voir les étiquettes","viewTasks":"Voir les tâches"}</script>
+  <script type='application/json' id='emanote-i18n'>{"ambiguousLink":"! Lien ambigu","ambiguousLinkTooltip":"Lien ambigu","audioLinkText":"lien vers l'audio","audioUnsupported":"Votre navigateur ne prend pas en charge l'audio HTML5. Voici un {link} à la place.","badYamlFiles":"Emanote : fichiers YAML invalides","brokenLinkTooltip":"Lien brisé","childrenInsideTitle":"{count} enfants à l'intérieur","copied":"Copié !","copyCode":"Copier le code","copyCodeToClipboard":"Copier le code dans le presse-papiers","copyFailed":"Échec de la copie","copyLink":"Copier le lien","copyLinkToHeading":"Copier le lien vers le titre","emanoteError":"Erreur Emanote","embeddedNote":"Note intégrée","embeds":"intègre","fixIt":"Corrigez-le (cette page se rechargera), ou {link}.","footnote":"Note de bas de page","footnoteLabel":"Note de bas de page {idx}","footnotes":"Notes de bas de page","generatedByVersion":"Généré par Emanote {version}","goToHome":"Aller à l'accueil","goToRoot":"aller à /","home":"Accueil","index":"Index","linkedFrom":"Lié depuis","maximizeNoteArea":"Agrandir la zone de note","missingLink":"! Lien manquant","notebookIssue":"Votre carnet contient un problème.","notes":"Notes","onThisPage":"Sur cette page","openPdf":"Ouvrir le PDF","restoreNoteArea":"Restaurer la mise en page","search":"Rechercher (Ctrl+K)","searchPlaceholder":"Rechercher (Ctrl+K) ...","siteIcon":"Icône du site","siteTitle":"Site Emanote","subtags":"Sous-étiquettes","tag":"Étiquette","tagIndex":"Index des étiquettes","tagIndexTitle":"{tag} - Index des étiquettes","tags":"Étiquettes","taskIndex":"Index des tâches","tasks":"Tâches","timeline":"Chronologie","toggleDarkMode":"Basculer le mode sombre","toggleSidebar":"Basculer la barre latérale","videoLinkText":"lien vers la vidéo","videoUnsupported":"Votre navigateur ne prend pas en charge la vidéo HTML5. Voici un {link} à la place.","viewFolgezettelChildren":"Voir les enfants folgezettel","viewIndex":"Voir l'index","viewTags":"Voir les étiquettes","viewTasks":"Voir les tâches"}</script>
   <!-- Site-authored interactive behaviors (issue #643). The splice emits
        an importmap (so live-server's per-file ?t=<mtime> propagates
        through ES module imports) plus the main entry as a deferred
@@ -530,7 +545,7 @@ par défaut d'Emanote suit page.lang." />
        must run pre-paint; the vendor Stork WASM loader above stays
        inline because window.stork must be defined synchronously
        before the stork.js module evaluates. -->
-  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/calendar-grid":"./_emanote-static/js/calendar-grid.js","@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/i18n":"./_emanote-static/js/i18n.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/sidebar-calendar":"./_emanote-static/js/sidebar-calendar.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
+  <script type='importmap' im-preserve='true' data-ema-skip='true'>{"imports":{"@emanote/calendar-grid":"./_emanote-static/js/calendar-grid.js","@emanote/code-copy":"./_emanote-static/js/code-copy.js","@emanote/footnote-popup":"./_emanote-static/js/footnote-popup.js","@emanote/i18n":"./_emanote-static/js/i18n.js","@emanote/morph":"./_emanote-static/js/morph.js","@emanote/note-focus":"./_emanote-static/js/note-focus.js","@emanote/sidebar-calendar":"./_emanote-static/js/sidebar-calendar.js","@emanote/stork":"./_emanote-static/js/stork.js","@emanote/theme-toggle":"./_emanote-static/js/theme-toggle.js","@emanote/timeline-heatmap":"./_emanote-static/js/timeline-heatmap.js","@emanote/toc-spy":"./_emanote-static/js/toc-spy.js"}}</script><script type='module' src='_emanote-static/js/main.js'></script>
 </head>
 
 <!-- DoNotFormat -->
@@ -633,7 +648,7 @@ par défaut d'Emanote suit page.lang." />
 </header>
 
           <div class='flex flex-col md:flex-row'>
-            <nav id='sidebar' class='flex-shrink hidden leading-snug text-sm md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
+            <nav id='sidebar' data-emanote-note-focus-hide='sidebar' class='flex-shrink hidden leading-snug text-sm md:block md:sticky md:top-0 md:max-h-screen md:overflow-y-auto md:w-52 md:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800'>
   <div class='px-4 py-5 text-gray-800 dark:text-gray-200'>
     <div class='flex items-center justify-between mb-4'>
       <div id='site-logo' class='flex items-center space-x-2.5 min-w-0'>
@@ -1491,8 +1506,8 @@ par défaut d'Emanote suit page.lang." />
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title="12 enfants à l'intérieur">
-          12
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title="13 enfants à l'intérieur">
+          13
         </span>
       
     
@@ -2006,8 +2021,30 @@ par défaut d'Emanote suit page.lang." />
             <!-- min-w-0 lets the flex item shrink below its min-content (default
      min-width:auto on flex items would otherwise let a long URL in a
      code block push the column past the container, dragging the
-     right-panel outside the card chrome). --><div class='flex-1 min-w-0 bg-white dark:bg-gray-800'>
-  <main class='px-6 py-8 max-w-7xl mx-auto'>
+     right-panel outside the card chrome). --><!-- DoNotFormat -->
+<!-- DoNotFormat -->
+
+<div id='note-column' data-emanote-note-focus-main class='relative flex-1 min-w-0 bg-white dark:bg-gray-800'>
+  <main class='relative px-6 py-8 max-w-7xl mx-auto'>
+    
+      
+  <div data-emanote-note-focus-toolbar class='hidden md:block absolute top-4 right-4 z-10'>
+    <button type='button' data-emanote-note-focus-toggle
+ class='p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer' title='Agrandir la zone de note' aria-label='Agrandir la zone de note' aria-pressed='false'>
+      <span data-emanote-note-focus-icon='maximize' aria-hidden='true'>
+        <svg class='w-[1.125rem] h-[1.125rem]' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 3H5a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3m8-18h3a2 2 0 012 2v3m0 8v3a2 2 0 01-2 2h-3'></path>
+        </svg>
+      </span>
+      <span data-emanote-note-focus-icon='restore' aria-hidden='true' hidden>
+        <svg class='w-[1.125rem] h-[1.125rem]' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 9H5m0 0V5m0 4l5-5m5 5h4m0 0V5m0 4l-5-5M9 15H5m0 0v4m0-4l5 5m5-5h4m0 0v4m0-4l-5 5'></path>
+        </svg>
+      </span>
+    </button>
+  </div>
+
+    
     <article class='overflow-auto'>
   <!-- What goes in this file will appear on top of note body-->
   
@@ -2103,6 +2140,7 @@ par défaut d'Emanote suit page.lang." />
     <!-- What goes in this file will at the very end of the main div -->
   </main>
 </div>
+
             <!-- Right panel: TOC + slim backlinks list, attached to the right of the
      main panel at md+ as a sibling of the sidebar inside #container.
      Mirrors sidebar's chrome (bg, border, sticky+scroll, width tiers)
@@ -2119,7 +2157,7 @@ par défaut d'Emanote suit page.lang." />
      clip it. We trade internal panel scrolling for working flyouts —
      fine for typical TOCs, and the page itself still scrolls. -->
 
-  <aside id='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
+  <aside id='right-panel' data-emanote-note-focus-hide='right-panel' class='flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800'>
     <div class='px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8'>
       <!-- Slim the overflow scrollbar (#668) so long TOCs don't show the chunky
      OS-default bar. Firefox honours `scrollbar-*`; WebKit needs the
@@ -2302,7 +2340,7 @@ par défaut d'Emanote suit page.lang." />
      match the right-panel's section IDs (#backlinks-bottom for the
      regular-backlinks list, .emanote-timeline for the heatmap), so
      e2e selectors and JS context detection target the right scope
-     instead of conflating timeline anchors with backlink anchors. --><aside class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
+     instead of conflating timeline anchors with backlink anchors. --><aside data-emanote-note-focus-hide='bottom-strip' class='emanote-bottom-strip lg:hidden [&amp;:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6'>
   
   
     <section id='backlinks-bottom'>
