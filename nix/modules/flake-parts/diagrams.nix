@@ -15,8 +15,13 @@
   # Transitive packages are enumerated manually because typst-packages
   # propagate via `propagatedBuildInputs` but we want a path-shaped
   # layout, not a build-input closure. cetz 0.3.4 imports
-  # `@preview/oxifmt:0.2.1` from its `src/util.typ`; add new
-  # transitive deps here when bumping the cetz version below.
+  # `@preview/oxifmt:0.2.1` from its `src/util.typ`; bumping the cetz
+  # version below means grepping the new release's source for
+  # `@preview/...` imports and adding any new transitive deps here.
+  # The `checks.diagrams-typst-offline` derivation below catches a
+  # missed dep at evaluation time by compiling a real cetz document
+  # against this package root — `nix flake check` fails loudly if
+  # the closure is incomplete.
   perSystem = { pkgs, lib, ... }:
     let
       diagramsCetzVersion = "0.3.4";
@@ -42,5 +47,24 @@
     in
     {
       _module.args = { inherit diagramsCetzVersion diagramsTypstPackageRoot; };
+      # Compile a minimal cetz document against the offline package
+      # root. A missing transitive `@preview/…` import surfaces here
+      # rather than at note-render time as a `Pandoc Lua filter error`
+      # banner.
+      checks.diagrams-typst-offline = pkgs.runCommand "diagrams-typst-offline"
+        {
+          nativeBuildInputs = [ pkgs.typst ];
+          TYPST_PACKAGE_PATH = diagramsTypstPackageRoot;
+        } ''
+        cat > smoke.typ <<EOF
+        #import "@preview/cetz:${diagramsCetzVersion}"
+        #set page(width: auto, height: auto, margin: 0.5cm)
+        #cetz.canvas({
+          import cetz.draw: *
+          circle((0, 0), radius: 1)
+        })
+        EOF
+        typst compile -f svg smoke.typ "$out"
+      '';
     };
 }
