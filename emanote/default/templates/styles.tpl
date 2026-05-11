@@ -378,11 +378,8 @@
     transform: scale(0.95);
   }
 
-  .note-focus-toggle svg {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
+  /* Focus mode spans several template components, so the shared root-state
+     selector stays centralized instead of repeating arbitrary variants. */
   html.emanote-note-focus [data-emanote-note-focus-hide] {
     display: none !important;
   }
