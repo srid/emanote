@@ -36,9 +36,19 @@ Org notes use the parallel keyword from the [[lua-filters]] guide:
 
 ## Supported engines
 
-Emanote ships the renderer binaries for the two engines its Nix closure pins: **[D2](https://d2lang.com/)** (`d2`) and **[CeTZ](https://github.com/cetz-package/cetz)** (a Typst drawing package, invoked via `typst`). The `@preview/cetz` package is pre-resolved into Emanote's binary via `TYPST_PACKAGE_PATH`, so cetz renders offline.
+The bundled filter recognises seven engine classes from upstream `pandoc-ext/diagram`; Emanote's Nix closure pins the binaries for two of them, and leaves the rest as bring-your-own:
 
-The upstream filter also recognises `mermaid`, `graphviz`, `plantuml`, `tikz`, `asymptote`, and `d2` extensions. Those still work if you install the corresponding binary yourself; only `d2` and `typst` are bundled.
+| Engine | Class | Binary | Bundled by Emanote? |
+| --- | --- | --- | --- |
+| [D2](https://d2lang.com/) | `d2` | `d2` | Yes |
+| [CeTZ](https://github.com/cetz-package/cetz) | `cetz` | `typst` (+ pre-resolved `@preview/cetz` package) | Yes |
+| Mermaid | `mermaid` | `mmdc` | No — set `MERMAID_BIN` or install on `PATH` |
+| Graphviz | `dot` | `dot` | No — set `DOT_BIN` or install on `PATH` |
+| PlantUML | `plantuml` | `plantuml` | No — set `PLANTUML_BIN` or install on `PATH` |
+| TikZ | `tikz` | `pdflatex` (+ `inkscape` for SVG) | No |
+| Asymptote | `asymptote` | `asy` | No — set `ASYMPTOTE_BIN` or install on `PATH` |
+
+A note that fences a class without a corresponding binary renders a `Pandoc Lua filter error` banner pointing at the failed `pandoc.pipe` call, so the missing-binary case is loud, not silent.
 
 ## d2 demo
 
