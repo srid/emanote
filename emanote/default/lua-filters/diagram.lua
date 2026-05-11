@@ -314,9 +314,12 @@ local d2 = {
         local infile = 'diagram.d2'
         local outfile = 'diagram.' .. file_extension
 
-        args = {'--bundle', '--pad=0', '--scale=1'}
+        -- Emanote-local patch: upstream forgot `local`, leaking `args`
+        -- and `d2_user_opts` into the global environment between
+        -- renders. Add this back when syncing from upstream.
+        local args = {'--bundle', '--pad=0', '--scale=1'}
 
-        d2_user_opts = {
+        local d2_user_opts = {
           'layout',
         }
         for _, d2_user_opt in pairs(d2_user_opts) do
