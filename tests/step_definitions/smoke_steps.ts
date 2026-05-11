@@ -619,7 +619,7 @@ Then(
     const markedIds = marked.map((region) => region.id).sort();
     assert.deepStrictEqual(
       markedIds,
-      [".emanote-bottom-strip", "#right-panel", "#sidebar", "#uptree"],
+      ["bottom-strip", "right-panel", "sidebar", "uptree"],
       `Expected the focus-hide DOM contract to include sidebar, right panel, uptree, and bottom strip; got ${markedIds.join(
         ", ",
       )}.`,
@@ -644,7 +644,7 @@ Then(
       .map((region) => region.id);
     assert.deepStrictEqual(
       visible.sort(),
-      ["#right-panel", "#sidebar", "#uptree"],
+      ["right-panel", "sidebar", "uptree"],
       `Expected restored note layout to show sidebar, right panel, and uptree; displayable selectors were ${visible.join(
         ", ",
       )}.`,
@@ -663,7 +663,7 @@ async function focusChromeState(
     ).map((el) => {
       const htmlEl = el as HTMLElement;
       return {
-        id: htmlEl.id ? `#${htmlEl.id}` : `.${htmlEl.classList[0]}`,
+        id: htmlEl.dataset.emanoteNoteFocusHide || "",
         display: getComputedStyle(htmlEl).display,
       };
     });
