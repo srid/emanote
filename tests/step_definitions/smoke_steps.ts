@@ -587,6 +587,71 @@ Then(
   },
 );
 
+When("I click the note focus toggle", async function (this: EmanoteWorld) {
+  await this.page.waitForFunction(() => Boolean((window as any).emanote?.noteFocus));
+  await this.page
+    .locator("button[data-emanote-note-focus-toggle]")
+    .first()
+    .click();
+});
+
+Then(
+  "note focus mode is {string}",
+  async function (this: EmanoteWorld, state: string) {
+    const expected = state === "on";
+    const actual = await this.page.evaluate(() =>
+      document.documentElement.classList.contains("emanote-note-focus"),
+    );
+    assert.strictEqual(
+      actual,
+      expected,
+      `Expected note focus mode to be ${state}; <html> classes were ${JSON.stringify(
+        await this.page.evaluate(() => document.documentElement.className),
+      )}.`,
+    );
+  },
+);
+
+Then(
+  "the note side chrome is hidden for focus mode",
+  async function (this: EmanoteWorld) {
+    const visible = await visibleSideChrome(this.page);
+    assert.deepStrictEqual(
+      visible,
+      [],
+      `Expected focus mode to hide all side chrome, but these selectors were still displayable: ${visible.join(
+        ", ",
+      )}.`,
+    );
+  },
+);
+
+Then(
+  "the note side chrome is visible outside focus mode",
+  async function (this: EmanoteWorld) {
+    const visible = await visibleSideChrome(this.page);
+    assert.deepStrictEqual(
+      visible.sort(),
+      ["#right-panel", "#sidebar", "#uptree"],
+      `Expected restored note layout to show sidebar, right panel, and uptree; displayable selectors were ${visible.join(
+        ", ",
+      )}.`,
+    );
+  },
+);
+
+async function visibleSideChrome(
+  page: EmanoteWorld["page"],
+): Promise<string[]> {
+  return page.evaluate(() => {
+    const selectors = ["#sidebar", "#right-panel", "#uptree"];
+    return selectors.filter((selector) => {
+      const el = document.querySelector(selector);
+      return Boolean(el && getComputedStyle(el).display !== "none");
+    });
+  });
+}
+
 // code-copy.js wires a button into every <pre> that has a child <code>.
 // Asserting parity (#buttons === #pre>code) catches both regressions:
 // missing buttons (selector mismatch, module not loaded) and duplicates
@@ -683,6 +748,17 @@ Then(
   "the first code copy button title is {string}",
   async function (this: EmanoteWorld, expected: string) {
     const button = this.page.locator("pre > .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await button.getAttribute("title"), expected);
+  },
+);
+
+Then(
+  "the note focus toggle title is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const button = this.page
+      .locator("button[data-emanote-note-focus-toggle]")
+      .first();
     await button.waitFor({ state: "attached", timeout: 5_000 });
     assert.strictEqual(await button.getAttribute("title"), expected);
   },

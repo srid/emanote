@@ -377,10 +377,31 @@
   .code-copy-button:active {
     transform: scale(0.95);
   }
+
+  .note-focus-toggle svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  html.emanote-note-focus #uptree,
+  html.emanote-note-focus #sidebar,
+  html.emanote-note-focus #right-panel,
+  html.emanote-note-focus .emanote-bottom-strip {
+    display: none !important;
+  }
+
+  html.emanote-note-focus #note-column {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  html.emanote-note-focus #note-column > main {
+    max-width: none;
+  }
 </style>
 
-<!-- Theme toggle and code-copy behaviors moved to
-     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
+<!-- Theme toggle, note-focus, and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,note-focus,code-copy}.js — see issue #643. -->
 
 <style data-category="external-link">
   /* External/mail link glyphs — drawn with mask-image so they inherit the

@@ -35,6 +35,7 @@ fs.cpSync(sourceFixtureDir, stagedFixtureDir, { recursive: true });
  *  inside the subtree (e.g. a previously-missing filter). New
  *  dep-kinds add their own subtree here as they come online. */
 const mutatedSubtrees: string[] = [
+  "focus-mode", // UI focus-mode hot-reload fixture
   "filters", // Pandoc Lua filters (issue #263)
 ];
 
