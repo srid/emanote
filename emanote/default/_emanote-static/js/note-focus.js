@@ -8,11 +8,6 @@ const STORAGE_KEY = 'emanote-note-focus';
 const ROOT_CLASS = 'emanote-note-focus';
 const BUTTON_SELECTOR = 'button[data-emanote-note-focus-toggle]';
 
-const MAXIMIZE_ICON =
-  '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3H5a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3m8-18h3a2 2 0 012 2v3m0 8v3a2 2 0 01-2 2h-3" /></svg>';
-const RESTORE_ICON =
-  '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9H5m0 0V5m0 4l5-5m5 5h4m0 0V5m0 4l-5-5M9 15H5m0 0v4m0-4l5 5m5-5h4m0 0v4m0-4l-5 5" /></svg>';
-
 window.emanote = window.emanote || {};
 
 let enabled = readStored(window.emanote.noteFocus?.enabled === true);
@@ -52,7 +47,10 @@ function updateButton(button) {
     ? text('restoreNoteArea', 'Restore note layout')
     : text('maximizeNoteArea', 'Maximize note area');
 
-  button.innerHTML = enabled ? RESTORE_ICON : MAXIMIZE_ICON;
+  const maximizeIcon = button.querySelector('[data-emanote-note-focus-icon="maximize"]');
+  const restoreIcon = button.querySelector('[data-emanote-note-focus-icon="restore"]');
+  if (maximizeIcon) maximizeIcon.hidden = enabled;
+  if (restoreIcon) restoreIcon.hidden = !enabled;
   button.setAttribute('aria-label', label);
   button.setAttribute('title', label);
   button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
