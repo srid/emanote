@@ -19,6 +19,19 @@ When("I delete {string}", function (fp: string) {
   fs.unlinkSync(path.join(stagedFixtureDir, fp));
 });
 
+When(
+  "I replace {string} with {string} in {string}",
+  function (fromToken: string, toToken: string, fp: string) {
+    const target = path.join(stagedFixtureDir, fp);
+    const original = fs.readFileSync(target, "utf8");
+    assert.ok(
+      original.includes(fromToken),
+      `${fp} does not contain ${JSON.stringify(fromToken)}.`,
+    );
+    fs.writeFileSync(target, original.replaceAll(fromToken, toToken));
+  },
+);
+
 Then(
   "the article body contains {string}",
   async function (this: EmanoteWorld, needle: string) {

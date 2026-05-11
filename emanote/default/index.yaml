@@ -65,6 +65,8 @@ template:
       searchPlaceholder: Search (Ctrl+K) ...
       toggleDarkMode: Toggle dark mode
       toggleSidebar: Toggle sidebar
+      maximizeNoteArea: Maximize note area
+      restoreNoteArea: Restore note layout
       siteIcon: Site Icon
       tag: Tag
       viewFolgezettelChildren: View folgezettel children
@@ -117,6 +119,8 @@ template:
       searchPlaceholder: Rechercher (Ctrl+K) ...
       toggleDarkMode: Basculer le mode sombre
       toggleSidebar: Basculer la barre latérale
+      maximizeNoteArea: Agrandir la zone de note
+      restoreNoteArea: Restaurer la mise en page
       siteIcon: Icône du site
       tag: Étiquette
       viewFolgezettelChildren: Voir les enfants folgezettel
@@ -169,6 +173,8 @@ template:
       searchPlaceholder: 搜索 (Ctrl+K) ...
       toggleDarkMode: 切换深色模式
       toggleSidebar: 切换侧栏
+      maximizeNoteArea: 最大化笔记区域
+      restoreNoteArea: 恢复笔记布局
       siteIcon: 站点图标
       tag: 标签
       viewFolgezettelChildren: 查看子笔记

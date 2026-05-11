@@ -53,7 +53,18 @@ emanoteJsModuleNames =
   -- Sidebar widgets (e.g. sidebar-calendar) attach by scanning the
   -- generic tree DOM emitted by `routeTreeSplices`; see the seam
   -- contract in `templates/components/sidebar-tree.tpl`.
-  ["morph", "i18n", "theme-toggle", "code-copy", "toc-spy", "footnote-popup", "stork", "calendar-grid", "timeline-heatmap", "sidebar-calendar"]
+  [ "morph"
+  , "i18n"
+  , "theme-toggle"
+  , "note-focus"
+  , "code-copy"
+  , "toc-spy"
+  , "footnote-popup"
+  , "stork"
+  , "calendar-grid"
+  , "timeline-heatmap"
+  , "sidebar-calendar"
+  ]
 
 {- | Render the importmap + module entry script tags. Drop into the page
 \<head\> via a Heist splice; safe to call multiple times per render
