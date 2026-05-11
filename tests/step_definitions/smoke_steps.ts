@@ -598,6 +598,10 @@ When("I click the note focus toggle", async function (this: EmanoteWorld) {
 Then(
   "note focus mode is {string}",
   async function (this: EmanoteWorld, state: string) {
+    assert.ok(
+      state === "on" || state === "off",
+      `Unsupported note focus mode state ${JSON.stringify(state)}; expected "on" or "off".`,
+    );
     const expected = state === "on";
     const actual = await this.page.evaluate(() =>
       document.documentElement.classList.contains("emanote-note-focus"),
