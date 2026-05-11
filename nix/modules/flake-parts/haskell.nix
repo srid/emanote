@@ -61,21 +61,21 @@
         tagtree.broken = false;
         tagtree.jailbreak = true;
         unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
-        emanote = { name, pkgs, self, super, ... }: {
-          check = false;
-          extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
-          custom = pkg: pkg.overrideAttrs (oldAttrs: {
+        emanote = { name, pkgs, self, super, ... }:
+          let
             # https://github.com/NixOS/cabal2nix/issues/608
-            meta = (oldAttrs.meta or { }) // {
-              longDescription = ''
-                Emanote is a tool for generating a structured view of your
-                plain-text notes on the web, as a statically generated
-                website as well as a local live server.
+            addMeta = pkg: pkg.overrideAttrs (oldAttrs: {
+              meta = (oldAttrs.meta or { }) // {
+                longDescription = ''
+                  Emanote is a tool for generating a structured view of your
+                  plain-text notes on the web, as a statically generated
+                  website as well as a local live server.
 
-                For editing notes, you can use any text editor of your
-                choice including the likes of Obsidian.
-              '';
-            };
+                  For editing notes, you can use any text editor of your
+                  choice including the likes of Obsidian.
+                '';
+              };
+            });
             # The bundled `lua-filters/diagram.lua` filter shells out to
             # `d2` and `typst`; ship them on the wrapped binary's PATH so
             # users opting into the filter don't need to install renderer
@@ -84,15 +84,21 @@
             # pinned in `diagrams.nix` is the only one anywhere.
             # `--set-default` lets a user with their own typst-package
             # cache override Emanote's.
-            nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
-            postInstall = (oldAttrs.postInstall or "") + ''
-              wrapProgram $out/bin/emanote \
-                --prefix PATH : ${lib.makeBinPath [ pkgs.d2 pkgs.typst ]} \
-                --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot} \
-                --set-default EMANOTE_CETZ_VERSION ${diagramsCetzVersion}
-            '';
-          });
-        };
+            wrapDiagramEngines = pkg: pkg.overrideAttrs (oldAttrs: {
+              nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+              postInstall = (oldAttrs.postInstall or "") + ''
+                wrapProgram $out/bin/emanote \
+                  --prefix PATH : ${lib.makeBinPath [ pkgs.d2 pkgs.typst ]} \
+                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot} \
+                  --set-default EMANOTE_CETZ_VERSION ${diagramsCetzVersion}
+              '';
+            });
+          in
+          {
+            check = false;
+            extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
+            custom = pkg: wrapDiagramEngines (addMeta pkg);
+          };
       };
     };
 
