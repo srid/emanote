@@ -574,6 +574,24 @@ local function cache_image (codeblock, imgdata, mimetype)
   write_file(imgpath, imgdata)
 end
 
+-- Emanote-local: replace upstream's `return nil` on engine failure with
+-- an in-place error Div carrying `emanote:error` plus the variant class
+-- `emanote:error:lua-filter`. The same class powers the catastrophic
+-- filter-error banner in `Emanote.View.Template.prependRenderFilterErrors`,
+-- so a typst/d2/mermaid stderr surfaces with consistent styling right
+-- where the failing code block sat. The original fenced source rides
+-- along as a CodeBlock child so the author can fix the right diagram.
+local function diagram_error_block (engine_name, message, source)
+  return pandoc.Div(
+    {
+      pandoc.Para { pandoc.Strong { pandoc.Str('Diagram error (' .. engine_name .. ')') } },
+      pandoc.CodeBlock(tostring(message)),
+      pandoc.CodeBlock(source, pandoc.Attr('', { engine_name }, {})),
+    },
+    pandoc.Attr('', { 'emanote:error', 'emanote:error:lua-filter' }, {})
+  )
+end
+
 -- Executes each document's code block to find matching code blocks:
 local function code_to_figure (conf)
   return function (block)
@@ -613,21 +631,22 @@ local function code_to_figure (conf)
       success, imgdata, imgtype =
         pcall(engine.compile, engine, block.text, dgr_opt.opt)
 
-      -- Bail if an error occurred; imgdata contains the error message
-      -- when that happens. The `warn` call records a `ScriptingWarning`
-      -- in pandoc's log; Emanote's render-filter wrapper captures those
-      -- and surfaces them via the shared `Pandoc Lua filter error`
-      -- banner (see `Emanote.Model.Note.Filter.applyPandocLuaFilters` →
-      -- `Emanote.View.Template.prependRenderFilterErrors`).
+      -- Bail if an error occurred; imgdata carries the engine's stderr
+      -- when that happens. Emanote-local: render the failure as a
+      -- visible block carrying `emanote:error:lua-filter` (see
+      -- `diagram_error_block` above) in place of the original code
+      -- block, so the author sees `typst`/`d2`/`mmdc` errors next to
+      -- the diagram that produced them. The `warn` call also records
+      -- the message to pandoc's log for terminal-side debugging.
       if not success then
         warn(PANDOC_SCRIPT_FILE, ': ', tostring(imgdata))
-        return nil
+        return diagram_error_block(diagram_type, imgdata, block.text)
       elseif not imgdata then
         warn(PANDOC_SCRIPT_FILE, ': Diagram engine returned no image data.')
-        return nil
+        return diagram_error_block(diagram_type, 'engine returned no image data', block.text)
       elseif not imgtype then
         warn(PANDOC_SCRIPT_FILE, ': Diagram engine did not return a MIME type.')
-        return nil
+        return diagram_error_block(diagram_type, 'engine did not return a MIME type', block.text)
       end
 
       -- Convert SVG if necessary.

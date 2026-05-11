@@ -28,10 +28,9 @@ import System.Directory (doesFileExist, doesPathExist, getTemporaryDirectory, re
 import System.FilePath (takeExtension, takeFileName, (</>))
 import System.IO (hClose, openTempFile)
 import System.IO.Error (catchIOError)
-import Text.Pandoc (getLog, runIO)
+import Text.Pandoc (runIO)
 import Text.Pandoc.Definition (Meta (..), MetaValue (..), Pandoc (..))
 import Text.Pandoc.Filter qualified as PF
-import Text.Pandoc.Logging (LogMessage (..))
 import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Exception (handle)
 
@@ -177,10 +176,7 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   -- rather than threading MonadUnliftIO/MonadMask through the WriterT
   -- stack here.
   guardedPaths <- liftIO $ acquireGuardedFilters ioCleanFilters
-  -- Parse-time discards the warnings list: the sandbox prelude neuters
-  -- `warn(...)` so warnings are always empty in practice; the explicit
-  -- discard makes that contract structural rather than incidental.
-  (filteredDoc, _warnings) <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
+  filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
   liftIO $ cleanupGuardedParseFilters guardedPaths
   pure filteredDoc
   where
@@ -205,7 +201,7 @@ applyRenderHtmlPandocFilters ::
   PandocFilterDeclarations ->
   Aeson.Value ->
   Pandoc ->
-  m (Pandoc, [Text])
+  m Pandoc
 applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
   applyPandocFilters scriptingEngine "html" (PF.LuaFilter . rpfResolvedPath <$> resolvedFilters) (withPandocMeta meta doc)
@@ -247,24 +243,15 @@ resolvePandocFilterPaths pluginBaseDir requestedFilters =
         pure Nothing
       (x : _) -> pure $ Just (p, x)
 
-{- | Run the Lua-filter pipeline and split the diagnostic streams: fatal
-errors flow through the @MonadWriter [Text]@ channel the upstream call
-sites already plumb (filter-not-found, IO violations, PandocError); the
-returned @[Text]@ carries non-fatal @ScriptingWarning@ messages a filter
-emitted via @warn(...)@. Callers decide how to route each — render-time
-prepends both to the page banner but only fatals abort a static build,
-parse-time discards the warnings list (the sandbox prelude neuters
-@warn@ in practice).
--}
-applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Pandoc, [Text])
+applyPandocFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m Pandoc
 applyPandocFilters scriptingEngine format paths doc = do
   case paths of
     [] ->
-      pure (doc, [])
+      pure doc
     filters ->
       applyPandocLuaFilters scriptingEngine format filters doc >>= \case
-        Left err -> tell [err] >> pure (doc, [])
-        Right (x, warnings) -> pure (x, warnings)
+        Left err -> tell [err] >> pure doc
+        Right x -> pure x
 
 checkLuaFilter :: (MonadIO m) => FilePath -> FilePath -> m (Either Text ResolvedPandocFilter)
 checkLuaFilter requestedPath resolvedPath = do
@@ -332,30 +319,19 @@ parseTimeNoIOPrelude =
       IOCallable -> "emanote_no_parse_io('" <> diagName <> "')"
       IOTable -> "false"
 
-{- | Run a Pandoc Lua filter pipeline. `Left` is a catastrophic failure
-(filter threw a `PandocError`); `Right` is the rewritten doc plus any
-`ScriptingWarning` log messages a filter emitted via `warn(...)` along
-the way. The two channels stay split so the caller picks how to route
-each — render-time tells both into the diagnostic banner; parse-time
-discards warnings (the no-IO prelude disables `warn` anyway).
--}
-applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text (Pandoc, [Text]))
+applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
 applyPandocLuaFilters scriptingEngine format filters x = do
   log $ "Applying pandoc filters (" <> toText format <> "): " <> show filters
-  liftIO (runIOCatchingErrors $ (,) <$> PF.applyFilters scriptingEngine def filters [format] x <*> getLog) >>= \case
+  liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters [format] x) >>= \case
     Left err -> do
       logE $ "Error applying pandoc filters: " <> show err
       pure $ Left (show err)
-    Right (x', msgs) ->
-      pure $ Right (x', mapMaybe scriptingWarningText msgs)
+    Right x' -> pure $ Right x'
   where
     -- `runIO` can throw `PandocError`. Fix this nonsense behaviour, by catching
     -- it and returning a `Left`.
     runIOCatchingErrors =
       handle (pure . Left) . runIO
-    scriptingWarningText :: LogMessage -> Maybe Text
-    scriptingWarningText (ScriptingWarning msg _) = Just msg
-    scriptingWarningText _ = Nothing
 
 parseTimeFilterIOUsesIn :: ResolvedPandocFilter -> IO [Text]
 parseTimeFilterIOUsesIn ResolvedPandocFilter {..} =

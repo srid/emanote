@@ -172,14 +172,16 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  -- applyRenderHtmlPandocFilters splits diagnostics into two channels:
-  -- fatal errors (filter-not-found, PandocError) flow through the
-  -- MonadWriter the static-build abort path watches, and non-fatal
-  -- `warn(...)` ScriptingWarnings ride along in the explicit return.
-  -- The on-page banner shows both; only fatals abort a static build,
-  -- so an engine that gracefully reports "no, that's a broken diagram"
-  -- via `warn` keeps the static build green.
-  ((filteredDoc, renderFilterWarnings), renderFilterFatals) <-
+  -- applyRenderHtmlPandocFilters speaks MonadWriter for diagnostics; capture
+  -- them here so we can both render them inline on the page (so the live
+  -- server keeps serving — the user sees the error and can fix the filter)
+  -- and abort the static build (so a broken filter doesn't ship to disk).
+  -- Per-block engine errors (e.g. a typst version mismatch on a `cetz`
+  -- fence) live next to their source as Lua-filter-emitted Divs carrying
+  -- `emanote:error:lua-filter`; this banner is reserved for catastrophic
+  -- filter-pipeline failures (filter missing, PandocError) the in-place
+  -- mechanism can't surface.
+  (filteredDoc, renderFilterErrors) <-
     runWriterT
       $ NoteFilter.applyRenderHtmlPandocFilters
         (model ^. M.modelScriptingEngine)
@@ -187,9 +189,9 @@ renderLmlHtml model note = do
         (note ^. MN.notePandocFilterDeclarations)
         meta
         baseDoc
-  let doc = prependRenderFilterErrors (renderFilterFatals <> renderFilterWarnings) filteredDoc
+  let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
       toc = newToc doc
-  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterFatals
+  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
