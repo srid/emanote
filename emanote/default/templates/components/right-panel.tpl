@@ -16,7 +16,7 @@
      fine for typical TOCs, and the page itself still scrolls. -->
 <bind tag="rightPanelClass">flex-shrink hidden leading-relaxed lg:block lg:sticky lg:top-0 lg:max-h-screen lg:w-52 lg:min-w-52 xl:w-72 xl:min-w-72 bg-gray-50 dark:bg-gray-950 lg:border-l border-gray-200 dark:border-gray-800</bind>
 <ema:has:toc>
-  <aside id="right-panel" class="${rightPanelClass}">
+  <aside id="right-panel" data-emanote-note-focus-hide class="${rightPanelClass}">
     <div class="px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8">
       <apply template="toc" />
       <apply template="timeline" />
@@ -25,7 +25,7 @@
   </aside>
   <else />
   <ema:note:backlinks:nodaily>
-    <aside id="right-panel" class="${rightPanelClass}">
+    <aside id="right-panel" data-emanote-note-focus-hide class="${rightPanelClass}">
       <div class="px-4 py-5 text-gray-800 dark:text-gray-200 space-y-8">
         <apply template="timeline" />
         <apply template="backlinks-margin" />

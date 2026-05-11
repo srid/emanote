@@ -615,11 +615,21 @@ Then(
 Then(
   "the note side chrome is hidden for focus mode",
   async function (this: EmanoteWorld) {
-    const visible = await visibleSideChrome(this.page);
+    const marked = await focusChromeState(this.page);
+    const markedIds = marked.map((region) => region.id).sort();
     assert.deepStrictEqual(
-      visible,
+      markedIds,
+      [".emanote-bottom-strip", "#right-panel", "#sidebar", "#uptree"],
+      `Expected the focus-hide DOM contract to include sidebar, right panel, uptree, and bottom strip; got ${markedIds.join(
+        ", ",
+      )}.`,
+    );
+    const visible = marked.filter((region) => region.display !== "none");
+    const visibleIds = visible.map((region) => region.id);
+    assert.deepStrictEqual(
+      visibleIds,
       [],
-      `Expected focus mode to hide all side chrome, but these selectors were still displayable: ${visible.join(
+      `Expected focus mode to hide all side chrome, but these selectors were still displayable: ${visibleIds.join(
         ", ",
       )}.`,
     );
@@ -629,7 +639,9 @@ Then(
 Then(
   "the note side chrome is visible outside focus mode",
   async function (this: EmanoteWorld) {
-    const visible = await visibleSideChrome(this.page);
+    const visible = (await focusChromeState(this.page))
+      .filter((region) => region.display !== "none")
+      .map((region) => region.id);
     assert.deepStrictEqual(
       visible.sort(),
       ["#right-panel", "#sidebar", "#uptree"],
@@ -640,14 +652,20 @@ Then(
   },
 );
 
-async function visibleSideChrome(
+type FocusChromeState = { id: string; display: string };
+
+async function focusChromeState(
   page: EmanoteWorld["page"],
-): Promise<string[]> {
+): Promise<FocusChromeState[]> {
   return page.evaluate(() => {
-    const selectors = ["#sidebar", "#right-panel", "#uptree"];
-    return selectors.filter((selector) => {
-      const el = document.querySelector(selector);
-      return Boolean(el && getComputedStyle(el).display !== "none");
+    return Array.from(
+      document.querySelectorAll("[data-emanote-note-focus-hide]"),
+    ).map((el) => {
+      const htmlEl = el as HTMLElement;
+      return {
+        id: htmlEl.id ? `#${htmlEl.id}` : `.${htmlEl.classList[0]}`,
+        display: getComputedStyle(htmlEl).display,
+      };
     });
   });
 }

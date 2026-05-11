@@ -2,7 +2,7 @@
      min-width:auto on flex items would otherwise let a long URL in a
      code block push the column past the container, dragging the
      right-panel outside the card chrome). -->
-<div id="note-column" class="relative flex-1 min-w-0 bg-white dark:bg-gray-800">
+<div id="note-column" data-emanote-note-focus-main class="relative flex-1 min-w-0 bg-white dark:bg-gray-800">
   <main class="px-6 py-8 max-w-7xl mx-auto">
     <div class="flex justify-end -mt-3 mb-3">
       <button type="button"

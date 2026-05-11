@@ -383,19 +383,16 @@
     height: 1.125rem;
   }
 
-  html.emanote-note-focus #uptree,
-  html.emanote-note-focus #sidebar,
-  html.emanote-note-focus #right-panel,
-  html.emanote-note-focus .emanote-bottom-strip {
+  html.emanote-note-focus [data-emanote-note-focus-hide] {
     display: none !important;
   }
 
-  html.emanote-note-focus #note-column {
+  html.emanote-note-focus [data-emanote-note-focus-main] {
     flex-basis: 100%;
     width: 100%;
   }
 
-  html.emanote-note-focus #note-column > main {
+  html.emanote-note-focus [data-emanote-note-focus-main] > main {
     max-width: none;
   }
 </style>
