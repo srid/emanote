@@ -623,8 +623,8 @@ Then(
     const markedIds = marked.map((region) => region.id).sort();
     assert.deepStrictEqual(
       markedIds,
-      ["bottom-strip", "right-panel", "sidebar", "uptree"],
-      `Expected the focus-hide DOM contract to include sidebar, right panel, uptree, and bottom strip; got ${markedIds.join(
+      ["bottom-strip", "right-panel", "sidebar"],
+      `Expected the focus-hide DOM contract to include sidebar, right panel, and bottom strip; got ${markedIds.join(
         ", ",
       )}.`,
     );
@@ -692,8 +692,8 @@ Then(
       .map((region) => region.id);
     assert.deepStrictEqual(
       visible.sort(),
-      ["right-panel", "sidebar", "uptree"],
-      `Expected restored note layout to show sidebar, right panel, and uptree; displayable selectors were ${visible.join(
+      ["right-panel", "sidebar"],
+      `Expected restored note layout to show sidebar and right panel; displayable selectors were ${visible.join(
         ", ",
       )}.`,
     );
@@ -717,6 +717,25 @@ async function focusChromeState(
     });
   });
 }
+
+Then(
+  "the note focus toggle is absent",
+  async function (this: EmanoteWorld) {
+    const count = await this.page
+      .locator("button[data-emanote-note-focus-toggle]")
+      .count();
+    assert.strictEqual(
+      count,
+      0,
+      `Expected no note focus toggle on a layout without sidebar or right-panel; found ${count}.`,
+    );
+  },
+);
+
+Then("the uptree is visible", async function (this: EmanoteWorld) {
+  const visible = await this.page.locator("#uptree").first().isVisible();
+  assert.ok(visible, "Expected the uptree to remain visible.");
+});
 
 // code-copy.js wires a button into every <pre> that has a child <code>.
 // Asserting parity (#buttons === #pre>code) catches both regressions:

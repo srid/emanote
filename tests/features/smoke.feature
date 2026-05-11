@@ -112,10 +112,16 @@ Feature: Smoke
     When I click the note focus toggle
     Then note focus mode is "on"
     And the note side chrome is hidden for focus mode
+    And the uptree is visible
     And the focused note body starts near the top
     When I click the note focus toggle
     Then note focus mode is "off"
     And the note side chrome is visible outside focus mode
+
+  Scenario: Note focus toggle is omitted when only uptree side material exists
+    When I open "/focus-mode/uptree-only.html"
+    Then the note focus toggle is absent
+    And the uptree is visible
 
   @live @hot-reload
   Scenario: Note focus mode survives Ema hot reload until explicitly restored

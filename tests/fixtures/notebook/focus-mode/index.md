@@ -7,7 +7,8 @@ template:
 # Focus Mode Fixture
 
 This page renders every side region that note focus mode must hide: the
-sidebar, right panel, and uptree.
+sidebar and right panel. It also renders uptree, which should stay visible
+while focused.
 
 ## Right Panel Anchor
 
