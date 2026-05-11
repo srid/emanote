@@ -330,6 +330,21 @@ Then(
 );
 
 Then(
+  "the article table link with text {string} has href containing {string}",
+  async function (this: EmanoteWorld, linkText: string, needle: string) {
+    const link = this.page
+      .locator(`article table a:has-text("${linkText}")`)
+      .first();
+    await link.waitFor({ state: "attached", timeout: 5_000 });
+    const href = await link.getAttribute("href");
+    assert.ok(
+      href && href.includes(needle),
+      `Article table link "${linkText}" expected href to contain ${JSON.stringify(needle)}, got ${JSON.stringify(href)}.`,
+    );
+  },
+);
+
+Then(
   "the first article link has HTML containing {string}",
   async function (this: EmanoteWorld, needle: string) {
     const link = this.page.locator("article a").first();

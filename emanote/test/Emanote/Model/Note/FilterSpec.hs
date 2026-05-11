@@ -110,6 +110,18 @@ spec = do
         renderedDoc `shouldBe` Pandoc (Meta mempty) [Para [Str "RENDER_IO_OK"]]
 
   describe "Org filter declarations" $ do
+    it "supports only explicit parse-time filter keywords" $ do
+      NoteFilter.lookupOrgPandocFilterDeclarations "#+PANDOC_FILTERS_PARSE: filters/parse.lua\n"
+        `shouldBe` NoteFilter.PandocFilterDeclarations ["filters/parse.lua"] []
+      NoteFilter.lookupOrgPandocFilterDeclarations "#+PANDOC_FILTERS: filters/legacy.lua\n"
+        `shouldBe` mempty
+
+    it "does not accept dotted Org filter keyword aliases" $ do
+      NoteFilter.lookupOrgPandocFilterDeclarations "#+PANDOC.FILTERS.PARSE: filters/parse.lua\n"
+        `shouldBe` mempty
+      NoteFilter.lookupOrgPandocFilterDeclarations "#+PANDOC.FILTERS.RENDER.HTML: filters/render.lua\n"
+        `shouldBe` mempty
+
     it "supports render-time filters without applying them during parse"
       $ withSystemTempDirectory "emanote-org-render-filter"
       $ \dir -> do

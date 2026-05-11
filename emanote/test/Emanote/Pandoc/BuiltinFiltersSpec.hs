@@ -11,6 +11,11 @@ import Text.Pandoc.Walk qualified as W
 
 spec :: Spec
 spec = do
+  describe "wikilinks inside pipe tables" $ do
+    it "keeps an escaped custom-title separator inside the wikilink"
+      $ links "| Phase | Best for |\n| --- | --- |\n| Render time | [[html-template\\|HTML-specific]] output |\n"
+      `shouldSatisfy` elem ("html-template", "HTML-specific")
+
   -- Regression test for https://github.com/srid/emanote/issues/349.
   -- `preparePandoc`'s last pass (`flattenNestedLinks`) unwraps any Link
   -- nested inside a parent Link's label — the autolink-extension artifact
