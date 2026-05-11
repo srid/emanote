@@ -12,6 +12,7 @@ This guide covers Emanote's core features:
 - **[[query]]** — Obsidian-style embed queries for dynamic content
 - **[[yaml-config]]** — Site metadata and per-page configuration
 - **[[lua-filters]]** — Pandoc Lua filter phases, bundled filters, and demos
+- **[[diagrams]]** — Inline-SVG diagrams from d2 and cetz code blocks
 - **[[i18n|Internationalisation]]** — English and French pages using `page.lang`
 - **[[html-template]]** — Full HTML customization with Heist templates
 - **[[layer]]** — Merging multiple notebook directories

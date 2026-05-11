@@ -28,9 +28,10 @@ import System.Directory (doesFileExist, doesPathExist, getTemporaryDirectory, re
 import System.FilePath (takeExtension, takeFileName, (</>))
 import System.IO (hClose, openTempFile)
 import System.IO.Error (catchIOError)
-import Text.Pandoc (runIO)
+import Text.Pandoc (getLog, runIO)
 import Text.Pandoc.Definition (Meta (..), MetaValue (..), Pandoc (..))
 import Text.Pandoc.Filter qualified as PF
+import Text.Pandoc.Logging (LogMessage (..))
 import Text.Pandoc.Scripting (ScriptingEngine)
 import UnliftIO.Exception (handle)
 
@@ -319,19 +320,29 @@ parseTimeNoIOPrelude =
       IOCallable -> "emanote_no_parse_io('" <> diagName <> "')"
       IOTable -> "false"
 
-applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
+applyPandocLuaFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
 applyPandocLuaFilters scriptingEngine format filters x = do
   log $ "Applying pandoc filters (" <> toText format <> "): " <> show filters
-  liftIO (runIOCatchingErrors $ PF.applyFilters scriptingEngine def filters [format] x) >>= \case
+  liftIO (runIOCatchingErrors $ (,) <$> PF.applyFilters scriptingEngine def filters [format] x <*> getLog) >>= \case
     Left err -> do
       logE $ "Error applying pandoc filters: " <> show err
       pure $ Left (show err)
-    Right x' -> pure $ Right x'
+    Right (x', msgs) -> do
+      -- `warn(...)` calls from inside a Lua filter land here as
+      -- `ScriptingWarning` log messages; surface them through the same
+      -- `MonadWriter [Text]` channel the catastrophic-error path uses
+      -- so render-time filter diagnostics travel one route end-to-end
+      -- ('Template.prependRenderFilterErrors' renders the banner).
+      tell $ mapMaybe scriptingWarningText msgs
+      pure $ Right x'
   where
     -- `runIO` can throw `PandocError`. Fix this nonsense behaviour, by catching
     -- it and returning a `Left`.
     runIOCatchingErrors =
       handle (pure . Left) . runIO
+    scriptingWarningText :: LogMessage -> Maybe Text
+    scriptingWarningText (ScriptingWarning msg _) = Just msg
+    scriptingWarningText _ = Nothing
 
 parseTimeFilterIOUsesIn :: ResolvedPandocFilter -> IO [Text]
 parseTimeFilterIOUsesIn ResolvedPandocFilter {..} =

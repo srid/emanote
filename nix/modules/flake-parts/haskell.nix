@@ -4,7 +4,7 @@
     inputs.haskell-flake.flakeModule
   ];
 
-  perSystem = { pkgs, lib, config, system, ... }: {
+  perSystem = { pkgs, lib, config, system, diagramsTypstPackageRoot, ... }: {
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -21,7 +21,10 @@
       devShell.tools = hp: {
         inherit (pkgs)
           stork
-          tailwindcss_4;
+          tailwindcss_4
+          # Diagram engines for the bundled `lua-filters/diagram.lua` filter.
+          d2
+          typst;
       };
       autoWire = [ "packages" "apps" "checks" ];
       packages = {
@@ -61,15 +64,28 @@
         emanote = { name, pkgs, self, super, ... }: {
           check = false;
           extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
-          custom = pkg: pkg.overrideAttrs (lib.addMetaAttrs {
+          custom = pkg: pkg.overrideAttrs (oldAttrs: {
             # https://github.com/NixOS/cabal2nix/issues/608
-            longDescription = ''
-              Emanote is a tool for generating a structured view of your
-              plain-text notes on the web, as a statically generated
-              website as well as a local live server.
+            meta = (oldAttrs.meta or { }) // {
+              longDescription = ''
+                Emanote is a tool for generating a structured view of your
+                plain-text notes on the web, as a statically generated
+                website as well as a local live server.
 
-              For editing notes, you can use any text editor of your
-              choice including the likes of Obsidian.
+                For editing notes, you can use any text editor of your
+                choice including the likes of Obsidian.
+              '';
+            };
+            # The bundled `lua-filters/diagram.lua` filter shells out to
+            # `d2` and `typst`; ship them on the wrapped binary's PATH so
+            # users opting into the filter don't need to install renderer
+            # binaries separately. `--set-default` lets a user with their
+            # own typst-package cache override Emanote's.
+            nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+            postInstall = (oldAttrs.postInstall or "") + ''
+              wrapProgram $out/bin/emanote \
+                --prefix PATH : ${lib.makeBinPath [ pkgs.d2 pkgs.typst ]} \
+                --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot}
             '';
           });
         };
