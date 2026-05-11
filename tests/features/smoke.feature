@@ -108,9 +108,11 @@ Feature: Smoke
   Scenario: Note focus mode hides side chrome until explicitly restored
     When I open "/focus-mode.html"
     Then note focus mode is "off"
+    And the note focus toggle is hidden on mobile
     When I click the note focus toggle
     Then note focus mode is "on"
     And the note side chrome is hidden for focus mode
+    And the focused note body starts near the top
     When I click the note focus toggle
     Then note focus mode is "off"
     And the note side chrome is visible outside focus mode

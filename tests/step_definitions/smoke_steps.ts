@@ -641,6 +641,50 @@ Then(
 );
 
 Then(
+  "the note focus toggle is hidden on mobile",
+  async function (this: EmanoteWorld) {
+    const viewport = this.page.viewportSize();
+    await this.page.setViewportSize({ width: 390, height: 844 });
+    try {
+      const hidden = await this.page
+        .locator("button[data-emanote-note-focus-toggle]")
+        .first()
+        .isHidden();
+      assert.ok(hidden, "Expected the note focus toggle to be hidden on mobile.");
+    } finally {
+      await this.page.setViewportSize(viewport ?? { width: 1280, height: 720 });
+    }
+  },
+);
+
+Then(
+  "the focused note body starts near the top",
+  async function (this: EmanoteWorld) {
+    const offset = await this.page.evaluate(() => {
+      const main = document.querySelector<HTMLElement>(
+        "[data-emanote-note-focus-main] > main",
+      );
+      const firstBlock = document.querySelector<HTMLElement>(
+        "[data-emanote-note-focus-main] > main > article > :first-child",
+      );
+      if (!main || !firstBlock) {
+        return null;
+      }
+      return firstBlock.getBoundingClientRect().top - main.getBoundingClientRect().top;
+    });
+    assert.notStrictEqual(
+      offset,
+      null,
+      "Expected to find the note main area and its first body block.",
+    );
+    assert.ok(
+      offset! <= 64,
+      `Expected focused note body to start near the top of the note area; first block was ${offset}px below main.`,
+    );
+  },
+);
+
+Then(
   "the note side chrome is visible outside focus mode",
   async function (this: EmanoteWorld) {
     const visible = (await focusChromeState(this.page))

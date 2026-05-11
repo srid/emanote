@@ -3,8 +3,8 @@
      code block push the column past the container, dragging the
      right-panel outside the card chrome). -->
 <div id="note-column" data-emanote-note-focus-main class="relative flex-1 min-w-0 bg-white dark:bg-gray-800">
-  <main class="px-6 py-8 max-w-7xl mx-auto">
-    <div class="flex justify-end -mt-3 mb-3">
+  <main class="relative px-6 py-8 max-w-7xl mx-auto">
+    <div data-emanote-note-focus-toolbar class="hidden md:block absolute top-4 right-4 z-10">
       <button type="button"
         data-emanote-note-focus-toggle
         class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
