@@ -252,7 +252,7 @@ applyPandocFilters scriptingEngine format paths doc = do
     filters ->
       applyPandocLuaFilters scriptingEngine format filters doc >>= \case
         Left err -> tell [err] >> pure doc
-        Right x -> pure x
+        Right (x, warnings) -> tell warnings >> pure x
 
 checkLuaFilter :: (MonadIO m) => FilePath -> FilePath -> m (Either Text ResolvedPandocFilter)
 checkLuaFilter requestedPath resolvedPath = do
@@ -320,21 +320,22 @@ parseTimeNoIOPrelude =
       IOCallable -> "emanote_no_parse_io('" <> diagName <> "')"
       IOTable -> "false"
 
-applyPandocLuaFilters :: (MonadIO m, MonadLogger m, MonadWriter [Text] m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text Pandoc)
+{- | Run a Pandoc Lua filter pipeline. `Left` is a catastrophic failure
+(filter threw a `PandocError`); `Right` is the rewritten doc plus any
+`ScriptingWarning` log messages a filter emitted via `warn(...)` along
+the way. The two channels stay split so the caller picks how to route
+each — render-time tells both into the diagnostic banner; parse-time
+discards warnings (the no-IO prelude disables `warn` anyway).
+-}
+applyPandocLuaFilters :: (MonadIO m, MonadLogger m) => ScriptingEngine -> String -> [PF.Filter] -> Pandoc -> m (Either Text (Pandoc, [Text]))
 applyPandocLuaFilters scriptingEngine format filters x = do
   log $ "Applying pandoc filters (" <> toText format <> "): " <> show filters
   liftIO (runIOCatchingErrors $ (,) <$> PF.applyFilters scriptingEngine def filters [format] x <*> getLog) >>= \case
     Left err -> do
       logE $ "Error applying pandoc filters: " <> show err
       pure $ Left (show err)
-    Right (x', msgs) -> do
-      -- `warn(...)` calls from inside a Lua filter land here as
-      -- `ScriptingWarning` log messages; surface them through the same
-      -- `MonadWriter [Text]` channel the catastrophic-error path uses
-      -- so render-time filter diagnostics travel one route end-to-end
-      -- ('Template.prependRenderFilterErrors' renders the banner).
-      tell $ mapMaybe scriptingWarningText msgs
-      pure $ Right x'
+    Right (x', msgs) ->
+      pure $ Right (x', mapMaybe scriptingWarningText msgs)
   where
     -- `runIO` can throw `PandocError`. Fix this nonsense behaviour, by catching
     -- it and returning a `Left`.
