@@ -13,7 +13,11 @@ window.emanote = window.emanote || {};
 function readStored(fallback) {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
-    return stored === null ? fallback : stored === 'true';
+    if (stored === null) return fallback;
+    if (stored === 'true') return true;
+    if (stored === 'false') return false;
+    console.warn('[emanote] note focus preference has an unexpected value; using current page state', stored);
+    return fallback;
   } catch (err) {
     console.warn('[emanote] note focus preference not readable; using current page state', err);
     return fallback;
@@ -33,10 +37,12 @@ function isEnabled() {
 }
 
 function setEnabled(next) {
-  const enabled = Boolean(next);
-  document.documentElement.classList.toggle(ROOT_CLASS, enabled);
-  persist(enabled);
-  updateButtons(enabled);
+  if (typeof next !== 'boolean') {
+    throw new TypeError('window.emanote.noteFocus.setEnabled expects a boolean');
+  }
+  document.documentElement.classList.toggle(ROOT_CLASS, next);
+  persist(next);
+  updateButtons(next);
 }
 
 function toggle() {
