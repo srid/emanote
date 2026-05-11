@@ -27,6 +27,7 @@
 
 **Bug fixes**
 
+- Live server ignore handling no longer logs `Unhandled folder event ... on an ignored path` when Git writes under ignored dot directories such as `.git/objects/`; ignored watcher events are filtered in UnionMount before debounce.
 - Org notes can now declare Pandoc Lua filters with repeated explicit `#+PANDOC_FILTERS_PARSE: path/to/filter.lua` and `#+PANDOC_FILTERS_RENDER_HTML: path/to/filter.lua` keywords. The filters run during static generation and live rendering, and edits/creation/deletion of referenced `.lua` files re-parse dependent Org notes the same way Markdown `pandoc.filters.parse` frontmatter does (closes the Org-mode parity item in [#721](https://github.com/srid/emanote/issues/721)).
 - Wikilinks now resolve to structural source files such as `index.yaml` and Heist `.tpl` templates. These files still feed their dedicated model paths (metadata cascade and template loading), but Emanote also tracks the topmost layer copy as a static file so `![[index.yaml]]` renders as highlighted YAML and `[[my-template.tpl]]` links to the template source (closes [#720](https://github.com/srid/emanote/issues/720)).
 - Inline hashtag parsing now leaves all-numeric GitHub-style issue references such as `#221` as plain text, so they no longer link to tag pages or pollute the global tag index. Tags that contain digits, such as hierarchical `#issue/221` or `#tag221`, still work normally.
