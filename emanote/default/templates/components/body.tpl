@@ -7,7 +7,7 @@
     <div class="flex justify-end -mt-3 mb-3">
       <button type="button"
         data-emanote-note-focus-toggle
-        class="note-focus-toggle p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
+        class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer"
         title="${ema:i18n:maximizeNoteArea}"
         aria-label="${ema:i18n:maximizeNoteArea}"
         aria-pressed="false">
