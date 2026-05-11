@@ -16,7 +16,8 @@ function readStored(fallback) {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
     return stored === null ? fallback : stored === 'true';
-  } catch (_) {
+  } catch (err) {
+    console.warn('[emanote] note focus preference not readable; using current page state', err);
     return fallback;
   }
 }
@@ -24,7 +25,9 @@ function readStored(fallback) {
 function persist() {
   try {
     sessionStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
-  } catch (_) {}
+  } catch (err) {
+    console.warn('[emanote] note focus preference not persisted; focus may reset on reload', err);
+  }
 }
 
 function setEnabled(next) {
