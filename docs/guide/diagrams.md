@@ -113,6 +113,6 @@ Without caching, every render of a page re-invokes the engine. For static [[laye
 
 ## Limitations
 
-- Filter declaration must live on the note itself — site-wide cascade from `index.yaml` is tracked in [#263](https://github.com/srid/emanote/issues/263).
+- Filter declaration must live on the note itself — [[yaml-config|site-wide cascade]] from `index.yaml` is tracked in [#263](https://github.com/srid/emanote/issues/263).
 - Other engines (mermaid, dot, plantuml, tikz, asymptote) work if you install the matching binary, but Emanote's Nix closure does not pin them. Set the engine's `_BIN` environment variable (`MERMAID_BIN`, `DOT_BIN`, …) to override the executable path explicitly.
 - Diagrams render only when `FORMAT == "html"`, so they have no effect on parse-time concerns like backlinks, tags, search index, or the note model. The fenced source remains in the document for export targets that don't run the filter.
