@@ -4,7 +4,7 @@
     inputs.haskell-flake.flakeModule
   ];
 
-  perSystem = { pkgs, lib, config, system, diagramsCetzVersion, diagramsTypstPackageRoot, ... }: {
+  perSystem = { pkgs, lib, config, system, diagramsTypstPackageRoot, ... }: {
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -79,18 +79,14 @@
             # The bundled `lua-filters/diagram.lua` filter shells out to
             # `d2` and `typst`; ship them on the wrapped binary's PATH so
             # users opting into the filter don't need to install renderer
-            # binaries separately. `EMANOTE_CETZ_VERSION` reaches the
-            # cetz engine's `@preview/cetz:…` preamble so the version
-            # pinned in `diagrams.nix` is the only one anywhere.
-            # `--set-default` lets a user with their own typst-package
-            # cache override Emanote's.
+            # binaries separately. `--set-default` lets a user with
+            # their own typst-package cache override Emanote's.
             wrapDiagramEngines = pkg: pkg.overrideAttrs (oldAttrs: {
               nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
               postInstall = (oldAttrs.postInstall or "") + ''
                 wrapProgram $out/bin/emanote \
                   --prefix PATH : ${lib.makeBinPath [ pkgs.d2 pkgs.typst ]} \
-                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot} \
-                  --set-default EMANOTE_CETZ_VERSION ${diagramsCetzVersion}
+                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot}
               '';
             });
           in

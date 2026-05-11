@@ -9,8 +9,10 @@ pandoc:
 # Diagram filter — cetz
 
 ```cetz
-#cetz.canvas({
-  import cetz.draw: *
+#import "@preview/cetz:0.3.4": canvas, draw
+
+#canvas({
+  import draw: *
   circle((0, 0), radius: 1.6)
   circle((0, 0), radius: 1.0)
   circle((0, 0), radius: 0.4)

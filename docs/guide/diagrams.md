@@ -73,8 +73,10 @@ happy -> excellent: sustain
 CeTZ shines on figures whose meaning is geometric, not flow-shaped. The method's feeling-states sit naturally as **concentric baselines**: outside is _feeling bad_, inside is _excellent_. Asking _HAIETMOBA_ moment-to-moment is the inward-pointing arrow:
 
 ```cetz
-#cetz.canvas({
-  import cetz.draw: *
+#import "@preview/cetz:0.3.4": canvas, draw
+
+#canvas({
+  import draw: *
 
   let levels = (
     (2.0, "feeling bad",  rgb("#dc2626")),
