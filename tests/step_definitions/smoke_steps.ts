@@ -587,6 +587,156 @@ Then(
   },
 );
 
+When("I click the note focus toggle", async function (this: EmanoteWorld) {
+  await this.page.waitForFunction(() => Boolean((window as any).emanote?.noteFocus));
+  await this.page
+    .locator("button[data-emanote-note-focus-toggle]")
+    .first()
+    .click();
+});
+
+Then(
+  "note focus mode is {string}",
+  async function (this: EmanoteWorld, state: string) {
+    assert.ok(
+      state === "on" || state === "off",
+      `Unsupported note focus mode state ${JSON.stringify(state)}; expected "on" or "off".`,
+    );
+    const expected = state === "on";
+    const actual = await this.page.evaluate(() =>
+      document.documentElement.classList.contains("emanote-note-focus"),
+    );
+    assert.strictEqual(
+      actual,
+      expected,
+      `Expected note focus mode to be ${state}; <html> classes were ${JSON.stringify(
+        await this.page.evaluate(() => document.documentElement.className),
+      )}.`,
+    );
+  },
+);
+
+Then(
+  "the note side chrome is hidden for focus mode",
+  async function (this: EmanoteWorld) {
+    const marked = await focusChromeState(this.page);
+    const markedIds = marked.map((region) => region.id).sort();
+    assert.deepStrictEqual(
+      markedIds,
+      ["bottom-strip", "right-panel", "sidebar"],
+      `Expected the focus-hide DOM contract to include sidebar, right panel, and bottom strip; got ${markedIds.join(
+        ", ",
+      )}.`,
+    );
+    const visible = marked.filter((region) => region.display !== "none");
+    const visibleIds = visible.map((region) => region.id);
+    assert.deepStrictEqual(
+      visibleIds,
+      [],
+      `Expected focus mode to hide all side chrome, but these selectors were still displayable: ${visibleIds.join(
+        ", ",
+      )}.`,
+    );
+  },
+);
+
+Then(
+  "the note focus toggle is hidden on mobile",
+  async function (this: EmanoteWorld) {
+    const viewport = this.page.viewportSize();
+    await this.page.setViewportSize({ width: 390, height: 844 });
+    try {
+      const hidden = await this.page
+        .locator("button[data-emanote-note-focus-toggle]")
+        .first()
+        .isHidden();
+      assert.ok(hidden, "Expected the note focus toggle to be hidden on mobile.");
+    } finally {
+      await this.page.setViewportSize(viewport ?? { width: 1280, height: 720 });
+    }
+  },
+);
+
+Then(
+  "the focused note body starts near the top",
+  async function (this: EmanoteWorld) {
+    const offset = await this.page.evaluate(() => {
+      const main = document.querySelector<HTMLElement>(
+        "[data-emanote-note-focus-main] > main",
+      );
+      const firstBlock = document.querySelector<HTMLElement>(
+        "[data-emanote-note-focus-main] > main > article > :first-child",
+      );
+      if (!main || !firstBlock) {
+        return null;
+      }
+      return firstBlock.getBoundingClientRect().top - main.getBoundingClientRect().top;
+    });
+    assert.notStrictEqual(
+      offset,
+      null,
+      "Expected to find the note main area and its first body block.",
+    );
+    assert.ok(
+      offset! <= 64,
+      `Expected focused note body to start near the top of the note area; first block was ${offset}px below main.`,
+    );
+  },
+);
+
+Then(
+  "the note side chrome is visible outside focus mode",
+  async function (this: EmanoteWorld) {
+    const visible = (await focusChromeState(this.page))
+      .filter((region) => region.display !== "none")
+      .map((region) => region.id);
+    assert.deepStrictEqual(
+      visible.sort(),
+      ["right-panel", "sidebar"],
+      `Expected restored note layout to show sidebar and right panel; displayable selectors were ${visible.join(
+        ", ",
+      )}.`,
+    );
+  },
+);
+
+type FocusChromeState = { id: string; display: string };
+
+async function focusChromeState(
+  page: EmanoteWorld["page"],
+): Promise<FocusChromeState[]> {
+  return page.evaluate(() => {
+    return Array.from(
+      document.querySelectorAll("[data-emanote-note-focus-hide]"),
+    ).map((el) => {
+      const htmlEl = el as HTMLElement;
+      return {
+        id: htmlEl.dataset.emanoteNoteFocusHide || "",
+        display: getComputedStyle(htmlEl).display,
+      };
+    });
+  });
+}
+
+Then(
+  "the note focus toggle is absent",
+  async function (this: EmanoteWorld) {
+    const count = await this.page
+      .locator("button[data-emanote-note-focus-toggle]")
+      .count();
+    assert.strictEqual(
+      count,
+      0,
+      `Expected no note focus toggle on a layout without sidebar or right-panel; found ${count}.`,
+    );
+  },
+);
+
+Then("the uptree is visible", async function (this: EmanoteWorld) {
+  const visible = await this.page.locator("#uptree").first().isVisible();
+  assert.ok(visible, "Expected the uptree to remain visible.");
+});
+
 // code-copy.js wires a button into every <pre> that has a child <code>.
 // Asserting parity (#buttons === #pre>code) catches both regressions:
 // missing buttons (selector mismatch, module not loaded) and duplicates
@@ -683,6 +833,17 @@ Then(
   "the first code copy button title is {string}",
   async function (this: EmanoteWorld, expected: string) {
     const button = this.page.locator("pre > .code-copy-button").first();
+    await button.waitFor({ state: "attached", timeout: 5_000 });
+    assert.strictEqual(await button.getAttribute("title"), expected);
+  },
+);
+
+Then(
+  "the note focus toggle title is {string}",
+  async function (this: EmanoteWorld, expected: string) {
+    const button = this.page
+      .locator("button[data-emanote-note-focus-toggle]")
+      .first();
     await button.waitFor({ state: "attached", timeout: 5_000 });
     assert.strictEqual(await button.getAttribute("title"), expected);
   },

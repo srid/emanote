@@ -377,10 +377,25 @@
   .code-copy-button:active {
     transform: scale(0.95);
   }
+
+  /* Focus mode spans several template components, so the shared root-state
+     selector stays centralized instead of repeating arbitrary variants. */
+  html.emanote-note-focus [data-emanote-note-focus-hide] {
+    display: none !important;
+  }
+
+  html.emanote-note-focus [data-emanote-note-focus-main] {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  html.emanote-note-focus [data-emanote-note-focus-main] > main {
+    max-width: none;
+  }
 </style>
 
-<!-- Theme toggle and code-copy behaviors moved to
-     _emanote-static/js/{theme-toggle,code-copy}.js — see issue #643. -->
+<!-- Theme toggle, note-focus, and code-copy behaviors moved to
+     _emanote-static/js/{theme-toggle,note-focus,code-copy}.js — see issue #643. -->
 
 <style data-category="external-link">
   /* External/mail link glyphs — drawn with mask-image so they inherit the
