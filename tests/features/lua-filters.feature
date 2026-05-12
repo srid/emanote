@@ -52,6 +52,22 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:CHANGED" within 10 seconds
 
   @live @hot-reload
+  Scenario: Editing the .md note that declares a Lua filter live-updates its page
+    When I open "/lua-filter-demo.html"
+    Then the article body contains "DEMO_FILTER:HELLO"
+    When I replace "Lua Filter Demo" with "Lua Filter Demo MD_BODY_EDIT_MARKER" in "lua-filter-demo.md"
+    Then the article body contains "MD_BODY_EDIT_MARKER" within 10 seconds
+    And the article body contains "DEMO_FILTER:HELLO"
+
+  @live @hot-reload
+  Scenario: Editing the .org note that declares a Lua filter live-updates its page
+    When I open "/lua-filter-org-demo.html"
+    Then the article body contains "DEMO_FILTER:HELLO"
+    When I replace "Lua Filter Org Demo" with "Lua Filter Org Demo ORG_BODY_EDIT_MARKER" in "lua-filter-org-demo.org"
+    Then the article body contains "ORG_BODY_EDIT_MARKER" within 10 seconds
+    And the article body contains "DEMO_FILTER:HELLO"
+
+  @live @hot-reload
   Scenario: Editing a render-time .lua filter live-updates dependent notes (#721)
     When I open "/lua-filter-render-demo.html"
     Then the article body contains "RENDER_FILTER:HTML"
