@@ -6,6 +6,8 @@ pandoc:
     render:
       html:
         - lua-filters/diagram.lua
+diagram:
+  cache: true
 ---
 
 # Diagrams
@@ -106,8 +108,12 @@ The upstream filter supports a content-addressed disk cache that skips re-runnin
 ```yaml
 diagram:
   cache: true
-  cache-dir: .diagrams
 ```
+
+Cache files land under `$XDG_CACHE_HOME/pandoc-diagram-filter/` (typically `~/.cache/pandoc-diagram-filter/`), keyed by `sha1(fence-body)`. The cache is shared across notebooks and naturally git-clean. Set `diagram.cache-dir: <path>` to override the location.
+
+> [!note]
+> The cache key is the fence body text only — it does **not** include the engine binary version or the fence's code-block attributes. Bumping `d2` / `typst` (or changing a `{.d2 layout=elk}` attribute) does not invalidate previously-cached renders. Bust the cache manually with `rm -rf $XDG_CACHE_HOME/pandoc-diagram-filter/` when an engine upgrade should reflow output.
 
 Without caching, every render of a page re-invokes the engine. For static [[layer|sites]] this happens once per build; for the live server it happens on each save of a note that contains diagrams.
 
