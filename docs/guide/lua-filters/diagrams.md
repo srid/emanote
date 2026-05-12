@@ -54,19 +54,22 @@ A note that fences a class without a corresponding binary renders a `Pandoc Lua 
 
 ## d2 demo
 
-D2's declarative syntax is the shortest path from prose to picture. The identity-flip Richard describes in ["Something has changed in me"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/somethinghaschangedinme.htm) — the move from a self defined by who-one-was and who-one-was-becoming to a self defined by what-and-who-one-actually-is — lays out as a 2×2 grid:
+D2's declarative syntax is the shortest path from prose to picture. The thought-meandering exercise Richard describes in ["Silly or Sensible"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm) — "_you will go off into a side branch ... and that will branch off into another side branch ... and into another and another ... and so on_" — drops out as a four-step meander followed by the snap-back:
 
 ```d2
 grid-rows: 2
-grid-gap: 30
+grid-gap: 25
 
-was: "Who I was" {style.fill: "#fee2e2"}
-becoming: "Who I was\nbecoming" {style.fill: "#fee2e2"}
-what: "What I am" {style.fill: "#dcfce7"}
-who: "Who I am" {style.fill: "#dcfce7"}
+start: "where I started" {style.fill: "#fef9c3"}
+b1: "side branch"
+b2: "another side branch"
+b3: "and another …"
+back: "snap back" {style.fill: "#dcfce7"; style.bold: true}
 
-was -> what: "coming to\nmy senses" {style.bold: true}
-becoming -> who: "coming to\nmy senses" {style.bold: true}
+start -> b1: meander
+b1 -> b2: meander
+b2 -> b3: meander
+b3 -> back: notice
 ```
 
 ## cetz demo

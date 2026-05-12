@@ -11,11 +11,12 @@ pandoc:
 ```d2
 grid-rows: 2
 
-was: "Who I was"
-becoming: "Who I was becoming"
-what: "What I am"
-who: "Who I am"
+start: "where I started"
+b1: "side branch"
+b2: "another side branch"
+back: "snap back"
 
-was -> what
-becoming -> who
+start -> b1: meander
+b1 -> b2: meander
+b2 -> back: notice
 ```
