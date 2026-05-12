@@ -29,14 +29,18 @@ const stagedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "emanote-e2e-stage-"));
 export const stagedFixtureDir = path.join(stagedRoot, "notebook");
 fs.cpSync(sourceFixtureDir, stagedFixtureDir, { recursive: true });
 
-/** Subtrees the hot-reload scenarios mutate wholesale. The reset
- *  removes the staged copy and re-copies from source, which both
- *  restores edited files and cleans up any files a scenario created
- *  inside the subtree (e.g. a previously-missing filter). New
- *  dep-kinds add their own subtree here as they come online. */
-const mutatedSubtrees: string[] = [
+/** Notebook paths (subtrees or top-level files) the hot-reload
+ *  scenarios mutate. The reset removes each staged entry and re-copies
+ *  from source, which both restores edited files and cleans up any
+ *  files a scenario created inside a listed subtree (e.g. a
+ *  previously-missing filter). Top-level note files belong here when a
+ *  scenario edits the note itself rather than its dependency. New
+ *  dep-kinds add their own entry here as they come online. */
+const mutatedPaths: string[] = [
   "focus-mode", // UI focus-mode hot-reload fixture
   "filters", // Pandoc Lua filters (issue #263)
+  "lua-filter-demo.md", // Markdown note edits via its declared filter
+  "lua-filter-org-demo.org", // Org note edits via its declared filter
 ];
 
 /** Files that hot-reload scenarios create from scratch at the
@@ -55,14 +59,14 @@ const ephemeralFiles: string[] = [
  *  baseline. Called from the @hot-reload Before hook in
  *  `support/hooks.ts`.
  *
- *  We rm + cp each declared mutated subtree rather than walking the
+ *  We rm + cp each declared mutated path rather than walking the
  *  whole notebook so unrelated state (the static-gen output dir, the
  *  user's other notebooks) stays untouched, and so a test-created
  *  file inside a tracked subtree is cleaned up automatically without
  *  the scenario needing to declare it. Top-level ephemeral files are
  *  listed explicitly. */
 export function resetStagedNotebookMutations(): void {
-  for (const sub of mutatedSubtrees) {
+  for (const sub of mutatedPaths) {
     const staged = path.join(stagedFixtureDir, sub);
     const source = path.join(sourceFixtureDir, sub);
     fs.rmSync(staged, { recursive: true, force: true });
