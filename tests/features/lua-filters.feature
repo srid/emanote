@@ -61,10 +61,13 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
 
   @live @hot-reload
   Scenario: Editing the .org note that declares a Lua filter live-updates its page
+    # Marker avoids underscores so Pandoc's Org reader does not consume
+    # them as `_subscript_` syntax — otherwise the rendered innerText
+    # collapses the marker and the assertion can't find it.
     When I open "/lua-filter-org-demo.html"
     Then the article body contains "DEMO_FILTER:HELLO"
-    When I replace "Lua Filter Org Demo" with "Lua Filter Org Demo ORG_BODY_EDIT_MARKER" in "lua-filter-org-demo.org"
-    Then the article body contains "ORG_BODY_EDIT_MARKER" within 10 seconds
+    When I replace "Lua Filter Org Demo" with "Lua Filter Org Demo ORGBODYEDITMARKER" in "lua-filter-org-demo.org"
+    Then the article body contains "ORGBODYEDITMARKER" within 10 seconds
     And the article body contains "DEMO_FILTER:HELLO"
 
   @live @hot-reload
