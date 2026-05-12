@@ -54,25 +54,24 @@ A note that fences a class without a corresponding binary renders a `Pandoc Lua 
 
 ## d2 demo
 
-D2's declarative syntax is the shortest path from prose to picture. Four baseline feeling-states from the [actualism method](https://actualfreedom.com.au/richard/articles/thismomentofbeingalive.htm) laid out as a 2×2 grid, with the central question labelling the edge that crosses from _affective_ to _actual_:
+D2's declarative syntax is the shortest path from prose to picture. The identity-flip Richard describes in ["Something has changed in me"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/somethinghaschangedinme.htm) — the move from a self defined by who-one-was and who-one-was-becoming to a self defined by what-and-who-one-actually-is — lays out as a 2×2 grid:
 
 ```d2
 grid-rows: 2
 grid-gap: 30
 
-bad: Feeling bad {style.fill: "#fee2e2"}
-good: Feeling good {style.fill: "#fef9c3"}
-happy: Happy &\nharmless {style.fill: "#dcfce7"}
-excellent: Feeling\nexcellent {style.fill: "#dbeafe"}
+was: "Who I was" {style.fill: "#fee2e2"}
+becoming: "Who I was\nbecoming" {style.fill: "#fee2e2"}
+what: "What I am" {style.fill: "#dcfce7"}
+who: "Who I am" {style.fill: "#dcfce7"}
 
-bad -> good: notice
-good -> happy: HAIETMOBA {style.bold: true}
-happy -> excellent: sustain
+was -> what: "coming to\nmy senses" {style.bold: true}
+becoming -> who: "coming to\nmy senses" {style.bold: true}
 ```
 
 ## cetz demo
 
-CeTZ shines on figures whose meaning is geometric, not flow-shaped. The method's feeling-states sit naturally as **concentric baselines**: outside is _feeling bad_, inside is _excellent_. Asking _HAIETMOBA_ moment-to-moment is the inward-pointing arrow:
+CeTZ shines on figures whose meaning is geometric, not flow-shaped. The temporal contrast Richard draws in ["This moment has no duration"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/thismomenthasnoduration.htm) — _time had a periodicity_ versus _the cutting edge_ where _this moment has no duration_ — is itself a geometric distinction (discrete tick marks vs. an infinitesimally thin line) that cetz can render directly:
 
 ```cetz
 #import "@preview/cetz:0.3.4": canvas, draw
@@ -80,24 +79,16 @@ CeTZ shines on figures whose meaning is geometric, not flow-shaped. The method's
 #canvas({
   import draw: *
 
-  let levels = (
-    (2.0, "feeling bad",  rgb("#dc2626")),
-    (1.6, "neutral",      rgb("#ea580c")),
-    (1.2, "feeling good", rgb("#16a34a")),
-    (0.8, "harmless",     rgb("#0ea5e9")),
-    (0.4, "excellent",    rgb("#6366f1")),
-  )
-
-  for (r, _l, col) in levels {
-    circle((0, 0), radius: r, stroke: col + 0.8pt)
+  let tick_xs = (-6.8, -5.6, -4.4, -3.2, -2.0)
+  line((-7.2, 0), (-1.6, 0), stroke: 1.2pt + gray)
+  for x in tick_xs {
+    line((x, -0.35), (x, 0.35), stroke: 2.5pt + gray)
   }
+  content((-4.4, -1.0), text(0.9em, fill: gray)[_time had a periodicity_])
 
-  for (r, l, col) in levels {
-    content((0, r - 0.18), text(0.55em, fill: col, l))
-  }
-
-  line((2.5, -2.2), (0.3, -0.15), stroke: 1.2pt + black, mark: (end: ">"))
-  content((2.0, -2.4), text(0.65em, weight: "bold", "HAIETMOBA"))
+  rect((2.92, -1.0), (3.08, 1.0), fill: rgb("#1d4ed8"), stroke: rgb("#1d4ed8"))
+  content((3.0, 1.5), text(1em, weight: "bold", fill: rgb("#1d4ed8"))[_the cutting edge_])
+  content((3.0, -1.5), text(0.85em, fill: rgb("#1d4ed8"))[_this moment has no duration_])
 })
 ```
 

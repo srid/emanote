@@ -13,11 +13,12 @@ pandoc:
 
 #canvas({
   import draw: *
-  circle((0, 0), radius: 1.6)
-  circle((0, 0), radius: 1.0)
-  circle((0, 0), radius: 0.4)
-  content((0, 1.4), [bad])
-  content((0, 0.8), [good])
-  content((0, 0.2), [excellent])
+  line((-2, 0), (-0.5, 0), stroke: 0.7pt + gray)
+  for x in (-1.7, -1.3, -0.9) {
+    line((x, -0.15), (x, 0.15), stroke: 1.5pt + gray)
+  }
+  rect((0.95, -0.5), (1.05, 0.5))
+  content((-1.3, -0.6), [periodicity])
+  content((1.0, -0.8), [no duration])
 })
 ```

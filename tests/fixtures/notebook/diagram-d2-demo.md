@@ -11,12 +11,11 @@ pandoc:
 ```d2
 grid-rows: 2
 
-bad: Feeling bad
-good: Feeling good
-happy: Happy & harmless
-excellent: Feeling excellent
+was: "Who I was"
+becoming: "Who I was becoming"
+what: "What I am"
+who: "Who I am"
 
-bad -> good
-good -> happy
-happy -> excellent
+was -> what
+becoming -> who
 ```
