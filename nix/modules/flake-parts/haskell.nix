@@ -4,7 +4,7 @@
     inputs.haskell-flake.flakeModule
   ];
 
-  perSystem = { pkgs, lib, config, system, diagramsTypstPackageRoot, ... }: {
+  perSystem = { pkgs, lib, config, system, diagramEngineBins, diagramsTypstPackageRoot, ... }: {
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -21,10 +21,7 @@
       devShell.tools = hp: {
         inherit (pkgs)
           stork
-          tailwindcss_4
-          # Diagram engines for the bundled `lua-filters/diagram.lua` filter.
-          d2
-          typst;
+          tailwindcss_4;
       };
       autoWire = [ "packages" "apps" "checks" ];
       packages = {
@@ -76,16 +73,18 @@
                 '';
               };
             });
-            # The bundled `lua-filters/diagram.lua` filter shells out to
-            # `d2` and `typst`; ship them on the wrapped binary's PATH so
-            # users opting into the filter don't need to install renderer
-            # binaries separately. `--set-default` lets a user with
-            # their own typst-package cache override Emanote's.
+            # Wrap the binary with the diagram-engine binaries and the
+            # offline Typst package cache the bundled `diagram.lua`
+            # filter needs. The engine set and package root both live
+            # in `nix/modules/flake-parts/diagrams.nix` — adding a new
+            # engine edits one file, not this one. `--set-default` lets
+            # a user with their own typst-package cache override
+            # Emanote's.
             wrapDiagramEngines = pkg: pkg.overrideAttrs (oldAttrs: {
               nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
               postInstall = (oldAttrs.postInstall or "") + ''
                 wrapProgram $out/bin/emanote \
-                  --prefix PATH : ${lib.makeBinPath [ pkgs.d2 pkgs.typst ]} \
+                  --prefix PATH : ${lib.makeBinPath diagramEngineBins} \
                   --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot}
               '';
             });
