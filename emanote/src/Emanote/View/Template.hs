@@ -282,6 +282,12 @@ failOnStaticRenderFilterErrors False r errs =
     <> ": "
     <> T.intercalate "; " errs
 
+{- | Top-of-page banner for catastrophic filter-pipeline failures. The
+@"lua-filter"@ category here matches the @emanote:error:lua-filter@
+class the bundled @lua-filters/diagram.lua@ emits in place of a
+failing fence, so both diagnostic surfaces share one styling entry in
+@emanote/default/index.yaml@.
+-}
 prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
 prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
