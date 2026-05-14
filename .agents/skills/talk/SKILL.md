@@ -26,7 +26,7 @@ Talk mode is a research-first workflow, not an off-the-cuff conversation. Before
 
 ### First-turn gate
 
-Your first substantive response must not contain recommendations, fixes, "suspects," or claims about third-party library behavior unless you have **already read the relevant source in this session**. If you haven't yet, your first response is the research itself — normally a single `Agent(subagent_type=Explore)` call. Direct `Read`s in the main turn are allowed only for narrow, single-file lookups you can name up front. Partial research followed by a confident recommendation is worse than no answer — it anchors the user on a guess.
+Your first substantive response must not contain recommendations, fixes, "suspects," or claims about third-party library behavior unless **the main agent has already read the relevant source in this session** (`Read` or `Grep` tool calls in the current turn — a subagent reading on your behalf does not count). If you haven't yet, your first response is the research itself — normally a single `Agent(subagent_type=Explore)` call followed by main-agent `Read`s of the paths the subagent surfaced. Direct `Read`s in the main turn are allowed only for narrow, single-file lookups you can name up front. Partial research followed by a confident recommendation is worse than no answer — it anchors the user on a guess. **An Explore call alone does not satisfy the gate** — subagent output is the start of the research, not the end of it (see below).
 
 ### When to use the Explore subagent
 
@@ -41,13 +41,15 @@ For narrow, single-file lookups, `Grep`/`Read` directly is fine. The line is: if
 
 **When the source isn't on disk.** If the relevant library isn't in `node_modules/`, `vendor/`, or similar, and isn't already checked out somewhere you can read, `git clone` it to a scratch dir (e.g. `/tmp/<name>`) at the version the project actually uses, then read it there. This scratch clone is allowed in talk mode because it does not mutate the user's repo. Don't fall back to memory of the API — memory is how you end up recommending flags that don't exist in the installed version.
 
-**Subagent output is a lead, not ground truth.** Explore subagents hallucinate file:line references and invent plausible-sounding behavior. If you haven't verified a claim yourself, mark it "per subagent, unverified" so the user can weigh it — don't launder subagent guesses into confident statements.
+**Subagent output is a lead, not ground truth.** Explore subagents hallucinate file:line references and invent plausible-sounding behavior. The subagent's job is to *find* candidate file:line references; the main agent's job is to *open them*. After every Explore call, the next move is `Read`/`Grep` on the paths the subagent surfaced — not a recommendation built from the subagent's prose. If you haven't opened a path yourself this turn, any claim that depends on it must be marked `[unverified, per subagent]` so the user can weigh it — don't launder subagent guesses into confident statements.
 
 ### Citation requirement
 
-Every non-trivial claim in your response must be backed by a `file:line` reference you actually read in this session. If you cannot cite a file:line for a claim, either go read the source and come back, or explicitly mark the claim as a guess (e.g. "I'm guessing — haven't verified") so the user can weigh it accordingly.
+Every non-trivial claim in your response must be backed by a `file:line` reference **the main agent opened** (via `Read` or `Grep`) in this session. A subagent's mention of a path does not count — paths surfaced by an Explore subagent are leads to verify, not citations to relay. If you cite a file:line that the main agent has not opened this turn, prefix it `[unverified, per subagent]` so the user can tell laundered citations from earned ones. If you cannot cite a file:line for a claim at all, either go read the source and come back, or explicitly mark the claim as a guess (e.g. "I'm guessing — haven't verified").
 
-**Claims about third-party library behavior require file:line references inside that library's source** — not just citations in your own project. "`Terminal.tsx:139` calls `clearTextureAtlas()`" tells you nothing about what `clearTextureAtlas()` *does*; you need a citation in the library's own file to back any claim about its effect.
+**Claims about third-party library behavior require file:line references inside that library's source** — not just citations in your own project. "`Terminal.tsx:139` calls `clearTextureAtlas()`" tells you nothing about what `clearTextureAtlas()` *does*; you need a citation in the library's own file to back any claim about its effect. For "does library X support Y?" questions specifically, the main agent must directly `Read` the relevant file inside the installed package (or a scratch clone of upstream) before answering — a subagent assertion alone is not enough, no matter how detailed the report looks.
+
+**If the user challenges your fact-check** — "did you actually read this?", "did you verify all the claims?" — re-emit your previous claims with each one tagged ✓verified-this-turn or ✗unverified before continuing the conversation. Don't re-argue the conclusion until the provenance is straight.
 
 ### Hedge words are a stop signal
 
@@ -62,7 +64,8 @@ If you're about to emit "probably", "almost certainly", "I suspect", "my #1 susp
 - ❌ "Want me to check whether `fit()` is actually a no-op?" — don't ask, check.
 - ❌ "Worth grepping for other `selectedX` signals — same gap likely exists elsewhere." — if you flagged it, you check it; don't hand the user homework.
 - ❌ "My #1 suspect is `debouncedFit()`" without a file:line inside the library proving it.
-- ❌ Citing a subagent's claim about `FitAddon.ts:45` without opening `FitAddon.ts:45` yourself first.
+- ❌ Citing a subagent's claim about `FitAddon.ts:45` without opening `FitAddon.ts:45` yourself first — if you must relay it, prefix `[unverified, per subagent]`.
+- ❌ "Library X doesn't support Y — `pkg/foo.tsx:168`" when the only thing that opened `foo.tsx` was an Explore subagent. The cite reads identical to a main-agent read; it isn't.
 - ✅ "I read `Viewport.ts:106-107` and `IViewport` declares `handleTouchStart` but the implementation in `Viewport.ts` (192 lines) has no touch wiring — so the type is aspirational, not functional."
 
 ## Behavior
