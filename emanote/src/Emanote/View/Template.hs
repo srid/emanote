@@ -299,17 +299,22 @@ place of a failing fence, carrying the engine's stderr as the first
 `CodeBlock` child (see `diagram_error_block` in that file). The class
 literal is the same string as the variant used by 'MN.errorDiv'
 "lua-filter" so a future tweak to one banner updates both.
+
+A Div without a `CodeBlock` child falls back to a banner string that
+names the marker class, so a future Lua filter that emits the class
+without a message still produces a locatable static-build abort
+instead of a bare "Pandoc Lua filter error".
 -}
 extractInPlaceFilterErrors :: Pandoc -> [Text]
 extractInPlaceFilterErrors = PW.query collect
   where
     collect :: B.Block -> [Text]
     collect (B.Div (_, classes, _) blocks)
-      | "emanote:error:lua-filter" `elem` classes = [errorText blocks]
+      | "emanote:error:lua-filter" `elem` classes = [errorText classes blocks]
     collect _ = []
-    errorText bs = case [t | B.CodeBlock _ t <- bs] of
+    errorText classes bs = case [t | B.CodeBlock _ t <- bs] of
       (msg : _) -> msg
-      _ -> "Pandoc Lua filter error"
+      _ -> "Pandoc Lua filter error (no engine message; class=" <> T.intercalate "," classes <> ")"
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
