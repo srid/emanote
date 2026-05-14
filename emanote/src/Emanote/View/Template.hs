@@ -45,6 +45,7 @@ import System.IO.Error (userError)
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Walk qualified as PW
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -191,7 +192,15 @@ renderLmlHtml model note = do
         baseDoc
   let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
       toc = newToc doc
-  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
+      -- Walk the post-filter AST for Divs carrying `emanote:error:lua-filter`
+      -- (Lua filters such as bundled `lua-filters/diagram.lua` emit those in
+      -- place of a failing fence). Without this, a static build sees no
+      -- entries in `renderFilterErrors` (Lua filters return AST nodes; they
+      -- can't `tell` the Haskell writer) and ships the error-banner page to
+      -- disk silently — defeating the abort-loudly intent of the static-mode
+      -- gate.
+      inPlaceFilterErrors = extractInPlaceFilterErrors filteredDoc
+  failOnStaticRenderFilterErrors (M.inLiveServer model) r (renderFilterErrors <> inPlaceFilterErrors)
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
@@ -277,6 +286,24 @@ prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
 prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
   Pandoc meta $ MN.errorDiv "lua-filter" "Pandoc Lua filter error" errs : blocks
+
+{- | Pull text out of every `emanote:error:lua-filter` Div the post-filter
+AST contains. The bundled `lua-filters/diagram.lua` emits one of these in
+place of a failing fence, carrying the engine's stderr as the first
+`CodeBlock` child (see `diagram_error_block` in that file). The class
+literal is the same string as the variant used by 'MN.errorDiv'
+"lua-filter" so a future tweak to one banner updates both.
+-}
+extractInPlaceFilterErrors :: Pandoc -> [Text]
+extractInPlaceFilterErrors = PW.query collect
+  where
+    collect :: B.Block -> [Text]
+    collect (B.Div (_, classes, _) blocks)
+      | "emanote:error:lua-filter" `elem` classes = [errorText blocks]
+    collect _ = []
+    errorText bs = case [t | B.CodeBlock _ t <- bs] of
+      (msg : _) -> msg
+      _ -> "Pandoc Lua filter error"
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
