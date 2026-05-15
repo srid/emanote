@@ -2,4 +2,4 @@
 AGENTS.md
 
 # Developer-only notes (Ralph reports, profiling, etc.) — not part of the docs site.
-dev/
+dev/**
