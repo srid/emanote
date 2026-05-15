@@ -42,10 +42,14 @@ flag ghcid
   manual:  True
 
 common haskell-common
+  -- `-j` enables module-level parallel compilation. cabal -j only
+  -- parallelises across packages; ghc -j parallelises modules within
+  -- one package, which is what emanote (single package, 60+ modules)
+  -- needs.
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
-    -fprint-explicit-foralls -fprint-explicit-kinds
+    -fprint-explicit-foralls -fprint-explicit-kinds -j
 
   default-extensions:
     BangPatterns

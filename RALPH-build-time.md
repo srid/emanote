@@ -57,6 +57,7 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 | # | Hypothesis | Mutation | cold (s) | incr (s) | ghcid-cold (s) | ghcid-warm (s) | Notes |
 | - | ---------- | -------- | -------- | -------- | -------------- | -------------- | ----- |
 | _baseline_ | — | — | 28.61 | 2.66 | 4.44 | 2.88 | reference |
+| 1 | GHC defaulted to `-j1`; `cabal -j` only parallelises across packages (we have one). Module-level parallelism was the cheapest leverage. | `ghc-options: -j` in `library-common` | **25.30** (-11.6%) | **2.41** (-9.4%) | **3.62** (-18.5%) | **2.04** (-29.2%) | `-j4` slightly faster than `-j` (21.5s vs 22.1s) but `-j` adapts to host cores. Probed `-j1/-j2/-j4/-j8/-j` first to confirm scaling stops at ~4. |
 
 ## Dead ends
 
