@@ -59,7 +59,10 @@ D2's declarative syntax is the shortest path from prose to picture. The thought-
 ```d2
 direction: down
 
-root: "where I started" {style.fill: "#fef9c3"}
+root: "where I started" {
+  style.fill: "#fef9c3"
+  link: https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm
+}
 b1: "side branch"
 b2: "another side branch"
 b3: "and another …"
