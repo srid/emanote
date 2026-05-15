@@ -76,14 +76,65 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
   rebuilds. Confined the option to `library-common`'s `ghc-options`
   instead.
 
+## Final result
+
+| Metric        | Baseline | After cycle 3 | Δ        |
+| ------------- | -------- | ------------- | -------- |
+| cold-build    | 28.61s   | **19.28s**    | **-32.6%** |
+| incremental   |  2.66s   |  **2.34s**    | **-12.2%** |
+| ghcid-cold    |  4.44s   |  **3.53s**    | **-20.5%** |
+| ghcid-warm    |  2.88s   |  **2.00s**    | **-30.5%** |
+
+`cabal build all && cabal test all` → BUILD_OK, 119/119 passing.
+
 ## Findings
 
-_TBD. Will summarize the structural lessons (which modules dominate, which
-extensions / deps matter, etc.) at the end of the run._
+1. **GHC defaulted to `-j1` here**, and `cabal -j` only parallelises
+   across packages. For a single-package project like emanote, the
+   only way to use more than one core is `ghc-options: -j` (cycle 1).
+   This alone bought 12% on cold-build and a striking 29% on
+   ghcid-warm — the cheapest single change.
+
+2. **Simplifier was the dominant phase under `-j`**, eating ~60s of
+   CPU. The default `-fmax-simplifier-iterations=4` does diminishing
+   work in passes 3-4 for this code; capping at 2 (cycle 2) shaved an
+   additional 18% off cold-build. Tests pass — pass 3-4 is mostly a
+   correctness-preserving polish step.
+
+3. **Cross-module specialization** (e.g. `optics`, `pandoc`
+   `SPECIALISE` pragmas) was the next-largest Simplifier driver.
+   `-fno-cross-module-specialise` (cycle 3) keeps intra-module
+   specialization (so the hottest loops still inline their classes)
+   but stops chasing pragmas across module boundaries. Another 6% off
+   cold-build.
+
+4. **Stopping rule**. After three cycles, further wins traded real
+   runtime perf for build time:
+   - `-fignore-interface-pragmas`: another -16% cold-build, but kills
+     cross-module inlining everywhere — would noticeably slow site
+     generation.
+   - `-O0`: -33% cold-build, much slower runtime.
+   - `-fno-specialise`: -9%, real perf hit for pandoc/optics-heavy
+     paths.
+
+   None of these fit the "preserve runtime behaviour" constraint as
+   it was intended. Shipped the three flag-level wins and stopped.
+
+5. **The `first incremental rebuild after a fresh build` outlier**
+   (~8s vs ~2.3s steady-state) is real and consistent across all
+   cycles. Not investigated further — likely cabal plan-cache priming.
 
 ## How to reproduce locally
 
 ```sh
 nix develop -c ./.ralph/measure.sh all          # cold + incr + ghcid
 nix develop -c ./.ralph/measure.sh cold 5       # just cold, 5 runs
+```
+
+The three landed knobs all live in `emanote/emanote.cabal` under
+`common haskell-common`:
+
+```
+ghc-options:
+  ... -j -fmax-simplifier-iterations=2 -fno-cross-module-specialise
 ```
