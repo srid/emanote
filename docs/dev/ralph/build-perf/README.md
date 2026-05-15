@@ -2,7 +2,7 @@
 
 Iterative, measurement-driven shrink of `cabal` build time — which also
 governs the `ghcid` / `just run` inner loop. Generated via the
-[`/ralph`](.claude/skills/ralph/SKILL.md) workflow.
+[`/ralph`](../../../../.claude/skills/ralph/SKILL.md) workflow.
 
 ## Goal
 
@@ -14,7 +14,7 @@ Dependency versions, GHC pin, and the public API are all in-bounds.
 
 All runs use the project's `nix develop` shell on
 `ghc-9.8.4 / cabal-3.14.2.0`. Each measurement is wall-clock seconds via
-`date +%s%N`, captured by `.ralph/measure.sh`. The helper warms up between
+`date +%s%N`, captured by `docs/dev/ralph/build-perf/measure.sh`. The helper warms up between
 runs as appropriate and reports per-run + median.
 
 | Metric                  | What it runs                                                     |
@@ -127,8 +127,8 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 ## How to reproduce locally
 
 ```sh
-nix develop -c ./.ralph/measure.sh all          # cold + incr + ghcid
-nix develop -c ./.ralph/measure.sh cold 5       # just cold, 5 runs
+nix develop -c ./docs/dev/ralph/build-perf/measure.sh all          # cold + incr + ghcid
+nix develop -c ./docs/dev/ralph/build-perf/measure.sh cold 5       # just cold, 5 runs
 ```
 
 The three landed knobs all live in `emanote/emanote.cabal` under

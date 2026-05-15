@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Ralph build-time measurement helper.
-# Usage:
-#   ./.ralph/measure.sh cold N      # N full clean builds, median seconds to stdout
-#   ./.ralph/measure.sh incr N      # N incremental builds (touch leaf), median seconds
-#   ./.ralph/measure.sh ghcid N     # N ghci loads via `:quit`, median seconds
-#   ./.ralph/measure.sh all         # cold 3, incr 5, ghcid 3 — prints a table
+# Usage (from repo root):
+#   ./docs/dev/ralph/build-perf/measure.sh cold N    # N full clean builds
+#   ./docs/dev/ralph/build-perf/measure.sh incr N    # N incremental builds (touch leaf)
+#   ./docs/dev/ralph/build-perf/measure.sh ghcid N   # N ghci loads via `:quit`
+#   ./docs/dev/ralph/build-perf/measure.sh all       # cold 3, incr 5, ghcid 3
 #
 # Output: each "row" run prints one line "RUN <kind> <i> <seconds>"; the
 # script then prints "MEDIAN <kind> <n> <median_seconds>".
@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 LEAF_FILE="emanote/src/Emanote/View/TaskIndex.hs"
 
 # Return monotonic nanoseconds.
