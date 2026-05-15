@@ -1,4 +1,4 @@
-module Emanote.View.Template (emanoteSiteOutput, render) where
+module Emanote.View.Template (emanoteSiteOutput, render, extractInPlaceFilterErrors) where
 
 import Control.Exception (throwIO)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
