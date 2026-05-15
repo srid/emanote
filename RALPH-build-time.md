@@ -59,11 +59,22 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 | _baseline_ | — | — | 28.61 | 2.66 | 4.44 | 2.88 | reference |
 | 1 | GHC defaulted to `-j1`; `cabal -j` only parallelises across packages (we have one). Module-level parallelism was the cheapest leverage. | `ghc-options: -j` in `library-common` | **25.30** (-11.6%) | **2.41** (-9.4%) | **3.62** (-18.5%) | **2.04** (-29.2%) | `-j4` slightly faster than `-j` (21.5s vs 22.1s) but `-j` adapts to host cores. Probed `-j1/-j2/-j4/-j8/-j` first to confirm scaling stops at ~4. |
 | 2 | Per-phase profile under `-j`: Simplifier ate 60s of CPU (dominant). Default `-fmax-simplifier-iterations=4` does 4 fixed-point passes; later passes typically find diminishing returns. | Add `-fmax-simplifier-iterations=2` | **20.73** (-18.0% vs cy1) | **2.32** (-3.7%) | **3.48** (-3.9%) | **1.98** (-3.0%) | Probed `-O0` (-33%), `-fno-specialise` (-9%), `-fno-cross-module-specialise` (-7%) as more aggressive options — all real runtime trade-offs. Iter=2 is the lightest perf tax with the biggest cold-build payoff. `cabal test all` still passes 119/119. |
+| 3 | Even with iter=2, the Simplifier still chases cross-module SPECIALISE pragmas (notably from optics, pandoc). Intra-module specialization keeps the worst hot paths fast; cross-module costs compile time. | Add `-fno-cross-module-specialise` | **19.55** (-5.7%) | 2.36 (noise) | 3.54 (noise) | 2.01 (noise) | Only cold-build moves. Tests pass 119/119. _Dead-end attempted in this cycle: pruning unused `build-depends` (13 packages flagged by `-Wunused-packages`). Removing test deps from `library-common` broke the `haskell-flake` dev shell because cabal2nix derives the env from library deps only — separate concern from compile speed._ |
 
 ## Dead ends
 
-_Filled in as the loop progresses — “tried X, no measurable change, here's
-why” lives here, so future Ralph runs don't repeat the experiment._
+- **Prune unused `build-depends` (cycle 3 attempt).** `-Wunused-packages`
+  flagged 13 packages in `library-common`. Moving test deps
+  (`hedgehog`, `hspec-hedgehog`) out broke the `haskell-flake`-derived
+  `nix develop` shell — `cabal2nix` collects deps from `library-common`
+  into the dev env and doesn't pick up test-only deps unless tests are
+  explicitly enabled in the nix expression. Reverted; the deeper
+  cleanup is a separate concern from compile speed.
+- **`cabal --ghc-options=-j` (probed during cycle 1).** Passing `-j` on
+  the command line applied to every package in the build plan (incl.
+  cached deps), invalidating their store entries and triggering full
+  rebuilds. Confined the option to `library-common`'s `ghc-options`
+  instead.
 
 ## Findings
 
