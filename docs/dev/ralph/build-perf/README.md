@@ -58,8 +58,8 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 | - | ---------- | -------- | -------- | -------- | -------------- | -------------- | ----- |
 | _baseline_ | — | — | 28.61 | 2.66 | 4.44 | 2.88 | reference |
 | 1 | GHC defaulted to `-j1`; `cabal -j` only parallelises across packages (we have one). Module-level parallelism was the cheapest leverage. | `ghc-options: -j` in `library-common` | **25.30** (-11.6%) | **2.41** (-9.4%) | **3.62** (-18.5%) | **2.04** (-29.2%) | `-j4` slightly faster than `-j` (21.5s vs 22.1s) but `-j` adapts to host cores. Probed `-j1/-j2/-j4/-j8/-j` first to confirm scaling stops at ~4. |
-| 2 | Per-phase profile under `-j`: Simplifier ate 60s of CPU (dominant). Default `-fmax-simplifier-iterations=4` does 4 fixed-point passes; later passes typically find diminishing returns. | Add `-fmax-simplifier-iterations=2` | **20.73** (-18.0% vs cy1) | **2.32** (-3.7%) | **3.48** (-3.9%) | **1.98** (-3.0%) | Probed `-O0` (-33%), `-fno-specialise` (-9%), `-fno-cross-module-specialise` (-7%) as more aggressive options — all real runtime trade-offs. Iter=2 is the lightest perf tax with the biggest cold-build payoff. `cabal test all` still passes 119/119. |
-| 3 | Even with iter=2, the Simplifier still chases cross-module SPECIALISE pragmas (notably from optics, pandoc). Intra-module specialization keeps the worst hot paths fast; cross-module costs compile time. | Add `-fno-cross-module-specialise` | **19.55** (-5.7%) | 2.36 (noise) | 3.54 (noise) | 2.01 (noise) | Only cold-build moves. Tests pass 119/119. _Dead-end attempted in this cycle: pruning unused `build-depends` (13 packages flagged by `-Wunused-packages`). Removing test deps from `library-common` broke the `haskell-flake` dev shell because cabal2nix derives the env from library deps only — separate concern from compile speed._ |
+| 2 | Per-phase profile under `-j`: Simplifier ate 60s of CPU (dominant). Default `-fmax-simplifier-iterations=4` does 4 fixed-point passes; later passes typically find diminishing returns. | Add `-fmax-simplifier-iterations=2` | _20.73 (-18.0% vs cy1)_ | _2.32_ | _3.48_ | _1.98_ | Probed `-O0` (-33%), `-fno-specialise` (-9%), `-fno-cross-module-specialise` (-7%) as more aggressive options — all real runtime trade-offs. **Backed out: shipping cycle 1 only.** Pass 3-4 of the simplifier are diminishing-returns but they're not zero-returns; some inlining cascades depend on them, and we want no runtime cost. |
+| 3 | Even with iter=2, the Simplifier still chases cross-module SPECIALISE pragmas (notably from optics, pandoc). Intra-module specialization keeps the worst hot paths fast; cross-module costs compile time. | Add `-fno-cross-module-specialise` | _19.55 (-5.7%)_ | _2.36_ | _3.54_ | _2.01_ | **Backed out: shipping cycle 1 only.** Pandoc parsing and `optics-core` traversals lean heavily on cross-module specialization; losing it would cost an estimated 10-25% on site-gen wall time. _Dead-end attempted in this cycle: pruning unused `build-depends` (13 packages flagged by `-Wunused-packages`). Removing test deps from `library-common` broke the `haskell-flake` dev shell because cabal2nix derives the env from library deps only — separate concern from compile speed._ |
 
 ## Dead ends
 
@@ -78,12 +78,18 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 
 ## Final result
 
-| Metric        | Baseline | After cycle 3 | Δ        |
-| ------------- | -------- | ------------- | -------- |
-| cold-build    | 28.61s   | **19.28s**    | **-32.6%** |
-| incremental   |  2.66s   |  **2.34s**    | **-12.2%** |
-| ghcid-cold    |  4.44s   |  **3.53s**    | **-20.5%** |
-| ghcid-warm    |  2.88s   |  **2.00s**    | **-30.5%** |
+Cycles 2 and 3 were measured and committed but then **backed out** on
+the constraint that runtime perf must not regress. Only cycle 1's `-j`
+flag ships — it changes module-level parallelism inside the compiler
+and produces a byte-identical artifact, so the runtime cost is exactly
+zero.
+
+| Metric        | Baseline | Shipped (-j only) | Δ        |
+| ------------- | -------- | ----------------- | -------- |
+| cold-build    | 28.61s   | **22.42s**        | **-21.6%** |
+| incremental   |  2.66s   |  **2.38s**        | **-10.7%** |
+| ghcid-cold    |  4.44s   |  **3.62s**        | **-18.4%** |
+| ghcid-warm    |  2.88s   |  **2.03s**        | **-29.4%** |
 
 `cabal build all && cabal test all` → BUILD_OK, 119/119 passing.
 
@@ -92,35 +98,25 @@ metric. Changes that don't beat noise (≥3% improvement) get a row but
 1. **GHC defaulted to `-j1` here**, and `cabal -j` only parallelises
    across packages. For a single-package project like emanote, the
    only way to use more than one core is `ghc-options: -j` (cycle 1).
-   This alone bought 12% on cold-build and a striking 29% on
-   ghcid-warm — the cheapest single change.
+   The compiled artifact is byte-identical to a `-j1` build — this is
+   the cheapest single change because the trade-off has no cost side.
 
-2. **Simplifier was the dominant phase under `-j`**, eating ~60s of
-   CPU. The default `-fmax-simplifier-iterations=4` does diminishing
-   work in passes 3-4 for this code; capping at 2 (cycle 2) shaved an
-   additional 18% off cold-build. Tests pass — pass 3-4 is mostly a
-   correctness-preserving polish step.
+2. **Simplifier was the dominant phase under `-j`** (~60s of CPU),
+   followed by Renamer/typechecker. The two compile-time levers we
+   probed against it — `-fmax-simplifier-iterations=2` (-18% extra) and
+   `-fno-cross-module-specialise` (-6% extra) — each had a small but
+   real runtime cost. Reverted both per the no-runtime-cost rule. The
+   simplifier passes 3-4 enable second-order inlining cascades;
+   cross-module SPECIALISE drives most of pandoc/optics' hot-path
+   unboxing.
 
-3. **Cross-module specialization** (e.g. `optics`, `pandoc`
-   `SPECIALISE` pragmas) was the next-largest Simplifier driver.
-   `-fno-cross-module-specialise` (cycle 3) keeps intra-module
-   specialization (so the hottest loops still inline their classes)
-   but stops chasing pragmas across module boundaries. Another 6% off
-   cold-build.
+3. **More aggressive options were probed and rejected** for the same
+   reason: `-fignore-interface-pragmas` (-16% extra cold-build, kills
+   cross-module inlining everywhere), `-O0` (-33% extra cold-build,
+   broad runtime regression), `-fno-specialise` (-9% extra, real hit
+   to pandoc/optics-heavy paths).
 
-4. **Stopping rule**. After three cycles, further wins traded real
-   runtime perf for build time:
-   - `-fignore-interface-pragmas`: another -16% cold-build, but kills
-     cross-module inlining everywhere — would noticeably slow site
-     generation.
-   - `-O0`: -33% cold-build, much slower runtime.
-   - `-fno-specialise`: -9%, real perf hit for pandoc/optics-heavy
-     paths.
-
-   None of these fit the "preserve runtime behaviour" constraint as
-   it was intended. Shipped the three flag-level wins and stopped.
-
-5. **The `first incremental rebuild after a fresh build` outlier**
+4. **The `first incremental rebuild after a fresh build` outlier**
    (~8s vs ~2.3s steady-state) is real and consistent across all
    cycles. Not investigated further — likely cabal plan-cache priming.
 
@@ -131,10 +127,10 @@ nix develop -c ./docs/dev/ralph/build-perf/measure.sh all          # cold + incr
 nix develop -c ./docs/dev/ralph/build-perf/measure.sh cold 5       # just cold, 5 runs
 ```
 
-The three landed knobs all live in `emanote/emanote.cabal` under
+The single landed knob lives in `emanote/emanote.cabal` under
 `common haskell-common`:
 
 ```
 ghc-options:
-  ... -j -fmax-simplifier-iterations=2 -fno-cross-module-specialise
+  ... -j
 ```
