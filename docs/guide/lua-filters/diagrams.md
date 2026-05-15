@@ -78,9 +78,9 @@ b3 -> root: "notice & snap back" {style.bold: true; style.stroke: "#16a34a"}
 
 CeTZ shines on figures whose meaning is geometric, not flow-shaped. The temporal contrast Richard draws in ["This moment has no duration"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/thismomenthasnoduration.htm) — _time had a periodicity_ versus _the cutting edge_ where _this moment has no duration_ — is itself a geometric distinction (discrete tick marks vs. an infinitesimally thin line) that cetz can render directly:
 
-```cetz
-#import "@preview/cetz:0.3.4": canvas, draw
+`canvas` and `draw` are pre-imported by Emanote's wrapper, so the author writes the figure directly without typing or remembering the cetz version:
 
+```cetz
 #canvas({
   import draw: *
 

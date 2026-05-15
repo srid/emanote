@@ -4,7 +4,7 @@
     inputs.haskell-flake.flakeModule
   ];
 
-  perSystem = { pkgs, lib, config, system, diagramEngineBins, diagramsTypstPackageRoot, ... }: {
+  perSystem = { pkgs, lib, config, system, diagramsCetzVersion, diagramEngineBins, diagramsTypstPackageRoot, ... }: {
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -85,7 +85,8 @@
               postInstall = (oldAttrs.postInstall or "") + ''
                 wrapProgram $out/bin/emanote \
                   --prefix PATH : ${lib.makeBinPath diagramEngineBins} \
-                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot}
+                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot} \
+                  --set-default EMANOTE_CETZ_VERSION ${diagramsCetzVersion}
               '';
             });
           in

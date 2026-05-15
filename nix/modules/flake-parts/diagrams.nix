@@ -47,7 +47,7 @@
         '';
     in
     {
-      _module.args = { inherit diagramEngineBins diagramsTypstPackageRoot; };
+      _module.args = { inherit diagramsCetzVersion diagramEngineBins diagramsTypstPackageRoot; };
       # Compile a minimal cetz document against the offline package
       # root. A missing transitive `@preview/…` import surfaces here
       # rather than at note-render time as a `Pandoc Lua filter error`

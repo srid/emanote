@@ -274,14 +274,19 @@ local cetz = {
     if not format then
       format, mime_type = 'svg', 'image/svg+xml'
     end
-    -- Emanote-local patch: drop upstream's `#import "@preview/cetz:…"`
-    -- from the preamble so each note declares its own cetz import (with
-    -- the destructuring `: canvas, draw` form, version pinned by the
-    -- author). The page-size hint stays so the rendered SVG is sized
-    -- to its content rather than to an A4 page.
-    local preamble = [[
+    -- Emanote-local patch: replace upstream's hardcoded
+    -- `#import "@preview/cetz:0.3.4"` with a destructuring import
+    -- (`canvas` and `draw` in scope directly) parameterised by the
+    -- `EMANOTE_CETZ_VERSION` env var the Nix wrapper sets from
+    -- `nix/modules/flake-parts/diagrams.nix`. Authors write
+    -- `#canvas({ import draw: *; … })` without typing or remembering
+    -- the version; bumping cetz in Nix reflows every existing note.
+    -- Falls back to the hardcoded value for hand-driven pandoc runs.
+    local cetz_version = os.getenv('EMANOTE_CETZ_VERSION') or '0.3.4'
+    local preamble = string.format([[
+#import "@preview/cetz:%s": canvas, draw
 #set page(width: auto, height: auto, margin: .5cm)
-]]
+]], cetz_version)
 
     local typst_code = preamble .. code
 
