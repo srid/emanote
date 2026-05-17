@@ -245,9 +245,24 @@ updateSlice :: (MonadIO m) => IgnoreState -> (IgnoreSlice -> IgnoreSlice) -> m (
 updateSlice st f =
   liftIO $ atomically $ modifyTVar' (st ^. isSlice) f
 
+{- | Overwrite the ledger entry for @fp@ unconditionally; the latest
+  unionmount event always carries the freshest overlay info, so the
+  replacement is the right call from the 'applyFiltered' path.
+-}
 recordModified :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
 recordModified st fp ev =
   updateSlice st $ sliceModified %~ Map.insert fp ev
+
+{- | Insert a ledger entry only if @fp@ is absent. Used by the model
+walk in 'evictNewlyIgnored', which has access to a single @(Loc,
+FilePath)@ via @_noteSource@ / @_staticFileSource@ — a thinner record
+than the full overlay 'applyFiltered' captured from a real unionmount
+event. If an existing entry was recorded from a prior partial filter,
+it carries the full overlay history and must win.
+-}
+recordModifiedIfAbsent :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
+recordModifiedIfAbsent st fp ev =
+  updateSlice st $ sliceModified %~ Map.insertWith (\_new old -> old) fp ev
 
 forgetModified :: (MonadIO m) => IgnoreState -> FilePath -> m ()
 forgetModified st fp =
@@ -329,13 +344,20 @@ evictNewlyIgnored ctx newPatterns m0 = do
           fpType = lmlRouteFileType route
           fpMounted = mountedPath loc lfp
       log $ "Hot-reload: hiding note " <> toText fpMounted
-      recordModified (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent fpType ((loc, lfp) :| []) UM.Existing)
+      -- ifAbsent: a previous OverlayPartial may have stashed the full
+      -- multi-layer overlay; the model walk only sees one layer via
+      -- _noteSource, so an unconditional insert would lose that history.
+      recordModifiedIfAbsent (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent fpType ((loc, lfp) :| []) UM.Existing)
       pure $! Model.modelDeleteNote route m
     evictStatic m (sf, loc, lfp) = do
       let route = SF._staticFileRoute sf
           fpMounted = mountedPath loc lfp
       log $ "Hot-reload: hiding static file " <> toText fpMounted
-      recordModified (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent R.AnyExt ((loc, lfp) :| []) UM.Existing)
+      -- R.AnyExt is the tag unionmount classifies static files under, so
+      -- a future re-emit through patchModel routes correctly. ifAbsent
+      -- preserves any richer overlay history from a prior partial filter
+      -- (see the matching evictNote branch for the same constraint).
+      recordModifiedIfAbsent (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent R.AnyExt ((loc, lfp) :| []) UM.Existing)
       pure $! Model.modelDeleteStaticFile route m
 
 {- | For every event we previously suppressed or trimmed, re-evaluate it
