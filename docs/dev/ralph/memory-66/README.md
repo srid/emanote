@@ -141,11 +141,45 @@ architectural changes (sanctioned by the `/ralph` scoping question).
 
 ## Optimization log
 
-| # | Change | Load HWM (MiB) | Δ% | Status |
-|---|--------|---------------:|---:|--------|
-| 0 | Baseline                                                                | 5167 |    – | baseline |
+Measurements are median of 5 runs on the 4.5k corpus, `+RTS -N1`.
+`LOAD_HWM` is sampled the moment `curl /` first succeeds — it is noisy
+because the streaming union-mount completes asynchronously. `AFTER_HWM`
+is sampled after a fixed sequence of 6 page hits and is the more stable
+comparable number.
 
-(Filled in as cycles complete.)
+| # | Change | LOAD_HWM (MiB) | Δ vs baseline | AFTER_HWM (MiB) | Δ vs baseline |
+|---|--------|---------------:|--------------:|----------------:|--------------:|
+| 0 | Baseline                                                       | 5165 | – | 5185 | – |
+| 1 | `deepseq` Pandoc + Aeson `Value` in `parseAndInsert`           | 3443 | **−33.3%** | 4244 | **−18.2%** |
+
+### Cycle 1 — `deepseq` after parse
+
+Hypothesis: lua-vr suggested in [#66 (comment)](https://github.com/srid/emanote/issues/66) that organon's leak was lazy
+parser state retained through Note thunks; a single `evaluate . force`
+after parse moved their 305 MiB to 191 MiB (~37 %).
+
+Patch:
+
+```haskell
+-- emanote/src/Emanote/Source/Patch.hs (parseAndInsert)
+note <-
+  N.parseNote (model ^. M.modelScriptingEngine) ... r src (decodeUtf8 s)
+-- Force the parsed Pandoc and Aeson Value so per-file parser closures
+-- can be released as we stream files into the model (#66).
+note ^. N.noteDoc `deepseq` (note ^. N.noteMeta :: Aeson.Value) `deepseq` pure ()
+```
+
+Result: 5185 MiB → 4244 MiB AFTER_HWM = **−18 %** (vs −37 % for organon).
+
+Smaller relative win than organon because Emanote's closure profile
+already showed `THUNK_*` closures at only ~2 % of heap — the live data
+(Pandoc AST + Text + ARR_WORDS) is mostly evaluated. The `deepseq` win
+comes from releasing the parser-state ByteString that streamed-mount's
+per-file closure was sharing across notes, not from collapsing thunks
+inside the Note itself.
+
+Behaviour preserved: forcing evaluates the same `Pandoc` and `Value`
+that would have been forced later by the renderer; no semantic change.
 
 ## Open question: `gen` mode blow-up
 
