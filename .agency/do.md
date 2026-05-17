@@ -19,6 +19,8 @@ Ignore Github Actions (slow) unless user asks for it.
 ## Documentation
 Keep `README.md`, `docs/` (user documentation), and `CHANGELOG.md` (under the `Unreleased` section) in sync with user-facing changes.
 
+**CHANGELOG style: one concise line per PR.** Each user-facing change gets a single bullet — issue/PR number, the headline, and a one-line link to where the detail lives (a docs page, a deep-dive `[[wikilink]]`, the issue, …). The detail belongs on the docs page or in the PR description, not in the CHANGELOG. Multi-paragraph entries that re-explain the design are clutter; if a reviewer needs more than the link, the docs page wasn't pulling its weight.
+
 New or fixed **Markdown-syntax features** should be demonstrated in [`docs/guide/markdown.md`](../docs/guide/markdown.md) so the live example serves as both reference and regression check. A working `<details>` block, a new callout type, a new wiki-link form — each goes there as a real rendered sample, not just a CHANGELOG note.
 
 ## HACK comments
