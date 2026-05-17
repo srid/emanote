@@ -94,6 +94,20 @@ makeLenses ''IgnoreSlice
 
 makeLenses ''IgnoreState
 
+{- | Session-stable handler context — the values 'emanoteSiteInput'
+binds once and threads through every per-change function. Kept in one
+record so a new helper that needs (say) 'storkIndex' alongside
+'ignoreState' doesn't have to grow another positional argument.
+-}
+data HandlerCtx = HandlerCtx
+  { _ctxIgnoreState :: IgnoreState
+  , _ctxLayers :: Set Loc
+  , _ctxNoteFn :: Note -> Note
+  , _ctxStorkIndex :: Stork.IndexVar
+  }
+
+makeLenses ''HandlerCtx
+
 {- | Make an Ema `Dynamic` for the Emanote model. The bulk of logic
 for building the Dynamic is in @Source/Patch.hs@.
 
@@ -127,6 +141,13 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   perLayerIgnore <- Ignore.loadIgnorePatterns layers
   ignoreState <- liftIO $ IgnoreState <$> newTVarIO (IgnoreSlice perLayerIgnore Map.empty)
   let
+    ctx =
+      HandlerCtx
+        { _ctxIgnoreState = ignoreState
+        , _ctxLayers = layers
+        , _ctxNoteFn = _emanoteConfigNoteFn
+        , _ctxStorkIndex = storkIndex
+        }
     -- unionmount sees only the universal patterns (per-source-mapped).
     -- Per-layer @.emanoteignore@ patterns are applied inside 'handle'
     -- so they can hot-reload without tearing the mount down.
@@ -146,10 +167,10 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
           ignoreRooted = any isRootedIgnoreFile ignoreActions
       m1 <-
         if ignoreRooted
-          then handleIgnoreFileChanges ignoreState layers _emanoteConfigNoteFn storkIndex m0
+          then handleIgnoreFileChanges ctx m0
           else pure m0
       patterns <- _slicePatterns <$> snapshotSlice ignoreState
-      foldlM (applyFiltered ignoreState layers _emanoteConfigNoteFn storkIndex patterns) m1 (changeEntries restCh)
+      foldlM (applyFiltered ctx patterns) m1 (changeEntries restCh)
   Dynamic
     <$> UM.unionMountStreaming
       (layers & Set.map (id &&& Loc.locPath))
@@ -181,42 +202,37 @@ when it owns the ignore map.
 -}
 applyFiltered ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
-  IgnoreState ->
-  Set Loc ->
-  (Note -> Note) ->
-  Stork.IndexVar ->
+  HandlerCtx ->
   Map Loc [FilePattern] ->
   Model.ModelEma ->
   (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m Model.ModelEma
-applyFiltered st layers noteFn storkIndex patterns m (fpType, fp, action) = case action of
+applyFiltered ctx patterns m (fpType, fp, action) = case action of
   UM.Refresh refr overlays -> case Ignore.classifyOverlays patterns overlays of
     Ignore.OverlayKept -> do
-      forgetModified st fp
+      forgetModified (ctx ^. ctxIgnoreState) fp
       dispatch (UM.Refresh refr overlays)
     Ignore.OverlayPartial survivors -> do
-      recordModified st fp (ModifiedEvent fpType overlays refr)
+      recordModified (ctx ^. ctxIgnoreState) fp (ModifiedEvent fpType overlays refr)
       dispatch (UM.Refresh refr survivors)
     Ignore.OverlayDropped -> do
-      recordModified st fp (ModifiedEvent fpType overlays refr)
+      recordModified (ctx ^. ctxIgnoreState) fp (ModifiedEvent fpType overlays refr)
       dispatch UM.Delete
   UM.Delete -> do
-    forgetModified st fp
+    forgetModified (ctx ^. ctxIgnoreState) fp
     dispatch UM.Delete
   where
-    dispatch a = applyOne layers noteFn storkIndex m (fpType, fp, a)
+    dispatch a = applyOne ctx m (fpType, fp, a)
 
 -- | Apply one unfiltered event by delegating to 'Patch.patchModel'.
 applyOne ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
-  Set Loc ->
-  (Note -> Note) ->
-  Stork.IndexVar ->
+  HandlerCtx ->
   Model.ModelEma ->
   (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m Model.ModelEma
-applyOne layers noteFn storkIndex m (fpType, fp, action) = do
-  trans <- Patch.patchModel layers noteFn storkIndex m fpType fp action
+applyOne ctx m (fpType, fp, action) = do
+  trans <- Patch.patchModel (ctx ^. ctxLayers) (ctx ^. ctxNoteFn) (ctx ^. ctxStorkIndex) m fpType fp action
   pure $! trans m
 
 -- | Atomic snapshot of the hot-reload state.
@@ -256,15 +272,13 @@ the model in the first place. See the @R.IgnoreFile@ branch of
 -}
 handleIgnoreFileChanges ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
-  IgnoreState ->
-  Set Loc ->
-  (Note -> Note) ->
-  Stork.IndexVar ->
+  HandlerCtx ->
   Model.ModelEma ->
   m Model.ModelEma
-handleIgnoreFileChanges st layers noteFn storkIndex m0 = do
+handleIgnoreFileChanges ctx m0 = do
+  let st = ctx ^. ctxIgnoreState
   oldPatterns <- _slicePatterns <$> snapshotSlice st
-  newPatterns <- Ignore.loadIgnorePatterns layers
+  newPatterns <- Ignore.loadIgnorePatterns (ctx ^. ctxLayers)
   if newPatterns == oldPatterns
     then do
       logD "Hot-reload: .emanoteignore event with no pattern change"
@@ -272,8 +286,8 @@ handleIgnoreFileChanges st layers noteFn storkIndex m0 = do
     else do
       updateSlice st $ slicePatterns .~ newPatterns
       log "Hot-reload: .emanoteignore patterns changed; refreshing model"
-      m1 <- evictNewlyIgnored st layers storkIndex newPatterns m0
-      reEmitModified st layers noteFn storkIndex newPatterns m1
+      m1 <- evictNewlyIgnored ctx newPatterns m0
+      reEmitModified ctx newPatterns m1
 
 {- | For each note whose top-overlay source now matches a pattern that
 didn't exist before, delete it from the model and remember the event so
@@ -285,20 +299,18 @@ disk and can't be ignored.
 -}
 evictNewlyIgnored ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
-  IgnoreState ->
-  Set Loc ->
-  Stork.IndexVar ->
+  HandlerCtx ->
   Map Loc [FilePattern] ->
   Model.ModelEma ->
   m Model.ModelEma
-evictNewlyIgnored st _layers storkIndex newPatterns m0 = do
+evictNewlyIgnored ctx newPatterns m0 = do
   let victims =
         [ (note, loc, lfp)
         | note <- Ix.toList (m0 ^. Model.modelNotes)
         , Just (loc, lfp) <- pure (N._noteSource note)
         , Ignore.isLayerPathIgnored newPatterns loc lfp
         ]
-  unless (null victims) $ Stork.clearStorkIndex storkIndex
+  unless (null victims) $ Stork.clearStorkIndex (ctx ^. ctxStorkIndex)
   foldlM evict m0 victims
   where
     evict m (note, loc, lfp) = do
@@ -306,7 +318,7 @@ evictNewlyIgnored st _layers storkIndex newPatterns m0 = do
           fpType = lmlRouteFileType route
           fpMounted = mountedPath loc lfp
       log $ "Hot-reload: hiding " <> toText fpMounted
-      recordModified st fpMounted (ModifiedEvent fpType ((loc, lfp) :| []) UM.Existing)
+      recordModified (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent fpType ((loc, lfp) :| []) UM.Existing)
       pure $! Model.modelDeleteNote route m
 
 {- | For every event we previously suppressed or trimmed, re-evaluate it
@@ -317,22 +329,20 @@ recorded for the next pattern change.
 -}
 reEmitModified ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
-  IgnoreState ->
-  Set Loc ->
-  (Note -> Note) ->
-  Stork.IndexVar ->
+  HandlerCtx ->
   Map Loc [FilePattern] ->
   Model.ModelEma ->
   m Model.ModelEma
-reEmitModified st layers noteFn storkIndex newPatterns m0 = do
+reEmitModified ctx newPatterns m0 = do
+  let st = ctx ^. ctxIgnoreState
   entries <- Map.toList . _sliceModified <$> snapshotSlice st
-  foldlM reEmit m0 entries
+  foldlM (reEmit st) m0 entries
   where
-    reEmit m (fp, ev) =
+    reEmit st m (fp, ev) =
       let overlays = ev ^. meOriginalOverlays
           fpType = ev ^. meType
           refr = ev ^. meRefreshAction
-          dispatch a = applyOne layers noteFn storkIndex m (fpType, fp, a)
+          dispatch a = applyOne ctx m (fpType, fp, a)
        in case Ignore.classifyOverlays newPatterns overlays of
             Ignore.OverlayDropped ->
               pure m
