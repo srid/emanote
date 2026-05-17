@@ -5,7 +5,7 @@ pandoc:
   filters:
     render:
       html:
-        - filters/hello.lua
+        - lua-filters/hello.lua
 ---
 
 # Writing a Pandoc Lua filter
@@ -25,7 +25,7 @@ Either phase can match any element type and either phase can produce any AST out
 
 ## Hello-world
 
-This page loads [`filters/hello.lua`](https://github.com/srid/emanote/blob/master/docs/filters/hello.lua), which matches `CodeBlock` elements whose first class is `hello` and turns each line of the body into a bullet greeting:
+This page loads [`lua-filters/hello.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/hello.lua) — bundled in Emanote's [[layer|default layer]] so any notebook can opt into it. It matches `CodeBlock` elements whose first class is `hello` and turns each line of the body into a bullet greeting:
 
 ```hello
 world

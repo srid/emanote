@@ -53,17 +53,17 @@ Edits to `.lua` files hot-reload. The live server re-parses every note that refe
 
 ## Bundled filters
 
-Three curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
+Four curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
 
 - [`list-table.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/list-table.lua) — nested bullet lists → HTML tables. From [pandoc-ext/list-table](https://github.com/pandoc-ext/list-table).
 - [`wordcount.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/wordcount.lua) — appends a `N words · M characters` footer.
 - [`diagram.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua) — fenced code blocks for `d2`, `cetz`, and the other engines [`pandoc-ext/diagram`](https://github.com/pandoc-ext/diagram) supports → inline SVG. The wrapped Emanote binary carries `d2`, `typst`, and an offline `@preview/cetz` package cache; see [[diagrams]].
+- [`hello.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/hello.lua) — a hello-world filter that drives the [[writing-filters|writing-filters guide]] and exercises the error-reporting protocol. Drop `lua-filters/hello.lua` into a note's `pandoc.filters.render.html` and fence with `hello` blocks to try it.
 
 ## Local docs filters
 
-This docs notebook also includes two custom filters under `docs/filters/`:
+This docs notebook also includes a custom filter under `docs/filters/`:
 
-- [`hello.lua`](https://github.com/srid/emanote/blob/master/docs/filters/hello.lua) — the hello-world that drives the [[writing-filters|writing-filters guide]] and exercises the error-reporting protocol.
 - [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) — turns a `:::slides` div into a navigable [[markdown|Markdown]] presentation; runs the [[slides]] deck.
 
 ## Demos
