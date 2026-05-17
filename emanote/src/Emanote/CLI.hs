@@ -23,6 +23,7 @@ import UnliftIO.Directory (getCurrentDirectory)
 data Cli = Cli
   { layers :: NonEmpty Layer
   , allowBrokenInternalLinks :: Bool
+  , allowBrokenLuaFilters :: Bool
   , verbose :: Bool
   , cmd :: Cmd
   }
@@ -86,6 +87,7 @@ cliParser :: FilePath -> Parser Cli
 cliParser cwd = do
   layers <- layerList $ one $ Layer cwd Nothing
   allowBrokenInternalLinks <- switch (long "allow-broken-internal-links" <> help "Report but do not fail on broken internal links")
+  allowBrokenLuaFilters <- switch (long "allow-broken-lua-filters" <> help "Report but do not fail on Pandoc Lua filter errors during static generation. Useful for documentation notebooks that demonstrate the error-surfacing protocol.")
   verbose <- switch (long "verbose" <> short 'v' <> help "Enable verbose logging")
   cmd <- cmdParser
   pure Cli {..}

@@ -281,8 +281,12 @@ local cetz = {
     -- `nix/modules/flake-parts/diagrams.nix`. Authors write
     -- `#canvas({ import draw: *; … })` without typing or remembering
     -- the version; bumping cetz in Nix reflows every existing note.
-    -- Falls back to the hardcoded value for hand-driven pandoc runs.
-    local cetz_version = os.getenv('EMANOTE_CETZ_VERSION') or '0.3.4'
+    -- No fallback: a missing env var means a misconfigured environment
+    -- (running `pandoc` outside the wrapper without setting it
+    -- yourself), and silently picking a version would couple every
+    -- note to whatever number this file happened to ship with.
+    local cetz_version = os.getenv('EMANOTE_CETZ_VERSION')
+      or error('EMANOTE_CETZ_VERSION is not set; the bundled diagram.lua needs the Nix wrapper (or a hand-set env var) to pick the cetz package version')
     local preamble = string.format([[
 #import "@preview/cetz:%s": canvas, draw
 #set page(width: auto, height: auto, margin: .5cm)
@@ -579,22 +583,26 @@ local function cache_image (codeblock, imgdata, mimetype)
   write_file(imgpath, imgdata)
 end
 
--- Emanote-local: replace upstream's `return nil` on engine failure with
--- an in-place error Div carrying `emanote:error` plus the variant class
--- `emanote:error:lua-filter`. The same class powers the catastrophic
--- filter-error banner in `Emanote.View.Template.prependRenderFilterErrors`,
--- so a typst/d2/mermaid stderr surfaces with consistent styling right
--- where the failing code block sat. The original fenced source rides
--- along as a CodeBlock child so the author can fix the right diagram.
+-- HACK: Emanote-local replacement for upstream's `return nil` on engine
+-- failure. Pandoc Lua filters can't push diagnostics back to host code
+-- out-of-band, so we encode the engine's stderr as an AST node — a Div
+-- carrying `emanote:error:lua-filter` — and let the Haskell side walk
+-- the post-filter document to extract it (`extractInPlaceFilterErrors`
+-- in `Emanote.View.Template`). Class string is the contract; the first
+-- `CodeBlock` child holds the stderr; both sides must agree without a
+-- shared definition. See the matching haddock on `extractInPlaceFilterErrors`
+-- for the proper-fix sketch (typed Lua→Haskell diagnostics channel).
+--
+-- Built via the `emanote.error_block` helper Emanote injects into every
+-- filter's chunk (see `emanoteLuaHelpers` in `Emanote.Model.Note.Filter`)
+-- so the protocol's Div shape lives in one place.
 local function diagram_error_block (engine_name, message, source)
-  return pandoc.Div(
-    {
-      pandoc.Para { pandoc.Strong { pandoc.Str('Diagram error (' .. engine_name .. ')') } },
-      pandoc.CodeBlock(tostring(message)),
-      pandoc.CodeBlock(source, pandoc.Attr('', { engine_name }, {})),
-    },
-    pandoc.Attr('', { 'emanote:error', 'emanote:error:lua-filter' }, {})
-  )
+  return emanote.error_block{
+    title = 'Diagram error (' .. engine_name .. ')',
+    message = message,
+    source = source,
+    source_class = engine_name,
+  }
 end
 
 -- Executes each document's code block to find matching code blocks:

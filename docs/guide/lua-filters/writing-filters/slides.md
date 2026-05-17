@@ -1,5 +1,5 @@
 ---
-slug: lua-filters/slides
+slug: slides
 short-title: Slides demo
 pandoc:
   filters:
@@ -81,3 +81,7 @@ The pattern is always the same: drop the `.lua` in, name it in [[yaml-config|fro
 :::
 
 This deck is rendered by `slides.lua`. If you view source, you'll see _it_ is plain [[markdown|Markdown]] inside one fenced div — the filter does the [[html-template|HTML-specific]] structural work at render time.
+
+## Source
+
+![[slides.lua]]

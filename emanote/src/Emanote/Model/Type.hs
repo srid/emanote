@@ -59,6 +59,11 @@ data ModelT encF = Model
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
   , _modelScriptingEngine :: ScriptingEngine
   , _modelCompileTailwind :: Bool
+  , _modelAllowBrokenLuaFilters :: Bool
+  -- ^ When True, 'Emanote.View.Template.failOnStaticRenderFilterErrors' downgrades
+  -- a Lua filter abort to a logged warning. Set by @--allow-broken-lua-filters@.
+  -- Used by the docs notebook, which renders the error-surfacing protocol live
+  -- on 'docs/guide/lua-filters/writing-filters.md'.
   , _modelInstanceID :: UUID
   -- ^ An unique ID for this process's model. ID changes across processes.
   , _modelNotes :: IxNote
@@ -118,8 +123,8 @@ modelPluginBaseDir :: ModelT f -> [FilePath]
 modelPluginBaseDir m =
   fst . locPath <$> Set.toAscList (m ^. modelLayers)
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren scriptingEngine ctw instanceId storkVar =
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> Bool -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
@@ -128,6 +133,7 @@ emptyModel layers act ren scriptingEngine ctw instanceId storkVar =
     , _modelPandocRenderers = ren
     , _modelScriptingEngine = scriptingEngine
     , _modelCompileTailwind = ctw
+    , _modelAllowBrokenLuaFilters = allowBrokenLua
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
       -- being run on an empty directory.
@@ -149,6 +155,13 @@ modelReadyForView =
 -- | Are we running in live server, or statically generated website?
 inLiveServer :: Model -> Bool
 inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
+
+{- | Has the user opted in to letting 'emanote gen' tolerate Lua filter
+errors? Used by the docs notebook so the @writing-filters@ page can
+live-render both a successful filter call and a deliberate failure.
+-}
+allowBrokenLuaFilters :: Model -> Bool
+allowBrokenLuaFilters = _modelAllowBrokenLuaFilters
 
 modelInsertNote :: Note -> ModelT f -> ModelT f
 modelInsertNote note =

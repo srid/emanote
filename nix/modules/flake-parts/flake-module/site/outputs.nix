@@ -65,17 +65,22 @@ in
           OUTPATH=$out/${config.basePath}
           mkdir -p $OUTPATH
           export LANG=C.UTF-8 LC_ALL=C.UTF-8  # https://github.com/srid/emanote/issues/125
-          # $HOME inside the Nix sandbox is /homeless-shelter, which is
-          # read-only; tools that use the XDG cache fall back to
+          # HACK: $HOME inside the Nix sandbox is /homeless-shelter, which
+          # is read-only; tools that use the XDG cache fall back to
           # $HOME/.cache and crash on the createDirectory. Point
           # XDG_CACHE_HOME at the per-build TMPDIR so the bundled
           # `lua-filters/diagram.lua` cache (and any other XDG-cache
-          # consumer) has a writable location during `emanote gen`.
+          # consumer) has a writable location during `emanote gen`. The
+          # proper fix is to teach `emanote gen` not to depend on a
+          # writable XDG cache during pure-build operation — either by
+          # plumbing a `--cache-dir` flag through to the diagram filter
+          # or by detecting `IN_NIX_SANDBOX` and short-circuiting.
           export XDG_CACHE_HOME="$TMPDIR/.cache"
           mkdir -p "$XDG_CACHE_HOME"
           ${pkgs.lib.getExe config.package} \
             --layers "${configDir};${layers}" \
             ${if config.allowBrokenInternalLinks then "--allow-broken-internal-links" else ""} \
+            ${if config.allowBrokenLuaFilters then "--allow-broken-lua-filters" else ""} \
               gen $OUTPATH
         '';
     outputs.check =

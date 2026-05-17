@@ -200,7 +200,8 @@ renderLmlHtml model note = do
       -- disk silently — defeating the abort-loudly intent of the static-mode
       -- gate.
       inPlaceFilterErrors = extractInPlaceFilterErrors filteredDoc
-  failOnStaticRenderFilterErrors (M.inLiveServer model) r (renderFilterErrors <> inPlaceFilterErrors)
+      skipAbort = M.inLiveServer model || M.allowBrokenLuaFilters model
+  failOnStaticRenderFilterErrors skipAbort r (renderFilterErrors <> inPlaceFilterErrors)
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
@@ -267,7 +268,10 @@ the user can fix it. For static generation no one is watching the
 server, and a broken filter would ship a banner-only page to disk;
 abort instead so CI fails loudly.
 
-The first 'Bool' is @inLiveServer@: @True@ skips, @False@ aborts.
+The first 'Bool' is @skipAbort@ — @True@ when running in the live
+server or when the user passed @--allow-broken-lua-filters@ (which
+the Emanote docs notebook uses to live-render the
+@writing-filters@ page's deliberate-error demo); @False@ aborts.
 -}
 failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
 failOnStaticRenderFilterErrors _ _ [] = pass
@@ -293,17 +297,21 @@ prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
   Pandoc meta $ MN.errorDiv "lua-filter" "Pandoc Lua filter error" errs : blocks
 
-{- | Pull text out of every `emanote:error:lua-filter` Div the post-filter
-AST contains. The bundled `lua-filters/diagram.lua` emits one of these in
-place of a failing fence, carrying the engine's stderr as the first
-`CodeBlock` child (see `diagram_error_block` in that file). The class
-literal is the same string as the variant used by 'MN.errorDiv'
-"lua-filter" so a future tweak to one banner updates both.
+{- | HACK: Pandoc Lua filters can return AST nodes but cannot @tell@ the
+host's @MonadWriter@ diagnostic channel. So 'lua-filters/diagram.lua'
+surfaces engine failures by emitting a sentinel @Div@ in the document,
+and we recover the message by walking the AST for that sentinel. The
+class literal @"emanote:error:lua-filter"@ is a cross-language string
+contract shared with 'diagram_error_block' in that Lua file and the
+style entry in @emanote/default/index.yaml@; rename it in one place
+and only @TemplateSpec.hs@ catches the drift. The fallback branch
+exists because a future filter author might emit the class without
+honoring the unwritten "first @CodeBlock@ holds the message" rule.
 
-A Div without a `CodeBlock` child falls back to a banner string that
-names the marker class, so a future Lua filter that emits the class
-without a message still produces a locatable static-build abort
-instead of a bare "Pandoc Lua filter error".
+The proper fix would be a typed Lua→Haskell diagnostics channel
+(upstream Pandoc feature or an Emanote sidecar protocol — an env-var
+pointing at an ndjson file the Lua side appends structured payloads
+to, drained here after @runWriterT@). Tracked in #625 follow-up.
 -}
 extractInPlaceFilterErrors :: Pandoc -> [Text]
 extractInPlaceFilterErrors = PW.query collect

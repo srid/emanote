@@ -4,7 +4,7 @@
     inputs.haskell-flake.flakeModule
   ];
 
-  perSystem = { pkgs, lib, config, system, diagramsCetzVersion, diagramEngineBins, diagramsTypstPackageRoot, ... }: {
+  perSystem = { pkgs, lib, config, system, ... }: {
     # haskell-flake configuration
     haskellProjects.default = {
       projectFlakeName = "emanote";
@@ -75,18 +75,20 @@
             });
             # Wrap the binary with the diagram-engine binaries and the
             # offline Typst package cache the bundled `diagram.lua`
-            # filter needs. The engine set and package root both live
-            # in `nix/modules/flake-parts/diagrams.nix` — adding a new
+            # filter needs. The engine set, package root, and cetz
+            # version all hang off `devShells.diagrams.passthru` in
+            # `nix/modules/flake-parts/diagrams.nix` — adding a new
             # engine edits one file, not this one. `--set-default` lets
             # a user with their own typst-package cache override
             # Emanote's.
+            diagrams = config.devShells.diagrams.passthru;
             wrapDiagramEngines = pkg: pkg.overrideAttrs (oldAttrs: {
               nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
               postInstall = (oldAttrs.postInstall or "") + ''
                 wrapProgram $out/bin/emanote \
-                  --prefix PATH : ${lib.makeBinPath diagramEngineBins} \
-                  --set-default TYPST_PACKAGE_PATH ${diagramsTypstPackageRoot} \
-                  --set-default EMANOTE_CETZ_VERSION ${diagramsCetzVersion}
+                  --prefix PATH : ${lib.makeBinPath diagrams.diagramEngineBins} \
+                  --set-default TYPST_PACKAGE_PATH ${diagrams.diagramsTypstPackageRoot} \
+                  --set-default EMANOTE_CETZ_VERSION ${diagrams.diagramsCetzVersion}
               '';
             });
           in

@@ -17,18 +17,24 @@
       diagramEngineBins = [ pkgs.d2 pkgs.typst ];
       diagramsTypstPackageRoot =
         let
-          # nixpkgs ships each typst package at
+          # HACK: nixpkgs ships each typst package at
           # `lib/typst-packages/<name>/<version>/`, which Typst can't read
           # directly — its `TYPST_PACKAGE_PATH` resolver wants
           # `<root>/preview/<name>/<version>/`. The runCommand below
-          # reshapes the layout.
+          # reshapes the layout via symlinks. A proper fix is in nixpkgs:
+          # either expose a `typstPackages.makeOfflineRoot` helper, or
+          # ship each package at the `preview/`-shaped path so consumers
+          # can `symlinkJoin` directly.
           #
-          # Transitive `@preview/…` imports are listed manually because
-          # typst-packages propagate via `propagatedBuildInputs` but we
-          # want a path-shaped layout, not a build-input closure. cetz
-          # 0.3.4 imports `@preview/oxifmt:0.2.1` from `src/util.typ`;
+          # HACK: transitive `@preview/…` imports are listed manually
+          # because typst-packages propagate via `propagatedBuildInputs`
+          # but we need a path-shaped layout, not a build-input closure.
+          # cetz 0.3.4 imports `@preview/oxifmt:0.2.1` from `src/util.typ`;
           # when bumping `diagramsCetzVersion`, grep the new release's
-          # source for `@preview/...` and update this list.
+          # source for `@preview/...` and update this list. The proper
+          # fix would be a closure walker that reads each package's
+          # `typst.toml`/sources and recursively pulls every
+          # `@preview/<name>:<ver>` it imports.
           typstPackages = [
             pkgs.typstPackages.${versionAttr diagramsCetzVersion}
             pkgs.typstPackages.oxifmt_0_2_1 # transitive dep of cetz 0.3.4
@@ -47,7 +53,21 @@
         '';
     in
     {
-      _module.args = { inherit diagramsCetzVersion diagramEngineBins diagramsTypstPackageRoot; };
+      # A self-contained shell that carries the diagram engines on PATH
+      # plus the env vars the bundled `lua-filters/diagram.lua` reads
+      # (`TYPST_PACKAGE_PATH`, `EMANOTE_CETZ_VERSION`). `devshell.nix`
+      # picks this up via `inputsFrom`; `haskell.nix` reads the raw
+      # values off `passthru` for `wrapProgram`. Adding a new engine
+      # edits this file alone.
+      devShells.diagrams = pkgs.mkShell {
+        name = "emanote-diagrams";
+        packages = diagramEngineBins;
+        TYPST_PACKAGE_PATH = diagramsTypstPackageRoot;
+        EMANOTE_CETZ_VERSION = diagramsCetzVersion;
+        passthru = {
+          inherit diagramsCetzVersion diagramEngineBins diagramsTypstPackageRoot;
+        };
+      };
       # Compile a minimal cetz document against the offline package
       # root. A missing transitive `@preview/…` import surfaces here
       # rather than at note-render time as a `Pandoc Lua filter error`
