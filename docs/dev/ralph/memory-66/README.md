@@ -152,6 +152,7 @@ comparable number.
 | 0 | Baseline                                                       | 5165 | – | 5185 | – |
 | 1 | `deepseq` Pandoc + Aeson `Value` in `parseAndInsert`           | 3443 | **−33.3%** | 4244 | **−18.2%** |
 | 2 | Bake `-with-rtsopts=-N -F1.5` (old-gen retention factor 2.0 → 1.5) | 3757 | **−27.3%** | 3936 | **−24.1%** |
+| 3 | Drop `_relCtx :: [Block]` from `Rel`; recompute on demand              | 3708 | **−28.2%** | 3729 | **−28.1%** |
 
 ### Cycle 1 — `deepseq` after parse
 
@@ -232,6 +233,72 @@ Users can still override at runtime: `emanote run +RTS -F2 -RTS`.
 
 Result: 4199 MiB → 3936 MiB AFTER_HWM at default `-N` (5-run median) =
 **−6.3 %** vs cycle 1, **−24.1 %** vs baseline.
+
+### Cycle 3 — drop `_relCtx` from `Rel`, recompute on demand
+
+Hypothesis: every outgoing link from every note gets a `Rel` stored in
+`_modelRels :: IxRel`. Each `Rel` carries `_relCtx :: [B.Block]` — a
+chunk of Pandoc Blocks describing the surrounding context, used at
+backlink-render time. With ~4500 notes × ~20 links per note, that's
+~90 000 `Rel`s × per-Rel Pandoc-Block chunks. The contexts are
+*derivable* from the source note's already-retained `_noteDoc`, so
+they are a pure duplicate retention.
+
+Code change (two small touch-ups, no new type):
+
+```haskell
+-- emanote/src/Emanote/Model/Link/Rel.hs (noteRels)
+mkRel srcPos (target, _ctx) = Rel (note ^. noteRoute) target srcPos []
+
+-- emanote/src/Emanote/Model/Link/Rel.hs (new)
+noteRelCtxToTarget :: ModelRoute -> Note -> [[B.Block]]
+noteRelCtxToTarget targetMR sourceNote = do
+  (url, instances) <- Map.toList (LC.queryLinksWithContext (sourceNote ^. noteDoc))
+  (attrs, ctx)     <- reverse (toList instances)
+  target           <- maybeToList $ fst <$> parseUnresolvedRelTarget parentR attrs url
+  guard $ target `elem` unresolvedRelsTo targetMR
+  pure ctx
+  where parentR = noteResolveLinkBase sourceNote
+
+-- emanote/src/Emanote/Model/Graph.hs (modelLookupBacklinks)
+withCtx from = do
+  sourceNote <- modelLookupNoteByRoute' from model
+  ctxs       <- nonEmpty $ Rel.noteRelCtxToTarget targetMR sourceNote
+  pure (from, ctxs)
+```
+
+Result: 3936 MiB → 3729 MiB AFTER_HWM (5-run median) = **−5.3 %** vs
+cycle 2, **−28.1 %** cumulative vs baseline.
+
+**Trade-off:** backlinks-page render now walks the source note's Pandoc
+once per backlinking source. For a 4500-file notebook with hundreds of
+backlinks to a single popular note, this is bounded by the sum of the
+backlinking notes' Pandoc sizes (small per source). No detectable
+regression in our smoke-render of `/`, `/topic00/n00000`, etc.
+
+### Dead end: per-Pandoc `GHC.Compact` regions
+
+Hypothesis: copy each Note's Pandoc into its own GHC.Compact region so
+GC walks the region as one opaque object instead of fanning out into
+the general heap.
+
+Implementation: `compactDoc <- Compact.compact (note ^. N.noteDoc)`,
+followed by `note & N.noteDoc .~ Compact.getCompact compactDoc`.
+
+Measurements (4.5k corpus):
+
+| Variant                                | AFTER_HWM (MiB) | vs cycle 2 |
+| -------------------------------------- | --------------: | ---------: |
+| Cycle 2 baseline (deepseq + F1.5)      |            3936 | – |
+| Per-Pandoc Compact regions             |            4515 | **+15 %** (regression) |
+
+Per-region overhead dominates for ~10 KiB Pandocs (Compact uses 4 KiB
+minimum blocks per region). 4500 regions × 4-32 KiB overhead = several
+hundred MiB of waste. Also added ~75 % to startup (53 s → 93 s).
+
+`GHC.Compact` would only help if **all 4500 notes shared one region**,
+which requires re-compacting on every file edit (an expensive
+rebuild). Rejected.
 
 ## Open question: `gen` mode blow-up
 
