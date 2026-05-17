@@ -125,10 +125,15 @@ data OverlayOutcome
   deriving stock (Eq, Show)
 
 classifyOverlays :: Map Loc [FilePattern] -> NonEmpty (Loc, FilePath) -> OverlayOutcome
-classifyOverlays patterns overlays =
-  let survivors = NE.filter (\(loc, lfp) -> not (isLayerPathIgnored patterns loc lfp)) overlays
-   in case nonEmpty survivors of
-        Nothing -> OverlayDropped
-        Just survNE
-          | length survivors == NE.length overlays -> OverlayKept
-          | otherwise -> OverlayPartial survNE
+classifyOverlays patterns overlays
+  -- Fast path: most notebooks have no per-layer patterns at all,
+  -- and even those that do leave most fsnotify events unaffected.
+  -- Skip the @NE.filter@ + per-overlay 'Map.findWithDefault' walk.
+  | Map.null patterns = OverlayKept
+  | otherwise =
+      let survivors = NE.filter (\(loc, lfp) -> not (isLayerPathIgnored patterns loc lfp)) overlays
+       in case nonEmpty survivors of
+            Nothing -> OverlayDropped
+            Just survNE
+              | length survivors == NE.length overlays -> OverlayKept
+              | otherwise -> OverlayPartial survNE
