@@ -68,10 +68,8 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
           cliAct
           _emanoteConfigPandocRenderers
           scriptingEngine
-          Model.ModelFlags
-            { Model.modelFlagCompileTailwind = _emanoteCompileTailwind
-            , Model.modelFlagAllowBrokenLuaFilters = CLI.allowBrokenLuaFilters _emanoteConfigCli
-            }
+          _emanoteCompileTailwind
+          (CLI.allowBrokenLuaFilters _emanoteConfigCli)
           instanceId
           storkIndex
   -- NOTE: Per-layer ignore patterns are loaded once at startup. Edits
