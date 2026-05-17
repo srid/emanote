@@ -81,6 +81,10 @@ data IgnoreState = IgnoreState
   , _isModifiedEvents :: TVar (Map FilePath ModifiedEvent)
   }
 
+makeLenses ''ModifiedEvent
+
+makeLenses ''IgnoreState
+
 {- | Make an Ema `Dynamic` for the Emanote model. The bulk of logic
 for building the Dynamic is in @Source/Patch.hs@.
 
@@ -139,7 +143,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
         if ignoreRooted
           then handleIgnoreFileChanges ignoreState layers _emanoteConfigNoteFn storkIndex m0
           else pure m0
-      patterns <- readTVarIO (_isPatterns ignoreState)
+      patterns <- readTVarIO (ignoreState ^. isPatterns)
       foldlM (applyFiltered ignoreState layers _emanoteConfigNoteFn storkIndex patterns) m1 (changeEntries restCh)
   Dynamic
     <$> UM.unionMountStreaming
@@ -217,11 +221,11 @@ applyOne layers noteFn storkIndex m (fpType, fp, action) = do
 
 recordModified :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
 recordModified st fp ev =
-  liftIO $ atomically $ modifyTVar' (_isModifiedEvents st) (Map.insert fp ev)
+  liftIO $ atomically $ modifyTVar' (st ^. isModifiedEvents) (Map.insert fp ev)
 
 forgetModified :: (MonadIO m) => IgnoreState -> FilePath -> m ()
 forgetModified st fp =
-  liftIO $ atomically $ modifyTVar' (_isModifiedEvents st) (Map.delete fp)
+  liftIO $ atomically $ modifyTVar' (st ^. isModifiedEvents) (Map.delete fp)
 
 {- | Handle a batch of @.emanoteignore@ events by reloading every layer's
 patterns from disk and walking the model + modified-event set so the
@@ -250,14 +254,14 @@ handleIgnoreFileChanges ::
   Model.ModelEma ->
   m Model.ModelEma
 handleIgnoreFileChanges st layers noteFn storkIndex m0 = do
-  oldPatterns <- readTVarIO (_isPatterns st)
+  oldPatterns <- readTVarIO (st ^. isPatterns)
   newPatterns <- Ignore.loadIgnorePatterns layers
   if newPatterns == oldPatterns
     then do
       logD "Hot-reload: .emanoteignore event with no pattern change"
       pure m0
     else do
-      atomically $ writeTVar (_isPatterns st) newPatterns
+      atomically $ writeTVar (st ^. isPatterns) newPatterns
       log "Hot-reload: .emanoteignore patterns changed; refreshing model"
       m1 <- evictNewlyIgnored st layers storkIndex newPatterns m0
       reEmitModified st layers noteFn storkIndex newPatterns m1
@@ -312,13 +316,13 @@ reEmitModified ::
   Model.ModelEma ->
   m Model.ModelEma
 reEmitModified st layers noteFn storkIndex newPatterns m0 = do
-  entries <- Map.toList <$> readTVarIO (_isModifiedEvents st)
+  entries <- Map.toList <$> readTVarIO (st ^. isModifiedEvents)
   foldlM reEmit m0 entries
   where
     reEmit m (fp, ev) = do
-      let overlays = _meOriginalOverlays ev
-          fpType = _meType ev
-          refr = _meRefreshAction ev
+      let overlays = ev ^. meOriginalOverlays
+          fpType = ev ^. meType
+          refr = ev ^. meRefreshAction
           survivors = NE.filter (\(loc, lfp) -> not (Ignore.isLayerPathIgnored newPatterns loc lfp)) overlays
           originalCount = NE.length overlays
           survivorCount = length survivors
