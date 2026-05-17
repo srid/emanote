@@ -32,7 +32,7 @@ import Emanote.Source.Loc (Loc)
 import Emanote.Source.Loc qualified as Loc
 import Emanote.Source.Patch qualified as Patch
 import Emanote.Source.Pattern qualified as Pattern
-import Optics.Core ((^.))
+import Optics.Core ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Paths_emanote qualified
 import Relude
@@ -67,20 +67,30 @@ data ModifiedEvent = ModifiedEvent
   --   file vs. 'UM.Update' for a mid-session modify).
   }
 
-{- | Runtime state for the @.emanoteignore@ hot-reload pipeline.
-
-The 'TVar' lets a writer-side fsnotify thread update patterns while
-the reader-side overlay filter reads them — both stay coordinated via
-STM. Tracking the modified events as a sibling field keeps the
-"what's currently hidden / trimmed" set queryable without re-deriving
-it from the live model on each pattern change.
+{- | The two pieces of mutable state the hot-reload pipeline holds:
+the current per-layer patterns and the ledger of events emanote
+modified under those patterns. Kept together in one record (and
+behind one 'TVar' below) so the pattern table and the suppression
+ledger move as a single unit — a pattern change that walks the
+ledger sees a consistent snapshot, and a future invariant linking
+the two has one place to live.
 -}
-data IgnoreState = IgnoreState
-  { _isPatterns :: TVar (Map Loc [FilePattern])
-  , _isModifiedEvents :: TVar (Map FilePath ModifiedEvent)
+data IgnoreSlice = IgnoreSlice
+  { _slicePatterns :: Map Loc [FilePattern]
+  , _sliceModified :: Map FilePath ModifiedEvent
+  }
+
+{- | Handle for the hot-reload pipeline's mutable state. Single 'TVar'
+keeps the two coupled fields atomic; 'snapshotSlice' and 'updateSlice'
+are the only sanctioned accessors.
+-}
+newtype IgnoreState = IgnoreState
+  { _isSlice :: TVar IgnoreSlice
   }
 
 makeLenses ''ModifiedEvent
+
+makeLenses ''IgnoreSlice
 
 makeLenses ''IgnoreState
 
@@ -115,11 +125,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
           instanceId
           storkIndex
   perLayerIgnore <- Ignore.loadIgnorePatterns layers
-  ignoreState <-
-    liftIO
-      $ IgnoreState
-      <$> newTVarIO perLayerIgnore
-      <*> newTVarIO Map.empty
+  ignoreState <- liftIO $ IgnoreState <$> newTVarIO (IgnoreSlice perLayerIgnore Map.empty)
   let
     -- unionmount sees only the universal patterns (per-source-mapped).
     -- Per-layer @.emanoteignore@ patterns are applied inside 'handle'
@@ -142,7 +148,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
         if ignoreRooted
           then handleIgnoreFileChanges ignoreState layers _emanoteConfigNoteFn storkIndex m0
           else pure m0
-      patterns <- readTVarIO (ignoreState ^. isPatterns)
+      patterns <- _slicePatterns <$> snapshotSlice ignoreState
       foldlM (applyFiltered ignoreState layers _emanoteConfigNoteFn storkIndex patterns) m1 (changeEntries restCh)
   Dynamic
     <$> UM.unionMountStreaming
@@ -213,13 +219,22 @@ applyOne layers noteFn storkIndex m (fpType, fp, action) = do
   trans <- Patch.patchModel layers noteFn storkIndex m fpType fp action
   pure $! trans m
 
+-- | Atomic snapshot of the hot-reload state.
+snapshotSlice :: (MonadIO m) => IgnoreState -> m IgnoreSlice
+snapshotSlice st = readTVarIO (st ^. isSlice)
+
+-- | Apply a transformer to the slice in a single STM transaction.
+updateSlice :: (MonadIO m) => IgnoreState -> (IgnoreSlice -> IgnoreSlice) -> m ()
+updateSlice st f =
+  liftIO $ atomically $ modifyTVar' (st ^. isSlice) f
+
 recordModified :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
 recordModified st fp ev =
-  liftIO $ atomically $ modifyTVar' (st ^. isModifiedEvents) (Map.insert fp ev)
+  updateSlice st $ sliceModified %~ Map.insert fp ev
 
 forgetModified :: (MonadIO m) => IgnoreState -> FilePath -> m ()
 forgetModified st fp =
-  liftIO $ atomically $ modifyTVar' (st ^. isModifiedEvents) (Map.delete fp)
+  updateSlice st $ sliceModified %~ Map.delete fp
 
 {- | Handle a batch of @.emanoteignore@ events by reloading every layer's
 patterns from disk and walking the model + modified-event set so the
@@ -248,14 +263,14 @@ handleIgnoreFileChanges ::
   Model.ModelEma ->
   m Model.ModelEma
 handleIgnoreFileChanges st layers noteFn storkIndex m0 = do
-  oldPatterns <- readTVarIO (st ^. isPatterns)
+  oldPatterns <- _slicePatterns <$> snapshotSlice st
   newPatterns <- Ignore.loadIgnorePatterns layers
   if newPatterns == oldPatterns
     then do
       logD "Hot-reload: .emanoteignore event with no pattern change"
       pure m0
     else do
-      atomically $ writeTVar (st ^. isPatterns) newPatterns
+      updateSlice st $ slicePatterns .~ newPatterns
       log "Hot-reload: .emanoteignore patterns changed; refreshing model"
       m1 <- evictNewlyIgnored st layers storkIndex newPatterns m0
       reEmitModified st layers noteFn storkIndex newPatterns m1
@@ -310,7 +325,7 @@ reEmitModified ::
   Model.ModelEma ->
   m Model.ModelEma
 reEmitModified st layers noteFn storkIndex newPatterns m0 = do
-  entries <- Map.toList <$> readTVarIO (st ^. isModifiedEvents)
+  entries <- Map.toList . _sliceModified <$> snapshotSlice st
   foldlM reEmit m0 entries
   where
     reEmit m (fp, ev) =
