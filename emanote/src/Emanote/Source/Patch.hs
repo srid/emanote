@@ -162,11 +162,17 @@ patchModel' layers noteF storkIndexTVar model fpType fp action = do
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
     R.IgnoreFile ->
       -- .emanoteignore events drive the hot-reload path in
-      -- 'Emanote.Source.Dynamic' before the change set reaches this
-      -- function; by the time we see one here, its effects have
-      -- already been applied to the model (via synthesised refresh /
-      -- delete actions for the notes whose ignore status flipped).
-      -- No further per-file work is needed.
+      -- 'Emanote.Source.Dynamic.handleIgnoreFileChanges', which runs
+      -- \*before* the change set reaches this function. By the time we
+      -- see an IgnoreFile event here, its model-shape effects have
+      -- already landed (the dispatch walks the model to evict newly-
+      -- ignored notes and the modified-event ledger to re-include
+      -- previously-suppressed ones). 'R.LuaFilter' takes the opposite
+      -- route — its hot-reload is implemented inside this function
+      -- because Lua-filter edits invalidate a *set of dependents*
+      -- recoverable from the running model via the SourceDependencies
+      -- reverse index, whereas .emanoteignore edits reshape what
+      -- belongs in the model in the first place.
       pure id
     R.AnyExt ->
       pure id

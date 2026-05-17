@@ -232,6 +232,14 @@ per-event overlay entries) lets a 'UM.Delete' of an ignore file Just
 Work: the deletion is recorded as a missing file by 'readIgnoreFile',
 which collapses to "no patterns for this layer". No per-event
 inspection needed.
+
+This intercept runs at the streaming-handler level, *before* events
+reach 'Patch.patchModel'. The symmetric hot-reload of Lua filters is
+asymmetric on purpose — it lives inside 'Patch.patchModel' because
+filter edits invalidate a set of dependents recoverable from the
+running model, whereas @.emanoteignore@ edits reshape what belongs in
+the model in the first place. See the @R.IgnoreFile@ branch of
+'Patch.patchModel' for the reciprocal note.
 -}
 handleIgnoreFileChanges ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
