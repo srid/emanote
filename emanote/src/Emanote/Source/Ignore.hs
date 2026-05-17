@@ -28,8 +28,11 @@ module Emanote.Source.Ignore (
   -- * Applying patterns
   matchesAnyPattern,
   isLayerPathIgnored,
+  OverlayOutcome (..),
+  classifyOverlays,
 ) where
 
+import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Data.Text qualified as T
@@ -106,3 +109,26 @@ pattern set? Layers absent from the map carry no per-layer patterns.
 isLayerPathIgnored :: Map Loc [FilePattern] -> Loc -> FilePath -> Bool
 isLayerPathIgnored patterns loc =
   matchesAnyPattern (Map.findWithDefault [] loc patterns)
+
+{- | How a 'NonEmpty (Loc, FilePath)' overlay list classifies under a
+pattern set: all entries kept, some kept, or none kept. Captures the
+pure decision the streaming handler needs so the side-effecting code
+in 'Emanote.Source.Dynamic' can pattern-match without re-deriving it.
+-}
+data OverlayOutcome
+  = -- | No overlay entry matched any pattern.
+    OverlayKept
+  | -- | At least one entry survived, but at least one was filtered.
+    OverlayPartial (NonEmpty (Loc, FilePath))
+  | -- | Every entry matched a pattern.
+    OverlayDropped
+  deriving stock (Eq, Show)
+
+classifyOverlays :: Map Loc [FilePattern] -> NonEmpty (Loc, FilePath) -> OverlayOutcome
+classifyOverlays patterns overlays =
+  let survivors = NE.filter (\(loc, lfp) -> not (isLayerPathIgnored patterns loc lfp)) overlays
+   in case nonEmpty survivors of
+        Nothing -> OverlayDropped
+        Just survNE
+          | length survivors == NE.length overlays -> OverlayKept
+          | otherwise -> OverlayPartial survNE

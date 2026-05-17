@@ -12,7 +12,6 @@ module Emanote.Source.Dynamic (
 
 import Control.Monad.Logger (MonadLoggerIO)
 import Data.IxSet.Typed qualified as Ix
-import Data.List.NonEmpty qualified as NE
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Data.UUID.V4 qualified as UUID
@@ -185,26 +184,21 @@ applyFiltered ::
   (R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath))) ->
   m Model.ModelEma
 applyFiltered st layers noteFn storkIndex patterns m (fpType, fp, action) = case action of
-  UM.Refresh refr overlays -> do
-    let survivors = NE.filter (\(loc, lfp) -> not (Ignore.isLayerPathIgnored patterns loc lfp)) overlays
-        originalCount = NE.length overlays
-        survivorCount = length survivors
-    case nonEmpty survivors of
-      Nothing -> do
-        recordModified st fp (ModifiedEvent fpType overlays refr)
-        dispatch m (fpType, fp, UM.Delete)
-      Just survNE
-        | survivorCount == originalCount -> do
-            forgetModified st fp
-            dispatch m (fpType, fp, UM.Refresh refr overlays)
-        | otherwise -> do
-            recordModified st fp (ModifiedEvent fpType overlays refr)
-            dispatch m (fpType, fp, UM.Refresh refr survNE)
+  UM.Refresh refr overlays -> case Ignore.classifyOverlays patterns overlays of
+    Ignore.OverlayKept -> do
+      forgetModified st fp
+      dispatch (UM.Refresh refr overlays)
+    Ignore.OverlayPartial survivors -> do
+      recordModified st fp (ModifiedEvent fpType overlays refr)
+      dispatch (UM.Refresh refr survivors)
+    Ignore.OverlayDropped -> do
+      recordModified st fp (ModifiedEvent fpType overlays refr)
+      dispatch UM.Delete
   UM.Delete -> do
     forgetModified st fp
-    dispatch m (fpType, fp, UM.Delete)
+    dispatch UM.Delete
   where
-    dispatch = applyOne layers noteFn storkIndex
+    dispatch a = applyOne layers noteFn storkIndex m (fpType, fp, a)
 
 -- | Apply one unfiltered event by delegating to 'Patch.patchModel'.
 applyOne ::
@@ -319,25 +313,22 @@ reEmitModified st layers noteFn storkIndex newPatterns m0 = do
   entries <- Map.toList <$> readTVarIO (st ^. isModifiedEvents)
   foldlM reEmit m0 entries
   where
-    reEmit m (fp, ev) = do
+    reEmit m (fp, ev) =
       let overlays = ev ^. meOriginalOverlays
           fpType = ev ^. meType
           refr = ev ^. meRefreshAction
-          survivors = NE.filter (\(loc, lfp) -> not (Ignore.isLayerPathIgnored newPatterns loc lfp)) overlays
-          originalCount = NE.length overlays
-          survivorCount = length survivors
-      case nonEmpty survivors of
-        Nothing ->
-          pure m
-        Just survNE
-          | survivorCount == originalCount -> do
+          dispatch a = applyOne layers noteFn storkIndex m (fpType, fp, a)
+       in case Ignore.classifyOverlays newPatterns overlays of
+            Ignore.OverlayDropped ->
+              pure m
+            Ignore.OverlayKept -> do
               forgetModified st fp
               log $ "Hot-reload: re-including " <> toText fp
-              applyOne layers noteFn storkIndex m (fpType, fp, UM.Refresh refr overlays)
-          | otherwise -> do
+              dispatch (UM.Refresh refr overlays)
+            Ignore.OverlayPartial survivors -> do
               recordModified st fp (ModifiedEvent fpType overlays refr)
               log $ "Hot-reload: re-including " <> toText fp <> " (partial overlay)"
-              applyOne layers noteFn storkIndex m (fpType, fp, UM.Refresh refr survNE)
+              dispatch (UM.Refresh refr survivors)
 
 -- | Recover the unionmount-style mounted path from a layer + layer-relative file.
 mountedPath :: Loc -> FilePath -> FilePath
