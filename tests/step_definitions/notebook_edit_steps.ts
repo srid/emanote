@@ -14,6 +14,7 @@ import * as path from "node:path";
 import * as assert from "node:assert";
 import { EmanoteWorld } from "../support/world.ts";
 import { stagedFixtureDir, writeStaged } from "../support/fixture.ts";
+import { pollUrl } from "../support/poll.ts";
 
 When("I delete {string}", function (fp: string) {
   fs.unlinkSync(path.join(stagedFixtureDir, fp));
@@ -105,19 +106,15 @@ Then(
     needle: string,
     seconds: number,
   ) {
-    const deadline = Date.now() + seconds * 1000;
-    let lastSnippet = "";
-    while (Date.now() < deadline) {
-      const resp = await this.page.request.get(url);
-      if (resp.ok()) {
-        const body = await resp.text();
-        lastSnippet = body.slice(0, 200);
-        if (body.includes(needle)) return;
-      }
-      await new Promise((r) => setTimeout(r, 200));
-    }
-    throw new Error(
-      `URL ${url} did not contain ${JSON.stringify(needle)} within ${seconds}s; last body prefix: ${JSON.stringify(lastSnippet)}.`,
+    await pollUrl(
+      this.page,
+      url,
+      seconds * 1000,
+      ({ ok, body }) => ok && body !== null && body.includes(needle),
+      ({ body }) =>
+        new Error(
+          `URL ${url} did not contain ${JSON.stringify(needle)} within ${seconds}s; last body prefix: ${JSON.stringify((body ?? "").slice(0, 200))}.`,
+        ),
     );
   },
 );
@@ -134,16 +131,15 @@ Then(
     needle: string,
     seconds: number,
   ) {
-    const deadline = Date.now() + seconds * 1000;
-    while (Date.now() < deadline) {
-      const resp = await this.page.request.get(url);
-      if (!resp.ok()) return;
-      const body = await resp.text();
-      if (!body.includes(needle)) return;
-      await new Promise((r) => setTimeout(r, 200));
-    }
-    throw new Error(
-      `URL ${url} continued to contain ${JSON.stringify(needle)} after ${seconds}s.`,
+    await pollUrl(
+      this.page,
+      url,
+      seconds * 1000,
+      ({ ok, body }) => !ok || (body !== null && !body.includes(needle)),
+      () =>
+        new Error(
+          `URL ${url} continued to contain ${JSON.stringify(needle)} after ${seconds}s.`,
+        ),
     );
   },
 );
@@ -158,19 +154,15 @@ Then(
 When(
   "I wait for {string} to contain {string}",
   async function (this: EmanoteWorld, url: string, needle: string) {
-    const deadline = Date.now() + 15_000;
-    let lastStatus: number | undefined;
-    while (Date.now() < deadline) {
-      const resp = await this.page.request.get(url);
-      lastStatus = resp.status();
-      if (resp.ok()) {
-        const body = await resp.text();
-        if (body.includes(needle)) return;
-      }
-      await new Promise((r) => setTimeout(r, 200));
-    }
-    throw new Error(
-      `Timed out waiting for ${url} to contain ${JSON.stringify(needle)} (last status=${String(lastStatus)}).`,
+    await pollUrl(
+      this.page,
+      url,
+      15_000,
+      ({ ok, body }) => ok && body !== null && body.includes(needle),
+      ({ status }) =>
+        new Error(
+          `Timed out waiting for ${url} to contain ${JSON.stringify(needle)} (last status=${status}).`,
+        ),
     );
   },
 );
