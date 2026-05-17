@@ -129,10 +129,16 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
       m Model.ModelEma
     handle change m0 = do
       let (ignoreCh, restCh) = Map.partitionWithKey (\k _ -> k == R.IgnoreFile) change
+          -- Sub-tree `.emanoteignore` events (e.g. @sub/.emanoteignore@)
+          -- arrive under the same 'R.IgnoreFile' tag but configure no
+          -- pattern set — only the layer-root file is consulted. Skip
+          -- the reload entirely when nothing rooted is in the batch.
+          ignoreActions = [a | files <- Map.elems ignoreCh, a <- Map.elems files]
+          ignoreRooted = any isRootedIgnoreFile ignoreActions
       m1 <-
-        if Map.null ignoreCh
-          then pure m0
-          else handleIgnoreFileChanges ignoreState layers _emanoteConfigNoteFn storkIndex m0
+        if ignoreRooted
+          then handleIgnoreFileChanges ignoreState layers _emanoteConfigNoteFn storkIndex m0
+          else pure m0
       patterns <- readTVarIO (_isPatterns ignoreState)
       foldlM (applyFiltered ignoreState layers _emanoteConfigNoteFn storkIndex patterns) m1 (changeEntries restCh)
   Dynamic
@@ -333,5 +339,14 @@ lmlRouteFileType :: LMLRoute -> R.FileType R.SourceExt
 lmlRouteFileType r
   | MR.isMdRoute r = R.LMLType R.Md
   | otherwise = R.LMLType R.Org
+
+{- | Does an 'R.IgnoreFile' event involve a layer-root @.emanoteignore@?
+Sub-tree files share the tag but configure no pattern set, so a batch
+that contains only sub-tree events can skip the reload entirely.
+-}
+isRootedIgnoreFile :: UM.FileAction (NonEmpty (Loc, FilePath)) -> Bool
+isRootedIgnoreFile = \case
+  UM.Refresh _ overlays -> any (Ignore.isLayerRootIgnoreFile . snd) overlays
+  UM.Delete -> True
 
 makeLenses ''EmanoteConfig
