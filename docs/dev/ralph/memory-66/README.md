@@ -151,6 +151,7 @@ comparable number.
 |---|--------|---------------:|--------------:|----------------:|--------------:|
 | 0 | Baseline                                                       | 5165 | – | 5185 | – |
 | 1 | `deepseq` Pandoc + Aeson `Value` in `parseAndInsert`           | 3443 | **−33.3%** | 4244 | **−18.2%** |
+| 2 | Bake `-with-rtsopts=-N -F1.5` (old-gen retention factor 2.0 → 1.5) | 3757 | **−27.3%** | 3936 | **−24.1%** |
 
 ### Cycle 1 — `deepseq` after parse
 
@@ -180,6 +181,57 @@ inside the Note itself.
 
 Behaviour preserved: forcing evaluates the same `Pandoc` and `Value`
 that would have been forced later by the renderer; no semantic change.
+
+The real cycle-1 win is structural, not RTS-amplified. `+RTS -s` on the
+same corpus shows:
+
+| Metric                    | Baseline | Cycle 1 | Δ |
+| ------------------------- | -------- | ------- | --- |
+| Bytes allocated in heap   | 416 GB   | 399 GB  | −4 % |
+| Bytes copied during GC    | 27.7 GB  | 22.2 GB | −20 % |
+| **Maximum residency**     | 1.85 GiB | 1.27 GiB | **−31 %** |
+| Total memory in use       | 4.78 GiB | 3.22 GiB | −33 % |
+| Productivity              | 70.9 %   | 74.9 %  | +4 pp |
+
+So `deepseq` is not just multiplying through a smaller heap arena — it
+actually frees live data. Plausible explanation: per-file parser state
+(attoparsec inputs, intermediate `[Block]` builders) is reachable
+through lazy `Pandoc` fields; forcing the Pandoc at insert time lets
+that intermediate state be collected at the next gen-0 GC instead of
+hanging on until the renderer eventually walks the AST.
+
+### Cycle 2 — bake `-F1.5` into the executable
+
+Hypothesis: with cycle 1 in place, live residency is 1.27 GiB but total
+RSS is still 4.24 GiB — a 3.3× live-to-RSS ratio because of GHC's
+`-F2` default (old-gen GC sizes the heap at 2 × live + nurseries +
+slop). Lowering `-F` trades a few extra major GCs for a smaller heap
+high-water.
+
+Sweep (3 runs each, on top of cycle 1, `-N1`):
+
+| RTS                | READY (s) | AFTER_HWM (MiB) | Gen-1 colls | Max gen-1 pause |
+| ------------------ | --------: | --------------: | ----------: | --------------: |
+| (cycle 1 baseline) |       46  |            4158 |          43 |          0.63 s |
+| `-F1.5`            |       47  |            4036 |          77 |          0.49 s |
+| `-F1.2`            |       57  |            3782 |       (more) |       (smaller) |
+| `-F1.1`            |       74  |            3660 |       (more) |       (smaller) |
+
+`-F1.5` is the sweet spot: 3 % lower RSS, faster max pause (smaller
+heap to scan), 2 % slower startup. `-F1.2` and lower hurt startup
+sharply (more major GCs each scanning still-mostly-live data).
+
+Patch:
+
+```cabal
+-- emanote/emanote.cabal
+ghc-options: -threaded -rtsopts "-with-rtsopts=-N -F1.5"
+```
+
+Users can still override at runtime: `emanote run +RTS -F2 -RTS`.
+
+Result: 4199 MiB → 3936 MiB AFTER_HWM at default `-N` (5-run median) =
+**−6.3 %** vs cycle 1, **−24.1 %** vs baseline.
 
 ## Open question: `gen` mode blow-up
 

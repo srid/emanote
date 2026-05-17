@@ -242,7 +242,11 @@ executable emanote
   import:         library-common
   hs-source-dirs: exe
   main-is:        Main.hs
-  ghc-options:    -threaded -rtsopts -with-rtsopts=-N
+  -- -F1.5: shrink the old-generation retention factor from the GHC default
+  -- (2.0) to 1.5, trading a few extra major GCs for ~30% lower RSS on large
+  -- notebooks (see docs/dev/ralph/memory-66/README.md, cycle 2). Users can
+  -- still override at runtime, e.g. `emanote run +RTS -F2 -RTS`.
+  ghc-options:    -threaded -rtsopts "-with-rtsopts=-N -F1.5"
 
   if flag(ghcid)
     hs-source-dirs: src
