@@ -199,8 +199,11 @@ renderLmlHtml model note = do
       -- entries in `renderFilterErrors` (Lua filters return AST nodes; they
       -- can't `tell` the Haskell writer) and ships the error-banner page to
       -- disk silently — defeating the abort-loudly intent of the static-mode
-      -- gate.
-      inPlaceFilterErrors = extractInPlaceFilterErrors filteredDoc
+      -- gate. Gated on the note actually declaring a render-html filter so
+      -- pages with no filters skip the full-AST traversal.
+      inPlaceFilterErrors
+        | null (NoteFilter.pfdRenderHtmlFilters (note ^. MN.notePandocFilterDeclarations)) = []
+        | otherwise = extractInPlaceFilterErrors filteredDoc
       skipAbort = M.inLiveServer model || model ^. M.modelAllowBrokenLuaFilters
   failOnStaticRenderFilterErrors skipAbort r (renderFilterErrors <> inPlaceFilterErrors)
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
