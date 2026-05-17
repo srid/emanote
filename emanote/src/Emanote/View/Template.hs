@@ -201,7 +201,7 @@ renderLmlHtml model note = do
       -- disk silently — defeating the abort-loudly intent of the static-mode
       -- gate.
       inPlaceFilterErrors = extractInPlaceFilterErrors filteredDoc
-      skipAbort = M.inLiveServer model || M.allowBrokenLuaFilters model
+      skipAbort = M.inLiveServer model || model ^. M.modelAllowBrokenLuaFilters
   failOnStaticRenderFilterErrors skipAbort r (renderFilterErrors <> inPlaceFilterErrors)
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta

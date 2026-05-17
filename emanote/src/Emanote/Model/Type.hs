@@ -60,10 +60,7 @@ data ModelT encF = Model
   , _modelScriptingEngine :: ScriptingEngine
   , _modelCompileTailwind :: Bool
   , _modelAllowBrokenLuaFilters :: Bool
-  -- ^ When True, 'Emanote.View.Template.failOnStaticRenderFilterErrors' downgrades
-  -- a Lua filter abort to a logged warning. Set by @--allow-broken-lua-filters@.
-  -- Used by the docs notebook, which renders the error-surfacing protocol live
-  -- on 'docs/guide/lua-filters/writing-filters.md'.
+  -- ^ See @--allow-broken-lua-filters@; consumed by 'Emanote.View.Template.failOnStaticRenderFilterErrors'.
   , _modelInstanceID :: UUID
   -- ^ An unique ID for this process's model. ID changes across processes.
   , _modelNotes :: IxNote
@@ -165,13 +162,6 @@ modelReadyForView =
 -- | Are we running in live server, or statically generated website?
 inLiveServer :: Model -> Bool
 inLiveServer = Ema.CLI.isLiveServer . _modelEmaCLIAction
-
-{- | Has the user opted in to letting 'emanote gen' tolerate Lua filter
-errors? Used by the docs notebook so the @writing-filters@ page can
-live-render both a successful filter call and a deliberate failure.
--}
-allowBrokenLuaFilters :: Model -> Bool
-allowBrokenLuaFilters = _modelAllowBrokenLuaFilters
 
 modelInsertNote :: Note -> ModelT f -> ModelT f
 modelInsertNote note =
