@@ -6,13 +6,13 @@ import Data.Aeson qualified as Aeson
 import Data.Aeson.Optics (key, _String)
 import Emanote.Model (Model)
 import Emanote.Model.Meta (getEffectiveRouteMeta)
-import Emanote.Model.Note (Feed (..), Note (..), lookupMeta)
+import Emanote.Model.Note (Feed (..), Note (..), lookupMeta, noteDoc)
 import Emanote.Model.Query (Query, parseQuery, runQuery)
 import Emanote.Model.SData (lookupAeson)
 import Emanote.Model.Title (toPlain)
 import Emanote.Route.SiteRoute
 import Emanote.Route.SiteRoute.Class (noteFeedSiteRoute)
-import Optics.Operators ((^?))
+import Optics.Operators ((^.), (^?))
 import Optics.Optic ((%))
 import Relude
 import Text.Atom.Feed qualified as Atom
@@ -48,7 +48,7 @@ getNoteDate :: Note -> Atom.Date
 getNoteDate note = fromMaybe "1970-01-01" $ _noteMeta note ^? key "date" % _String
 
 getNoteQuery :: Note -> Either LText Query
-getNoteQuery note = case _noteDoc note of
+getNoteQuery note = case note ^. noteDoc of
   Pandoc _meta [] -> Left "empty note"
   Pandoc _meta blocks -> go blocks
   where
