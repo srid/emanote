@@ -399,13 +399,12 @@ mountedPath :: Loc -> FilePath -> FilePath
 mountedPath loc lfp =
   maybe lfp (</> lfp) (Loc.locMountPoint loc)
 
-{- | The unionmount tag for an LML route, used when synthesising an event
-  for a note we want to evict.
+{- | The unionmount tag for an LML route. 'MR.withLmlRoute' selects the
+  right 'HasExt' instance, so 'fileType' returns 'R.LMLType R.Md' or
+  'R.LMLType R.Org' without a manual case-split.
 -}
 lmlRouteFileType :: LMLRoute -> R.FileType R.SourceExt
-lmlRouteFileType r
-  | MR.isMdRoute r = R.LMLType R.Md
-  | otherwise = R.LMLType R.Org
+lmlRouteFileType = MR.withLmlRoute (\(_ :: R.R ('R.LMLType lml)) -> R.fileType @_ @('R.LMLType lml))
 
 {- | Does an 'R.IgnoreFile' event involve a layer-root @.emanoteignore@?
 Sub-tree files share the tag but configure no pattern set, so a batch
