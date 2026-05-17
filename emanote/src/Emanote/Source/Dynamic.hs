@@ -62,7 +62,16 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
   storkIndex <- Stork.newIndex
   scriptingEngine <- getEngine
   let layers = Loc.userLayers ((CLI.path &&& CLI.mountPoint) <$> CLI.layers _emanoteConfigCli) <> one defaultLayer
-      initialModel = Model.emptyModel layers cliAct _emanoteConfigPandocRenderers scriptingEngine _emanoteCompileTailwind instanceId storkIndex
+      initialModel =
+        Model.emptyModel
+          layers
+          cliAct
+          _emanoteConfigPandocRenderers
+          scriptingEngine
+          _emanoteCompileTailwind
+          (CLI.allowBrokenLuaFilters _emanoteConfigCli)
+          instanceId
+          storkIndex
   -- NOTE: Per-layer ignore patterns are loaded once at startup. Edits
   -- to a `.emanoteignore` file during a live-serve session do not take
   -- effect until restart. Live reload (#228 phase 2) requires

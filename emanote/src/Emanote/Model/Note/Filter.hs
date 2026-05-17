@@ -22,6 +22,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Emanote.Model.SData qualified as SData
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Prelude (log, logE)
 import Relude
 import System.Directory (doesFileExist, doesPathExist, getTemporaryDirectory, removeFile)
@@ -175,9 +176,9 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
   -- async exception between acquire and the post-apply cleanup, accepted
   -- rather than threading MonadUnliftIO/MonadMask through the WriterT
   -- stack here.
-  guardedPaths <- liftIO $ acquireGuardedFilters ioCleanFilters
+  guardedPaths <- liftIO $ acquireGuardedFilters writeGuardedParseFilter ioCleanFilters
   filteredDoc <- applyPandocFilters scriptingEngine "markdown" (PF.LuaFilter <$> guardedPaths) doc
-  liftIO $ cleanupGuardedParseFilters guardedPaths
+  liftIO $ cleanupGuardedFilters guardedPaths
   pure filteredDoc
   where
     rejectParseTimeIO rf = do
@@ -186,12 +187,12 @@ applyParsePandocFilters scriptingEngine pluginBaseDir declarations doc = do
         then pure True
         else tell [parseTimeFilterIOErrorMsg rf uses] >> pure False
 
-acquireGuardedFilters :: [ResolvedPandocFilter] -> IO [FilePath]
-acquireGuardedFilters = go []
+acquireGuardedFilters :: (ResolvedPandocFilter -> IO FilePath) -> [ResolvedPandocFilter] -> IO [FilePath]
+acquireGuardedFilters writer = go []
   where
     go acc [] = pure (reverse acc)
     go acc (f : rest) = do
-      p <- writeGuardedParseFilter f `CE.onException` cleanupGuardedParseFilters acc
+      p <- writer f `CE.onException` cleanupGuardedFilters acc
       go (p : acc) rest
 
 applyRenderHtmlPandocFilters ::
@@ -204,7 +205,13 @@ applyRenderHtmlPandocFilters ::
   m Pandoc
 applyRenderHtmlPandocFilters scriptingEngine pluginBaseDir declarations meta doc = do
   resolvedFilters <- resolveLuaFilters pluginBaseDir (pfdRenderHtmlFilters declarations)
-  applyPandocFilters scriptingEngine "html" (PF.LuaFilter . rpfResolvedPath <$> resolvedFilters) (withPandocMeta meta doc)
+  -- Render-time filters get the same `emanote` global as parse-time ones,
+  -- so a downstream filter author can `emanote.error_block { ... }`
+  -- regardless of phase. Acquire/cleanup mirrors `applyParsePandocFilters`.
+  guardedPaths <- liftIO $ acquireGuardedFilters writeGuardedRenderFilter resolvedFilters
+  filteredDoc <- applyPandocFilters scriptingEngine "html" (PF.LuaFilter <$> guardedPaths) (withPandocMeta meta doc)
+  liftIO $ cleanupGuardedFilters guardedPaths
+  pure filteredDoc
 
 data ResolvedPandocFilter = ResolvedPandocFilter
   { rpfRequestedPath :: FilePath
@@ -263,23 +270,61 @@ checkLuaFilter requestedPath resolvedPath = do
     else pure $ Left $ "Unsupported filter: " <> toText requestedPath
 
 -- Pandoc's Lua filter runner takes a file path, not an in-memory script.
--- Parse-time filters therefore run through guarded temporary copies so the
--- no-IO prelude executes in the same Lua chunk as the user's filter.
-writeGuardedParseFilter :: ResolvedPandocFilter -> IO FilePath
-writeGuardedParseFilter ResolvedPandocFilter {..} = do
+-- Filters therefore run through guarded temporary copies so the injected
+-- Lua chunk -- 'emanoteLuaHelpers' (both phases) plus 'parseTimeNoIOPrelude'
+-- (parse only) -- executes in the same Lua chunk as the user's filter.
+writeGuardedFilter :: Text -> String -> ResolvedPandocFilter -> IO FilePath
+writeGuardedFilter prelude prefix ResolvedPandocFilter {..} = do
   tmpDir <- getTemporaryDirectory
-  (guardedPath, h) <- openTempFile tmpDir $ "emanote-parse-" <> takeFileName rpfResolvedPath
+  (guardedPath, h) <- openTempFile tmpDir $ prefix <> takeFileName rpfResolvedPath
   source <- decodeUtf8 <$> readFileBS rpfResolvedPath
-  TIO.hPutStr h $ parseTimeNoIOPrelude <> "\n" <> source
+  TIO.hPutStr h $ prelude <> "\n" <> source
   hClose h
   pure guardedPath
 
-cleanupGuardedParseFilters :: [FilePath] -> IO ()
-cleanupGuardedParseFilters =
+writeGuardedParseFilter :: ResolvedPandocFilter -> IO FilePath
+writeGuardedParseFilter = writeGuardedFilter (emanoteLuaHelpers <> " " <> parseTimeNoIOPrelude) "emanote-parse-"
+
+writeGuardedRenderFilter :: ResolvedPandocFilter -> IO FilePath
+writeGuardedRenderFilter = writeGuardedFilter emanoteLuaHelpers "emanote-render-"
+
+cleanupGuardedFilters :: [FilePath] -> IO ()
+cleanupGuardedFilters =
   traverse_ $ \path ->
     -- Best-effort cleanup: if the temp file is already gone, there is no
     -- semantic state to recover and the OS temp cleaner can handle stragglers.
     removeFile path `catchIOError` const pass
+
+{- | Pure-Lua helper library Emanote injects into every filter's Lua chunk
+so downstream filters (bundled or user-written) don't carry near-identical
+copies of the 'emanote:error:lua-filter' Div builder. Available as the
+'emanote' global to both parse-time and render-time filters; the body
+only calls 'pandoc.*' AST constructors and therefore needs no IO, so the
+parse-time sandbox lets it through.
+
+Emitted on a single physical line so a runtime/syntax error in the user's
+filter still reports the right line number (see the comment on
+'parseTimeNoIOPrelude'). For the protocol the @error_block@ builder
+implements, see @docs/guide/lua-filters/writing-filters.md@.
+-}
+emanoteLuaHelpers :: Text
+emanoteLuaHelpers =
+  T.intercalate
+    " "
+    [ "local emanote = {};"
+    , "function emanote.error_block(opts)"
+    , "  opts = opts or {}"
+    , "  local children = { pandoc.Para { pandoc.Strong { pandoc.Str(opts.title or 'Pandoc Lua filter error') } }, pandoc.CodeBlock(tostring(opts.message or '')) }"
+    , "  if opts.source then table.insert(children, pandoc.CodeBlock(opts.source, pandoc.Attr('', { opts.source_class or '' }, {}))) end"
+    , "  return pandoc.Div(children, pandoc.Attr('', { " <> luaClassList <> " }, {}))"
+    , "end;"
+    , "_G.emanote = emanote;"
+    ]
+  where
+    -- Render the Haskell-side class list (`errorClasses Diagnostic.luaFilterCategory`)
+    -- as a Lua table literal of single-quoted strings, so a rename of the
+    -- protocol class on either side is a one-edit change.
+    luaClassList = T.intercalate ", " ["'" <> c <> "'" | c <- Diagnostic.errorClasses Diagnostic.luaFilterCategory]
 
 {- | Lua chunk prepended to every parse-time filter to enforce the no-IO
 policy at runtime. Generated from the same name lists the static scanner

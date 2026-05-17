@@ -242,11 +242,20 @@ pandoc:
     emanote:error: emanote:error
     # YAML / Markdown parse-error banner — built by 'Emanote.Model.Note.errorDiv'
     # via 'Diagnostic.errorBlock "yaml"'. Used for the #285 bad-yaml banner.
-    emanote:error:yaml: text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
+    # The same utility-class string powers the Pandoc Lua filter banner
+    # ('emanote:error:lua-filter' below) so the two diagnostic surfaces stay
+    # visually consistent without duplicating the class list.
+    emanote:error:yaml: &emanoteErrorBanner text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     # Block placeholder shown when a note embed (`![[…]]`) would form a cycle —
     # built by 'Renderer.Embed.renderCyclicEmbedSplice' via
     # 'Diagnostic.errorBlock "cyclic-embed"' (#362). Trimmed for inline note flow.
     emanote:error:cyclic-embed: not-prose text-sm bg-red-50 dark:bg-red-950 my-3 px-3 py-2 border-l-4 border-red-500 dark:border-red-400 rounded-r-md text-red-900 dark:text-red-100
+    # Pandoc Lua filter banner — used both for catastrophic render-filter
+    # failures prepended by 'Emanote.View.Template.prependRenderFilterErrors'
+    # (#721) and for per-block engine errors emitted in place by the bundled
+    # 'lua-filters/diagram.lua' (#625). Reuses 'emanote:error:yaml''s
+    # utility-class string so a tweak to one banner updates both.
+    emanote:error:lua-filter: *emanoteErrorBanner
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-4 py-3 rounded-lg shadow-md bg-yellow-50 dark:bg-yellow-900 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-xl border-l-4 border-yellow-400 mb-8 mt-8 transition-all duration-200
     note: p-4 mb-4 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 w-full float-none md:float-right md:w-1/2 md:clear-both border border-gray-200 dark:border-gray-800

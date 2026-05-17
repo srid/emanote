@@ -43,6 +43,20 @@ Then(
   },
 );
 
+// Tag-shaped assertion for nodes whose markup matters (e.g. <svg>
+// produced by the bundled diagram filter). textContent stripping
+// would hide the element, so we check the rendered DOM directly.
+Then(
+  "the article body contains an {string} element",
+  async function (this: EmanoteWorld, tag: string) {
+    const count = await this.page.locator(`article ${tag}`).count();
+    assert.ok(
+      count > 0,
+      `Expected at least one <${tag}> inside <article>; got ${count}.`,
+    );
+  },
+);
+
 Then(
   "the article body does not contain {string}",
   async function (this: EmanoteWorld, needle: string) {

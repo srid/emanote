@@ -6,6 +6,14 @@ Copyright (c) 2021 Martin Fischer, 2023-2024 Pandoc Extensions contributors
 wordcount.lua:
 Copyright (c) 2017-2021 pandoc Lua filters contributors
 
+diagram.lua:
+Copyright © 2019-2023 Albert Krewinkel
+Copyright © 2019 Thorsten Sommer
+Copyright © 2018 Florian Schätzig
+Copyright © 2018 John MacFarlane
+Vendored from https://github.com/pandoc-ext/diagram with a small
+Emanote-side extension that inlines SVG diagrams from the mediabag.
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

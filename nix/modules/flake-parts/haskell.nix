@@ -58,21 +58,45 @@
         tagtree.broken = false;
         tagtree.jailbreak = true;
         unionmount.check = !pkgs.stdenv.isDarwin; # garnix: Slow M1 builder
-        emanote = { name, pkgs, self, super, ... }: {
-          check = false;
-          extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
-          custom = pkg: pkg.overrideAttrs (lib.addMetaAttrs {
+        emanote = { name, pkgs, self, super, ... }:
+          let
             # https://github.com/NixOS/cabal2nix/issues/608
-            longDescription = ''
-              Emanote is a tool for generating a structured view of your
-              plain-text notes on the web, as a statically generated
-              website as well as a local live server.
+            addMeta = pkg: pkg.overrideAttrs (oldAttrs: {
+              meta = (oldAttrs.meta or { }) // {
+                longDescription = ''
+                  Emanote is a tool for generating a structured view of your
+                  plain-text notes on the web, as a statically generated
+                  website as well as a local live server.
 
-              For editing notes, you can use any text editor of your
-              choice including the likes of Obsidian.
-            '';
-          });
-        };
+                  For editing notes, you can use any text editor of your
+                  choice including the likes of Obsidian.
+                '';
+              };
+            });
+            # Wrap the binary with the diagram-engine binaries and the
+            # offline Typst package cache the bundled `diagram.lua`
+            # filter needs. The engine set, package root, and cetz
+            # version all hang off `devShells.diagrams.passthru` in
+            # `nix/modules/flake-parts/diagrams.nix` — adding a new
+            # engine edits one file, not this one. `--set-default` lets
+            # a user with their own typst-package cache override
+            # Emanote's.
+            diagrams = config.devShells.diagrams.passthru;
+            wrapDiagramEngines = pkg: pkg.overrideAttrs (oldAttrs: {
+              nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+              postInstall = (oldAttrs.postInstall or "") + ''
+                wrapProgram $out/bin/emanote \
+                  --prefix PATH : ${lib.makeBinPath diagrams.diagramEngineBins} \
+                  --set-default TYPST_PACKAGE_PATH ${diagrams.diagramsTypstPackageRoot} \
+                  --set-default EMANOTE_CETZ_VERSION ${diagrams.diagramsCetzVersion}
+              '';
+            });
+          in
+          {
+            check = false;
+            extraBuildDepends = [ pkgs.stork pkgs.tailwindcss_4 ];
+            custom = pkg: wrapDiagramEngines (addMeta pkg);
+          };
       };
     };
 

@@ -1,4 +1,4 @@
-module Emanote.View.Template (emanoteSiteOutput, render) where
+module Emanote.View.Template (emanoteSiteOutput, render, extractInPlaceFilterErrors) where
 
 import Control.Exception (throwIO)
 import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
@@ -22,6 +22,7 @@ import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -45,6 +46,7 @@ import System.IO.Error (userError)
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Walk qualified as PW
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -176,6 +178,11 @@ renderLmlHtml model note = do
   -- them here so we can both render them inline on the page (so the live
   -- server keeps serving — the user sees the error and can fix the filter)
   -- and abort the static build (so a broken filter doesn't ship to disk).
+  -- Per-block engine errors (e.g. a typst version mismatch on a `cetz`
+  -- fence) live next to their source as Lua-filter-emitted Divs carrying
+  -- `emanote:error:lua-filter`; this banner is reserved for catastrophic
+  -- filter-pipeline failures (filter missing, PandocError) the in-place
+  -- mechanism can't surface.
   (filteredDoc, renderFilterErrors) <-
     runWriterT
       $ NoteFilter.applyRenderHtmlPandocFilters
@@ -186,7 +193,20 @@ renderLmlHtml model note = do
         baseDoc
   let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
       toc = newToc doc
-  failOnStaticRenderFilterErrors (M.inLiveServer model) r renderFilterErrors
+      -- Walk the post-filter AST for Divs carrying `emanote:error:lua-filter`
+      -- (Lua filters such as bundled `lua-filters/diagram.lua` emit those in
+      -- place of a failing fence). Without this, a static build sees no
+      -- entries in `renderFilterErrors` (Lua filters return AST nodes; they
+      -- can't `tell` the Haskell writer) and ships the error-banner page to
+      -- disk silently — defeating the abort-loudly intent of the static-mode
+      -- gate. Gated on the note actually declaring at least one Lua filter
+      -- (either phase, since `emanote.error_block` is injected into both) so
+      -- pages with no filters skip the full-AST traversal.
+      inPlaceFilterErrors
+        | null (NoteFilter.pandocFilterDependencyPaths (note ^. MN.notePandocFilterDeclarations)) = []
+        | otherwise = extractInPlaceFilterErrors filteredDoc
+      skipAbort = M.inLiveServer model || model ^. M.modelAllowBrokenLuaFilters
+  failOnStaticRenderFilterErrors skipAbort r (renderFilterErrors <> inPlaceFilterErrors)
   pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
@@ -253,7 +273,10 @@ the user can fix it. For static generation no one is watching the
 server, and a broken filter would ship a banner-only page to disk;
 abort instead so CI fails loudly.
 
-The first 'Bool' is @inLiveServer@: @True@ skips, @False@ aborts.
+The first 'Bool' is @skipAbort@ — @True@ when running in the live
+server or when the user passed @--allow-broken-lua-filters@ (which
+the Emanote docs notebook uses to live-render the
+@writing-filters@ page's deliberate-error demo); @False@ aborts.
 -}
 failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
 failOnStaticRenderFilterErrors _ _ [] = pass
@@ -268,10 +291,44 @@ failOnStaticRenderFilterErrors False r errs =
     <> ": "
     <> T.intercalate "; " errs
 
+{- | Top-of-page banner for catastrophic filter-pipeline failures. The
+@"lua-filter"@ category here matches the @emanote:error:lua-filter@
+class the bundled @lua-filters/diagram.lua@ emits in place of a
+failing fence, so both diagnostic surfaces share one styling entry in
+@emanote/default/index.yaml@.
+-}
 prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
 prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
-  Pandoc meta $ MN.errorDiv "lua-filter" "Pandoc Lua filter error" errs : blocks
+  Pandoc meta $ MN.errorDiv Diagnostic.luaFilterCategory "Pandoc Lua filter error" errs : blocks
+
+{- | HACK: Pandoc Lua filters can return AST nodes but cannot @tell@ the
+host's @MonadWriter@ diagnostic channel. So 'lua-filters/diagram.lua'
+surfaces engine failures by emitting a sentinel @Div@ in the document,
+and we recover the message by walking the AST for that sentinel. The
+class literal @"emanote:error:lua-filter"@ is a cross-language string
+contract shared with 'diagram_error_block' in that Lua file and the
+style entry in @emanote/default/index.yaml@; rename it in one place
+and only @TemplateSpec.hs@ catches the drift. The fallback branch
+exists because a future filter author might emit the class without
+honoring the unwritten "first @CodeBlock@ holds the message" rule.
+
+The proper fix would be a typed Lua→Haskell diagnostics channel
+(upstream Pandoc feature or an Emanote sidecar protocol — an env-var
+pointing at an ndjson file the Lua side appends structured payloads
+to, drained here after @runWriterT@). Tracked in #625 follow-up.
+-}
+extractInPlaceFilterErrors :: Pandoc -> [Text]
+extractInPlaceFilterErrors = PW.query collect
+  where
+    luaFilterClass = Diagnostic.errorVariantClass Diagnostic.luaFilterCategory
+    collect :: B.Block -> [Text]
+    collect (B.Div (_, classes, _) blocks)
+      | luaFilterClass `elem` classes = [errorText classes blocks]
+    collect _ = []
+    errorText classes bs = case [t | B.CodeBlock _ t <- bs] of
+      (msg : _) -> msg
+      _ -> "Pandoc Lua filter error (no engine message; class=" <> T.intercalate "," classes <> ")"
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =

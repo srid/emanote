@@ -33,6 +33,15 @@ in
       description = ''Allow broken internal links in the static site'';
       default = false;
     };
+    allowBrokenLuaFilters = mkOption {
+      type = types.bool;
+      description = ''
+        Allow Pandoc Lua filter errors during static generation. Set to
+        true on the docs notebook because `writing-filters.md` deliberately
+        demos a failing filter call to teach the error-surfacing protocol.
+      '';
+      default = false;
+    };
     basePath = mkOption {
       type = types.str;
       description = ''Top-level directory to copy the static site to'';

@@ -59,6 +59,8 @@ data ModelT encF = Model
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
   , _modelScriptingEngine :: ScriptingEngine
   , _modelCompileTailwind :: Bool
+  , _modelAllowBrokenLuaFilters :: Bool
+  -- ^ See @--allow-broken-lua-filters@; consumed by 'Emanote.View.Template.failOnStaticRenderFilterErrors'.
   , _modelInstanceID :: UUID
   -- ^ An unique ID for this process's model. ID changes across processes.
   , _modelNotes :: IxNote
@@ -118,8 +120,8 @@ modelPluginBaseDir :: ModelT f -> [FilePath]
 modelPluginBaseDir m =
   fst . locPath <$> Set.toAscList (m ^. modelLayers)
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren scriptingEngine ctw instanceId storkVar =
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> Bool -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
@@ -128,6 +130,7 @@ emptyModel layers act ren scriptingEngine ctw instanceId storkVar =
     , _modelPandocRenderers = ren
     , _modelScriptingEngine = scriptingEngine
     , _modelCompileTailwind = ctw
+    , _modelAllowBrokenLuaFilters = allowBrokenLua
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
       -- being run on an empty directory.
