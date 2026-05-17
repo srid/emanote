@@ -9,6 +9,7 @@ import Data.IxSet.Typed (Indexable (..), IxSet, ixFun, ixList)
 import Data.Text qualified as T
 import Data.Time (UTCTime)
 import Emanote.Route qualified as R
+import Emanote.Source.Loc (Loc)
 import Optics.TH (makeLenses)
 import Relude
 import Skylighting qualified
@@ -21,6 +22,13 @@ data StaticFile = StaticFile
   -- ^ Indicates that this file was updated no latter than the given time.
   , _staticFileInfo :: Maybe StaticFileInfo
   -- ^ This file might have its content read
+  , _staticFileSource :: Maybe (Loc, FilePath)
+  -- ^ Layer + layer-relative path of the top overlay for this file.
+  -- 'Nothing' only when the static file is synthesised without a
+  -- backing source (currently never — populated unconditionally by
+  -- 'Emanote.Source.Patch.insertStaticFile'). Used by the
+  -- @.emanoteignore@ hot-reload walk in 'Emanote.Source.Dynamic' to
+  -- decide which static files to evict when a pattern starts matching.
   }
   deriving stock (Eq, Ord, Show, Generic)
   deriving anyclass (Aeson.ToJSON)

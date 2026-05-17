@@ -257,11 +257,11 @@ modelLookupStaticFile fp m = do
   r :: R.R 'AnyExt <- R.mkRouteFromFilePath fp
   Ix.getOne $ Ix.getEQ r $ m ^. modelStaticFiles
 
-modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> ModelT f -> ModelT f
-modelInsertStaticFile t r fp mInfo =
+modelInsertStaticFile :: UTCTime -> R.R 'AnyExt -> FilePath -> Maybe StaticFileInfo -> Maybe (Loc, FilePath) -> ModelT f -> ModelT f
+modelInsertStaticFile t r fp mInfo mSrc =
   modelStaticFiles %~ Ix.updateIx r staticFile
   where
-    staticFile = StaticFile r fp t mInfo
+    staticFile = StaticFile r fp t mInfo mSrc
 
 modelDeleteStaticFile :: R.R 'AnyExt -> ModelT f -> ModelT f
 modelDeleteStaticFile r =

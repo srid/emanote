@@ -232,10 +232,11 @@ insertStaticFile ::
   R.R 'R.AnyExt ->
   m (ModelEma -> ModelEma)
 insertStaticFile refreshAction overlays r = do
-  let fpAbs = locResolve $ head overlays
+  let topOverlay = head overlays
+      fpAbs = locResolve topOverlay
   t <- liftIO getCurrentTime
   mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
-  pure $ M.modelInsertStaticFile t r fpAbs mInfo
+  pure $ M.modelInsertStaticFile t r fpAbs mInfo (Just topOverlay)
 
 {- | Declaration-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The

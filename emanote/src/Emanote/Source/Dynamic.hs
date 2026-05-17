@@ -20,6 +20,7 @@ import Ema.CLI qualified
 import Emanote.CLI qualified as CLI
 import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
+import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Stork.Index qualified as Stork
 import Emanote.Model.Type qualified as Model
 import Emanote.Pandoc.Renderer (EmanotePandocRenderers)
@@ -289,13 +290,16 @@ handleIgnoreFileChanges ctx m0 = do
       m1 <- evictNewlyIgnored ctx newPatterns m0
       reEmitModified ctx newPatterns m1
 
-{- | For each note whose top-overlay source now matches a pattern that
-didn't exist before, delete it from the model and remember the event so
-a later pattern relaxation can resurrect it.
+{- | For each note or static file whose source now matches a pattern
+that didn't exist before, delete it from the model and remember the
+event so a later pattern relaxation can resurrect it.
 
-This walks @_modelNotes@ — auto-generated ancestor placeholders carry
+Notes are walked via @_modelNotes@; static files via
+@_modelStaticFiles@. Auto-generated ancestor placeholders carry
 @_noteSource = Nothing@ and are skipped, since they aren't files on
-disk and can't be ignored.
+disk and can't be ignored. YAML data and Heist templates carry no
+source metadata yet — see the docs note in
+@docs/guide/emanoteignore.md@.
 -}
 evictNewlyIgnored ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
@@ -304,22 +308,35 @@ evictNewlyIgnored ::
   Model.ModelEma ->
   m Model.ModelEma
 evictNewlyIgnored ctx newPatterns m0 = do
-  let victims =
+  let noteVictims =
         [ (note, loc, lfp)
         | note <- Ix.toList (m0 ^. Model.modelNotes)
         , Just (loc, lfp) <- pure (N._noteSource note)
         , Ignore.isLayerPathIgnored newPatterns loc lfp
         ]
-  unless (null victims) $ Stork.clearStorkIndex (ctx ^. ctxStorkIndex)
-  foldlM evict m0 victims
+      staticVictims =
+        [ (sf, loc, lfp)
+        | sf <- Ix.toList (m0 ^. Model.modelStaticFiles)
+        , Just (loc, lfp) <- pure (SF._staticFileSource sf)
+        , Ignore.isLayerPathIgnored newPatterns loc lfp
+        ]
+  unless (null noteVictims) $ Stork.clearStorkIndex (ctx ^. ctxStorkIndex)
+  m1 <- foldlM evictNote m0 noteVictims
+  foldlM evictStatic m1 staticVictims
   where
-    evict m (note, loc, lfp) = do
+    evictNote m (note, loc, lfp) = do
       let route = N._noteRoute note
           fpType = lmlRouteFileType route
           fpMounted = mountedPath loc lfp
-      log $ "Hot-reload: hiding " <> toText fpMounted
+      log $ "Hot-reload: hiding note " <> toText fpMounted
       recordModified (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent fpType ((loc, lfp) :| []) UM.Existing)
       pure $! Model.modelDeleteNote route m
+    evictStatic m (sf, loc, lfp) = do
+      let route = SF._staticFileRoute sf
+          fpMounted = mountedPath loc lfp
+      log $ "Hot-reload: hiding static file " <> toText fpMounted
+      recordModified (ctx ^. ctxIgnoreState) fpMounted (ModifiedEvent R.AnyExt ((loc, lfp) :| []) UM.Existing)
+      pure $! Model.modelDeleteStaticFile route m
 
 {- | For every event we previously suppressed or trimmed, re-evaluate it
 under the new patterns and emit the appropriate action via
