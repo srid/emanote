@@ -58,8 +58,12 @@ the static-file route despite being unfiltered here.
 -}
 ignorePatterns :: [FilePattern]
 ignorePatterns =
-  [ -- Ignore all dotfile directories (eg: .git, .vscode)
-    "**/.*/**"
+  [ -- Contents of dotfile directories (eg @.git/HEAD@, @.vscode/settings.json@).
+    -- The trailing @\/**\/*@ requires at least one path component INSIDE the
+    -- dotfile directory — without it, the pattern silently swallows root-level
+    -- dotfiles like @.emanoteignore@ (since @\*\*@ matches the empty path),
+    -- which would defeat the hot-reload pipeline in 'Emanote.Source.Dynamic'.
+    "**/.*/**/*"
   , -- Ignore vi/vim/neovim writebackup files (see ":help writebackup")
     "**/*~"
   , -- /Top-level ./-/ directory is reserved by Emanote
