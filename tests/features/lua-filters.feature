@@ -122,3 +122,37 @@ Feature: Pandoc Lua filter hot-reload (issue #263)
     Then the article body contains "DEMO_FILTER:HELLO"
     When I delete "filters/demo-filter.lua"
     Then the article body contains "EMANOTELUAORGDEMO" within 10 seconds
+
+  # Hot-reload matrix for a CodeBlock-matching render-time filter
+  # (bundled `lua-filters/hello.lua`). The earlier scenarios prove
+  # hot-reload for inline-Str-rewrite filters; these three close the
+  # gap for filters that transform fenced blocks and prove that all
+  # three axes of change (note prose, fence body, filter source) flow
+  # to the live page.
+
+  @live @hot-reload
+  Scenario: Hot reload — editing prose around a filtered fence
+    When I open "/lua-filter-hello-fence.html"
+    Then the article body contains "HELLO_PROSE_TOKEN"
+    And the article body contains "Hello, HELLO_FENCE_TOKEN!"
+    When I replace "HELLO_PROSE_TOKEN" with "HELLO_PROSE_EDITED" in "lua-filter-hello-fence.md"
+    Then the article body contains "HELLO_PROSE_EDITED" within 10 seconds
+    And the article body contains "Hello, HELLO_FENCE_TOKEN!"
+
+  @live @hot-reload
+  Scenario: Hot reload — editing a fence body re-runs the filter on the new content
+    When I open "/lua-filter-hello-fence.html"
+    Then the article body contains "Hello, HELLO_FENCE_TOKEN!"
+    When I replace "HELLO_FENCE_TOKEN" with "HELLO_FENCE_EDITED" in "lua-filter-hello-fence.md"
+    Then the article body contains "Hello, HELLO_FENCE_EDITED!" within 10 seconds
+
+  @live @hot-reload
+  Scenario: Hot reload — shadowing the bundled hello.lua reloads dependent notes
+    # Default-layer hello.lua greets with "Hello, …". Writing a
+    # notebook-local `lua-filters/hello.lua` shadows the bundled
+    # version (notebook layer beats default layer); the filesystem
+    # watcher fires, dependent notes re-render with the new greeting.
+    When I open "/lua-filter-hello-fence.html"
+    Then the article body contains "Hello, HELLO_FENCE_TOKEN!"
+    When I write a hello-shadow filter at "lua-filters/hello.lua" with prefix "Howdy,"
+    Then the article body contains "Howdy, HELLO_FENCE_TOKEN" within 10 seconds

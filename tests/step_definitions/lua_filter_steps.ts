@@ -35,6 +35,35 @@ When(
   },
 );
 
+// Build a CodeBlock-matching hello.lua-shaped filter with a configurable
+// greeting prefix. Used by the @hot-reload scenarios that shadow the
+// bundled `lua-filters/hello.lua` to prove that editing the .lua source
+// of a CodeBlock-matching filter reloads dependent notes.
+function helloShadowFilter(prefix: string): string {
+  return `local function on_hello(block)
+  if block.classes[1] ~= 'hello' then return nil end
+  local items = {}
+  for line in block.text:gmatch('[^\\n]+') do
+    table.insert(items, { pandoc.Plain {
+      pandoc.Str('${prefix} '),
+      pandoc.Strong { pandoc.Str(line) },
+    } })
+  end
+  return pandoc.BulletList(items)
+end
+return { { CodeBlock = on_hello } }
+`;
+}
+
+When(
+  "I write a hello-shadow filter at {string} with prefix {string}",
+  function (fp: string, prefix: string) {
+    const target = path.join(stagedFixtureDir, fp);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, helloShadowFilter(prefix));
+  },
+);
+
 // Used to set up the missing-at-parse-time case: the note is created
 // before its referenced filter exists. `parseNote` registers a dep
 // edge keyed by the (still-unresolved) frontmatter path; when the

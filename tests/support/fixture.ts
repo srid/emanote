@@ -41,6 +41,7 @@ const mutatedPaths: string[] = [
   "filters", // Pandoc Lua filters (issue #263)
   "lua-filter-demo.md", // Markdown note edits via its declared filter
   "lua-filter-org-demo.org", // Org note edits via its declared filter
+  "lua-filter-hello-fence.md", // hello.lua hot-reload matrix (prose + fence-body edits)
 ];
 
 /** Files that hot-reload scenarios create from scratch at the
@@ -53,6 +54,7 @@ const mutatedPaths: string[] = [
 const ephemeralFiles: string[] = [
   "lua-filter-late.md",
   "lua-filter-late.org",
+  "lua-filters/hello.lua", // notebook-local shadow used by the hello.lua hot-reload scenario
 ];
 
 /** Reset the staged notebook so the next scenario starts from
