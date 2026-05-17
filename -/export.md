@@ -66,7 +66,7 @@ This guide covers Emanote's core features:
 - **[[wikilinks]]** — `[[…]]` syntax, structural links, broken / ambiguous link rendering
 - **[[query]]** — Obsidian-style embed queries for dynamic content
 - **[[yaml-config]]** — Site metadata and per-page configuration
-- **[[lua-filters]]** — Pandoc Lua filter phases, bundled filters, and demos
+- **[[lua-filters]]** — Pandoc Lua filter phases, bundled filters, and demos (including [[diagrams|inline-SVG diagrams]] from d2 and cetz)
 - **[[i18n|Internationalisation]]** — English and French pages using `page.lang`
 - **[[html-template]]** — Full HTML customization with Heist templates
 - **[[layer]]** — Merging multiple notebook directories
@@ -1252,84 +1252,30 @@ pandoc:
 
 # Pandoc Lua Filters
 
-A [Pandoc Lua filter](https://pandoc.org/lua-filters.html) rewrites the parsed Pandoc document before Emanote turns it into an [[html-template|HTML page]].
-
-Filters are note-local. Enable them in [[yaml-config|Markdown frontmatter]] or, for [[orgmode|Org notes]], with `#+PANDOC_FILTERS_PARSE:` / `#+PANDOC_FILTERS_RENDER_HTML:`.
+A [Pandoc Lua filter](https://pandoc.org/lua-filters.html) rewrites the parsed Pandoc document before Emanote turns it into an [[html-template|HTML page]]. Filters are note-local — declare them in [[yaml-config|Markdown frontmatter]], or for [[orgmode|Org notes]] via `#+PANDOC_FILTERS_PARSE:` / `#+PANDOC_FILTERS_RENDER_HTML:` keywords.
 
 ## Choose a phase
 
-Emanote supports two filter phases:
-
-| Phase | YAML key | Runs with | Best for |
+| Phase | YAML key | Runs with | Use for |
 | --- | --- | --- | --- |
-| Parse time | `pandoc.filters.parse` | `FORMAT == "markdown"` | Cheap, pure AST rewrites that should affect Emanote's model |
-| Render time | `pandoc.filters.render.html` | `FORMAT == "html"` | [[html-template\|HTML-specific]] output and IO work |
+| **Parse-time** | `pandoc.filters.parse` | `FORMAT == "markdown"` | Cheap AST rewrites that should affect Emanote's model — titles, tags, [[wikilinks|links]], [[backlinks]], tasks, [[markdown\|table structure]], [[search\|search text]]. **IO is banned at runtime** (`io`, `os`, `require`, `pandoc.pipe`, `pandoc.system`, etc.) so model updates stay deterministic and fast. |
+| **Render-time** | `pandoc.filters.render.html` | `FORMAT == "html"` | [[html-template\|HTML-specific]] output, [[mermaid\|diagrams]], shelling out to engines, anything that should *not* run when Emanote is only after metadata. IO is allowed. |
 
-### Parse-time filters
-
-Parse-time filters run immediately after Markdown parsing:
-
-```yaml
-pandoc:
-  filters:
-    parse:
-      - lua-filters/list-table.lua
-```
-
-Use parse-time filters when the rewritten document should affect Emanote's semantic model:
-
-- title extraction
-- tags and [[wikilinks|links]]
-- [[backlinks]]
-- tasks
-- [[markdown|table structure]]
-- [[search|search text]]
-
-Parse-time filters should stay cheap. They run when Emanote parses notes, so expensive work here slows model updates even when Emanote only needs [[yaml-config|metadata]], [[wikilinks|links]], [[search|search text]], or other non-HTML data.
-
-Parse-time filters cannot use IO. Emanote rejects direct references before running the filter and also runs parse filters with IO-capable APIs disabled. That includes:
-
-- Lua APIs such as `io`, `os`, `print`, `require`, `load`, `dofile`, and `debug`
-- Pandoc APIs such as `pandoc.pipe`, `pandoc.system`, `pandoc.mediabag`, `pandoc.template`, and `pandoc.zip`
-- nested Pandoc filter runners such as `pandoc.utils.run_lua_filter`
-
-### Render-time filters
-
-Render-time filters run when Emanote renders a note to [[html-template|HTML]]:
-
-```yaml
-pandoc:
-  filters:
-    render:
-      html:
-        - filters/slides.lua
-```
-
-Use render-time filters for:
-
-- raw [[markdown|HTML]], [[custom-style|CSS]], or JavaScript
-- writer-specific filters that branch on `FORMAT == "html"`
-- [[mermaid|diagrams]] and other generated assets
-- calls to external tools
-- filesystem, process, cache, media, or module-loading work
-
-Render-time filters keep parsing fast because their IO work is paid only when Emanote is producing [[html-template|HTML]].
+Both phases use the same filter shape; see [[writing-filters]] for the API, the [[writing-filters#reporting-errors-to-the-reader|error-reporting protocol]], and a hello-world example.
 
 ## Filter paths
 
-Filter paths are resolved against your [[layer|notebook layers]] first, then against Emanote's [[layer|default layer]].
-
-That means:
+Filter paths are resolved against your [[layer|notebook layers]] first, then against Emanote's [[layer|default layer]]:
 
 - `filters/custom.lua` works when the file exists in your notebook
-- `lua-filters/list-table.lua` and `lua-filters/wordcount.lua` work without copying anything into your notes
+- `lua-filters/list-table.lua` and `lua-filters/wordcount.lua` work without copying anything into your notes — they come from the default layer
 - multiple filters run in declaration order
 
-This page chains the bundled `list-table.lua` and `wordcount.lua`, and you can see the wordcount footer at the bottom.
+This page chains the bundled `list-table.lua` and `wordcount.lua` — the wordcount footer at the bottom proves it.
 
 ## Org notes
 
-[[orgmode|Org notes]] use Org keywords. Add one keyword line per filter:
+[[orgmode|Org notes]] use one keyword per filter:
 
 ```org
 #+PANDOC_FILTERS_PARSE: lua-filters/list-table.lua
@@ -1337,39 +1283,30 @@ This page chains the bundled `list-table.lua` and `wordcount.lua`, and you can s
 #+PANDOC_FILTERS_RENDER_HTML: filters/slides.lua
 ```
 
-`#+PANDOC_FILTERS_PARSE:` is parse-time. `#+PANDOC_FILTERS_RENDER_HTML:` is render-time HTML.
-
 ## Hot reload
 
-Edits to `.lua` files hot-reload. The live server re-parses every note that references a changed filter, with no `touch` of the note required.
-
-Hot reload also covers missing-at-parse-time filter references:
-
-1. Declare a filter in [[yaml-config|frontmatter]] before creating it on disk.
-2. Create the `.lua` file.
-3. Every dependent note re-parses when the file lands.
-
-`.lua` files are recognised as filters for hot-reload and remain linkable as source files. See [[embed|Embedding]] for a source-file embed example.
+Edits to `.lua` files hot-reload. The live server re-parses every note that references a changed filter, no `touch` needed. A filter referenced before it exists on disk re-parses dependent notes the moment the file lands. `.lua` files also remain linkable as source files — see [[embed|Embedding]].
 
 ## Limitations
 
-> [!warning] Remaining limitations
-> - Filter declarations are note-local: [[yaml-config|Markdown frontmatter]] or explicit [[orgmode|Org]] `#+PANDOC_FILTERS_PARSE:` / `#+PANDOC_FILTERS_RENDER_HTML:` keywords. Cascading `pandoc.filters` from an ancestor [[yaml-config|`index.yaml`]] is still tracked under [#263](https://github.com/srid/emanote/issues/263).
-> - Parse-time filters run with `FORMAT == "markdown"`. Writer-specific [[html-template|HTML]] filters should use `pandoc.filters.render.html`, which runs with `FORMAT == "html"` and receives the note's effective [[yaml-config|metadata]] in `doc.meta`.
+> [!warning]
+> - Filter declarations are note-local. Cascading `pandoc.filters` from an ancestor [[yaml-config|`index.yaml`]] is tracked under [#263](https://github.com/srid/emanote/issues/263).
 > - Filters that need filesystem, process, media, module-loading, or dynamic-code IO belong under `pandoc.filters.render.html`, not `pandoc.filters.parse`.
 
 ## Bundled filters
 
-Two curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
+Four curated filters ship in Emanote's [[layer|default layer]] under [`emanote/default/lua-filters/`](https://github.com/srid/emanote/tree/master/emanote/default/lua-filters):
 
-- [`list-table.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/list-table.lua) turns nested bullet lists into HTML tables. It is bundled from the maintained [pandoc-ext/list-table](https://github.com/pandoc-ext/list-table) extension.
-- [`wordcount.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/wordcount.lua) appends a `N words · M characters` footer to the document. This Emanote-specific filter is derived from the retired [`pandoc/lua-filters` wordcount filter](https://github.com/pandoc/lua-filters/tree/master/wordcount); upstream prints to stdout and calls `os.exit(0)`, which would terminate the live server.
+- [`list-table.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/list-table.lua) — nested bullet lists → HTML tables. From [pandoc-ext/list-table](https://github.com/pandoc-ext/list-table).
+- [`wordcount.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/wordcount.lua) — appends a `N words · M characters` footer.
+- [`diagram.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua) — fenced code blocks for `d2`, `cetz`, and the other engines [`pandoc-ext/diagram`](https://github.com/pandoc-ext/diagram) supports → inline SVG. The wrapped Emanote binary carries `d2`, `typst`, and an offline `@preview/cetz` package cache; see [[diagrams]].
+- [`hello.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/hello.lua) — a hello-world filter that drives the [[writing-filters|writing-filters guide]] and exercises the error-reporting protocol. Drop `lua-filters/hello.lua` into a note's `pandoc.filters.render.html` and fence with `hello` blocks to try it.
 
-## Local demo filter
+## Local docs filters
 
-This docs notebook also includes a local custom filter:
+This docs notebook also includes a custom filter under `docs/filters/`:
 
-- [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) turns a `:::slides` div into a navigable [[markdown|Markdown]] presentation at [[html-template|HTML]] render time, used by [[lua-filters/slides]].
+- [`slides.lua`](https://github.com/srid/emanote/blob/master/docs/filters/slides.lua) — turns a `:::slides` div into a navigable [[markdown|Markdown]] presentation; runs the [[slides]] deck.
 
 ## Demos
 
@@ -1391,22 +1328,247 @@ This docs notebook also includes a local custom filter:
 
 ### `wordcount.lua`
 
-The footer at the bottom of this page is emitted by parse-time `wordcount.lua` — every save recomputes it.
+The footer at the bottom of this page — every save recomputes it.
 
 ### `slides.lua`
 
-See [[lua-filters/slides]] for a full Markdown presentation _about_ Lua filters, rendered by this notebook's local `filters/slides.lua` with `FORMAT == "html"`.
+See [[slides]] for a Markdown presentation rendered by `slides.lua` at HTML render time.
+
+### `diagram.lua`
+
+See [[diagrams]] for inline-SVG demos of `d2` and `cetz` fences, both rendered offline.
+
+### `hello.lua`
+
+See [[writing-filters]] — embedded source plus live happy and sad-path renders.
 
 
 ===
 
-<!-- Source: guide/lua-filters/slides.md -->
-<!-- URL: https://emanote.srid.ca/lua-filters/slides -->
-<!-- Title: A Markdown Presentation about Lua Filters -->
-<!-- Wikilinks: [[guide/lua-filters/slides]], [[lua-filters/slides]], [[slides]] -->
+<!-- Source: guide/lua-filters/diagrams.md -->
+<!-- URL: https://emanote.srid.ca/diagrams -->
+<!-- Title: Diagrams -->
+<!-- Wikilinks: [[guide/lua-filters/diagrams]], [[lua-filters/diagrams]], [[diagrams]] -->
 
 ---
-slug: lua-filters/slides
+slug: diagrams
+short-title: Diagrams
+pandoc:
+  filters:
+    render:
+      html:
+        - lua-filters/diagram.lua
+diagram:
+  cache: true
+---
+
+# Diagrams
+
+Emanote bundles [`lua-filters/diagram.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua), a render-time [[lua-filters|Pandoc Lua filter]] that turns fenced code blocks into inline SVG. The filter is vendored from [pandoc-ext/diagram](https://github.com/pandoc-ext/diagram) and post-processed so SVG diagrams land directly in the page — no `--extract-media` pass, no JavaScript renderer, no network at view time.
+
+## Enabling the filter
+
+Diagrams render only on notes that opt in. Add the bundled filter to a note's render-time HTML phase in frontmatter:
+
+```yaml
+---
+pandoc:
+  filters:
+    render:
+      html:
+        - lua-filters/diagram.lua
+---
+```
+
+This page declares the filter itself — every fenced block below renders through the same pipeline.
+
+Org notes use the parallel keyword from the [[lua-filters]] guide:
+
+```org
+#+PANDOC_FILTERS_RENDER_HTML: lua-filters/diagram.lua
+```
+
+## Supported engines
+
+The bundled filter recognises seven engine classes from upstream `pandoc-ext/diagram`; Emanote's Nix closure pins the binaries for two of them, and leaves the rest as bring-your-own:
+
+| Engine | Class | Binary | Bundled by Emanote? |
+| --- | --- | --- | --- |
+| [D2](https://d2lang.com/) | `d2` | `d2` | Yes |
+| [CeTZ](https://github.com/cetz-package/cetz) | `cetz` | `typst` (+ pre-resolved `@preview/cetz` package) | Yes |
+| Mermaid | `mermaid` | `mmdc` | No — set `MERMAID_BIN` or install on `PATH` |
+| Graphviz | `dot` | `dot` | No — set `DOT_BIN` or install on `PATH` |
+| PlantUML | `plantuml` | `plantuml` | No — set `PLANTUML_BIN` or install on `PATH` |
+| TikZ | `tikz` | `pdflatex` (+ `inkscape` for SVG) | No |
+| Asymptote | `asymptote` | `asy` | No — set `ASYMPTOTE_BIN` or install on `PATH` |
+
+A note that fences a class without a corresponding binary renders a `Pandoc Lua filter error` banner pointing at the failed `pandoc.pipe` call, so the missing-binary case is loud, not silent.
+
+## d2 demo
+
+D2's declarative syntax is the shortest path from prose to picture. The thought-meandering exercise Richard describes in ["Silly or Sensible"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm) — "_you will go off into a side branch ... and that will branch off into another side branch ... and into another and another ... and so on_" — drops out as a four-step meander followed by the snap-back:
+
+```d2
+direction: down
+
+root: "where I started" {
+  style.fill: "#fef9c3"
+  link: https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm
+}
+b1: "side branch"
+b2: "another side branch"
+b3: "and another …"
+
+root -> b1: meander
+b1 -> b2: meander
+b2 -> b3: meander
+
+b3 -> root: "notice & snap back" {style.bold: true; style.stroke: "#16a34a"}
+```
+
+## cetz demo
+
+CeTZ shines on figures whose meaning is geometric, not flow-shaped. The temporal contrast Richard draws in ["This moment has no duration"](https://www.actualfreedom.com.au/richard/audiotapeddialogues/thismomenthasnoduration.htm) — _time had a periodicity_ versus _the cutting edge_ where _this moment has no duration_ — is itself a geometric distinction (discrete tick marks vs. an infinitesimally thin line) that cetz can render directly:
+
+`canvas` and `draw` are pre-imported by Emanote's wrapper, so the author writes the figure directly without typing or remembering the cetz version:
+
+```cetz
+#canvas({
+  import draw: *
+
+  let tick_xs = (-6.8, -5.6, -4.4, -3.2, -2.0)
+  line((-7.2, 0), (-1.6, 0), stroke: 1.2pt + gray)
+  for x in tick_xs {
+    line((x, -0.35), (x, 0.35), stroke: 2.5pt + gray)
+  }
+  content((-4.4, -1.0), text(0.9em, fill: gray)[_time had a periodicity_])
+
+  rect((2.92, -1.0), (3.08, 1.0), fill: rgb("#1d4ed8"), stroke: rgb("#1d4ed8"))
+  content((3.0, 1.5), text(1em, weight: "bold", fill: rgb("#1d4ed8"))[_the cutting edge_])
+  content((3.0, -1.5), text(0.85em, fill: rgb("#1d4ed8"))[_this moment has no duration_])
+})
+```
+
+## Caching
+
+The upstream filter supports a content-addressed disk cache that skips re-running an engine for unchanged source. Enable it once per document via metadata:
+
+```yaml
+diagram:
+  cache: true
+```
+
+Cache files land under `$XDG_CACHE_HOME/pandoc-diagram-filter/` (typically `~/.cache/pandoc-diagram-filter/`), keyed by `sha1(fence-body)`. The cache is shared across notebooks and naturally git-clean. Set `diagram.cache-dir: <path>` to override the location.
+
+> [!note]
+> The cache key is the fence body text only — it does **not** include the engine binary version or the fence's code-block attributes. Bumping `d2` / `typst` (or changing a `{.d2 layout=elk}` attribute) does not invalidate previously-cached renders. Bust the cache manually with `rm -rf $XDG_CACHE_HOME/pandoc-diagram-filter/` when an engine upgrade should reflow output.
+
+Without caching, every render of a page re-invokes the engine. For static [[layer|sites]] this happens once per build; for the live server it happens on each save of a note that contains diagrams.
+
+## Limitations
+
+- Filter declaration must live on the note itself — [[yaml-config|site-wide cascade]] from `index.yaml` is tracked in [#263](https://github.com/srid/emanote/issues/263).
+- Other engines (mermaid, dot, plantuml, tikz, asymptote) work if you install the matching binary, but Emanote's Nix closure does not pin them. Set the engine's `_BIN` environment variable (`MERMAID_BIN`, `DOT_BIN`, …) to override the executable path explicitly.
+- Diagrams render only when `FORMAT == "html"`, so they have no effect on parse-time concerns like backlinks, tags, search index, or the note model. The fenced source remains in the document for export targets that don't run the filter.
+
+
+===
+
+<!-- Source: guide/lua-filters/writing-filters.md -->
+<!-- URL: https://emanote.srid.ca/writing-filters -->
+<!-- Title: Writing a Pandoc Lua filter -->
+<!-- Wikilinks: [[guide/lua-filters/writing-filters]], [[lua-filters/writing-filters]], [[writing-filters]] -->
+
+---
+slug: writing-filters
+short-title: Writing filters
+pandoc:
+  filters:
+    render:
+      html:
+        - lua-filters/hello.lua
+---
+
+# Writing a Pandoc Lua filter
+
+A filter is a Lua table whose keys are AST element constructors — `CodeBlock`, `Para`, `Header`, `Image`, `Link`, `Str`, `Span`, `Div`, `Note`, … — and whose values are handler functions. Each handler returns a replacement AST node, or `nil` to leave the input alone.
+
+For where filters fit in Emanote's pipeline and how to enable them in [[yaml-config|frontmatter]], see [[lua-filters]].
+
+## Two phases, one shape
+
+The same Lua-table shape works in both phases. What changes is what's allowed:
+
+- **Parse-time** filters run with `FORMAT == "markdown"` and rewrite the model. They can't do IO — `io`, `os`, `require`, `dofile`, `pandoc.pipe`, `pandoc.system`, etc. are runtime-banned. Good for cheap AST rewrites that should affect [[backlinks]], tags, titles, [[search]], table structure.
+- **Render-time** filters run with `FORMAT == "html"` and can do IO. Good for shelling out to engines, reading the [[layer|notebook layer]], or anything that should *not* run when Emanote is only after metadata.
+
+Either phase can match any element type and either phase can produce any AST output. The error-reporting protocol below also works identically in both.
+
+## Hello-world
+
+This page loads [`lua-filters/hello.lua`](https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/hello.lua) — bundled in Emanote's [[layer|default layer]] so any notebook can opt into it. It matches `CodeBlock` elements whose first class is `hello` and turns each line of the body into a bullet greeting:
+
+```hello
+world
+Pandoc
+Lua filters
+```
+
+Source:
+
+![[hello.lua]]
+
+## Reporting errors to the reader
+
+Lua gives several tools that *look* like reasonable ways to flag "this input was malformed". They land in very different places — verified empirically against the rendered output of this page:
+
+| Tool | Filter pipeline | Other inputs on the page | Reader sees | `emanote gen` |
+| --- | --- | --- | --- | --- |
+| `error('msg')` | Aborts on the offending input | Not transformed; ship as raw | Top-of-page banner; failing input stays raw | Aborts |
+| `emanote.error_block{...}` | Continues | Transform normally | Inline red banner exactly where the input was | Aborts |
+| `warn(...)` / `pandoc.log.warn(...)` | Continues | Transform normally | Whatever the handler returns; warning to stderr | Does **not** abort |
+
+- `error()` is right when the filter file itself is misconfigured (missing required metadata, a typo in the table, etc.) — nothing on the page is going to work.
+- `warn` / `pandoc.log.warn` are for filter-author diagnostics during development. The output goes to stderr (`[WARNING] Scripting warning at …`); the reader sees nothing. Never use them as the reader-facing error surface.
+- `emanote.error_block` is the right answer for *recoverable per-element* errors. Five `cetz` blocks on a page with a typo in the second: `error()` leaves a top banner + four raw code blocks; `emanote.error_block` leaves four working diagrams + one inline banner.
+
+### `emanote.error_block`
+
+Emanote injects an `emanote` global into every filter's Lua chunk — parse-time and render-time. The helper builds the marker `Div` so filters don't carry near-identical copies of it:
+
+```lua
+return emanote.error_block{
+  title = 'cetz error',           -- bolded title
+  message = engine_stderr,        -- first CodeBlock child; what `emanote gen` recovers
+  source = block.text,            -- optional: original failing source
+  source_class = 'cetz',          -- optional: syntax class on the source CodeBlock
+}
+```
+
+The returned `Div` carries the marker class `emanote:error:lua-filter`. The static-build walks the post-filter AST for that class and aborts unless the notebook opts out via `--allow-broken-lua-filters` — which the docs site does, which is why the sad-path demo below ships in the deployed static site.
+
+### Live sad-path demo
+
+```hello
+ERROR: typst stderr says "unclosed delimiter at line 7"
+```
+
+The block above triggers the sad path. On the live server, the rest of the page renders normally. In a `emanote gen` run without the opt-out flag, the build aborts with `typst stderr says ...` in the failure message.
+
+## A fuller example — `slides.lua`
+
+See [[slides]]# for a real-world render-time filter: it rewrites `:::slides` `Div` elements into a navigable Reveal.js presentation. `Div` matching, `pandoc.RawBlock` / `pandoc.RawInline` for raw HTML, frontmatter metadata via `doc.meta` — plus the embedded source.
+
+
+===
+
+<!-- Source: guide/lua-filters/writing-filters/slides.md -->
+<!-- URL: https://emanote.srid.ca/slides -->
+<!-- Title: A Markdown Presentation about Lua Filters -->
+<!-- Wikilinks: [[guide/lua-filters/writing-filters/slides]], [[lua-filters/writing-filters/slides]], [[writing-filters/slides]], [[slides]] -->
+
+---
+slug: slides
 short-title: Slides demo
 pandoc:
   filters:
@@ -1488,6 +1650,10 @@ The pattern is always the same: drop the `.lua` in, name it in [[yaml-config|fro
 :::
 
 This deck is rendered by `slides.lua`. If you view source, you'll see _it_ is plain [[markdown|Markdown]] inside one fenced div — the filter does the [[html-template|HTML-specific]] structural work at render time.
+
+## Source
+
+![[slides.lua]]
 
 
 ===

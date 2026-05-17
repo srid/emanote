@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=56efc396-da3f-46e0-83f1-2637a0f23caa' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=fb374948-7bab-459f-80e8-7476e63e196b' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -593,6 +593,15 @@
             <li class='inline-flex items-center shrink-0'>
               <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='lua-filters'>
                 Pandoc Lua Filters
+              </a>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
+                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
+              </svg>
+            </li>
+          
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='writing-filters'>
+                Writing a Pandoc Lua filter
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -1535,6 +1544,122 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Diagrams' href='diagrams' data-iso-date>
+      Diagrams
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+    
+      
+    
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='6 9 12 15 18 9'></polyline>
+      </svg>
+      
+  
+        
+    </span>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Writing filters' href='writing-filters' data-iso-date>
+      Writing filters
+    </a>
+    
+      
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+    <div class='emanote-tree-children'>
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
   
 
 
@@ -1559,7 +1684,7 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Slides demo' href='lua-filters/slides' data-iso-date>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Slides demo' href='slides' data-iso-date>
       Slides demo
     </a>
     
@@ -1580,6 +1705,11 @@
   -->
   
     <div class='emanote-tree-children'>
+      
+    </div>
+  
+</div>
+
       
     </div>
   
@@ -2145,7 +2275,7 @@
       
   Why filters?
   
-  <a href='lua-filters/slides.html#why-filters-1' class='--ema-anchor ml-2'>
+  <a href='slides.html#why-filters-1' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2167,7 +2297,7 @@
       
   Adding one to your notebook
   
-  <a href='lua-filters/slides.html#adding-one-to-your-notebook-2' class='--ema-anchor ml-2'>
+  <a href='slides.html#adding-one-to-your-notebook-2' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2206,7 +2336,7 @@
       
   What this page does
   
-  <a href='lua-filters/slides.html#what-this-page-does-3' class='--ema-anchor ml-2'>
+  <a href='slides.html#what-this-page-does-3' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2228,7 +2358,7 @@
       
   Hot-reload
   
-  <a href='lua-filters/slides.html#hot-reload-4' class='--ema-anchor ml-2'>
+  <a href='slides.html#hot-reload-4' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2250,7 +2380,7 @@
       
   A second example: word count
   
-  <a href='lua-filters/slides.html#a-second-example-word-count-5' class='--ema-anchor ml-2'>
+  <a href='slides.html#a-second-example-word-count-5' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2277,7 +2407,7 @@
       
   Writer-specific filters
   
-  <a href='lua-filters/slides.html#writer-specific-filters-6' class='--ema-anchor ml-2'>
+  <a href='slides.html#writer-specific-filters-6' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2299,7 +2429,7 @@
       
   Where to find more
   
-  <a href='lua-filters/slides.html#where-to-find-more-7' class='--ema-anchor ml-2'>
+  <a href='slides.html#where-to-find-more-7' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2454,9 +2584,411 @@
       This deck is rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>. If you view source, you’ll see <em>it</em> is plain <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> inside one fenced div — the filter does the <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML-specific</a> structural work at render time.
     </p>
   
+    <h2 id='source' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Source
+  
+  <a href='slides.html#source' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  <!-- The data-language attribute is for theme CSS/JS that wants to target a
+     specific language; skylighting itself encodes the language inside the
+     <code class="sourceCode …"> emitted by <ema:code:block />. --><div class='emanote-code-embed mb-6 text-sm' title='/nix/store/9p3bixwrhmlh0n7pahbygxif8j1ykls4-docs/filters/slides.lua' data-language='lua'>
+  <div><pre><code class='lua'><span class='co'>--- slides.lua — turn `:::slides` divs into a navigable Markdown presentation.</span>
+<span class='co'>---</span>
+<span class='co'>--- Author writes a fenced div with class `slides`; each level-2 header</span>
+<span class='co'>--- inside it begins a new slide. The filter wraps each slide in its own</span>
+<span class='co'>--- `</span><span class='kw'>&lt;section</span><span class='ot'> class=</span><span class='dt'>"emanote-slide"</span><span class='kw'>&gt;</span><span class='co'>`, prepends a nav strip with anchor</span>
+<span class='co'>--- links, and injects scoped CSS + arrow-key JS so the result reads as a</span>
+<span class='co'>--- real horizontal-snap deck.</span>
+<span class='co'>---</span>
+<span class='co'>--- Layout uses CSS scroll-snap (no framework, no reveal.js); the JS is a</span>
+<span class='co'>--- ~20-line module that adds keyboard nav. Both blocks are emitted as raw</span>
+<span class='co'>--- HTML so the demo page is self-contained — no template surgery, no</span>
+<span class='co'>--- bundled assets in the default layer.</span>
+<span class='co'>---</span>
+<span class='co'>--- Example:</span>
+<span class='co'>---</span>
+<span class='co'>---   ::: slides</span>
+<span class='co'>---</span>
+<span class='co'>---   ## Hello</span>
+<span class='co'>---</span>
+<span class='co'>---   Welcome to a Markdown presentation.</span>
+<span class='co'>---</span>
+<span class='co'>---   ## Why</span>
+<span class='co'>---</span>
+<span class='co'>---   - It's just Markdown</span>
+<span class='co'>---   - It hot-reloads</span>
+<span class='co'>---   :::</span>
+<span class='co'>---</span>
+<span class='co'>--- HTML render-time filter; the emitted RawBlocks target HTML.</span>
+
+<span class='cf'>if</span> <span class='cn'>FORMAT</span> <span class='op'>~=</span> <span class='st'>"html"</span> <span class='cf'>then</span>
+  <span class='cf'>return</span> <span class='op'>{}</span>
+<span class='cf'>end</span>
+
+<span class='kw'>local</span> <span class='kw'>function</span> slugify<span class='op'>(</span><span class='va'>s</span><span class='op'>,</span> <span class='va'>idx</span><span class='op'>)</span>
+  <span class='kw'>local</span> <span class='va'>base</span> <span class='op'>=</span> <span class='va'>s</span><span class='op'>:</span><span class='fu'>lower</span><span class='op'>():</span><span class='fu'>gsub</span><span class='op'>(</span><span class='st'>"[^%w]+"</span><span class='op'>,</span> <span class='st'>"-"</span><span class='op'>):</span><span class='fu'>gsub</span><span class='op'>(</span><span class='st'>"^%-+"</span><span class='op'>,</span> <span class='st'>""</span><span class='op'>):</span><span class='fu'>gsub</span><span class='op'>(</span><span class='st'>"%-+$"</span><span class='op'>,</span> <span class='st'>""</span><span class='op'>)</span>
+  <span class='cf'>if</span> <span class='va'>base</span> <span class='op'>==</span> <span class='st'>""</span> <span class='cf'>then</span> <span class='va'>base</span> <span class='op'>=</span> <span class='st'>"slide"</span> <span class='cf'>end</span>
+  <span class='cf'>return</span> <span class='fu'>string.format</span><span class='op'>(</span><span class='st'>"%s-%d"</span><span class='op'>,</span> <span class='va'>base</span><span class='op'>,</span> <span class='va'>idx</span><span class='op'>)</span>
+<span class='kw'>end</span>
+
+<span class='kw'>local</span> <span class='kw'>function</span> header_text<span class='op'>(</span><span class='va'>header</span><span class='op'>)</span>
+  <span class='cf'>return</span> <span class='va'>pandoc</span><span class='op'>.</span><span class='va'>utils</span><span class='op'>.</span>stringify<span class='op'>(</span><span class='va'>header</span><span class='op'>.</span><span class='va'>content</span><span class='op'>)</span>
+<span class='kw'>end</span>
+
+<span class='kw'>local</span> <span class='va'>css</span> <span class='op'>=</span> <span class='vs'>[[</span>
+<span class='vs'>&lt;style&gt;</span>
+<span class='vs'>.emanote-slides {</span>
+<span class='vs'>  border: 1px solid var(--color-gray-200);</span>
+<span class='vs'>  border-radius: 0.5rem;</span>
+<span class='vs'>  margin: 2rem 0;</span>
+<span class='vs'>  background: var(--color-gray-50);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav {</span>
+<span class='vs'>  display: flex;</span>
+<span class='vs'>  flex-wrap: wrap;</span>
+<span class='vs'>  gap: 0.25rem;</span>
+<span class='vs'>  padding: 0.5rem 0.75rem;</span>
+<span class='vs'>  border-bottom: 1px solid var(--color-gray-200);</span>
+<span class='vs'>  font-size: 0.875rem;</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav [data-slide-id] {</span>
+<span class='vs'>  display: inline-flex;</span>
+<span class='vs'>  align-items: center;</span>
+<span class='vs'>  justify-content: center;</span>
+<span class='vs'>  min-width: 1.75rem;</span>
+<span class='vs'>  height: 1.75rem;</span>
+<span class='vs'>  padding: 0 0.5rem;</span>
+<span class='vs'>  border-radius: 0.25rem;</span>
+<span class='vs'>  border: 1px solid transparent;</span>
+<span class='vs'>  color: var(--color-gray-700);</span>
+<span class='vs'>  text-decoration: none;</span>
+<span class='vs'>  font-variant-numeric: tabular-nums;</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav [data-slide-id]:hover {</span>
+<span class='vs'>  border-color: var(--color-gray-300);</span>
+<span class='vs'>  background: var(--color-gray-100);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav [data-slide-id].active {</span>
+<span class='vs'>  background: var(--color-primary-600);</span>
+<span class='vs'>  border-color: var(--color-primary-600);</span>
+<span class='vs'>  color: #fff;</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav [data-slide-id].active:hover {</span>
+<span class='vs'>  background: var(--color-primary-700);</span>
+<span class='vs'>  border-color: var(--color-primary-700);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav .emanote-slides-fs {</span>
+<span class='vs'>  margin-left: auto;</span>
+<span class='vs'>  border: 1px solid transparent;</span>
+<span class='vs'>  background: transparent;</span>
+<span class='vs'>  color: var(--color-gray-700);</span>
+<span class='vs'>  border-radius: 0.25rem;</span>
+<span class='vs'>  width: 1.75rem;</span>
+<span class='vs'>  height: 1.75rem;</span>
+<span class='vs'>  padding: 0;</span>
+<span class='vs'>  display: inline-flex;</span>
+<span class='vs'>  align-items: center;</span>
+<span class='vs'>  justify-content: center;</span>
+<span class='vs'>  cursor: pointer;</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav .emanote-slides-fs:hover {</span>
+<span class='vs'>  border-color: var(--color-gray-300);</span>
+<span class='vs'>  background: var(--color-gray-100);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides-nav .emanote-slides-fs svg { width: 1rem; height: 1rem; display: block; }</span>
+<span class='vs'>.emanote-slides-nav .emanote-slides-fs .icon-exit { display: none; }</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-enter { display: none; }</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slides-nav .emanote-slides-fs .icon-exit { display: block; }</span>
+<span class='vs'>.emanote-slides-track {</span>
+<span class='vs'>  display: flex;</span>
+<span class='vs'>  overflow-x: auto;</span>
+<span class='vs'>  scroll-snap-type: x mandatory;</span>
+<span class='vs'>  scroll-behavior: smooth;</span>
+<span class='vs'>  aspect-ratio: 16 / 9;</span>
+<span class='vs'>  background: var(--color-gray-50);</span>
+<span class='vs'>}</span>
+<span class='vs'>/* Fullscreen mode: fill the viewport, kill margins/border, scale slide</span>
+<span class='vs'>   padding so the deck doesn't read as a tiny embedded frame. */</span>
+<span class='vs'>.emanote-slides:fullscreen {</span>
+<span class='vs'>  margin: 0;</span>
+<span class='vs'>  border: none;</span>
+<span class='vs'>  border-radius: 0;</span>
+<span class='vs'>  display: flex;</span>
+<span class='vs'>  flex-direction: column;</span>
+<span class='vs'>  background: var(--color-gray-50);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slides-track {</span>
+<span class='vs'>  flex: 1 1 auto;</span>
+<span class='vs'>  aspect-ratio: auto;</span>
+<span class='vs'>  height: auto;</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slide { padding: 4rem 6rem; }</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slide &gt; h2:first-child { font-size: 3rem; }</span>
+<span class='vs'>.emanote-slides:fullscreen .emanote-slide :is(p, ul, ol, pre) { font-size: 1.5rem; }</span>
+<span class='vs'>.emanote-slide {</span>
+<span class='vs'>  flex: 0 0 100%;</span>
+<span class='vs'>  scroll-snap-align: start;</span>
+<span class='vs'>  scroll-snap-stop: always;</span>
+<span class='vs'>  padding: 2.5rem 3rem;</span>
+<span class='vs'>  display: flex;</span>
+<span class='vs'>  flex-direction: column;</span>
+<span class='vs'>  justify-content: center;</span>
+<span class='vs'>  overflow-y: auto;</span>
+<span class='vs'>  color: var(--color-gray-900);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slide &gt; h2:first-child {</span>
+<span class='vs'>  margin-top: 0;</span>
+<span class='vs'>  font-size: 2rem;</span>
+<span class='vs'>  color: var(--color-gray-900);</span>
+<span class='vs'>}</span>
+<span class='vs'>.emanote-slide :is(p, ul, ol, pre) { font-size: 1.125rem; }</span>
+
+<span class='vs'>.dark .emanote-slides {</span>
+<span class='vs'>  background: var(--color-gray-900);</span>
+<span class='vs'>  border-color: var(--color-gray-800);</span>
+<span class='vs'>}</span>
+<span class='vs'>.dark .emanote-slides-nav { border-bottom-color: var(--color-gray-800); }</span>
+<span class='vs'>.dark .emanote-slides-nav [data-slide-id] { color: var(--color-gray-300); }</span>
+<span class='vs'>.dark .emanote-slides-nav [data-slide-id]:hover {</span>
+<span class='vs'>  border-color: var(--color-gray-700);</span>
+<span class='vs'>  background: var(--color-gray-800);</span>
+<span class='vs'>}</span>
+<span class='vs'>.dark .emanote-slides-nav [data-slide-id].active {</span>
+<span class='vs'>  background: var(--color-primary-500);</span>
+<span class='vs'>  border-color: var(--color-primary-500);</span>
+<span class='vs'>  color: var(--color-gray-950);</span>
+<span class='vs'>}</span>
+<span class='vs'>.dark .emanote-slides-nav [data-slide-id].active:hover {</span>
+<span class='vs'>  background: var(--color-primary-400);</span>
+<span class='vs'>  border-color: var(--color-primary-400);</span>
+<span class='vs'>}</span>
+<span class='vs'>.dark .emanote-slides-track { background: var(--color-gray-900); }</span>
+<span class='vs'>.dark .emanote-slide,</span>
+<span class='vs'>.dark .emanote-slide &gt; h2:first-child { color: var(--color-gray-100); }</span>
+<span class='vs'>&lt;/style&gt;</span>
+<span class='vs'>]]</span>
+
+<span class='kw'>local</span> <span class='va'>js</span> <span class='op'>=</span> <span class='vs'>[[</span>
+<span class='vs'>&lt;script&gt;</span>
+<span class='vs'>(() =&gt; {</span>
+<span class='vs'>  // Nav buttons drive horizontal scroll on the track. Deep-linking</span>
+<span class='vs'>  // via `#slide-id` works one-shot at load time via `location.hash`,</span>
+<span class='vs'>  // but we never push/replace the hash on click — the back stack</span>
+<span class='vs'>  // would fill with intra-deck transitions and interact badly with</span>
+<span class='vs'>  // the live-server's morph-DOM navigation.</span>
+<span class='vs'>  for (const deck of document.querySelectorAll('.emanote-slides')) {</span>
+<span class='vs'>    // Ema's live-server uses morph-DOM for in-app navigation; if a</span>
+<span class='vs'>    // slides page is re-entered the script tag may run again over a</span>
+<span class='vs'>    // deck node that already has listeners. Idempotent guard: the</span>
+<span class='vs'>    // first run flips a dataset flag; subsequent runs skip.</span>
+<span class='vs'>    if (deck.dataset.emanoteSlidesInited) continue;</span>
+<span class='vs'>    const track = deck.querySelector('.emanote-slides-track');</span>
+<span class='vs'>    const slides = [...deck.querySelectorAll('.emanote-slide')];</span>
+<span class='vs'>    if (!track || slides.length === 0) continue;</span>
+<span class='vs'>    deck.dataset.emanoteSlidesInited = '1';</span>
+<span class='vs'>    deck.tabIndex = 0;</span>
+<span class='vs'>    const indexOf = (id) =&gt; slides.findIndex(s =&gt; s.id === id);</span>
+<span class='vs'>    // Scroll the track horizontally to the chosen slide. Using</span>
+<span class='vs'>    // track.scrollTo (vs slides[j].scrollIntoView) keeps scrolling</span>
+<span class='vs'>    // contained to the track — scrollIntoView with block:'nearest'</span>
+<span class='vs'>    // has been observed to drop horizontal scroll updates when the</span>
+<span class='vs'>    // surrounding page is the actual scroll-container winner.</span>
+<span class='vs'>    //</span>
+<span class='vs'>    // Use getBoundingClientRect rather than offsetLeft: offsetLeft</span>
+<span class='vs'>    // is relative to the slide's offsetParent, which is whatever</span>
+<span class='vs'>    // ancestor happens to be positioned. The track itself has no</span>
+<span class='vs'>    // explicit position, so offsetLeft mixes track-internal scroll</span>
+<span class='vs'>    // coords with outer-wrapper coords and current() mis-identifies</span>
+<span class='vs'>    // the visible slide whenever the track has a non-zero left in</span>
+<span class='vs'>    // the page (any sidebar layout, in practice).</span>
+<span class='vs'>    const go = (i, smooth = true) =&gt; {</span>
+<span class='vs'>      const j = Math.max(0, Math.min(slides.length - 1, i));</span>
+<span class='vs'>      const slideLeft = slides[j].getBoundingClientRect().left;</span>
+<span class='vs'>      const trackLeft = track.getBoundingClientRect().left;</span>
+<span class='vs'>      track.scrollTo({</span>
+<span class='vs'>        left: track.scrollLeft + (slideLeft - trackLeft),</span>
+<span class='vs'>        behavior: smooth ? 'smooth' : 'instant',</span>
+<span class='vs'>      });</span>
+<span class='vs'>    };</span>
+<span class='vs'>    const current = () =&gt; {</span>
+<span class='vs'>      const trackRect = track.getBoundingClientRect();</span>
+<span class='vs'>      const trackCenter = trackRect.left + trackRect.width / 2;</span>
+<span class='vs'>      let best = 0, bestDist = Infinity;</span>
+<span class='vs'>      slides.forEach((s, i) =&gt; {</span>
+<span class='vs'>        const r = s.getBoundingClientRect();</span>
+<span class='vs'>        const d = Math.abs(r.left + r.width / 2 - trackCenter);</span>
+<span class='vs'>        if (d &lt; bestDist) { bestDist = d; best = i; }</span>
+<span class='vs'>      });</span>
+<span class='vs'>      return best;</span>
+<span class='vs'>    };</span>
+<span class='vs'>    const navLinks = [...deck.querySelectorAll('.emanote-slides-nav [data-slide-id]')];</span>
+<span class='vs'>    const setActive = (id) =&gt; {</span>
+<span class='vs'>      for (const a of navLinks) {</span>
+<span class='vs'>        a.classList.toggle('active', a.dataset.slideId === id);</span>
+<span class='vs'>      }</span>
+<span class='vs'>    };</span>
+<span class='vs'>    navLinks.forEach(a =&gt; {</span>
+<span class='vs'>      a.addEventListener('click', (e) =&gt; {</span>
+<span class='vs'>        const i = indexOf(a.dataset.slideId);</span>
+<span class='vs'>        if (i &lt; 0) return;</span>
+<span class='vs'>        e.preventDefault();</span>
+<span class='vs'>        e.stopPropagation();</span>
+<span class='vs'>        go(i);</span>
+<span class='vs'>        // Move focus to the deck so subsequent arrow keys reach the</span>
+<span class='vs'>        // deck-level keydown handler.</span>
+<span class='vs'>        requestAnimationFrame(() =&gt; deck.focus({ preventScroll: true }));</span>
+<span class='vs'>      });</span>
+<span class='vs'>    });</span>
+<span class='vs'>    // Fullscreen toggle: requestFullscreen on click, exitFullscreen</span>
+<span class='vs'>    // when already fullscreen. The CSS swaps the icon based on</span>
+<span class='vs'>    // :fullscreen pseudo-class — no manual class juggling.</span>
+<span class='vs'>    const fsBtn = deck.querySelector('.emanote-slides-fs');</span>
+<span class='vs'>    if (fsBtn) {</span>
+<span class='vs'>      fsBtn.addEventListener('click', (e) =&gt; {</span>
+<span class='vs'>        e.stopPropagation();</span>
+<span class='vs'>        if (document.fullscreenElement === deck) {</span>
+<span class='vs'>          document.exitFullscreen?.();</span>
+<span class='vs'>        } else {</span>
+<span class='vs'>          // requestFullscreen rejects when the user denies the</span>
+<span class='vs'>          // permission gesture or the browser refuses (e.g. the</span>
+<span class='vs'>          // page isn't allowed to take fullscreen at all). Log so</span>
+<span class='vs'>          // a click that does nothing isn't a silent mystery.</span>
+<span class='vs'>          deck.requestFullscreen?.()</span>
+<span class='vs'>            .then(() =&gt; deck.focus({ preventScroll: true }))</span>
+<span class='vs'>            .catch((err) =&gt;</span>
+<span class='vs'>              console.warn('emanote-slides: fullscreen request denied or unavailable:', err)</span>
+<span class='vs'>            );</span>
+<span class='vs'>        }</span>
+<span class='vs'>      });</span>
+<span class='vs'>    }</span>
+<span class='vs'>    if (slides[0]) setActive(slides[0].id);</span>
+<span class='vs'>    const observer = new IntersectionObserver((entries) =&gt; {</span>
+<span class='vs'>      let best = null, bestRatio = 0;</span>
+<span class='vs'>      for (const entry of entries) {</span>
+<span class='vs'>        if (entry.isIntersecting && entry.intersectionRatio &gt; bestRatio) {</span>
+<span class='vs'>          best = entry.target;</span>
+<span class='vs'>          bestRatio = entry.intersectionRatio;</span>
+<span class='vs'>        }</span>
+<span class='vs'>      }</span>
+<span class='vs'>      if (best) setActive(best.id);</span>
+<span class='vs'>    }, { root: track, threshold: [0.5, 0.75, 1] });</span>
+<span class='vs'>    slides.forEach(s =&gt; observer.observe(s));</span>
+<span class='vs'>    deck.addEventListener('keydown', (e) =&gt; {</span>
+<span class='vs'>      if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(current() + 1); }</span>
+<span class='vs'>      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current() - 1); }</span>
+<span class='vs'>      else if (e.key === 'Home') { e.preventDefault(); go(0); }</span>
+<span class='vs'>      else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }</span>
+<span class='vs'>    });</span>
+<span class='vs'>    if (location.hash) {</span>
+<span class='vs'>      const i = indexOf(location.hash.slice(1));</span>
+<span class='vs'>      if (i &gt;= 0) requestAnimationFrame(() =&gt; go(i, false));</span>
+<span class='vs'>    }</span>
+<span class='vs'>  }</span>
+<span class='vs'>})();</span>
+<span class='vs'>&lt;/script&gt;</span>
+<span class='vs'>]]</span>
+
+<span class='co'>--- Split a list of blocks into slide groups: every level-2 Header begins</span>
+<span class='co'>--- a new slide; blocks before the first header are dropped (an authoring</span>
+<span class='co'>--- convention that lets users put a leading paragraph as a deck intro</span>
+<span class='co'>--- if they want it outside the slides themselves — but currently we</span>
+<span class='co'>--- treat such pre-content as discarded; could change later).</span>
+<span class='kw'>local</span> <span class='kw'>function</span> split_into_slides<span class='op'>(</span><span class='va'>blocks</span><span class='op'>)</span>
+  <span class='kw'>local</span> <span class='va'>slides</span> <span class='op'>=</span> <span class='op'>{}</span>
+  <span class='kw'>local</span> <span class='va'>current</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='cf'>for</span> <span class='cn'>_</span><span class='op'>,</span> <span class='va'>b</span> <span class='kw'>in</span> <span class='fu'>ipairs</span><span class='op'>(</span><span class='va'>blocks</span><span class='op'>)</span> <span class='cf'>do</span>
+    <span class='cf'>if</span> <span class='va'>b</span><span class='op'>.</span><span class='va'>t</span> <span class='op'>==</span> <span class='st'>"Header"</span> <span class='kw'>and</span> <span class='va'>b</span><span class='op'>.</span><span class='va'>level</span> <span class='op'>==</span> <span class='dv'>2</span> <span class='cf'>then</span>
+      <span class='cf'>if</span> <span class='va'>current</span> <span class='cf'>then</span> <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>slides</span><span class='op'>,</span> <span class='va'>current</span><span class='op'>)</span> <span class='cf'>end</span>
+      <span class='va'>current</span> <span class='op'>=</span> <span class='op'>{</span> <span class='va'>header</span> <span class='op'>=</span> <span class='va'>b</span><span class='op'>,</span> <span class='va'>body</span> <span class='op'>=</span> <span class='op'>{}</span> <span class='op'>}</span>
+    <span class='cf'>elseif</span> <span class='va'>current</span> <span class='cf'>then</span>
+      <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>current</span><span class='op'>.</span><span class='va'>body</span><span class='op'>,</span> <span class='va'>b</span><span class='op'>)</span>
+    <span class='cf'>end</span>
+  <span class='cf'>end</span>
+  <span class='cf'>if</span> <span class='va'>current</span> <span class='cf'>then</span> <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>slides</span><span class='op'>,</span> <span class='va'>current</span><span class='op'>)</span> <span class='cf'>end</span>
+  <span class='cf'>return</span> <span class='va'>slides</span>
+<span class='kw'>end</span>
+
+<span class='co'>-- Inline SVG icons for the fullscreen toggle (24x24 viewBox; CSS sizes</span>
+<span class='co'>-- them down to 1rem). Two icons, one shown at a time via the</span>
+<span class='co'>-- :fullscreen pseudo-class — no JS class toggling needed.</span>
+<span class='kw'>local</span> <span class='va'>fs_icons</span> <span class='op'>=</span> <span class='vs'>[[&lt;svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"&gt;&lt;path d="M4 9V4h5"/&gt;&lt;path d="M20 9V4h-5"/&gt;&lt;path d="M4 15v5h5"/&gt;&lt;path d="M20 15v5h-5"/&gt;&lt;/svg&gt;&lt;svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"&gt;&lt;path d="M9 4v5H4"/&gt;&lt;path d="M15 4v5h5"/&gt;&lt;path d="M9 20v-5H4"/&gt;&lt;path d="M15 20v-5h5"/&gt;&lt;/svg&gt;]]</span>
+
+<span class='kw'>local</span> <span class='kw'>function</span> build_deck<span class='op'>(</span><span class='va'>slides</span><span class='op'>)</span>
+  <span class='kw'>local</span> <span class='va'>nav_links</span> <span class='op'>=</span> <span class='op'>{}</span>
+  <span class='kw'>local</span> <span class='va'>sections</span> <span class='op'>=</span> <span class='op'>{}</span>
+  <span class='cf'>for</span> <span class='va'>i</span><span class='op'>,</span> <span class='va'>s</span> <span class='kw'>in</span> <span class='fu'>ipairs</span><span class='op'>(</span><span class='va'>slides</span><span class='op'>)</span> <span class='cf'>do</span>
+    <span class='kw'>local</span> <span class='va'>title</span> <span class='op'>=</span> header_text<span class='op'>(</span><span class='va'>s</span><span class='op'>.</span><span class='va'>header</span><span class='op'>)</span>
+    <span class='kw'>local</span> <span class='va'>id</span> <span class='op'>=</span> slugify<span class='op'>(</span><span class='va'>title</span><span class='op'>,</span> <span class='va'>i</span><span class='op'>)</span>
+    <span class='va'>s</span><span class='op'>.</span><span class='va'>header</span><span class='op'>.</span><span class='va'>identifier</span> <span class='op'>=</span> <span class='va'>id</span>
+    <span class='co'>-- Use &lt;button&gt;, not &lt;a&gt;. A bare-hash &lt;a href="#id"&gt; gets resolved</span>
+    <span class='co'>-- to "/#id" via &lt;base href="/"&gt;, and the static link-checker</span>
+    <span class='co'>-- follows it back to root and reports a missing anchor. &lt;a&gt; with</span>
+    <span class='co'>-- no href fails htmlproofer's "missing reference" check. &lt;button&gt;</span>
+    <span class='co'>-- carries no link semantics for the checker; JS handles</span>
+    <span class='co'>-- navigation via the data-slide-id attribute.</span>
+    <span class='kw'>local</span> <span class='va'>link</span> <span class='op'>=</span> <span class='va'>pandoc</span><span class='op'>.</span>RawInline<span class='op'>(</span>
+      <span class='st'>"html"</span><span class='op'>,</span>
+      <span class='fu'>string.format</span><span class='op'>(</span>
+        <span class='st'>'&lt;button type="button" data-slide-id="%s" title="%s"&gt;%d&lt;/button&gt;'</span><span class='op'>,</span>
+        <span class='va'>id</span><span class='op'>,</span> <span class='va'>title</span><span class='op'>,</span> <span class='va'>i</span>
+      <span class='op'>)</span>
+    <span class='op'>)</span>
+    <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>nav_links</span><span class='op'>,</span> <span class='va'>link</span><span class='op'>)</span>
+    <span class='cf'>if</span> <span class='va'>i</span> <span class='op'>&lt;</span> <span class='op'>#</span><span class='va'>slides</span> <span class='cf'>then</span>
+      <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>nav_links</span><span class='op'>,</span> <span class='va'>pandoc</span><span class='op'>.</span>Space<span class='op'>())</span>
+    <span class='cf'>end</span>
+    <span class='kw'>local</span> <span class='va'>body</span> <span class='op'>=</span> <span class='op'>{</span> <span class='va'>s</span><span class='op'>.</span><span class='va'>header</span> <span class='op'>}</span>
+    <span class='cf'>for</span> <span class='cn'>_</span><span class='op'>,</span> <span class='va'>b</span> <span class='kw'>in</span> <span class='fu'>ipairs</span><span class='op'>(</span><span class='va'>s</span><span class='op'>.</span><span class='va'>body</span><span class='op'>)</span> <span class='cf'>do</span> <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>body</span><span class='op'>,</span> <span class='va'>b</span><span class='op'>)</span> <span class='cf'>end</span>
+    <span class='kw'>local</span> <span class='va'>section</span> <span class='op'>=</span> <span class='va'>pandoc</span><span class='op'>.</span>Div<span class='op'>(</span><span class='va'>body</span><span class='op'>,</span> <span class='va'>pandoc</span><span class='op'>.</span>Attr<span class='op'>(</span><span class='va'>id</span><span class='op'>,</span> <span class='op'>{</span> <span class='st'>"emanote-slide"</span> <span class='op'>},</span> <span class='op'>{}))</span>
+    <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>sections</span><span class='op'>,</span> <span class='va'>section</span><span class='op'>)</span>
+  <span class='cf'>end</span>
+  <span class='co'>-- Fullscreen toggle: sits on the right side of the nav (margin-left:</span>
+  <span class='co'>-- auto in CSS pushes it past the slide-number links). Inline raw HTML</span>
+  <span class='co'>-- because pandoc's Builder doesn't model &lt;button&gt;.</span>
+  <span class='kw'>local</span> <span class='va'>fs_button</span> <span class='op'>=</span>
+    <span class='va'>pandoc</span><span class='op'>.</span>RawInline<span class='op'>(</span>
+      <span class='st'>"html"</span><span class='op'>,</span>
+      <span class='fu'>string.format</span><span class='op'>(</span>
+        <span class='st'>'&lt;button type="button" class="emanote-slides-fs" aria-label="Toggle fullscreen" title="Fullscreen"&gt;%s&lt;/button&gt;'</span><span class='op'>,</span>
+        <span class='va'>fs_icons</span>
+      <span class='op'>)</span>
+    <span class='op'>)</span>
+  <span class='fu'>table.insert</span><span class='op'>(</span><span class='va'>nav_links</span><span class='op'>,</span> <span class='va'>fs_button</span><span class='op'>)</span>
+  <span class='kw'>local</span> <span class='va'>nav</span> <span class='op'>=</span> <span class='va'>pandoc</span><span class='op'>.</span>Div<span class='op'>(</span>
+    <span class='op'>{</span> <span class='va'>pandoc</span><span class='op'>.</span>Plain<span class='op'>(</span><span class='va'>nav_links</span><span class='op'>)</span> <span class='op'>},</span>
+    <span class='va'>pandoc</span><span class='op'>.</span>Attr<span class='op'>(</span><span class='st'>""</span><span class='op'>,</span> <span class='op'>{</span> <span class='st'>"emanote-slides-nav"</span> <span class='op'>},</span> <span class='op'>{})</span>
+  <span class='op'>)</span>
+  <span class='kw'>local</span> <span class='va'>track</span> <span class='op'>=</span> <span class='va'>pandoc</span><span class='op'>.</span>Div<span class='op'>(</span><span class='va'>sections</span><span class='op'>,</span> <span class='va'>pandoc</span><span class='op'>.</span>Attr<span class='op'>(</span><span class='st'>""</span><span class='op'>,</span> <span class='op'>{</span> <span class='st'>"emanote-slides-track"</span> <span class='op'>},</span> <span class='op'>{}))</span>
+  <span class='cf'>return</span> <span class='va'>pandoc</span><span class='op'>.</span>Div<span class='op'>({</span> <span class='va'>nav</span><span class='op'>,</span> <span class='va'>track</span> <span class='op'>},</span> <span class='va'>pandoc</span><span class='op'>.</span>Attr<span class='op'>(</span><span class='st'>""</span><span class='op'>,</span> <span class='op'>{</span> <span class='st'>"emanote-slides"</span> <span class='op'>},</span> <span class='op'>{}))</span>
+<span class='kw'>end</span>
+
+<span class='kw'>local</span> <span class='va'>emitted_assets</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+<span class='kw'>function</span> Div<span class='op'>(</span><span class='va'>el</span><span class='op'>)</span>
+  <span class='cf'>if</span> <span class='kw'>not</span> <span class='va'>el</span><span class='op'>.</span><span class='va'>classes</span><span class='op'>:</span>includes<span class='op'>(</span><span class='st'>"slides"</span><span class='op'>)</span> <span class='cf'>then</span> <span class='cf'>return</span> <span class='kw'>nil</span> <span class='cf'>end</span>
+  <span class='kw'>local</span> <span class='va'>slides</span> <span class='op'>=</span> split_into_slides<span class='op'>(</span><span class='va'>el</span><span class='op'>.</span><span class='va'>content</span><span class='op'>)</span>
+  <span class='cf'>if</span> <span class='op'>#</span><span class='va'>slides</span> <span class='op'>==</span> <span class='dv'>0</span> <span class='cf'>then</span> <span class='cf'>return</span> <span class='kw'>nil</span> <span class='cf'>end</span>
+  <span class='kw'>local</span> <span class='va'>deck</span> <span class='op'>=</span> build_deck<span class='op'>(</span><span class='va'>slides</span><span class='op'>)</span>
+  <span class='cf'>if</span> <span class='kw'>not</span> <span class='va'>emitted_assets</span> <span class='cf'>then</span>
+    <span class='va'>emitted_assets</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='cf'>return</span> <span class='op'>{</span> <span class='va'>pandoc</span><span class='op'>.</span>RawBlock<span class='op'>(</span><span class='st'>"html"</span><span class='op'>,</span> <span class='va'>css</span><span class='op'>),</span> <span class='va'>deck</span><span class='op'>,</span> <span class='va'>pandoc</span><span class='op'>.</span>RawBlock<span class='op'>(</span><span class='st'>"html"</span><span class='op'>,</span> <span class='va'>js</span><span class='op'>)</span> <span class='op'>}</span>
+  <span class='cf'>end</span>
+  <span class='cf'>return</span> <span class='va'>deck</span>
+<span class='kw'>end</span>
+</code></pre></div>
+</div>
+
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters/slides.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters/writing-filters/slides.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2514,6 +3046,38 @@
     <ul class='space-y-1'>
       
         <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='writing-filters'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Writing a Pandoc Lua filter
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>See <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkBranch'>A Markdown Presentation about Lua Filters</a> for a real-world render-time filter: it rewrites <code>:::slides</code> <code>Div</code> elements into a navigable Reveal.js presentation. <code>Div</code> matching, <code>pandoc.RawBlock</code> / <code>pandoc.RawInline</code> for raw HTML, frontmatter metadata via <code>doc.meta</code> — plus the embedded source.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+        <li class='group relative'>
           <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
             <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Pandoc Lua Filters
           </a>
@@ -2536,11 +3100,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation at <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a> render time, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation; runs the <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> deck.</div>
     </div>
   
     <div>
-      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code> with <code>FORMAT == "html"</code>.</p></div>
+      <div><p>See <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a Markdown presentation rendered by <code>slides.lua</code> at HTML render time.</p></div>
     </div>
   
 </div>
@@ -2586,6 +3150,30 @@
       <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
         
           <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='writing-filters'>
+              Writing a Pandoc Lua filter
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><p>See <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkBranch'>A Markdown Presentation about Lua Filters</a> for a real-world render-time filter: it rewrites <code>:::slides</code> <code>Div</code> elements into a navigable Reveal.js presentation. <code>Div</code> matching, <code>pandoc.RawBlock</code> / <code>pandoc.RawInline</code> for raw HTML, frontmatter metadata via <code>doc.meta</code> — plus the embedded source.</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
             <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
               Pandoc Lua Filters
             </a>
@@ -2601,11 +3189,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation at <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML</a> render time, used by <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a>.</div>
+      <div><a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>slides.lua</code></a> — turns a <code>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation; runs the <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> deck.</div>
     </div>
   
     <div>
-      <div><p>See <a href='lua-filters/slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a full Markdown presentation <em>about</em> Lua filters, rendered by this notebook’s local <code>filters/slides.lua</code> with <code>FORMAT == "html"</code>.</p></div>
+      <div><p>See <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a Markdown presentation rendered by <code>slides.lua</code> at HTML render time.</p></div>
     </div>
   
 </div>

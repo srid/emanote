@@ -30,15 +30,15 @@
     })();
   </script>
   <title>
-    Pandoc Lua Filters – Emanote
+    Diagrams – Emanote
   </title>
   
     
-      <meta property='og:description' content='A Pandoc Lua filter rewrites the parsed Pandoc document before Emanote turns it into an HTML page. Filters are note-local — declare them in Markdown frontmatter, or for Org notes via #+PANDOC_FILTERS_PARSE: / #+PANDOC_FILTERS_RENDER_HTML: keywords.' />
+      <meta property='og:description' content='Emanote bundles lua-filters/diagram.lua, a render-time Pandoc Lua filter that turns fenced code blocks into inline SVG. The filter is vendored from pandoc-ext/diagram and post-processed so SVG diagrams land directly in the page — no --extract-media pass, no JavaScript renderer, no network at view time.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
-      <meta property='og:title' content='Pandoc Lua Filters' />
+      <meta property='og:title' content='Diagrams' />
       
         <meta name='twitter:card' content='summary_large_image' />
       
@@ -590,6 +590,15 @@
               </svg>
             </li>
           
+            <li class='inline-flex items-center shrink-0'>
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='lua-filters'>
+                Pandoc Lua Filters
+              </a>
+              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
+                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
+              </svg>
+            </li>
+          
         
       </ul>
     </div>
@@ -633,7 +642,7 @@
      the page identity but at low intensity, so the prose below isn't
      out-shouted. --><header class='px-8 py-5 md:rounded-t-lg bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 text-center border-b border-primary-200/60 dark:border-primary-800/40'>
   <h1 class='text-3xl md:text-4xl font-semibold tracking-tight'>
-    Pandoc Lua Filters
+    Diagrams
   </h1>
 </header>
 
@@ -1469,7 +1478,11 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
+    
+      
+    
   
+
 
 
   <!-- Demoted toggle: light-gray chevron rather than a filled circle.
@@ -1492,7 +1505,7 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
       Lua Filters
     </a>
     
@@ -1522,7 +1535,7 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-
+  
 
 
   <!-- Leaf node marker: a tiny dot centered in the toggle column.
@@ -1540,21 +1553,17 @@
     <span class='flex-shrink-0'>
       
         
-          
     <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
       <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
     </span>
   
         
-      
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Diagrams' href='diagrams' data-iso-date>
+    <a class='font-semibold tracking-tight bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Diagrams' href='diagrams' data-iso-date>
       Diagrams
     </a>
     
       
-        
-    
   </div>
 
   <!-- Node's children forest, displayed only on active trees
@@ -1569,6 +1578,10 @@
     the same. Do not add widget-specific bindings (e.g. `node:month-
     group`) to `routeTreeSplices` — keep the seam thin.
   -->
+  
+    <div class='emanote-tree-children'>
+      
+    </div>
   
 </div>
 
@@ -2054,32 +2067,14 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      A <a href='https://pandoc.org/lua-filters.html' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>Pandoc Lua filter</a> rewrites the parsed Pandoc document before Emanote turns it into an <a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML page</a>. Filters are note-local — declare them in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown frontmatter</a>, or for <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org notes</a> via <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>#+PANDOC_FILTERS_PARSE:</code> / <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>#+PANDOC_FILTERS_RENDER_HTML:</code> keywords.
+      Emanote bundles <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lua-filters/diagram.lua</code></a>, a render-time <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua filter</a> that turns fenced code blocks into inline SVG. The filter is vendored from <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc-ext/diagram</a> and post-processed so SVG diagrams land directly in the page — no <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>--extract-media</code> pass, no JavaScript renderer, no network at view time.
     </p>
   
-    <h2 id='choose-a-phase' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+    <h2 id='enabling-the-filter' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
-  Choose a phase
+  Enabling the filter
   
-  <a href='lua-filters.html#choose-a-phase' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Phase</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>YAML key</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Runs with</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Use for</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>Parse-time</strong></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.parse</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "markdown"</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Cheap AST rewrites that should affect Emanote’s model — titles, tags, [[wikilinks</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>Render-time</strong></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.render.html</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "html"</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='html-template' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>HTML-specific</a> output, <a href='mermaid' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>diagrams</a>, shelling out to engines, anything that should <em>not</em> run when Emanote is only after metadata. IO is allowed.</td></tr></tbody></table>
-    <p class='mb-4 leading-relaxed'>
-      Both phases use the same filter shape; see <a href='writing-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Writing a Pandoc Lua filter</a> for the API, the <a href='writing-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>error-reporting protocol</a>, and a hello-world example.
-    </p>
-  
-    <h2 id='filter-paths' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Filter paths
-  
-  <a href='lua-filters.html#filter-paths' class='--ema-anchor ml-2'>
+  <a href='diagrams.html#enabling-the-filter' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2090,55 +2085,30 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Filter paths are resolved against your <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>notebook layers</a> first, then against Emanote’s <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>default layer</a>:
+      Diagrams render only on notes that opt in. Add the bundled filter to a note’s render-time HTML phase in frontmatter:
     </p>
-  
-    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
-      
-        <li>
-          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>filters/custom.lua</code> works when the file exists in your notebook
-        </li>
-      
-        <li>
-          <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lua-filters/list-table.lua</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lua-filters/wordcount.lua</code> work without copying anything into your notes — they come from the default layer
-        </li>
-      
-        <li>
-          multiple filters run in declaration order
-        </li>
-      
-    </ul>
-  
-    <p class='mb-4 leading-relaxed'>
-      This page chains the bundled <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code> — the wordcount footer at the bottom proves it.
-    </p>
-  
-    <h2 id='org-notes' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Org notes
-  
-  <a href='lua-filters.html#org-notes' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org notes</a> use one keyword per filter:
-    </p>
-  <div class='mb-6 text-sm'><pre><code class='org'>#+PANDOC_FILTERS_PARSE: lua-filters/list-table.lua
-#+PANDOC_FILTERS_PARSE: lua-filters/wordcount.lua
-#+PANDOC_FILTERS_RENDER_HTML: filters/slides.lua
+  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='pp'>---</span>
+<span class='fu'>pandoc</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>filters</span><span class='kw'>:</span>
+<span class='at'>    </span><span class='fu'>render</span><span class='kw'>:</span>
+<span class='at'>      </span><span class='fu'>html</span><span class='kw'>:</span>
+<span class='at'>        </span><span class='kw'>-</span><span class='at'> lua-filters/diagram.lua</span>
+<span class='pp'>---</span>
 </code></pre></div>
-    <h2 id='hot-reload' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Hot reload
+    <p class='mb-4 leading-relaxed'>
+      This page declares the filter itself — every fenced block below renders through the same pipeline.
+    </p>
   
-  <a href='lua-filters.html#hot-reload' class='--ema-anchor ml-2'>
+    <p class='mb-4 leading-relaxed'>
+      Org notes use the parallel keyword from the <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> guide:
+    </p>
+  <div class='mb-6 text-sm'><pre><code class='org'>#+PANDOC_FILTERS_RENDER_HTML: lua-filters/diagram.lua
+</code></pre></div>
+    <h2 id='supported-engines' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Supported engines
+  
+  <a href='diagrams.html#supported-engines' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2149,14 +2119,493 @@
     </h2>
   
     <p class='mb-4 leading-relaxed'>
-      Edits to <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> files hot-reload. The live server re-parses every note that references a changed filter, no <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>touch</code> needed. A filter referenced before it exists on disk re-parses dependent notes the moment the file lands. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>.lua</code> files also remain linkable as source files — see <a href='embed' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Embedding</a>.
+      The bundled filter recognises seven engine classes from upstream <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc-ext/diagram</code>; Emanote’s Nix closure pins the binaries for two of them, and leaves the rest as bring-your-own:
+    </p>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Engine</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Class</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Binary</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Bundled by Emanote?</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://d2lang.com/' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>D2</a></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Yes</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><a href='https://github.com/cetz-package/cetz' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>CeTZ</a></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>cetz</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>typst</code> (+ pre-resolved <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@preview/cetz</code> package)</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Yes</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Mermaid</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>mermaid</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>mmdc</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>No — set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>MERMAID_BIN</code> or install on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>PATH</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Graphviz</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>dot</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>dot</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>No — set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>DOT_BIN</code> or install on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>PATH</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>PlantUML</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>plantuml</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>plantuml</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>No — set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>PLANTUML_BIN</code> or install on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>PATH</code></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>TikZ</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>tikz</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pdflatex</code> (+ <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>inkscape</code> for SVG)</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>No</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Asymptote</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>asymptote</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>asy</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>No — set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>ASYMPTOTE_BIN</code> or install on <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>PATH</code></td></tr></tbody></table>
+    <p class='mb-4 leading-relaxed'>
+      A note that fences a class without a corresponding binary renders a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>Pandoc Lua filter error</code> banner pointing at the failed <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.pipe</code> call, so the missing-binary case is loud, not silent.
+    </p>
+  
+    <h2 id='d2-demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  d2 demo
+  
+  <a href='diagrams.html#d2-demo' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      D2’s declarative syntax is the shortest path from prose to picture. The thought-meandering exercise Richard describes in <a href='https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>“Silly or Sensible”</a> — “<em>you will go off into a side branch … and that will branch off into another side branch … and into another and another … and so on</em>” — drops out as a four-step meander followed by the snap-back:
+    </p>
+  <rawhtml xmlhtmlRaw style='display: contents'><?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.7.0" preserveAspectRatio="xMinYMin meet" viewBox="0 0 294 646" width="294" height="646"><svg class="d2-653127406 d2-svg" width="294" height="646" viewBox="-1 -18 294 646"><rect x="-1.000000" y="-18.000000" width="294.000000" height="646.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-653127406 .text-bold {
+	font-family: "d2-653127406-font-bold";
+}
+@font-face {
+	font-family: d2-653127406-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-653127406 .text-italic {
+	font-family: "d2-653127406-font-italic";
+}
+@font-face {
+	font-family: d2-653127406-font-italic;
+	src: url("data:application/font-woff;base64,d09GRgABAAAAAA2UAAoAAAAAFWAAARhRAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgW1SVeGNtYXAAAAFUAAAAmAAAAMgDVyQZZ2x5ZgAAAewAAAceAAAJ+C2a2EFoZWFkAAAJDAAAADYAAAA2G7Ur2mhoZWEAAAlEAAAAJAAAACQLeAjEaG10eAAACWgAAACAAAAAgDchA21sb2NhAAAJ6AAAAEIAAABCLJQqOG1heHAAAAosAAAAIAAAACAAOAD2bmFtZQAACkwAAAMmAAAIMgntVzNwb3N0AAANdAAAACAAAAAg/8YAMgADAeEBkAAFAAACigJY//EASwKKAlgARAFeADIBIwAAAgsFAwMEAwkCBCAAAHcAAAADAAAAAAAAAABBREJPAAEAIP//Au7/BgAAA9gBESAAAZMAAAAAAeYClAAAACAAA3icdM07asIAHIDxX5r0nbbp+5VCpowtXXuDHqNj6VIEES/j6xaCd5FsDuLg4PoXBBfBb/0NHxKpBLnMBKVCKlepvfvw6cu3X//aOrpVHcGO/vjT2mo0sYx5LGIWTYxjFMMYRD9609Xms7/Ekxdvnr06kMocOnLsxKkz53IXLl0pXLtx6869B49K1gAAAP//AQAA//+t8yV7eJx8Vlts2+YVPv9PmUxsWbZEibRoSbRIiZQlmrpQIi3buvkq25ITx7HrNbFj9xKkWza4SzdsyLJkKVYUu2QZ0JcVA1asGNAhb+7L9tIBwbAZGzJsQDC02DoM3eIOyYp2glCsRS0OlHyR87AX4of045zzfef7PhI6IASAv4RfAQJOQg+4wAOg0UGC0AxDZAlNlkWKMmSapkI30c7NV20TTz6IvPaJwttmvvXz+X9v3MGv7F1GN9auX2+ce/nZZ5949KgRRX9+BACAQASAOr4NhFVTI8QXF17Et/e2AACDbNbRf1EN3NYtVpAy6TzWUgyrGRohGiJJyindMCRJFBzY42beLFaUuXVNzjltdH6zcMImrrqkUyHFk/KFJjJ80n5uefrr57VIMNfgyuF4UY2/IwnR2bVUIQfNfrxZRx/hHfBYiFlBkkVKpDWK0nRdSzEetwPLqTzOpCVRICmKYR7KOSfhLtyqygwOnR1qts+EJjKBxKCwKKpuzR4J5vDOWxv+2JMrVutidHZNy+ei4fclARCEzTraRjXwHUNHWYBI0uNmtJRusCT59qlnlOpmRhljhmjJn1jRsyMDOiNwVfvFtckry3HBm2A9k1sT49OcM+UOwwF3WG7DcsTd/ydvxEX0StXb++wthB9nTx648Nbe8OP04SaWX6EacBBu78d43CQVJJkDLISm65l0E+E/V54bmj+fMEoBe0fj1ycHJqL+LBvwL/7IxIRrUMys2z+/ObV1RlFPp3yao3A67HVqHh6Fu/q6fUl+GRDEAND38X1gLe2IBdxc0z5/FKVRIhFbLnSVensWclzU1d/Z7wwOnnA+ZX96Gb2R7VicW+ruMqjOVGwp31i1OENmCNVQDXhQW/s3WnMbJCkeVx9JEsfYu5NcEUO+qUh+zuGVzsZzp2Oz55NS3knQhYv0lay4KMSYpE8saYH4XyV/hhUqxUuSsrI88cLnUpYeiQsXUTAW/aMkDE6vJkZHW97gAdDbeAe8TW8c6ZAiRNqi0YJJ8LeqiV7b4BklnzmRr4zZbGVfWZ3CO49yYrw0zIcav0OKu697Pqo23jBNqyZ8irexBAEAIIEvH/X6AO+AveVDqx8tyhTF36pu4E9W735lYW2LwzsNP0K/bzz44MtXAYFi1uFTvAMui61M2qAtYjzu/VV/sURerV5DyEmQFOpk7AWnF39h74fUScKF8KjNdtgXP0Q1iLYwtiCy+0DJY0jbQW8WKJu0JI0kO+Kr4Zxus+WrOZttxlNWpiwOpplybArtzoaSRkTRSsPOgLudh6PTEc+oBn3tMzxOs9Vx8Ix6jOVmh8dJPvQf+guqQQ/42/3QCpGmB/ZNfv/UujK3njp1QZlfjw4tanrKetgvnZu6sqy2nsXxrcnxmYmtyfFpq7b5samhj1Ct5W2qbWIHFpupRdHHcqrzOwWSCC+rTYunpDEau/iftefUPfxmkR/aNzh/6ScI7QeV9K9w8Egf30A16G3jiKWkA266bP7KkNfT38uFKnwO7a4puZOTJwqjjXuAzM/MOrqGaiC3uyqTlmRJyqTbTetxM2wzMsjXk2veBFuUornBYTWrzCrqnE+ltaCU1Afy6cQZezoi8RFV5GSeyw/GSuFQIOLmhviA5BLGlKHJsDXzmFlHq/jyYb7qhpUSWjMZ2vL1l8W0DWVnuiqhUv9V+7Us4RMcXJezN24vDPVw3ciV7XjppXzjocsVCHR2GFSPVXvYrKMP0a7lzYPaR+qn9yP2zqEyy/4ZZapivZQiZ+3jhpOnkd64T3styaDVBjcnai2epwHwb9EuBAEsFzIMq+lWwaMTIRKSJIskSRHPiZVehJCtp7/3xrwTY2RzcL3Xy+9ecDR/9fd8Fe023hMmBWFSQIG2E4c6xXIoVBYbHwMy75px9A+0CxwA1dxPM/TauyMHJjsHHF6XK1zyupYqUscJwuYMu75XabznHS3/iaKyJ3MpEb3f+DBYFcWKgJx7/4lXFQsTAT1mHU/iH0MXJCEHQLvZA3USTep040AH1uopxvK/oVknlpJkkpRbq5Ks84MuqSD3cbGR5Ny5eCXmSiyouq6fVT2l8GCOm+YrCSM+kMtHN36QVcWpAXmcVUvo75LCqsMiG5zfe2dpWj+d50b14SeSOVWr5v3ppyOxZ0bGr6YVZ96dEeTX1WGfN3bJ4GetfXAA6Ab+JnQBaIZGi4ZuaIRGcd3f3Xi+c9kYfeGmvYj+lrILe3eL1n3WrMPLcNm639JFC9U045V9TF/Y7mM4xc94FTDN5t0d9C6WgYMieh5Iq5tpwpJZJ1bgMkjAjQHIwKFvAwAFHP6DpRHzF+YG+in+jfXNRCENldH2cKP6GnHxs1cPvQr30O7BNxW/WX0K7Ta45n8zeB628bY1H90239fogMi6/SKeZxlvsI/xDvwPAAD//wEAAP//0o4DfwAAAAEAAAABGFFjb5w5Xw889QABA+gAAAAA2F2gzAAAAADdZi83/r3+3QgdA8kAAgADAAIAAAAAAAAAAQAAA9j+7wAACED+vf28CB0D6ADC/9EAAAAAAAAAAAAAACACdAAkAMgAAAD8ACMCGQAnAhgAHwGzACUCFwAnAeEAJQEaACsCEwABAgsAHwDtAB8B3AAfAPgALAMfAB8CDQAfAgMAJwIX//YBVgAfAZL//AFFADwCEAA4AsMARgHA/8ICRgAPAeAAGgDyABcA8gAXA78AUwFU/7gA7QAfAAAARwAAAC4ALgA8AHQArADaARIBTAF0AbwB5gHyAgwCLgJwApoCyAMCAyADXAOKA7YD8AQgBH4ElgSsBLgEyATYBOYE/AAAAAEAAAAgAIwADABmAAcAAQAAAAAAAAAAAAAAAAAEAAN4nJyU204bVxSGPwfbbXq6qFBEbtC+TKVkTKMQJeHKlKCMinDqcXqQqkqDPT6I8czIM5iSJ+h136Jvkas+Rp+i6nW1fy+DHUVBIAT8e/Y6/Gutf21gk//YoFa/C/zdnBuusd382fAdvmgeGd5gv/mZ4ToPG/8YbjBovDXc5EGja/gT3tX/NPwpT+q/Gb7LVv3Q8Oc8rm8a/nLD8a/hr3jCuwWuwTP+MFxji8LwHTb51fAG97CYtTr32DHc4Gu2DTfZBnpMqEiZkDHCMWTCiDNmJJREJMyYMCRhgCOkTUqlrxmxkGP0wa8xERUzYkUcU+FIiUiJKRlbxLfyynmtjEOdZnbXpmJMzIk8TonJcOSMyMlIOFWcioqCF7RoUdIX34KKkoCSCSkBOTNGtOhwyBE9xkwocRwqkmcWkTOk4pxY+Z1Z+M70ScgojdUZGQPxdOKXyDvkCEeHQrarkY/WIjzE8aO8Pbdctt8S6NetMFvPu2QTM1c/U3Ul1c25JjjWrc/b5gfhihe4W/Vnncn1PRrof6XIJ5xp/gNNKhOTDOe2aBNJQZG7j2Nf55BIHfmJkB6v6PCGns5tunRpc0yPkJfy7dDF8R0djjmQRyi8uDuUYo75Bcf3hLLxsRPrz2JiCb9TmLpLcZypjimFeu6ZB6o1UYU3n7DfoXxNHaV8+tojb+k0v0x7FjMyVRRiOFUvl9oorX8DU8RUtfjZXt37bZjb7i23+IJcO+zVuuDkJ7dgdN1Ug/c0c66fgJgBOSey6JMzpUXFhXi/JuaMFMeBuvdKW1LRvvTxeS6kkoSpGIRkijOj0N/YdBMZ9/6a7p29JQP5e6anl1XdJotTr65m9EbdW95F1uVkZQItm2q+oqa+uGam/UQ7tco/km+p1y3nEaHiLnb7Q6/ADs/ZZY+xsvR1M7+886+Et9hTB05JZDWUpn0NjwnYJeApu+zynKfv9XLJxhkft8ZnNX+bA/bpsHdtNQvbDvu8XIv28cx/ie2O6nE8ujw9u/U0H9xAtd9o367eza4m56cxt2hX23FMzNRzcVurNbn7BP8DAAD//wEAAP//cqFRQAAAAAMAAP/1AAD/zgAyAAAAAAAAAAAAAAAAAAAAAAAAAAA=");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-653127406 .fill-N1{fill:#0A0F25;}
+		.d2-653127406 .fill-N2{fill:#676C7E;}
+		.d2-653127406 .fill-N3{fill:#9499AB;}
+		.d2-653127406 .fill-N4{fill:#CFD2DD;}
+		.d2-653127406 .fill-N5{fill:#DEE1EB;}
+		.d2-653127406 .fill-N6{fill:#EEF1F8;}
+		.d2-653127406 .fill-N7{fill:#FFFFFF;}
+		.d2-653127406 .fill-B1{fill:#0D32B2;}
+		.d2-653127406 .fill-B2{fill:#0D32B2;}
+		.d2-653127406 .fill-B3{fill:#E3E9FD;}
+		.d2-653127406 .fill-B4{fill:#E3E9FD;}
+		.d2-653127406 .fill-B5{fill:#EDF0FD;}
+		.d2-653127406 .fill-B6{fill:#F7F8FE;}
+		.d2-653127406 .fill-AA2{fill:#4A6FF3;}
+		.d2-653127406 .fill-AA4{fill:#EDF0FD;}
+		.d2-653127406 .fill-AA5{fill:#F7F8FE;}
+		.d2-653127406 .fill-AB4{fill:#EDF0FD;}
+		.d2-653127406 .fill-AB5{fill:#F7F8FE;}
+		.d2-653127406 .stroke-N1{stroke:#0A0F25;}
+		.d2-653127406 .stroke-N2{stroke:#676C7E;}
+		.d2-653127406 .stroke-N3{stroke:#9499AB;}
+		.d2-653127406 .stroke-N4{stroke:#CFD2DD;}
+		.d2-653127406 .stroke-N5{stroke:#DEE1EB;}
+		.d2-653127406 .stroke-N6{stroke:#EEF1F8;}
+		.d2-653127406 .stroke-N7{stroke:#FFFFFF;}
+		.d2-653127406 .stroke-B1{stroke:#0D32B2;}
+		.d2-653127406 .stroke-B2{stroke:#0D32B2;}
+		.d2-653127406 .stroke-B3{stroke:#E3E9FD;}
+		.d2-653127406 .stroke-B4{stroke:#E3E9FD;}
+		.d2-653127406 .stroke-B5{stroke:#EDF0FD;}
+		.d2-653127406 .stroke-B6{stroke:#F7F8FE;}
+		.d2-653127406 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-653127406 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-653127406 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-653127406 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-653127406 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-653127406 .background-color-N1{background-color:#0A0F25;}
+		.d2-653127406 .background-color-N2{background-color:#676C7E;}
+		.d2-653127406 .background-color-N3{background-color:#9499AB;}
+		.d2-653127406 .background-color-N4{background-color:#CFD2DD;}
+		.d2-653127406 .background-color-N5{background-color:#DEE1EB;}
+		.d2-653127406 .background-color-N6{background-color:#EEF1F8;}
+		.d2-653127406 .background-color-N7{background-color:#FFFFFF;}
+		.d2-653127406 .background-color-B1{background-color:#0D32B2;}
+		.d2-653127406 .background-color-B2{background-color:#0D32B2;}
+		.d2-653127406 .background-color-B3{background-color:#E3E9FD;}
+		.d2-653127406 .background-color-B4{background-color:#E3E9FD;}
+		.d2-653127406 .background-color-B5{background-color:#EDF0FD;}
+		.d2-653127406 .background-color-B6{background-color:#F7F8FE;}
+		.d2-653127406 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-653127406 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-653127406 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-653127406 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-653127406 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-653127406 .color-N1{color:#0A0F25;}
+		.d2-653127406 .color-N2{color:#676C7E;}
+		.d2-653127406 .color-N3{color:#9499AB;}
+		.d2-653127406 .color-N4{color:#CFD2DD;}
+		.d2-653127406 .color-N5{color:#DEE1EB;}
+		.d2-653127406 .color-N6{color:#EEF1F8;}
+		.d2-653127406 .color-N7{color:#FFFFFF;}
+		.d2-653127406 .color-B1{color:#0D32B2;}
+		.d2-653127406 .color-B2{color:#0D32B2;}
+		.d2-653127406 .color-B3{color:#E3E9FD;}
+		.d2-653127406 .color-B4{color:#E3E9FD;}
+		.d2-653127406 .color-B5{color:#EDF0FD;}
+		.d2-653127406 .color-B6{color:#F7F8FE;}
+		.d2-653127406 .color-AA2{color:#4A6FF3;}
+		.d2-653127406 .color-AA4{color:#EDF0FD;}
+		.d2-653127406 .color-AA5{color:#F7F8FE;}
+		.d2-653127406 .color-AB4{color:#EDF0FD;}
+		.d2-653127406 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-653127406);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-653127406);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-653127406);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-653127406);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-653127406);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-653127406);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-653127406);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-653127406);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><a href="https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm" xlink:href="https://www.actualfreedom.com.au/richard/audiotapeddialogues/sillyorsensible.htm"><g class="cm9vdA=="><g class="shape" ><rect x="84.000000" y="0.000000" width="153.000000" height="66.000000" stroke="#0D32B2" fill="#fef9c3" class=" stroke-B1" style="stroke-width:2;" /></g><text x="160.500000" y="38.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">where I started</text></g></a><g class="YjE="><g class="shape" ><rect x="30.000000" y="187.000000" width="127.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="93.500000" y="225.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">side branch</text></g><g class="YjI="><g class="shape" ><rect x="0.000000" y="374.000000" width="187.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="93.500000" y="412.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">another side branch</text></g><g class="YjM="><g class="shape" ><rect x="88.000000" y="561.000000" width="145.000000" height="66.000000" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="160.500000" y="599.500000" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">and another …</text></g><g class="KHJvb3QgLSZndDsgYjEpWzBd"><marker id="mk-d2-653127406-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 135.347686 67.134678 C 102.099998 114.300003 93.500000 138.699997 93.500000 183.500000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-653127406-3488378134)" mask="url(#d2-653127406)" /><text x="99.500000" y="127.000000" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">meander</text></g><g class="KGIxIC0mZ3Q7IGIyKVswXQ=="><path d="M 93.500000 254.500000 C 93.500000 301.299988 93.500000 325.700012 93.500000 370.500000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-653127406-3488378134)" mask="url(#d2-653127406)" /><text x="93.500000" y="319.000000" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">meander</text></g><g class="KGIyIC0mZ3Q7IGIzKVswXQ=="><path d="M 93.500000 441.500000 C 93.500000 488.299988 102.099998 512.700012 134.195371 558.230644" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-653127406-3488378134)" mask="url(#d2-653127406)" /><text x="99.500000" y="511.000000" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">meander</text></g><g class="KGIzIC0mZ3Q7IHJvb3QpWzBd"><marker id="mk-d2-653127406-3054584388" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="#16a34a" class="connection" stroke-width="2" /> </marker><path d="M 185.152314 559.865322 C 218.399994 512.700012 227.000000 481.799988 227.000000 453.750000 C 227.000000 425.700012 227.000000 388.299988 227.000000 360.250000 C 227.000000 332.200012 227.000000 294.799988 227.000000 266.750000 C 227.000000 238.699997 218.399994 114.300003 186.304628 68.769356" stroke="#16a34a" fill="none" class="connection" style="stroke-width:2;" marker-end="url(#mk-d2-653127406-3054584388)" mask="url(#d2-653127406)" /><text x="227.000000" y="319.000000" fill="#676C7E" class="text-bold fill-N2" style="text-anchor:middle;font-size:16px">notice &amp; snap back</text></g><g transform="translate(221 -16)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111-d2-653127406-OJXW65A)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-653127406-OJXW65A">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><mask id="d2-653127406" maskUnits="userSpaceOnUse" x="-1" y="-18" width="294" height="646">
+<rect x="-1" y="-18" width="294" height="646" fill="white"></rect>
+<rect x="104.500000" y="22.500000" width="112" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="50.500000" y="209.500000" width="86" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="20.500000" y="396.500000" width="146" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="108.500000" y="583.500000" width="104" height="21" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="67.000000" y="111.000000" width="65" height="21" fill="black"></rect>
+<rect x="61.000000" y="303.000000" width="65" height="21" fill="black"></rect>
+<rect x="67.000000" y="495.000000" width="65" height="21" fill="black"></rect>
+<rect x="159.000000" y="303.000000" width="136" height="21" fill="black"></rect>
+</mask></svg></svg>
+</rawhtml>
+    <h2 id='cetz-demo' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  cetz demo
+  
+  <a href='diagrams.html#cetz-demo' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      CeTZ shines on figures whose meaning is geometric, not flow-shaped. The temporal contrast Richard draws in <a href='https://www.actualfreedom.com.au/richard/audiotapeddialogues/thismomenthasnoduration.htm' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>“This moment has no duration”</a> — <em>time had a periodicity</em> versus <em>the cutting edge</em> where <em>this moment has no duration</em> — is itself a geometric distinction (discrete tick marks vs. an infinitesimally thin line) that cetz can render directly:
+    </p>
+  
+    <p class='mb-4 leading-relaxed'>
+      <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>canvas</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>draw</code> are pre-imported by Emanote’s wrapper, so the author writes the figure directly without typing or remembering the cetz version:
+    </p>
+  <rawhtml xmlhtmlRaw style='display: contents'><svg class="typst-doc" viewBox="0 0 370.85946496062996 121.30445177165355" width="370.85946496062996pt" height="121.30445177165355pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:h5="http://www.w3.org/1999/xhtml">
+    <path class="typst-shape" fill="#ffffff" fill-rule="nonzero" d="M 0 0 L 0 121.30445 L 370.85947 121.30445 L 370.85947 0 Z "/>
+    <g>
+        <g transform="translate(14.173228346456693 14.173228346456693)">
+            <g class="typst-group">
+                <g>
+                    <g transform="translate(0 47.37618503937008)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="1.2" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 0 L 158.74016 0 "/>
+                    </g>
+                    <g transform="translate(11.338582677165364 37.4549251968504)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 19.84252 L 0 0 "/>
+                    </g>
+                    <g transform="translate(45.35433070866143 37.4549251968504)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 19.84252 L 0 0 "/>
+                    </g>
+                    <g transform="translate(79.37007874015748 37.4549251968504)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 19.84252 L 0 0 "/>
+                    </g>
+                    <g transform="translate(113.38582677165354 37.4549251968504)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 19.84252 L 0 0 "/>
+                    </g>
+                    <g transform="translate(147.4015748031496 37.4549251968504)">
+                        <path class="typst-shape" fill="none" stroke="#aaaaaa" stroke-width="2.5" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 19.84252 L 0 0 "/>
+                    </g>
+                    <g transform="translate(36.20112874015748 71.35179173228347)">
+                        <path class="typst-shape" fill="none" d="M 0 0 L 86.3379 0 L 86.3379 8.7417 L 0 8.7417 L 0 0 Z "/>
+                    </g>
+                    <g transform="translate(36.20112874015748 71.35179173228347)">
+                        <g class="typst-group">
+                            <g>
+                                <g transform="translate(0 0)">
+                                    <g class="typst-group">
+                                        <g>
+                                            <g transform="translate(0 6.3854999999999995)">
+                                                <g class="typst-text" transform="scale(1, -1)">
+                                                    <use xlink:href="#g9C8AF6126446A7F4B07FE26FDE567552" x="0" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB3649E79A8FB56C2D30DD5C9040D0EC0" x="3.0393" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g71FF2218FD9F4F1450156E21D0D810E5" x="5.7717" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g9F3E73962ED0DE0AF026F9AE27EF6EDB" x="13.5234" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gA516BFAF795B6BD66446E88D588A40B" x="19.968300000000003" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB9A13869F3DD68D79D4E1B820DF59BD8" x="25.1064" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g102E066FE2D2C8ABCCC0FB7158D3DD28" x="29.9178" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB9A13869F3DD68D79D4E1B820DF59BD8" x="37.2339" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gAEE10465B3F585218D9B0B7A294F760B" x="44.5203" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g9F3E73962ED0DE0AF026F9AE27EF6EDB" x="49.4307" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g3A3AE73812CAE3E06D3932E40DDC64BD" x="53.400600000000004" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB3649E79A8FB56C2D30DD5C9040D0EC0" x="56.934900000000006" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gAA294B09BD5F418E067B77546E0EC79B" x="59.667300000000004" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g102E066FE2D2C8ABCCC0FB7158D3DD28" x="64.1619" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB3649E79A8FB56C2D30DD5C9040D0EC0" x="69.003" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g906EB18B0DD4F032C3870FF94038BC3F" x="71.7354" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB3649E79A8FB56C2D30DD5C9040D0EC0" x="75.5865" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g9C8AF6126446A7F4B07FE26FDE567552" x="78.3189" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gBEF421B2B3AFDD76520106CF5ED40A98" x="81.3582" fill="#aaaaaa" fill-rule="nonzero"/>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g transform="translate(286.86614173228344 19.029728346456693)">
+                        <path class="typst-shape" fill="#1d4ed8" fill-rule="nonzero" stroke="#1d4ed8" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" d="M 0 0 L 0 56.692913 L 4.5354333 56.692913 L 4.5354333 0 L 0 0 Z "/>
+                    </g>
+                    <g transform="translate(250.38085826771655 0)">
+                        <path class="typst-shape" fill="none" d="M 0 0 L 77.506 0 L 77.506 9.713 L 0 9.713 L 0 0 Z "/>
+                    </g>
+                    <g transform="translate(250.38085818897636 -0.00000006299212582521214)">
+                        <g class="typst-group">
+                            <g>
+                                <g transform="translate(0 0)">
+                                    <g class="typst-group">
+                                        <g>
+                                            <g transform="translate(0 7.095000000000001)">
+                                                <g class="typst-text" transform="scale(1, -1)">
+                                                    <use xlink:href="#g2E78A67D478F24798CD34195AEAC1391" x="0" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g28C1E49C13DD488DF058E155FD637EB9" x="4.037" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gCA80794F15A5A66506E52A4E3B40CD4C" x="10.857" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g4A024CF29EB0538780170AAC83816647" x="18.105999999999998" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g35117FAA8192CE7A23480D79C1D49130" x="22.88" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g2E78A67D478F24798CD34195AEAC1391" x="29.985999999999997" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g2E78A67D478F24798CD34195AEAC1391" x="34.022999999999996" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gDA4814782596FF263A5AE50E0F75E1F0" x="38.059999999999995" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gF6F2891311C5E5A887306487B5EE668C" x="41.821999999999996" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gF70F791F0A1BC46EBA796D5354822AF4" x="48.57599999999999" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gCA80794F15A5A66506E52A4E3B40CD4C" x="56.79299999999999" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gF6F0F798940352C819EADEFB8F11A76B" x="61.36899999999999" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gF70F791F0A1BC46EBA796D5354822AF4" x="67.53999999999999" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gCA80794F15A5A66506E52A4E3B40CD4C" x="73.00699999999999" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                    <g transform="translate(235.75470826771652 86.83374507874015)">
+                        <path class="typst-shape" fill="none" d="M 0 0 L 106.7583 0 L 106.7583 6.12425 L 0 6.12425 L 0 0 Z "/>
+                    </g>
+                    <g transform="translate(235.75470817322835 86.8337449448819)">
+                        <g class="typst-group">
+                            <g>
+                                <g transform="translate(0 0)">
+                                    <g class="typst-group">
+                                        <g>
+                                            <g transform="translate(0 6.03075)">
+                                                <g class="typst-text" transform="scale(1, -1)">
+                                                    <use xlink:href="#g28B916B4DCE138804B13A80E1D8973EC" x="0" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gFF6EA9B59699C6925687CC431A83A13A" x="2.87045" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB577CDE6AE37EB0C1B7A4A32221BABCE" x="7.7231000000000005" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g24D4943E9A4F28CE4D8437BBF6D53752" x="10.303700000000001" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB78D0CB58E92B6A1E06DCB483B5465A4" x="15.94175" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g3E0F1EB37EB6C1E02626B98E275BF970" x="23.262800000000002" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB78D0CB58E92B6A1E06DCB483B5465A4" x="27.44225" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g5761E6DC92E7BFFE0A42DA6480F9D269" x="34.7633" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g7198C3B4B0F84607930A3BAA1CB38DD8" x="38.51265" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g28B916B4DCE138804B13A80E1D8973EC" x="43.35595" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gFF6EA9B59699C6925687CC431A83A13A" x="48.5639" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gC3B5BFDD889DEE225932F95E3F035AF6" x="53.41655" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g24D4943E9A4F28CE4D8437BBF6D53752" x="57.96065" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g7198C3B4B0F84607930A3BAA1CB38DD8" x="63.5987" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g3E0F1EB37EB6C1E02626B98E275BF970" x="68.44200000000001" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g7F1D4CEC8DFCD4FED7D771A87664CC1B" x="74.95895000000002" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g61448B1092E257665A2D667064A6E53C" x="79.53110000000001" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g84192E941279BC9B63B022CE88CE2494" x="84.40245000000002" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gC3B5BFDD889DEE225932F95E3F035AF6" x="87.74040000000002" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g28B916B4DCE138804B13A80E1D8973EC" x="92.28450000000002" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#gB577CDE6AE37EB0C1B7A4A32221BABCE" x="95.15495000000003" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g3E0F1EB37EB6C1E02626B98E275BF970" x="97.73555000000003" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                    <use xlink:href="#g7198C3B4B0F84607930A3BAA1CB38DD8" x="101.91500000000003" fill="#1d4ed8" fill-rule="nonzero"/>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+    <defs id="glyph">
+        <symbol id="g9C8AF6126446A7F4B07FE26FDE567552" overflow="visible">
+            <path d="M 1.8414 4.2471 L 1.3167 4.2174 C 1.1286 4.2075 1.0593 4.1283 1.0395 4.0491 C 1.0296 4.0194 0.9999 3.9006 0.9999 3.8808 C 0.9999 3.861 1.0296 3.861 1.0593 3.861 L 1.7523 3.861 L 1.1484 1.1682 C 1.0791 0.8514 1.0098 0.5445 1.0098 0.3564 C 1.0098 0 1.188 -0.099 1.4949 -0.099 C 1.9404 -0.099 2.5938 0.3069 2.9304 0.9207 C 2.9007 1.0494 2.8314 1.1087999 2.7126 1.1087999 C 2.2572 0.594 2.079 0.495 1.9205999 0.495 C 1.8909 0.495 1.7919 0.5148 1.7919 0.6336 C 1.7919 0.7227 1.8216 0.9207 1.9008 1.2573 L 2.4849 3.861 L 3.4551 3.861 C 3.5739 3.9105 3.6629999 4.1679 3.5541 4.2471 L 2.574 4.2471 L 2.673 4.6926 C 2.7126 4.8807 2.8016999 5.1678 2.8016999 5.2866 C 2.8016999 5.4549 2.7225 5.5539 2.4057 5.5539 C 2.0493 5.5539 2.0691 5.1084 1.9701 4.7421 Z "/>
+        </symbol>
+        <symbol id="gB3649E79A8FB56C2D30DD5C9040D0EC0" overflow="visible">
+            <path d="M 2.4255 3.168 C 2.5146 3.5541 2.6334 3.9402 2.6334 4.1085 C 2.6334 4.2471 2.5542 4.3164 2.4255 4.3164 C 2.1087 4.3164 1.6632 4.2471 1.1978999 4.1877 C 1.1286 4.1085 1.1484 3.9996 1.2078 3.9105 L 1.6037999 3.8808 C 1.7226 3.8709 1.782 3.7818 1.782 3.6828 C 1.782 3.5937 1.7622 3.4551 1.6929 3.1779 L 1.2276 1.1385 C 1.1583 0.8217 1.0593 0.4158 1.0593 0.2277 C 1.0593 0.0396 1.1682 -0.099 1.4652 -0.099 C 1.9404 -0.099 2.3859 0.2376 2.8413 0.8217 C 2.8116 0.9108 2.7522 0.99 2.6136 0.99 C 2.3562 0.693 2.0691 0.495 1.9701 0.495 C 1.9008 0.495 1.8711 0.5445 1.8711 0.6633 C 1.8711 0.7524 1.9205999 0.9702 1.98 1.2276 Z M 1.9899 5.643 C 1.9899 5.3856 2.2077 5.1678 2.4651 5.1678 C 2.7225 5.1678 2.9403 5.3856 2.9403 5.643 C 2.9403 5.9004 2.7225 6.1182 2.4651 6.1182 C 2.2077 6.1182 1.9899 5.9004 1.9899 5.643 Z "/>
+        </symbol>
+        <symbol id="g71FF2218FD9F4F1450156E21D0D810E5" overflow="visible">
+            <path d="M 1.8018 3.1779 L 1.2375 0.7128 C 1.188 0.5148 1.1087999 0.2673 1.1087999 0.1683 C 1.1087999 0.0099 1.1978999 -0.099 1.5146999 -0.099 C 1.8909 -0.099 1.8711 0.3366 1.9701 0.7128 L 2.3661 2.3067 C 3.1383 3.4254 3.6927 3.7521 4.0095 3.7521 C 4.2075 3.7521 4.2669 3.6828 4.2669 3.3858 C 4.2669 3.267 4.257 3.0293999 4.1877 2.7225 L 3.7125 0.7128 C 3.6629999 0.5148 3.5838 0.2673 3.5838 0.1683 C 3.5838 0.0099 3.6729 -0.099 3.9897 -0.099 C 4.3659 -0.099 4.356 0.3366 4.4451 0.7128 L 4.8213 2.2671 C 5.6628 3.4452 6.0489 3.7521 6.3657 3.7521 C 6.5538 3.7521 6.6528 3.6828 6.6528 3.3858 C 6.6528 3.2769 6.6429 2.9898 6.5637 2.6829 L 6.1776 1.1286 C 6.0786 0.7227 5.9994 0.3168 5.9994 0.2277 C 5.9994 0.0297 6.1776 -0.099 6.3162 -0.099 C 6.9003 -0.099 7.4448 0.1881 7.7813997 0.9999 C 7.7616 1.089 7.6923 1.1385 7.5636 1.1385 C 7.3259997 0.7623 7.0488 0.495 6.8705997 0.495 C 6.8210998 0.495 6.8013 0.55439997 6.8013 0.6039 C 6.8013 0.6435 6.8210998 0.891 6.8508 0.9999 L 7.3161 2.7621 C 7.3754997 2.9898 7.4151 3.2967 7.4151 3.4847999 C 7.4151 4.1085 7.1181 4.3461 6.8112 4.3461 C 6.1082997 4.3461 5.5638 3.7422 4.9896 3.0195 C 5.0193 3.1779 5.0292 3.3561 5.0292 3.4847999 C 5.0292 4.1778 4.7322 4.3461 4.455 4.3461 C 3.7422 4.3461 3.0987 3.8214 2.5146 3.069 L 2.4948 3.0789 L 2.5146 3.168 C 2.6136 3.5541 2.7423 3.9402 2.7423 4.1085 C 2.7423 4.2471 2.6631 4.3164 2.5344 4.3164 C 2.2175999 4.3164 1.7721 4.2471 1.3068 4.1877 C 1.2375 4.1085 1.2573 3.9996 1.3167 3.9105 L 1.7127 3.8808 C 1.8314999 3.8709 1.8909 3.7818 1.8909 3.6828 C 1.8909 3.5937 1.8612 3.4551 1.8018 3.1779 Z "/>
+        </symbol>
+        <symbol id="g9F3E73962ED0DE0AF026F9AE27EF6EDB" overflow="visible">
+            <path d="M 1.6533 1.9701 C 4.1976 2.4651 4.1976 3.2175 4.1976 3.5937 C 4.1976 3.6036 4.1976 3.6036 4.1976 3.6134999 C 4.1976 3.861 3.9699 4.3461 3.2570999 4.3461 C 1.5345 4.3461 0.8217 2.6631 0.8217 1.4058 C 0.8217 0.5643 1.2177 -0.099 2.0394 -0.099 C 2.7027 -0.099 3.3066 0.2475 3.8906999 0.9999 C 3.8411999 1.1087999 3.7818 1.1583 3.6629999 1.1583 C 3.0987 0.5841 2.871 0.495 2.3957999 0.495 C 1.9503 0.495 1.6434 0.7326 1.6434 1.6335 C 1.6434 1.683 1.6434 1.8909 1.6533 1.9701 Z M 3.5145 3.6629999 C 3.5145 2.772 2.475 2.4453 1.7226 2.3463 C 2.0691 3.7521 2.6136 4.0392 3.0293999 4.0392 C 3.3858 4.0392 3.5145 3.9501 3.5145 3.6629999 Z "/>
+        </symbol>
+        <symbol id="gA516BFAF795B6BD66446E88D588A40B" overflow="visible">
+            <path d="M 1.7423999 0.7128 L 2.1186 2.3562 C 2.7423 3.168 3.3858 3.7521 3.7422 3.7521 C 3.9501 3.7521 4.0887 3.6927 4.0887 3.3858 C 4.0887 3.2472 4.0689 3.0591 3.9897 2.7225 L 3.6134999 1.1385 C 3.5343 0.8217 3.4452 0.4158 3.4452 0.2277 C 3.4452 0.0396 3.5541 -0.099 3.8511 -0.099 C 4.3263 -0.099 4.7718 0.2376 5.2272 0.8217 C 5.1974998 0.9108 5.1381 0.99 4.9995 0.99 C 4.7421 0.693 4.455 0.495 4.356 0.495 C 4.2867 0.495 4.257 0.5445 4.257 0.6633 C 4.257 0.7524 4.3065 0.9702 4.3659 1.2276 L 4.7421 2.8016999 C 4.8213 3.1482 4.8708 3.3759 4.8708 3.5541 C 4.8708 4.1481 4.6035 4.3461 4.2174 4.3461 C 3.7026 4.3461 3.1878 4.1382 2.277 3.0888 L 2.8809 5.7717 C 3.0293999 6.4151998 3.1284 6.8112 3.1284 6.8112 C 3.1284 6.8805 3.0987 6.9102 3.0096 6.9102 C 2.7423 6.8112 2.0295 6.6825 1.6236 6.6528 L 1.5939 6.4151998 C 1.5939 6.3855 1.6037999 6.3657 1.6434 6.3657 L 1.9503 6.3459 C 2.079 6.3459 2.1582 6.2865 2.1582 6.0687 C 2.1582 5.9598 2.1384 5.7915 2.0889 5.5737 L 1.0098 0.7128 C 0.96029997 0.5148 0.8811 0.2673 0.8811 0.1683 C 0.8811 0.0099 0.9702 -0.099 1.287 -0.099 C 1.6632 -0.099 1.6533 0.3366 1.7423999 0.7128 Z "/>
+        </symbol>
+        <symbol id="gB9A13869F3DD68D79D4E1B820DF59BD8" overflow="visible">
+            <path d="M 4.059 4.2867 C 3.7917 4.3164 3.6629999 4.3461 3.267 4.3461 C 2.2077 4.3461 0.7722 2.7918 0.7722 1.2375 C 0.7722 0.6831 0.9009 -0.099 1.7325 -0.099 C 2.2572 -0.099 2.8116 0.4455 3.4056 1.3266 L 3.4254 1.3068 L 3.2967 0.891 C 3.2274 0.6633 3.1977 0.4653 3.1977 0.3465 C 3.1977 0.1584 3.267 -0.099 3.6036 -0.099 C 4.2174 -0.099 4.6134 0.297 4.8708 0.8613 C 4.8213 0.9504 4.7718 1.0197 4.6431 1.0197 C 4.3758 0.6534 4.1877 0.495 4.0887 0.495 C 4.059 0.495 3.9699 0.5148 3.9699 0.6336 C 3.9699 0.7227 4.0293 0.9999 4.0689 1.188 L 4.752 4.2669 C 4.6827 4.2669 4.6233 4.2669 4.554 4.2669 C 4.3758 4.257 4.2075 4.2471 4.059 4.2867 Z M 3.564 2.1680999 C 3.0789 1.2771 2.3166 0.4455 1.9998 0.4455 C 1.6632 0.4455 1.5642 0.8415 1.5642 1.3959 C 1.5642 2.4453 2.3859 4.0392 3.2967 4.0392 C 3.5046 4.0392 3.7224 3.9699 3.9105 3.8511 C 3.9105 3.8511 3.8115 2.8016999 3.564 2.1680999 Z "/>
+        </symbol>
+        <symbol id="g102E066FE2D2C8ABCCC0FB7158D3DD28" overflow="visible">
+            <path d="M 3.4155 1.1484 L 3.3462 0.891 C 3.2868 0.6534 3.2472 0.4653 3.2472 0.3465 C 3.2472 0.1584 3.3165 -0.099 3.6531 -0.099 C 4.2669 -0.099 4.6629 0.297 4.9203 0.8613 C 4.8708 0.9504 4.8213 1.0197 4.6926 1.0197 C 4.4253 0.6534 4.2372 0.495 4.1382 0.495 C 4.1085 0.495 4.0194 0.5148 4.0194 0.6336 C 4.0194 0.7227 4.0788 0.9999 4.1184 1.188 L 5.1678 5.7717 C 5.3163 6.4151998 5.4153 6.8112 5.4153 6.8112 C 5.4153 6.8805 5.3856 6.9102 5.2965 6.9102 C 5.0292 6.8112 4.3164 6.6825 3.9105 6.6528 L 3.8808 6.4151998 C 3.8808 6.3855 3.8906999 6.3657 3.9303 6.3657 L 4.2372 6.3459 C 4.3659 6.3459 4.4451 6.2865 4.4451 6.0687 C 4.4451 5.9598 4.4253 5.7915 4.3758 5.5737 L 4.0095 3.8016 L 3.9996 3.8016 C 3.8808 4.0986 3.5937 4.3461 3.2175 4.3461 C 2.1582 4.3461 0.80189997 2.8809 0.80189997 1.3266 C 0.80189997 0.7821 0.9405 -0.099 1.8117 -0.099 C 2.3265 -0.099 2.7918 0.297 3.3858 1.1682 Z M 3.4155 1.9205999 C 2.9304 1.0296 2.3661 0.3564 1.98 0.3564 C 1.6632 0.3564 1.5939 0.9306 1.5939 1.485 C 1.5939 2.5344 2.3364 3.9897 3.2472 3.9897 C 3.6234 3.9897 3.8709 3.4749 3.8709 3.1284 C 3.8709 2.9007 3.7026 2.4453 3.4155 1.9205999 Z "/>
+        </symbol>
+        <symbol id="gAEE10465B3F585218D9B0B7A294F760B" overflow="visible">
+            <path d="M 2.6334 3.9996 C 2.673 4.1778 2.7621 4.4748 2.7621 4.5936 C 2.7621 4.7619 2.6631 4.8609 2.3463 4.8609 C 1.9701 4.8609 1.9701 4.4253 1.8909 4.0491 L 1.7622 3.465 C 1.2672 3.1086 0.9009 2.8116 0.6237 2.4651 C 0.6633 2.3265 0.7524 2.2572 0.9306 2.2572 C 1.1484 2.5443 1.3662 2.7225 1.6434 2.9502 L 0.6237 -1.5939 C 0.5643 -1.8711 0.4158 -1.9899 0.099 -2.0394 L -0.0891 -2.0691 C -0.13859999 -2.079 -0.1881 -2.0889 -0.1881 -2.1483 L -0.1881 -2.3364 L -0.1683 -2.3562 C -0.1683 -2.3562 0.5049 -2.3067 0.8613 -2.3067 C 1.2474 -2.3067 1.9205999 -2.3265 1.9205999 -2.3265 L 1.9404 -2.3067 L 1.9404 -2.1087 C 1.9404 -2.0592 1.9205999 -2.0394 1.881 -2.0295 L 1.6929 -1.9998 C 1.5444 -1.98 1.287 -1.9305 1.3662 -1.5939 L 1.8018 0.2277 C 1.9503 0.069299996 2.2374 -0.099 2.5245 -0.099 C 3.2274 -0.099 3.8016 0.297 4.2372 0.8217 C 4.7718 1.4751 5.0391 2.1483 5.0391 2.8611 C 5.0391 3.6927 4.7619 4.3461 3.7719 4.3461 C 3.267 4.3461 2.9007 4.158 2.6334 3.9996 Z M 4.2273 2.7027 C 4.2273 2.2275 4.0293 1.5345 3.6531 0.96029997 C 3.3957 0.5445 2.9997 0.2475 2.6234999 0.2475 C 2.3661 0.2475 2.0988 0.3762 1.8909 0.6633 L 2.5443 3.5541 C 2.7918 3.7125 3.0789 3.8906999 3.4551 3.8906999 C 4.1283 3.8906999 4.2273 3.1878 4.2273 2.7027 Z "/>
+        </symbol>
+        <symbol id="g3A3AE73812CAE3E06D3932E40DDC64BD" overflow="visible">
+            <path d="M 2.1879 2.8215 L 2.2671 3.168 C 2.3562 3.5541 2.4453 3.9006 2.4453 4.0689 C 2.4453 4.2174 2.3562 4.3164 2.2275 4.3164 C 1.9107 4.3164 1.5048 4.2471 1.0395 4.1877 C 0.9702 4.1085 0.99 3.9996 1.0494 3.9105 L 1.4454 3.8808 C 1.5642 3.8709 1.6236 3.7818 1.6236 3.6828 C 1.6236 3.5937 1.6236 3.4551 1.5543 3.1779 L 1.0098 0.7128 C 0.96029997 0.5049 0.8811 0.3267 0.8811 0.1683 C 0.8811 0.0099 0.9702 -0.099 1.2573 -0.099 C 1.6037999 -0.099 1.6137 0.3267 1.7127 0.7128 L 1.9998 1.8711 C 2.475 2.7324 3.0293999 3.6531 3.2570999 3.6531 C 3.3561 3.6531 3.4056 3.6036 3.465 3.5343 C 3.5343 3.4551 3.6629999 3.3264 3.8016 3.3264 C 4.0689 3.3264 4.2471 3.6134999 4.2471 3.8808 C 4.2471 4.0887 4.0986 4.3461 3.7323 4.3461 C 3.2373 4.3461 2.6631 3.7323 2.2275 2.8116 Z "/>
+        </symbol>
+        <symbol id="gAA294B09BD5F418E067B77546E0EC79B" overflow="visible">
+            <path d="M 0.7722 1.6037999 C 0.7722 1.0791 0.9009 -0.099 2.1582 -0.099 C 2.475 -0.099 2.7819 -0.0594 3.069 0.0891 C 3.9303 0.5247 4.6035 1.5741 4.6035 2.7423 C 4.6035 3.4551 4.4253 4.3461 3.2075999 4.3461 C 1.5543 4.3461 0.7722 2.7918 0.7722 1.6037999 Z M 1.5939 1.683 C 1.5939 2.574 1.98 4.0194 3.0293999 4.0194 C 3.3264 4.0194 3.4847999 3.861 3.6333 3.5838 C 3.7521 3.3363 3.7818 2.97 3.7818 2.673 C 3.7818 2.277 3.7224 1.4256 3.3561 0.87119997 C 3.0789 0.4455 2.6829 0.2673 2.3067 0.2673 C 2.0196 0.2673 1.5939 0.6435 1.5939 1.683 Z "/>
+        </symbol>
+        <symbol id="g906EB18B0DD4F032C3870FF94038BC3F" overflow="visible">
+            <path d="M 2.0691 -0.099 C 2.7819 -0.099 3.4254 0.4158 3.9006 1.0791 C 3.8709 1.1781 3.7719 1.2474 3.6828 1.2474 C 3.2967 0.8118 2.9007 0.4851 2.376 0.4851 C 2.2077 0.4851 2.0196 0.5247 1.881 0.7128 C 1.7325 0.9009 1.6335 1.0989 1.6335 1.6929 C 1.6335 3.168 2.3265 4.0392 3.0888 4.0392 C 3.2274 4.0392 3.5046 3.9897 3.5046 3.6629999 C 3.5046 3.6036 3.4847999 3.5244 3.4551 3.4749 C 3.4254 3.4352999 3.4056 3.3264 3.4056 3.267 C 3.4056 3.1086 3.5046 2.9502 3.6729 2.9502 C 3.9402 2.9502 4.1877 3.1482 4.1877 3.3957 C 4.1877 3.7818 4.158 4.3461 3.0789 4.3461 C 2.6829 4.3461 2.0493 4.0887 1.6335 3.6531 C 1.1484 3.1284 0.8217 2.3661 0.8217 1.4751 C 0.8217 1.1484 0.891 0.7029 1.1187 0.3762 C 1.3266 0.0891 1.6632 -0.099 2.0691 -0.099 Z "/>
+        </symbol>
+        <symbol id="gBEF421B2B3AFDD76520106CF5ED40A98" overflow="visible">
+            <path d="M 3.4947 0 C 3.6828 0.3168 4.8906 2.1680999 5.1678 2.8215 C 5.3163 3.168 5.4351 3.5244 5.4351 3.8808 C 5.4351 4.158 5.3064 4.3461 4.9203 4.3461 C 4.6332 4.3461 4.4649 4.2174 4.4649 3.9798 C 4.4649 3.9204 4.4847 3.8214 4.5144 3.7818 C 4.6629 3.5541 4.7223 3.3462 4.7223 3.1878 C 4.7223 2.7522 4.3164 2.0097 3.9798 1.4751 C 3.9798 1.4751 3.465 0.6435 3.2175 0.27719998 L 3.1482 0.3069 C 3.0888 1.4553 3.0195 2.3859 2.7225 3.6134999 C 2.5839 4.1382 2.4552 4.3461 2.2077 4.3461 C 1.98 4.3461 1.2474 3.9402 0.9009 3.6828 C 0.9108 3.5739 0.9504 3.4551 1.0296 3.3759 C 1.1484 3.4352999 1.4751 3.5937 1.683 3.5937 C 1.8117 3.5937 1.9107 3.564 1.9602 3.4749 C 1.9998 3.3957 2.0592 3.2373 2.1087 3.0591 C 2.4156 2.0493 2.7126 -0.3564 2.5938 -0.6138 C 2.1879 -1.2771 1.7721 -1.7127 1.6335 -1.7127 C 1.5345 -1.7127 1.3464 -1.584 1.287 -1.5345 C 1.2177 -1.4751 1.0197 -1.3959 0.9405 -1.3959 C 0.7326 -1.3959 0.4851 -1.5939 0.4851 -1.9008 C 0.4851 -2.2275 0.9207 -2.3166 1.089 -2.3166 C 1.6137 -2.3166 2.4057 -1.6731 3.0393 -0.693 Z "/>
+        </symbol>
+        <symbol id="g2E78A67D478F24798CD34195AEAC1391" overflow="visible">
+            <path d="M 1.298 1.298 C 1.243 1.045 1.188 0.748 1.188 0.517 C 1.188 0.143 1.353 -0.11 1.749 -0.11 C 2.519 -0.11 3.245 0.32999998 3.795 0.935 C 3.762 1.034 3.6299999 1.243 3.476 1.243 C 3.19 0.913 2.816 0.726 2.706 0.726 C 2.618 0.726 2.585 0.814 2.585 0.924 C 2.585 1.067 2.629 1.243 2.662 1.397 L 3.322 4.202 L 4.4 4.202 C 4.532 4.257 4.642 4.631 4.521 4.719 L 3.432 4.719 L 3.542 5.2139997 C 3.586 5.412 3.762 6.072 3.762 6.204 C 3.762 6.391 3.047 6.259 2.706 6.171 C 2.321 6.072 2.332 5.687 2.222 5.269 L 2.079 4.719 L 1.496 4.686 C 1.287 4.675 1.21 4.587 1.188 4.499 C 1.177 4.466 1.133 4.246 1.133 4.224 C 1.133 4.202 1.166 4.202 1.199 4.202 L 1.969 4.202 Z "/>
+        </symbol>
+        <symbol id="g28C1E49C13DD488DF058E155FD637EB9" overflow="visible">
+            <path d="M 2.486 0.792 L 2.871 2.552 C 3.553 3.432 4.103 4.059 4.488 4.059 C 4.719 4.059 4.873 4.004 4.873 3.6629999 C 4.873 3.509 4.862 3.399 4.774 3.025 L 4.367 1.265 C 4.279 0.913 4.224 0.451 4.29 0.253 C 4.378 0.033 4.499 -0.11 4.829 -0.11 C 5.599 -0.11 6.358 0.253 6.864 0.902 C 6.831 1.001 6.699 1.21 6.545 1.21 C 6.259 0.88 5.8849998 0.693 5.775 0.693 C 5.588 0.693 5.665 1.078 5.731 1.364 L 6.149 3.113 C 6.237 3.498 6.292 3.751 6.292 3.949 C 6.292 4.609 5.742 4.829 5.313 4.829 C 4.752 4.829 4.048 4.609 3.08 3.498 L 3.718 6.413 C 3.795 6.776 3.883 7.095 3.883 7.315 C 3.883 7.546 3.806 7.678 3.553 7.678 C 3.212 7.678 2.2 7.469 1.727 7.392 C 1.661 7.2599998 1.6389999 7.117 1.6719999 7.018 C 2.354 7.018 2.53 6.952 2.354 6.193 L 1.144 0.792 C 1.089 0.528 1.001 0.297 1.001 0.187 C 1.001 0.011 1.111 -0.11 1.727 -0.11 C 2.398 -0.11 2.387 0.363 2.486 0.792 Z "/>
+        </symbol>
+        <symbol id="gCA80794F15A5A66506E52A4E3B40CD4C" overflow="visible">
+            <path d="M 2.123 2.189 C 3.509 2.486 4.301 2.805 4.675 3.168 C 5.016 3.487 5.016 3.861 5.016 4.059 C 5.016 4.444 4.565 4.829 3.674 4.829 C 1.54 4.829 0.693 2.9589999 0.693 1.562 C 0.693 0.627 0.979 -0.11 2.299 -0.11 C 3.036 -0.11 3.894 0.253 4.5429997 1.089 C 4.488 1.21 4.323 1.364 4.191 1.364 C 3.564 0.726 3.223 0.55 2.695 0.55 C 2.266 0.55 2.112 1.078 2.112 1.8149999 C 2.112 1.87 2.112 2.101 2.123 2.189 Z M 3.773 4.07 C 3.773 3.08 2.783 2.706 2.2 2.6069999 C 2.574 4.158 2.992 4.378 3.421 4.378 C 3.652 4.378 3.773 4.29 3.773 4.07 Z "/>
+        </symbol>
+        <symbol id="g4A024CF29EB0538780170AAC83816647" overflow="visible">
+            <path d="M 4.631 0.957 C 4.631 1.056 4.499 1.298 4.4 1.298 C 3.905 0.891 3.553 0.726 3.179 0.726 C 2.508 0.726 2.057 1.408 2.31 2.596 C 2.574 3.817 3.069 4.422 3.608 4.422 C 3.9819999 4.422 4.048 3.993 4.004 3.641 C 3.971 3.3439999 4.191 3.124 4.521 3.124 C 4.851 3.124 5.137 3.399 5.2139997 3.74 C 5.335 4.334 4.906 4.884 3.795 4.884 C 2.585 4.884 1.199 3.839 0.858 2.211 C 0.704 1.496 0.803 0.858 1.111 0.462 C 1.43 0.055 1.859 -0.11 2.585 -0.11 C 3.256 -0.11 4.114 0.352 4.631 0.957 Z "/>
+        </symbol>
+        <symbol id="g35117FAA8192CE7A23480D79C1D49130" overflow="visible">
+            <path d="M 4.741 1.177 C 4.697 0.946 4.653 0.704 4.653 0.517 C 4.653 0.41799998 4.664 0.319 4.686 0.253 C 4.774 0.033 4.906 -0.11 5.236 -0.11 C 6.006 -0.11 6.6879997 0.253 7.194 0.902 C 7.161 1.001 7.029 1.21 6.875 1.21 C 6.5889997 0.88 6.215 0.693 6.105 0.693 C 6.017 0.693 5.984 0.781 5.984 0.891 C 5.984 1.034 6.028 1.21 6.061 1.364 L 6.633 3.971 C 6.677 4.191 6.776 4.466 6.776 4.576 C 6.776 4.763 6.666 4.873 6.05 4.873 C 5.379 4.873 5.39 4.4 5.291 3.971 L 4.873 2.2549999 C 4.18 1.353 3.784 0.83599997 3.388 0.83599997 C 2.981 0.83599997 2.937 1.287 3.047 1.738 L 3.454 3.498 C 3.531 3.85 3.597 4.312 3.531 4.5099998 C 3.443 4.741 3.322 4.873 2.992 4.873 C 2.222 4.873 1.4629999 4.5099998 0.957 3.861 C 0.99 3.762 1.122 3.553 1.276 3.553 C 1.562 3.883 1.936 4.07 2.046 4.07 C 2.233 4.07 2.156 3.685 2.09 3.399 L 1.6719999 1.65 C 1.584 1.276 1.584 1.045 1.584 0.858 C 1.584 0.847 1.584 0.847 1.584 0.83599997 C 1.584 0.176 2.134 -0.066 2.563 -0.066 C 3.135 -0.066 3.74 0.176 4.752 1.364 L 4.774 1.342 C 4.675 0.88 4.741 1.177 4.741 1.177 Z "/>
+        </symbol>
+        <symbol id="gDA4814782596FF263A5AE50E0F75E1F0" overflow="visible">
+            <path d="M 3.223 3.52 C 3.322 3.96 3.454 4.378 3.454 4.565 C 3.454 4.719 3.366 4.796 3.223 4.796 C 2.871 4.796 1.848 4.719 1.331 4.653 C 1.254 4.565 1.243 4.334 1.309 4.235 L 1.749 4.202 C 1.881 4.191 1.947 4.092 1.947 3.9819999 C 1.947 3.883 1.947 3.817 1.881 3.531 L 1.397 1.265 C 1.3199999 0.913 1.254 0.451 1.3199999 0.253 C 1.408 0.033 1.529 -0.11 1.859 -0.11 C 2.629 -0.11 3.388 0.253 3.894 0.902 C 3.861 1.001 3.729 1.21 3.575 1.21 C 3.289 0.88 2.915 0.693 2.805 0.693 C 2.618 0.693 2.695 1.078 2.761 1.364 Z M 2.189 6.5559998 C 2.189 6.193 2.453 5.83 2.893 5.83 C 3.388 5.83 3.674 6.226 3.674 6.512 C 3.674 6.842 3.421 7.238 2.9589999 7.238 C 2.442 7.238 2.189 6.886 2.189 6.5559998 Z "/>
+        </symbol>
+        <symbol id="gF6F2891311C5E5A887306487B5EE668C" overflow="visible">
+            <path d="M 1.54 2.673 L 1.122 0.792 C 1.067 0.572 0.979 0.297 0.979 0.187 C 0.979 0.011 1.089 -0.11 1.705 -0.11 C 2.376 -0.11 2.354 0.363 2.464 0.792 L 2.882 2.508 C 3.575 3.41 4.136 4.059 4.532 4.059 C 4.763 4.059 4.917 4.004 4.917 3.6629999 C 4.917 3.509 4.906 3.399 4.818 3.025 L 4.411 1.265 C 4.323 0.913 4.268 0.451 4.334 0.253 C 4.422 0.033 4.5429997 -0.11 4.873 -0.11 C 5.643 -0.11 6.402 0.253 6.908 0.902 C 6.875 1.001 6.743 1.21 6.5889997 1.21 C 6.303 0.88 5.929 0.693 5.819 0.693 C 5.632 0.693 5.709 1.078 5.775 1.364 L 6.193 3.113 C 6.281 3.498 6.336 3.751 6.336 3.949 C 6.336 4.609 5.786 4.829 5.357 4.829 C 4.653 4.829 4.07 4.587 3.058 3.399 L 3.036 3.421 C 3.135 3.883 3.179 4.345 3.179 4.532 C 3.179 4.686 3.058 4.796 2.915 4.796 C 2.563 4.796 1.606 4.719 1.089 4.653 C 1.012 4.565 1.001 4.334 1.067 4.235 L 1.507 4.202 C 1.661 4.191 1.705 4.004 1.705 3.872 C 1.705 3.751 1.705 3.399 1.54 2.673 Z "/>
+        </symbol>
+        <symbol id="gF70F791F0A1BC46EBA796D5354822AF4" overflow="visible">
+            <path d="M 4.895 3.201 C 4.895 3.498 4.851 3.839 4.697 4.059 C 4.862 4.213 5.016 4.378 5.115 4.378 C 5.225 4.378 5.269 4.312 5.313 4.246 C 5.379 4.136 5.467 4.015 5.676 4.015 C 5.9179997 4.015 6.083 4.202 6.083 4.455 C 6.083 4.697 5.874 4.906 5.577 4.906 C 5.225 4.906 4.862 4.774 4.4769998 4.422 C 4.235 4.708 3.674 4.829 3.19 4.829 C 1.958 4.829 1.254 3.993 1.254 3.113 C 1.254 2.629 1.452 2.068 1.87 1.8149999 C 1.342 1.452 1.166 1.001 1.166 0.616 C 1.166 0.429 1.221 0.099 1.562 -0.022 C 0.979 -0.341 -0.033 -0.83599997 -0.033 -1.496 C -0.033 -2.387 1.408 -2.618 2.299 -2.618 C 3.806 -2.618 5.027 -2.189 5.027 -1.1 C 5.027 -0.385 4.279 0.088 3.685 0.264 C 2.805 0.528 2.299 0.726 2.222 0.968 C 2.156 1.177 2.156 1.452 2.2549999 1.6389999 C 2.431 1.529 2.695 1.452 3.003 1.452 C 3.96 1.452 4.895 2.112 4.895 3.201 Z M 1.881 -0.143 C 2.079 -0.187 2.849 -0.539 3.212 -0.704 C 3.828 -0.99 3.872 -1.089 3.872 -1.397 C 3.872 -1.727 3.685 -2.2 2.75 -2.2 C 1.518 -2.2 1.034 -1.848 1.034 -1.243 C 1.034 -0.715 1.606 -0.341 1.881 -0.143 Z M 3.641 3.201 C 3.641 3.135 3.641 3.069 3.641 3.003 C 3.652 2.409 3.652 1.892 3.058 1.892 C 2.475 1.892 2.486 2.409 2.508 2.893 C 2.508 2.9589999 2.508 3.036 2.508 3.102 C 2.508 3.179 2.508 3.256 2.508 3.333 C 2.497 3.993 2.497 4.389 3.146 4.389 C 3.619 4.389 3.641 3.949 3.641 3.201 Z "/>
+        </symbol>
+        <symbol id="gF6F0F798940352C819EADEFB8F11A76B" overflow="visible">
+            <path d="M 4.895 6.193 L 4.444 4.224 L 4.444 4.224 C 4.312 4.554 3.993 4.829 3.575 4.829 C 2.992 4.829 2.563 4.675 2.068 4.279 C 1.122 3.531 0.638 2.343 0.638 1.364 C 0.638 0.561 0.99 -0.11 1.958 -0.11 C 2.585 -0.11 3.102 0.32999998 3.762 1.298 L 3.784 1.287 C 3.729 1.045 3.674 0.737 3.674 0.517 C 3.674 0.143 3.839 -0.11 4.235 -0.11 C 5.005 -0.11 5.731 0.32999998 6.281 0.935 C 6.248 1.034 6.116 1.243 5.962 1.243 C 5.676 0.913 5.302 0.726 5.192 0.726 C 5.104 0.726 5.071 0.814 5.071 0.924 C 5.071 1.067 5.115 1.243 5.148 1.397 L 6.259 6.413 C 6.336 6.776 6.424 7.095 6.424 7.315 C 6.424 7.546 6.347 7.678 6.094 7.678 C 5.753 7.678 4.741 7.469 4.268 7.392 C 4.202 7.2599998 4.18 7.117 4.213 7.018 C 4.895 7.018 5.071 6.952 4.895 6.193 Z M 4.147 2.904 C 4.07 2.684 3.96 2.42 3.806 2.134 C 3.267 1.144 2.849 0.616 2.42 0.616 C 2.101 0.616 1.969 1.034 1.969 1.65 C 1.969 2.816 2.662 4.323 3.608 4.323 C 4.026 4.323 4.268 3.861 4.268 3.476 C 4.268 3.465 4.268 3.443 4.268 3.421 Z M 4.213 3.102 L 4.246 3.3 C 4.246 3.234 4.224 3.168 4.213 3.102 Z "/>
+        </symbol>
+        <symbol id="g28B916B4DCE138804B13A80E1D8973EC" overflow="visible">
+            <path d="M 1.7391 4.01115 L 1.24355 3.9831 C 1.0659 3.9737499 1.00045 3.8989499 0.98175 3.82415 C 0.9724 3.7961 0.94435 3.6838999 0.94435 3.6652 C 0.94435 3.6464999 0.9724 3.6464999 1.00045 3.6464999 L 1.65495 3.6464999 L 1.0846 1.1033 C 1.01915 0.8041 0.9537 0.51425 0.9537 0.3366 C 0.9537 0 1.122 -0.0935 1.41185 -0.0935 C 1.8326 -0.0935 2.4496999 0.28985 2.7676 0.86955 C 2.7395499 0.9911 2.6741 1.0472 2.5619 1.0472 C 2.1318 0.561 1.9635 0.4675 1.8139 0.4675 C 1.78585 0.4675 1.69235 0.4862 1.69235 0.5984 C 1.69235 0.68255 1.7204 0.86955 1.7952 1.18745 L 2.34685 3.6464999 L 3.26315 3.6464999 C 3.37535 3.69325 3.4595 3.9363499 3.3566499 4.01115 L 2.431 4.01115 L 2.5245 4.4319 C 2.5619 4.60955 2.64605 4.8807 2.64605 4.9929 C 2.64605 5.1518497 2.57125 5.24535 2.27205 5.24535 C 1.93545 5.24535 1.95415 4.8245997 1.86065 4.47865 Z "/>
+        </symbol>
+        <symbol id="gFF6EA9B59699C6925687CC431A83A13A" overflow="visible">
+            <path d="M 1.6456 0.6732 L 2.0009 2.2253 C 2.58995 2.992 3.1977 3.54365 3.5343 3.54365 C 3.73065 3.54365 3.86155 3.48755 3.86155 3.1977 C 3.86155 3.0667999 3.84285 2.88915 3.76805 2.57125 L 3.41275 1.07525 C 3.33795 0.77605 3.2538 0.3927 3.2538 0.21505 C 3.2538 0.0374 3.3566499 -0.0935 3.63715 -0.0935 C 4.08595 -0.0935 4.5067 0.2244 4.9368 0.77605 C 4.90875 0.8602 4.85265 0.935 4.72175 0.935 C 4.47865 0.6545 4.2075 0.4675 4.114 0.4675 C 4.04855 0.4675 4.0205 0.51425 4.0205 0.62645 C 4.0205 0.7106 4.06725 0.9163 4.12335 1.1594 L 4.47865 2.64605 C 4.55345 2.9733 4.6002 3.18835 4.6002 3.3566499 C 4.6002 3.91765 4.34775 4.10465 3.9831 4.10465 C 3.4969 4.10465 3.0107 3.9083 2.1505 2.9172 L 2.72085 5.45105 C 2.8611 6.0587997 2.9546 6.4328 2.9546 6.4328 C 2.9546 6.49825 2.92655 6.5263 2.8424 6.5263 C 2.58995 6.4328 1.91675 6.3112497 1.5333999 6.2832 L 1.50535 6.0587997 C 1.50535 6.03075 1.5146999 6.01205 1.5521 6.01205 L 1.8419499 5.99335 C 1.9635 5.99335 2.0383 5.93725 2.0383 5.7315497 C 2.0383 5.6287 2.0196 5.46975 1.97285 5.26405 L 0.9537 0.6732 C 0.90695 0.4862 0.83215 0.25245 0.83215 0.15895 C 0.83215 0.00935 0.9163 -0.0935 1.2155 -0.0935 C 1.5708 -0.0935 1.56145 0.3179 1.6456 0.6732 Z "/>
+        </symbol>
+        <symbol id="gB577CDE6AE37EB0C1B7A4A32221BABCE" overflow="visible">
+            <path d="M 2.29075 2.992 C 2.3749 3.3566499 2.4871 3.7213 2.4871 3.88025 C 2.4871 4.01115 2.4122999 4.0766 2.29075 4.0766 C 1.99155 4.0766 1.5708 4.01115 1.13135 3.95505 C 1.0659 3.88025 1.0846 3.7774 1.1407 3.69325 L 1.5146999 3.6652 C 1.6269 3.65585 1.683 3.5717 1.683 3.4782 C 1.683 3.39405 1.6643 3.26315 1.59885 3.00135 L 1.1594 1.07525 C 1.09395 0.77605 1.00045 0.3927 1.00045 0.21505 C 1.00045 0.0374 1.1033 -0.0935 1.3838 -0.0935 C 1.8326 -0.0935 2.25335 0.2244 2.68345 0.77605 C 2.6554 0.8602 2.5993 0.935 2.4684 0.935 C 2.2253 0.6545 1.95415 0.4675 1.86065 0.4675 C 1.7952 0.4675 1.76715 0.51425 1.76715 0.62645 C 1.76715 0.7106 1.8139 0.9163 1.87 1.1594 Z M 1.87935 5.3295 C 1.87935 5.0864 2.08505 4.8807 2.32815 4.8807 C 2.57125 4.8807 2.77695 5.0864 2.77695 5.3295 C 2.77695 5.5726 2.57125 5.7783 2.32815 5.7783 C 2.08505 5.7783 1.87935 5.5726 1.87935 5.3295 Z "/>
+        </symbol>
+        <symbol id="g24D4943E9A4F28CE4D8437BBF6D53752" overflow="visible">
+            <path d="M 1.6269 -0.0935 L 1.76715 -0.0935 C 2.68345 -0.0935 3.2351 0.4114 3.2351 1.1033 C 3.2351 1.54275 2.98265 1.97285 2.1224499 2.5432 C 1.8419499 2.7302 1.74845 2.8985 1.74845 3.13225 C 1.74845 3.4595 1.93545 3.7961 2.3375 3.7961 C 2.57125 3.7961 2.7302 3.7213 2.75825 3.52495 C 2.7863 3.30055 2.94525 3.03875 3.18835 3.03875 C 3.45015 3.03875 3.52495 3.20705 3.52495 3.3566499 C 3.52495 3.69325 3.03875 4.10465 2.45905 4.10465 C 1.6456 4.10465 1.15005 3.50625 1.15005 2.9359 C 1.15005 2.5619 1.35575 2.15985 1.9635 1.74845 C 2.45905 1.41185 2.53385 1.1033 2.53385 0.90695 C 2.53385 0.3927 2.15985 0.21505 1.7391 0.21505 C 1.496 0.21505 1.3651 0.2618 1.33705 0.4675 C 1.309 0.68255 1.1781 0.96305 0.8976 0.96305 C 0.62645 0.96305 0.55165 0.73865 0.55165 0.6358 C 0.55165 0.28985 0.98175 -0.0561 1.6269 -0.0935 Z "/>
+        </symbol>
+        <symbol id="gB78D0CB58E92B6A1E06DCB483B5465A4" overflow="visible">
+            <path d="M 1.7017 3.00135 L 1.16875 0.6732 C 1.122 0.4862 1.0472 0.25245 1.0472 0.15895 C 1.0472 0.00935 1.13135 -0.0935 1.43055 -0.0935 C 1.78585 -0.0935 1.76715 0.3179 1.86065 0.6732 L 2.23465 2.17855 C 2.96395 3.2351 3.48755 3.54365 3.78675 3.54365 C 3.9737499 3.54365 4.02985 3.4782 4.02985 3.1977 C 4.02985 3.0855 4.0205 2.8611 3.95505 2.57125 L 3.50625 0.6732 C 3.4595 0.4862 3.3847 0.25245 3.3847 0.15895 C 3.3847 0.00935 3.46885 -0.0935 3.76805 -0.0935 C 4.12335 -0.0935 4.114 0.3179 4.19815 0.6732 L 4.55345 2.14115 C 5.3482 3.2538 5.71285 3.54365 6.01205 3.54365 C 6.1897 3.54365 6.2832 3.4782 6.2832 3.1977 C 6.2832 3.09485 6.27385 2.8237 6.19905 2.53385 L 5.8344 1.0659 C 5.7409 0.68255 5.6661 0.2992 5.6661 0.21505 C 5.6661 0.02805 5.8344 -0.0935 5.9653 -0.0935 C 6.51695 -0.0935 7.0312 0.17765 7.3491 0.94435 C 7.3304 1.0285 7.26495 1.07525 7.1434 1.07525 C 6.919 0.71995 6.6572 0.4675 6.4889 0.4675 C 6.44215 0.4675 6.42345 0.5236 6.42345 0.57035 C 6.42345 0.60775 6.44215 0.8415 6.4702 0.94435 L 6.90965 2.60865 C 6.9657497 2.8237 7.00315 3.11355 7.00315 3.2912 C 7.00315 3.88025 6.72265 4.10465 6.4328 4.10465 C 5.76895 4.10465 5.2547 3.5343 4.7124 2.85175 C 4.74045 3.00135 4.7498 3.16965 4.7498 3.2912 C 4.7498 3.9457 4.4693 4.10465 4.2075 4.10465 C 3.5343 4.10465 2.92655 3.6090999 2.3749 2.8985 L 2.3562 2.90785 L 2.3749 2.992 C 2.4684 3.3566499 2.58995 3.7213 2.58995 3.88025 C 2.58995 4.01115 2.51515 4.0766 2.3936 4.0766 C 2.0944 4.0766 1.67365 4.01115 1.2342 3.95505 C 1.16875 3.88025 1.18745 3.7774 1.24355 3.69325 L 1.61755 3.6652 C 1.72975 3.65585 1.78585 3.5717 1.78585 3.4782 C 1.78585 3.39405 1.7578 3.26315 1.7017 3.00135 Z "/>
+        </symbol>
+        <symbol id="g3E0F1EB37EB6C1E02626B98E275BF970" overflow="visible">
+            <path d="M 0.7293 1.5146999 C 0.7293 1.01915 0.85085 -0.0935 2.0383 -0.0935 C 2.3375 -0.0935 2.62735 -0.0561 2.8985 0.08415 C 3.71195 0.49555 4.34775 1.48665 4.34775 2.58995 C 4.34775 3.26315 4.17945 4.10465 3.0293999 4.10465 C 1.46795 4.10465 0.7293 2.6367 0.7293 1.5146999 Z M 1.50535 1.5895 C 1.50535 2.431 1.87 3.7961 2.8611 3.7961 C 3.1416 3.7961 3.2912 3.6464999 3.43145 3.3847 C 3.54365 3.15095 3.5717 2.805 3.5717 2.5245 C 3.5717 2.1505 3.5156 1.3464 3.16965 0.8228 C 2.90785 0.42075 2.53385 0.25245 2.17855 0.25245 C 1.9074 0.25245 1.50535 0.60775 1.50535 1.5895 Z "/>
+        </symbol>
+        <symbol id="g5761E6DC92E7BFFE0A42DA6480F9D269" overflow="visible">
+            <path d="M 1.56145 1.86065 C 3.9644 2.32815 3.9644 3.03875 3.9644 3.39405 C 3.9644 3.4034 3.9644 3.4034 3.9644 3.41275 C 3.9644 3.6464999 3.74935 4.10465 3.07615 4.10465 C 1.44925 4.10465 0.77605 2.51515 0.77605 1.3277 C 0.77605 0.53295 1.15005 -0.0935 1.9261 -0.0935 C 2.55255 -0.0935 3.1229 0.23375 3.67455 0.94435 C 3.6278 1.0472 3.5717 1.09395 3.4595 1.09395 C 2.92655 0.55165 2.7115 0.4675 2.2627 0.4675 C 1.8419499 0.4675 1.5521 0.6919 1.5521 1.54275 C 1.5521 1.5895 1.5521 1.78585 1.56145 1.86065 Z M 3.3192499 3.4595 C 3.3192499 2.618 2.3375 2.30945 1.6269 2.21595 C 1.95415 3.54365 2.4684 3.8148 2.8611 3.8148 C 3.1977 3.8148 3.3192499 3.73065 3.3192499 3.4595 Z "/>
+        </symbol>
+        <symbol id="g7198C3B4B0F84607930A3BAA1CB38DD8" overflow="visible">
+            <path d="M 4.04855 1.1594 L 4.40385 2.64605 C 4.47865 2.9733 4.5254 3.18835 4.5254 3.3566499 C 4.5254 3.91765 4.27295 4.10465 3.9083 4.10465 C 3.4221 4.10465 3.02005 3.9083 2.15985 2.8985 L 2.1505 2.90785 L 2.17855 2.992 C 2.3001 3.33795 2.38425 3.74 2.38425 3.88025 C 2.38425 4.01115 2.30945 4.0766 2.1879 4.0766 C 1.8887 4.0766 1.44925 4.0205 1.0098 3.95505 C 0.94435 3.88025 0.96305 3.7774 1.01915 3.69325 L 1.39315 3.6652 C 1.50535 3.65585 1.56145 3.5717 1.56145 3.4782 C 1.56145 3.4034 1.5333999 3.26315 1.4773 3.00135 L 0.9537 0.6732 C 0.90695 0.4862 0.83215 0.25245 0.83215 0.15895 C 0.83215 0.00935 0.935 -0.0935 1.2342 -0.0935 C 1.5895 -0.0935 1.58015 0.3179 1.6643 0.6732 L 2.0196 2.2253 C 2.60865 2.992 3.1229 3.54365 3.4595 3.54365 C 3.65585 3.54365 3.78675 3.4969 3.78675 3.20705 C 3.78675 3.09485 3.73065 2.83305 3.6652 2.57125 L 3.3099 1.07525 C 3.2351 0.77605 3.15095 0.3927 3.15095 0.21505 C 3.15095 0.0374 3.2538 -0.0935 3.5343 -0.0935 C 3.9831 -0.0935 4.4319 0.2244 4.862 0.77605 C 4.83395 0.8602 4.77785 0.935 4.64695 0.935 C 4.40385 0.6545 4.1327 0.4675 4.0392 0.4675 C 3.9737499 0.4675 3.9457 0.51425 3.9457 0.62645 C 3.9457 0.7106 3.99245 0.9163 4.04855 1.1594 Z "/>
+        </symbol>
+        <symbol id="gC3B5BFDD889DEE225932F95E3F035AF6" overflow="visible">
+            <path d="M 3.8335 4.04855 C 3.58105 4.0766 3.4595 4.10465 3.0855 4.10465 C 2.08505 4.10465 0.7293 2.6367 0.7293 1.16875 C 0.7293 0.64515 0.85085 -0.0935 1.63625 -0.0935 C 2.1318 -0.0935 2.6554 0.42075 3.2164 1.2529 L 3.2351 1.2342 L 3.11355 0.8415 C 3.0481 0.62645 3.02005 0.43945 3.02005 0.32725 C 3.02005 0.1496 3.0855 -0.0935 3.4034 -0.0935 C 3.9831 -0.0935 4.3571 0.2805 4.6002 0.81345 C 4.55345 0.8976 4.5067 0.96305 4.38515 0.96305 C 4.1327 0.6171 3.95505 0.4675 3.86155 0.4675 C 3.8335 0.4675 3.74935 0.4862 3.74935 0.5984 C 3.74935 0.68255 3.80545 0.94435 3.84285 1.122 L 4.488 4.02985 C 4.42255 4.02985 4.36645 4.02985 4.301 4.02985 C 4.1327 4.0205 3.9737499 4.01115 3.8335 4.04855 Z M 3.366 2.04765 C 2.90785 1.2061499 2.1879 0.42075 1.8887 0.42075 C 1.5708 0.42075 1.4773 0.79475 1.4773 1.31835 C 1.4773 2.30945 2.25335 3.8148 3.11355 3.8148 C 3.3099 3.8148 3.5156 3.74935 3.69325 3.63715 C 3.69325 3.63715 3.59975 2.64605 3.366 2.04765 Z "/>
+        </symbol>
+        <symbol id="g7F1D4CEC8DFCD4FED7D771A87664CC1B" overflow="visible">
+            <path d="M 3.22575 1.0846 L 3.1603 0.8415 C 3.1042 0.6171 3.0667999 0.43945 3.0667999 0.32725 C 3.0667999 0.1496 3.13225 -0.0935 3.45015 -0.0935 C 4.02985 -0.0935 4.40385 0.2805 4.64695 0.81345 C 4.6002 0.8976 4.55345 0.96305 4.4319 0.96305 C 4.17945 0.6171 4.0018 0.4675 3.9083 0.4675 C 3.88025 0.4675 3.7961 0.4862 3.7961 0.5984 C 3.7961 0.68255 3.8522 0.94435 3.8896 1.122 L 4.8807 5.45105 C 5.02095 6.0587997 5.11445 6.4328 5.11445 6.4328 C 5.11445 6.49825 5.0864 6.5263 5.00225 6.5263 C 4.7498 6.4328 4.0766 6.3112497 3.69325 6.2832 L 3.6652 6.0587997 C 3.6652 6.03075 3.67455 6.01205 3.71195 6.01205 L 4.0018 5.99335 C 4.12335 5.99335 4.19815 5.93725 4.19815 5.7315497 C 4.19815 5.6287 4.17945 5.46975 4.1327 5.26405 L 3.78675 3.5904 L 3.7774 3.5904 C 3.6652 3.8709 3.39405 4.10465 3.03875 4.10465 C 2.0383 4.10465 0.75734997 2.72085 0.75734997 1.2529 C 0.75734997 0.73865 0.88825 -0.0935 1.71105 -0.0935 C 2.19725 -0.0935 2.6367 0.2805 3.1977 1.1033 Z M 3.22575 1.8139 C 2.7676 0.9724 2.23465 0.3366 1.87 0.3366 C 1.5708 0.3366 1.50535 0.8789 1.50535 1.4025 C 1.50535 2.3936 2.2066 3.76805 3.0667999 3.76805 C 3.4221 3.76805 3.65585 3.28185 3.65585 2.9546 C 3.65585 2.7395499 3.4969 2.30945 3.22575 1.8139 Z "/>
+        </symbol>
+        <symbol id="g61448B1092E257665A2D667064A6E53C" overflow="visible">
+            <path d="M 4.7311 3.2912 C 4.7685 3.4595 4.85265 3.74 4.85265 3.8522 C 4.85265 4.01115 4.75915 4.10465 4.45995 4.10465 C 4.10465 4.10465 4.12335 3.69325 4.02985 3.33795 L 3.7587 2.30945 C 3.0667999 1.13135 2.60865 0.4675 2.14115 0.4675 C 1.97285 0.4675 1.86065 0.561 1.86065 0.81345 C 1.86065 0.96305 1.87935 1.1594 1.9448 1.41185 L 2.34685 2.9359 C 2.42165 3.2351 2.5432 3.61845 2.5432 3.7961 C 2.5432 3.9737499 2.4871 4.10465 2.2066 4.10465 C 1.7578 4.10465 1.2248499 3.78675 0.79475 3.2351 C 0.8228 3.15095 0.8789 3.07615 1.0098 3.07615 C 1.2529 3.3566499 1.56145 3.54365 1.65495 3.54365 C 1.7204 3.54365 1.74845 3.4969 1.74845 3.3847 C 1.74845 3.30055 1.69235 3.09485 1.6269 2.85175 L 1.2155 1.28095 C 1.15005 1.03785 1.122 0.83215 1.122 0.6545 C 1.122 0.12155 1.4212 -0.0935 1.74845 -0.0935 C 2.47775 -0.0935 2.94525 0.4862 3.6090999 1.4586 L 3.63715 1.4399 L 3.5343 1.07525 C 3.45015 0.77605 3.37535 0.3927 3.37535 0.21505 C 3.37535 0.0374 3.4408 -0.0935 3.7213 -0.0935 C 4.1701 -0.0935 4.59085 0.2244 5.02095 0.77605 C 4.9929 0.8602 4.9368 0.935 4.8059 0.935 C 4.5628 0.6545 4.29165 0.4675 4.19815 0.4675 C 4.1327 0.4675 4.10465 0.51425 4.10465 0.62645 C 4.10465 0.7106 4.1514 0.9163 4.2075 1.1594 Z "/>
+        </symbol>
+        <symbol id="g84192E941279BC9B63B022CE88CE2494" overflow="visible">
+            <path d="M 2.06635 2.66475 L 2.14115 2.992 C 2.2253 3.3566499 2.30945 3.6838999 2.30945 3.84285 C 2.30945 3.9831 2.2253 4.0766 2.10375 4.0766 C 1.8045499 4.0766 1.4212 4.01115 0.98175 3.95505 C 0.9163 3.88025 0.935 3.7774 0.9911 3.69325 L 1.3651 3.6652 C 1.4773 3.65585 1.5333999 3.5717 1.5333999 3.4782 C 1.5333999 3.39405 1.5333999 3.26315 1.46795 3.00135 L 0.9537 0.6732 C 0.90695 0.47685 0.83215 0.30855 0.83215 0.15895 C 0.83215 0.00935 0.9163 -0.0935 1.18745 -0.0935 C 1.5146999 -0.0935 1.52405 0.30855 1.61755 0.6732 L 1.8887 1.76715 C 2.3375 2.5806 2.8611 3.45015 3.07615 3.45015 C 3.16965 3.45015 3.2164 3.4034 3.2725 3.33795 C 3.33795 3.26315 3.4595 3.1416 3.5904 3.1416 C 3.84285 3.1416 4.01115 3.41275 4.01115 3.6652 C 4.01115 3.86155 3.8709 4.10465 3.52495 4.10465 C 3.05745 4.10465 2.51515 3.52495 2.10375 2.6554 Z "/>
+        </symbol>
+    </defs>
+</svg>
+</rawhtml>
+    <h2 id='caching' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Caching
+  
+  <a href='diagrams.html#caching' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      The upstream filter supports a content-addressed disk cache that skips re-running an engine for unchanged source. Enable it once per document via metadata:
+    </p>
+  <div class='mb-6 text-sm'><pre><code class='yaml'><span class='fu'>diagram</span><span class='kw'>:</span>
+<span class='at'>  </span><span class='fu'>cache</span><span class='kw'>:</span><span class='at'> </span><span class='ch'>true</span>
+</code></pre></div>
+    <p class='mb-4 leading-relaxed'>
+      Cache files land under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>$XDG_CACHE_HOME/pandoc-diagram-filter/</code> (typically <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>~/.cache/pandoc-diagram-filter/</code>), keyed by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>sha1(fence-body)</code>. The cache is shared across notebooks and naturally git-clean. Set <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>diagram.cache-dir: &lt;path&gt;</code> to override the location.
+    </p>
+  
+
+
+
+
+  <div data-callout-metadata data-callout-fold data-callout='note' data-footnote-scope
+ class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
+    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
+      
+  <div class='callout-icon flex-shrink-0'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+      
+    <line x1='18' y1='2' x2='22' y2='6'></line>
+    <path d='M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z'></path>
+  
+    </svg>
+  </div>
+
+      <div class='ml-3'>
+        Note
+      </div>
+    </div>
+    
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
+    
+    <p class='mb-4 leading-relaxed'>
+      The cache key is the fence body text only — it does <strong>not</strong> include the engine binary version or the fence’s code-block attributes. Bumping <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code> / <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>typst</code> (or changing a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>{.d2 layout=elk}</code> attribute) does not invalidate previously-cached renders. Bust the cache manually with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>rm -rf $XDG_CACHE_HOME/pandoc-diagram-filter/</code> when an engine upgrade should reflow output.
+    </p>
+  
+  </div>
+
+  </div>
+
+
+
+
+
+
+    <p class='mb-4 leading-relaxed'>
+      Without caching, every render of a page re-invokes the engine. For static <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>sites</a> this happens once per build; for the live server it happens on each save of a note that contains diagrams.
     </p>
   
     <h2 id='limitations' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
   Limitations
   
-  <a href='lua-filters.html#limitations' class='--ema-anchor ml-2'>
+  <a href='diagrams.html#limitations' class='--ema-anchor ml-2'>
     <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
         <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
         <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
@@ -2165,246 +2614,26 @@
 
 
     </h2>
-  
-
-
-
-
-  <div data-callout-metadata data-callout-fold data-callout='warning' data-footnote-scope
- class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #EC7500 8%, transparent); border-left-color: #EC7500'>
-    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #EC7500'>
-      
-  <div class='callout-icon flex-shrink-0'>
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
-      
-    <path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'></path>
-    <line x1='12' y1='9' x2='12' y2='13'></line>
-    <line x1='12' y1='17' x2='12.01' y2='17'></line>
-  
-    </svg>
-  </div>
-
-      <div class='ml-3'>
-        Warning
-      </div>
-    </div>
-    
-  <div class='callout-content text-gray-700 dark:text-gray-300'>
-    
-    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
-      
-        <li>
-          Filter declarations are note-local. Cascading <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters</code> from an ancestor <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>`index.yaml`</a> is tracked under <a href='https://github.com/srid/emanote/issues/263' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>#263</a>.
-        </li>
-      
-        <li>
-          Filters that need filesystem, process, media, module-loading, or dynamic-code IO belong under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.render.html</code>, not <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.parse</code>.
-        </li>
-      
-    </ul>
-  
-  </div>
-
-  </div>
-
-
-
-
-
-
-    <h2 id='bundled-filters' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Bundled filters
-  
-  <a href='lua-filters.html#bundled-filters' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      Four curated filters ship in Emanote’s <a href='layer' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>default layer</a> under <a href='https://github.com/srid/emanote/tree/master/emanote/default/lua-filters' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote/default/lua-filters/</code></a>:
-    </p>
   
     <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
       
         <li>
-          <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/list-table.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code></a> — nested bullet lists → HTML tables. From <a href='https://github.com/pandoc-ext/list-table' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>pandoc-ext/list-table</a>.
+          Filter declaration must live on the note itself — <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>site-wide cascade</a> from <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>index.yaml</code> is tracked in <a href='https://github.com/srid/emanote/issues/263' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>#263</a>.
         </li>
       
         <li>
-          <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/wordcount.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code></a> — appends a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>N words · M characters</code> footer.
+          Other engines (mermaid, dot, plantuml, tikz, asymptote) work if you install the matching binary, but Emanote’s Nix closure does not pin them. Set the engine’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>_BIN</code> environment variable (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>MERMAID_BIN</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>DOT_BIN</code>, …) to override the executable path explicitly.
         </li>
       
         <li>
-          <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>diagram.lua</code></a> — fenced code blocks for <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>cetz</code>, and the other engines <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc-ext/diagram</code></a> supports → inline SVG. The wrapped Emanote binary carries <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>typst</code>, and an offline <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@preview/cetz</code> package cache; see <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a>.
-        </li>
-      
-        <li>
-          <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/hello.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>hello.lua</code></a> — a hello-world filter that drives the <a href='writing-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>writing-filters guide</a> and exercises the error-reporting protocol. Drop <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>lua-filters/hello.lua</code> into a note’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>pandoc.filters.render.html</code> and fence with <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>hello</code> blocks to try it.
+          Diagrams render only when <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>FORMAT == "html"</code>, so they have no effect on parse-time concerns like backlinks, tags, search index, or the note model. The fenced source remains in the document for export targets that don’t run the filter.
         </li>
       
     </ul>
   
-    <h2 id='local-docs-filters' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Local docs filters
-  
-  <a href='lua-filters.html#local-docs-filters' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <p class='mb-4 leading-relaxed'>
-      This docs notebook also includes a custom filter under <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>docs/filters/</code>:
-    </p>
-  
-    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
-      
-        <li>
-          <a href='https://github.com/srid/emanote/blob/master/docs/filters/slides.lua' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code></a> — turns a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>:::slides</code> div into a navigable <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown</a> presentation; runs the <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> deck.
-        </li>
-      
-    </ul>
-  
-    <h2 id='demos' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
-      
-  Demos
-  
-  <a href='lua-filters.html#demos' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h2>
-  
-    <h3 id='list-tablelua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list-table.lua</code>
-  
-  <a href='lua-filters.html#list-tablelua' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 1</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 2</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 1, column 3</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 2, column 1</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 2, column 3</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 3, column 1</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>row 3, column 2</td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Well!</td></tr></tbody></table>
-    <h3 id='wordcountlua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>wordcount.lua</code>
-  
-  <a href='lua-filters.html#wordcountlua' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      The footer at the bottom of this page — every save recomputes it.
-    </p>
-  
-    <h3 id='slideslua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code>
-  
-  <a href='lua-filters.html#slideslua' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      See <a href='slides' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>A Markdown Presentation about Lua Filters</a> for a Markdown presentation rendered by <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>slides.lua</code> at HTML render time.
-    </p>
-  
-    <h3 id='diagramlua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>diagram.lua</code>
-  
-  <a href='lua-filters.html#diagramlua' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      See <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a> for inline-SVG demos of <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>d2</code> and <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>cetz</code> fences, both rendered offline.
-    </p>
-  
-    <h3 id='hellolua' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
-      
-  <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>hello.lua</code>
-  
-  <a href='lua-filters.html#hellolua' class='--ema-anchor ml-2'>
-    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
-        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
-      </svg></span>
-  </a>
-
-
-    </h3>
-  
-    <p class='mb-4 leading-relaxed'>
-      See <a href='writing-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Writing a Pandoc Lua filter</a> — embedded source plus live happy and sad-path renders.
-    </p>
-  <rawhtml xmlhtmlRaw style='display: contents'><style>
-.wordcount-footer {
-  margin-top: 3rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--color-gray-200);
-  display: flex;
-  justify-content: flex-end;
-  font-size: 0.8125rem;
-  color: var(--color-gray-500);
-}
-.wordcount-footer dl {
-  display: flex;
-  gap: 1.5rem;
-  margin: 0;
-}
-.wordcount-footer div { display: flex; gap: 0.375rem; align-items: baseline; }
-.wordcount-footer dt { font-variant: small-caps; letter-spacing: 0.04em; }
-.wordcount-footer dd {
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  color: var(--color-gray-800);
-}
-.dark .wordcount-footer { border-top-color: var(--color-gray-800); color: var(--color-gray-400); }
-.dark .wordcount-footer dd { color: var(--color-gray-100); }
-</style>
-</rawhtml><div class='wordcount-footer'><rawhtml xmlhtmlRaw style='display: contents'><dl><div><dt>words</dt><dd>468</dd></div><div><dt>chars</dt><dd>2840</dd></div><div><dt>chars + spaces</dt><dd>3257</dd></div></dl></rawhtml></div>
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/lua-filters/diagrams.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -2444,9 +2673,9 @@
     
         <ul class='space-y-1 ml-2'>
           
-            <li class='truncate' title='Choose a phase'>
-              <a href='lua-filters.html#choose-a-phase' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Choose a phase
+            <li class='truncate' title='Enabling the filter'>
+              <a href='diagrams.html#enabling-the-filter' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Enabling the filter
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2455,9 +2684,9 @@
       
             </li>
           
-            <li class='truncate' title='Filter paths'>
-              <a href='lua-filters.html#filter-paths' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Filter paths
+            <li class='truncate' title='Supported engines'>
+              <a href='diagrams.html#supported-engines' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Supported engines
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2466,9 +2695,9 @@
       
             </li>
           
-            <li class='truncate' title='Org notes'>
-              <a href='lua-filters.html#org-notes' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Org notes
+            <li class='truncate' title='d2 demo'>
+              <a href='diagrams.html#d2-demo' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                d2 demo
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2477,9 +2706,20 @@
       
             </li>
           
-            <li class='truncate' title='Hot reload'>
-              <a href='lua-filters.html#hot-reload' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Hot reload
+            <li class='truncate' title='cetz demo'>
+              <a href='diagrams.html#cetz-demo' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                cetz demo
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Caching'>
+              <a href='diagrams.html#caching' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Caching
               </a>
               
         <ul class='space-y-1 ml-2'>
@@ -2489,99 +2729,11 @@
             </li>
           
             <li class='truncate' title='Limitations'>
-              <a href='lua-filters.html#limitations' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+              <a href='diagrams.html#limitations' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
                 Limitations
               </a>
               
         <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Bundled filters'>
-              <a href='lua-filters.html#bundled-filters' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Bundled filters
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Local docs filters'>
-              <a href='lua-filters.html#local-docs-filters' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Local docs filters
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='Demos'>
-              <a href='lua-filters.html#demos' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                Demos
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-            <li class='truncate' title='list-table.lua'>
-              <a href='lua-filters.html#list-tablelua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                list-table.lua
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='wordcount.lua'>
-              <a href='lua-filters.html#wordcountlua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                wordcount.lua
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='slides.lua'>
-              <a href='lua-filters.html#slideslua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                slides.lua
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='diagram.lua'>
-              <a href='lua-filters.html#diagramlua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                diagram.lua
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
-          
-            <li class='truncate' title='hello.lua'>
-              <a href='lua-filters.html#hellolua' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
-                hello.lua
-              </a>
-              
-        <ul class='space-y-1 ml-2'>
-          
-        </ul>
-      
-            </li>
           
         </ul>
       
@@ -2619,8 +2771,8 @@
     <ul class='space-y-1'>
       
         <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='writing-filters'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Writing a Pandoc Lua filter
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Pandoc Lua Filters
           </a>
           <!-- Outer wrapper extends right up against the li (right:full)
                with pr-3 of padding so the inner card visually sits 0.75rem
@@ -2641,111 +2793,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>For where filters fit in Emanote’s pipeline and how to enable them in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>frontmatter</a>, see <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>.</p></div>
+      <div><a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>diagram.lua</code></a> — fenced code blocks for <code>d2</code>, <code>cetz</code>, and the other engines <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>pandoc-ext/diagram</code></a> supports → inline SVG. The wrapped Emanote binary carries <code>d2</code>, <code>typst</code>, and an offline <code>@preview/cetz</code> package cache; see <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a>.</div>
     </div>
   
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='sidebar'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Sidebar
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
     <div>
-      <div><p>This page will use “Hello World” as its title in the main view, but “hello” in the sidebar and index pages. For real-world example, see the page “<a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>”.</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/orgmode'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Org Mode ✍️
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>While <code class='verbatim'>#+TITLE</code> is recognized, most other metadata are not recognized yet. <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>Pandoc Lua filters</a> are the exception: use one <code class='verbatim'>#+PANDOC_FILTERS_PARSE: path/to/filter.lua</code> keyword per parse-time filter, or <code class='verbatim'>#+PANDOC_FILTERS_RENDER_HTML: path/to/filter.lua</code> per render-time HTML filter. Store other file-associated metadata in a separate <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>YAML file</a>.</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='markdown'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>
-          <svg xmlns='http://www.w3.org/2000/svg' class='--ema-checkbox inline-block h-[0.9em] w-[0.9em] shrink-0 mr-1 align-[-0.1em] text-gray-400 dark:text-gray-500 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='2' x='2' y='2' width='24' height='24' rx='4'></rect></svg>
-<span>
-  
-            Task with <em>Markdown</em> and links (eg: <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>)
-          
-</span>
-
-        </div>
+      <div><p>See <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a> for inline-SVG demos of <code>d2</code> and <code>cetz</code> fences, both rendered offline.</p></div>
     </div>
   
 </div>
@@ -2778,82 +2830,6 @@
   
     <div>
       <div><strong><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a></strong> — Pandoc Lua filter phases, bundled filters, and demos (including <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>inline-SVG diagrams</a> from d2 and cetz)</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='diagrams'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Diagrams
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Emanote bundles <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>lua-filters/diagram.lua</code></a>, a render-time <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua filter</a> that turns fenced code blocks into inline SVG. The filter is vendored from <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>pandoc-ext/diagram</a> and post-processed so SVG diagrams land directly in the page — no <code>--extract-media</code> pass, no JavaScript renderer, no network at view time.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Org notes use the parallel keyword from the <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> guide:</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='slides'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>A Markdown Presentation about Lua Filters
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>For setup, phase guidance, and bundled filters, see <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the main Lua filters guide</a>.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Pure-Lua filters compose cleanly. The <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>main guide page</a> chains <code>list-table.lua</code> with <code>wordcount.lua</code>:</p></div>
-    </div>
-  
-    <div>
-      <div><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> — Emanote’s main guide</div>
     </div>
   
 </div>
@@ -2898,8 +2874,8 @@
       <ul class='divide-y divide-gray-200 dark:divide-gray-800 text-sm'>
         
           <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='writing-filters'>
-              Writing a Pandoc Lua filter
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='lua-filters'>
+              Pandoc Lua Filters
             </a>
             <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
               
@@ -2913,87 +2889,11 @@
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>For where filters fit in Emanote’s pipeline and how to enable them in <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>frontmatter</a>, see <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>.</p></div>
+      <div><a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>diagram.lua</code></a> — fenced code blocks for <code>d2</code>, <code>cetz</code>, and the other engines <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>pandoc-ext/diagram</code></a> supports → inline SVG. The wrapped Emanote binary carries <code>d2</code>, <code>typst</code>, and an offline <code>@preview/cetz</code> package cache; see <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a>.</div>
     </div>
   
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='sidebar'>
-              Sidebar
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
     <div>
-      <div><p>This page will use “Hello World” as its title in the main view, but “hello” in the sidebar and index pages. For real-world example, see the page “<a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>”.</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/orgmode'>
-              Org Mode ✍️
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>While <code class='verbatim'>#+TITLE</code> is recognized, most other metadata are not recognized yet. <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>Pandoc Lua filters</a> are the exception: use one <code class='verbatim'>#+PANDOC_FILTERS_PARSE: path/to/filter.lua</code> keyword per parse-time filter, or <code class='verbatim'>#+PANDOC_FILTERS_RENDER_HTML: path/to/filter.lua</code> per render-time HTML filter. Store other file-associated metadata in a separate <a href='yaml-config' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'>YAML file</a>.</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='markdown'>
-              Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span>
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div>
-          <svg xmlns='http://www.w3.org/2000/svg' class='--ema-checkbox inline-block h-[0.9em] w-[0.9em] shrink-0 mr-1 align-[-0.1em] text-gray-400 dark:text-gray-500 stroke-current' fill='none' viewBox='0 0 28 28'><desc>☐</desc><rect stroke-width='2' x='2' y='2' width='24' height='24' rx='4'></rect></svg>
-<span>
-  
-            Task with <em>Markdown</em> and links (eg: <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a>)
-          
-</span>
-
-        </div>
+      <div><p>See <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Diagrams</a> for inline-SVG demos of <code>d2</code> and <code>cetz</code> fences, both rendered offline.</p></div>
     </div>
   
 </div>
@@ -3018,66 +2918,6 @@
   
     <div>
       <div><strong><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a></strong> — Pandoc Lua filter phases, bundled filters, and demos (including <a href='diagrams' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>inline-SVG diagrams</a> from d2 and cetz)</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='diagrams'>
-              Diagrams
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>Emanote bundles <a href='https://github.com/srid/emanote/blob/master/emanote/default/lua-filters/diagram.lua' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'><code>lua-filters/diagram.lua</code></a>, a render-time <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua filter</a> that turns fenced code blocks into inline SVG. The filter is vendored from <a href='https://github.com/pandoc-ext/diagram' class='transition-colors text-primary-600 dark:text-primary-300 underline decoration-1 hover:decoration-2' data-linkicon='external' target='_blank' rel='noopener'>pandoc-ext/diagram</a> and post-processed so SVG diagrams land directly in the page — no <code>--extract-media</code> pass, no JavaScript renderer, no network at view time.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Org notes use the parallel keyword from the <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> guide:</p></div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='slides'>
-              A Markdown Presentation about Lua Filters
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><p>For setup, phase guidance, and bundled filters, see <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>the main Lua filters guide</a>.</p></div>
-    </div>
-  
-    <div>
-      <div><p>Pure-Lua filters compose cleanly. The <a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>main guide page</a> chains <code>list-table.lua</code> with <code>wordcount.lua</code>:</p></div>
-    </div>
-  
-    <div>
-      <div><a href='lua-filters' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Pandoc Lua Filters</a> — Emanote’s main guide</div>
     </div>
   
 </div>
