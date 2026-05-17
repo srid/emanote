@@ -141,13 +141,18 @@ embedResourceRoute model nr ctx embedderRoute note = do
     then pure $ renderCyclicEmbedSplice model ctx embedStack note
     else do
       let nestedCtx = withEmbedStack nr model embedderRoute (pushEmbedStack targetRoute embedStack) ctx
+      -- '_noteDoc' is a lazy field whose first access drives the
+      -- deferred re-parse (#66) and memoises the result back into the
+      -- field via Haskell's normal lazy-evaluation semantics. Bind once
+      -- so the body and TOC splices share the single forced thunk.
+      let !doc = note ^. MN.noteDoc
       pure . runEmbedTemplate "note" $ do
         "ema:note:title" ## Tit.titleSplice nestedCtx id (MN._noteTitle note)
         "ema:note:url" ## HI.textSplice (SR.siteRouteUrl model $ SR.lmlSiteRoute (R.LMLView_Html, note ^. MN.noteRoute))
         "ema:note:pandoc" ##
-          pandocSplice nestedCtx (note ^. MN.noteDoc)
+          pandocSplice nestedCtx doc
         "ema:note:toc" ##
-          renderToc nestedCtx (newToc $ note ^. MN.noteDoc)
+          renderToc nestedCtx (newToc doc)
 
 {- | Rebuild a 'HP.RenderCtx' with the new embed stack baked into both
 'HP.userData' (so the embed renderer can read it via 'getUserData') *and*
