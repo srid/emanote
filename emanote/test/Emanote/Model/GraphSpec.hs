@@ -33,8 +33,10 @@ spec = do
                 (error "CLI action unused by modelLookupBacklinks")
                 (error "renderers unused by modelLookupBacklinks")
                 (error "scripting engine unused by modelLookupBacklinks")
-                False
-                False
+                M.ModelFlags
+                  { M.modelFlagCompileTailwind = False
+                  , M.modelFlagAllowBrokenLuaFilters = False
+                  }
                 (error "instance ID unused by modelLookupBacklinks")
                 (error "stork index unused by modelLookupBacklinks")
 

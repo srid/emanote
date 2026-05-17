@@ -123,8 +123,18 @@ modelPluginBaseDir :: ModelT f -> [FilePath]
 modelPluginBaseDir m =
   fst . locPath <$> Set.toAscList (m ^. modelLayers)
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar =
+{- | CLI-derived booleans that propagate into the 'Model'. Grouped into a
+record so 'emptyModel' doesn't take adjacent positional 'Bool' parameters
+that the type checker can't disambiguate — a swap at the call site would
+otherwise silently flip Tailwind compilation and Lua-filter tolerance.
+-}
+data ModelFlags = ModelFlags
+  { modelFlagCompileTailwind :: Bool
+  , modelFlagAllowBrokenLuaFilters :: Bool
+  }
+
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> ModelFlags -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren scriptingEngine flags instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
@@ -132,8 +142,8 @@ emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar
     , _modelRoutePrism = Const ()
     , _modelPandocRenderers = ren
     , _modelScriptingEngine = scriptingEngine
-    , _modelCompileTailwind = ctw
-    , _modelAllowBrokenLuaFilters = allowBrokenLua
+    , _modelCompileTailwind = modelFlagCompileTailwind flags
+    , _modelAllowBrokenLuaFilters = modelFlagAllowBrokenLuaFilters flags
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote
       -- being run on an empty directory.
