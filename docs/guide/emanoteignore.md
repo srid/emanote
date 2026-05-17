@@ -36,7 +36,7 @@ Universal ignores (dotfile directories, editor backup files, the reserved `-/` d
 
 Editing `.emanoteignore` mid-session takes effect immediately, without restarting `emanote run` (closes [#739](https://github.com/srid/emanote/issues/739)). Adding a pattern evicts matching notes and static files from the model and the sidebar; removing a pattern brings the previously-hidden notes and static files back. Multi-layer notebooks update on a per-layer basis: editing `layer-A/.emanoteignore` only re-evaluates files inside layer A.
 
-YAML data files (e.g. `index.yaml` driving the metadata cascade) and Heist `.tpl` templates carry no per-layer source metadata in the model today; adding a pattern that matches one mid-session still leaves the resolved cascade / template in memory until restart. Edits that *remove* such a pattern are unaffected because those files were never filtered out in the first place.
+YAML data files (e.g. `index.yaml` driving the metadata cascade, see [[yaml-config]]) and Heist `.tpl` templates (see [[html-template]]) carry no per-layer source metadata in the model today; adding a pattern that matches one mid-session still leaves the resolved cascade / template in memory until restart. Edits that *remove* such a pattern are unaffected because those files were never filtered out in the first place.
 
 ## Common patterns
 
