@@ -22,6 +22,12 @@ data FileType a where
   -- hot-reload path before the file is also indexed as linkable source.
   -- See "Emanote.Model.SourceDependencies".
   LuaFilter :: FileType SourceExt
+  -- | A @.emanoteignore@ file. Tracked as its own type so unionmount
+  -- delivers edits to it through the same fsnotify pipeline as other
+  -- source files; the handler then re-parses the patterns and walks
+  -- the model to evict or re-include affected notes without restart.
+  -- See "Emanote.Source.Ignore" and "Emanote.Source.Dynamic".
+  IgnoreFile :: FileType SourceExt
   -- | `AnyExt` has no *known* (at compile time) extension. It is used as a
   -- "catch all" type to capture files using an arbitrary.
   AnyExt :: FileType SourceExt

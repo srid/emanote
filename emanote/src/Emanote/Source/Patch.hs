@@ -160,6 +160,10 @@ patchModel' layers noteF storkIndexTVar model fpType fp action = do
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
+    R.IgnoreFile ->
+      -- Handled upstream in 'Emanote.Source.Dynamic.handleIgnoreFileChanges';
+      -- the LuaFilter-vs-IgnoreFile interception asymmetry is documented there.
+      pure id
     R.AnyExt ->
       pure id
   staticPatch <- patchStaticFileIndex fpType fp action
@@ -208,6 +212,7 @@ indexesAsStaticFile = \case
   R.LuaFilter -> True
   R.Yaml -> True
   R.HeistTpl -> True
+  R.IgnoreFile -> False
   R.AnyExt -> True
 
 insertStaticFile ::
@@ -217,10 +222,11 @@ insertStaticFile ::
   R.R 'R.AnyExt ->
   m (ModelEma -> ModelEma)
 insertStaticFile refreshAction overlays r = do
-  let fpAbs = locResolve $ head overlays
+  let topOverlay = head overlays
+      fpAbs = locResolve topOverlay
   t <- liftIO getCurrentTime
   mInfo <- readStaticFileInfo fpAbs (fmap decodeUtf8 . readRefreshedFile refreshAction)
-  pure $ M.modelInsertStaticFile t r fpAbs mInfo
+  pure $ M.modelInsertStaticFile t r fpAbs mInfo (Just topOverlay)
 
 {- | Declaration-form keys an unionmount-delivered path could correspond
 to: the path itself, plus each layer-mount-prefix-stripped variant. The
