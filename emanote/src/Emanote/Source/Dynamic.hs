@@ -180,10 +180,6 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
       initialModel
       handle
 
-{- | Flatten a `Change` into per-file entries so a streaming handler can
-fold them one at a time (the GC-eager pattern unionMountStreaming
-exists for; see its haddock).
--}
 changeEntries ::
   UM.Change Loc (R.FileType R.SourceExt) ->
   [(R.FileType R.SourceExt, FilePath, UM.FileAction (NonEmpty (Loc, FilePath)))]
@@ -225,7 +221,6 @@ applyFiltered ctx patterns m (fpType, fp, action) = case action of
   where
     dispatch a = applyOne ctx m (fpType, fp, a)
 
--- | Apply one unfiltered event by delegating to 'Patch.patchModel'.
 applyOne ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
   HandlerCtx ->
@@ -236,29 +231,24 @@ applyOne ctx m (fpType, fp, action) = do
   trans <- Patch.patchModel (ctx ^. ctxLayers) (ctx ^. ctxNoteFn) (ctx ^. ctxStorkIndex) m fpType fp action
   pure $! trans m
 
--- | Atomic snapshot of the hot-reload state.
 snapshotSlice :: (MonadIO m) => IgnoreState -> m IgnoreSlice
 snapshotSlice st = readTVarIO (st ^. isSlice)
 
--- | Apply a transformer to the slice in a single STM transaction.
 updateSlice :: (MonadIO m) => IgnoreState -> (IgnoreSlice -> IgnoreSlice) -> m ()
 updateSlice st f =
   liftIO $ atomically $ modifyTVar' (st ^. isSlice) f
 
-{- | Overwrite the ledger entry for @fp@ unconditionally; the latest
-  unionmount event always carries the freshest overlay info, so the
-  replacement is the right call from the 'applyFiltered' path.
+{- | Overwrite-wins. Called from 'applyFiltered'; the latest unionmount
+  event carries the freshest overlay info so a replacement is correct.
 -}
 recordModified :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
 recordModified st fp ev =
   updateSlice st $ sliceModified %~ Map.insert fp ev
 
-{- | Insert a ledger entry only if @fp@ is absent. Used by the model
-walk in 'evictNewlyIgnored', which has access to a single @(Loc,
-FilePath)@ via @_noteSource@ / @_staticFileSource@ — a thinner record
-than the full overlay 'applyFiltered' captured from a real unionmount
-event. If an existing entry was recorded from a prior partial filter,
-it carries the full overlay history and must win.
+{- | Existing-wins. Called from the model walk in 'evictNewlyIgnored';
+  the model only knows the top overlay via @_noteSource@ /
+  @_staticFileSource@, so any existing ledger entry (from a prior
+  'OverlayPartial') has richer multi-layer history and must survive.
 -}
 recordModifiedIfAbsent :: (MonadIO m) => IgnoreState -> FilePath -> ModifiedEvent -> m ()
 recordModifiedIfAbsent st fp ev =
@@ -394,7 +384,6 @@ reEmitModified ctx newPatterns m0 = do
               log $ "Hot-reload: re-including " <> toText fp <> " (partial overlay)"
               dispatch (UM.Refresh refr survivors)
 
--- | Recover the unionmount-style mounted path from a layer + layer-relative file.
 mountedPath :: Loc -> FilePath -> FilePath
 mountedPath loc lfp =
   maybe lfp (</> lfp) (Loc.locMountPoint loc)
