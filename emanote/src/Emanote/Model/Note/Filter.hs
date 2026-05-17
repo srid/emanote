@@ -22,6 +22,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
 import Emanote.Model.SData qualified as SData
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Prelude (log, logE)
 import Relude
 import System.Directory (doesFileExist, doesPathExist, getTemporaryDirectory, removeFile)
@@ -315,10 +316,15 @@ emanoteLuaHelpers =
     , "  opts = opts or {}"
     , "  local children = { pandoc.Para { pandoc.Strong { pandoc.Str(opts.title or 'Pandoc Lua filter error') } }, pandoc.CodeBlock(tostring(opts.message or '')) }"
     , "  if opts.source then table.insert(children, pandoc.CodeBlock(opts.source, pandoc.Attr('', { opts.source_class or '' }, {}))) end"
-    , "  return pandoc.Div(children, pandoc.Attr('', { 'emanote:error', 'emanote:error:lua-filter' }, {}))"
+    , "  return pandoc.Div(children, pandoc.Attr('', { " <> luaClassList <> " }, {}))"
     , "end;"
     , "_G.emanote = emanote;"
     ]
+  where
+    -- Render the Haskell-side class list (`errorClasses Diagnostic.luaFilterCategory`)
+    -- as a Lua table literal of single-quoted strings, so a rename of the
+    -- protocol class on either side is a one-edit change.
+    luaClassList = T.intercalate ", " ["'" <> c <> "'" | c <- Diagnostic.errorClasses Diagnostic.luaFilterCategory]
 
 {- | Lua chunk prepended to every parse-time filter to enforce the no-IO
 policy at runtime. Generated from the same name lists the static scanner

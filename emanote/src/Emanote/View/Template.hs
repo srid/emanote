@@ -22,6 +22,7 @@ import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -295,7 +296,7 @@ failing fence, so both diagnostic surfaces share one styling entry in
 prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
 prependRenderFilterErrors [] doc = doc
 prependRenderFilterErrors errs (Pandoc meta blocks) =
-  Pandoc meta $ MN.errorDiv "lua-filter" "Pandoc Lua filter error" errs : blocks
+  Pandoc meta $ MN.errorDiv Diagnostic.luaFilterCategory "Pandoc Lua filter error" errs : blocks
 
 {- | HACK: Pandoc Lua filters can return AST nodes but cannot @tell@ the
 host's @MonadWriter@ diagnostic channel. So 'lua-filters/diagram.lua'
@@ -316,9 +317,10 @@ to, drained here after @runWriterT@). Tracked in #625 follow-up.
 extractInPlaceFilterErrors :: Pandoc -> [Text]
 extractInPlaceFilterErrors = PW.query collect
   where
+    luaFilterClass = Diagnostic.errorVariantClass Diagnostic.luaFilterCategory
     collect :: B.Block -> [Text]
     collect (B.Div (_, classes, _) blocks)
-      | "emanote:error:lua-filter" `elem` classes = [errorText classes blocks]
+      | luaFilterClass `elem` classes = [errorText classes blocks]
     collect _ = []
     errorText classes bs = case [t | B.CodeBlock _ t <- bs] of
       (msg : _) -> msg

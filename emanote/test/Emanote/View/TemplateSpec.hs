@@ -1,6 +1,7 @@
 module Emanote.View.TemplateSpec where
 
 import Data.Text qualified as T
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.View.Template (extractInPlaceFilterErrors)
 import Relude
 import Test.Hspec
@@ -17,7 +18,15 @@ import Text.Pandoc.Definition (Pandoc (..))
 --
 -- These tests pin that contract — what the Lua emits, what the Haskell
 -- reader extracts — so a future tweak to either side either preserves
--- the cross-language coupling or breaks loudly here.
+-- the cross-language coupling or breaks loudly here. The class strings
+-- come from 'Emanote.Pandoc.Diagnostic' so a rename of the protocol
+-- category propagates here without manual edits.
+
+luaFilterClasses :: [Text]
+luaFilterClasses = Diagnostic.errorClasses Diagnostic.luaFilterCategory
+
+luaFilterVariantClass :: Text
+luaFilterVariantClass = Diagnostic.errorVariantClass Diagnostic.luaFilterCategory
 
 spec :: Spec
 spec = describe "extractInPlaceFilterErrors" $ do
@@ -26,7 +35,7 @@ spec = describe "extractInPlaceFilterErrors" $ do
           Pandoc mempty $
             one $
               B.Div
-                ("", ["emanote:error", "emanote:error:lua-filter"], [])
+                ("", luaFilterClasses, [])
                 [ B.Para [B.Strong [B.Str "Diagram error (cetz)"]]
                 , B.CodeBlock B.nullAttr "typst: error: unclosed delimiter"
                 , B.CodeBlock ("", ["cetz"], []) "#canvas({ broken"
@@ -41,10 +50,10 @@ spec = describe "extractInPlaceFilterErrors" $ do
           Pandoc mempty $
             one $
               B.Div
-                ("", ["emanote:error:lua-filter"], [])
+                ("", [luaFilterVariantClass], [])
                 [B.Para [B.Str "no engine output"]]
         msg = fromMaybe "" $ viaNonEmpty head $ extractInPlaceFilterErrors doc
-    msg `shouldSatisfy` T.isInfixOf "emanote:error:lua-filter"
+    msg `shouldSatisfy` T.isInfixOf luaFilterVariantClass
 
   it "ignores Divs that don't carry the marker class" $ do
     let doc =
@@ -70,7 +79,7 @@ spec = describe "extractInPlaceFilterErrors" $ do
   it "collects every marker Div in the doc, in order" $ do
     let marker n =
           B.Div
-            ("", ["emanote:error:lua-filter"], [])
+            ("", [luaFilterVariantClass], [])
             [B.CodeBlock B.nullAttr ("engine error " <> n)]
         doc = Pandoc mempty [marker "1", B.Para [B.Str "interlude"], marker "2"]
     extractInPlaceFilterErrors doc `shouldBe` ["engine error 1", "engine error 2"]
@@ -78,7 +87,7 @@ spec = describe "extractInPlaceFilterErrors" $ do
   it "walks nested Divs (a marker inside a wrapper)" $ do
     let inner =
           B.Div
-            ("", ["emanote:error:lua-filter"], [])
+            ("", [luaFilterVariantClass], [])
             [B.CodeBlock B.nullAttr "deeply nested"]
         doc = Pandoc mempty $ one $ B.Div B.nullAttr [inner]
     extractInPlaceFilterErrors doc `shouldBe` ["deeply nested"]
