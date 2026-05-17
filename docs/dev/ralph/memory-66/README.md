@@ -46,6 +46,17 @@ GC time, productivity). Heap-profile breakdowns come from `+RTS -hT` on a
 profiling-linked binary. The `.hp` file is parsed by `hp2pretty` /
 `hp2html` for visualization.
 
+## Final result (5-run median on 4.5k corpus, `+RTS -N`)
+
+| Metric        | Baseline @6950760d | After cycles 1-3 | Δ |
+| ------------- | -----------------: | ---------------: | --- |
+| `READY` (s)   |                 51 |               55 | +8 % |
+| `LOAD_HWM`    |           5162 MiB |         3647 MiB | **−29.3 %** |
+| `AFTER_HWM`   |           5181 MiB |         3672 MiB | **−29.1 %** |
+| Live (`-RTS -s`) | 1.85 GiB | 1.27 GiB | **−31 %** |
+| Total alloc   |             416 GB |   ~399 GB | −4 % |
+| GC productivity |             70.9 % |       74.9 % | +4 pp |
+
 ## Baseline (origin/master, commit [6950760d](https://github.com/srid/emanote/commit/6950760d))
 
 | Corpus | Files | MB raw | Ready (s) | Load VmHWM (MiB) | After-hits VmHWM (MiB) |
@@ -122,22 +133,6 @@ in the model.
 
 5. **`-F2` retention factor.** Independent of live data — a tuning fix
    alone can move RSS by ~30%.
-
-## Cycle plan
-
-In order of expected ROI vs. risk:
-
-| # | Idea                                                          | Expected | Risk |
-|---|---------------------------------------------------------------|----------|------|
-| 1 | Force parsed `Note` with `evaluate . force` in `parseAndInsert` (organon-style) | ~10-25% | low |
-| 2 | `+RTS -F1.2 -A8m` baked into executable                       | ~20-30% RSS, modest throughput cost | low |
-| 3 | Strict `Note` fields (`StrictData` or bangs)                  | ~5-15%  | low |
-| 4 | Move parsed `Note` set into a `GHC.Compact` region            | ~30-50% live | high |
-| 5 | Drop `_noteDoc :: Pandoc`; re-parse on render                 | ~40-60% live, latency cost | high |
-| 6 | Skip Pandoc retention; emit Heist templates eagerly at insert | structural rewrite | high |
-
-Cycles 1-3 are behaviour-preserving local fixes. Cycles 4-6 are
-architectural changes (sanctioned by the `/ralph` scoping question).
 
 ## Optimization log
 
@@ -299,6 +294,50 @@ hundred MiB of waste. Also added ~75 % to startup (53 s → 93 s).
 `GHC.Compact` would only help if **all 4500 notes shared one region**,
 which requires re-compacting on every file edit (an expensive
 rebuild). Rejected.
+
+## Root cause and the ceiling at ~−29 %
+
+The cycles above are the floor of what is achievable while still keeping
+the assumption *"each Note retains its full `Pandoc` AST in
+`_modelNotes`"*. Within that assumption:
+
+- Per-Note Pandoc AST is ~250 KiB for a ~15 KiB source markdown — a
+  ~16× source-to-AST blow-up driven by list cons, `Inline` constructors,
+  and `Text` with its backing `ByteArray#`s.
+- 4500 notes × ~250 KiB ≈ **1.1 GiB unavoidable live data**, which
+  matches the post-cycle live residency of 1.27 GiB.
+- GHC's old-generation retention multiplier on that live data accounts
+  for the rest of RSS.
+
+Cycles 1-3 attack the *indirect* costs around that ceiling:
+
+| Cost component                                       | Cycle |
+| ---------------------------------------------------- | ----- |
+| Per-file parser closures held by streaming mount    | 1     |
+| GHC's `-F2` heap-headroom multiplier                | 2     |
+| Pandoc-block context duplicated into `_modelRels`   | 3     |
+
+To go meaningfully below ~3.5 GiB AFTER_HWM, **the assumption itself
+must change**. The architectural options are:
+
+1. **Don't retain `_noteDoc :: Pandoc`.** Store source text, re-parse
+   on render. Extracted indices (title, tags, link skeletons) are
+   built once at insert time and persisted. Render latency rises by
+   one Pandoc parse per request (~10 ms per typical note). Live
+   residency drops by ~1 GiB.
+2. **Serialize `_noteDoc` to a `ByteString` blob** (e.g. via `binary`
+   with a derived `Binary Pandoc` instance) and decode on access. Same
+   trade-off as (1) but keeps the existing `noteDoc :: Note -> Pandoc`
+   API as a `Generic`-derived getter.
+3. **Move the IxNote into a single `GHC.Compact` region after initial
+   load** and re-compact on file edits (debounced). Avoids
+   per-Note region overhead while preserving the API surface.
+   `GHC.Compact` here mostly helps GC time, not RSS.
+
+All three are real refactors with meaningful test-surface implications.
+This PR stops at cycles 1-3 to deliver a measurable, behaviour-preserving
+−29 % today; the architectural follow-ups belong in a separate change
+once the design choice between (1)/(2)/(3) is made.
 
 ## Open question: `gen` mode blow-up
 
