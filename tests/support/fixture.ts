@@ -42,6 +42,7 @@ const mutatedPaths: string[] = [
   "lua-filter-demo.md", // Markdown note edits via its declared filter
   "lua-filter-org-demo.org", // Org note edits via its declared filter
   "lua-filter-hello-fence.md", // hello.lua hot-reload matrix (prose + fence-body edits)
+  ".emanoteignore", // .emanoteignore hot-reload (issue #739)
 ];
 
 /** Files that hot-reload scenarios create from scratch at the

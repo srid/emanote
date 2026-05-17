@@ -20,12 +20,16 @@ filePattern = \case
       $ "**/*"
   R.LuaFilter ->
     R.withExt @_ @'R.LuaFilter "**/*"
+  R.IgnoreFile ->
+    ignoreFilePattern
   R.AnyExt ->
     "**"
 
 {- | unionmount assigns the first matching pattern's tag, so 'R.AnyExt'
 is appended last by construction — new known types add to
 'knownTypes' without disturbing the catch-all's trailing position.
+'R.IgnoreFile' must precede 'R.AnyExt' so an @.emanoteignore@ file
+is tagged as an ignore file rather than as an arbitrary static asset.
 -}
 filePatterns :: [(R.FileType R.SourceExt, FilePattern)]
 filePatterns =
@@ -39,11 +43,18 @@ filePatterns =
       , R.Yaml
       , R.HeistTpl
       , R.LuaFilter
+      , R.IgnoreFile
       ]
 
 {- | Universal ignore patterns applied to every layer. Layer-specific
-ignores belong in a `.emanoteignore` file at the layer root — see
+ignores belong in a @.emanoteignore@ file at the layer root — see
 "Emanote.Source.Ignore".
+
+@.emanoteignore@ deliberately does NOT appear here: 'Emanote.Source.Dynamic'
+threads its events through the fsnotify pipeline so mid-session edits
+can refresh the model. The 'R.IgnoreFile' branch in
+@Emanote.Source.Patch.indexesAsStaticFile@ keeps it from leaking onto
+the static-file route despite being unfiltered here.
 -}
 ignorePatterns :: [FilePattern]
 ignorePatterns =
@@ -53,6 +64,4 @@ ignorePatterns =
     "**/*~"
   , -- /Top-level ./-/ directory is reserved by Emanote
     "-/**"
-  , -- The ignore file itself is configuration, not a note or static asset.
-    ignoreFilePattern
   ]

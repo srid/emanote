@@ -32,6 +32,10 @@ Patterns in a `.emanoteignore` only suppress files inside the layer they live in
 
 Universal ignores (dotfile directories, editor backup files, the reserved `-/` directory, the `.emanoteignore` file itself) are still enforced globally — those don't need to be repeated per layer.
 
+## Hot reload
+
+Editing `.emanoteignore` mid-session takes effect immediately, without restarting `emanote run` (closes [#739](https://github.com/srid/emanote/issues/739)). Adding a pattern evicts matching notes from the model and the sidebar; removing a pattern brings the previously-hidden notes back. Multi-layer notebooks update on a per-layer basis: editing `layer-A/.emanoteignore` only re-evaluates files inside layer A.
+
 ## Common patterns
 
 | Use case | Pattern |

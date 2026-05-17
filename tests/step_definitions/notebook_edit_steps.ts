@@ -85,6 +85,74 @@ Then(
   },
 );
 
+// .emanoteignore hot-reload (issue #739) wants to rewrite a whole
+// configuration file rather than patch a substring — easier with a
+// Gherkin doc-string than with the substring-based `I replace …` step.
+When(
+  "I write the file {string} with:",
+  function (fp: string, body: string) {
+    const target = path.join(stagedFixtureDir, fp);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, body);
+  },
+);
+
+// Like `the article body contains … within N seconds` but polls a URL
+// over HTTP instead of an already-open page. .emanoteignore hot-reload
+// scenarios need this because a newly re-included route may never have
+// been opened in the browser; we just want to assert that fetching it
+// reflects the updated ignore set.
+Then(
+  "the URL {string} contains {string} within {int} seconds",
+  async function (
+    this: EmanoteWorld,
+    url: string,
+    needle: string,
+    seconds: number,
+  ) {
+    const deadline = Date.now() + seconds * 1000;
+    let lastSnippet = "";
+    while (Date.now() < deadline) {
+      const resp = await this.page.request.get(url);
+      if (resp.ok()) {
+        const body = await resp.text();
+        lastSnippet = body.slice(0, 200);
+        if (body.includes(needle)) return;
+      }
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    throw new Error(
+      `URL ${url} did not contain ${JSON.stringify(needle)} within ${seconds}s; last body prefix: ${JSON.stringify(lastSnippet)}.`,
+    );
+  },
+);
+
+// Inverse of the above: poll until the URL no longer includes the
+// marker (body changed, or the route became unreachable). Used by the
+// "pattern added → note hidden" branch of the .emanoteignore hot-reload
+// matrix.
+Then(
+  "the URL {string} stops containing {string} within {int} seconds",
+  async function (
+    this: EmanoteWorld,
+    url: string,
+    needle: string,
+    seconds: number,
+  ) {
+    const deadline = Date.now() + seconds * 1000;
+    while (Date.now() < deadline) {
+      const resp = await this.page.request.get(url);
+      if (!resp.ok()) return;
+      const body = await resp.text();
+      if (!body.includes(needle)) return;
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    throw new Error(
+      `URL ${url} continued to contain ${JSON.stringify(needle)} after ${seconds}s.`,
+    );
+  },
+);
+
 // Used when a scenario creates a brand-new note: opening the route
 // before emanote has parsed it lands on the "missing link" template,
 // which doesn't morph into the real page when the route later

@@ -1,16 +1,33 @@
 {- | Load user-controllable ignore patterns from a per-layer
-@.emanoteignore@ file.
+@.emanoteignore@ file, and re-read them mid-session when those files
+change.
 
 Each layer (user or default) may contain a top-level @.emanoteignore@
 listing one `FilePattern` per line. Blank lines and lines beginning
 with @#@ are skipped. Patterns are scoped to the layer they live in,
 so a pattern in layer A's file does not affect files inside layer B.
+
+The static loader 'loadIgnorePatterns' is the startup path. The
+mid-session hot-reload path lives in 'Emanote.Source.Dynamic' and
+calls 'readIgnoreFile' on each fsnotify event for an 'R.IgnoreFile';
+the parsed patterns are stored in a 'TVar' so unionmount's overlay
+filter sees the new values immediately and the model walk that
+follows knows which notes flipped sides.
 -}
 module Emanote.Source.Ignore (
+  -- * Loading patterns
   loadIgnorePatterns,
+  readIgnoreFile,
+  parsePatterns,
+
+  -- * Filenames and patterns
   ignoreFileName,
   ignoreFilePattern,
-  parsePatterns,
+  isLayerRootIgnoreFile,
+
+  -- * Applying patterns
+  matchesAnyPattern,
+  isLayerPathIgnored,
 ) where
 
 import Data.Map.Strict qualified as Map
@@ -20,7 +37,7 @@ import Emanote.Source.Loc (Loc, locPath)
 import Relude
 import System.Directory (doesFileExist)
 import System.FilePath ((</>))
-import System.FilePattern (FilePattern)
+import System.FilePattern (FilePattern, (?==))
 
 {- | The filename Emanote reads ignore patterns from, relative to each
 layer's root.
@@ -28,29 +45,34 @@ layer's root.
 ignoreFileName :: FilePath
 ignoreFileName = ".emanoteignore"
 
-{- | The `FilePattern` that matches the ignore file at any depth. Used
-by "Emanote.Source.Pattern" to keep the configuration file off the
-static-file route.
+{- | The `FilePattern` that matches the ignore file at any depth.
+Used in "Emanote.Source.Pattern" to surface ignore-file events
+through unionmount as their own 'R.IgnoreFile' tag.
 -}
 ignoreFilePattern :: FilePattern
 ignoreFilePattern = "**/" <> ignoreFileName
 
 {- | Read @.emanoteignore@ from each layer's root and return a map keyed
 by `Loc`. Layers without an ignore file (or with an empty one) are
-absent from the result; `unionMount` treats absence as "no per-source
-patterns," which is the correct behavior for those layers.
+absent from the result.
 -}
 loadIgnorePatterns :: (MonadIO m) => Set Loc -> m (Map Loc [FilePattern])
 loadIgnorePatterns layers =
   fmap (Map.fromList . catMaybes) $ forM (Set.toList layers) $ \loc -> do
-    let path = fst (locPath loc) </> ignoreFileName
-    liftIO (doesFileExist path) >>= \case
-      False -> pure Nothing
-      True -> do
-        contents <- decodeUtf8 <$> readFileBS path
-        case parsePatterns contents of
-          [] -> pure Nothing
-          pats -> pure $ Just (loc, pats)
+    readIgnoreFile (fst (locPath loc) </> ignoreFileName) <&> \case
+      [] -> Nothing
+      pats -> Just (loc, pats)
+
+{- | Read and parse a single @.emanoteignore@ file. Returns @[]@ when
+the file is absent, empty, or parses to no usable patterns — the
+"no patterns" semantic is the same in all three cases, which keeps
+callers from re-tripping over 'doesFileExist'.
+-}
+readIgnoreFile :: (MonadIO m) => FilePath -> m [FilePattern]
+readIgnoreFile path =
+  liftIO (doesFileExist path) >>= \case
+    False -> pure []
+    True -> parsePatterns . decodeUtf8 <$> readFileBS path
 
 {- | Strip blanks and comments, then return one pattern per remaining
 line. Comment syntax is a literal @#@ at the start of the line — no
@@ -65,3 +87,22 @@ parsePatterns =
       guard $ not (T.null trimmed)
       guard $ not ("#" `T.isPrefixOf` trimmed)
       pure $ toString trimmed
+
+{- | Is the given layer-relative path the @.emanoteignore@ file at the
+layer root? Sub-tree ignore files (e.g. @sub/.emanoteignore@) are
+delivered to the handler by unionmount under the same 'R.IgnoreFile'
+tag but are configuration noise — only the layer-root file is read.
+-}
+isLayerRootIgnoreFile :: FilePath -> Bool
+isLayerRootIgnoreFile = (== ignoreFileName)
+
+-- | Does any of the patterns match the given layer-relative path?
+matchesAnyPattern :: [FilePattern] -> FilePath -> Bool
+matchesAnyPattern pats fp = any (?== fp) pats
+
+{- | Is a given layer-relative path ignored under the per-layer
+pattern set? Layers absent from the map carry no per-layer patterns.
+-}
+isLayerPathIgnored :: Map Loc [FilePattern] -> Loc -> FilePath -> Bool
+isLayerPathIgnored patterns loc =
+  matchesAnyPattern (Map.findWithDefault [] loc patterns)

@@ -160,6 +160,14 @@ patchModel' layers noteF storkIndexTVar model fpType fp action = do
         UM.Delete -> do
           log $ "Removing template: " <> toText fp
           pure $ M.modelHeistTemplate %~ T.removeTemplateFile fp
+    R.IgnoreFile ->
+      -- .emanoteignore events drive the hot-reload path in
+      -- 'Emanote.Source.Dynamic' before the change set reaches this
+      -- function; by the time we see one here, its effects have
+      -- already been applied to the model (via synthesised refresh /
+      -- delete actions for the notes whose ignore status flipped).
+      -- No further per-file work is needed.
+      pure id
     R.AnyExt ->
       pure id
   staticPatch <- patchStaticFileIndex fpType fp action
@@ -208,6 +216,7 @@ indexesAsStaticFile = \case
   R.LuaFilter -> True
   R.Yaml -> True
   R.HeistTpl -> True
+  R.IgnoreFile -> False
   R.AnyExt -> True
 
 insertStaticFile ::
