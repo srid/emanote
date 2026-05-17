@@ -13,7 +13,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as assert from "node:assert";
 import { EmanoteWorld } from "../support/world.ts";
-import { stagedFixtureDir } from "../support/fixture.ts";
+import { stagedFixtureDir, writeStaged } from "../support/fixture.ts";
 
 When("I delete {string}", function (fp: string) {
   fs.unlinkSync(path.join(stagedFixtureDir, fp));
@@ -88,14 +88,9 @@ Then(
 // .emanoteignore hot-reload (issue #739) wants to rewrite a whole
 // configuration file rather than patch a substring — easier with a
 // Gherkin doc-string than with the substring-based `I replace …` step.
-When(
-  "I write the file {string} with:",
-  function (fp: string, body: string) {
-    const target = path.join(stagedFixtureDir, fp);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, body);
-  },
-);
+When("I write the file {string} with:", function (fp: string, body: string) {
+  writeStaged(fp, body);
+});
 
 // Like `the article body contains … within N seconds` but polls a URL
 // over HTTP instead of an already-open page. .emanoteignore hot-reload

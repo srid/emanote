@@ -9,9 +9,7 @@
  */
 
 import { When } from "@cucumber/cucumber";
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { stagedFixtureDir } from "../support/fixture.ts";
+import { writeStaged } from "../support/fixture.ts";
 
 /** Build a Pandoc Lua filter that rewrites a single token. The shape
  *  is fixed across our scenarios — only the input/output tokens vary
@@ -29,9 +27,7 @@ end
 When(
   "I write {string} so {word} maps to {string}",
   function (fp: string, fromToken: string, toToken: string) {
-    const target = path.join(stagedFixtureDir, fp);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, tokenRewriteFilter(fromToken, toToken));
+    writeStaged(fp, tokenRewriteFilter(fromToken, toToken));
   },
 );
 
@@ -58,9 +54,7 @@ return { { CodeBlock = on_hello } }
 When(
   "I write a hello-shadow filter at {string} with prefix {string}",
   function (fp: string, prefix: string) {
-    const target = path.join(stagedFixtureDir, fp);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(target, helloShadowFilter(prefix));
+    writeStaged(fp, helloShadowFilter(prefix));
   },
 );
 
@@ -83,7 +77,7 @@ pandoc:
 
 A token a not-yet-existing filter will rewrite: ${token}
 `;
-    fs.writeFileSync(path.join(stagedFixtureDir, mdPath), md);
+    writeStaged(mdPath, md);
   },
 );
 
@@ -97,6 +91,6 @@ When(
 
 A token a not-yet-existing filter will rewrite: ${token}
 `;
-    fs.writeFileSync(path.join(stagedFixtureDir, orgPath), org);
+    writeStaged(orgPath, org);
   },
 );

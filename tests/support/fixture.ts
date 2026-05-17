@@ -68,6 +68,17 @@ const ephemeralFiles: string[] = [
  *  file inside a tracked subtree is cleaned up automatically without
  *  the scenario needing to declare it. Top-level ephemeral files are
  *  listed explicitly. */
+/** Write a file at @relativeFp inside the staged notebook, creating
+ *  any missing parent directories. Shared by every step that mutates
+ *  the staged fixture — keeps the three-line mkdirSync + writeFileSync
+ *  ceremony in one place.
+ */
+export function writeStaged(relativeFp: string, contents: string): void {
+  const target = path.join(stagedFixtureDir, relativeFp);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, contents);
+}
+
 export function resetStagedNotebookMutations(): void {
   for (const sub of mutatedPaths) {
     const staged = path.join(stagedFixtureDir, sub);
