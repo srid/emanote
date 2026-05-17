@@ -292,8 +292,17 @@ handleIgnoreFileChanges ctx m0 = do
     else do
       updateSlice st $ slicePatterns .~ newPatterns
       log "Hot-reload: .emanoteignore patterns changed; refreshing model"
-      m1 <- evictNewlyIgnored ctx newPatterns m0
-      reEmitModified ctx newPatterns m1
+      -- Layers whose pattern set actually moved. Restricting the model
+      -- and ledger walks to these keeps the eviction O(notes-in-changed-layers)
+      -- on large notebooks instead of O(all-notes).
+      let changedLocs =
+            Set.fromList
+              [ loc
+              | loc <- toList (Set.union (Map.keysSet oldPatterns) (Map.keysSet newPatterns))
+              , Map.lookup loc oldPatterns /= Map.lookup loc newPatterns
+              ]
+      m1 <- evictNewlyIgnored ctx changedLocs newPatterns m0
+      reEmitModified ctx changedLocs newPatterns m1
 
 {- | For each note or static file whose source now matches a pattern
 that didn't exist before, delete it from the model and remember the
@@ -309,20 +318,23 @@ source metadata yet — see the docs note in
 evictNewlyIgnored ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
   HandlerCtx ->
+  Set Loc ->
   Map Loc [FilePattern] ->
   Model.ModelEma ->
   m Model.ModelEma
-evictNewlyIgnored ctx newPatterns m0 = do
+evictNewlyIgnored ctx changedLocs newPatterns m0 = do
   let noteVictims =
         [ (note, loc, lfp)
         | note <- Ix.toList (m0 ^. Model.modelNotes)
         , Just (loc, lfp) <- pure (N._noteSource note)
+        , Set.member loc changedLocs
         , Ignore.isLayerPathIgnored newPatterns loc lfp
         ]
       staticVictims =
         [ (sf, loc, lfp)
         | sf <- Ix.toList (m0 ^. Model.modelStaticFiles)
         , Just (loc, lfp) <- pure (SF._staticFileSource sf)
+        , Set.member loc changedLocs
         , Ignore.isLayerPathIgnored newPatterns loc lfp
         ]
   unless (null noteVictims) $ Stork.clearStorkIndex (ctx ^. ctxStorkIndex)
@@ -359,13 +371,20 @@ recorded for the next pattern change.
 reEmitModified ::
   (MonadUnliftIO m, MonadLoggerIO m) =>
   HandlerCtx ->
+  Set Loc ->
   Map Loc [FilePattern] ->
   Model.ModelEma ->
   m Model.ModelEma
-reEmitModified ctx newPatterns m0 = do
+reEmitModified ctx changedLocs newPatterns m0 = do
   let st = ctx ^. ctxIgnoreState
   entries <- Map.toList . _sliceModified <$> snapshotSlice st
-  foldlM (reEmit st) m0 entries
+  -- An entry whose overlay locs were untouched can't have flipped sides
+  -- under the new patterns; skip without classifying.
+  let affected =
+        filter
+          (\(_, ev) -> any (\(loc, _) -> Set.member loc changedLocs) (ev ^. meOriginalOverlays))
+          entries
+  foldlM (reEmit st) m0 affected
   where
     reEmit st m (fp, ev) =
       let overlays = ev ^. meOriginalOverlays
