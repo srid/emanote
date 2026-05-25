@@ -1,5 +1,7 @@
 module Emanote.MCP.ToolsSpec where
 
+import Data.Aeson qualified as Aeson
+import Data.Text qualified
 import Emanote.MCP.Tools (NoteMatch (..), ResolveResult (..), findNotes, getBacklinks, resolveWikilink)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type qualified as M
@@ -57,9 +59,10 @@ spec = do
     it "treats a non-positive limit as zero" $ do
       findNotes "guide" 0 notebook `shouldBe` []
 
-    it "advertises an emanote:// URI for every match" $ do
+    it "advertises an emanote:// URI for every match in the JSON payload" $ do
       let [hit] = findNotes "wiki" 20 notebook
-      uri hit `shouldBe` "emanote://note/guide/wikilinks.md"
+          json = decodeUtf8 @Text (Aeson.encode hit)
+      json `shouldSatisfy` Data.Text.isInfixOf "\"uri\":\"emanote://note/guide/wikilinks.md\""
 
   describe "getBacklinks" $ do
     let target = LMLRoute_Md (R ("guide" :| ["neuron"]))

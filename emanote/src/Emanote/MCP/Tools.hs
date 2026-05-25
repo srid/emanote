@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 {- | MCP query tools (phase 3).
 
@@ -29,8 +29,7 @@ import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as T
-import Emanote.MCP.Catalog (ResourceKind (Note))
-import Emanote.MCP.Uri (kindToUri)
+import Emanote.MCP.Uri (noteUriPrefix)
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Graph qualified as G
@@ -73,19 +72,27 @@ tools readModel =
 data NoteMatch = NoteMatch
   { path :: Text
   , title :: Text
-  , uri :: Text
   }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (ToJSON)
+
+{- | The @uri@ field is derived from @path@ so there is no way for the two to
+diverge: drift in 'noteUriPrefix' propagates to every consumer through
+one place.
+-}
+instance ToJSON NoteMatch where
+  toJSON NoteMatch {path, title} =
+    Aeson.object
+      [ "path" .= path
+      , "title" .= title
+      , "uri" .= (noteUriPrefix <> path)
+      ]
 
 noteMatchOf :: N.Note -> NoteMatch
 noteMatchOf note =
-  let p = toText $ R.lmlSourcePath (note ^. N.noteRoute)
-   in NoteMatch
-        { path = p
-        , title = Tit.toPlain (note ^. N.noteTitle)
-        , uri = kindToUri (Note (toString p))
-        }
+  NoteMatch
+    { path = toText $ R.lmlSourcePath (note ^. N.noteRoute)
+    , title = Tit.toPlain (note ^. N.noteTitle)
+    }
 
 {- | Build a 'NoteMatch' from a route. Falls back to a route-derived title
 when the note can't be looked up — used by callers that hold a route but
@@ -93,15 +100,13 @@ not the 'N.Note' (e.g. backlink sources).
 -}
 noteMatchOfRoute :: Model -> R.LMLRoute -> NoteMatch
 noteMatchOfRoute model r =
-  case M.modelLookupNoteByRoute' r model of
-    Just note -> noteMatchOf note
-    Nothing ->
-      let p = toText $ R.lmlSourcePath r
-       in NoteMatch
-            { path = p
-            , title = Tit.toPlain (Tit.fromRoute r)
-            , uri = kindToUri (Note (toString p))
-            }
+  maybe fallback noteMatchOf (M.modelLookupNoteByRoute' r model)
+  where
+    fallback =
+      NoteMatch
+        { path = toText $ R.lmlSourcePath r
+        , title = Tit.toPlain (Tit.fromRoute r)
+        }
 
 -- ---------------------------------------------------------------------------
 -- find_notes
