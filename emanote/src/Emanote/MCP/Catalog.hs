@@ -115,9 +115,8 @@ readResource :: Model -> ResourceKind -> IO (Either CatalogError ResourceBody)
 readResource model = \case
   MetadataJson ->
     pure $ Right $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
-  ContentMarkdown -> do
-    body <- ExportContent.renderContentExport model
-    pure $ Right $ ResourceBody body
+  ContentMarkdown ->
+    Right . ResourceBody <$> ExportContent.renderContentExport model
   Note path ->
     case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
       Nothing -> pure $ Left NotFound
