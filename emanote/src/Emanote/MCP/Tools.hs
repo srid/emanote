@@ -78,14 +78,30 @@ data NoteMatch = NoteMatch
   deriving stock (Eq, Show, Generic)
   deriving anyclass (ToJSON)
 
-noteMatchOf :: Model -> R.LMLRoute -> NoteMatch
-noteMatchOf model r =
-  let p = toText $ R.lmlSourcePath r
+noteMatchOf :: N.Note -> NoteMatch
+noteMatchOf note =
+  let p = toText $ R.lmlSourcePath (note ^. N.noteRoute)
    in NoteMatch
         { path = p
-        , title = Tit.toPlain (M.modelLookupTitle r model)
+        , title = Tit.toPlain (note ^. N.noteTitle)
         , uri = kindToUri (Note (toString p))
         }
+
+{- | Build a 'NoteMatch' from a route. Falls back to a route-derived title
+when the note can't be looked up — used by callers that hold a route but
+not the 'N.Note' (e.g. backlink sources).
+-}
+noteMatchOfRoute :: Model -> R.LMLRoute -> NoteMatch
+noteMatchOfRoute model r =
+  case M.modelLookupNoteByRoute' r model of
+    Just note -> noteMatchOf note
+    Nothing ->
+      let p = toText $ R.lmlSourcePath r
+       in NoteMatch
+            { path = p
+            , title = Tit.toPlain (Tit.fromRoute r)
+            , uri = kindToUri (Note (toString p))
+            }
 
 -- ---------------------------------------------------------------------------
 -- find_notes
@@ -101,11 +117,9 @@ findNotes :: Text -> Int -> Model -> [NoteMatch]
 findNotes query lim model =
   let q = T.toLower query
       hit note =
-        let r = note ^. N.noteRoute
-            t = Tit.toPlain (note ^. N.noteTitle)
-            p = toText (R.lmlSourcePath r)
-         in if q `T.isInfixOf` T.toLower t || q `T.isInfixOf` T.toLower p
-              then Just (noteMatchOf model r)
+        let m = noteMatchOf note
+         in if q `T.isInfixOf` T.toLower (title m) || q `T.isInfixOf` T.toLower (path m)
+              then Just m
               else Nothing
    in take (max 0 lim) $ mapMaybe hit $ Ix.toList (model ^. M.modelNotes)
 
@@ -147,7 +161,7 @@ getBacklinks fp model =
   case R.mkLMLRouteFromMdOrOrgFilePath fp of
     Nothing -> Left $ "Not a recognised note path: " <> toText fp
     Just r ->
-      Right $ noteMatchOf model . fst <$> G.modelLookupBacklinks r model
+      Right $ noteMatchOfRoute model . fst <$> G.modelLookupBacklinks r model
 
 getBacklinksTool :: IO Model -> ToolHandler
 getBacklinksTool readModel =
@@ -213,16 +227,13 @@ resolveWikilink wlText mFromPath model = do
     Nothing -> Right (M.modelIndexRoute model)
     Just p -> maybeToRight ("Not a recognised note path: " <> toText p) (R.mkLMLRouteFromMdOrOrgFilePath p)
   Right $ case Resolve.resolveWikiLinkMustExist model fromR wl of
-    Rel.RRTFound (Left (_, note)) ->
-      ResolvedNote (noteMatchOf model (note ^. N.noteRoute))
-    Rel.RRTFound (Right sf) ->
-      ResolvedStatic (staticFilePath sf)
+    Rel.RRTFound (Left (_, note)) -> ResolvedNote (noteMatchOf note)
+    Rel.RRTFound (Right sf) -> ResolvedStatic (staticFilePath sf)
     Rel.RRTMissing -> UnresolvedMissing
-    Rel.RRTAmbiguous cs ->
-      UnresolvedAmbiguous $ toList $ candidate <$> cs
+    Rel.RRTAmbiguous cs -> UnresolvedAmbiguous $ toList $ candidate <$> cs
   where
     candidate = \case
-      Left (_, note) -> Left $ noteMatchOf model (note ^. N.noteRoute)
+      Left (_, note) -> Left (noteMatchOf note)
       Right sf -> Right (staticFilePath sf)
     staticFilePath sf = toText $ R.encodeRoute (sf ^. SF.staticFileRoute)
 
