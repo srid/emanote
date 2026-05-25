@@ -21,8 +21,10 @@ fmt:
 # Run the app using ghcid (with auto-reload / recompile)
 # To run against a custom notebook:
 #   just notebook=$HOME/code/mynotebook run
+# The MCP HTTP endpoint is available at http://localhost:8079/mcp for
+# apm.yml's emanote client (see dependencies.mcp).
 run:
-    {{nix_shell}} ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L {{notebook}} run --port=9010"
+    {{nix_shell}} ghcid -c 'cabal repl exe:emanote --flags=ghcid' --warnings -T ":main -L {{notebook}} run --port=9010 --mcp-port=8079"
 
 # Run ghcid with log output to ghcid.log
 ghcid:

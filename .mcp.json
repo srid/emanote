@@ -3,6 +3,10 @@
     "chrome-devtools": {
       "command": "just",
       "args": ["mcp-chrome-devtools"]
+    },
+    "emanote": {
+      "type": "http",
+      "url": "http://localhost:8079/mcp"
     }
   }
 }
