@@ -2,8 +2,8 @@
 
 Answers two questions:
 
-* /What/ is available? — 'listResources' returns catalog entries, one per
-  static export ('MetadataJson', 'ContentMarkdown') and one per note.
+* /What/ is available? — 'listResources' returns catalog entries for
+  the static metadata export.
 * /How do I fetch one?/ — 'readResource' resolves a 'ResourceKind' to a
   'ResourceBody'.
 
@@ -38,8 +38,6 @@ import Relude
 data ResourceKind
   = -- | Whole-notebook metadata as JSON.
     MetadataJson
-  | -- | Whole-notebook concatenated Markdown.
-    ContentMarkdown
   | -- | Individual note by source-relative path (e.g. @guide/mcp.md@).
     Note FilePath
   deriving stock (Show, Eq)
@@ -51,7 +49,6 @@ __Complexity:__ /O(1)/.
 kindMime :: ResourceKind -> Text
 kindMime = \case
   MetadataJson -> "application/json"
-  ContentMarkdown -> "text/markdown"
   Note {} -> "text/markdown"
 
 -- | Catalog entry. URI-free by design; consumers assign addressing.
@@ -102,13 +99,7 @@ staticResources =
       { resourceKind = MetadataJson
       , resourceName = "Notebook metadata"
       , resourceTitle = Just "Notebook metadata (JSON)"
-      , resourceDescription = Just "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links."
-      }
-  , NotebookResource
-      { resourceKind = ContentMarkdown
-      , resourceName = "Notebook content (single-file)"
-      , resourceTitle = Just "Notebook content (single-file Markdown)"
-      , resourceDescription = Just "All notes concatenated into a single Markdown document, separated by '===' delimiters."
+      , resourceDescription = Just "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note paths, then read individual notes via the emanote://note/{path} template."
       }
   ]
 
@@ -119,8 +110,6 @@ resolved relations across all notes):
 
 * @'MetadataJson'@ — /O(N + R)/. Iterates every note in
   'Emanote.View.Export.JSON.renderJSONExport' and encodes the result.
-* @'ContentMarkdown'@ — /O(N log N + Σ |note|)/. Sorts notes by source
-  path, then reads each note's source file from disk. IO-dominated.
 * @'Note' path@ — /O(log N + |note|)/. ixset lookup plus one file read.
 
 Returns 'Left' 'NotFound' when a 'Note' kind references a path that
@@ -131,8 +120,6 @@ readResource :: Model -> ResourceKind -> IO (Either CatalogError ResourceBody)
 readResource model = \case
   MetadataJson ->
     pure $ Right $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
-  ContentMarkdown ->
-    Right . ResourceBody <$> ExportContent.renderContentExport model
   Note path ->
     case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
       Nothing -> pure $ Left NotFound

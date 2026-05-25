@@ -16,8 +16,7 @@ relations):
   'allKindShapes' list.
 * @resources\/read@ — /O(|URI|)/ for the URI parse plus the per-kind
   cost from 'Catalog.readResource' (/O(N + R)/ for metadata,
-  /O(N log N + Σ |note|)/ for content, /O(log N + |note|)/ for a single
-  note).
+  /O(log N + |note|)/ for a single note).
 
 No caching: each call re-runs against the live model.
 -}
@@ -115,7 +114,7 @@ textResult uri mime body =
 arbitrary — 'templateFor' only inspects the constructor.
 -}
 allKindShapes :: [ResourceKind]
-allKindShapes = [MetadataJson, ContentMarkdown, Note ""]
+allKindShapes = [MetadataJson, Note ""]
 
 {- | The MCP resource template for a kind, if it accepts a URI parameter.
 
@@ -127,7 +126,6 @@ decision about whether it deserves a template.
 templateFor :: ResourceKind -> Maybe ResourceTemplate
 templateFor = \case
   MetadataJson -> Nothing
-  ContentMarkdown -> Nothing
   Note _ ->
     Just
       $ ResourceTemplate

@@ -6,7 +6,6 @@ phase needs versioning, a prefix revision lands here.
 -}
 module Emanote.MCP.Uri (
   metadataUri,
-  contentUri,
   noteUriPrefix,
   noteUriTemplate,
   uriToKind,
@@ -20,9 +19,6 @@ import Relude
 metadataUri :: Text
 metadataUri = "emanote://export/metadata"
 
-contentUri :: Text
-contentUri = "emanote://export/content"
-
 noteUriPrefix :: Text
 noteUriPrefix = "emanote://note/"
 
@@ -33,12 +29,10 @@ noteUriTemplate = noteUriPrefix <> "{path}"
 uriToKind :: Text -> Maybe ResourceKind
 uriToKind uri
   | uri == metadataUri = Just MetadataJson
-  | uri == contentUri = Just ContentMarkdown
   | Just path <- T.stripPrefix noteUriPrefix uri = Just (Note (toString path))
   | otherwise = Nothing
 
 kindToUri :: ResourceKind -> Text
 kindToUri = \case
   MetadataJson -> metadataUri
-  ContentMarkdown -> contentUri
   Note path -> noteUriPrefix <> toText path
