@@ -149,7 +149,7 @@ resolveWikilink wlText mFromPath model = do
   fromR <- case mFromPath of
     Nothing -> Right (M.modelIndexRoute model)
     Just p -> maybeToRight ("Not a recognised note path: " <> toText p) (R.mkLMLRouteFromMdOrOrgFilePath p)
-  Right $ case Resolve.resolveWikiLinkMustExist model fromR wl of
+  pure $ case Resolve.resolveWikiLinkMustExist model fromR wl of
     Rel.RRTFound (Left (_, note)) -> ResolvedNote (noteMatchOf note)
     Rel.RRTFound (Right sf) -> ResolvedStatic (staticFilePath sf)
     Rel.RRTMissing -> UnresolvedMissing
