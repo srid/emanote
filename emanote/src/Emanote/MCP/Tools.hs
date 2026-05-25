@@ -143,6 +143,8 @@ readTextArgMaybe :: Text -> Maybe (Map Text Aeson.Value) -> Maybe Text
 readTextArgMaybe k margs = do
   args <- margs
   Aeson.String t <- Map.lookup k args
+  -- Normalise absent and empty-string to Nothing: some MCP clients omit
+  -- optional fields, others send "". Callers see one uniform absent signal.
   guard (not (T.null t))
   pure t
 
