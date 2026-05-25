@@ -34,7 +34,7 @@
   </title>
   
     
-      <meta property='og:description' content='[!warning] Work in progress MCP support is rolling out in phases (#645). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.' />
+      <meta property='og:description' content='[!warning] Work in progress MCP support is rolling out in phases (#645). Read-only resources are live as of this release — query tools and subscriptions arrive in later PRs. Expect the tool/prompt surface to grow until this notice is removed.' />
       <meta property='og:site_name' content='Emanote' />
       <meta property='og:image' content='https://emanote.srid.ca/' />
       <meta property='og:type' content='website' />
@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=5c7f36a4-a5f7-4973-9945-1352fb0e1a50' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=7adb8c1f-2017-4d31-9097-35608c69ed90' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -1962,7 +1962,7 @@
   <div class='callout-content text-gray-700 dark:text-gray-300'>
     
     <p class='mb-4 leading-relaxed'>
-      MCP support is rolling out in phases (<a href='https://github.com/srid/emanote/issues/645' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>#645</a>). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
+      MCP support is rolling out in phases (<a href='https://github.com/srid/emanote/issues/645' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>#645</a>). <strong>Read-only resources</strong> are live as of this release — query tools and subscriptions arrive in later PRs. Expect the tool/prompt surface to grow until this notice is removed.
     </p>
   
   </div>
@@ -2027,7 +2027,7 @@
 <span class='fu'>}</span>
 </code></pre></div>
     <p class='mb-4 leading-relaxed'>
-      Start Emanote in one terminal (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run --mcp-port 8079</code>), launch Claude Code in the same directory, and it will connect on startup. Use <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>/mcp</code> inside Claude Code to verify the server appears and list its tools/resources.
+      Start Emanote in one terminal (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote run --mcp-port 8079</code>), launch Claude Code in the same directory, and it will connect on startup. Use <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>/mcp</code> inside Claude Code to verify the server appears and list its resources.
     </p>
   
     <h3 id='codex' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
@@ -2079,6 +2079,117 @@
     <p class='mb-4 leading-relaxed'>
       You should see an SSE <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>event: message</code> frame carrying the server’s implementation metadata and advertised capabilities.
     </p>
+  
+    <h2 id='resources' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
+      
+  Resources
+  
+  <a href='mcp.html#resources' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h2>
+  
+    <p class='mb-4 leading-relaxed'>
+      Emanote advertises the notebook under the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://</code> scheme as one static export plus a per-note URI template:
+    </p>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>URI</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>MIME</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>What it returns</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://export/metadata</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>application/json</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Metadata for every note — titles, source paths, parent routes, resolved links. Same shape as <a href='export' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote export --format=metadata</code></a>. Use this to discover paths.</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://note/{path}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>text/markdown</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>One note, by its source path (e.g. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://note/guide/mcp.md</code>). Prefixed with a header block (<code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;!-- Source … --&gt;</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;!-- URL … --&gt;</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;!-- Title … --&gt;</code>, <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>&lt;!-- Wikilinks … --&gt;</code>).</td></tr></tbody></table>
+    <p class='mb-4 leading-relaxed'>
+      <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/list</code> returns only the metadata export. Emanote intentionally does <strong>not</strong> enumerate one entry per note: that scales linearly with notebook size and inflates context on every poll. <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/templates/list</code> advertises the <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://note/{path}</code> template for clients that support <a href='https://datatracker.ietf.org/doc/html/rfc6570' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>RFC 6570 URI templates</a>; to address a specific note, construct a URI from the template and call <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/read</code> directly. Discover the set of valid paths from <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://export/metadata</code> (every note’s <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>srcPath</code>).
+    </p>
+  
+
+
+
+
+  <div data-callout-metadata data-callout-fold data-callout='note' data-footnote-scope
+ class='callout p-5 pt-4 pb-3 rounded-xl mb-6 border-l-4 shadow-sm' role='note' style='background-color: color-mix(in srgb, #086DD3 8%, transparent); border-left-color: #086DD3'>
+    <div class='callout-title flex items-center mb-3 font-semibold text-lg' style='color: #086DD3'>
+      
+  <div class='callout-icon flex-shrink-0'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='w-5 h-5'>
+      
+    <line x1='18' y1='2' x2='22' y2='6'></line>
+    <path d='M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z'></path>
+  
+    </svg>
+  </div>
+
+      <div class='ml-3'>
+         No bundled-content export
+      </div>
+    </div>
+    
+  <div class='callout-content text-gray-700 dark:text-gray-300'>
+    
+    <p class='mb-4 leading-relaxed'>
+      Earlier drafts of phase 2 exposed <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote://export/content</code> (every note concatenated into a single Markdown blob). It was removed before merge: the same information is available via metadata + per-note reads, the blob blows context budgets on any non-trivial notebook (a 422-note notebook is well past any reasonable LLM window), and an MCP client that polls it re-reads the whole disk every time. The <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>emanote export --format=content</code> CLI still produces this artifact for human/script use; MCP is the wrong transport for batch export.
+    </p>
+  
+  </div>
+
+  </div>
+
+
+
+
+
+
+    <h3 id='algorithmic-complexity' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
+      
+  Algorithmic complexity
+  
+  <a href='mcp.html#algorithmic-complexity' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <p class='mb-4 leading-relaxed'>
+      Per-request cost, where <em>N</em> = number of notes in the model and <em>R</em> = total resolved relations (wikilinks + transclusions) across all notes:
+    </p>
+  <table class='mb-3'><thead><tr class='border-b-2 border-t-2 border-gray-300'><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>MCP method</th><th class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'>Cost in notebook size</th></tr></thead><tbody><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>initialize</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>O(1)</strong></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/list</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>O(1)</strong> — one fixed static entry, independent of <em>N</em></td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/templates/list</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>O(1)</strong> — currently one template (per-note); grows with templated kinds, not with notebook size</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/read emanote://export/metadata</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>O(N + R)</strong> — iterates every note and every relation; JSON-encodes the result</td></tr><tr class='border-b-2 border-t-2 border-gray-300'><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/read emanote://note/{path}</code></td><td class='py-2 px-2 align-top border-r-2 border-l-2 border-gray-300'><strong>O(log N + |note|)</strong> — ixset lookup plus one file read</td></tr></tbody></table>
+    <p class='mb-4 leading-relaxed'>
+      Reads are uncached: every <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/read</code> re-runs against the live model. There is no per-client throttling or coalescing — a client that loops over per-note reads will re-traverse the disk each time. Phase 4 (subscriptions) replaces polling with push notifications and removes the per-poll cost for clients that opt in.
+    </p>
+  
+    <h3 id='per-client-behaviour' class='group mt-8 mb-4 font-semibold text-gray-900 dark:text-gray-50 text-2xl'>
+      
+  Per-client behaviour
+  
+  <a href='mcp.html#per-client-behaviour' class='--ema-anchor ml-2'>
+    <span class='text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 group-hover:opacity-100 opacity-0 cursor-pointer text-sm align-middle transition-opacity' aria-label='Copy link' title='Copy link to heading'><svg class='inline w-5 h-5' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+        <path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path>
+        <path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path>
+      </svg></span>
+  </a>
+
+
+    </h3>
+  
+    <ul class='my-4 ml-6 list-disc space-y-1.5 leading-relaxed marker:text-gray-400 dark:marker:text-gray-500'>
+      
+        <li>
+          <strong>Codex</strong> sees the template in the model-side <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>list_mcp_resource_templates</code> tool and can call <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>read_mcp_resource</code> against any path. Works out of the box.
+        </li>
+      
+        <li>
+          <strong>Claude Code</strong>’s model-side read tool (<a href='https://code.claude.com/docs/en/mcp.md#use-mcp-resources' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>docs</a>) reads any URI the model constructs, including ones derived from the template. The <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@</code>-mention picker, however, fuzzy-searches only the enumerated <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/list</code> entries — so users won’t see individual notes there and must reference them by asking the model (e.g. “read <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>guide/mcp.md</code> from the notebook”) instead of <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>@</code>-mentioning them. Phase 3 will add a <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>find_notes</code> tool to make this lookup explicit.
+        </li>
+      
+        <li>
+          <strong>opencode</strong> populates its attach picker from <code class='py-0 px-1.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono rounded text-[0.9em] leading-normal'>resources/list</code> only; per-note attachment via UI is unavailable without an enumeration. Same model-driven workaround as Claude Code applies when the model itself drives reads.
+        </li>
+      
+    </ul>
   
     <h2 id='debugging' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
       
@@ -2202,6 +2313,39 @@
             <li class='truncate' title='Quick sanity check with curl'>
               <a href='mcp.html#quick-sanity-check-with-curl' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
                 Quick sanity check with curl
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Resources'>
+              <a href='mcp.html#resources' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Resources
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+            <li class='truncate' title='Algorithmic complexity'>
+              <a href='mcp.html#algorithmic-complexity' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Algorithmic complexity
+              </a>
+              
+        <ul class='space-y-1 ml-2'>
+          
+        </ul>
+      
+            </li>
+          
+            <li class='truncate' title='Per-client behaviour'>
+              <a href='mcp.html#per-client-behaviour' class='--ema-toc block rounded-md px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors'>
+                Per-client behaviour
               </a>
               
         <ul class='space-y-1 ml-2'>

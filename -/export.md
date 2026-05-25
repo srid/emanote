@@ -2206,7 +2206,7 @@ slug: mcp
 # MCP server
 
 > [!warning] Work in progress
-> MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). The current release ships only the HTTP transport and the lifecycle handshake — resources, tools, and subscriptions arrive in later PRs. Expect the surface to grow and the wire details to shift until this notice is removed.
+> MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). **Read-only resources** are live as of this release — query tools and subscriptions arrive in later PRs. Expect the tool/prompt surface to grow until this notice is removed.
 
 Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [live server](https://ema.srid.ca/topics/live-server), so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
 
@@ -2238,7 +2238,7 @@ Claude Code reads MCP server configuration from `.mcp.json` in your project root
 }
 ```
 
-Start Emanote in one terminal (`emanote run --mcp-port 8079`), launch Claude Code in the same directory, and it will connect on startup. Use `/mcp` inside Claude Code to verify the server appears and list its tools/resources.
+Start Emanote in one terminal (`emanote run --mcp-port 8079`), launch Claude Code in the same directory, and it will connect on startup. Use `/mcp` inside Claude Code to verify the server appears and list its resources.
 
 ### Codex
 
@@ -2263,6 +2263,40 @@ curl -sS -N -X POST http://localhost:8079/mcp \
 ```
 
 You should see an SSE `event: message` frame carrying the server's implementation metadata and advertised capabilities.
+
+## Resources
+
+Emanote advertises the notebook under the `emanote://` scheme as one static export plus a per-note URI template:
+
+| URI | MIME | What it returns |
+|---|---|---|
+| `emanote://export/metadata` | `application/json` | Metadata for every note — titles, source paths, parent routes, resolved links. Same shape as [`emanote export --format=metadata`](export.md). Use this to discover paths. |
+| `emanote://note/{path}` | `text/markdown` | One note, by its source path (e.g. `emanote://note/guide/mcp.md`). Prefixed with a header block (`<!-- Source … -->`, `<!-- URL … -->`, `<!-- Title … -->`, `<!-- Wikilinks … -->`). |
+
+`resources/list` returns only the metadata export. Emanote intentionally does **not** enumerate one entry per note: that scales linearly with notebook size and inflates context on every poll. `resources/templates/list` advertises the `emanote://note/{path}` template for clients that support [RFC 6570 URI templates](https://datatracker.ietf.org/doc/html/rfc6570); to address a specific note, construct a URI from the template and call `resources/read` directly. Discover the set of valid paths from `emanote://export/metadata` (every note's `srcPath`).
+
+> [!note] No bundled-content export
+> Earlier drafts of phase 2 exposed `emanote://export/content` (every note concatenated into a single Markdown blob). It was removed before merge: the same information is available via metadata + per-note reads, the blob blows context budgets on any non-trivial notebook (a 422-note notebook is well past any reasonable LLM window), and an MCP client that polls it re-reads the whole disk every time. The `emanote export --format=content` CLI still produces this artifact for human/script use; MCP is the wrong transport for batch export.
+
+### Algorithmic complexity
+
+Per-request cost, where _N_ = number of notes in the model and _R_ = total resolved relations (wikilinks + transclusions) across all notes:
+
+| MCP method | Cost in notebook size |
+|---|---|
+| `initialize` | **O(1)** |
+| `resources/list` | **O(1)** — one fixed static entry, independent of _N_ |
+| `resources/templates/list` | **O(1)** — currently one template (per-note); grows with templated kinds, not with notebook size |
+| `resources/read emanote://export/metadata` | **O(N + R)** — iterates every note and every relation; JSON-encodes the result |
+| `resources/read emanote://note/{path}` | **O(log N + \|note\|)** — ixset lookup plus one file read |
+
+Reads are uncached: every `resources/read` re-runs against the live model. There is no per-client throttling or coalescing — a client that loops over per-note reads will re-traverse the disk each time. Phase 4 (subscriptions) replaces polling with push notifications and removes the per-poll cost for clients that opt in.
+
+### Per-client behaviour
+
+- **Codex** sees the template in the model-side `list_mcp_resource_templates` tool and can call `read_mcp_resource` against any path. Works out of the box.
+- **Claude Code**'s model-side read tool ([docs](https://code.claude.com/docs/en/mcp.md#use-mcp-resources)) reads any URI the model constructs, including ones derived from the template. The `@`-mention picker, however, fuzzy-searches only the enumerated `resources/list` entries — so users won't see individual notes there and must reference them by asking the model (e.g. "read `guide/mcp.md` from the notebook") instead of `@`-mentioning them. Phase 3 will add a `find_notes` tool to make this lookup explicit.
+- **opencode** populates its attach picker from `resources/list` only; per-note attachment via UI is unavailable without an enumeration. Same model-driven workaround as Claude Code applies when the model itself drives reads.
 
 ## Debugging
 
