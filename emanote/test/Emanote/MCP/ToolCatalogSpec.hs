@@ -1,8 +1,8 @@
-module Emanote.MCP.ToolsSpec where
+module Emanote.MCP.ToolCatalogSpec where
 
 import Data.Aeson qualified as Aeson
 import Data.Text qualified
-import Emanote.MCP.Tools (NoteMatch (..), ResolveResult (..), findNotes, getBacklinks, resolveWikilink)
+import Emanote.MCP.ToolCatalog (NoteMatch (..), ResolveResult (..), findNotes, getBacklinks, resolveWikilink)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type qualified as M
 import Emanote.Route.ModelRoute (LMLRoute (LMLRoute_Md))
