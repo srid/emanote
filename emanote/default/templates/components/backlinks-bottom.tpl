@@ -14,7 +14,7 @@
      regular-backlinks list, .emanote-timeline for the heatmap), so
      e2e selectors and JS context detection target the right scope
      instead of conflating timeline anchors with backlink anchors. -->
-<aside class="emanote-bottom-strip lg:hidden [&:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6">
+<aside data-emanote-note-focus-hide="bottom-strip" class="emanote-bottom-strip lg:hidden [&:not(:has(*))]:hidden bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-4 py-6 space-y-6">
   <ema:note:backlinks:daily>
     <apply template="timeline" />
   </ema:note:backlinks:daily>

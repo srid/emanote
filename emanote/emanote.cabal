@@ -33,6 +33,8 @@ data-files:
   _emanote-static/stork/stork.wasm
   favicon.svg
   index.yaml
+  lua-filters/*.lua
+  lua-filters/LICENSE
   templates/**/*.tpl
 
 flag ghcid
@@ -40,10 +42,14 @@ flag ghcid
   manual:  True
 
 common haskell-common
+  -- `-j` enables module-level parallel compilation. cabal -j only
+  -- parallelises across packages; ghc -j parallelises modules within
+  -- one package, which is what emanote (single package, 60+ modules)
+  -- needs.
   ghc-options:
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
-    -fprint-explicit-foralls -fprint-explicit-kinds
+    -fprint-explicit-foralls -fprint-explicit-kinds -j
 
   default-extensions:
     BangPatterns
@@ -140,6 +146,7 @@ common library-common
     , profunctors
     , relude                 >=1.0
     , shower
+    , skylighting            >=0.14
     , stm
     , tagged
     , tagtree
@@ -181,6 +188,7 @@ library
     Emanote.Model.Note.Filter
     Emanote.Model.Query
     Emanote.Model.SData
+    Emanote.Model.SourceDependencies
     Emanote.Model.StaticFile
     Emanote.Model.Stork
     Emanote.Model.Stork.Index
@@ -262,8 +270,10 @@ test-suite test
     other-modules:
       Emanote.Model.GraphSpec
       Emanote.Model.Link.RelSpec
+      Emanote.Model.Note.FilterSpec
       Emanote.Model.QuerySpec
       Emanote.Model.SDataSpec
+      Emanote.Model.SourceDependenciesSpec
       Emanote.Model.TocSpec
       Emanote.Pandoc.BuiltinFiltersSpec
       Emanote.Pandoc.ExternalLinkSpec

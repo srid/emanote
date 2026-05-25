@@ -17,6 +17,7 @@ import Commonmark qualified as CM
 import Commonmark.Inlines qualified as CM
 import Commonmark.Pandoc qualified as CP
 import Commonmark.TokParsers (noneOfToks, symbol)
+import Data.Char (isDigit)
 import Data.Map.Strict qualified as Map
 import Data.TagTree qualified as TT
 import Data.Text qualified as T
@@ -73,9 +74,12 @@ hashTagSpec =
     tagP :: (Monad m) => P.ParsecT [CM.Tok] s m [CM.Tok]
     tagP = do
       s <- some (noneOfToks disallowed)
+      let tag = CM.untokenize s
       -- A tag cannot end with a slash (which is a separator in hierarchical tags)
-      guard $ not $ "/" `T.isSuffixOf` CM.untokenize s
+      guard $ not $ "/" `T.isSuffixOf` tag
+      -- Common GitHub issue references like #221 are not semantic tags.
+      guard $ not $ T.all isDigit tag
       pure s
       where
         disallowed = [Spaces, UnicodeSpace, LineEnd] <> fmap Symbol punctuation
-        punctuation = "[];:,.?!"
+        punctuation = "()[];:,.?!"

@@ -125,6 +125,8 @@ Column alignment is honored on each cell — use `:---` for left, `---:` for rig
 
 Add Twitter-like hashtags anywhere in Markdown file. They can also be added to the [[yaml-config|YAML frontmatter]]. Hash tags can also be "hierarchical", for instance: #emanote/syntax/demo
 
+All-numeric issue references such as #221 are left as plain text rather than tags. If a numeric identifier should be a tag, use a hierarchical tag such as #issue/221.
+
 ## Highlighting
 
 You can highlight any ==inline text== by wraping them in `==` (ie. `==inline text==`).[^prop] The CSS style for highlighted inlines can be specified in [[custom-style|index.yaml]]. Regular Markdown syntax, including emojis, can be mixed in with highlighted inlines to ==🍓 give a **distinction** on top== of it all.
@@ -174,10 +176,17 @@ On default theme, an anchor is displayed when you hover on the heading allowing 
 
 ###### Heading `level` 6
 
-## More extensions
+## Code
 
-:::{.flex-row .space-y-8}
-![[syntax-highlighting]]
+Fenced code blocks are tokenised at build time and shipped as styled `<span>`s, e.g.
 
-[[mermaid]]
-:::
+```haskell
+main :: IO ()
+main = putStrLn "Hello, world!"
+```
+
+See [[syntax-highlighting]] for the highlighter, the bundled language list, and how to disable highlighting per-page.
+
+Source files can also be embedded into a note by wikilink — `![[foo.hs]]` inlines the file as a syntax-highlighted code block, with the language picked from the file extension. This also works for Emanote's own source files such as `index.yaml` and Heist `.tpl` templates. See [[embed]] for the syntax and the recognised extensions.
+
+Diagrams written in `mermaid` syntax render as SVG — see [[mermaid]].

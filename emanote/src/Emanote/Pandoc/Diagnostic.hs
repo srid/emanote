@@ -37,6 +37,9 @@ multiple errors at once.
 -}
 module Emanote.Pandoc.Diagnostic (
   errorBlock,
+  errorClasses,
+  errorVariantClass,
+  luaFilterCategory,
 ) where
 
 import Data.Text qualified as T
@@ -50,7 +53,20 @@ errorBlock :: Text -> [B.Block] -> B.Block
 errorBlock category =
   B.Div ("", errorClasses category, [])
 
+-- | The full class list for a category: the universal marker plus the variant.
 errorClasses :: Text -> [Text]
 errorClasses category
   | T.null category = ["emanote:error"]
-  | otherwise = ["emanote:error", "emanote:error:" <> category]
+  | otherwise = ["emanote:error", errorVariantClass category]
+
+-- | The variant-only class for a category (the universal @emanote:error@ marker is /not/ included).
+errorVariantClass :: Text -> Text
+errorVariantClass category = "emanote:error:" <> category
+
+{- | Category for Pandoc-Lua-filter-emitted errors — the contract shared between
+the bundled @lua-filters/diagram.lua@ (and the injected @emanote.error_block@
+helper) on the emit side, and 'Emanote.View.Template.extractInPlaceFilterErrors'
+on the recover side.
+-}
+luaFilterCategory :: Text
+luaFilterCategory = "lua-filter"

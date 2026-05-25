@@ -65,6 +65,8 @@ template:
       searchPlaceholder: Search (Ctrl+K) ...
       toggleDarkMode: Toggle dark mode
       toggleSidebar: Toggle sidebar
+      maximizeNoteArea: Maximize note area
+      restoreNoteArea: Restore note layout
       siteIcon: Site Icon
       tag: Tag
       viewFolgezettelChildren: View folgezettel children
@@ -117,6 +119,8 @@ template:
       searchPlaceholder: Rechercher (Ctrl+K) ...
       toggleDarkMode: Basculer le mode sombre
       toggleSidebar: Basculer la barre latérale
+      maximizeNoteArea: Agrandir la zone de note
+      restoreNoteArea: Restaurer la mise en page
       siteIcon: Icône du site
       tag: Étiquette
       viewFolgezettelChildren: Voir les enfants folgezettel
@@ -155,6 +159,60 @@ template:
       tagIndexTitle: "{tag} - Index des étiquettes"
       generatedByVersion: Généré par Emanote {version}
       embeds: intègre
+    zh:
+      siteTitle: Emanote 站点
+      home: 主页
+      goToHome: 返回主页
+      index: 索引
+      viewIndex: 查看索引
+      tags: 标签
+      viewTags: 查看标签
+      tasks: 任务
+      viewTasks: 查看任务
+      search: 搜索 (Ctrl+K)
+      searchPlaceholder: 搜索 (Ctrl+K) ...
+      toggleDarkMode: 切换深色模式
+      toggleSidebar: 切换侧栏
+      maximizeNoteArea: 最大化笔记区域
+      restoreNoteArea: 恢复笔记布局
+      siteIcon: 站点图标
+      tag: 标签
+      viewFolgezettelChildren: 查看子笔记
+      childrenInsideTitle: "{count} 篇子笔记"
+      onThisPage: 本页目录
+      timeline: 时间线
+      linkedFrom: 反向链接
+      subtags: 子标签
+      notes: 笔记
+      footnotes: 脚注
+      footnote: 脚注
+      footnoteLabel: 脚注 {idx}
+      copyLink: 复制链接
+      copyLinkToHeading: 复制标题链接
+      embeddedNote: 嵌入笔记
+      openPdf: 打开 PDF
+      videoUnsupported: 您的浏览器不支持 HTML5 视频，{link}
+      videoLinkText: 点此查看
+      audioUnsupported: 您的浏览器不支持 HTML5 音频，{link}
+      audioLinkText: 点此收听
+      copyCode: 复制代码
+      copyCodeToClipboard: 复制代码到剪贴板
+      copied: 已复制！
+      copyFailed: 复制失败
+      missingLink: "! 链接缺失"
+      ambiguousLink: "! 链接不明确"
+      brokenLinkTooltip: 链接已失效
+      ambiguousLinkTooltip: 链接不明确
+      emanoteError: Emanote 错误
+      badYamlFiles: "Emanote：YAML 文件有误"
+      notebookIssue: 笔记库存在问题。
+      fixIt: 修复后页面将自动重载，或 {link}。
+      goToRoot: 返回根目录
+      taskIndex: 任务索引
+      tagIndex: 标签索引
+      tagIndexTitle: "{tag} - 标签索引"
+      generatedByVersion: 由 Emanote {version} 生成
+      embeds: 嵌入
 
 pandoc:
   # Rewrite the class specified in Pandoc's Div and Span nodes. You can specify the class using
@@ -184,11 +242,20 @@ pandoc:
     emanote:error: emanote:error
     # YAML / Markdown parse-error banner — built by 'Emanote.Model.Note.errorDiv'
     # via 'Diagnostic.errorBlock "yaml"'. Used for the #285 bad-yaml banner.
-    emanote:error:yaml: text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
+    # The same utility-class string powers the Pandoc Lua filter banner
+    # ('emanote:error:lua-filter' below) so the two diagnostic surfaces stay
+    # visually consistent without duplicating the class list.
+    emanote:error:yaml: &emanoteErrorBanner text-sm bg-red-50 dark:bg-red-950 p-3 border-2 border-red-200 dark:border-red-800 m-2 font-mono rounded-lg
     # Block placeholder shown when a note embed (`![[…]]`) would form a cycle —
     # built by 'Renderer.Embed.renderCyclicEmbedSplice' via
     # 'Diagnostic.errorBlock "cyclic-embed"' (#362). Trimmed for inline note flow.
     emanote:error:cyclic-embed: not-prose text-sm bg-red-50 dark:bg-red-950 my-3 px-3 py-2 border-l-4 border-red-500 dark:border-red-400 rounded-r-md text-red-900 dark:text-red-100
+    # Pandoc Lua filter banner — used both for catastrophic render-filter
+    # failures prepended by 'Emanote.View.Template.prependRenderFilterErrors'
+    # (#721) and for per-block engine errors emitted in place by the bundled
+    # 'lua-filters/diagram.lua' (#625). Reuses 'emanote:error:yaml''s
+    # utility-class string so a tweak to one banner updates both.
+    emanote:error:lua-filter: *emanoteErrorBanner
     # You can also add your own class -> style mappings. We provide a sample below.
     sticky-note: px-4 py-3 rounded-lg shadow-md bg-yellow-50 dark:bg-yellow-900 mx-2 transform -skew-y-1 scale-95 hover:scale-100 hover:border-yellow-400 hover:shadow-xl border-l-4 border-yellow-400 mb-8 mt-8 transition-all duration-200
     note: p-4 mb-4 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 w-full float-none md:float-right md:w-1/2 md:clear-both border border-gray-200 dark:border-gray-800

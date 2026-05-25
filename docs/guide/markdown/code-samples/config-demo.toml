@@ -1,0 +1,10 @@
+[package]
+name = "emanote"
+version = "2.0.0"
+
+[features]
+default = ["live-server", "mcp"]
+
+[server]
+host = "127.0.0.1"
+port = 8080

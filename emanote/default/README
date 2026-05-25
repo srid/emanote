@@ -15,3 +15,12 @@ are licensed `SPDX-License-Identifier: CC0-1.0 OR AGPL-3.0-or-later`:
 - [AGPL3 LICENSE](../LICENSE)
 
 This means that you can choose to use the specified files under either of the licenses.
+
+The files under [`lua-filters/`](lua-filters/) are MIT-licensed filters:
+[`list-table.lua`](lua-filters/list-table.lua) is bundled from
+[`pandoc-ext/list-table`](https://github.com/pandoc-ext/list-table), and
+[`wordcount.lua`](lua-filters/wordcount.lua) is an Emanote-specific filter
+derived from the retired
+[`pandoc/lua-filters`](https://github.com/pandoc/lua-filters) wordcount
+filter. See [`lua-filters/LICENSE`](lua-filters/LICENSE) for the bundled
+license notices.

@@ -23,7 +23,7 @@ Notice how this page's sidebar colorscheme has [changed to green]{.greenery}? Vi
 When a child route's frontmatter or YAML overlaps with values from parent YAMLs, Emanote merges them along three rules:
 
 - **Objects** are deep-merged by key — the child overrides individual nested fields without touching siblings.
-- **Arrays** concatenate (with deduplication) — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` on a child note yields `[team-doc, internal-note]`. The same applies to other list-valued fields like `pandoc.filters`.
+- **Arrays** concatenate (with deduplication) — `tags: [team-doc]` in `folder.yaml` plus `tags: [internal-note]` on a child note yields `[team-doc, internal-note]`.
 - **Scalars** right-win — the most-specific value (the leaf) overrides ancestors.
 
 The array rule is what makes a parent YAML's `tags` survive to its children even when those children declare their own.

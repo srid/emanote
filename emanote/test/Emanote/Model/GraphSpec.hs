@@ -32,6 +32,8 @@ spec = do
                 mempty
                 (error "CLI action unused by modelLookupBacklinks")
                 (error "renderers unused by modelLookupBacklinks")
+                (error "scripting engine unused by modelLookupBacklinks")
+                False
                 False
                 (error "instance ID unused by modelLookupBacklinks")
                 (error "stork index unused by modelLookupBacklinks")

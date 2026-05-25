@@ -1,0 +1,9 @@
+/* A small CSS sample used to demonstrate the ![[..]] code embed feature. */
+.emanote-code-embed {
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.emanote-code-embed pre {
+  font-family: "Space Mono", monospace;
+}

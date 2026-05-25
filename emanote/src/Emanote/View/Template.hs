@@ -1,6 +1,8 @@
-module Emanote.View.Template (emanoteSiteOutput, render) where
+module Emanote.View.Template (emanoteSiteOutput, render, extractInPlaceFilterErrors) where
 
-import Control.Monad.Logger (MonadLoggerIO)
+import Control.Exception (throwIO)
+import Control.Monad.Logger (MonadLogger, MonadLoggerIO)
+import Control.Monad.Writer.Strict (runWriterT)
 import Data.Aeson.Types qualified as Aeson
 import Data.Map.Strict qualified as Map
 import Data.Map.Syntax ((##))
@@ -16,9 +18,11 @@ import Emanote.Model.Calendar qualified as Calendar
 import Emanote.Model.Graph qualified as G
 import Emanote.Model.Meta qualified as Meta
 import Emanote.Model.Note qualified as MN
+import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Model.SData qualified as SData
 import Emanote.Model.Stork (renderStorkIndex)
 import Emanote.Model.Toc (newToc, renderToc, tocUnnecessaryToRender)
+import Emanote.Pandoc.Diagnostic qualified as Diagnostic
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute (SiteRoute)
 import Emanote.Route.SiteRoute qualified as SR
@@ -38,9 +42,11 @@ import Heist.Splices qualified as Heist
 import Optics.Core (Prism', review)
 import Optics.Operators ((.~), (^.))
 import Relude
+import System.IO.Error (userError)
 import Text.Blaze.Renderer.XmlHtml qualified as RX
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
+import Text.Pandoc.Walk qualified as PW
 
 emanoteSiteOutput :: (MonadIO m, MonadLoggerIO m) => Prism' FilePath SiteRoute -> ModelEma -> SR.SiteRoute -> m (Ema.Asset LByteString)
 emanoteSiteOutput rp model' r = do
@@ -77,7 +83,7 @@ render m = \case
             & setErrorPageMeta meta
             & MN.noteTitle
             .~ fromString (toString $ C.i18nText meta "missingLink" "! Missing link")
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m note404
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note404
   SR.SiteRoute_AmbiguousR urlPath notes -> do
     let (_, meta) = C.defaultRouteMeta m
         noteAmb =
@@ -85,28 +91,31 @@ render m = \case
             & setErrorPageMeta meta
             & MN.noteTitle
             .~ fromString (toString $ C.i18nText meta "ambiguousLink" "! Ambiguous link")
-    pure $ Ema.AssetGenerated Ema.Html $ renderLmlHtml m noteAmb
-  SR.SiteRoute_ResourceRoute r -> pure $ renderResourceRoute m r
+    Ema.AssetGenerated Ema.Html <$> renderLmlHtml m noteAmb
+  SR.SiteRoute_ResourceRoute r -> renderResourceRoute m r
   SR.SiteRoute_VirtualRoute r -> renderVirtualRoute m r
   where
     setErrorPageMeta meta =
       MN.noteMeta .~ SData.mergeAesons (withTemplateName "/templates/error" :| [withSiteTitle (C.i18nText meta "emanoteError" "Emanote Error")])
 
-renderResourceRoute :: Model -> SR.ResourceRoute -> Ema.Asset LByteString
+renderResourceRoute :: (MonadIO m, MonadLogger m) => Model -> SR.ResourceRoute -> m (Ema.Asset LByteString)
 renderResourceRoute m = \case
   SR.ResourceRoute_LML view r -> do
     case M.modelLookupNoteByRoute (view, r) m of
       Just (R.LMLView_Html, note) ->
-        Ema.AssetGenerated Ema.Html $ renderLmlHtml m note
+        Ema.AssetGenerated Ema.Html <$> renderLmlHtml m note
       Just (R.LMLView_Atom, note) ->
         case renderFeed m note of
-          Left err -> error $ toStrict $ "Bad feed: " <> show r <> ": " <> err
-          Right feed -> Ema.AssetGenerated Ema.Other feed
+          Left err -> liftIO . throwIO . userError . toString $ "Bad feed: " <> show r <> ": " <> err
+          Right feed -> pure $ Ema.AssetGenerated Ema.Other feed
       Nothing ->
-        -- This should never be reached because decodeRoute looks up the model.
-        error $ "Bad route: " <> show r
+        -- decodeRoute already looked up the model, so reaching here means an
+        -- invariant break, not user input — surface as an IO exception so
+        -- the live server reports it through the same channel as other
+        -- render-time failures.
+        liftIO . throwIO . userError $ "Bad route: " <> show r
   SR.ResourceRoute_StaticFile _ fpAbs ->
-    Ema.AssetStatic fpAbs
+    pure $ Ema.AssetStatic fpAbs
 
 renderVirtualRoute :: (MonadIO m, MonadLoggerIO m) => Model -> SR.VirtualRoute -> m (Ema.Asset LByteString)
 renderVirtualRoute m = \case
@@ -150,12 +159,12 @@ patchMeta meta =
   where
     siteUrl = SData.lookupAeson @Text "" ("page" :| ["siteUrl"]) meta
 
-renderLmlHtml :: Model -> MN.Note -> LByteString
+renderLmlHtml :: (MonadIO m, MonadLogger m) => Model -> MN.Note -> m LByteString
 renderLmlHtml model note = do
   let r = note ^. MN.noteRoute
       meta = patchMeta $ Meta.getEffectiveRouteMetaWith (note ^. MN.noteMeta) r model
-      doc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
-      toc = newToc doc
+      baseDoc = prependDataErrors meta (Meta.cascadeYamlErrors model r) (note ^. MN.noteDoc)
+      pluginBaseDir = M.modelPluginBaseDir model
       sourcePath = fromMaybe (R.withLmlRoute R.encodeRoute r) $ do
         fmap snd $ note ^. MN.noteSource
       -- Force a doctype into the generated HTML as a workaround for Heist
@@ -165,7 +174,40 @@ renderLmlHtml model note = do
         if M.inLiveServer model && model ^. M.modelStatus == M.Status_Loading
           then (loaderHead <>)
           else id
-  withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
+  -- applyRenderHtmlPandocFilters speaks MonadWriter for diagnostics; capture
+  -- them here so we can both render them inline on the page (so the live
+  -- server keeps serving — the user sees the error and can fix the filter)
+  -- and abort the static build (so a broken filter doesn't ship to disk).
+  -- Per-block engine errors (e.g. a typst version mismatch on a `cetz`
+  -- fence) live next to their source as Lua-filter-emitted Divs carrying
+  -- `emanote:error:lua-filter`; this banner is reserved for catastrophic
+  -- filter-pipeline failures (filter missing, PandocError) the in-place
+  -- mechanism can't surface.
+  (filteredDoc, renderFilterErrors) <-
+    runWriterT
+      $ NoteFilter.applyRenderHtmlPandocFilters
+        (model ^. M.modelScriptingEngine)
+        pluginBaseDir
+        (note ^. MN.notePandocFilterDeclarations)
+        meta
+        baseDoc
+  let doc = prependRenderFilterErrors renderFilterErrors filteredDoc
+      toc = newToc doc
+      -- Walk the post-filter AST for Divs carrying `emanote:error:lua-filter`
+      -- (Lua filters such as bundled `lua-filters/diagram.lua` emit those in
+      -- place of a failing fence). Without this, a static build sees no
+      -- entries in `renderFilterErrors` (Lua filters return AST nodes; they
+      -- can't `tell` the Haskell writer) and ships the error-banner page to
+      -- disk silently — defeating the abort-loudly intent of the static-mode
+      -- gate. Gated on the note actually declaring at least one Lua filter
+      -- (either phase, since `emanote.error_block` is injected into both) so
+      -- pages with no filters skip the full-AST traversal.
+      inPlaceFilterErrors
+        | null (NoteFilter.pandocFilterDependencyPaths (note ^. MN.notePandocFilterDeclarations)) = []
+        | otherwise = extractInPlaceFilterErrors filteredDoc
+      skipAbort = M.inLiveServer model || model ^. M.modelAllowBrokenLuaFilters
+  failOnStaticRenderFilterErrors skipAbort r (renderFilterErrors <> inPlaceFilterErrors)
+  pure . withDoctype . withLoadingMessage . C.renderModelTemplate model (lookupTemplateName meta) $ do
     let ctx = C.mkTemplateRenderCtx model r meta
     C.commonSplices (C.withLinkInlineCtx ctx) model meta (note ^. MN.noteTitle)
     -- Template flags
@@ -223,6 +265,70 @@ renderLmlHtml model note = do
       C.withBlockCtx ctx
         $ \ctx' ->
           renderToc ctx' toc
+
+{- | Static-build escape hatch for render-time Lua filter errors. The
+inline-on-page banner (via 'prependRenderFilterErrors') is the right
+UX for the live server — keep serving, surface the error visibly so
+the user can fix it. For static generation no one is watching the
+server, and a broken filter would ship a banner-only page to disk;
+abort instead so CI fails loudly.
+
+The first 'Bool' is @skipAbort@ — @True@ when running in the live
+server or when the user passed @--allow-broken-lua-filters@ (which
+the Emanote docs notebook uses to live-render the
+@writing-filters@ page's deliberate-error demo); @False@ aborts.
+-}
+failOnStaticRenderFilterErrors :: (MonadIO m) => Bool -> R.LMLRoute -> [Text] -> m ()
+failOnStaticRenderFilterErrors _ _ [] = pass
+failOnStaticRenderFilterErrors True _ _ = pass
+failOnStaticRenderFilterErrors False r errs =
+  liftIO
+    . throwIO
+    . userError
+    $ toString
+    $ "Pandoc Lua filter error for "
+    <> show r
+    <> ": "
+    <> T.intercalate "; " errs
+
+{- | Top-of-page banner for catastrophic filter-pipeline failures. The
+@"lua-filter"@ category here matches the @emanote:error:lua-filter@
+class the bundled @lua-filters/diagram.lua@ emits in place of a
+failing fence, so both diagnostic surfaces share one styling entry in
+@emanote/default/index.yaml@.
+-}
+prependRenderFilterErrors :: [Text] -> Pandoc -> Pandoc
+prependRenderFilterErrors [] doc = doc
+prependRenderFilterErrors errs (Pandoc meta blocks) =
+  Pandoc meta $ MN.errorDiv Diagnostic.luaFilterCategory "Pandoc Lua filter error" errs : blocks
+
+{- | HACK: Pandoc Lua filters can return AST nodes but cannot @tell@ the
+host's @MonadWriter@ diagnostic channel. So 'lua-filters/diagram.lua'
+surfaces engine failures by emitting a sentinel @Div@ in the document,
+and we recover the message by walking the AST for that sentinel. The
+class literal @"emanote:error:lua-filter"@ is a cross-language string
+contract shared with 'diagram_error_block' in that Lua file and the
+style entry in @emanote/default/index.yaml@; rename it in one place
+and only @TemplateSpec.hs@ catches the drift. The fallback branch
+exists because a future filter author might emit the class without
+honoring the unwritten "first @CodeBlock@ holds the message" rule.
+
+The proper fix would be a typed Lua→Haskell diagnostics channel
+(upstream Pandoc feature or an Emanote sidecar protocol — an env-var
+pointing at an ndjson file the Lua side appends structured payloads
+to, drained here after @runWriterT@). Tracked in #625 follow-up.
+-}
+extractInPlaceFilterErrors :: Pandoc -> [Text]
+extractInPlaceFilterErrors = PW.query collect
+  where
+    luaFilterClass = Diagnostic.errorVariantClass Diagnostic.luaFilterCategory
+    collect :: B.Block -> [Text]
+    collect (B.Div (_, classes, _) blocks)
+      | luaFilterClass `elem` classes = [errorText classes blocks]
+    collect _ = []
+    errorText classes bs = case [t | B.CodeBlock _ t <- bs] of
+      (msg : _) -> msg
+      _ -> "Pandoc Lua filter error (no engine message; class=" <> T.intercalate "," classes <> ")"
 
 backlinksSplice :: Model -> [(R.LMLRoute, NonEmpty [B.Block])] -> HI.Splice Identity
 backlinksSplice model (bs :: [(R.LMLRoute, NonEmpty [B.Block])]) =
@@ -340,4 +446,4 @@ markdown and yaml error surfaces share one Div shape. Issue #285.
 prependDataErrors :: Aeson.Value -> [Text] -> Pandoc -> Pandoc
 prependDataErrors _ [] doc = doc
 prependDataErrors meta errs (Pandoc m blocks) =
-  Pandoc m (MN.errorDiv (C.i18nText meta "badYamlFiles" "Emanote: bad YAML files") errs : blocks)
+  Pandoc m (MN.errorDiv "yaml" (C.i18nText meta "badYamlFiles" "Emanote: bad YAML files") errs : blocks)

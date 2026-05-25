@@ -105,10 +105,57 @@ Feature: Smoke
     Then the documentElement has class "dark"
     And localStorage "emanote-theme" is "dark"
 
+  Scenario: Note focus mode hides side chrome until explicitly restored
+    When I open "/focus-mode.html"
+    Then note focus mode is "off"
+    And the note focus toggle is hidden on mobile
+    When I click the note focus toggle
+    Then note focus mode is "on"
+    And the note side chrome is hidden for focus mode
+    And the uptree is visible
+    And the focused note body starts near the top
+    When I click the note focus toggle
+    Then note focus mode is "off"
+    And the note side chrome is visible outside focus mode
+
+  Scenario: Note focus toggle is omitted when only uptree side material exists
+    When I open "/focus-mode/uptree-only.html"
+    Then the note focus toggle is absent
+    And the uptree is visible
+
+  @live @hot-reload
+  Scenario: Note focus mode survives Ema hot reload until explicitly restored
+    When I open "/focus-mode/live.html"
+    And I click the note focus toggle
+    Then note focus mode is "on"
+    When I replace "FOCUS_MODE_ORIGINAL" with "FOCUS_MODE_CHANGED" in "focus-mode/live.md"
+    Then the article body contains "FOCUS_MODE_CHANGED" within 10 seconds
+    And note focus mode is "on"
+    And the note side chrome is hidden for focus mode
+    When I click the note focus toggle
+    Then note focus mode is "off"
+    And the note side chrome is visible outside focus mode
+
   Scenario: Every fenced code block gets a copy button at first paint
     When I open "/code.html"
     Then every <pre> with a child <code> has a .code-copy-button
     And the first code copy button becomes visible when I hover its code block
+
+  Scenario: Wikilink-embedded source files are syntax-highlighted by skylighting (regression: #24)
+    When I open "/code-embed.html"
+    Then the page contains an element with class "kw"
+    And the page contains an element with class "fu"
+
+  Scenario: Wikilink-embedded YAML files resolve as code files (regression: #720)
+    When I open "/special-source-files.html"
+    Then the page contains an element with class "yaml"
+    And the page contains an element with class "kw"
+
+  Scenario: Wikilinks to Heist template files resolve as static files (regression: #720)
+    When I open "/special-source-files.html"
+    Then the article link with text "template source" has href containing "view-source.tpl"
+    When I fetch "/view-source.tpl"
+    Then the response body contains "data-special-template-source=\"issue-720\""
 
   @morph
   Scenario: Code copy button remains hover-visible after Ema's in-app morph navigation to a dotted route
@@ -122,6 +169,7 @@ Feature: Smoke
     And the footer contains link text "Accueil"
     And the TOC heading is "Sur cette page"
     And the Stork search placeholder is "Rechercher (Ctrl+K) ..."
+    And the note focus toggle title is "Agrandir la zone de note"
     And the first code copy button title is "Copier le code"
 
   Scenario: Scrolling a section into view highlights its TOC link
@@ -189,6 +237,16 @@ Feature: Smoke
     When I open "/issue-199.html"
     Then the article tag link with text "###structure" has href containing "-/tags/%23%23structure.html"
     And the metadata tag chip with text "###structure" has href containing "-/tags/%23%23structure.html"
+
+  Scenario: Numeric GitHub issue references do not appear as tags
+    When I open "/numeric-issue-tags.html"
+    Then the article tag link with text "#real-tag" has href containing "-/tags/real-tag.html"
+    When I fetch "/-/tags.html"
+    Then the response body contains "-/tags/real-tag.html"
+    And the response body does not contain "-/tags/221"
+    And the response body does not contain "-/tags/228"
+    And the response body does not contain "-/tags/263"
+    And the response body does not contain "-/tags/712"
 
   Scenario: Tag declared in sibling folder YAML appears as a metadata chip on the child note (regression: #352)
     When I open "/issue-352/note.html"
