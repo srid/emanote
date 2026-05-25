@@ -176,6 +176,7 @@ library
     Emanote.MCP.Catalog
     Emanote.MCP.Handlers
     Emanote.MCP.Server
+    Emanote.MCP.Types
     Emanote.MCP.Uri
     Emanote.Model
     Emanote.Model.Calendar

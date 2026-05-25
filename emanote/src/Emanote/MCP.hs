@@ -8,6 +8,7 @@ Exposes the notebook model as read-only MCP resources:
 
 Umbrella module. Implementation lives in:
 
+* "Emanote.MCP.Types" — package-level type-family instances
 * "Emanote.MCP.Catalog" — notebook resource catalog (what's available, how to read it)
 * "Emanote.MCP.Uri" — URI wire schema and 'ResourceKind' \<-\> URI translation
 * "Emanote.MCP.Handlers" — request handlers adapting the catalog to MCP wire types

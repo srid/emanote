@@ -12,6 +12,7 @@ module Emanote.MCP.Server (
 
 import Data.Version (showVersion)
 import Emanote.MCP.Handlers (handlers)
+import Emanote.MCP.Types ()
 import Emanote.MCP.Uri (contentUri, metadataUri, noteUriPrefix, noteUriTemplate)
 import Emanote.Model (Model)
 import MCP.Server (

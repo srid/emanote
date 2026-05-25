@@ -1,6 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE NamedFieldPuns #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 
 {- | MCP request handlers.
 
@@ -20,8 +19,6 @@ import Emanote.Model (Model)
 import MCP.Server (
   ListResourceTemplatesResult (..),
   ListResourcesResult (..),
-  MCPHandlerState,
-  MCPHandlerUser,
   ProcessResult (..),
   ReadResourceParams (..),
   ReadResourceResult (..),
@@ -37,11 +34,6 @@ import MCP.Server (
  )
 import MCP.Server qualified as MCP
 import Relude
-
-type instance MCPHandlerState = ()
-
--- | Unused: 'MCP.Server.simpleHttpApp' bypasses the JWT pipeline that would consume this.
-type instance MCPHandlerUser = ()
 
 handlers :: IO Model -> MCP.ProcessHandlers
 handlers readModel =
