@@ -50,7 +50,7 @@ kindMime :: ResourceKind -> Text
 kindMime = \case
   MetadataJson -> "application/json"
   ContentMarkdown -> "text/markdown"
-  Note _ -> "text/markdown"
+  Note {} -> "text/markdown"
 
 -- | Catalog entry. URI-free by design; consumers assign addressing.
 data NotebookResource = NotebookResource
