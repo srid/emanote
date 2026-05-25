@@ -20,7 +20,6 @@ import MCP.Server (
   MCPServerState (..),
   ResourcesCapability (..),
   ServerCapabilities (..),
-  ToolsCapability (..),
   initMCPServerState,
   simpleHttpApp,
  )
@@ -82,7 +81,7 @@ capabilities =
     { logging = Nothing
     , prompts = Nothing
     , resources = Just ResourcesCapability {listChanged = Nothing, subscribe = Nothing}
-    , tools = Just ToolsCapability {listChanged = Nothing}
+    , tools = Nothing
     , completions = Nothing
     , experimental = Nothing
     }
