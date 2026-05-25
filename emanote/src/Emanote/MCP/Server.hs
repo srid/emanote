@@ -1,4 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 {- | MCP HTTP server setup.
 
@@ -11,14 +12,17 @@ module Emanote.MCP.Server (
 ) where
 
 import Data.Version (showVersion)
-import Emanote.MCP.Handlers (handlers)
+import Emanote.MCP.Catalog (NotebookResource (..))
+import Emanote.MCP.Catalog qualified as Catalog
+import Emanote.MCP.Handlers (allKindShapes, handlers, templateFor)
 import Emanote.MCP.Types ()
-import Emanote.MCP.Uri (contentUri, metadataUri, noteUriPrefix, noteUriTemplate)
+import Emanote.MCP.Uri (kindToUri)
 import Emanote.Model (Model)
 import MCP.Server (
   Implementation (..),
   LoggingLevel (..),
   MCPServerState (..),
+  ResourceTemplate (..),
   ResourcesCapability (..),
   ServerCapabilities (..),
   initMCPServerState,
@@ -69,12 +73,15 @@ instructions :: Maybe Text
 instructions =
   Just
     $ unlines
-      [ "Emanote notebook exposed over MCP."
-      , "Resources:"
-      , "- " <> metadataUri <> " — JSON metadata for every note (titles, paths, parents, links)"
-      , "- " <> contentUri <> " — all notes concatenated as a single Markdown document"
-      , "- " <> noteUriTemplate <> " — individual note by source path (e.g. " <> noteUriPrefix <> "guide/mcp.md)"
-      ]
+    $ "Emanote notebook exposed over MCP."
+    : "Resources:"
+    : (resourceLine <$> Catalog.staticResources)
+      <> (templateLine <$> mapMaybe templateFor allKindShapes)
+  where
+    resourceLine NotebookResource {resourceKind, resourceDescription} =
+      "- " <> kindToUri resourceKind <> maybe "" (" — " <>) resourceDescription
+    templateLine ResourceTemplate {uriTemplate, description} =
+      "- " <> uriTemplate <> maybe "" (" — " <>) description
 
 capabilities :: ServerCapabilities
 capabilities =

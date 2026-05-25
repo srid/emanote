@@ -10,6 +10,8 @@ supplied at startup and translate 'Catalog.NotebookResource' /
 -}
 module Emanote.MCP.Handlers (
   handlers,
+  allKindShapes,
+  templateFor,
 ) where
 
 import Emanote.MCP.Catalog (CatalogError (..), NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)

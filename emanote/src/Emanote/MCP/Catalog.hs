@@ -19,6 +19,7 @@ module Emanote.MCP.Catalog (
   CatalogError (..),
   kindMime,
   listResources,
+  staticResources,
   readResource,
 ) where
 
