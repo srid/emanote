@@ -20,6 +20,7 @@ module Emanote.Route.ModelRoute (
   lmlToHtmlRoute,
   mkLMLRouteFromFilePath,
   mkLMLRouteFromKnownFilePath,
+  lmlSourcePath,
   isMdRoute,
   -- Static file routes
   StaticFileRoute,
@@ -158,3 +159,7 @@ mkLMLRouteFromKnownFilePath lmlType fp =
   case lmlType of
     Md -> fmap LMLRoute_Md (R.mkLmlRouteFromFilePath fp)
     Org -> fmap LMLRoute_Org (R.mkLmlRouteFromFilePath fp)
+
+-- | Source-relative path of an LML note (e.g. @guide/mcp.md@).
+lmlSourcePath :: LMLRoute -> FilePath
+lmlSourcePath = withLmlRoute R.encodeRoute

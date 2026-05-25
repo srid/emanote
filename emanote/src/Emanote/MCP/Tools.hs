@@ -42,7 +42,6 @@ import Emanote.Model.Title qualified as Tit
 import Emanote.Route qualified as R
 import Emanote.Route.Ext (LML (Md, Org))
 import Emanote.Route.ModelRoute (mkLMLRouteFromKnownFilePath)
-import Emanote.View.Export.JSON (lmlSourcePath)
 import MCP.Server (
   CallToolResult,
   InputSchema (..),
@@ -83,7 +82,7 @@ data NoteMatch = NoteMatch
 
 noteMatchOf :: Model -> R.LMLRoute -> NoteMatch
 noteMatchOf model r =
-  let p = toText $ lmlSourcePath r
+  let p = toText $ R.lmlSourcePath r
    in NoteMatch
         { path = p
         , title = Tit.toPlain (M.modelLookupTitle r model)
@@ -106,7 +105,7 @@ findNotes query lim model =
       hit note =
         let r = note ^. N.noteRoute
             t = Tit.toPlain (note ^. N.noteTitle)
-            p = toText (lmlSourcePath r)
+            p = toText (R.lmlSourcePath r)
          in if q `T.isInfixOf` T.toLower t || q `T.isInfixOf` T.toLower p
               then Just (noteMatchOf model r)
               else Nothing

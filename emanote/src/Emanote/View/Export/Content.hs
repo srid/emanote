@@ -20,7 +20,7 @@ import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Emanote.Route.SiteRoute.Class (lmlSiteRoute)
 import Emanote.Source.Loc (locResolve)
-import Emanote.View.Export.JSON (getBaseUrlFromModel, lmlSourcePath)
+import Emanote.View.Export.JSON (getBaseUrlFromModel)
 import NeatInterpolation (text)
 import Optics.Operators ((^.))
 import Relude
@@ -51,7 +51,7 @@ renderContentExport :: Model -> IO Text
 renderContentExport model = do
   let mBaseUrl = getBaseUrlFromModel model
   let notes_ = model ^. M.modelNotes
-      noteList = sortOn (lmlSourcePath . Note._noteRoute) $ toList notes_
+      noteList = sortOn (R.lmlSourcePath . Note._noteRoute) $ toList notes_
   exportedNotes <- catMaybes <$> mapM (exportNote model) noteList
   let urlHelpText = case mBaseUrl of
         Just _ -> "- URL: The full URL where this note can be accessed"
@@ -66,7 +66,7 @@ renderContentExport model = do
 generateNoteHeader :: Model -> Note.Note -> Text
 generateNoteHeader model note =
   let route = Note._noteRoute note
-      sourcePath = lmlSourcePath route
+      sourcePath = R.lmlSourcePath route
       noteTitle = Tit.toPlain $ Note._noteTitle note
       wikilinks = Note.noteSelfRefs note
       wikilinkTexts = toList $ fmap (toText . (show :: WL.WikiLink -> String)) wikilinks
