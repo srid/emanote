@@ -12,7 +12,7 @@ module Emanote.MCP.Handlers (
   handlers,
 ) where
 
-import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), kindMime)
+import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)
 import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Uri (kindToUri, noteUriPrefix, noteUriTemplate, uriToKind)
 import Emanote.Model (Model)
@@ -52,7 +52,7 @@ handlers readModel =
           pure
             $ ProcessSuccess
             $ ListResourceTemplatesResult
-              { resourceTemplates = [noteTemplate]
+              { resourceTemplates = mapMaybe templateFor allKindShapes
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
@@ -96,14 +96,30 @@ textResult uri mime body =
     , MCP._meta = Nothing
     }
 
-noteTemplate :: ResourceTemplate
-noteTemplate =
-  ResourceTemplate
-    { MCP.name = "Notebook note"
-    , MCP.title = Just "Notebook note"
-    , uriTemplate = noteUriTemplate
-    , MCP.description = Just $ "Individual note by source path, e.g. " <> noteUriPrefix <> "guide/mcp.md"
-    , MCP.mimeType = Just "text/markdown"
-    , annotations = Nothing
-    , MCP._meta = Nothing
-    }
+{- | One representative value per 'ResourceKind' constructor, used to drive
+'templateFor' from 'listResourceTemplatesHandler'. The 'Note' path is
+arbitrary — 'templateFor' only inspects the constructor.
+-}
+allKindShapes :: [ResourceKind]
+allKindShapes = [MetadataJson, ContentMarkdown, Note ""]
+
+{- | The MCP resource template for a kind, if it accepts a URI parameter.
+
+Exhaustive on 'ResourceKind' so adding a new constructor forces a
+decision about whether it deserves a template.
+-}
+templateFor :: ResourceKind -> Maybe ResourceTemplate
+templateFor = \case
+  MetadataJson -> Nothing
+  ContentMarkdown -> Nothing
+  Note _ ->
+    Just
+      $ ResourceTemplate
+        { MCP.name = "Notebook note"
+        , MCP.title = Just "Notebook note"
+        , uriTemplate = noteUriTemplate
+        , MCP.description = Just $ "Individual note by source path, e.g. " <> noteUriPrefix <> "guide/mcp.md"
+        , MCP.mimeType = Just (kindMime (Note ""))
+        , annotations = Nothing
+        , MCP._meta = Nothing
+        }
