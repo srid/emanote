@@ -17,6 +17,8 @@ relations):
 * @resources\/read@ — /O(|URI|)/ for the URI parse plus the per-kind
   cost from 'Catalog.readResource' (/O(N + R)/ for metadata,
   /O(log N + |note|)/ for a single note).
+* @tools\/list@, @tools\/call@ — wired through "Emanote.MCP.Tools";
+  see that module for per-tool complexity.
 
 No caching: each call re-runs against the live model.
 -}
@@ -28,6 +30,7 @@ module Emanote.MCP.Handlers (
 
 import Emanote.MCP.Catalog (CatalogError (..), NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)
 import Emanote.MCP.Catalog qualified as Catalog
+import Emanote.MCP.Tools qualified as Tools
 import Emanote.MCP.Uri (kindToUri, noteUriPrefix, noteUriTemplate, uriToKind)
 import Emanote.Model (Model)
 import MCP.Server (
@@ -51,7 +54,7 @@ import Relude
 
 handlers :: IO Model -> MCP.ProcessHandlers
 handlers readModel =
-  withToolHandlers []
+  withToolHandlers (Tools.tools readModel)
     $ defaultProcessHandlers
       { listResourcesHandler = Just $ \_ ->
           pure
