@@ -87,6 +87,11 @@ run cfg@EmanoteConfig {..} = do
           Nothing ->
             Ema.runSiteWithInput @SiteRoute emaCfg rawDyn >>= liftIO . postRun cfg
           Just port -> do
+            -- `currentValue` seeds an IORef with the Dynamic's initial value
+            -- before returning, so `readLiveModel` is non-blocking from the
+            -- first call. `wrapped` must be consumed on the other arm of
+            -- `race_` to keep `readLiveModel` advancing past that initial
+            -- snapshot.
             (readEma, wrapped) <- currentValue rawDyn
             let readLiveModel = unModelEma <$> readEma
             race_
