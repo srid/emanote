@@ -49,7 +49,13 @@ Emanote advertises the notebook as three URI schemes under the `emanote://` sche
 | `emanote://export/content` | `text/markdown` | All notes concatenated into a single Markdown document with delimiters and an LLM-oriented preamble. Same shape as [`emanote export --format=content`](export.md). |
 | `emanote://note/{path}` | `text/markdown` | One note, by its source path (e.g. `emanote://note/guide/mcp.md`). Prefixed with a header block (`<!-- Source … -->`, `<!-- URL … -->`, `<!-- Title … -->`, `<!-- Wikilinks … -->`). |
 
-`resources/list` returns the two static exports plus one entry per note; `resources/templates/list` advertises the `emanote://note/{path}` template for clients that support [RFC 6570 URI templates](https://datatracker.ietf.org/doc/html/rfc6570).
+`resources/list` returns only the two static exports — Emanote intentionally does **not** enumerate one entry per note, since that scales linearly with notebook size and inflates context on every poll. `resources/templates/list` advertises the `emanote://note/{path}` template for clients that support [RFC 6570 URI templates](https://datatracker.ietf.org/doc/html/rfc6570); to address a specific note, construct a URI from the template and call `resources/read` directly. Discover the set of valid paths from `emanote://export/metadata` (every note's `srcPath`).
+
+### Per-client behaviour
+
+- **Codex** sees the template in the model-side `list_mcp_resource_templates` tool and can call `read_mcp_resource` against any path. Works out of the box.
+- **Claude Code**'s model-side read tool ([docs](https://code.claude.com/docs/en/mcp.md#use-mcp-resources)) reads any URI the model constructs, including ones derived from the template. The `@`-mention picker, however, fuzzy-searches only the enumerated `resources/list` entries — so users won't see individual notes there and must reference them by asking the model (e.g. "read `guide/mcp.md` from the notebook") instead of `@`-mentioning them. Phase 3 will add a `find_notes` tool to make this lookup explicit.
+- **opencode** populates its attach picker from `resources/list` only; per-note attachment via UI is unavailable without an enumeration. Same model-driven workaround as Claude Code applies when the model itself drives reads.
 
 ### Codex
 

@@ -26,7 +26,6 @@ module Emanote.MCP.Catalog (
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as Note
-import Emanote.Model.Title qualified as Tit
 import Emanote.Route qualified as R
 import Emanote.Route.Ext (LML (Md, Org))
 import Emanote.Route.ModelRoute (mkLMLRouteFromKnownFilePath)
@@ -73,9 +72,23 @@ backing note in the model).
 data CatalogError = NotFound
   deriving stock (Show, Eq)
 
--- | Enumerate all resources the notebook currently exposes.
-listResources :: Model -> [NotebookResource]
-listResources model = staticResources <> noteResources model
+{- | Enumerate the resources advertised through MCP's @resources\/list@.
+
+Returns only the two static, whole-notebook exports. Per-note resources
+are intentionally not enumerated: enumerating one entry per note makes
+@resources\/list@ scale linearly with notebook size, which clients poll
+on every refresh and which inflates context for clients that load the
+list eagerly. Per-note addressing is still fully supported through the
+@emanote:\/\/note\/{path}@ URI template advertised via
+@resources\/templates\/list@: discover paths from
+@emanote:\/\/export\/metadata@ (or wikilink graph) and call
+@resources\/read@ directly. Clients that surface only enumerated
+resources in an @-mention picker (Claude Code, opencode) won't fuzzy-list
+individual notes; clients that drive resource reads from the model
+(Codex, and Claude Code's model-side read tool) are unaffected.
+-}
+listResources :: [NotebookResource]
+listResources = staticResources
 
 staticResources :: [NotebookResource]
 staticResources =
@@ -91,18 +104,6 @@ staticResources =
       , resourceTitle = Just "Notebook content (single-file Markdown)"
       , resourceDescription = Just "All notes concatenated into a single Markdown document, separated by '===' delimiters."
       }
-  ]
-
-noteResources :: Model -> [NotebookResource]
-noteResources model =
-  [ NotebookResource
-    { resourceKind = Note sourcePath
-    , resourceName = toText sourcePath
-    , resourceTitle = Just (Tit.toPlain (Note._noteTitle note))
-    , resourceDescription = Nothing
-    }
-  | note <- toList (model ^. M.modelNotes)
-  , let sourcePath = ExportJSON.lmlSourcePath (Note._noteRoute note)
   ]
 
 {- | Resolve a 'ResourceKind' to its body.

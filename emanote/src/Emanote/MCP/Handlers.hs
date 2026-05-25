@@ -41,12 +41,11 @@ handlers :: IO Model -> MCP.ProcessHandlers
 handlers readModel =
   withToolHandlers []
     $ defaultProcessHandlers
-      { listResourcesHandler = Just $ \_ -> do
-          model <- liftIO readModel
+      { listResourcesHandler = Just $ \_ ->
           pure
             $ ProcessSuccess
             $ ListResourcesResult
-              { resources = toMcpResource <$> Catalog.listResources model
+              { resources = toMcpResource <$> Catalog.listResources
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
