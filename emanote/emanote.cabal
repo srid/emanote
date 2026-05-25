@@ -145,6 +145,7 @@ common library-common
     , process-extras
     , profunctors
     , relude                 >=1.0
+    , scientific
     , shower
     , skylighting            >=0.14
     , stm

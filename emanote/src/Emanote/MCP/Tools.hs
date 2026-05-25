@@ -19,6 +19,7 @@ module Emanote.MCP.Tools (
 import Data.Aeson (ToJSON, (.=))
 import Data.Aeson qualified as Aeson
 import Data.Map.Strict qualified as Map
+import Data.Scientific (toBoundedInteger)
 import Data.Text qualified as T
 import Emanote.MCP.ToolCatalog qualified as TC
 import Emanote.Model (Model)
@@ -145,11 +146,12 @@ readTextArgMaybe k margs = do
   guard (not (T.null t))
   pure t
 
+-- | Returns 'Nothing' for non-integer JSON numbers and out-of-range values.
 readIntArg :: Text -> Maybe (Map Text Aeson.Value) -> Maybe Int
 readIntArg k margs = do
   args <- margs
   Aeson.Number n <- Map.lookup k args
-  pure (truncate (toRational n))
+  toBoundedInteger n
 
 stringProp :: Text -> Aeson.Value
 stringProp desc =
