@@ -11,6 +11,10 @@ dependencies:
   apm:
   - srid/agency#master
   - juspay/skills/skills/nix-justfile
+  - juspay/skills/skills/nix-haskell
+  - juspay/skills/skills/nix-for-dev
+  - juspay/skills/skills/nix-playwright
+  - juspay/nix-chrome-devtools-mcp
   - anthropics/skills/skills/frontend-design
   mcp:
   - name: emanote

@@ -1,6 +1,7 @@
 ---
 paths:
-  - ".claude/**,.opencode/**"
+  - ".claude/**"
+  - ".opencode/**"
 ---
 
 ## Generated Files — Do Not Edit Directly

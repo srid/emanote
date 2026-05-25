@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Launch chrome-devtools-mcp using a Chrome-for-Testing binary resolved via
+# Nix. Self-contained — no surrounding devshell required. Requires flakes
+# (`experimental-features = nix-command flakes` in nix.conf).
+#
+# Override knobs (env vars):
+#   NIXPKGS_FLAKE                 — flake-ref for nixpkgs (default: `nixpkgs`)
+#   CHROME_DEVTOOLS_MCP_VERSION   — npm version of chrome-devtools-mcp
+#                                   (default: `latest`)
+
+set -euo pipefail
+shopt -s nullglob
+
+nixpkgs="${NIXPKGS_FLAKE:-nixpkgs}"
+mcp_version="${CHROME_DEVTOOLS_MCP_VERSION:-latest}"
+
+browsers=$(nix build --no-link --print-out-paths "${nixpkgs}#playwright-driver.browsers")
+
+chrome=""
+for c in \
+    "$browsers"/chromium-*/chrome-linux64/chrome \
+    "$browsers"/chromium-*/chrome-mac-*/"Google Chrome for Testing.app"/Contents/MacOS/"Google Chrome for Testing"; do
+    if [[ -x "$c" ]]; then
+        chrome="$c"
+        break
+    fi
+done
+
+if [[ -z "$chrome" ]]; then
+    echo "nix-chrome-devtools-mcp: no Chrome binary found under $browsers" >&2
+    exit 1
+fi
+
+exec nix shell "${nixpkgs}#nodejs" --command \
+    npx -y "chrome-devtools-mcp@${mcp_version}" \
+    --headless=true \
+    --isolated=true \
+    --executable-path="$chrome"
