@@ -7,6 +7,19 @@ Bridges "Emanote.MCP.Catalog" (notebook data) to "MCP.Server" wire
 types. Handlers pull the current model via the 'IO' 'Model' reader
 supplied at startup and translate 'Catalog.NotebookResource' /
 'Catalog.ResourceBody' into MCP's 'Resource' / 'ReadResourceResult'.
+
+__Per-request complexity__ (with /N/ = number of notes, /R/ = total
+relations):
+
+* @resources\/list@ — /O(1)/. Returns 'Catalog.listResources' verbatim.
+* @resources\/templates\/list@ — /O(1)/. 'mapMaybe' over the fixed
+  'allKindShapes' list.
+* @resources\/read@ — /O(|URI|)/ for the URI parse plus the per-kind
+  cost from 'Catalog.readResource' (/O(N + R)/ for metadata,
+  /O(N log N + Σ |note|)/ for content, /O(log N + |note|)/ for a single
+  note).
+
+No caching: each call re-runs against the live model.
 -}
 module Emanote.MCP.Handlers (
   handlers,
@@ -105,6 +118,8 @@ allKindShapes :: [ResourceKind]
 allKindShapes = [MetadataJson, ContentMarkdown, Note ""]
 
 {- | The MCP resource template for a kind, if it accepts a URI parameter.
+
+__Complexity:__ /O(1)/. Independent of notebook size.
 
 Exhaustive on 'ResourceKind' so adding a new constructor forces a
 decision about whether it deserves a template.

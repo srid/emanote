@@ -44,7 +44,10 @@ data ResourceKind
     Note FilePath
   deriving stock (Show, Eq)
 
--- | MIME type of a resource, derived from its kind.
+{- | MIME type of a resource, derived from its kind.
+
+__Complexity:__ /O(1)/.
+-}
 kindMime :: ResourceKind -> Text
 kindMime = \case
   MetadataJson -> "application/json"
@@ -73,6 +76,9 @@ data CatalogError = NotFound
   deriving stock (Show, Eq)
 
 {- | Enumerate the resources advertised through MCP's @resources\/list@.
+
+__Complexity:__ /O(1)/ — fixed two static entries, independent of
+notebook size.
 
 Returns only the two static, whole-notebook exports. Per-note resources
 are intentionally not enumerated: enumerating one entry per note makes
@@ -107,6 +113,15 @@ staticResources =
   ]
 
 {- | Resolve a 'ResourceKind' to its body.
+
+__Complexity__ (per-kind, where /N/ = number of notes and /R/ = total
+resolved relations across all notes):
+
+* @'MetadataJson'@ — /O(N + R)/. Iterates every note in
+  'Emanote.View.Export.JSON.renderJSONExport' and encodes the result.
+* @'ContentMarkdown'@ — /O(N log N + Σ |note|)/. Sorts notes by source
+  path, then reads each note's source file from disk. IO-dominated.
+* @'Note' path@ — /O(log N + |note|)/. ixset lookup plus one file read.
 
 Returns 'Left' 'NotFound' when a 'Note' kind references a path that
 doesn't correspond to any known note, or when the note has no source
