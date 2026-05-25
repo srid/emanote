@@ -12,7 +12,7 @@ module Emanote.MCP.Handlers (
   handlers,
 ) where
 
-import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..))
+import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), kindMime)
 import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Uri (kindToUri, noteUriPrefix, noteUriTemplate, uriToKind)
 import Emanote.Model (Model)
@@ -64,18 +64,18 @@ handlers readModel =
               mBody <- liftIO $ Catalog.readResource model kind
               pure $ case mBody of
                 Nothing -> ProcessRPCError 404 $ "Resource not found: " <> uri
-                Just (ResourceBody mime body) ->
-                  ProcessSuccess $ textResult uri mime body
+                Just (ResourceBody body) ->
+                  ProcessSuccess $ textResult uri (kindMime kind) body
       }
 
 toMcpResource :: NotebookResource -> Resource
-toMcpResource NotebookResource {resourceKind, resourceName, resourceTitle, resourceMime, resourceDescription} =
+toMcpResource NotebookResource {resourceKind, resourceName, resourceTitle, resourceDescription} =
   Resource
     { MCP.uri = kindToUri resourceKind
     , MCP.name = resourceName
     , MCP.title = resourceTitle
     , MCP.description = resourceDescription
-    , MCP.mimeType = Just resourceMime
+    , MCP.mimeType = Just (kindMime resourceKind)
     , size = Nothing
     , annotations = Nothing
     , MCP._meta = Nothing
