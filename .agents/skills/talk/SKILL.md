@@ -1,7 +1,7 @@
 ---
 name: talk
 description: Enter talk mode — conversation and research, no repo changes. ONLY invoke when the user explicitly types `/talk` or `$talk`; never auto-select from a natural-language question or design discussion.
-argument-hint: "[--no-laconic] <topic or question>"
+argument-hint: "[--no-laconic] [--html] <topic or question>"
 ---
 
 # Probe (Talk Mode)
@@ -10,7 +10,7 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 
 ## Rules
 
-- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo.
+- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo. (Sole exception: `--html` mode below, which permits writing a single `.html` artifact to `$PWD`.)
 - **Do NOT run destructive repo commands.** No `git commit`, `git push`, `git add`, `git rm`, or anything else that mutates the current repo.
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
 - You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
@@ -92,6 +92,8 @@ Any time the conversation produces a concrete code plan, diff proposal, or desig
 - **Lowy** flags boundaries that track functionality instead of volatility and where a seam would cleanly encapsulate an axis of change.
 - **Hickey** flags structural complecting and fragmentation — concept multiplication, sum-types-as-parallel-fields, hidden coupling at OS or shared-state layers, and the rest of the Layer 3-4 catalog. Hickey on a sketch can drift toward generic critique; in your prompt, instruct it to either land specific complecting/fragmentation risks in *this* sketch or say explicitly that there's nothing yet to bite into. Generic principles are not findings. Layer 5 (entanglement counts) and the diff-shaped Actions table will be thin on a sketch — that's expected; the design-level layers are the ones that bite here.
 
+**Duplication audit (both lenses).** When the sketch proposes a new top-level abstraction — a new component, primitive, module, dialog, picker, popover, scheduler, error type, etc. — include in each reviewer's spawn prompt a brief instruction to first survey the codebase for the canonical in-repo pattern that solves the same *kind* of operation. If the sketch reinvents an existing pattern (Hickey calls this concept multiplication; Lowy calls it duplicated volatility encapsulation), that is the headline finding — surface it before any micro-level critique inside the new abstraction. Skip this audit when the sketch is a refactor, internal cleanup, or bug fix that doesn't introduce a new abstraction. The audit step itself lives in the skills (`hickey` Layer 3, `lowy` §1 "Check for prior encapsulation"); the hint exists so the reviewer doesn't skip it under sketch-anchoring pressure.
+
 Skip both passes only when the turn is pure Q&A with no proposed change (e.g. "how does X work?"). When in doubt, run them. `do` re-runs hickey + lowy post-implement on the real diff, so the talk-mode pass is the design-level rehearsal, not the final word.
 
 **Model selection lives in the skill, not here.** Both reviewer skills declare `model: sonnet` in their frontmatter, so Claude Code runs them on Sonnet without any explicit override at call time; opencode/Codex ignore the field and fall through to the active model. Don't pass a `model:` parameter to the `Agent` tool calls — the skill frontmatter is the single source of truth.
@@ -109,5 +111,19 @@ When laconic mode is active:
 - Code blocks only when code is the answer.
 
 Laconic mode trims the *output*, not the *investigation*. Do the same reading you would otherwise; just say less about it.
+
+## HTML artifact mode (`--html`)
+
+If `ARGUMENTS` contains `--html` (strip the flag before treating the rest as the topic), respond by writing a self-contained `.html` file to `$PWD` instead of replying in chat. Print only the file path — the HTML *is* the response.
+
+The point is to pair with a runner that can render the artifact and let the user select text on it to queue comments back (e.g. [juspay/kolu#922](https://github.com/juspay/kolu/pull/922)). The user reads the rendered HTML, replies with their selected comments as text, you re-emit the updated HTML. The artifact stays the conversation's single source of truth.
+
+- **Filename**: stable for the session — `talk-<short-slug>.html` derived from the topic (lowercase, dashes, no spaces), or `talk.html` if there's no obvious slug. Follow-up turns update the **same** file; do not spawn a new artifact per turn.
+- **File contents**: self-contained — embedded `<style>` block, no external assets, no JavaScript, no remote fonts. Plain semantic markup that renders legibly inside an iframe preview. Carry the same `file:line` citations you would put in a text response; the research/citation rules above are unchanged.
+- **UI prototypes for UI work**: if the topic involves UI changes, embed *rendered* HTML/CSS prototypes of the proposed components inside the artifact — not ASCII mockups, not prose descriptions of what the UI would look like. The runner renders the file, so the user sees the proposed UI alongside the rationale and can comment on the visual itself. Approximate the target visual style (colors, spacing, typography); the prototype is static (no JS), but layout and hierarchy should be representative enough to react to.
+- **Repo-write exception**: writing that one `.html` file in `$PWD` is the only mutation `--html` permits. No `Edit` on pre-existing repo files, no `git` writes, no destructive ops — the rest of talk mode's read-only posture holds.
+- **Follow-up loop**: when the user replies with comments (typically pasted from a select-and-queue surface as a Markdown list), re-emit the **full** revised HTML and print the file path again. Do not narrate the diff in chat; the updated artifact is the reply.
+- **Interaction with `hickey` + `lowy`**: when the artifact is a design sketch, run the reviewers as usual and fold their findings into the HTML body **before** printing the file path — same "post-review proposal, not original sketch + critique appended" rule as text-mode responses.
+- **Interaction with laconic mode**: laconic trims the HTML body the same way it would trim a text response — brief prose, no preamble, no needless bullets, no heading scaffolding unless the answer is genuinely structured. `--html` picks the medium; `--no-laconic` picks the verbosity. UI-prototype markup is the substance of the answer, not prose filler, so it's not what laconic trims.
 
 ARGUMENTS: $ARGUMENTS

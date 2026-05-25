@@ -1,6 +1,6 @@
 lockfile_version: '1'
-generated_at: '2026-05-14T18:18:22.230015+00:00'
-apm_version: 0.13.0
+generated_at: '2026-05-25T16:12:06.762207+00:00'
+apm_version: 0.14.2
 dependencies:
 - repo_url: anthropics/skills
   host: github.com
@@ -12,6 +12,34 @@ dependencies:
   - .agents/skills/frontend-design
   - .claude/skills/frontend-design
   content_hash: sha256:063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67
+- repo_url: juspay/nix-chrome-devtools-mcp
+  host: github.com
+  resolved_commit: 407e0abef0d0e5c7bc401819d0a815b8c49c6674
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/nix-chrome-devtools-mcp
+  - .claude/skills/nix-chrome-devtools-mcp
+  content_hash: sha256:1af1b958b54a863cd9aae61bc4078969abed77f5a9f8539e73ee4a1c53349bc3
+- repo_url: juspay/skills
+  host: github.com
+  resolved_commit: e5791cf388499456c8083a1667ecc1bd6c35fe2c
+  virtual_path: skills/nix-for-dev
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/nix-for-dev
+  - .claude/skills/nix-for-dev
+  content_hash: sha256:222bee6d02ef727eff965ae224683604c59d387c3e4ce47582543a8550b86bc4
+- repo_url: juspay/skills
+  host: github.com
+  resolved_commit: e5791cf388499456c8083a1667ecc1bd6c35fe2c
+  virtual_path: skills/nix-haskell
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/nix-haskell
+  - .claude/skills/nix-haskell
+  content_hash: sha256:ccdbce81faf2660681c9e0cd8c2bd3a101941e50f07afeb48cf37671e08209bf
 - repo_url: juspay/skills
   host: github.com
   resolved_commit: 39020c4a3aba48694e5b482f749aeb56b55ea644
@@ -22,9 +50,19 @@ dependencies:
   - .agents/skills/nix-justfile
   - .claude/skills/nix-justfile
   content_hash: sha256:8f48e067e59da48c3ac90b4e2228ebb4ecfd988375b40efe831339d9a493accd
+- repo_url: juspay/skills
+  host: github.com
+  resolved_commit: e5791cf388499456c8083a1667ecc1bd6c35fe2c
+  virtual_path: skills/nix-playwright
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/nix-playwright
+  - .claude/skills/nix-playwright
+  content_hash: sha256:0a2fe4264d3e462ca50c94c2ce2eac49f48ca2bd25c27c64a789d9cd7c20c854
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: bd39f372e9835505d814773e9756277ce1cc9711
+  resolved_commit: 16889eb67592c8448c8592e527953ce7272f625c
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -57,11 +95,19 @@ dependencies:
     .claude/agents/hickey.md: sha256:10d9a4350a85752dc6658af8e0efb3d8be41803a2b6c73464e3d5b7a840435ad
     .claude/agents/lowy.md: sha256:05aff7f6a91149a42c1fb9a3ca382a6f77bc39ac8a8d45436d443dd3349fb11e
     .claude/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-    .claude/rules/apm-sources.md: sha256:65640c481c347cc4edf50603f784d0b448b6395acc43419a4f8ad0c53de2db4b
+    .claude/rules/apm-sources.md: sha256:0d34f182279b93803855bd7f7b27a57e7cf3117ce4291d31a46294c629ee75d5
     .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
     .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
     .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-  content_hash: sha256:19e7eb86aeecb85a70f361fa3bb838e98c687d162e9541cb5a2a651ab7871bbb
+  content_hash: sha256:5418127b67140ce58953d891bb9755a21fb6508f72f7453485b52358a77be324
+mcp_servers:
+- chrome-devtools
+mcp_configs:
+  chrome-devtools:
+    name: chrome-devtools
+    transport: stdio
+    registry: false
+    command: .agents/skills/nix-chrome-devtools-mcp/bin/serve
 local_deployed_files:
 - .agents/skills/dpella-mcp
 - .claude/rules/emanote-docs.md
