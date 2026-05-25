@@ -73,10 +73,9 @@ instructions :: Maybe Text
 instructions =
   Just
     $ unlines
-    $ "Emanote notebook exposed over MCP."
-    : "Resources:"
-    : (resourceLine <$> Catalog.staticResources)
-      <> (templateLine <$> mapMaybe templateFor allKindShapes)
+    $ ["Emanote notebook exposed over MCP.", "Resources:"]
+    ++ (resourceLine <$> Catalog.staticResources)
+    ++ (templateLine <$> mapMaybe templateFor allKindShapes)
   where
     resourceLine NotebookResource {resourceKind, resourceDescription} =
       "- " <> kindToUri resourceKind <> maybe "" (" — " <>) resourceDescription
