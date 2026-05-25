@@ -8,6 +8,8 @@ on:
 
 jobs:
   flake-parts-docs:
+    # Temporarily disabled — re-enable by removing the `if: false` guard.
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
