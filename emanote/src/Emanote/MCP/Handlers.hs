@@ -12,7 +12,7 @@ module Emanote.MCP.Handlers (
   handlers,
 ) where
 
-import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)
+import Emanote.MCP.Catalog (CatalogError (..), NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)
 import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Uri (kindToUri, noteUriPrefix, noteUriTemplate, uriToKind)
 import Emanote.Model (Model)
@@ -58,13 +58,13 @@ handlers readModel =
               }
       , readResourceHandler = Just $ \ReadResourceParams {uri} ->
           case uriToKind uri of
-            Nothing -> pure $ ProcessRPCError 404 $ "Resource not found: " <> uri
+            Nothing -> pure $ ProcessRPCError 400 $ "Unrecognized resource URI: " <> uri
             Just kind -> do
               model <- liftIO readModel
-              mBody <- liftIO $ Catalog.readResource model kind
-              pure $ case mBody of
-                Nothing -> ProcessRPCError 404 $ "Resource not found: " <> uri
-                Just (ResourceBody body) ->
+              eBody <- liftIO $ Catalog.readResource model kind
+              pure $ case eBody of
+                Left NotFound -> ProcessRPCError 404 $ "Resource not found: " <> uri
+                Right (ResourceBody body) ->
                   ProcessSuccess $ textResult uri (kindMime kind) body
       }
 

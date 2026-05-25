@@ -16,6 +16,7 @@ module Emanote.MCP.Catalog (
   ResourceKind (..),
   NotebookResource (..),
   ResourceBody (..),
+  CatalogError (..),
   kindMime,
   listResources,
   readResource,
@@ -61,6 +62,16 @@ data NotebookResource = NotebookResource
 -- | Body payload for a resolved resource.
 newtype ResourceBody = ResourceBody {resourceBodyText :: Text}
 
+{- | Why 'readResource' couldn't return a body.
+
+Distinguishes /the kind references nothing in the catalog/ from any
+future IO-failure modes ('readNoteContent' surfaces a missing file as
+'NotFound' today, since it can't tell that apart from a path with no
+backing note in the model).
+-}
+data CatalogError = NotFound
+  deriving stock (Show, Eq)
+
 -- | Enumerate all resources the notebook currently exposes.
 listResources :: Model -> [NotebookResource]
 listResources model = staticResources <> noteResources model
@@ -95,26 +106,27 @@ noteResources model =
 
 {- | Resolve a 'ResourceKind' to its body.
 
-Returns 'Nothing' when a 'Note' kind references a path that doesn't
-correspond to any known note, or when the note has no source file
-(auto-generated notes).
+Returns 'Left' 'NotFound' when a 'Note' kind references a path that
+doesn't correspond to any known note, or when the note has no source
+file (auto-generated notes).
 -}
-readResource :: Model -> ResourceKind -> IO (Maybe ResourceBody)
+readResource :: Model -> ResourceKind -> IO (Either CatalogError ResourceBody)
 readResource model = \case
   MetadataJson ->
-    pure $ Just $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
+    pure $ Right $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
   ContentMarkdown -> do
     body <- ExportContent.renderContentExport model
-    pure $ Just $ ResourceBody body
+    pure $ Right $ ResourceBody body
   Note path ->
     case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
-      Nothing -> pure Nothing
+      Nothing -> pure $ Left NotFound
       Just note -> do
         mContent <- ExportContent.readNoteContent note
-        pure $ do
-          content <- mContent
-          let header = ExportContent.generateNoteHeader model note
-          Just $ ResourceBody (header <> content)
+        pure $ case mContent of
+          Nothing -> Left NotFound
+          Just content ->
+            let header = ExportContent.generateNoteHeader model note
+             in Right $ ResourceBody (header <> content)
 
 parseNoteRoute :: FilePath -> Maybe R.LMLRoute
 parseNoteRoute fp =
