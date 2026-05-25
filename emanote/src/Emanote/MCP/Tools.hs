@@ -40,8 +40,6 @@ import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Route qualified as R
-import Emanote.Route.Ext (LML (Md, Org))
-import Emanote.Route.ModelRoute (mkLMLRouteFromKnownFilePath)
 import MCP.Server (
   CallToolResult,
   InputSchema (..),
@@ -146,7 +144,7 @@ Returns 'Left' if @path@ isn't a recognised LML source path
 -}
 getBacklinks :: FilePath -> Model -> Either Text [NoteMatch]
 getBacklinks fp model =
-  case parseNoteRoute fp of
+  case R.mkLMLRouteFromMdOrOrgFilePath fp of
     Nothing -> Left $ "Not a recognised note path: " <> toText fp
     Just r ->
       Right $ noteMatchOf model . fst <$> G.modelLookupBacklinks r model
@@ -213,7 +211,7 @@ resolveWikilink wlText mFromPath model = do
   wl <- maybeToRight ("Not a valid wikilink: " <> wlText) (parseWikiLinkText wlText)
   fromR <- case mFromPath of
     Nothing -> Right (M.modelIndexRoute model)
-    Just p -> maybeToRight ("Not a recognised note path: " <> toText p) (parseNoteRoute p)
+    Just p -> maybeToRight ("Not a recognised note path: " <> toText p) (R.mkLMLRouteFromMdOrOrgFilePath p)
   Right $ case Resolve.resolveWikiLinkMustExist model fromR wl of
     Rel.RRTFound (Left (_, note)) ->
       ResolvedNote (noteMatchOf model (note ^. N.noteRoute))
@@ -256,10 +254,6 @@ resolveWikilinkTool readModel =
 -- ---------------------------------------------------------------------------
 -- Helpers
 -- ---------------------------------------------------------------------------
-
-parseNoteRoute :: FilePath -> Maybe R.LMLRoute
-parseNoteRoute fp =
-  mkLMLRouteFromKnownFilePath Md fp <|> mkLMLRouteFromKnownFilePath Org fp
 
 -- | Parse a slash-separated wikilink target (e.g. "foo/bar") into a 'WL.WikiLink'.
 parseWikiLinkText :: Text -> Maybe WL.WikiLink

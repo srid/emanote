@@ -27,8 +27,6 @@ import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Note qualified as Note
 import Emanote.Route qualified as R
-import Emanote.Route.Ext (LML (Md, Org))
-import Emanote.Route.ModelRoute (mkLMLRouteFromKnownFilePath)
 import Emanote.View.Export.Content qualified as ExportContent
 import Emanote.View.Export.JSON qualified as ExportJSON
 import Optics.Operators ((^.))
@@ -121,7 +119,7 @@ readResource model = \case
   MetadataJson ->
     pure $ Right $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
   Note path ->
-    case parseNoteRoute path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
+    case R.mkLMLRouteFromMdOrOrgFilePath path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
       Nothing -> pure $ Left NotFound
       Just note -> do
         mContent <- ExportContent.readNoteContent note
@@ -130,7 +128,3 @@ readResource model = \case
           Just content ->
             let header = ExportContent.generateNoteHeader model note
              in Right $ ResourceBody (header <> content)
-
-parseNoteRoute :: FilePath -> Maybe R.LMLRoute
-parseNoteRoute fp =
-  mkLMLRouteFromKnownFilePath Md fp <|> mkLMLRouteFromKnownFilePath Org fp
