@@ -5,22 +5,23 @@
 
 Bridges "Emanote.MCP.Catalog" (notebook data) to "MCP.Server" wire
 types. Handlers pull the current model via the 'IO' 'Model' reader
-supplied at startup and translate 'Catalog.NotebookResource' /
-'Catalog.ResourceBody' into MCP's 'Resource' / 'ReadResourceResult'.
+supplied at startup. Routing for both @resources\/list@ and
+@resources\/read@ is derived from 'Catalog.resources', so adding a
+catalog entry advertises and serves it without touching this module.
 
 __Per-request complexity__ (with /N/ = number of notes, /R/ = total
 relations):
 
 * @resources\/list@ — /O(1)/. Returns 'Catalog.listResources' verbatim.
-* @resources\/read@ — /O(N + R)/ for the metadata export; other URIs
-  return 400.
+* @resources\/read@ — /O(k + N + R)/ where /k/ is the catalog size.
+  Currently /k/ = 1, so effectively /O(N + R)/ for the metadata export.
+* @tools\/list@, @tools\/call@ — wired through "Emanote.MCP.Tools";
+  see that module for per-tool complexity.
 
 @resources\/templates\/list@ is not advertised — Emanote has no
 templated resources today, and 'defaultProcessHandlers' leaves the
-slot unset, so clients fall back to the @dpella\/mcp@ library default
+slot unset so clients fall back to the @dpella\/mcp@ library default
 (an empty list).
-* @tools\/list@, @tools\/call@ — wired through "Emanote.MCP.Tools";
-  see that module for per-tool complexity.
 
 No caching: each call re-runs against the live model.
 -}
@@ -28,7 +29,7 @@ module Emanote.MCP.Handlers (
   handlers,
 ) where
 
-import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..), metadataMime, metadataUri)
+import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..))
 import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Tools qualified as Tools
 import Emanote.Model (Model)
@@ -60,13 +61,13 @@ handlers readModel =
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
-      , readResourceHandler = Just $ \ReadResourceParams {uri} ->
-          if uri == metadataUri
-            then do
-              model <- liftIO readModel
-              let ResourceBody body = Catalog.readMetadata model
-              pure $ ProcessSuccess $ textResult uri metadataMime body
-            else pure $ ProcessRPCError 400 $ "Unrecognized resource URI: " <> uri
+      , readResourceHandler = Just $ \ReadResourceParams {uri} -> do
+          model <- liftIO readModel
+          pure $ case Catalog.readResource uri model of
+            Just (r, ResourceBody body) ->
+              ProcessSuccess $ textResult uri (resourceMime r) body
+            Nothing ->
+              ProcessRPCError 400 $ "Unrecognized resource URI: " <> uri
       }
 
 toMcpResource :: NotebookResource -> Resource

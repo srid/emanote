@@ -1,9 +1,14 @@
 {- | Notebook resource catalog consumed by "Emanote.MCP".
 
-Answers two questions:
+Answers two questions in one declaration:
 
-* /What/ is available? — 'listResources' returns catalog entries.
-* /How do I fetch one?/ — 'readMetadata' produces the metadata payload.
+* /What/ is available? — 'resources' is the canonical list.
+* /How do I fetch one?/ — each entry pairs a 'NotebookResource'
+  description with a model-reading function.
+
+'listResources' (for @resources\/list@) and 'readResource' (for
+@resources\/read@) both derive from 'resources', so adding or removing
+an entry updates advertising and serving in one place.
 
 The types here are MCP-independent (no MCP wire types), which keeps the
 catalog easy to reuse if a second surface ever appears. The module
@@ -17,26 +22,20 @@ through their own filesystem tools. See 'Emanote.MCP' for the rationale.
 module Emanote.MCP.Catalog (
   NotebookResource (..),
   ResourceBody (..),
-  metadataUri,
-  metadataMime,
-  metadataResource,
+  resources,
   listResources,
-  readMetadata,
+  readResource,
 ) where
 
 import Emanote.Model (Model)
 import Emanote.View.Export.JSON qualified as ExportJSON
 import Relude
 
--- | URI of the notebook metadata export. External clients hard-code this.
-metadataUri :: Text
-metadataUri = "emanote://export/metadata"
+{- | Catalog entry. URI-bearing but MCP-wire-independent.
 
--- | MIME type of the notebook metadata export.
-metadataMime :: Text
-metadataMime = "application/json"
-
--- | Catalog entry. URI-bearing but MCP-wire-independent.
+External clients hard-code 'resourceUri' — changing it is a breaking
+protocol change.
+-}
 data NotebookResource = NotebookResource
   { resourceUri :: Text
   , resourceMime :: Text
@@ -48,17 +47,17 @@ data NotebookResource = NotebookResource
 -- | Body payload for a resolved resource.
 newtype ResourceBody = ResourceBody {resourceBodyText :: Text}
 
-metadataResource :: NotebookResource
-metadataResource =
-  NotebookResource
-    { resourceUri = metadataUri
-    , resourceMime = metadataMime
-    , resourceName = "Notebook metadata"
-    , resourceTitle = Just "Notebook metadata (JSON)"
-    , resourceDescription =
-        Just
-          "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note source paths, then read the files directly through your own filesystem tools."
-    }
+{- | The full set of advertised resources, each paired with its renderer.
+
+This is the single source of truth: 'listResources' projects out the
+descriptions, 'readResource' looks up by URI to dispatch to the
+renderer. Adding a new resource is one tuple here.
+
+The renderer takes the live model so reads are not cached — every
+@resources\/read@ re-runs.
+-}
+resources :: [(NotebookResource, Model -> ResourceBody)]
+resources = [(metadataResource, readMetadata)]
 
 {- | Enumerate the resources advertised through MCP's @resources\/list@.
 
@@ -71,13 +70,31 @@ from @emanote:\/\/export\/metadata@ (every note's @filePath@) and read
 the underlying files via their own filesystem tools.
 -}
 listResources :: [NotebookResource]
-listResources = [metadataResource]
+listResources = fst <$> resources
 
-{- | Render the notebook metadata as JSON.
+{- | Look up a resource by URI and render it against the current model.
 
-__Complexity:__ /O(N + R)/ where /N/ = number of notes and /R/ = total
-resolved relations. Iterates every note in
-'Emanote.View.Export.JSON.renderJSONExport' and encodes the result.
+Returns 'Nothing' when no advertised resource matches the URI.
+
+__Complexity:__ /O(k)/ in the catalog size /k/ for the lookup, plus
+the renderer's own cost (/O(N + R)/ for the metadata export).
 -}
+readResource :: Text -> Model -> Maybe (NotebookResource, ResourceBody)
+readResource uri model =
+  find ((== uri) . resourceUri . fst) resources
+    <&> \(r, render) -> (r, render model)
+
+metadataResource :: NotebookResource
+metadataResource =
+  NotebookResource
+    { resourceUri = "emanote://export/metadata"
+    , resourceMime = "application/json"
+    , resourceName = "Notebook metadata"
+    , resourceTitle = Just "Notebook metadata (JSON)"
+    , resourceDescription =
+        Just
+          "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note source paths, then read the files directly through your own filesystem tools."
+    }
+
 readMetadata :: Model -> ResourceBody
 readMetadata = ResourceBody . decodeUtf8 . ExportJSON.renderJSONExport
