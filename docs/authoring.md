@@ -10,6 +10,7 @@ What you type into a note — input formats, link syntax, graph structures, rend
 - **[[markdown]]** — extensions on top of CommonMark: callouts, task lists, emojis, footnotes, footers
 - **[[wikilinks]]** — `[[…]]` syntax, structural links, broken / ambiguous link rendering
 - **[[query]]** — Obsidian-style embed queries for dynamic listings
+- **[[folder-note]]** — placing `foo.md` next to `foo/` (or `foo/index.md`) to give a folder its own page
 - **[[folgezettel]]** — the `#[[…]]` wikilink form that declares parent/child structure
 - **[[daily-notes]]** — date-stamped notes
 - **[[orgmode]]** — Org-mode notes alongside Markdown
