@@ -2,12 +2,12 @@
 
 Answers two questions in one declaration:
 
-* /What/ is available? — 'resources' is the canonical list.
+* /What/ is available? — the internal @resources@ list is the canonical list.
 * /How do I fetch one?/ — each entry pairs a 'NotebookResource'
   description with a model-reading function.
 
 'listResources' (for @resources\/list@) and 'readResource' (for
-@resources\/read@) both derive from 'resources', so adding or removing
+@resources\/read@) both derive from @resources@, so adding or removing
 an entry updates advertising and serving in one place.
 
 The types here are MCP-independent (no MCP wire types), which keeps the
@@ -22,7 +22,6 @@ through their own filesystem tools. See 'Emanote.MCP' for the rationale.
 module Emanote.MCP.Catalog (
   NotebookResource (..),
   ResourceBody (..),
-  resources,
   listResources,
   readResource,
 ) where
@@ -57,7 +56,20 @@ The renderer takes the live model so reads are not cached — every
 @resources\/read@ re-runs.
 -}
 resources :: [(NotebookResource, Model -> ResourceBody)]
-resources = [(metadataResource, readMetadata)]
+resources =
+  [
+    ( NotebookResource
+        { resourceUri = "emanote://export/metadata"
+        , resourceMime = "application/json"
+        , resourceName = "Notebook metadata"
+        , resourceTitle = Just "Notebook metadata (JSON)"
+        , resourceDescription =
+            Just
+              "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note source paths, then read the files directly through your own filesystem tools."
+        }
+    , ResourceBody . decodeUtf8 . ExportJSON.renderJSONExport
+    )
+  ]
 
 {- | Enumerate the resources advertised through MCP's @resources\/list@.
 
@@ -81,20 +93,5 @@ the renderer's own cost (/O(N + R)/ for the metadata export).
 -}
 readResource :: Text -> Model -> Maybe (NotebookResource, ResourceBody)
 readResource uri model =
-  find ((== uri) . resourceUri . fst) resources
+  find (\(r, _) -> resourceUri r == uri) resources
     <&> \(r, render) -> (r, render model)
-
-metadataResource :: NotebookResource
-metadataResource =
-  NotebookResource
-    { resourceUri = "emanote://export/metadata"
-    , resourceMime = "application/json"
-    , resourceName = "Notebook metadata"
-    , resourceTitle = Just "Notebook metadata (JSON)"
-    , resourceDescription =
-        Just
-          "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note source paths, then read the files directly through your own filesystem tools."
-    }
-
-readMetadata :: Model -> ResourceBody
-readMetadata = ResourceBody . decodeUtf8 . ExportJSON.renderJSONExport
