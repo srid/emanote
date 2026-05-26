@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Docs for flake.parts
         run: |
           # TODO: Define this in Vira or make it part of our flake?
@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Build emanote
         id: build
         run: |
@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Download emanote closure
         uses: actions/download-artifact@v4
         with:
@@ -115,7 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v33
+        uses: DeterminateSystems/nix-installer-action@main
       - name: Docs static site
         id: docs
         run: |
