@@ -17,7 +17,3 @@ What you type into a note — input formats, link syntax, graph structures, rend
 - **[[feed]]**, **[[export]]** — frontmatter-declared outputs
 
 Cross-cutting: configuration that affects what you can type lives under [[config]] ([[yaml-config]], [[layer]]); output customisation lives under [[theme]]; code-level extension lives under [[extend]].
-
-```query
-path:./*
-```

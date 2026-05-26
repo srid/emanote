@@ -13,7 +13,3 @@ The notebook model — how notes, folders, and YAML compose. Read this section b
 - **[[folder-note]]** — `foo.md`/`foo/index.md` semantics
 - **[[folgezettel]]** — structural-link hierarchy (consumed by [[sidebar]])
 - **[[i18n]]** — internationalisation via `page.lang`
-
-```query
-path:./*
-```
