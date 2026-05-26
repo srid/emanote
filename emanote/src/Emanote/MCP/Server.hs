@@ -14,15 +14,13 @@ module Emanote.MCP.Server (
 import Data.Version (showVersion)
 import Emanote.MCP.Catalog (NotebookResource (..))
 import Emanote.MCP.Catalog qualified as Catalog
-import Emanote.MCP.Handlers (allKindShapes, handlers, templateFor)
+import Emanote.MCP.Handlers (handlers)
 import Emanote.MCP.Types ()
-import Emanote.MCP.Uri (kindToUri)
 import Emanote.Model (Model)
 import MCP.Server (
   Implementation (..),
   LoggingLevel (..),
   MCPServerState (..),
-  ResourceTemplate (..),
   ResourcesCapability (..),
   ServerCapabilities (..),
   ToolsCapability (..),
@@ -75,13 +73,10 @@ instructions =
   Just
     $ unlines
     $ ["Emanote notebook exposed over MCP.", "Resources:"]
-    ++ (resourceLine <$> Catalog.staticResources)
-    ++ (templateLine <$> mapMaybe templateFor allKindShapes)
+    ++ (resourceLine <$> Catalog.listResources)
   where
-    resourceLine NotebookResource {resourceKind, resourceDescription} =
-      "- " <> kindToUri resourceKind <> maybe "" (" — " <>) resourceDescription
-    templateLine ResourceTemplate {uriTemplate, description} =
-      "- " <> uriTemplate <> maybe "" (" — " <>) description
+    resourceLine NotebookResource {resourceUri, resourceDescription} =
+      "- " <> resourceUri <> maybe "" (" — " <>) resourceDescription
 
 capabilities :: ServerCapabilities
 capabilities =

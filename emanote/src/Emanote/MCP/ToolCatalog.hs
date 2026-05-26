@@ -22,7 +22,6 @@ import Data.Aeson (ToJSON (..), (.=))
 import Data.Aeson qualified as Aeson
 import Data.IxSet.Typed qualified as Ix
 import Data.Text qualified as T
-import Emanote.MCP.Uri (noteUriPrefix)
 import Emanote.Model (Model)
 import Emanote.Model qualified as M
 import Emanote.Model.Graph qualified as G
@@ -40,23 +39,24 @@ import Relude
 -- Result shapes
 -- ---------------------------------------------------------------------------
 
--- | A single note hit returned by 'findNotes' and 'getBacklinks'.
+{- | A single note hit returned by 'findNotes' and 'getBacklinks'.
+
+The @path@ is the note's source-relative path (e.g. @guide/mcp.md@) —
+the same path used as a key in the JSON metadata export. Clients read
+the underlying file through their own filesystem tools; MCP no longer
+serves note bodies.
+-}
 data NoteMatch = NoteMatch
   { path :: Text
   , title :: Text
   }
   deriving stock (Eq, Show, Generic)
 
-{- | The @uri@ field is derived from @path@ so there is no way for the two to
-diverge: drift in 'noteUriPrefix' propagates to every consumer through
-one place.
--}
 instance ToJSON NoteMatch where
   toJSON NoteMatch {path, title} =
     Aeson.object
       [ "path" .= path
       , "title" .= title
-      , "uri" .= (noteUriPrefix <> path)
       ]
 
 -- | Outcome of resolving a wikilink, mirroring 'Rel.ResolvedRelTarget'.
