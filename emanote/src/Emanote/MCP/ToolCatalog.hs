@@ -3,8 +3,8 @@
 
 {- | Pure query helpers backing the MCP tools.
 
-MCP-independent by design: this module has no @dpella/mcp@ imports, only the
-in-repo URI scheme and the model query layer. Tools live next door in
+MCP-independent by design: this module has no @dpella/mcp@ imports and no
+URI-scheme layer — only the model query layer. Tools live next door in
 "Emanote.MCP.Tools" and adapt these helpers to MCP wire types. Mirrors the
 'Emanote.MCP.Catalog' / 'Emanote.MCP.Handlers' split phase 2 introduced for
 resources.
