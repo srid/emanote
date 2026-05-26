@@ -24,6 +24,10 @@
 /guide/html-template/breadcrumbs /breadcrumbs 301
 /guide/html-template/toc /toc 301
 /guide/html-template/ogp /ogp 301
+/guide/html-template/backlinks /backlinks 301
+/guide/html-template/dark-mode /dark-mode 301
+/guide/html-template/focus-mode /focus-mode 301
+/guide/html-template/right-panel /right-panel 301
 
 # Markdown features
 /guide/markdown/custom-style /custom-style 301
