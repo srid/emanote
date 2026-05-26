@@ -8,7 +8,7 @@ The patterns here came out of [#672](https://github.com/srid/emanote/pull/672) (
 
 A docs-page `slug:` must be a **single path segment**, not a multi-segment slash-path. Two reasons:
 
-- The page's directory location already encodes hierarchy. A slug that re-encodes that hierarchy is duplicated state that drifts the moment one of the two moves (a page at `docs/guide/lua-filters/diagrams.md` with `slug: lua-filters/diagrams` carries the same path in two places — a rename of the parent or the page silently breaks the mirror).
+- The page's directory location already encodes hierarchy. A slug that re-encodes that hierarchy is duplicated state that drifts the moment one of the two moves (a page at `docs/extend/lua-filters/diagrams.md` with `slug: lua-filters/diagrams` carries the same path in two places — a rename of the parent or the page silently breaks the mirror).
 - Public URLs stay short and rename-stable. `[[diagrams]]` survives a future reshuffle of where the page sits in the docs tree; `[[lua-filters/diagrams]]` does not.
 
 Acceptable: `slug: diagrams`, `slug: yaml-config`, `slug: html-template`, `slug: i18n.fr` (single segment; dot-namespaced for locale or close variants).
@@ -17,7 +17,7 @@ Unacceptable: `slug: lua-filters/diagrams`, `slug: guide/whatever` — anything 
 
 Wikilinks that reference the page use the single-segment form too: `[[diagrams]]`, not `[[lua-filters/diagrams]]`.
 
-> _New rule from this PR_: an early draft of [[diagrams]] used `slug: lua-filters/diagrams` to mirror its directory placement under `docs/guide/lua-filters/`. The slug was reduced to `diagrams` so a future move of the file doesn't invalidate every inbound wikilink.
+> _New rule from this PR_: an early draft of [[diagrams]] used `slug: lua-filters/diagrams` to mirror its directory placement under `docs/extend/lua-filters/`. The slug was reduced to `diagrams` so a future move of the file doesn't invalidate every inbound wikilink.
 
 ## docs-internal-wikilinks
 
@@ -26,7 +26,7 @@ When reviewing documentation changes under `docs/`, check internal documentation
 - Use wikilinks for references to existing docs pages, such as `[[yaml-config]]`, `[[html-template]]`, `[[wikilinks]]`, `[[layer]]`, `[[markdown]]`, `[[query]]`, `[[search]]`, and related guide pages.
 - Prefer wikilinks over raw relative Markdown links for internal docs references.
 - Replace bare mentions of concepts covered by existing docs pages with wikilinks, unless doing so would make the sentence noisy or misleading.
-- New or newly promoted guide pages should be linked from the nearest relevant index page, usually `docs/guide.md`.
+- New or newly promoted pages should be linked from the relevant section folder-note (`docs/authoring/authoring.md`, `docs/config/config.md`, `docs/theme/theme.md`, `docs/extend/extend.md`, `docs/reference/reference.md`, or `docs/start/start.md`).
 
 This rule is meant to catch isolated docs pages that repeat or mention existing Emanote concepts without connecting to the surrounding guide.
 

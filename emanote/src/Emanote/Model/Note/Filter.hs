@@ -305,7 +305,7 @@ parse-time sandbox lets it through.
 Emitted on a single physical line so a runtime/syntax error in the user's
 filter still reports the right line number (see the comment on
 'parseTimeNoIOPrelude'). For the protocol the @error_block@ builder
-implements, see @docs/guide/lua-filters/writing-filters.md@.
+implements, see @docs/extend/lua-filters/writing-filters.md@.
 -}
 emanoteLuaHelpers :: Text
 emanoteLuaHelpers =

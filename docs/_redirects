@@ -37,9 +37,10 @@
 /start/install/wsl /wsl 301
 /start/neuron /neuron 301
 /start/known-issues /known-issues 301
-/start/resources /resources 301
 
-# Resources
+# Resources (folder retired; pages flattened into /start and /reference)
+/resources /start 301
+/start/resources /start 301
 /start/resources/editors /editors 301
 /start/resources/emanote-template /emanote-template 301
 /start/resources/zk /zk 301
@@ -48,10 +49,22 @@
 /start/resources/editors/vim /vim 301
 /start/resources/editors/vscode /vscode 301
 
-# Tips
+# Tips (folder retired; pages absorbed into /authoring and /start)
+/tips /authoring 301
 /tips/adding-images /adding-images 301
 /tips/js /js 301
-/tips/js/math /tips/math 301
-/tips/js/mermaid /tips/mermaid 301
+/tips/js/math /math 301
+/tips/js/mermaid /mermaid 301
 /tips/js/syntax-highlighting /syntax-highlighting 301
+/tips/math /math 301
+/tips/mermaid /mermaid 301
+/tips/syntax-highlighting /syntax-highlighting 301
 /tips/sync /sync 301
+
+# Guide (umbrella retired; section split into authoring/config/theme/extend)
+/guide /authoring 301
+/guide/i18n /i18n 301
+/guide/wikilinks /wikilinks 301
+/guide/emanoteignore /emanoteignore 301
+/guide/mcp /mcp 301
+/guide/orgmode /orgmode 301

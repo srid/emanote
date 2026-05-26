@@ -25,6 +25,7 @@
   - The default template now has a note focus button in the note area when collapsible side chrome is present. It expands the central note column inside the browser window by hiding the sidebar, right-panel, and bottom strip while leaving the uptree visible; the control is hidden on narrow screens and the state survives Ema live hot reloads until the user explicitly restores the layout.
 - Mermaid: add `elk` layout ([#618](https://github.com/srid/emanote/pull/618))
 - Home Manager module: macOS support via launchd ([#623](https://github.com/srid/emanote/pull/623))
+- Docs site reorganised around reader concern: `start`, `authoring`, `config`, `theme`, `extend`, `reference`. URLs are unchanged (every page already has a slug); legacy `/guide/*`, `/tips/*`, and `/start/resources/*` paths continue to redirect.
 
 **Bug fixes**
 
