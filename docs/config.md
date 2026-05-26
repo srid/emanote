@@ -11,5 +11,5 @@ The notebook model — how notes, folders, and YAML compose. Read this section b
 - **[[layer]]** — merging multiple notebook directories
 - **[[emanoteignore]]** — excluding files from the notebook model
 - **[[folder-note]]** — `foo.md`/`foo/index.md` semantics
-- **[[folgezettel]]** — structural-link hierarchy (consumed by [[sidebar]])
+- **[[folgezettel]]** — `folder-folgezettel:` YAML toggle and the parent/child tree it builds for [[sidebar]] and [[uptree]]
 - **[[i18n]]** — internationalisation via `page.lang`
