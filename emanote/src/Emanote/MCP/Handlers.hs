@@ -12,9 +12,13 @@ __Per-request complexity__ (with /N/ = number of notes, /R/ = total
 relations):
 
 * @resources\/list@ — /O(1)/. Returns 'Catalog.listResources' verbatim.
-* @resources\/templates\/list@ — /O(1)/. Currently empty.
 * @resources\/read@ — /O(N + R)/ for the metadata export; other URIs
   return 400.
+
+@resources\/templates\/list@ is not advertised — Emanote has no
+templated resources today, and 'defaultProcessHandlers' leaves the
+slot unset, so clients fall back to the @dpella\/mcp@ library default
+(an empty list).
 * @tools\/list@, @tools\/call@ — wired through "Emanote.MCP.Tools";
   see that module for per-tool complexity.
 
@@ -29,7 +33,6 @@ import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Tools qualified as Tools
 import Emanote.Model (Model)
 import MCP.Server (
-  ListResourceTemplatesResult (..),
   ListResourcesResult (..),
   ProcessResult (..),
   ReadResourceParams (..),
@@ -38,7 +41,6 @@ import MCP.Server (
   ResourceContents (..),
   TextResourceContents (..),
   defaultProcessHandlers,
-  listResourceTemplatesHandler,
   listResourcesHandler,
   readResourceHandler,
   withToolHandlers,
@@ -55,14 +57,6 @@ handlers readModel =
             $ ProcessSuccess
             $ ListResourcesResult
               { resources = toMcpResource <$> Catalog.listResources
-              , nextCursor = Nothing
-              , MCP._meta = Nothing
-              }
-      , listResourceTemplatesHandler = Just $ \_ ->
-          pure
-            $ ProcessSuccess
-            $ ListResourceTemplatesResult
-              { resourceTemplates = []
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
