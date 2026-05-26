@@ -180,7 +180,6 @@ library
     Emanote.MCP.ToolCatalog
     Emanote.MCP.Tools
     Emanote.MCP.Types
-    Emanote.MCP.Uri
     Emanote.Model
     Emanote.Model.Calendar
     Emanote.Model.Calendar.Parser

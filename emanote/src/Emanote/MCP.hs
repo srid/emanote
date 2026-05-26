@@ -1,16 +1,23 @@
 {- | MCP (Model Context Protocol) server for Emanote.
 
-Exposes the notebook model as read-only MCP resources:
+Exposes the notebook model as a single read-only resource plus a set of
+query tools:
 
 * @emanote:\/\/export\/metadata@ — JSON metadata for every note
-* @emanote:\/\/export\/content@ — all notes concatenated as a single Markdown document
-* @emanote:\/\/note\/{path}@ — an individual note by its source path
+  (titles, source paths, parent routes, resolved links)
+* @find_notes@, @get_backlinks@, @resolve_wikilink@ — query tools that
+  return note source paths and titles
+
+Per-note bodies are intentionally not served: every result already
+includes the note's source-relative @path@, and MCP clients read the
+underlying file with their own filesystem tools. This keeps the MCP
+surface focused on the structured data Emanote can answer for that
+clients can't compute themselves.
 
 Umbrella module. Implementation lives in:
 
 * "Emanote.MCP.Types" — package-level type-family instances
 * "Emanote.MCP.Catalog" — notebook resource catalog (what's available, how to read it)
-* "Emanote.MCP.Uri" — URI wire schema and 'ResourceKind' \<-\> URI translation
 * "Emanote.MCP.Handlers" — request handlers adapting the catalog to MCP wire types
 * "Emanote.MCP.Server" — Warp setup, server identity, capabilities, instructions
 -}

@@ -5,46 +5,43 @@
 
 Bridges "Emanote.MCP.Catalog" (notebook data) to "MCP.Server" wire
 types. Handlers pull the current model via the 'IO' 'Model' reader
-supplied at startup and translate 'Catalog.NotebookResource' /
-'Catalog.ResourceBody' into MCP's 'Resource' / 'ReadResourceResult'.
+supplied at startup. Routing for both @resources\/list@ and
+@resources\/read@ is derived from 'Catalog.resources', so adding a
+catalog entry advertises and serves it without touching this module.
 
 __Per-request complexity__ (with /N/ = number of notes, /R/ = total
 relations):
 
 * @resources\/list@ — /O(1)/. Returns 'Catalog.listResources' verbatim.
-* @resources\/templates\/list@ — /O(1)/. 'mapMaybe' over the fixed
-  'allKindShapes' list.
-* @resources\/read@ — /O(|URI|)/ for the URI parse plus the per-kind
-  cost from 'Catalog.readResource' (/O(N + R)/ for metadata,
-  /O(log N + |note|)/ for a single note).
+* @resources\/read@ — /O(k + N + R)/ where /k/ is the catalog size.
+  Currently /k/ = 1, so effectively /O(N + R)/ for the metadata export.
 * @tools\/list@, @tools\/call@ — wired through "Emanote.MCP.Tools";
   see that module for per-tool complexity.
+
+@resources\/templates\/list@ is not advertised — Emanote has no
+templated resources today, and 'defaultProcessHandlers' leaves the
+slot unset so clients fall back to the @dpella\/mcp@ library default
+(an empty list).
 
 No caching: each call re-runs against the live model.
 -}
 module Emanote.MCP.Handlers (
   handlers,
-  allKindShapes,
-  templateFor,
 ) where
 
-import Emanote.MCP.Catalog (CatalogError (..), NotebookResource (..), ResourceBody (..), ResourceKind (..), kindMime)
+import Emanote.MCP.Catalog (NotebookResource (..), ResourceBody (..))
 import Emanote.MCP.Catalog qualified as Catalog
 import Emanote.MCP.Tools qualified as Tools
-import Emanote.MCP.Uri (kindToUri, noteUriPrefix, noteUriTemplate, uriToKind)
 import Emanote.Model (Model)
 import MCP.Server (
-  ListResourceTemplatesResult (..),
   ListResourcesResult (..),
   ProcessResult (..),
   ReadResourceParams (..),
   ReadResourceResult (..),
   Resource (..),
   ResourceContents (..),
-  ResourceTemplate (..),
   TextResourceContents (..),
   defaultProcessHandlers,
-  listResourceTemplatesHandler,
   listResourcesHandler,
   readResourceHandler,
   withToolHandlers,
@@ -64,34 +61,23 @@ handlers readModel =
               , nextCursor = Nothing
               , MCP._meta = Nothing
               }
-      , listResourceTemplatesHandler = Just $ \_ ->
-          pure
-            $ ProcessSuccess
-            $ ListResourceTemplatesResult
-              { resourceTemplates = mapMaybe templateFor allKindShapes
-              , nextCursor = Nothing
-              , MCP._meta = Nothing
-              }
-      , readResourceHandler = Just $ \ReadResourceParams {uri} ->
-          case uriToKind uri of
-            Nothing -> pure $ ProcessRPCError 400 $ "Unrecognized resource URI: " <> uri
-            Just kind -> do
-              model <- liftIO readModel
-              eBody <- liftIO $ Catalog.readResource model kind
-              pure $ case eBody of
-                Left NotFound -> ProcessRPCError 404 $ "Resource not found: " <> uri
-                Right (ResourceBody body) ->
-                  ProcessSuccess $ textResult uri (kindMime kind) body
+      , readResourceHandler = Just $ \ReadResourceParams {uri} -> do
+          model <- liftIO readModel
+          pure $ case Catalog.readResource uri model of
+            Just (r, ResourceBody body) ->
+              ProcessSuccess $ textResult uri (resourceMime r) body
+            Nothing ->
+              ProcessRPCError 400 $ "Unrecognized resource URI: " <> uri
       }
 
 toMcpResource :: NotebookResource -> Resource
-toMcpResource NotebookResource {resourceKind, resourceName, resourceTitle, resourceDescription} =
+toMcpResource NotebookResource {resourceUri, resourceMime, resourceName, resourceTitle, resourceDescription} =
   Resource
-    { MCP.uri = kindToUri resourceKind
+    { MCP.uri = resourceUri
     , MCP.name = resourceName
     , MCP.title = resourceTitle
     , MCP.description = resourceDescription
-    , MCP.mimeType = Just (kindMime resourceKind)
+    , MCP.mimeType = Just resourceMime
     , size = Nothing
     , annotations = Nothing
     , MCP._meta = Nothing
@@ -111,32 +97,3 @@ textResult uri mime body =
         ]
     , MCP._meta = Nothing
     }
-
-{- | One representative value per 'ResourceKind' constructor, used to drive
-'templateFor' from 'listResourceTemplatesHandler'. The 'Note' path is
-arbitrary — 'templateFor' only inspects the constructor.
--}
-allKindShapes :: [ResourceKind]
-allKindShapes = [MetadataJson, Note ""]
-
-{- | The MCP resource template for a kind, if it accepts a URI parameter.
-
-__Complexity:__ /O(1)/. Independent of notebook size.
-
-Exhaustive on 'ResourceKind' so adding a new constructor forces a
-decision about whether it deserves a template.
--}
-templateFor :: ResourceKind -> Maybe ResourceTemplate
-templateFor = \case
-  MetadataJson -> Nothing
-  Note _ ->
-    Just
-      $ ResourceTemplate
-        { MCP.name = "Notebook note"
-        , MCP.title = Just "Notebook note"
-        , uriTemplate = noteUriTemplate
-        , MCP.description = Just $ "Individual note by source path, e.g. " <> noteUriPrefix <> "guide/mcp.md"
-        , MCP.mimeType = Just (kindMime (Note ""))
-        , annotations = Nothing
-        , MCP._meta = Nothing
-        }

@@ -1,57 +1,43 @@
 {- | Notebook resource catalog consumed by "Emanote.MCP".
 
-Answers two questions:
+Answers two questions in one declaration:
 
-* /What/ is available? — 'listResources' returns catalog entries for
-  the static metadata export.
-* /How do I fetch one?/ — 'readResource' resolves a 'ResourceKind' to a
-  'ResourceBody'.
+* /What/ is available? — the internal @resources@ list is the canonical list.
+* /How do I fetch one?/ — each entry pairs a 'NotebookResource'
+  description with a model-reading function.
 
-The types here are MCP-independent (no URIs, no wire types), which
-keeps the catalog easy to reuse if a second surface ever appears. The
-module lives under "Emanote.MCP" because MCP is today's only consumer
-and shares the catalog's change cadence.
+'listResources' (for @resources\/list@) and 'readResource' (for
+@resources\/read@) both derive from @resources@, so adding or removing
+an entry updates advertising and serving in one place.
+
+The types here are MCP-independent (no MCP wire types), which keeps the
+catalog easy to reuse if a second surface ever appears. The module
+lives under "Emanote.MCP" because MCP is today's only consumer and
+shares the catalog's change cadence.
+
+Per-note content is /not/ a resource: clients discover note source
+paths through the metadata export and read the underlying files
+through their own filesystem tools. See 'Emanote.MCP' for the rationale.
 -}
 module Emanote.MCP.Catalog (
-  ResourceKind (..),
   NotebookResource (..),
   ResourceBody (..),
-  CatalogError (..),
-  kindMime,
   listResources,
-  staticResources,
   readResource,
 ) where
 
 import Emanote.Model (Model)
-import Emanote.Model qualified as M
-import Emanote.Model.Note qualified as Note
-import Emanote.Route qualified as R
-import Emanote.View.Export.Content qualified as ExportContent
 import Emanote.View.Export.JSON qualified as ExportJSON
-import Optics.Operators ((^.))
 import Relude
 
--- | A kind of resource the notebook exposes.
-data ResourceKind
-  = -- | Whole-notebook metadata as JSON.
-    MetadataJson
-  | -- | Individual note by source-relative path (e.g. @guide/mcp.md@).
-    Note FilePath
-  deriving stock (Show, Eq)
+{- | Catalog entry. URI-bearing but MCP-wire-independent.
 
-{- | MIME type of a resource, derived from its kind.
-
-__Complexity:__ /O(1)/.
+External clients hard-code 'resourceUri' — changing it is a breaking
+protocol change.
 -}
-kindMime :: ResourceKind -> Text
-kindMime = \case
-  MetadataJson -> "application/json"
-  Note {} -> "text/markdown"
-
--- | Catalog entry. URI-free by design; consumers assign addressing.
 data NotebookResource = NotebookResource
-  { resourceKind :: ResourceKind
+  { resourceUri :: Text
+  , resourceMime :: Text
   , resourceName :: Text
   , resourceTitle :: Maybe Text
   , resourceDescription :: Maybe Text
@@ -60,71 +46,52 @@ data NotebookResource = NotebookResource
 -- | Body payload for a resolved resource.
 newtype ResourceBody = ResourceBody {resourceBodyText :: Text}
 
-{- | Why 'readResource' couldn't return a body.
+{- | The full set of advertised resources, each paired with its renderer.
 
-Distinguishes /the kind references nothing in the catalog/ from any
-future IO-failure modes ('readNoteContent' surfaces a missing file as
-'NotFound' today, since it can't tell that apart from a path with no
-backing note in the model).
+This is the single source of truth: 'listResources' projects out the
+descriptions, 'readResource' looks up by URI to dispatch to the
+renderer. Adding a new resource is one tuple here.
+
+The renderer takes the live model so reads are not cached — every
+@resources\/read@ re-runs.
 -}
-data CatalogError = NotFound
-  deriving stock (Show, Eq)
+resources :: [(NotebookResource, Model -> ResourceBody)]
+resources =
+  [
+    ( NotebookResource
+        { resourceUri = "emanote://export/metadata"
+        , resourceMime = "application/json"
+        , resourceName = "Notebook metadata"
+        , resourceTitle = Just "Notebook metadata (JSON)"
+        , resourceDescription =
+            Just
+              "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note source paths, then read the files directly through your own filesystem tools."
+        }
+    , ResourceBody . decodeUtf8 . ExportJSON.renderJSONExport
+    )
+  ]
 
 {- | Enumerate the resources advertised through MCP's @resources\/list@.
 
-__Complexity:__ /O(1)/ — fixed two static entries, independent of
-notebook size.
-
-Returns only the two static, whole-notebook exports. Per-note resources
-are intentionally not enumerated: enumerating one entry per note makes
-@resources\/list@ scale linearly with notebook size, which clients poll
-on every refresh and which inflates context for clients that load the
-list eagerly. Per-note addressing is still fully supported through the
-@emanote:\/\/note\/{path}@ URI template advertised via
-@resources\/templates\/list@: discover paths from
-@emanote:\/\/export\/metadata@ (or wikilink graph) and call
-@resources\/read@ directly. Clients that surface only enumerated
-resources in an @-mention picker (Claude Code, opencode) won't fuzzy-list
-individual notes; clients that drive resource reads from the model
-(Codex, and Claude Code's model-side read tool) are unaffected.
+__Complexity:__ /O(1)/ — fixed one static entry, independent of
+notebook size. Per-note resources are intentionally absent: enumerating
+one entry per note makes @resources\/list@ scale linearly with notebook
+size, which clients poll on every refresh and which inflates context
+for clients that load the list eagerly. Clients discover note paths
+from @emanote:\/\/export\/metadata@ (every note's @filePath@) and read
+the underlying files via their own filesystem tools.
 -}
 listResources :: [NotebookResource]
-listResources = staticResources
+listResources = fst <$> resources
 
-staticResources :: [NotebookResource]
-staticResources =
-  [ NotebookResource
-      { resourceKind = MetadataJson
-      , resourceName = "Notebook metadata"
-      , resourceTitle = Just "Notebook metadata (JSON)"
-      , resourceDescription = Just "Notebook metadata as JSON: per-note titles, source paths, parent routes, and resolved links. Use this to discover note paths, then read individual notes via the emanote://note/{path} template."
-      }
-  ]
+{- | Look up a resource by URI and render it against the current model.
 
-{- | Resolve a 'ResourceKind' to its body.
+Returns 'Nothing' when no advertised resource matches the URI.
 
-__Complexity__ (per-kind, where /N/ = number of notes and /R/ = total
-resolved relations across all notes):
-
-* @'MetadataJson'@ — /O(N + R)/. Iterates every note in
-  'Emanote.View.Export.JSON.renderJSONExport' and encodes the result.
-* @'Note' path@ — /O(log N + |note|)/. ixset lookup plus one file read.
-
-Returns 'Left' 'NotFound' when a 'Note' kind references a path that
-doesn't correspond to any known note, or when the note has no source
-file (auto-generated notes).
+__Complexity:__ /O(k)/ in the catalog size /k/ for the lookup, plus
+the renderer's own cost (/O(N + R)/ for the metadata export).
 -}
-readResource :: Model -> ResourceKind -> IO (Either CatalogError ResourceBody)
-readResource model = \case
-  MetadataJson ->
-    pure $ Right $ ResourceBody (decodeUtf8 (ExportJSON.renderJSONExport model))
-  Note path ->
-    case R.mkLMLRouteFromMdOrOrgFilePath path >>= (`Note.lookupNotesByRoute` (model ^. M.modelNotes)) of
-      Nothing -> pure $ Left NotFound
-      Just note -> do
-        mContent <- ExportContent.readNoteContent note
-        pure $ case mContent of
-          Nothing -> Left NotFound
-          Just content ->
-            let header = ExportContent.generateNoteHeader model note
-             in Right $ ResourceBody (header <> content)
+readResource :: Text -> Model -> Maybe (NotebookResource, ResourceBody)
+readResource uri model =
+  find (\(r, _) -> resourceUri r == uri) resources
+    <&> \(r, render) -> (r, render model)

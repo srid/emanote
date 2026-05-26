@@ -1,7 +1,7 @@
 module Emanote.MCP.ToolCatalogSpec where
 
 import Data.Aeson qualified as Aeson
-import Data.Text qualified
+import Data.Aeson.KeyMap qualified as KM
 import Emanote.MCP.ToolCatalog (NoteMatch (..), ResolveResult (..), findNotes, getBacklinks, resolveWikilink)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Type qualified as M
@@ -59,10 +59,11 @@ spec = do
     it "treats a non-positive limit as zero" $ do
       findNotes "guide" 0 notebook `shouldBe` []
 
-    it "advertises an emanote:// URI for every match in the JSON payload" $ do
+    it "serialises only path and title — no URI field, since per-note bodies are not an MCP resource" $ do
       let [hit] = findNotes "wiki" 20 notebook
-          json = decodeUtf8 @Text (Aeson.encode hit)
-      json `shouldSatisfy` Data.Text.isInfixOf "\"uri\":\"emanote://note/guide/wikilinks.md\""
+      case Aeson.toJSON hit of
+        Aeson.Object obj -> KM.keys obj `shouldMatchList` ["path", "title"]
+        other -> expectationFailure $ "Expected a JSON object, got: " <> show other
 
   describe "getBacklinks" $ do
     let target = LMLRoute_Md (R ("guide" :| ["neuron"]))
