@@ -145,6 +145,7 @@ common library-common
     , process-extras
     , profunctors
     , relude                 >=1.0
+    , scientific
     , shower
     , skylighting            >=0.14
     , stm
@@ -176,6 +177,8 @@ library
     Emanote.MCP.Catalog
     Emanote.MCP.Handlers
     Emanote.MCP.Server
+    Emanote.MCP.ToolCatalog
+    Emanote.MCP.Tools
     Emanote.MCP.Types
     Emanote.MCP.Uri
     Emanote.Model

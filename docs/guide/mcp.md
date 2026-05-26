@@ -5,7 +5,7 @@ slug: mcp
 # MCP server
 
 > [!warning] Work in progress
-> MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). **Read-only resources** are live as of this release — query tools and subscriptions arrive in later PRs. Expect the tool/prompt surface to grow until this notice is removed.
+> MCP support is rolling out in phases ([#645](https://github.com/srid/emanote/issues/645)). **Read-only resources and query tools** are live as of this release; subscriptions and prompts arrive in later PRs. Expect the tool/prompt surface to grow until this notice is removed.
 
 Emanote can expose an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) endpoint beside its [live server](https://ema.srid.ca/topics/live-server), so that [Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), or any other MCP-aware client can query your notebook directly from the same process that renders it.
 
@@ -88,14 +88,31 @@ Per-request cost, where _N_ = number of notes in the model and _R_ = total resol
 | `resources/templates/list` | **O(1)** — currently one template (per-note); grows with templated kinds, not with notebook size |
 | `resources/read emanote://export/metadata` | **O(N + R)** — iterates every note and every relation; JSON-encodes the result |
 | `resources/read emanote://note/{path}` | **O(log N + \|note\|)** — ixset lookup plus one file read |
+| `tools/list`, `tools/call find_notes` | **O(N)** — linear scan over note titles and source paths |
+| `tools/call get_backlinks` | **O(R)** — ixset lookup of relations pointing to the target |
+| `tools/call resolve_wikilink` | **O(log N)** — ixset lookup by wikilink, plus ambiguity resolution against the `from` note |
 
 Reads are uncached: every `resources/read` re-runs against the live model. There is no per-client throttling or coalescing — a client that loops over per-note reads will re-traverse the disk each time. Phase 4 (subscriptions) replaces polling with push notifications and removes the per-poll cost for clients that opt in.
 
 ### Per-client behaviour
 
 - **Codex** sees the template in the model-side `list_mcp_resource_templates` tool and can call `read_mcp_resource` against any path. Works out of the box.
-- **Claude Code**'s model-side read tool ([docs](https://code.claude.com/docs/en/mcp.md#use-mcp-resources)) reads any URI the model constructs, including ones derived from the template. The `@`-mention picker, however, fuzzy-searches only the enumerated `resources/list` entries — so users won't see individual notes there and must reference them by asking the model (e.g. "read `guide/mcp.md` from the notebook") instead of `@`-mentioning them. Phase 3 will add a `find_notes` tool to make this lookup explicit.
+- **Claude Code**'s model-side read tool ([docs](https://code.claude.com/docs/en/mcp.md#use-mcp-resources)) reads any URI the model constructs, including ones derived from the template. The `@`-mention picker, however, fuzzy-searches only the enumerated `resources/list` entries — so users won't see individual notes there and must drive reads through the model (e.g. ask it to "read `guide/mcp.md`" or to call the `find_notes` tool — see [[#tools]]).
 - **opencode** populates its attach picker from `resources/list` only; per-note attachment via UI is unavailable without an enumeration. Same model-driven workaround as Claude Code applies when the model itself drives reads.
+
+## Tools
+
+Emanote advertises three read-only query tools through MCP's `tools/list`. They share the live model snapshot used by resources and return JSON-encoded text payloads.
+
+| Tool | Inputs | Returns |
+|---|---|---|
+| `find_notes` | `query` (substring), optional `limit` (1–100, default 20) | `{matches: [{path, title, uri}]}` — case-insensitive matches on title or source path |
+| `get_backlinks` | `path` (e.g. `guide/mcp.md`) | `{backlinks: [{path, title, uri}]}` — notes that link to the given note |
+| `resolve_wikilink` | `wikilink` (e.g. `guide/mcp`), optional `from` (source path for disambiguation) | `{result: "found"\|"missing"\|"ambiguous", …}` — resolves through the same path Emanote uses for inline `[[…]]` references |
+
+Each `path` returned is also a valid suffix for the `emanote://note/{path}` template — chain `find_notes` (or `get_backlinks`) into `resources/read` to load the full note. `resolve_wikilink` is the structured equivalent of asking Emanote what `[[…]]` would resolve to from the current note, including ambiguity disambiguation by closest common ancestor.
+
+Errors surface in two ways: malformed input that can't be parsed (unknown path, empty wikilink) comes back as a text result with `isError: true`; a missing required argument comes back as JSON-RPC error `-32602` per the MCP protocol.
 
 ## Debugging
 

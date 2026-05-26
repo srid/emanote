@@ -9,7 +9,6 @@ module Emanote.View.Export.JSON (
   modelRels,
   currentVersion,
   lmlRouteKey,
-  lmlSourcePath,
   getBaseUrlFromModel,
 ) where
 
@@ -73,7 +72,7 @@ renderJSONExport model =
                  in SourceFile
                       (Tit.toPlain tit)
                       k
-                      (toText . lmlSourcePath <$> M.parentLmlRoute model r)
+                      (toText . R.lmlSourcePath <$> M.parentLmlRoute model r)
                       (SR.siteRouteUrl model $ lmlSiteRoute (R.LMLView_Html, r))
                       meta_
                       (fromMaybe [] $ Map.lookup k rels)
@@ -98,13 +97,7 @@ modelRels model =
 --
 -- We use the source path consistently.
 lmlRouteKey :: LMLRoute -> Text
-lmlRouteKey =
-  toText . R.withLmlRoute R.encodeRoute
-
--- Path of the LML note
-lmlSourcePath :: LMLRoute -> FilePath
-lmlSourcePath =
-  R.withLmlRoute R.encodeRoute
+lmlRouteKey = toText . R.lmlSourcePath
 
 -- | Get base URL from model configuration (returns Nothing if not configured)
 getBaseUrlFromModel :: Model -> Maybe Text
