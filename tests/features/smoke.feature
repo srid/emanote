@@ -65,6 +65,11 @@ Feature: Smoke
     When I open "/wikilink-entities.html"
     Then the first article link has HTML containing "Spivak&nbsp;(2014)"
 
+  Scenario: Wiki link with #anchor renders the fragment on the href (discussion #105)
+    When I open "/wikilink-anchor.html"
+    Then the article link with text "Heading target" has href containing "heading-target#alpha-section"
+    And the article link with text "jump to alpha" has href containing "heading-target#alpha-section"
+
   Scenario: URL-bearing link labels render as one hyperlink (regression: #349)
     When I open "/issue-349.html"
     Then the article link with text "https://issue349-case1.example.com" has href containing "issue349-case1.example.com#anchor"
