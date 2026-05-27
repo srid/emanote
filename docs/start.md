@@ -11,8 +11,14 @@ Follow these steps to get started with Emanote.
 1. Use your existing notebook, or create one from [[emanote-template]][^gh].
 1. Run `emanote run --port=8080` (or just `emanote`) in terminal after `cd`'ing to that notebook folder; this will launch the live server.
      - Or, if you only want to generate the HTML files (for deployment), run `mkdir /tmp/output; emanote gen /tmp/output`.
-2. Visit [[authoring]] to learn what you can type, or [[examples]] to get inspired first.[^h]
+2. From there:[^h]
+    - **[[authoring]]** — what you can type into a note
+    - **[[config]]** — `yaml-config`, layers, `.emanoteignore`, i18n
+    - **[[theme]]** — customise the HTML output, [[neuron-layout|Neuron-like layout]]
+    - **[[extend]]** — Pandoc Lua filters, the MCP server
+    - **[[external-tools]]** — set up your [[editors|editor]], sync with [[sync|Syncthing]]
+    - **[[examples]]** — Emanote sites in the wild, for inspiration
 
 
 [^gh]: [[emanote-template]] also includes the GitHub Pages workflow for static site deployment.
-[^h]: If you are [Haskell](https://srid.ca/haskell) developer, see [[architecture]].
+[^h]: If you are a [Haskell](https://srid.ca/haskell) developer, see [[architecture]].
