@@ -69,7 +69,7 @@ Emanote advertises the notebook under the `emanote://` scheme as a single static
 
 | URI | MIME | What it returns |
 |---|---|---|
-| `emanote://export/metadata` | `application/json` | Metadata for every note — titles, source paths, parent routes, resolved links. Same shape as [`emanote export --format=metadata`](export.md). Use this to discover paths. |
+| `emanote://export/metadata` | `application/json` | Metadata for every note — titles, source paths, parent routes, resolved links. Same shape as [`emanote export --format=metadata`](../authoring/export.md). Use this to discover paths. |
 
 `resources/list` returns only the metadata export. Emanote intentionally does **not** enumerate one entry per note: that scales linearly with notebook size and inflates context on every poll. Clients discover note paths from `emanote://export/metadata` (every note's `filePath`) and the query tools below; the underlying files are read through the client's own filesystem tools (e.g. Claude Code's `Read`, Codex's local file access), not through MCP.
 

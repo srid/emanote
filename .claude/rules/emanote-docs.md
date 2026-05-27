@@ -9,7 +9,7 @@ When adding a new documentation page under `docs/`, give it an explicit simple `
 
 ## Wikilink internal references
 
-Connect docs pages to surrounding documentation with **wikilinks**, both when creating a new page and when editing existing ones. Link to the nearest relevant guide page — `[[yaml-config]]`, `[[html-template]]`, `[[wikilinks]]`, `[[layer]]`, etc. — instead of repeating concepts inline or leaving the page as an isolated note. Prefer wikilinks over raw relative Markdown links for any internal docs reference.
+Connect docs pages to surrounding documentation with **wikilinks**, both when creating a new page and when editing existing ones. Link to the nearest relevant docs page — `[[yaml-config]]`, `[[html-template]]`, `[[wikilinks]]`, `[[layer]]`, etc. — instead of repeating concepts inline or leaving the page as an isolated note. Prefer wikilinks over raw relative Markdown links for any internal docs reference.
 
 When you add prose that mentions another concept covered by an existing page, replace the bare phrase with a wikilink — e.g. write `… see [[html-template]] for the override mechanism …` rather than restating it. If no page covers the concept yet, this is a signal to consider promoting it to a dedicated page (see below) rather than burying the explanation inside an unrelated guide.
 
@@ -21,4 +21,18 @@ A section under one guide page should be **promoted to its own page** once any o
 - It carries reference material — splice tables, override protocols, configuration surfaces — that other pages need to wikilink to.
 - It documents a feature with its own slug-worthy concept name (`wikilinks`, `callout`, `folgezettel`, etc.).
 
-Move the content to a new file with a stable slug, replace the original section with a one-paragraph pointer plus a `[[<slug>]]` wikilink, and add the new page to `docs/guide.md`'s top-level list. Inbound links from other docs pages should point at the dedicated page.
+Move the content to a new file with a stable slug, replace the original section with a one-paragraph pointer plus a `[[<slug>]]` wikilink, and add the new page to the relevant section folder-note (`docs/start.md`, `docs/authoring.md`, `docs/config.md`, `docs/theme.md`, `docs/extend.md`, `docs/external-tools.md`, or `docs/reference.md`). Inbound links from other docs pages should point at the dedicated page.
+
+## Section layout
+
+`docs/` is organised into seven top-level sections, each driven by a reader concern:
+
+- `start/` — install + emanote-template.
+- `authoring/` — input formats, link syntax, graph structures (folder notes, folgezettel), render features the author types (math, mermaid, syntax-highlighting, images), frontmatter-declared outputs (feed, export).
+- `config/` — configuration surface: `yaml-config`, `layer`, `emanoteignore`, `i18n`.
+- `theme/` — HTML/Heist template customisation (`html-template` and its sub-pages only).
+- `extend/` — code-level extension: Pandoc Lua filters, MCP server.
+- `external-tools/` — third-party tools that integrate with Emanote: editors (vim, vscode, obsidian, nota), Syncthing sync, zk.
+- `reference/` — migration (`neuron`), examples, edge cases (`known-issues`).
+
+Place new pages in the section whose reader concern they match; cross-link via wikilinks rather than reorganising. The folder structure drives the sidebar tree; the page slug determines the public URL (see the slug rule above).

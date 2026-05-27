@@ -1,5 +1,6 @@
 ---
 slug: emanote-template
+order: 2
 ---
 
 # emanote-template

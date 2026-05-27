@@ -10,13 +10,17 @@ You can link to a note by placing the filename (without extension) inside double
 
 See [[folgezettel]] for the special wiki-link form used to declare the [[sidebar]] (and [[uptree]]) hierarchy.
 
+## Folder notes
+
+A wiki-link can resolve to a [[folder-note|folder note]] — a `foo.md` placed next to a `foo/` directory (or `foo/index.md` inside it) — so `[[guide]]` links to the page that represents the whole folder.
+
 ## Anchors
 
 Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links. Regular Markdown links do — for example, [example link](./markdown.md#lists).
 
 ## Regular Markdown note links
 
-Regular Markdown links to notes can include their `.md` or `.org` extension, but they don't have to. `[Neuron](../start/neuron)` and `[Neuron](../start/neuron.md)` both render as [Neuron](../start/neuron). Folder-note links such as `[Guide](../guide)` resolve the same way before Emanote falls back to looking for a static file at that path.
+Regular Markdown links to notes can include their `.md` or `.org` extension, but they don't have to. `[Neuron](../reference/neuron)` and `[Neuron](../reference/neuron.md)` both render as [Neuron](../reference/neuron). Folder-note links such as `[Reference](../reference)` resolve the same way before Emanote falls back to looking for a static file at that path.
 
 ## Broken links
 
