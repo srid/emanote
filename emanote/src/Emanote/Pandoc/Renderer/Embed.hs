@@ -79,7 +79,11 @@ embedBlockWikiLinkResolvingSplice model nr ctx noteRoute node = do
   (inlRef, (_, _, otherAttrs), _, (url, tit)) <- Link.parseInlineRef inl
   guard $ inlRef == Link.InlineLink
   let parentR = M.modelResolveLinkBase model noteRoute
-  -- TODO: Use anchor to embed a section?
+  -- TODO(srid/emanote#105 follow-up): the parser preserves an embed's
+  -- `#anchor` (so `![[note#section]]` reaches this site with `_mAnchor`
+  -- populated) but section-scoped embed is not implemented yet — the
+  -- whole target note is inlined. Same applies to the two `_mAnchor`
+  -- discards in the inline-wikilink and regular-link embed splices below.
   (Rel.URTWikiLink (WL.WikiLinkEmbed, wl), _mAnchor) <-
     Rel.parseUnresolvedRelTarget parentR (otherAttrs <> one ("title", tit)) url
   let rRel = Resolve.resolveWikiLinkMustExist model noteRoute wl
