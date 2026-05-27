@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=7e941e37-0a06-40ae-9663-cc80d603150e' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ca30a3df-53f8-4cd7-9422-7cf12ba26e1d' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -582,8 +582,8 @@
             </li>
           
             <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='guide'>
-                Guide
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='authoring'>
+                Authoring
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -716,8 +716,8 @@
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
-          4
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
         </span>
       
     
@@ -774,8 +774,8 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide' data-iso-date>
-      Guide
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Authoring' href='authoring' data-iso-date>
+      Authoring
     </a>
     
       
@@ -1183,75 +1183,12 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='YAML configuration' href='yaml-config' data-iso-date>
-      YAML configuration
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query' data-iso-date>
+      Queries
     </a>
     
       
         
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
-       The eye lands on the title now, not on the toggle. -->
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          <a href='i18n' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
-            
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='9 6 15 12 9 18'></polyline>
-      </svg>
-    
-  
-          </a>
-          
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Internationalisation' href='i18n' data-iso-date>
-      Internationalisation
-    </a>
-    
-      
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
-          2
-        </span>
-      
     
   </div>
 
@@ -1305,8 +1242,67 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Queries' href='query' data-iso-date>
-      Queries
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syntax Highlighting' href='syntax-highlighting' data-iso-date>
+      Syntax Highlighting
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Adding Images' href='adding-images' data-iso-date>
+      Adding Images
     </a>
     
       
@@ -1545,8 +1541,8 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folder notes' href='folder-note' data-iso-date>
-      Folder notes
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Math' href='math' data-iso-date>
+      Math
     </a>
     
       
@@ -1604,8 +1600,8 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Folgezettel links' href='folgezettel' data-iso-date>
-      Folgezettel links
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Mermaid Diagrams' href='mermaid' data-iso-date>
+      Mermaid Diagrams
     </a>
     
       
@@ -1652,7 +1648,7 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='html-template' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='wikilinks' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -1664,130 +1660,8 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='HTML Templates' href='html-template' data-iso-date>
-      HTML Templates
-    </a>
-    
-      
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='13 children inside'>
-          13
-        </span>
-      
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Layer system' href='layer' data-iso-date>
-      Layer system
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
-       The eye lands on the title now, not on the toggle. -->
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          <a href='lua-filters' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
-            
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='9 6 15 12 9 18'></polyline>
-      </svg>
-    
-  
-          </a>
-          
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Lua Filters' href='lua-filters' data-iso-date>
-      Lua Filters
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Wiki Links' href='wikilinks' data-iso-date>
+      Wiki Links
     </a>
     
       
@@ -1848,185 +1722,8 @@
         
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='MCP server' href='mcp' data-iso-date>
-      MCP server
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Wiki Links' href='wikilinks' data-iso-date>
-      Wiki Links
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='guide/orgmode' data-iso-date>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Org Mode ✍️' href='authoring/orgmode' data-iso-date>
       Org Mode ✍️
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='.emanoteignore' href='emanoteignore' data-iso-date>
-      <code>.emanoteignore</code>
     </a>
     
       
@@ -2078,7 +1775,7 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='tips' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='config' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -2090,13 +1787,13 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips' data-iso-date>
-      Tips
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Configuration' href='config' data-iso-date>
+      Configuration
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='5 children inside'>
-          5
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
         </span>
       
     
@@ -2129,13 +1826,10 @@
 
 
 
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
   
-
+  
 
 <!-- Rendering of this tree -->
 <div class='pl-2'>
@@ -2144,20 +1838,216 @@
     <span class='flex-shrink-0'>
       
         
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
+          <a href='theme' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
   
-        
+          </a>
+          
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples' data-iso-date>
-      Examples
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Theme' href='theme' data-iso-date>
+      Theme
     </a>
     
       
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='1 children inside'>
+          1
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
         
+          <a href='extend' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Extend' href='extend' data-iso-date>
+      Extend
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='external-tools' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='External tools' href='external-tools' data-iso-date>
+      External tools
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
+          3
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='reference' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Reference' href='reference' data-iso-date>
+      Reference
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
+          3
+        </span>
+      
     
   </div>
 
@@ -2227,7 +2117,7 @@
 
 
     <p class='mb-4 leading-relaxed'>
-      Emanote notes are primarily written in <strong>Markdown</strong> format, but <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a> is also supported in a basic form. A tutorial is <a href='https://commonmark.org/help/tutorial/' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>available here</a>. Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
+      Emanote notes are primarily written in <strong>Markdown</strong> format, but <a href='authoring/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a> is also supported in a basic form. A tutorial is <a href='https://commonmark.org/help/tutorial/' class='transition-colors text-primary-600 dark:text-primary-300 no-underline hover:underline decoration-primary-500 decoration-1 hover:decoration-2 underline-offset-4' data-linkicon='external' target='_blank' rel='noopener'>available here</a>. Below we shall highlight some of the commonmark extensions that Emanote supports on top of standard Mardown syntax.
     </p>
   
     <h2 id='wikilink' class='group mt-10 mb-5 font-semibold text-gray-900 dark:text-gray-50 pb-1 border-b border-gray-100 dark:border-gray-700 text-3xl'>
@@ -2880,7 +2770,7 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
   
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/guide/markdown.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/authoring/markdown.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>
@@ -3256,7 +3146,7 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
         </li>
       
         <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/orgmode'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='authoring/orgmode'>
             <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Org Mode ✍️
           </a>
           <!-- Outer wrapper extends right up against the li (right:full)
@@ -3320,38 +3210,6 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
         </li>
       
         <li class='group relative'>
-          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide'>
-            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Guide
-          </a>
-          <!-- Outer wrapper extends right up against the li (right:full)
-               with pr-3 of padding so the inner card visually sits 0.75rem
-               away. That padding is the "hover bridge": cursor crossing
-               from li to the card stays inside the outer wrapper, so
-               group-hover doesn't drop and the flyout doesn't vanish
-               mid-traverse. -->
-          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
-            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><strong><a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a></strong> — Markdown extensions: callouts, task lists, emojis, footnotes</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </div>
-        </li>
-      
-        <li class='group relative'>
           <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='external-links'>
             <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>External links
           </a>
@@ -3406,7 +3264,7 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>The metadata of all content (<a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
+      <div><p>The metadata of all content (<a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='authoring/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
     </div>
   
 </div>
@@ -3438,7 +3296,39 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>While Emacs is the usual way to edit <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
+      <div><p>While Emacs is the usual way to edit <a href='authoring/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </div>
+        </li>
+      
+        <li class='group relative'>
+          <a class='block py-1 px-2 rounded-sm bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='authoring'>
+            <span class='text-primary-400 dark:text-primary-700 mr-1.5 select-none' aria-hidden='true'>←</span>Authoring
+          </a>
+          <!-- Outer wrapper extends right up against the li (right:full)
+               with pr-3 of padding so the inner card visually sits 0.75rem
+               away. That padding is the "hover bridge": cursor crossing
+               from li to the card stays inside the outer wrapper, so
+               group-hover doesn't drop and the flyout doesn't vanish
+               mid-traverse. -->
+          <div class='hidden group-hover:block group-focus-within:block absolute right-full top-0 pr-3 z-30'>
+            <div class='w-[22rem] max-w-[min(22rem,40vw)] px-4 py-3.5 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 shadow-xl text-[0.85rem] leading-[1.55]'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><strong><a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a></strong> — extensions on top of CommonMark: callouts, task lists, emojis, footnotes, footers</div>
     </div>
   
 </div>
@@ -3603,7 +3493,7 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
           </li>
         
           <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide/orgmode'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='authoring/orgmode'>
               Org Mode ✍️
             </a>
             <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
@@ -3651,30 +3541,6 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
           </li>
         
           <li class='py-3 first:pt-0 last:pb-0'>
-            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='guide'>
-              Guide
-            </a>
-            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
-              
-                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
-     every-but-first sibling makes the boundary between contexts obvious
-     (otherwise adjacent contexts read as one continuous block of prose).
-     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
-     (see tests/step_definitions/smoke_steps.ts: every backlink context
-     wrapper has overflow-y "visible"). The wrapper now lives nested
-     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
-     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
-  
-    <div>
-      <div><strong><a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a></strong> — Markdown extensions: callouts, task lists, emojis, footnotes</div>
-    </div>
-  
-</div>
-              
-            </div>
-          </li>
-        
-          <li class='py-3 first:pt-0 last:pb-0'>
             <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='external-links'>
               External links
             </a>
@@ -3714,7 +3580,7 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>The metadata of all content (<a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
+      <div><p>The metadata of all content (<a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a> and <a href='authoring/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>), along with their link relationships, can be retrieved as <code>JSON</code> using one of the following means:</p></div>
     </div>
   
 </div>
@@ -3738,7 +3604,31 @@ main <span class='ot'>=</span> <span class='fu'>putStrLn</span> <span class='st'
      so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
   
     <div>
-      <div><p>While Emacs is the usual way to edit <a href='guide/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
+      <div><p>While Emacs is the usual way to edit <a href='authoring/orgmode' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Org Mode ✍️</a>, there are multiple apps for editing <a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a>:</p></div>
+    </div>
+  
+</div>
+              
+            </div>
+          </li>
+        
+          <li class='py-3 first:pt-0 last:pb-0'>
+            <a class='inline-block bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-2 py-0.5 rounded-sm hover:bg-primary-100/80 dark:hover:bg-primary-900/70 transition-colors' href='authoring'>
+              Authoring
+            </a>
+            <div class='mt-2 ml-2 pl-3 border-l-2 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400'>
+              
+                <!-- Each <context> iteration emits its own <div>; a thin top-rule on
+     every-but-first sibling makes the boundary between contexts obvious
+     (otherwise adjacent contexts read as one continuous block of prose).
+     Within a single context, [&_p+p]:mt-2 spaces adjacent paragraphs. --><!-- emanote-backlink-context is a stable hook for e2e regression tests
+     (see tests/step_definitions/smoke_steps.ts: every backlink context
+     wrapper has overflow-y "visible"). The wrapper now lives nested
+     inside backlinks-margin's flyout / backlinks-bottom / backlinks card,
+     so a class is the structure-independent way to target it. --><div class='emanote-backlink-context text-sm text-gray-500 dark:text-gray-300 [&>div+div]:border-t [&>div+div]:border-gray-200 dark:[&>div+div]:border-gray-700 [&>div+div]:pt-3 [&>div+div]:mt-3 [&amp;_p]:m-0 [&amp;_p+p]:mt-2 [&amp;_pre]:overflow-x-auto [&amp;_table]:overflow-x-auto'>
+  
+    <div>
+      <div><strong><a href='markdown' class='transition-colors bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1 py-0.5 rounded-sm box-decoration-clone hover:bg-primary-100/80 dark:hover:bg-primary-900/70' data-wikilink-type='WikiLinkNormal'>Markdown <span class='emoji' data-emoji='writing_hand' style='font-family: emoji'>✍️</span></a></strong> — extensions on top of CommonMark: callouts, task lists, emojis, footnotes, footers</div>
     </div>
   
 </div>

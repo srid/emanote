@@ -64,7 +64,7 @@
   --color-primary-900: var(--color-blue-900);
   --color-primary-950: var(--color-blue-950);
 }
-</style><link href='tailwind.css?instanceId=7e941e37-0a06-40ae-9663-cc80d603150e' rel='stylesheet' type='text/css' />
+</style><link href='tailwind.css?instanceId=ca30a3df-53f8-4cd7-9422-7cf12ba26e1d' rel='stylesheet' type='text/css' />
 
   <!-- styles.tpl is the escape hatch for CSS that inline Tailwind can't
      express: @keyframes, :target, ::marker bodies that need multiple
@@ -582,17 +582,8 @@
             </li>
           
             <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='start'>
-                Getting Started
-              </a>
-              <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
-                <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
-              </svg>
-            </li>
-          
-            <li class='inline-flex items-center shrink-0'>
-              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='resources'>
-                Resources
+              <a class='px-1 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition-colors' href='external-tools'>
+                External tools
               </a>
               <svg fill='currentColor' viewBox='0 0 20 20' class='w-auto h-5 text-gray-400 dark:text-gray-500'>
                 <path fill-rule='evenodd' d='M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' clip-rule='evenodd'></path>
@@ -702,10 +693,6 @@
      "this links to another note" — one primary palette, one weight. -->
 
   
-    
-      
-    
-  
 
 
 
@@ -721,60 +708,7 @@
     <span class='flex-shrink-0'>
       
         
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='6 9 12 15 18 9'></polyline>
-      </svg>
-      
-  
-        
-    </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start' data-iso-date>
-      Getting Started
-    </a>
-    
-      
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-    <div class='emanote-tree-children'>
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
-       The eye lands on the title now, not on the toggle. -->
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          <a href='install' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='start' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -786,8 +720,8 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Installing' href='install' data-iso-date>
-      Installing
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Getting Started' href='start' data-iso-date>
+      Getting Started
     </a>
     
       
@@ -813,8 +747,8 @@
   
 </div>
 
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -837,7 +771,7 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='neuron' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='authoring' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -849,8 +783,134 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Migrating from neuron' href='neuron' data-iso-date>
-      Migrating from neuron
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Authoring' href='authoring' data-iso-date>
+      Authoring
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='11 children inside'>
+          11
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='config' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Configuration' href='config' data-iso-date>
+      Configuration
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='4 children inside'>
+          4
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          <a href='theme' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Theme' href='theme' data-iso-date>
+      Theme
     </a>
     
       
@@ -876,8 +936,71 @@
   
 </div>
 
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
+       The eye lands on the title now, not on the toggle. -->
+  
+  
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
       
-        <!-- Variable bindings for this tree. The default rest-state link class is
+        
+          <a href='extend' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+            
+    
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
+        <polyline points='9 6 15 12 9 18'></polyline>
+      </svg>
+    
+  
+          </a>
+          
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Extend' href='extend' data-iso-date>
+      Extend
+    </a>
+    
+      
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='2 children inside'>
+          2
+        </span>
+      
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+    
+      <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
      hover-only style, special/index.tpl uses the wikilink chip palette so
      every entry on /-/all reads as a "linked note"). The active item shares
@@ -912,8 +1035,8 @@
   
         
     </span>
-    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Resources' href='resources' data-iso-date>
-      Resources
+    <a class='font-semibold tracking-tight hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='External tools' href='external-tools' data-iso-date>
+      External tools
     </a>
     
       
@@ -933,6 +1056,124 @@
   -->
   
     <div class='emanote-tree-children'>
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syncthing sync' href='sync' data-iso-date>
+      Syncthing sync
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
+      
+        <!-- Variable bindings for this tree. The default rest-state link class is
+     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
+     hover-only style, special/index.tpl uses the wikilink chip palette so
+     every entry on /-/all reads as a "linked note"). The active item shares
+     the wikilink chip palette so "you are here" reads as the same family as
+     "this links to another note" — one primary palette, one weight. -->
+
+  
+
+
+
+  <!-- Leaf node marker: a tiny dot centered in the toggle column.
+       Less visual weight than a file/document icon — the chevron
+       column already disambiguates folder vs leaf by presence of
+       the chevron, and leaves don't need their own glyph competing
+       with the title for attention. -->
+  
+
+
+<!-- Rendering of this tree -->
+<div class='pl-2'>
+  <!-- Node's rootLabel-->
+  <div class='flex items-center my-1.5 space-x-2 justify-left'>
+    <span class='flex-shrink-0'>
+      
+        
+          
+    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
+      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
+    </span>
+  
+        
+      
+    </span>
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='zk' href='zk' data-iso-date>
+      zk
+    </a>
+    
+      
+        
+    
+  </div>
+
+  <!-- Node's children forest, displayed only on active trees
+    TODO: Use <details> to toggle visibility?
+
+    Seam contract for sidebar-tree widgets — two pieces, both required:
+      1. `<div class="emanote-tree-children">` wraps every expanded
+         subtree (here).
+      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
+         empty), emitted from `routeTreeSplices` via `node:iso-date`.
+    sidebar-calendar.js attaches by reading both. Future widgets do
+    the same. Do not add widget-specific bindings (e.g. `node:month-
+    group`) to `routeTreeSplices` — keep the seam thin.
+  -->
+  
+</div>
+
       
         <!-- Variable bindings for this tree. The default rest-state link class is
      supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
@@ -1232,247 +1473,6 @@
 </div>
 
       
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='emanote-template' href='emanote-template' data-iso-date>
-      emanote-template
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='zk' href='zk' data-iso-date>
-      zk
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Syncthing sync' href='sync' data-iso-date>
-      Syncthing sync
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
-    </div>
-  
-</div>
-
-      
-        <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Known Issues' href='known-issues' data-iso-date>
-      Known Issues
-    </a>
-    
-      
-        
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-      
     </div>
   
 </div>
@@ -1501,7 +1501,7 @@
     <span class='flex-shrink-0'>
       
         
-          <a href='guide' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
+          <a href='reference' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
             
     
       <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
@@ -1513,137 +1513,15 @@
           
       
     </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Guide' href='guide' data-iso-date>
-      Guide
+    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Reference' href='reference' data-iso-date>
+      Reference
     </a>
     
       
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='16 children inside'>
-          16
+        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='3 children inside'>
+          3
         </span>
       
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Demoted toggle: light-gray chevron rather than a filled circle.
-       The eye lands on the title now, not on the toggle. -->
-  
-  
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          <a href='tips' title='View folgezettel children' class='hover:opacity-70 transition-opacity'>
-            
-    
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='w-5 h-5 flex-shrink-0 inline text-gray-400 dark:text-gray-500' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'>
-        <polyline points='9 6 15 12 9 18'></polyline>
-      </svg>
-    
-  
-          </a>
-          
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Tips' href='tips' data-iso-date>
-      Tips
-    </a>
-    
-      
-        <span class='text-xs text-gray-400 dark:text-gray-500 flex-shrink-0' title='5 children inside'>
-          5
-        </span>
-      
-    
-  </div>
-
-  <!-- Node's children forest, displayed only on active trees
-    TODO: Use <details> to toggle visibility?
-
-    Seam contract for sidebar-tree widgets — two pieces, both required:
-      1. `<div class="emanote-tree-children">` wraps every expanded
-         subtree (here).
-      2. Each leaf anchor carries `data-iso-date="YYYY-MM-DD"` (or
-         empty), emitted from `routeTreeSplices` via `node:iso-date`.
-    sidebar-calendar.js attaches by reading both. Future widgets do
-    the same. Do not add widget-specific bindings (e.g. `node:month-
-    group`) to `routeTreeSplices` — keep the seam thin.
-  -->
-  
-</div>
-
-    
-      <!-- Variable bindings for this tree. The default rest-state link class is
-     supplied by the caller via `tree-link-rest-class` (sidebar.tpl uses a
-     hover-only style, special/index.tpl uses the wikilink chip palette so
-     every entry on /-/all reads as a "linked note"). The active item shares
-     the wikilink chip palette so "you are here" reads as the same family as
-     "this links to another note" — one primary palette, one weight. -->
-
-  
-
-
-
-  <!-- Leaf node marker: a tiny dot centered in the toggle column.
-       Less visual weight than a file/document icon — the chevron
-       column already disambiguates folder vs leaf by presence of
-       the chevron, and leaves don't need their own glyph competing
-       with the title for attention. -->
-  
-
-
-<!-- Rendering of this tree -->
-<div class='pl-2'>
-  <!-- Node's rootLabel-->
-  <div class='flex items-center my-1.5 space-x-2 justify-left'>
-    <span class='flex-shrink-0'>
-      
-        
-          
-    <span class='w-5 h-5 flex-shrink-0 inline-flex items-center justify-center' aria-hidden='true'>
-      <span class='block w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700'></span>
-    </span>
-  
-        
-      
-    </span>
-    <a class='hover:bg-primary-50/70 dark:hover:bg-primary-950/50 hover:text-primary-600 dark:hover:text-primary-300 transition-colors rounded-md px-2 py-1 truncate flex-1' title='Examples' href='examples' data-iso-date>
-      Examples
-    </a>
-    
-      
-        
     
   </div>
 
@@ -1718,7 +1596,7 @@
   
 
   <div class='flex items-center justify-center mt-2'>
-  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/start/resources/editors/vscode.md'>
+  <a class='text-gray-300 hover:text-primary-600 text-sm' title='Edit this page on GitHub' href='https://github.com/srid/emanote/edit/master/docs/external-tools/editors/vscode.md'>
     <svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
       <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'></path>
     </svg>

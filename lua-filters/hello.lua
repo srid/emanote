@@ -2,7 +2,7 @@
 --
 -- Handles `hello` fenced code blocks and demonstrates Emanote's
 -- in-place error protocol via the injected `emanote.error_block`
--- helper (see `docs/guide/lua-filters/writing-filters.md`).
+-- helper (see `docs/extend/lua-filters/writing-filters.md`).
 --
 -- Happy path -> a greeting; sad path -> a protocol-shaped error block
 -- that (a) shows inline as a red banner on the live server, and
