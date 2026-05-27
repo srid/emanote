@@ -20,11 +20,11 @@
     "commonmark-wikilink": {
       "flake": false,
       "locked": {
-        "lastModified": 1779848553,
-        "narHash": "sha256-dQF9diLWK3gEFQbEYGJW8HM/lI1T3DbMxEoe9J1bgLQ=",
+        "lastModified": 1779923980,
+        "narHash": "sha256-JW02+8aLgdtxt2+O9roh5OKL+DE1bqxqcO7y/MtLZ6w=",
         "owner": "srid",
         "repo": "commonmark-wikilink",
-        "rev": "d6b6bc0c850a2cd846fd6e53b321bc5d9f6b99d2",
+        "rev": "11a91881e6768d2478ad6f218f7bf5746cbdb9e2",
         "type": "github"
       },
       "original": {
