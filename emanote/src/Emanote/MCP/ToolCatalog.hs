@@ -164,8 +164,13 @@ resolveWikilink wlText mFromPath model = do
 -- Internal helpers
 -- ---------------------------------------------------------------------------
 
--- | Parse a slash-separated wikilink target (e.g. "foo/bar") into a 'WL.WikiLink'.
+{- | Parse a slash-separated wikilink target (e.g. @"foo/bar"@) into a
+'WL.WikiLink', stripping any @#anchor@ via 'WL.dropUrlAnchor' so the MCP
+resolver agrees with the HTML renderer on @"note#heading"@ → note @"note"@.
+-}
 parseWikiLinkText :: Text -> Maybe WL.WikiLink
-parseWikiLinkText s
-  | T.null s = Nothing
-  | otherwise = viaNonEmpty WL.mkWikiLinkFromSlugs (Slug.decodeSlug <$> T.splitOn "/" s)
+parseWikiLinkText raw
+  | T.null wlPart = Nothing
+  | otherwise = viaNonEmpty WL.mkWikiLinkFromSlugs (Slug.decodeSlug <$> T.splitOn "/" wlPart)
+  where
+    (wlPart, _mAnchor) = WL.dropUrlAnchor raw

@@ -103,6 +103,15 @@ spec = do
         ResolvedNote nm -> path nm `shouldBe` "guide/neuron.md"
         other -> expectationFailure $ "Unexpected resolve result: " <> show other
 
+    it "ignores #anchor on the wikilink target (discussion #105)" $ do
+      -- MCP resolution agrees with the HTML renderer that "note#heading"
+      -- still resolves to "note"; the anchor is metadata about which
+      -- section the user is pointing at, not part of the note identity.
+      let Right res = resolveWikilink "guide/neuron#alpha-section" Nothing notebook
+      case res of
+        ResolvedNote nm -> path nm `shouldBe` "guide/neuron.md"
+        other -> expectationFailure $ "Unexpected resolve result: " <> show other
+
     it "reports missing when no candidate exists" $ do
       resolveWikilink "no-such-note" Nothing notebook `shouldBe` Right UnresolvedMissing
 
