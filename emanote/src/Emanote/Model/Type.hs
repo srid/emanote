@@ -45,6 +45,7 @@ import Optics.Core (Prism')
 import Optics.Operators ((%~), (.~), (^.))
 import Optics.TH (makeLenses)
 import Relude
+import Skylighting.Types (SyntaxMap)
 import Text.Pandoc.Scripting (ScriptingEngine)
 
 data Status = Status_Loading | Status_Ready
@@ -56,6 +57,7 @@ data ModelT encF = Model
   , _modelEmaCLIAction :: Ema.CLI.Action
   , _modelRoutePrism :: encF (Prism' FilePath SiteRoute)
   , _modelPandocRenderers :: EmanotePandocRenderers Model LMLRoute
+  , _modelSyntaxMap :: SyntaxMap
   -- ^ Dictates how exactly to render `Pandoc` to Heist nodes.
   , _modelScriptingEngine :: ScriptingEngine
   , _modelCompileTailwind :: Bool
@@ -120,8 +122,8 @@ modelPluginBaseDir :: ModelT f -> [FilePath]
 modelPluginBaseDir m =
   fst . locPath <$> Set.toAscList (m ^. modelLayers)
 
-emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> Bool -> UUID -> Stork.IndexVar -> ModelEma
-emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar =
+emptyModel :: Set Loc -> Ema.CLI.Action -> EmanotePandocRenderers Model LMLRoute -> ScriptingEngine -> Bool -> Bool -> SyntaxMap -> UUID -> Stork.IndexVar -> ModelEma
+emptyModel layers act ren scriptingEngine ctw allowBrokenLua syntaxMap instanceId storkVar =
   Model
     { _modelStatus = Status_Loading
     , _modelLayers = layers
@@ -130,6 +132,7 @@ emptyModel layers act ren scriptingEngine ctw allowBrokenLua instanceId storkVar
     , _modelPandocRenderers = ren
     , _modelScriptingEngine = scriptingEngine
     , _modelCompileTailwind = ctw
+    , _modelSyntaxMap = syntaxMap
     , _modelAllowBrokenLuaFilters = allowBrokenLua
     , _modelInstanceID = instanceId
     , -- Inject a placeholder `index.md` to account for the use case of emanote

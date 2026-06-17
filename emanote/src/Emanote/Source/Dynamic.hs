@@ -5,6 +5,7 @@ module Emanote.Source.Dynamic (
   emanoteSiteInput,
   EmanoteConfig (..),
   emanoteCompileTailwind,
+  emanoteSyntaxMap,
   emanoteConfigCli,
   emanoteConfigNoteFn,
   emanoteConfigPandocRenderers,
@@ -31,6 +32,7 @@ import Emanote.Source.Pattern qualified as Pattern
 import Optics.TH (makeLenses)
 import Paths_emanote qualified
 import Relude
+import Skylighting.Types (SyntaxMap)
 import System.UnionMount qualified as UM
 import Text.Pandoc.Lua (getEngine)
 import UnliftIO (MonadUnliftIO)
@@ -45,6 +47,7 @@ data EmanoteConfig = EmanoteConfig
   -- ^ How to render Pandoc to Heist HTML.
   , _emanoteCompileTailwind :: Bool
   -- ^ Whether to replace Tailwind2 CDN with a minimized Tailwind3 CSS file.
+  , _emanoteSyntaxMap :: SyntaxMap
   }
 
 {- | Make an Ema `Dynamic` for the Emanote model. The bulk of logic
@@ -70,6 +73,7 @@ emanoteSiteInput cliAct EmanoteConfig {..} = do
           scriptingEngine
           _emanoteCompileTailwind
           (CLI.allowBrokenLuaFilters _emanoteConfigCli)
+          _emanoteSyntaxMap
           instanceId
           storkIndex
   -- NOTE: Per-layer ignore patterns are loaded once at startup. Edits

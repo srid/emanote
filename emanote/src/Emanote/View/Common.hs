@@ -96,6 +96,7 @@ mkTemplateRenderCtx model r meta =
         Renderer.mkRenderCtxWithPandocRenderers
           pandocRenderers
           classRules
+          (model ^. M.modelSyntaxMap)
           model
           r
           renderFeatures
