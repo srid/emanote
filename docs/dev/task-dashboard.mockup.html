@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+  UI prototype for emanote #751 Phase 1 — task date badges on /-/tasks.
+  Standalone, self-contained (Tailwind Play CDN) so it renders via
+  htmlpreview straight from the branch. This is a look-and-feel mockup
+  for review, NOT the shipped markup — the real page is rendered by
+  templates/special/tasks.tpl + loops.js. Removed once the plan is approved.
+-->
+<html lang="en" class="">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>#751 Phase 1 — task date badges (mockup)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: { extend: { colors: { primary: {
+          50:'#eff6ff',100:'#dbeafe',300:'#93c5fd',500:'#3b82f6',
+          600:'#2563eb',700:'#1d4ed8',900:'#1e3a8a',950:'#172554' } } } },
+      };
+    </script>
+    <style> body { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; } </style>
+  </head>
+  <body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-6">
+    <div class="max-w-2xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-lg font-semibold tracking-tight">/-/tasks — Phase 1 mockup</h1>
+        <button id="toggle" class="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-700">
+          Toggle dark
+        </button>
+      </div>
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">
+        Today is pinned to <strong>2026-06-28</strong> for this mockup. Overdue =
+        red, due-today = amber, upcoming = neutral. With JS off, every badge falls
+        back to the neutral style and still shows the date.
+      </p>
+
+      <section class="mt-6 mb-8">
+        <header class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3 pb-2 border-b border-gray-100 dark:border-gray-800">
+          <a class="bg-primary-50/70 dark:bg-primary-950/50 text-primary-600 dark:text-primary-300 font-semibold tracking-tight px-1.5 py-0.5 rounded-sm" href="#">
+            Daily/2026-06-28
+          </a>
+          <ol class="text-xs text-gray-500 dark:text-gray-400 inline-flex flex-wrap items-center gap-x-1.5">
+            <li>Daily</li>
+          </ol>
+        </header>
+        <ul class="space-y-1.5">
+          <!-- overdue (due 2026-06-25 < today) -->
+          <li class="flex items-baseline gap-x-2 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 px-2 py-1">
+            <span class="text-gray-400 select-none">☐</span>
+            <span class="flex-1">Draft the release notes <span class="text-gray-400 dark:text-gray-500">#active</span></span>
+            <span data-due="2026-06-25" class="task-badge inline-flex items-center gap-x-1 text-xs font-medium px-1.5 py-0.5 rounded-sm tabular-nums whitespace-nowrap">
+              <span aria-hidden="true">📅</span><time datetime="2026-06-25">2026-06-25</time>
+            </span>
+          </li>
+          <!-- due today (2026-06-28) -->
+          <li class="flex items-baseline gap-x-2 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 px-2 py-1">
+            <span class="text-gray-400 select-none">☐</span>
+            <span class="flex-1">Send the monthly report <span class="text-gray-400 dark:text-gray-500">#active</span></span>
+            <span data-due="2026-06-28" class="task-badge inline-flex items-center gap-x-1 text-xs font-medium px-1.5 py-0.5 rounded-sm tabular-nums whitespace-nowrap">
+              <span aria-hidden="true">📅</span><time datetime="2026-06-28">2026-06-28</time>
+            </span>
+          </li>
+          <!-- upcoming due -->
+          <li class="flex items-baseline gap-x-2 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 px-2 py-1">
+            <span class="text-gray-400 select-none">☐</span>
+            <span class="flex-1">Book the venue <span class="text-gray-400 dark:text-gray-500">#waiting</span></span>
+            <span data-due="2026-07-21" class="task-badge inline-flex items-center gap-x-1 text-xs font-medium px-1.5 py-0.5 rounded-sm tabular-nums whitespace-nowrap">
+              <span aria-hidden="true">📅</span><time datetime="2026-07-21">2026-07-21</time>
+            </span>
+          </li>
+          <!-- scheduled (⏳) upcoming -->
+          <li class="flex items-baseline gap-x-2 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 px-2 py-1">
+            <span class="text-gray-400 select-none">☐</span>
+            <span class="flex-1">Follow up with the vendor</span>
+            <span data-scheduled="2026-12-01" class="task-badge inline-flex items-center gap-x-1 text-xs font-medium px-1.5 py-0.5 rounded-sm tabular-nums whitespace-nowrap">
+              <span aria-hidden="true">⏳</span><time datetime="2026-12-01">2026-12-01</time>
+            </span>
+          </li>
+          <!-- no date: unchanged from today -->
+          <li class="flex items-baseline gap-x-2 rounded-sm hover:bg-gray-50 dark:hover:bg-gray-900 px-2 py-1">
+            <span class="text-gray-400 select-none">☐</span>
+            <span class="flex-1">A task with no date at all</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <script type="module">
+      // Stand-in for loops.js. Real module imports { ready, onMorph } from
+      // '@emanote/morph' and uses the live browser clock; here we pin today
+      // so the mockup is stable. It reads data-due / data-scheduled (never
+      // re-parses the visible text) and swaps the badge class string —
+      // exactly the sidebar-calendar.js pattern.
+      const TODAY = '2026-06-28';
+      const NEUTRAL = ' text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-gray-800';
+      const TODAY_S  = ' text-amber-800 bg-amber-100 dark:text-amber-200 dark:bg-amber-900/40 font-semibold';
+      const OVERDUE  = ' text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/40 font-semibold';
+      const BASE = 'task-badge inline-flex items-center gap-x-1 text-xs px-1.5 py-0.5 rounded-sm tabular-nums whitespace-nowrap';
+      function paint() {
+        for (const el of document.querySelectorAll('.task-badge')) {
+          const iso = el.dataset.due || el.dataset.scheduled;
+          if (!iso) continue;
+          const state = iso < TODAY ? OVERDUE : iso === TODAY ? TODAY_S : NEUTRAL;
+          el.className = BASE + state;
+          el.dataset.state = iso < TODAY ? 'overdue' : iso === TODAY ? 'today' : 'upcoming';
+        }
+      }
+      paint();
+      document.getElementById('toggle').onclick = () =>
+        document.documentElement.classList.toggle('dark');
+    </script>
+  </body>
+</html>
