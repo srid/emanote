@@ -103,6 +103,26 @@ Volatility-based building blocks are reusable because they encapsulate one axis 
 
 Lowy observes that reuse increases downward through layers: infrastructure and data-access components should be highly reusable across contexts, business-logic orchestrators are reusable across multiple clients, and clients/UI are rarely reusable. If a lower-layer component is locked to a single consumer, the boundary likely tracks functionality rather than a genuine axis of change.
 
+**Single in-tree consumer is not disqualifying when the interface is stable under the encapsulated axis.** §5's bar is whether the interface would survive the volatility it claims to encapsulate — not whether it currently has more than one importer. A receptacle with one wire plugged in is still a receptacle. The published precedent: [`@kolu/surface`](https://kolu.dev/blog/surface-framework/) (and its peers `@kolu/solid-pierre`, the seven `@kolu/*` packages graduated from the [kolu#998 ralph loop](https://github.com/juspay/kolu/pull/998)) extracted from single-in-tree-consumer code. Each encapsulates a stable volatility axis its README names explicitly. The reuse-count check would have killed all of them. The interface-stability check admits them — correctly. The shape that disqualifies is *"the interface mirrors the implementation"*, not *"only one place imports it today"*.
+
+### 6.5 Package Coherence
+
+When the extraction crosses a *package* boundary (not just a module within the same package), the reviewer's job is not done after naming one volatility axis. The package as a whole must read as a **coherent library** — one concept, one socket. If the package ships three exports for three internal aspects of what should be one primitive, you have shipped *partial wiring*, not a receptacle.
+
+Run this check whenever the extraction adds a new published-shape package (`@org/foo`):
+
+1. **Read the package's exports list as if you were a new consumer.** Does it suggest one coherent thing or a topic-bundle?
+   - `@kolu/surface` exports `defineSurface` → one entry, one concept (typed reactive layer). Coherent.
+   - `@kolu/solid-xterm@0.1` (kolu#998 cycle 3–5) exported `createXtermWebgl`, `attachXtermStyleSync`, `createScrollLock` → three entries, three internal aspects of "xterm lifecycle" leaked through three exports. Not a coherent SolidJS adapter for xterm; a topic-bundle of three xterm-adjacent helpers. The fix shipped in `@kolu/solid-xterm@0.2.0` (commit [`4af1c647`](https://github.com/juspay/kolu/commit/4af1c647)) is one `createSolidXterm({ container, theme, fontSize, addons, webgl, scrollLock, ... })` primitive that hides WebGL / style / scroll as internal submodules.
+
+2. **Apply §5's atomic-verb rule at the package level.** §5 already warns that an interface exposing `OpenPort` / `ClosePort` / `AdjustBeam` alongside `ReadCode` mixes axes. A package exporting `createX_webgl` / `attachX_style` / `createX_scroll` does the same thing one altitude up: the package's surface is three operations on three axes, not one atomic abstraction.
+
+3. **The Surface test.** If the package's exports list does not resemble Surface's shape — *one entry point per coherent concept, with internal submodules hidden* — the package is shaped around the implementation, not around a stable contract. Even if each individual export passes §5 in isolation, the *package* fails the test.
+
+4. **The "consumer wires it together" smell.** If the only in-tree consumer imports several of the package's exports and then composes them by hand — the way `Terminal.tsx` had to wire `createXtermWebgl` + `attachXtermStyleSync` + `createScrollLock` + a bare `XTerm` constructor + 8 addon imports in v0.1 — the missing primitive is the composition. The package is shipping submodules and asking the consumer to be the integrator. Wrap them.
+
+**Action when this fires.** Re-extract behind a single primitive that owns the integrated lifecycle; demote the current exports to internal submodules of that primitive. The Lowy verdict is not "don't extract" — it's "extract one socket, not three wires."
+
 ### 7. The Almost-Expendable Test
 
 Lowy's litmus test for correct decomposition: when a change request arrives, the response should be *contemplative* — you think through how to adapt. If a module is *expensive* to change, it's too big (functional decomposition has coupled unrelated concerns). If a module is *expendable* (trivially thrown away), it's an unnecessary boundary. If a module is *almost expendable* — it encapsulates just enough to contain one axis of change, and replacing it is straightforward but not trivial — the decomposition is correct.
@@ -128,6 +148,8 @@ After completing all steps, **invoke `/fact-check` on your own output**. The fac
 - _"The module encapsulates [domain entity]"_ — domain entities are not volatility axes. What *about* the entity changes? Name the specific volatility or it's domain decomposition.
 - _"This is variable, so we should encapsulate it"_ — variable is not volatile. Can you state the risk in terms of likelihood and effect?
 - _"this is a new kind of [picker / dialog / scheduler / error type] for a new domain"_ — "new domain, same kind" duplicates the receptacle, not the volatility axis. Run the prior-encapsulation check from §1: the canonical pattern (command palette, generic dialog, single tagged error, etc.) is already the receptacle for this volatility. A parallel encapsulation is duplicated encapsulation, which maximizes change blast radius the same way functional decomposition does.
+- _"Fails Lowy's reuse test"_ (when based on import count alone) — reuse-count is a symptom, not a diagnosis. The diagnosis is §5's interface-stability check. An interface can have one importer today and a perfectly stable contract; ten importers and still be shaped around its implementation. Cite the axis, not the count.
+- _"Each export passes §5 in isolation"_ (without checking the package surface) — §5 fires per interface; §6.5 fires per package. Three coherent helpers in one package can collectively fail the package-coherence check if their union suggests one thing the package doesn't actually deliver. Read the exports list as a consumer would and ask "what library is this?" — if the answer is a topic-bundle ("xterm-adjacent helpers") rather than a primitive ("SolidJS adapter for xterm"), §6.5 applies.
 
 If fact-check finds issues, revise before presenting to the user.
 

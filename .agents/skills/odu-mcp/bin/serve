@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Launch the odu MCP server — odu's agent face. Resolves odu via Nix and runs
+# `odu mcp` in the current directory: the server dials `.ci/odu.sock` and
+# starts / attaches to runs in the cwd, so an MCP host launching this from the
+# repo root drives that repo's CI. Self-contained — no surrounding devshell
+# required. Requires flakes (`experimental-features = nix-command flakes`).
+#
+# Override knobs (env vars):
+#   ODU_FLAKE   — flake-ref for odu (default: github:juspay/odu). A consuming
+#                 repo that re-exports odu can point this at its pinned output,
+#                 e.g. ODU_FLAKE=.#odu
+set -euo pipefail
+exec nix run --accept-flake-config "${ODU_FLAKE:-github:juspay/odu}" -- mcp "$@"

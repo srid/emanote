@@ -2,7 +2,9 @@
   "mcpServers": {
     "chrome-devtools": {
       "command": "just",
-      "args": ["mcp-chrome-devtools"]
+      "args": [
+        "mcp-chrome-devtools"
+      ]
     },
     "emanote": {
       "type": "http",

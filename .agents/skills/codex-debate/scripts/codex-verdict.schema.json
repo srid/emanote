@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "approved": {
+      "type": "boolean",
+      "description": "true ONLY when every finding is resolved — all your feedback addressed at any severity (minor and nit included), not just blockers."
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph assessment of the change as it currently stands."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable identifier reused across rounds for the same issue, e.g. F1, F2."
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["blocking", "major", "minor", "nit"]
+          },
+          "location": {
+            "type": "string",
+            "description": "file:line (or file) the finding applies to."
+          },
+          "issue": {
+            "type": "string",
+            "description": "What is wrong and why it matters."
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Concrete fix or direction."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "resolved"],
+            "description": "resolved once the authoring engineer has adequately addressed it (by a fix or a dispute you accept); otherwise open."
+          }
+        },
+        "required": [
+          "id",
+          "severity",
+          "location",
+          "issue",
+          "suggestion",
+          "status"
+        ]
+      }
+    },
+    "responseToRebuttal": {
+      "type": "string",
+      "description": "Directly address the authoring engineer's disputes from the previous round: concede (and mark the finding resolved) or hold firm with specific reasoning. Empty string on the first round."
+    }
+  },
+  "required": ["approved", "summary", "findings", "responseToRebuttal"]
+}
