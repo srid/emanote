@@ -10,6 +10,7 @@ targets:
 dependencies:
   apm:
   - srid/agency#master
+  - juspay/kolu/agents
   - juspay/skills/skills/nix-justfile
   - juspay/skills/skills/nix-haskell
   - juspay/skills/skills/nix-for-dev

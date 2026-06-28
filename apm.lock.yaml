@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-05-25T16:12:06.762207+00:00'
+generated_at: '2026-06-28T21:16:47.520879+00:00'
 apm_version: 0.14.2
 dependencies:
 - repo_url: anthropics/skills
@@ -12,6 +12,28 @@ dependencies:
   - .agents/skills/frontend-design
   - .claude/skills/frontend-design
   content_hash: sha256:063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67
+- repo_url: juspay/kolu
+  host: github.com
+  resolved_commit: d313096ebac029a507a6013c60b42cfb9b5b0058
+  virtual_path: agents
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/be
+  - .agents/skills/be-review
+  - .agents/skills/codex-debate
+  - .agents/skills/kolu
+  - .agents/skills/lens-debate
+  - .agents/skills/perfection-review
+  - .agents/skills/surface
+  - .claude/skills/be
+  - .claude/skills/be-review
+  - .claude/skills/codex-debate
+  - .claude/skills/kolu
+  - .claude/skills/lens-debate
+  - .claude/skills/perfection-review
+  - .claude/skills/surface
+  content_hash: sha256:7ce5ffd10ce3d30f1bb6465c4cfb0ed269e16993ac8c3ff55c16ab9bb9594f79
 - repo_url: juspay/nix-chrome-devtools-mcp
   host: github.com
   resolved_commit: 407e0abef0d0e5c7bc401819d0a815b8c49c6674
@@ -62,7 +84,7 @@ dependencies:
   content_hash: sha256:0a2fe4264d3e462ca50c94c2ce2eac49f48ca2bd25c27c64a789d9cd7c20c854
 - repo_url: srid/agency
   host: github.com
-  resolved_commit: 16889eb67592c8448c8592e527953ce7272f625c
+  resolved_commit: 81455051ccca654c57ad6088838c85e7248ac159
   resolved_ref: master
   package_type: apm_package
   deployed_files:
@@ -91,6 +113,11 @@ dependencies:
   - .codex/agents/hickey.toml
   - .codex/agents/lowy.toml
   - .codex/hooks/agency/scripts/do-stop-guard.sh
+  - .github/agents/hickey.agent.md
+  - .github/agents/lowy.agent.md
+  - .github/hooks/agency-do-stop-guard.json
+  - .github/hooks/scripts/agency/scripts/do-stop-guard.sh
+  - .github/instructions/apm-sources.instructions.md
   deployed_file_hashes:
     .claude/agents/hickey.md: sha256:10d9a4350a85752dc6658af8e0efb3d8be41803a2b6c73464e3d5b7a840435ad
     .claude/agents/lowy.md: sha256:05aff7f6a91149a42c1fb9a3ca382a6f77bc39ac8a8d45436d443dd3349fb11e
@@ -99,20 +126,57 @@ dependencies:
     .codex/agents/hickey.toml: sha256:f508bacedcac2916cf1e29a11f2ac161483ffc2acf182c8f1c00c26d14073c00
     .codex/agents/lowy.toml: sha256:c57b72c43687ef255a4490f65984fe556325cb9847a5626e43c2a7addea049e4
     .codex/hooks/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
-  content_hash: sha256:5418127b67140ce58953d891bb9755a21fb6508f72f7453485b52358a77be324
+    .github/agents/hickey.agent.md: sha256:10d9a4350a85752dc6658af8e0efb3d8be41803a2b6c73464e3d5b7a840435ad
+    .github/agents/lowy.agent.md: sha256:05aff7f6a91149a42c1fb9a3ca382a6f77bc39ac8a8d45436d443dd3349fb11e
+    .github/hooks/agency-do-stop-guard.json: sha256:c8e18f0e32fa72f98fdc21a14fa9cee7ac6cc55e018cfc27398ade39a4d7d2c0
+    .github/hooks/scripts/agency/scripts/do-stop-guard.sh: sha256:cb033f86c15ffd3d09d8e4b74a61f55a70def4cc4131cc013b7368a2d23f3f33
+    .github/instructions/apm-sources.instructions.md: sha256:222dca77aa6f495d0684db2531a18b580b6ad869d05cf160e242fc78ea0ccac5
+  content_hash: sha256:e2144eca9c2932044bde96b74db5a546a2cec052f747be926abfc638ab684db9
+- repo_url: juspay/odu
+  host: github.com
+  resolved_commit: 721c66393fad9d82f7fe1766fdd2ffcd6f8cf579
+  depth: 2
+  resolved_by: juspay/kolu
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/ci
+  - .agents/skills/odu-mcp
+  - .claude/skills/ci
+  - .claude/skills/odu-mcp
+  content_hash: sha256:1b9686c051e74f620d8657acf432c87c1f4cb8fb0ba3c0bae3fa6d27f006a82a
+- repo_url: juspay/project-unknown
+  host: github.com
+  resolved_commit: 4b02d628a9ac3b42ad4ff31cf12d11c439fa7a4e
+  depth: 2
+  resolved_by: juspay/kolu
+  package_type: apm_package
+  deployed_files:
+  - .agents/skills/pu
+  - .claude/skills/pu
+  content_hash: sha256:ee915e29126ef6360924010ce35f88b71d271a08418a7e86bd7920703f295a5f
 mcp_servers:
 - chrome-devtools
+- emanote
 mcp_configs:
   chrome-devtools:
     name: chrome-devtools
     transport: stdio
     registry: false
     command: .agents/skills/nix-chrome-devtools-mcp/bin/serve
+  emanote:
+    name: emanote
+    transport: http
+    registry: false
+    url: http://localhost:8079/mcp
 local_deployed_files:
 - .agents/skills/dpella-mcp
 - .claude/rules/emanote-docs.md
 - .claude/rules/emanote.md
 - .claude/skills/dpella-mcp
+- .github/instructions/emanote-docs.instructions.md
+- .github/instructions/emanote.instructions.md
 local_deployed_file_hashes:
-  .claude/rules/emanote-docs.md: sha256:fd71b77f8bb981e4daefc262bf70cc0d506e997c1004e26753d110eef31b3d42
+  .claude/rules/emanote-docs.md: sha256:df2b1776b7c6f40c61322f90e45347d4a3b2de45d494470aa95aeca903c52c48
   .claude/rules/emanote.md: sha256:d555a8211505067127b5198ae717b673c7bdd8d16c21b1c8c911163ab2a9d58f
+  .github/instructions/emanote-docs.instructions.md: sha256:a99df8c50aaea1c2788714d601ad24c6003144bcf4a897c04baac55d3aea8fa5
+  .github/instructions/emanote.instructions.md: sha256:e9c47a94ef1f334962569b74085e0c6d446965063187a38888871d5eb2cd8aa1

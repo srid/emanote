@@ -10,7 +10,7 @@ You are now in **talk mode**. Have a conversation with the user — discuss idea
 
 ## Rules
 
-- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo. (Sole exception: `--html` mode below, which permits writing a single `.html` artifact to `$PWD`.)
+- **Do NOT edit or mutate the current repo.** No `Edit`, `Write`, `NotebookEdit` tool calls against workspace files, and no Bash commands that create, modify, or delete files in the checked-out repo. (Sole exception: `--html` mode below, which permits writing a single `.html` artifact to the repo root or an existing `docs/plans/`.)
 - **Do NOT run destructive repo commands.** No `git commit`, `git push`, `git add`, `git rm`, or anything else that mutates the current repo.
 - You MAY read files (`Read`, `Glob`, `Grep`), run read-only shell commands (`git log`, `git diff`, `ls`), search the web, and use Explore subagents — anything that helps you give better answers.
 - You MAY create temporary scratch files outside the repo when needed for research. Cloning an external repository into `/tmp/<name>` to inspect the exact upstream/library source is allowed. Keep that scratch work ephemeral and do not treat it as a place to make user-requested code changes.
@@ -114,14 +114,16 @@ Laconic mode trims the *output*, not the *investigation*. Do the same reading yo
 
 ## HTML artifact mode (`--html`)
 
-If `ARGUMENTS` contains `--html` (strip the flag before treating the rest as the topic), respond by writing a self-contained `.html` file to `$PWD` instead of replying in chat. Print only the file path — the HTML *is* the response.
+If `ARGUMENTS` contains `--html` (strip the flag before treating the rest as the topic), respond by writing a self-contained `.html` file instead of replying in chat. Print only the file path — the HTML *is* the response.
+
+- **Output directory**: write to `docs/plans/` if that directory already exists; otherwise write to the repo root (`$PWD`). Do not create `docs/plans/` — only use it when it's already there.
 
 The point is to pair with a runner that can render the artifact and let the user select text on it to queue comments back (e.g. [juspay/kolu#922](https://github.com/juspay/kolu/pull/922)). The user reads the rendered HTML, replies with their selected comments as text, you re-emit the updated HTML. The artifact stays the conversation's single source of truth.
 
-- **Filename**: stable for the session — `talk-<short-slug>.html` derived from the topic (lowercase, dashes, no spaces), or `talk.html` if there's no obvious slug. Follow-up turns update the **same** file; do not spawn a new artifact per turn.
+- **Filename**: stable for the session — `talk-<short-slug>.html` derived from the topic (lowercase, dashes, no spaces), or `talk.html` if there's no obvious slug, in the output directory above. Follow-up turns update the **same** file; do not spawn a new artifact per turn.
 - **File contents**: self-contained — embedded `<style>` block, no external assets, no JavaScript, no remote fonts. Plain semantic markup that renders legibly inside an iframe preview. Carry the same `file:line` citations you would put in a text response; the research/citation rules above are unchanged.
 - **UI prototypes for UI work**: if the topic involves UI changes, embed *rendered* HTML/CSS prototypes of the proposed components inside the artifact — not ASCII mockups, not prose descriptions of what the UI would look like. The runner renders the file, so the user sees the proposed UI alongside the rationale and can comment on the visual itself. Approximate the target visual style (colors, spacing, typography); the prototype is static (no JS), but layout and hierarchy should be representative enough to react to.
-- **Repo-write exception**: writing that one `.html` file in `$PWD` is the only mutation `--html` permits. No `Edit` on pre-existing repo files, no `git` writes, no destructive ops — the rest of talk mode's read-only posture holds.
+- **Repo-write exception**: writing that one `.html` file in the output directory above is the only mutation `--html` permits. No `Edit` on pre-existing repo files, no `git` writes, no destructive ops — the rest of talk mode's read-only posture holds.
 - **Follow-up loop**: when the user replies with comments (typically pasted from a select-and-queue surface as a Markdown list), re-emit the **full** revised HTML and print the file path again. Do not narrate the diff in chat; the updated artifact is the reply.
 - **Interaction with `hickey` + `lowy`**: when the artifact is a design sketch, run the reviewers as usual and fold their findings into the HTML body **before** printing the file path — same "post-review proposal, not original sketch + critique appended" rule as text-mode responses.
 - **Interaction with laconic mode**: laconic trims the HTML body the same way it would trim a text response — brief prose, no preamble, no needless bullets, no heading scaffolding unless the answer is genuinely structured. `--html` picks the medium; `--no-laconic` picks the verbosity. UI-prototype markup is the substance of the answer, not prose filler, so it's not what laconic trims.

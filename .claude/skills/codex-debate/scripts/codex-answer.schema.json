@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "answer": {
+      "type": "string",
+      "description": "Your complete, self-contained answer to the user's prompt as it stands THIS round. On a cross-check round this is your UPDATED unified answer, revised in light of the other assistant's answer."
+    },
+    "keyPoints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The core claims your answer rests on, one per item — the things the other side must agree with for there to be consensus."
+    },
+    "agreesWithOther": {
+      "type": "boolean",
+      "description": "true ONLY when the other assistant's latest answer is correct and complete and you have NO substantive disagreement left — your answers say the same thing. false on the first round (you haven't seen theirs yet) and whenever any objection below remains."
+    },
+    "objections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "point": {
+            "type": "string",
+            "description": "The specific claim in the OTHER assistant's answer you disagree with, or the gap you think it leaves."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why it's wrong or incomplete — cite file:line or concrete evidence when the prompt is about this repo."
+          }
+        },
+        "required": ["point", "reason"]
+      },
+      "description": "Your remaining disagreements with the other assistant's latest answer. Empty when you fully agree (agreesWithOther:true) and on round 1."
+    },
+    "changedMind": {
+      "type": "string",
+      "description": "What you revised this round because the other assistant convinced you, and why. Empty string on round 1 or when nothing changed."
+    }
+  },
+  "required": [
+    "answer",
+    "keyPoints",
+    "agreesWithOther",
+    "objections",
+    "changedMind"
+  ]
+}

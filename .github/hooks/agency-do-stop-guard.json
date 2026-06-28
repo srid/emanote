@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".github/hooks/scripts/agency/scripts/do-stop-guard.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

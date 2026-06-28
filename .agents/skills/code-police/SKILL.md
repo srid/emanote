@@ -3,11 +3,16 @@ name: code-police
 description: Review code for quality, simplicity, and common mistakes before declaring work complete.
 context: fork
 model: sonnet
+argument-hint: "[--no-elegance]"
 ---
 
 # Code Police
 
 Review the current changes (scoped to the current branch/PR) against the rules below **plus any additional rules from the project**. The three passes — rule checklist, fact-check, elegance — run as parallel sub-agents on fresh contexts; the implementer's main context just wrote the diff and is biased to rationalize it, so reviewing inline laundered violations through. Sub-agents start cold, which is the point. After they return, the orchestrator stitches their findings into a single summary.
+
+## Arguments
+
+`--no-elegance` — skip Pass 3 (elegance) entirely. Pass 1 (rules) and Pass 2 (fact-check) still run. Use this when the elegance pass would be redundant because `/simplify` already ran over this same tree — e.g. a caller that invokes `/simplify` standalone and then `/code-police`. Without it, Pass 3 re-invokes `/simplify` on an already-simplified tree, paying a full skill invocation (agent spawn, diff re-read, model tokens) to re-derive a near-guaranteed no-op. When the flag is set, report Pass 3 as `Elegance | – | Skipped (--no-elegance)` in the summary.
 
 ## Project rules
 
@@ -82,7 +87,7 @@ Spawn Pass 1 and Pass 2 as **two parallel sub-agents** via the harness's agent t
 
 Each sub-agent inherits no context from the implementer's main thread; the prompts below are self-contained and reference the rules-of-record by file path so a single source of truth stays in this skill.
 
-Pass 3 runs **after** Pass 1 and Pass 2 return. It applies fixes (via `/simplify`) and would race against Pass 1/2's grep-and-read work if run in parallel; sequential is the safer ordering. See "Pass 3: Elegance" below.
+Pass 3 runs **after** Pass 1 and Pass 2 return. It applies fixes (via `/simplify`) and would race against Pass 1/2's grep-and-read work if run in parallel; sequential is the safer ordering. See "Pass 3: Elegance" below. If `--no-elegance` was passed, skip Pass 3 — only Pass 1 and Pass 2 run.
 
 Once all three pass outputs are in hand, stitch them into the summary table in the **Output** section.
 
@@ -137,6 +142,8 @@ Sub-agent prompt:
 > For each finding: file, line, one-line risk, concrete fix. If no issues, say so — don't invent problems. Do not apply fixes; the orchestrator will route them.
 
 ### Pass 3: Elegance
+
+**Skip if `--no-elegance` was passed.** Do not run this pass and do not invoke `/simplify`; report `Elegance | – | Skipped (--no-elegance)` in the summary. The caller asserted `/simplify` already ran over this tree, so a second run is redundant. Pass 1 and Pass 2 are unaffected.
 
 **Skip on tiny diffs.** Run `git diff origin/HEAD...HEAD --shortstat` (or the appropriate base-branch ref). If the diff is **under 10 lines**, skip this pass and report `Elegance | 0 | Skipped (tiny diff)` in the summary. The elegance pass's three-lens fan-out has overhead that's disproportionate to a few-line change; Pass 1 and Pass 2 still run. If the diff exceeds the threshold, proceed below.
 
