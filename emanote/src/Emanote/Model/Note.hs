@@ -6,6 +6,7 @@
 module Emanote.Model.Note where
 
 import Commonmark.Extensions.WikiLink qualified as WL
+import Control.DeepSeq (NFData)
 import Control.Monad.Logger (MonadLogger)
 import Control.Monad.Writer (MonadWriter (tell), WriterT, runWriterT)
 import Data.Aeson qualified as Aeson
@@ -30,6 +31,7 @@ import Emanote.Route.Ext (FileType (Folder))
 import Emanote.Route.ModelRoute qualified as MR
 import Emanote.Route.R (R)
 import Emanote.Source.Loc (Loc)
+import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
 import Network.URI.Slug (Slug)
 import Optics.Core ((%), (.~))
 import Optics.TH (makeLenses)
@@ -39,11 +41,13 @@ import Text.Pandoc (readerExtensions, runPure)
 import Text.Pandoc.Builder qualified as B
 import Text.Pandoc.Definition (Pandoc (..))
 import Text.Pandoc.Extensions
+import Text.Pandoc.LinkContext qualified as LC
 import Text.Pandoc.Readers.Org (readOrg)
 import Text.Pandoc.Scripting (ScriptingEngine)
 import Text.Pandoc.Walk qualified as W
 import Text.Parsec qualified as P
 import Text.Printf (printf)
+import Text.Show qualified as Show
 
 data Feed = Feed
   { _feedEnable :: Bool
@@ -51,21 +55,87 @@ data Feed = Feed
   , _feedLimit :: Maybe Word
   }
   deriving stock (Eq, Ord, Show, Generic)
-  deriving anyclass (Aeson.ToJSON, Aeson.FromJSON)
+  deriving anyclass (Aeson.ToJSON, Aeson.FromJSON, NFData)
+
+{- | A Note keeps the raw markdown/org source text plus a handful of
+small, pre-extracted facts about it (title, frontmatter, outgoing link
+URLs, task-list items, …). '_noteDoc' is intentionally a *lazy* field
+populated with a closure that re-parses '_noteSourceText' on first
+access; Haskell's normal lazy-evaluation semantics then memoise the
+parsed Pandoc back into the field, so subsequent accesses (and embeds)
+pay no extra parse cost. The driving cost on a 4500-file notebook is
+that the in-memory Pandoc is ~16× the source bytes (#66); deferring the
+parse means notes that are never rendered never materialise their
+Pandoc, and the live memory floor drops to roughly the source size.
+
+For three categories the parse cannot be deferred and 'mkNoteWith' binds
+'_noteDoc' to an already-evaluated Pandoc:
+
+* notes with parse-time Lua filters — the filter pass runs in IO and
+  mutates the AST, so a pure re-parse would silently skip it;
+* synthetic notes constructed via 'mkEmptyNoteWith' (folder placeholders,
+  diagnostic banners) — they have no on-disk source to re-parse from;
+* notes that carried parse errors — 'mkNoteWith' prepends an error
+  banner Block which is not visible to the re-parse path.
+-}
+data NoteLink = NoteLink
+  { _nlUrl :: !Text
+  , _nlAttrs :: ![(Text, Text)]
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
+
+data NoteTask = NoteTask
+  { _ntChecked :: !Bool
+  , _ntDescription :: ![B.Inline]
+  }
+  deriving stock (Eq, Ord, Show, Generic)
+  deriving anyclass (Aeson.ToJSON, NFData)
 
 data Note = Note
   { _noteRoute :: R.LMLRoute
   , _noteSource :: Maybe (Loc, FilePath)
   -- ^ The layer from which this note came. Nothing if the note was auto-generated.
-  , _noteDoc :: Pandoc
+  , _noteSourceText :: !Text
+  -- ^ Raw source bytes (markdown or org). Empty for synthetic notes.
   , _noteMeta :: Aeson.Value
   , _notePandocFilterDeclarations :: NoteFilter.PandocFilterDeclarations
   , _noteTitle :: Tit.Title
   , _noteErrors :: [Text]
   , _noteFeed :: Maybe Feed
+  , _noteLinks :: ![NoteLink]
+  -- ^ URLs (with their HTML attributes) of every link found in the
+  -- parsed Pandoc, extracted once at parse time so 'noteRels' does not
+  -- need to re-walk the AST.
+  , _noteTaskList :: ![NoteTask]
+  -- ^ Task-list items found in the parsed Pandoc, extracted once at
+  -- parse time so the task index does not need the full AST.
+  , _noteDoc :: Pandoc
+  -- ^ The post-filter Pandoc. /Lazy on purpose/: the per-note value is
+  -- a closure over '_noteSourceText' that re-parses on first access and
+  -- memoises by Haskell's normal evaluation semantics. Until a renderer
+  -- forces this field, the Pandoc AST is not in memory — that is the
+  -- whole point of the (#66) optimisation. Notes that cannot be
+  -- re-parsed purely (Lua filters, synthetic notes, parse errors) bind
+  -- this field directly to the already-evaluated Pandoc so the first
+  -- access is free.
   }
-  deriving stock (Eq, Ord, Show, Generic)
+  deriving stock (Generic)
   deriving anyclass (Aeson.ToJSON)
+
+-- 'Eq' and 'Ord' for 'Note' must not force '_noteDoc'. IxSet stores
+-- 'Note' under an 'Ord' index, and a derived 'Ord' would compare the
+-- lazy Pandoc field — re-parsing on every insertion-time comparison
+-- defeats the deferred-parse design. Compare by route only; routes are
+-- already unique within the IxSet via @ixFun (one . _noteRoute)@.
+instance Eq Note where
+  a == b = _noteRoute a == _noteRoute b
+
+instance Ord Note where
+  compare a b = compare (_noteRoute a) (_noteRoute b)
+
+instance Show.Show Note where
+  show n = "Note { _noteRoute = " <> show (_noteRoute n) <> ", … }"
 
 newtype RAncestor = RAncestor {unRAncestor :: R 'R.Folder}
   deriving stock (Eq, Ord, Show, Generic)
@@ -336,25 +406,60 @@ ambiguousNoteURL urlPath rs =
 
 mkEmptyNoteWith :: R.LMLRoute -> [B.Block] -> Note
 mkEmptyNoteWith someR (Pandoc mempty -> doc) =
-  mkNoteWith someR Nothing doc meta mempty mempty
+  -- Synthetic notes have no on-disk source — pass an empty source text
+  -- and force 'mkNoteWith' to retain the Pandoc by reporting "needs
+  -- retention".
+  mkNoteWith someR Nothing mempty doc meta mempty mempty
   where
     meta = Aeson.Null
 
-mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Pandoc -> Aeson.Value -> NoteFilter.PandocFilterDeclarations -> [Text] -> Note
-mkNoteWith r src doc' meta filterDeclarations errs =
+mkNoteWith :: R.LMLRoute -> Maybe (Loc, FilePath) -> Text -> Pandoc -> Aeson.Value -> NoteFilter.PandocFilterDeclarations -> [Text] -> Note
+mkNoteWith r src sourceText doc' meta filterDeclarations errs =
   let (doc'', tit) = queryNoteTitle r doc' meta
       feed = queryNoteFeed meta
       doc = if null errs then doc'' else pandocPrepend (errorDiv "yaml" "Emanote Errors 😔" errs) doc''
-   in Note
-        { _noteRoute = r
-        , _noteSource = src
-        , _noteDoc = doc
-        , _noteMeta = meta
-        , _notePandocFilterDeclarations = filterDeclarations
-        , _noteTitle = tit
-        , _noteErrors = errs
-        , _noteFeed = feed
-        }
+      links = extractNoteLinks doc
+      tasks = extractNoteTasks doc
+      -- The deferred-parse path is only safe when the post-filter
+      -- Pandoc can be deterministically reproduced by re-parsing the
+      -- source text. That excludes:
+      --   * Lua-filter notes (filter pass runs in IO and mutates the AST),
+      --   * synthetic notes (no on-disk source to re-parse),
+      --   * notes that carried parse errors (an error banner Block has
+      --     been prepended onto 'doc' and is not visible to re-parse).
+      mustRetain =
+        needsLuaFilter filterDeclarations
+          || isNothing src
+          || not (null errs)
+      baseNote =
+        Note
+          { _noteRoute = r
+          , _noteSource = src
+          , _noteSourceText = sourceText
+          , _noteMeta = meta
+          , _notePandocFilterDeclarations = filterDeclarations
+          , _noteTitle = tit
+          , _noteErrors = errs
+          , _noteFeed = feed
+          , _noteLinks = links
+          , _noteTaskList = tasks
+          , _noteDoc = error "mkNoteWith: _noteDoc not bound"
+          }
+   in -- Branch *eagerly* on 'mustRetain' so each Note's '_noteDoc' field
+      -- references only one of {doc, deferredDoc}, never both. With an
+      -- @if mustRetain then doc else deferredDoc@ thunk the field would
+      -- close over both branches and the original 'doc' could never be
+      -- collected even on the deferred path — defeating (#66).
+      if mustRetain
+        then baseNote {_noteDoc = doc}
+        else
+          let deferredDoc = case r of
+                R.LMLRoute_Md _ ->
+                  let fp = maybe "" snd src
+                   in reparseMd r fp sourceText meta
+                R.LMLRoute_Org _ ->
+                  reparseOrg sourceText
+           in baseNote {_noteDoc = deferredDoc}
   where
     -- Prepend to block to the beginning of a Pandoc document (never before H1)
     pandocPrepend :: B.Block -> Pandoc -> Pandoc
@@ -364,6 +469,45 @@ mkNoteWith r src doc' meta filterDeclarations errs =
               h1 : prefix : rest
             _ -> prefix : blocks
        in Pandoc docMeta blocks'
+
+needsLuaFilter :: NoteFilter.PandocFilterDeclarations -> Bool
+needsLuaFilter d =
+  not (null (NoteFilter.pfdParseFilters d) && null (NoteFilter.pfdRenderHtmlFilters d))
+
+{- | Pure markdown re-parse, structurally identical to the no-Lua-filter
+path of 'parseNoteMarkdown'. Errors are silently swallowed because the
+error-carrying notes opt out of deferred parsing in 'mkNoteWith' and
+keep their already-evaluated Pandoc inline.
+-}
+reparseMd :: R.LMLRoute -> FilePath -> Text -> Aeson.Value -> Pandoc
+reparseMd r fp md meta =
+  case Markdown.parseMarkdown fp md of
+    Left _ -> mempty
+    Right (_frontmatter, doc') ->
+      let doc = preparePandoc doc'
+          -- Strip the H1 if the note's title came from it, matching the
+          -- shape of the originally-stored '_noteDoc' (see 'mkNoteWith').
+          (doc'', _tit) = queryNoteTitle r doc meta
+       in doc''
+
+reparseOrg :: Text -> Pandoc
+reparseOrg s =
+  case runPure $ readOrg readerOpts s of
+    Left _ -> mempty
+    Right doc -> preparePandoc doc
+  where
+    readerOpts = def {readerExtensions = extensionsFromList [Ext_auto_identifiers]}
+
+extractNoteLinks :: Pandoc -> [NoteLink]
+extractNoteLinks doc = do
+  (url, instances) <- Map.toList $ LC.queryLinksWithContext doc
+  (attrs, _ctx) <- reverse (toList instances)
+  pure (NoteLink url attrs)
+
+extractNoteTasks :: Pandoc -> [NoteTask]
+extractNoteTasks doc =
+  TaskList.queryTasks doc
+    <&> \(checked, inlines) -> NoteTask checked inlines
 
 {- | Shared builder for diagnostic banners. The @category@ is what
 'Diagnostic.errorBlock' turns into the @emanote:error:<category>@ variant
@@ -402,7 +546,7 @@ parseNote scriptingEngine pluginBaseDir r src@(_, fp) s = do
   let metaWithDateFromPath = case P.parse dateParser mempty (takeFileName fp) of
         Left _ -> pnsMeta
         Right date -> SData.modifyAeson (pure "date") (Just . fromMaybe (Aeson.String date)) pnsMeta
-  pure $ mkNoteWith r (Just src) pnsDoc metaWithDateFromPath pnsFilterDeclarations errs
+  pure $ mkNoteWith r (Just src) s pnsDoc metaWithDateFromPath pnsFilterDeclarations errs
   where
     dateParser = do
       year <- replicateM 4 P.digit
@@ -518,3 +662,5 @@ applyNoteMetaFilters doc r =
           )
 
 makeLenses ''Note
+makeLenses ''NoteLink
+makeLenses ''NoteTask

@@ -10,6 +10,7 @@ import Emanote.Model.Note qualified as Note
 import Emanote.Model.Note.Filter qualified as NoteFilter
 import Emanote.Route qualified as R
 import Emanote.Source.Loc (Loc (LocUser))
+import Optics.Operators ((^.))
 import Relude
 import System.Directory (createDirectoryIfMissing)
 import Test.Hspec
@@ -146,7 +147,7 @@ spec = do
         Note._noteErrors note `shouldBe` []
         NoteFilter.pfdParseFilters declarations `shouldBe` []
         NoteFilter.pfdRenderHtmlFilters declarations `shouldBe` ["filters/render.lua"]
-        pandocStrs (Note._noteDoc note) `shouldSatisfy` elem "EMANOTEORGRENDERFILTERTOKEN"
+        pandocStrs ((note ^. Note.noteDoc)) `shouldSatisfy` elem "EMANOTEORGRENDERFILTERTOKEN"
         (renderedDoc, renderErrors) <-
           runNoLoggingT
             $ runWriterT
@@ -155,7 +156,7 @@ spec = do
               [dir]
               declarations
               Aeson.Null
-              (Note._noteDoc note)
+              ((note ^. Note.noteDoc))
         renderErrors `shouldBe` []
         pandocStrs renderedDoc `shouldSatisfy` elem "RENDER_FILTER:ORG"
 

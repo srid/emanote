@@ -5,6 +5,7 @@ module Emanote.Source.Patch (
   ignorePatterns,
 ) where
 
+import Control.DeepSeq (deepseq)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
 import Data.ByteString qualified as BS
 import Data.List qualified as List
@@ -255,6 +256,14 @@ parseAndInsert noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   note <-
     N.parseNote (model ^. M.modelScriptingEngine) (M.modelPluginBaseDir model) r src (decodeUtf8 s)
+  -- For deferred-parse to release the post-filter Pandoc that
+  -- 'parseNote' produced, the pre-extracted summary fields must be
+  -- forced — otherwise the @extractNoteLinks doc@ / @extractNoteTasks
+  -- doc@ thunks would keep 'doc' alive after we drop the local 'note'
+  -- reference (#66). '_noteDoc' itself is left as a thunk so the
+  -- deferred re-parse only fires when a renderer actually walks the
+  -- AST.
+  (note ^. N.noteLinks) `deepseq` (note ^. N.noteTaskList) `deepseq` pure ()
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src (note ^. N.notePandocFilterDeclarations))

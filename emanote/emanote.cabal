@@ -113,6 +113,7 @@ common library-common
     , commonmark-wikilink    >=0.2
     , containers
     , data-default
+    , deepseq
     , deriving-aeson
     , directory
     , ema                    >=0.10.1

@@ -1,6 +1,5 @@
 module Emanote.Model.Link.RelSpec where
 
-import Commonmark.Extensions.WikiLink qualified as WL
 import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Link.Rel
 import Emanote.Model.Note qualified as MN
@@ -100,9 +99,12 @@ spec = do
       got === want
   describe "noteRels source order (issue #186)" $ do
     it "orders rels by source position, not by lexicographic Ord on context" $ do
-      -- 'Z' sorts last lexicographically but comes first in source; 'A'
-      -- sorts first but comes second. Without the srcPos tie-breaker,
-      -- Ord [Block] would yield A-then-Z; we want source order.
+      -- Both 'z' and 'a' link to the same target via the same URL, so
+      -- the two rels share (_relFrom, _relTo) and can only be ordered
+      -- by _relSrcPos. Source order is "Z first" then "A second", so
+      -- IxSet.toList should produce srcPos [0, 1] in that order.
+      -- (#66 dropped _relCtx — see Rel.noteRelCtxToTarget for the
+      -- on-demand backlinks-context recovery path.)
       let mkLink lbl = B.Link B.nullAttr [B.Str lbl] ("Foo.md", "")
           note =
             MN.mkEmptyNoteWith
@@ -110,11 +112,7 @@ spec = do
               [ B.Para [B.Str "Z first: ", mkLink "z"]
               , B.Para [B.Str "A second: ", mkLink "a"]
               ]
-          paraText rel = case _relCtx rel of
-            [B.Para is] -> WL.plainify is
-            other -> error $ "expected single-paragraph context, got " <> show other
-      (paraText <$> Ix.toList (noteRels note))
-        `shouldBe` ["Z first: z", "A second: a"]
+      (_relSrcPos <$> Ix.toList (noteRels note)) `shouldBe` [0, 1]
     it "does not collapse two identical-context links to the same target" $ do
       -- One paragraph mentions Foo.md twice. The two rels share
       -- (relFrom, relTo, relCtx); without srcPos in Ord, IxSet.fromList's

@@ -9,7 +9,6 @@ import Data.IxSet.Typed qualified as Ix
 import Emanote.Model.Note (Note)
 import Emanote.Model.Note qualified as N
 import Emanote.Route qualified as R
-import Heist.Extra.Splices.Pandoc.TaskList qualified as TaskList
 import Optics.Operators ((^.))
 import Optics.TH (makeLenses)
 import Relude
@@ -41,12 +40,13 @@ instance Indexable TaskIxs Task where
     ixList
       (ixFun $ one . _taskRoute)
 
+-- | Tasks for the note's index. Uses the pre-extracted '_noteTaskList'
+-- so the model builder never has to re-walk Pandoc (#66).
 noteTasks :: Note -> IxTask
 noteTasks note =
-  let taskListItems = TaskList.queryTasks $ note ^. N.noteDoc
-   in Ix.fromList
-        $ zip [1 ..] taskListItems
-        <&> \(idx, (checked, doc)) ->
-          Task (note ^. N.noteRoute) idx doc checked
+  Ix.fromList
+    $ zip [1 ..] (note ^. N.noteTaskList)
+    <&> \(idx, nt) ->
+      Task (note ^. N.noteRoute) idx (nt ^. N.ntDescription) (nt ^. N.ntChecked)
 
 makeLenses ''Task
