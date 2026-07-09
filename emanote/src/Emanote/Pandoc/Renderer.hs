@@ -23,6 +23,7 @@ import Heist.Extra.Splices.Pandoc qualified as Splices
 import Heist.Extra.Splices.Pandoc.Ctx qualified as Splices
 import Heist.Interpreted qualified as HI
 import Relude
+import Skylighting.Types (SyntaxMap)
 import Text.Pandoc.Definition qualified as B
 
 -- | Custom Heist renderer function for specific Pandoc AST nodes.
@@ -48,14 +49,16 @@ mkRenderCtxWithPandocRenderers ::
   (Monad m) =>
   PandocRenderers model route ->
   Map Text Text ->
+  SyntaxMap ->
   model ->
   route ->
   -- | Rendering feature selection (code highlighting, static math, …)
   Splices.RenderFeatures ->
   HeistT Identity m Splices.RenderCtx
-mkRenderCtxWithPandocRenderers nr classRules model x =
+mkRenderCtxWithPandocRenderers nr classRules syntaxMap model x =
   Splices.mkRenderCtx
     classRules
+    syntaxMap
     (\ctx -> dispatchBlock model nr ctx x)
     (\ctx -> dispatchInline model nr ctx x)
 

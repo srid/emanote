@@ -44,6 +44,7 @@ import Emanote.View.Tailwind (compileTailwindCss, generatedCssFile)
 import Emanote.View.Template qualified as View
 import Optics.Core ((.~), (^.))
 import Relude
+import Skylighting (defaultSyntaxMap)
 import System.FilePath ((</>))
 import UnliftIO.Async (race_)
 
@@ -73,6 +74,7 @@ defaultEmanoteConfig cli =
     , _emanoteConfigNoteFn = id
     , _emanoteConfigPandocRenderers = defaultEmanotePandocRenderers
     , _emanoteCompileTailwind = False
+    , _emanoteSyntaxMap = defaultSyntaxMap
     }
 
 run :: EmanoteConfig -> IO ()
