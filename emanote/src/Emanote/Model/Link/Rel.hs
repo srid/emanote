@@ -98,7 +98,33 @@ noteRels note =
             pure (target, ctx)
        in Ix.fromList $ zipWith mkRel [0 ..] links
       where
-        mkRel srcPos (target, ctx) = Rel (note ^. noteRoute) target srcPos ctx
+        -- Drop the per-Rel `[B.Block]` context at insert time and recover
+        -- it on demand at backlink-render time by re-walking the source
+        -- note's Pandoc (see 'noteRelCtxToTarget' / 'modelLookupBacklinks'
+        -- in @Emanote.Model.Graph@). The context is a chunk of Pandoc
+        -- Blocks per outgoing link; with thousands of notes and dozens of
+        -- outgoing links each, persisting it in @_modelRels@ dominates the
+        -- live-data overhead (#66). The on-demand walk is bounded by the
+        -- source note's own AST size — fast for any single backlinks page.
+        mkRel srcPos (target, _ctx) = Rel (note ^. noteRoute) target srcPos []
+
+{- | Re-extract the Pandoc-block contexts of every outgoing link in
+@sourceNote@ that points to @targetMR@. Used by the backlinks renderer
+to recover the context that 'noteRels' deliberately drops at insert
+time (#66). Cost is one walk of the source note's Pandoc per backlink
+expansion — paid only when the @targetMR@'s backlinks page is rendered.
+-}
+noteRelCtxToTarget :: ModelRoute -> Note -> [[B.Block]]
+noteRelCtxToTarget targetMR sourceNote =
+  let contextsByUrl = LC.queryLinksWithContext (sourceNote ^. noteDoc)
+      parentR = noteResolveLinkBase sourceNote
+      targets = unresolvedRelsTo targetMR
+   in do
+        (url, instances) <- Map.toList contextsByUrl
+        (attrs, ctx) <- reverse (toList instances)
+        target <- maybeToList $ fst <$> parseUnresolvedRelTarget parentR attrs url
+        guard $ target `elem` targets
+        pure ctx
 
 {- | All `UnresolvedRelTarget`s that could resolve to the given
 `ModelRoute`. Each `URTResource` form is built by re-parsing a URL

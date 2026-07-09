@@ -5,7 +5,9 @@ module Emanote.Source.Patch (
   ignorePatterns,
 ) where
 
+import Control.DeepSeq (deepseq)
 import Control.Monad.Logger (LoggingT (runLoggingT), MonadLogger, MonadLoggerIO (askLoggerIO))
+import Data.Aeson qualified as Aeson
 import Data.ByteString qualified as BS
 import Data.List qualified as List
 import Data.List.NonEmpty qualified as NEL
@@ -255,6 +257,9 @@ parseAndInsert noteF model refreshAction r src = do
   s <- readRefreshedFile refreshAction (locResolve src)
   note <-
     N.parseNote (model ^. M.modelScriptingEngine) (M.modelPluginBaseDir model) r src (decodeUtf8 s)
+  -- Force the parsed Pandoc and Aeson Value so per-file parser closures
+  -- can be released as we stream files into the model (#66).
+  note ^. N.noteDoc `deepseq` (note ^. N.noteMeta :: Aeson.Value) `deepseq` pure ()
   pure
     $ M.modelInsertNote (noteF note)
     >>> (modelSourceDependencies %~ SDeps.setLuaDeps r src (note ^. N.notePandocFilterDeclarations))

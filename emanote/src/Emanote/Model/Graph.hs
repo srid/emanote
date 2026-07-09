@@ -3,7 +3,6 @@ module Emanote.Model.Graph where
 import Commonmark.Extensions.WikiLink qualified as WL
 import Data.IxSet.Typed ((@+), (@=))
 import Data.IxSet.Typed qualified as Ix
-import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Data.Tree (Forest, Tree (Node))
 import Emanote.Model.Calendar qualified as Calendar
@@ -12,7 +11,7 @@ import Emanote.Model.Link.Resolve qualified as Resolve
 import Emanote.Model.Meta (lookupRouteMeta)
 import Emanote.Model.Note qualified as MN
 import Emanote.Model.Note qualified as N
-import Emanote.Model.Type (Model, modelIndexRoute, modelNotes, modelRels, parentLmlRoute)
+import Emanote.Model.Type (Model, modelIndexRoute, modelLookupNoteByRoute', modelNotes, modelRels, parentLmlRoute)
 import Emanote.Route qualified as R
 import Emanote.Route.SiteRoute qualified as SR
 import Optics.Operators as Lens ((^.))
@@ -176,20 +175,24 @@ lookupNoteByWikiLink model currentRoute wl = do
 modelLookupBacklinks :: R.LMLRoute -> Model -> [(R.LMLRoute, NonEmpty [B.Block])]
 modelLookupBacklinks r model =
   sortOn (Calendar.backlinkSortKey model . fst)
-    $ groupNE
+    $ mapMaybe withCtx
+    $ groupBySource
     $ backlinkRels r model
-    <&> \rel ->
-      (rel ^. Rel.relFrom, rel ^. Rel.relCtx)
   where
-    groupNE :: forall a b. (Ord a) => [(a, b)] -> [(a, NonEmpty b)]
-    groupNE =
-      Map.toList . foldl' f Map.empty
-      where
-        f :: Map a (NonEmpty b) -> (a, b) -> Map a (NonEmpty b)
-        f m (x, y) =
-          case Map.lookup x m of
-            Nothing -> Map.insert x (one y) m
-            Just ys -> Map.insert x (ys <> one y) m
+    -- Group backlink-rels by their source route. Context blocks are no
+    -- longer carried on each Rel (#66) — instead they are recovered once
+    -- per source note by re-walking the source's Pandoc, which is cheap
+    -- (one note's AST) compared to retaining contexts in _modelRels for
+    -- every link in the entire notebook.
+    groupBySource :: [Rel.Rel] -> [R.LMLRoute]
+    groupBySource = ordNub . fmap (^. Rel.relFrom)
+    targetMR :: R.ModelRoute
+    targetMR = R.ModelRoute_LML R.LMLView_Html r
+    withCtx :: R.LMLRoute -> Maybe (R.LMLRoute, NonEmpty [B.Block])
+    withCtx from = do
+      sourceNote <- modelLookupNoteByRoute' from model
+      ctxs <- nonEmpty $ Rel.noteRelCtxToTarget targetMR sourceNote
+      pure (from, ctxs)
 
 -- | Rels pointing *to* this route
 backlinkRels :: R.LMLRoute -> Model -> [Rel.Rel]
