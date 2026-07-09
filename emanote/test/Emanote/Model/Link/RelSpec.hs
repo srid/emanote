@@ -98,6 +98,19 @@ spec = do
                        ]
                 )
       got === want
+  describe "parseUnresolvedRelTarget anchors (discussion #105)" $ do
+    let wlAttrs = [("data-wikilink-type", "WikiLinkNormal")]
+    it "wikilink without anchor → no anchor returned" . hedgehog $ do
+      let manc = snd =<< parseUnresolvedRelTarget Nothing wlAttrs "note"
+      manc === Nothing
+    it "wikilink with anchor → anchor returned alongside target" . hedgehog $ do
+      let res = parseUnresolvedRelTarget Nothing wlAttrs "note#heading"
+          manc = WL.anchorSuffix . snd <$> res
+      manc === Just "#heading"
+    it "regular link with anchor → anchor returned alongside resource" . hedgehog $ do
+      let res = parseUnresolvedRelTarget Nothing [] "guide#section"
+          manc = WL.anchorSuffix . snd <$> res
+      manc === Just "#section"
   describe "noteRels source order (issue #186)" $ do
     it "orders rels by source position, not by lexicographic Ord on context" $ do
       -- 'Z' sorts last lexicographically but comes first in source; 'A'

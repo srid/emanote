@@ -16,7 +16,9 @@ A wiki-link can resolve to a [[folder-note|folder note]] — a `foo.md` placed n
 
 ## Anchors
 
-Wiki-links [do not yet](https://github.com/srid/emanote/discussions/105) support anchor links. Regular Markdown links do — for example, [example link](./markdown.md#lists).
+Append `#heading-id` to a wiki-link to jump to a specific heading on the target page — e.g. `[[markdown#wikilink]]` renders as [[markdown#wikilink]] and lands on the Wiki Links section of [[markdown]]. The fragment matches Pandoc's auto-generated heading id (the slugified, lowercased form), the same as regular Markdown anchor links. A heading carrying a Pandoc `{#custom-id}` attribute uses that custom id instead of the auto-slug, so the wiki-link must spell it the same way. Custom titles still work: `[[markdown#wikilink|jump to wiki-links]]` renders as [[markdown#wikilink|jump to wiki-links]].
+
+Same-file anchor wiki-links (`[[#heading]]`) are not yet supported — use the regular Markdown form `[heading](#heading)` for now.
 
 ## Regular Markdown note links
 

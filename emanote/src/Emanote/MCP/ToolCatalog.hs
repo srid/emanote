@@ -31,7 +31,6 @@ import Emanote.Model.Note qualified as N
 import Emanote.Model.StaticFile qualified as SF
 import Emanote.Model.Title qualified as Tit
 import Emanote.Route qualified as R
-import Network.URI.Slug qualified as Slug
 import Optics.Operators ((^.))
 import Relude
 
@@ -145,7 +144,9 @@ the notebook index when unspecified.
 -}
 resolveWikilink :: Text -> Maybe FilePath -> Model -> Either Text ResolveResult
 resolveWikilink wlText mFromPath model = do
-  wl <- maybeToRight ("Not a valid wikilink: " <> wlText) (parseWikiLinkText wlText)
+  -- Discard the anchor: MCP's resolve_wikilink answers "which note?", not
+  -- "which heading on that note?". Anchor handling stays in the HTML renderer.
+  (wl, _mAnchor) <- maybeToRight ("Not a valid wikilink: " <> wlText) (WL.parseWikiLinkUrl wlText)
   fromR <- case mFromPath of
     Nothing -> Right (M.modelIndexRoute model)
     Just p -> maybeToRight ("Not a recognised note path: " <> toText p) (R.mkLMLRouteFromMdOrOrgFilePath p)
@@ -159,13 +160,3 @@ resolveWikilink wlText mFromPath model = do
       Left (_, note) -> Left (noteMatchOf note)
       Right sf -> Right (staticFilePath sf)
     staticFilePath sf = toText $ R.encodeRoute (sf ^. SF.staticFileRoute)
-
--- ---------------------------------------------------------------------------
--- Internal helpers
--- ---------------------------------------------------------------------------
-
--- | Parse a slash-separated wikilink target (e.g. "foo/bar") into a 'WL.WikiLink'.
-parseWikiLinkText :: Text -> Maybe WL.WikiLink
-parseWikiLinkText s
-  | T.null s = Nothing
-  | otherwise = viaNonEmpty WL.mkWikiLinkFromSlugs (Slug.decodeSlug <$> T.splitOn "/" s)
