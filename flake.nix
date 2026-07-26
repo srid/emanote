@@ -4,44 +4,60 @@
     extra-substituters = "https://cache.nixos.asia/oss";
     extra-trusted-public-keys = "oss:KO872wNJkCDgmGN3xy9dT89WAhvv13EiKncTtHDItVU=";
   };
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    # Independent pin tracking unstable HEAD, used by tests/shell.nix
-    # for playwright-driver. Decoupled from `nixpkgs` so the Haskell
-    # build's pin and the Playwright pin update on different cadences.
-    nixpkgs-latest.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-    haskell-flake.url = "github:srid/haskell-flake";
-    fourmolu-nix.url = "github:jedimahdi/fourmolu-nix";
-    git-hooks.url = "github:bmrips/git-hooks.nix";
-    git-hooks.flake = false;
-    nixos-unified.url = "github:srid/nixos-unified";
 
-    # These are not (necessarily) upstreamed to nixpkgs, yet.
-    ema.url = "github:srid/ema";
-    ema.flake = false;
-    lvar.url = "github:srid/lvar/0.2.0.0";
-    lvar.flake = false;
-    heist-extra.url = "github:srid/heist-extra";
-    heist-extra.flake = false;
-    unionmount.url = "github:srid/unionmount";
-    unionmount.flake = false;
-    commonmark-simple.url = "github:srid/commonmark-simple/0.2.0.0";
-    commonmark-simple.flake = false;
-    commonmark-wikilink.url = "github:srid/commonmark-wikilink/master";
-    commonmark-wikilink.flake = false;
+  # Keep this user-facing flake input-free. Nix verifies every flake input on
+  # each invocation; the same revisions are pinned by npins and consumed through
+  # the standalone libraries exposed by haskell-flake and the development tools.
+  outputs = { self }:
+    let
+      sources = import ./npins;
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      eachSystem = f: builtins.listToAttrs (map
+        (system: {
+          name = system;
+          value = f system;
+        })
+        systems);
+      systemOutputs = eachSystem (system: import ./nix/system.nix {
+        inherit sources system;
+        root = ./.;
+      });
+      outputFor = name: builtins.mapAttrs (_: output: output.${name}) systemOutputs;
+    in
+    {
+      packages = outputFor "packages";
+      apps = outputFor "apps";
+      devShells = outputFor "devShells";
+      checks = outputFor "checks";
 
-    emanote-template.url = "github:srid/emanote-template";
-    emanote-template.flake = false;
+      homeManagerModule = { lib, pkgs, ... }: {
+        imports = [ ./nix/modules/home/emanote.nix ];
+        services.emanote.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      };
+      flakeModule = ./nix/modules/flake-parts/flake-module;
+      templates.default = {
+        description = "A simple flake.nix template for emanote notebooks";
+        path = builtins.path {
+          name = "emanote-template";
+          path = sources.emanote-template;
+          filter = path: _: baseNameOf path == "flake.nix";
+        };
+      };
 
-    # dpella/mcp is newer on GitHub than in nixpkgs' all-cabal-hashes,
-    # so pin the source directly. mcp-server/ and mcp-types/ are subdirs.
-    dpella-mcp.url = "github:dpella/mcp/52d13472d23ec11b9f6109f0fbf5159e9fda93da";
-    dpella-mcp.flake = false;
-    dpella-jsonrpc.url = "github:dpella/jsonrpc/0a708eb6c2744e1d69822d1cb90e9e352455a51b";
-    dpella-jsonrpc.flake = false;
-  };
-  outputs = inputs:
-    inputs.nixos-unified.lib.mkFlake { inherit inputs; root = ./.; };
+      # Retain the Omnix CI contract previously declared by the flake-parts
+      # small-closure module. Its system list is intentionally empty today.
+      om.ci.default.emanote = {
+        dir = ".";
+        steps.custom.closure-size = {
+          type = "app";
+          name = "check-closure-size";
+          systems = [ ];
+        };
+      };
+    };
 }

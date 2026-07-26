@@ -1,5 +1,6 @@
 notebook := "../docs"
 nix_shell := if env('IN_NIX_SHELL', '') != '' { '' } else { 'nix develop -c' }
+nix_fmt_shell := 'nix develop .#fmt -c'
 
 # List available recipes
 default:
@@ -16,7 +17,7 @@ repl *ARGS:
 
 # Autoformat the project tree
 fmt:
-    {{nix_shell}} pre-commit run --all-files
+    {{nix_fmt_shell}} pre-commit run --all-files
 
 # Run the app using ghcid (with auto-reload / recompile)
 # To run against a custom notebook:

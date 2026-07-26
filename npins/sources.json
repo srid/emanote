@@ -1,0 +1,189 @@
+{
+  "pins": {
+    "commonmark-simple": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-simple"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "81dc7a66b2490a701bfc87e6e892307665e6336e",
+      "url": "https://github.com/srid/commonmark-simple/archive/81dc7a66b2490a701bfc87e6e892307665e6336e.tar.gz",
+      "hash": "sha256-2WE5SjwgwjKdsHxDRfQIb2WRrVYoNPiCIyG4HZd8Znk=",
+      "frozen": true
+    },
+    "commonmark-wikilink": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "commonmark-wikilink"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "e47ba496ceaf68ec119e56eb22670ae017b35a42",
+      "url": "https://github.com/srid/commonmark-wikilink/archive/e47ba496ceaf68ec119e56eb22670ae017b35a42.tar.gz",
+      "hash": "sha256-dxjsU2SGG2txShwdXCl18ND18Y5Qbqt3J/FlrKhrkp4="
+    },
+    "dpella-jsonrpc": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "dpella",
+        "repo": "jsonrpc"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "0a708eb6c2744e1d69822d1cb90e9e352455a51b",
+      "url": "https://github.com/dpella/jsonrpc/archive/0a708eb6c2744e1d69822d1cb90e9e352455a51b.tar.gz",
+      "hash": "sha256-gdBzrXo/tm9Xcs35yYiZkf9OI3S/FEV/5eGY183ywm4="
+    },
+    "dpella-mcp": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "dpella",
+        "repo": "mcp"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "52d13472d23ec11b9f6109f0fbf5159e9fda93da",
+      "url": "https://github.com/dpella/mcp/archive/52d13472d23ec11b9f6109f0fbf5159e9fda93da.tar.gz",
+      "hash": "sha256-wfh76/wO6j5JCIB++vfZn4LaFz1KAdy7hBjaFIpW5ZI="
+    },
+    "ema": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "ema"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "87da4f3c678b78bc3ee96225910a3932b3e8b6f9",
+      "url": "https://github.com/srid/ema/archive/87da4f3c678b78bc3ee96225910a3932b3e8b6f9.tar.gz",
+      "hash": "sha256-bzypHo+Z/fLJRK1hTEuxCzK/ybxJixDrfML8M6cfDtk="
+    },
+    "emanote-template": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "emanote-template"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "1475b182fc136fc5da3a3b3e2b9be90795af19bb",
+      "url": "https://github.com/srid/emanote-template/archive/1475b182fc136fc5da3a3b3e2b9be90795af19bb.tar.gz",
+      "hash": "sha256-cLL9ylGe1OoN/KSX7+FRW3j8rm5iPTCleOJGSdOfdE0="
+    },
+    "fourmolu-nix": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "jedimahdi",
+        "repo": "fourmolu-nix"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b",
+      "url": "https://github.com/jedimahdi/fourmolu-nix/archive/717f5a91b0d7b97b1be7ecc3a0fd42d37ffe1c9b.tar.gz",
+      "hash": "sha256-tCFzZQJicDdYjnuJiNK4hiiRAH7c2wQzMhOCdUMbVKE="
+    },
+    "git-hooks": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "bmrips",
+        "repo": "git-hooks.nix"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "2749fc9197fd12231746ef685225eaf85fe087fd",
+      "url": "https://github.com/bmrips/git-hooks.nix/archive/2749fc9197fd12231746ef685225eaf85fe087fd.tar.gz",
+      "hash": "sha256-KVgK2PB1h5RNhHJzGn090XcW1i9Mq0FVh6qTVKsg2RU="
+    },
+    "haskell-flake": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "haskell-flake"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "f52ac89b2232dd50e5d1110416ebc5bbb09265bd",
+      "url": "https://github.com/srid/haskell-flake/archive/f52ac89b2232dd50e5d1110416ebc5bbb09265bd.tar.gz",
+      "hash": "sha256-Na95Y2awqZsLhFNfBNbLj0hk4zyE3eKUROB2o9Qdqi8="
+    },
+    "heist-extra": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "heist-extra"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "85c433921629d0de9374bc5deaa866ec830748c2",
+      "url": "https://github.com/srid/heist-extra/archive/85c433921629d0de9374bc5deaa866ec830748c2.tar.gz",
+      "hash": "sha256-YefkrB6jip7AV9ssRLngjSbp9xHE/xcSgfQMzDjpga0="
+    },
+    "lvar": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "lvar"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "cd110d4823ee7b8bbbf115a47c79bc304c3309cd",
+      "url": "https://github.com/srid/lvar/archive/cd110d4823ee7b8bbbf115a47c79bc304c3309cd.tar.gz",
+      "hash": "sha256-Uwg5s0SlxLp83bXHA+6TIQV+L+lu8lwMpBdNuiuk7hg=",
+      "frozen": true
+    },
+    "nixpkgs": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nixos",
+        "repo": "nixpkgs"
+      },
+      "branch": "nixpkgs-unstable",
+      "submodules": false,
+      "revision": "6b4955211758ba47fac850c040a27f23b9b4008f",
+      "url": "https://github.com/nixos/nixpkgs/archive/6b4955211758ba47fac850c040a27f23b9b4008f.tar.gz",
+      "hash": "sha256-dPALCtmik9Wr14MGqVXm+OQcv7vhPBXcWNIOThGnB/Q="
+    },
+    "nixpkgs-latest": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nixos",
+        "repo": "nixpkgs"
+      },
+      "branch": "nixpkgs-unstable",
+      "submodules": false,
+      "revision": "01fbdeef22b76df85ea168fbfe1bfd9e63681b30",
+      "url": "https://github.com/nixos/nixpkgs/archive/01fbdeef22b76df85ea168fbfe1bfd9e63681b30.tar.gz",
+      "hash": "sha256-GMSVw35Q+294GlrTUKlx087E31z7KurReQ1YHSKp5iw="
+    },
+    "unionmount": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "srid",
+        "repo": "unionmount"
+      },
+      "branch": "master",
+      "submodules": false,
+      "revision": "7b631ebe44d1b9e3e6bc39c9acb97645ddf8b9ba",
+      "url": "https://github.com/srid/unionmount/archive/7b631ebe44d1b9e3e6bc39c9acb97645ddf8b9ba.tar.gz",
+      "hash": "sha256-SyJUttW4blD+1OW8yCMWndN1OxVP/pSJRmboIE9bQDM="
+    }
+  },
+  "version": 7
+}
