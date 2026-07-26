@@ -5,26 +5,17 @@
 # `npx playwright install --with-deps` (which shells out to
 # `sudo apt-get`) cannot work.
 #
-# nixpkgs is read from the parent flake's `nixpkgs-latest` input —
-# kept independent from the main `nixpkgs` input (which the Haskell
+# nixpkgs is read from the parent project's `nixpkgs-latest` npins source —
+# kept independent from the main `nixpkgs` source (which the Haskell
 # build pins) so the Playwright pin can move on its own cadence. The
 # constraint: this rev's `playwright-driver` version must match the
 # `playwright` version in `tests/package.json`. Diverging the two
 # raises "browser revision X not found at <PLAYWRIGHT_BROWSERS_PATH>"
-# at launch — bump both together via `nix flake update nixpkgs-latest`
+# at launch — bump both together via `npins update nixpkgs-latest`
 # plus a matching npm bump.
 let
-  lock = builtins.fromJSON (builtins.readFile ../flake.lock);
-  nixpkgsLocked = lock.nodes.nixpkgs-latest.locked;
-  pkgs = import
-    (builtins.fetchTree {
-      type = "github";
-      owner = nixpkgsLocked.owner;
-      repo = nixpkgsLocked.repo;
-      rev = nixpkgsLocked.rev;
-      narHash = nixpkgsLocked.narHash;
-    })
-    { };
+  sources = import ../npins;
+  pkgs = import sources.nixpkgs-latest { };
 in
 pkgs.mkShell {
   packages = [ pkgs.nodejs ];
